@@ -1,0 +1,602 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>CREATE OPERATOR CLASS</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="CREATE OPERATOR"
+HREF="sql-createoperator.html"><LINK
+REL="NEXT"
+TITLE="CREATE OPERATOR FAMILY"
+HREF="sql-createopfamily.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="CREATE OPERATOR"
+HREF="sql-createoperator.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="CREATE OPERATOR FAMILY"
+HREF="sql-createopfamily.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-CREATEOPCLASS"
+></A
+>CREATE OPERATOR CLASS</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN74574"
+></A
+><H2
+>Название</H2
+>CREATE OPERATOR CLASS&nbsp;--&nbsp;создать класс операторов</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN74577"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>CREATE OPERATOR CLASS <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> [ DEFAULT ] FOR TYPE <TT
+CLASS="REPLACEABLE"
+><I
+>тип_данных</I
+></TT
+>
+  USING <TT
+CLASS="REPLACEABLE"
+><I
+>метод_индекса</I
+></TT
+> [ FAMILY <TT
+CLASS="REPLACEABLE"
+><I
+>имя_семейства</I
+></TT
+> ] AS
+  {  OPERATOR <TT
+CLASS="REPLACEABLE"
+><I
+>номер_стратегии</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>имя_оператора</I
+></TT
+> [ ( <TT
+CLASS="REPLACEABLE"
+><I
+>тип_операнда</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>тип_операнда</I
+></TT
+> ) ] [ FOR SEARCH | FOR ORDER BY <TT
+CLASS="REPLACEABLE"
+><I
+>семейство_сортировки</I
+></TT
+> ]
+   | FUNCTION <TT
+CLASS="REPLACEABLE"
+><I
+>номер_опорной_функции</I
+></TT
+> [ ( <TT
+CLASS="REPLACEABLE"
+><I
+>тип_операнда</I
+></TT
+> [ , <TT
+CLASS="REPLACEABLE"
+><I
+>тип_операнда</I
+></TT
+> ] ) ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_функции</I
+></TT
+> ( <TT
+CLASS="REPLACEABLE"
+><I
+>тип_аргумента</I
+></TT
+> [, ...] )
+   | STORAGE <TT
+CLASS="REPLACEABLE"
+><I
+>тип_хранения</I
+></TT
+>
+  } [, ... ]</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN74594"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>CREATE OPERATOR CLASS</TT
+> создаёт класс операторов. Класс операторов устанавливает, как данный тип будет использоваться в индексе, определяя, какие операторы исполняют конкретные роли или <SPAN
+CLASS="QUOTE"
+>"стратегии"</SPAN
+> для этого типа данных и метода индекса. Также класс операторов определяет вспомогательные процедуры, которые будет задействовать метод индекса в случае выбора данного класса для колонки индекса. Все операторы и функции, используемые классом операторов, должны существовать до создания этого класса.</P
+><P
+>Если указывается имя схемы, класс операторов создаётся в указанной схеме, в противном случае — в текущей. Два класса операторов в одной схеме могут иметь одинаковые имена, только если они предназначены для разных методов индекса.</P
+><P
+>Владельцем класса операторов становится пользователь, создавший его. В настоящее время создавать классы операторов могут только суперпользователи. (Это ограничение введено потому, что ошибочное определение класса может вызвать нарушения или даже сбой в работе сервера.)</P
+><P
+><TT
+CLASS="COMMAND"
+>CREATE OPERATOR CLASS</TT
+> в настоящее время не проверяет, включает ли определение класса операторов все операторы и функции, требуемые для метода индекса, и образуют ли они целостный набор. Ответственность за правильность определения класса операторов лежит на пользователе.</P
+><P
+>Связанные классы операторов могут быть сгруппированы в <I
+CLASS="FIRSTTERM"
+>семейства операторов</I
+>. Чтобы поместить класс в существующее семейство, добавьте параметр <TT
+CLASS="LITERAL"
+>FAMILY</TT
+> в <TT
+CLASS="COMMAND"
+>CREATE OPERATOR CLASS</TT
+>. Без этого параметра новый класс помещается в семейство, имеющее то же имя, что и класс (если такое семейство не существует, оно создаётся).</P
+><P
+>За дополнительными сведениями обратитесь к <A
+HREF="xindex.html"
+>Разделу 35.14</A
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN74609"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></DT
+><DD
+><P
+>Имя создаваемого класса операторов, возможно, дополненное схемой.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>DEFAULT</TT
+></DT
+><DD
+><P
+>Если присутствует это указание, класс операторов становится классом по умолчанию для своего типа данных. Для определённого типа данных и метода индекса можно определить не больше одного класса операторов по умолчанию.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>тип_данных</I
+></TT
+></DT
+><DD
+><P
+>Тип данных колонки, для которого предназначен этот класс операторов.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>метод_индекса</I
+></TT
+></DT
+><DD
+><P
+>Имя индексного метода, для которого предназначен этот класс операторов.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_семейства</I
+></TT
+></DT
+><DD
+><P
+>Имя существующего семейства операторов, в которое будет добавлен этот класс. Если не указано, подразумевается семейство с тем же именем, что и класс (если такое семейство не существует, оно создаётся).</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>номер_стратегии</I
+></TT
+></DT
+><DD
+><P
+>Номер стратегии индексного метода для оператора, связанного с данным классом операторов.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_оператора</I
+></TT
+></DT
+><DD
+><P
+>Имя (возможно, дополненное схемой) оператора, связанного с данным классом операторов.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>тип_операнда</I
+></TT
+></DT
+><DD
+><P
+>В предложении <TT
+CLASS="LITERAL"
+>OPERATOR</TT
+> это тип данных операнда, либо ключевое слово <TT
+CLASS="LITERAL"
+>NONE</TT
+>, характеризующее левый унарный или правый унарный оператор. Типы операндов обычно можно опустить, когда они совпадают с типом данных класса операторов.</P
+><P
+>В предложении <TT
+CLASS="LITERAL"
+>FUNCTION</TT
+> это тип данных операнда, который должна поддерживать эта функция, если он отличается от входного типа данных функции (для функций сравнения в B-деревьях и хеш-функций) или типа данных класса (для функций поддержки сортировки в B-деревьях и всех функций в классах операторов GiST, SP-GiST и GIN). Обычно предполагаемые по умолчанию типы оказываются верными, так что <TT
+CLASS="REPLACEABLE"
+><I
+>тип_операнда</I
+></TT
+> указывать в <TT
+CLASS="LITERAL"
+>FUNCTION</TT
+> не нужно, кроме функций сортировки B-дерева, предназначенных для сравнений разных типов данных.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>семейство_сортировки</I
+></TT
+></DT
+><DD
+><P
+>Имя (возможно, дополненное схемой) существующего семейства операторов <TT
+CLASS="LITERAL"
+>btree</TT
+>, описывающего порядок сортировки, связанный с оператором сортировки.</P
+><P
+>Если не указано ни <TT
+CLASS="LITERAL"
+>FOR SEARCH</TT
+> (для поиска), ни <TT
+CLASS="LITERAL"
+>FOR ORDER BY</TT
+> (для сортировки), подразумевается <TT
+CLASS="LITERAL"
+>FOR SEARCH</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>номер_опорной_функции</I
+></TT
+></DT
+><DD
+><P
+>Номер опорной процедуры индексного метода для функции, связанной с данным классом операторов.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_функции</I
+></TT
+></DT
+><DD
+><P
+>Имя (возможно, дополненное схемой) функции, которая является опорной процедурой индексного метода для данного класса операторов.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>тип_аргумента</I
+></TT
+></DT
+><DD
+><P
+>Тип данных параметра функции.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>тип_хранения</I
+></TT
+></DT
+><DD
+><P
+>Тип данных, фактически сохраняемых в индексе. Обычно это тип данных колонки, но некоторые методы индекса (в настоящее время, GiST и GIN) могут работать с отличным от него типом. Предложение <TT
+CLASS="LITERAL"
+>STORAGE</TT
+> может присутствовать, только если метод индекса позволяет использовать другой тип данных.</P
+></DD
+></DL
+></DIV
+><P
+>Предложения <TT
+CLASS="LITERAL"
+>OPERATOR</TT
+>, <TT
+CLASS="LITERAL"
+>FUNCTION</TT
+> и <TT
+CLASS="LITERAL"
+>STORAGE</TT
+> могут указываться в любом порядке.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN74693"
+></A
+><H2
+>Замечания</H2
+><P
+>Так как механизмы индексов не проверяют права доступа к функциям, прежде чем вызывать их, включение функций или операторов в класс операторов по сути даёт всем право на выполнение их. Обычно это не проблема для таких функций, какие бывают полезны в классе операторов.</P
+><P
+>Операторы не должны реализовываться в функциях на языке SQL. SQL-функция вероятнее всего будет встроена в вызывающий запрос, что помешает оптимизатору понять, что этот запрос соответствует индексу.</P
+><P
+>До <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> 8.4 предложение <TT
+CLASS="LITERAL"
+>OPERATOR</TT
+> могло включать указание <TT
+CLASS="LITERAL"
+>RECHECK</TT
+>. Теперь это не поддерживается, так как оператор индекса может быть <SPAN
+CLASS="QUOTE"
+>"неточным"</SPAN
+> и это определяется на ходу в момент выполнения. Это позволяет эффективно справляться с ситуациями, когда оператор может быть или не быть неточным.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN74702"
+></A
+><H2
+>Примеры</H2
+><P
+>Команда в следующем примере определяет класс операторов индекса GiST для типа данных <TT
+CLASS="LITERAL"
+>_int4</TT
+> (массива из <TT
+CLASS="TYPE"
+>int4</TT
+>). Полный пример приведён в модуле <A
+HREF="intarray.html"
+>intarray</A
+>.</P
+><PRE
+CLASS="PROGRAMLISTING"
+>CREATE OPERATOR CLASS gist__int_ops
+    DEFAULT FOR TYPE _int4 USING gist AS
+        OPERATOR        3       &amp;&amp;,
+        OPERATOR        6       = (anyarray, anyarray),
+        OPERATOR        7       @&gt;,
+        OPERATOR        8       &lt;@,
+        OPERATOR        20      @@ (_int4, query_int),
+        FUNCTION        1       g_int_consistent (internal, _int4, int, oid, internal),
+        FUNCTION        2       g_int_union (internal, internal),
+        FUNCTION        3       g_int_compress (internal),
+        FUNCTION        4       g_int_decompress (internal),
+        FUNCTION        5       g_int_penalty (internal, internal, internal),
+        FUNCTION        6       g_int_picksplit (internal, internal),
+        FUNCTION        7       g_int_same (_int4, _int4, internal);</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN74709"
+></A
+><H2
+>Совместимость</H2
+><P
+><TT
+CLASS="COMMAND"
+>CREATE OPERATOR CLASS</TT
+> является расширением <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Команда <TT
+CLASS="COMMAND"
+>CREATE OPERATOR CLASS</TT
+> отсутствует в стандарте SQL.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN74715"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-alteropclass.html"
+>ALTER OPERATOR CLASS</A
+>, <A
+HREF="sql-dropopclass.html"
+>DROP OPERATOR CLASS</A
+>, <A
+HREF="sql-createopfamily.html"
+>CREATE OPERATOR FAMILY</A
+>, <A
+HREF="sql-alteropfamily.html"
+>ALTER OPERATOR FAMILY</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-createoperator.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-createopfamily.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>CREATE OPERATOR</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>CREATE OPERATOR FAMILY</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

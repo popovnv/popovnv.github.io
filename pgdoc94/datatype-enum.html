@@ -1,0 +1,303 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Типы перечислений</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Типы данных"
+HREF="datatype.html"><LINK
+REL="PREVIOUS"
+TITLE="Логический тип"
+HREF="datatype-boolean.html"><LINK
+REL="NEXT"
+TITLE="Геометрические типы"
+HREF="datatype-geometric.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Логический тип"
+HREF="datatype-boolean.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="datatype.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 8. Типы данных</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Геометрические типы"
+HREF="datatype-geometric.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="DATATYPE-ENUM"
+>8.7. Типы перечислений</A
+></H1
+><P
+>Типы перечислений (enum) определяют статический упорядоченный набор значений, так же как и типы <TT
+CLASS="TYPE"
+>enum</TT
+>, существующие в ряде языков программирования. В качестве перечисления можно привести дни недели или набор состояний.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN6620"
+>8.7.1. Объявление перечислений</A
+></H2
+><P
+>Тип перечислений создаются с помощью команды <A
+HREF="sql-createtype.html"
+>CREATE TYPE</A
+>, например так: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TYPE mood AS ENUM ('sad', 'ok', 'happy');</PRE
+><P> Созданные типы enum можно использовать в определениях таблиц и функций, как и любые другие: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TYPE mood AS ENUM ('sad', 'ok', 'happy');
+CREATE TABLE person (
+    name text,
+    current_mood mood
+);
+INSERT INTO person VALUES ('Moe', 'happy');
+SELECT * FROM person WHERE current_mood = 'happy';
+ name | current_mood 
+------+--------------
+ Moe  | happy
+(1 row)</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN6626"
+>8.7.2. Порядок</A
+></H2
+><P
+>Порядок значений в перечислении определяется последовательностью, в которой были указаны значения при создании типа. Перечисления поддерживаются всеми стандартными операторами сравнения и связанными агрегатными функциями. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>INSERT INTO person VALUES ('Larry', 'sad');
+INSERT INTO person VALUES ('Curly', 'ok');
+SELECT * FROM person WHERE current_mood &gt; 'sad';
+ name  | current_mood 
+-------+--------------
+ Moe   | happy
+ Curly | ok
+(2 rows)
+
+SELECT * FROM person WHERE current_mood &gt; 'sad' ORDER BY current_mood;
+ name  | current_mood 
+-------+--------------
+ Curly | ok
+ Moe   | happy
+(2 rows)
+
+SELECT name
+FROM person
+WHERE current_mood = (SELECT MIN(current_mood) FROM person);
+ name  
+-------
+ Larry
+(1 row)</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN6630"
+>8.7.3. Безопасность типа</A
+></H2
+><P
+>Все типы перечислений считаются уникальными и поэтому значения разных типов нельзя сравнивать. Взгляните на этот пример: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TYPE happiness AS ENUM ('happy', 'very happy', 'ecstatic');
+CREATE TABLE holidays (
+    num_weeks integer,
+    happiness happiness
+);
+INSERT INTO holidays(num_weeks,happiness) VALUES (4, 'happy');
+INSERT INTO holidays(num_weeks,happiness) VALUES (6, 'very happy');
+INSERT INTO holidays(num_weeks,happiness) VALUES (8, 'ecstatic');
+INSERT INTO holidays(num_weeks,happiness) VALUES (2, 'sad');
+ОШИБКА:  неверное значение для перечисления happiness: "sad"
+SELECT person.name, holidays.num_weeks FROM person, holidays
+  WHERE person.current_mood = holidays.happiness;
+ОШИБКА:  оператор не существует: mood = happiness</PRE
+><P></P
+><P
+>Если вам действительно нужно сделать что-то подобное, вы можете либо реализовать собственный оператор, либо явно преобразовать типы в запросе: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT person.name, holidays.num_weeks FROM person, holidays
+  WHERE person.current_mood::text = holidays.happiness::text;
+ name | num_weeks 
+------+-----------
+ Moe  |         4
+(1 row)</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN6636"
+>8.7.4. Тонкости реализации</A
+></H2
+><P
+>Значение enum занимает на диске 4 байта. Длина текстовой метки значения ограничена параметром компиляции <TT
+CLASS="SYMBOL"
+>NAMEDATALEN</TT
+>; в стандартных сборках <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> он ограничивает длину 63 байтами.</P
+><P
+>В метках значений регистр имеет значение, т. е. <TT
+CLASS="TYPE"
+>'happy'</TT
+> и <TT
+CLASS="TYPE"
+>'HAPPY'</TT
+> &mdash; не одно и то же. Также в метках имеют значение пробелы.</P
+><P
+>Сопоставления внутренних значений enum с текстовыми метками хранятся в системном каталоге <A
+HREF="catalog-pg-enum.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_enum</TT
+></A
+>. Он может быть полезен в ряде случаев.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="datatype-boolean.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="datatype-geometric.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Логический тип</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="datatype.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Геометрические типы</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

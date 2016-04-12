@@ -1,0 +1,3724 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Системные информационные функции</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Функции и операторы"
+HREF="functions.html"><LINK
+REL="PREVIOUS"
+TITLE="Функции, возвращающие множества"
+HREF="functions-srf.html"><LINK
+REL="NEXT"
+TITLE="Функции для системного администрирования"
+HREF="functions-admin.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Функции, возвращающие множества"
+HREF="functions-srf.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 9. Функции и операторы</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Функции для системного администрирования"
+HREF="functions-admin.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="FUNCTIONS-INFO"
+>9.25. Системные информационные функции</A
+></H1
+><P
+>В <A
+HREF="functions-info.html#FUNCTIONS-INFO-SESSION-TABLE"
+>Таблице 9-56</A
+> перечислен ряд функций, предназначенных для получения информации о текущем сеансе и системе.</P
+><P
+>В дополнение к перечисленным здесь функциям существуют также функции, связанные с подсистемой статистики, которые тоже предоставляют системную информацию. Подробнее они рассматриваются в <A
+HREF="monitoring-stats.html#MONITORING-STATS-VIEWS"
+>Подразделе 27.2.2</A
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-INFO-SESSION-TABLE"
+></A
+><P
+><B
+>Таблица 9-56. Функции получения информации о сеансе</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип результата</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>current_catalog</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>name</TT
+>
+                </TD
+><TD
+>имя текущей базы данных (в стандарте SQL она называется <SPAN
+CLASS="QUOTE"
+>"каталогом"</SPAN
+>)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>current_database()</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>name</TT
+>
+                </TD
+><TD
+>имя текущей базы данных</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>current_query()</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>текст запроса, выполняемого в данный момент, в том виде, в каком его передал клиент (может состоять из нескольких операторов)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>current_schema</CODE
+>[()]</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>name</TT
+>
+                </TD
+><TD
+>имя текущей схемы</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>current_schemas(<TT
+CLASS="TYPE"
+>boolean</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>name[]</TT
+>
+                </TD
+><TD
+>имена схем в пути поиска, возможно включая схемы, добавляемые в него неявно</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>current_user</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>name</TT
+>
+                </TD
+><TD
+>имя пользователя в текущем контексте выполнения</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>inet_client_addr()</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>inet</TT
+>
+                </TD
+><TD
+>адрес удалённой стороны соединения</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>inet_client_port()</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int</TT
+>
+                </TD
+><TD
+>порт удалённой стороны соединения</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>inet_server_addr()</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>inet</TT
+>
+                </TD
+><TD
+>адрес локальной стороны соединения</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>inet_server_port()</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int</TT
+>
+                </TD
+><TD
+>порт локальной стороны соединения</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>pg_backend_pid()</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int</TT
+>
+                </TD
+><TD
+>код серверного процесса, обслуживающего текущий сеанс</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>pg_conf_load_time()</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+>
+                </TD
+><TD
+>время загрузки конфигурации</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>pg_is_other_temp_schema(​<TT
+CLASS="TYPE"
+>oid</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>является ли заданная схема временной в другом сеансе?</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>pg_listening_channels()</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>setof text</TT
+>
+                </TD
+><TD
+>имена каналов, по которым текущий сеанс принимает сигналы</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>pg_my_temp_schema()</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>OID временной схемы этого сеанса или 0, если её нет</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>pg_postmaster_start_time()</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+>
+                </TD
+><TD
+>время запуска сервера</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>pg_trigger_depth()</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int</TT
+>
+                </TD
+><TD
+>текущий уровень вложенности в триггерах <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> (0, если эта функция вызывается (прямо или косвенно) не из тела триггера)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>session_user</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>name</TT
+>
+                </TD
+><TD
+>имя пользователя сеанса</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>user</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>name</TT
+>
+                </TD
+><TD
+>синоним <CODE
+CLASS="FUNCTION"
+>current_user</CODE
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>version()</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>информация о версии <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Функции <CODE
+CLASS="FUNCTION"
+>current_catalog</CODE
+>, <CODE
+CLASS="FUNCTION"
+>current_schema</CODE
+>, <CODE
+CLASS="FUNCTION"
+>current_user</CODE
+>, <CODE
+CLASS="FUNCTION"
+>session_user</CODE
+> и <CODE
+CLASS="FUNCTION"
+>user</CODE
+> имеют особый синтаксический статус в <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>: они должны вызываться без скобок после имени. (PostgreSQL позволяет добавить скобки в вызове <CODE
+CLASS="FUNCTION"
+>current_schema</CODE
+>, но не других функций.)</P
+></BLOCKQUOTE
+></DIV
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>session_user</CODE
+> обычно возвращает имя пользователя, установившего текущее соединение с базой данных, но суперпользователи могут изменить это имя, выполнив команду <A
+HREF="sql-set-session-authorization.html"
+>SET SESSION AUTHORIZATION</A
+>. Функция <CODE
+CLASS="FUNCTION"
+>current_user</CODE
+> возвращает идентификатор пользователя, по которому будут проверяться его права. Обычно это тот же пользователь, что и пользователь сеанса, но его можно сменить с помощью <A
+HREF="sql-set-role.html"
+>SET ROLE</A
+>. Этот идентификатор также меняется при выполнении функций с атрибутом <TT
+CLASS="LITERAL"
+>SECURITY DEFINER</TT
+>. На языке Unix пользователь сеанса называется <SPAN
+CLASS="QUOTE"
+>"реальным"</SPAN
+>, а текущий &mdash; <SPAN
+CLASS="QUOTE"
+>"эффективным"</SPAN
+>.</P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>current_schema</CODE
+> возвращает имя схемы, которая стоит первой в пути поиска (или NULL, если путь поиска пуст). Эта схема будет задействована при создании таблиц или других именованных объектов, если целевая схема не указана явно. Функция <CODE
+CLASS="FUNCTION"
+>current_schemas(boolean)</CODE
+> возвращает массив имён всех схем, находящихся в пути поиска. Её логический параметр определяет, будут ли включаться в результат неявно добавляемые в путь поиска системные схемы, такие как <TT
+CLASS="LITERAL"
+>pg_catalog</TT
+>.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Путь поиска можно изменить во время выполнения следующей командой: </P><PRE
+CLASS="PROGRAMLISTING"
+>SET search_path TO <TT
+CLASS="REPLACEABLE"
+><I
+>схема</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>схема</I
+></TT
+>, ...</SPAN
+>]</PRE
+><P></P
+></BLOCKQUOTE
+></DIV
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_listening_channels</CODE
+> возвращает имена каналов, по которым текущий сеанс принимает сигналы. Подробнее это освещается в описании команды <A
+HREF="sql-listen.html"
+>LISTEN</A
+>.</P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>inet_client_addr</CODE
+> возвращает IP-адрес текущего клиента, <CODE
+CLASS="FUNCTION"
+>inet_client_port</CODE
+> &mdash; номер его порта, <CODE
+CLASS="FUNCTION"
+>inet_server_addr</CODE
+> &mdash; IP-адрес сервера, по которому он принял подключение клиента, а <CODE
+CLASS="FUNCTION"
+>inet_server_port</CODE
+> &mdash; соответствующий номер порта. Все эти функции возвращают NULL, если текущее соединение устанавливается через доменный сокет Unix.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_my_temp_schema</CODE
+> возвращает OID временной схемы текущего сеанса или 0, если такой нет (в рамках сеанса не создавались временные таблицы). <CODE
+CLASS="FUNCTION"
+>pg_is_other_temp_schema</CODE
+> возвращает true, если заданный OID относится к временной схеме другого сеанса. (Это может быть полезно, например для исключения временных таблиц других сеансов из общего списка при просмотре таблиц базы данных.)</P
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_postmaster_start_time</CODE
+> возвращает время (<TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+>), когда был запущен сервер.</P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>pg_conf_load_time</CODE
+> возвращает время (<TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+>), когда в последний раз сервер загружал файлы конфигурации. (Если текущий сеанс начался раньше, она возвращает время, когда эти файлы были перезагружены для данного сеанса, так что в разных сеансах это значение может немного различаться. В противном случае это будет время, когда файлы конфигурации считал главный процесс.)</P
+><P
+><CODE
+CLASS="FUNCTION"
+>version</CODE
+> возвращает строку, описывающую версию сервера <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+><P
+>В <A
+HREF="functions-info.html#FUNCTIONS-INFO-ACCESS-TABLE"
+>Таблице 9-57</A
+> перечислены функции, позволяющую пользователю программно проверить свои права доступа к объектам. Подробнее о правах можно узнать в <A
+HREF="ddl-priv.html"
+>Разделе 5.6</A
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-INFO-ACCESS-TABLE"
+></A
+><P
+><B
+>Таблица 9-57. Функции для проверки прав доступа</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип результата</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>has_any_column_privilege</CODE
+>(​<TT
+CLASS="PARAMETER"
+>user</TT
+>, <TT
+CLASS="PARAMETER"
+>table</TT
+>, <TT
+CLASS="PARAMETER"
+>privilege</TT
+>)</TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>имеет ли пользователь указанное право для какой-либо колонки таблицы</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>has_any_column_privilege</CODE
+>(​<TT
+CLASS="PARAMETER"
+>table</TT
+>, <TT
+CLASS="PARAMETER"
+>privilege</TT
+>)</TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>имеет ли текущий пользователь указанное право для какой-либо колонки таблицы</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>has_column_privilege</CODE
+>(​<TT
+CLASS="PARAMETER"
+>user</TT
+>, <TT
+CLASS="PARAMETER"
+>table</TT
+>, <TT
+CLASS="PARAMETER"
+>column</TT
+>, <TT
+CLASS="PARAMETER"
+>privilege</TT
+>)</TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>имеет ли пользователь указанное право для колонки</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>has_column_privilege</CODE
+>(​<TT
+CLASS="PARAMETER"
+>table</TT
+>, <TT
+CLASS="PARAMETER"
+>column</TT
+>, <TT
+CLASS="PARAMETER"
+>privilege</TT
+>)</TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>имеет ли текущий пользователь указанное право для колонки</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>has_database_privilege</CODE
+>(​<TT
+CLASS="PARAMETER"
+>user</TT
+>, <TT
+CLASS="PARAMETER"
+>база данных</TT
+>, <TT
+CLASS="PARAMETER"
+>privilege</TT
+>)</TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>имеет ли пользователь указанное право для базы данных</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>has_database_privilege</CODE
+>(​<TT
+CLASS="PARAMETER"
+>база данных</TT
+>, <TT
+CLASS="PARAMETER"
+>privilege</TT
+>)</TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>имеет ли текущий пользователь указанное право для базы данных</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>has_foreign_data_wrapper_​privilege</CODE
+>(​<TT
+CLASS="PARAMETER"
+>user</TT
+>, <TT
+CLASS="PARAMETER"
+>fdw</TT
+>, <TT
+CLASS="PARAMETER"
+>privilege</TT
+>)</TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>имеет ли пользователь указанное право для обёртки сторонних данных</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>has_foreign_data_wrapper_​privilege</CODE
+>(​<TT
+CLASS="PARAMETER"
+>fdw</TT
+>, <TT
+CLASS="PARAMETER"
+>privilege</TT
+>)</TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>имеет ли текущий пользователь указанное право для обёртки сторонних данных</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>has_function_privilege</CODE
+>(​<TT
+CLASS="PARAMETER"
+>user</TT
+>, <TT
+CLASS="PARAMETER"
+>function</TT
+>, <TT
+CLASS="PARAMETER"
+>privilege</TT
+>)</TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>имеет ли пользователь указанное право для функции</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>has_function_privilege</CODE
+>(​<TT
+CLASS="PARAMETER"
+>function</TT
+>, <TT
+CLASS="PARAMETER"
+>privilege</TT
+>)</TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>имеет ли текущий пользователь указанное право для функции</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>has_language_privilege</CODE
+>(​<TT
+CLASS="PARAMETER"
+>user</TT
+>, <TT
+CLASS="PARAMETER"
+>language</TT
+>, <TT
+CLASS="PARAMETER"
+>privilege</TT
+>)</TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>имеет ли пользователь указанное право для языка</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>has_language_privilege</CODE
+>(​<TT
+CLASS="PARAMETER"
+>language</TT
+>, <TT
+CLASS="PARAMETER"
+>privilege</TT
+>)</TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>имеет ли текущий пользователь указанное право для языка</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>has_schema_privilege</CODE
+>(​<TT
+CLASS="PARAMETER"
+>user</TT
+>, <TT
+CLASS="PARAMETER"
+>schema</TT
+>, <TT
+CLASS="PARAMETER"
+>privilege</TT
+>)</TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>имеет ли пользователь указанное право для схемы</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>has_schema_privilege</CODE
+>(​<TT
+CLASS="PARAMETER"
+>schema</TT
+>, <TT
+CLASS="PARAMETER"
+>privilege</TT
+>)</TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>имеет ли текущий пользователь указанное право для схемы</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>has_sequence_privilege</CODE
+>(​<TT
+CLASS="PARAMETER"
+>user</TT
+>, <TT
+CLASS="PARAMETER"
+>sequence</TT
+>, <TT
+CLASS="PARAMETER"
+>privilege</TT
+>)</TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>имеет ли пользователь указанное право для последовательности</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>has_sequence_privilege</CODE
+>(​<TT
+CLASS="PARAMETER"
+>sequence</TT
+>, <TT
+CLASS="PARAMETER"
+>privilege</TT
+>)</TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>имеет ли текущий пользователь указанное право для последовательности</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>has_server_privilege</CODE
+>(​<TT
+CLASS="PARAMETER"
+>user</TT
+>, <TT
+CLASS="PARAMETER"
+>server</TT
+>, <TT
+CLASS="PARAMETER"
+>privilege</TT
+>)</TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>имеет ли пользователь указанное право для стороннего сервера</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>has_server_privilege</CODE
+>(​<TT
+CLASS="PARAMETER"
+>server</TT
+>, <TT
+CLASS="PARAMETER"
+>privilege</TT
+>)</TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>имеет ли текущий пользователь указанное право для стороннего сервера</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>has_table_privilege</CODE
+>(​<TT
+CLASS="PARAMETER"
+>user</TT
+>, <TT
+CLASS="PARAMETER"
+>table</TT
+>, <TT
+CLASS="PARAMETER"
+>privilege</TT
+>)</TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>имеет ли пользователь указанное право для таблицы</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>has_table_privilege</CODE
+>(​<TT
+CLASS="PARAMETER"
+>table</TT
+>, <TT
+CLASS="PARAMETER"
+>privilege</TT
+>)</TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>имеет ли текущий пользователь указанное право для таблицы</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>has_tablespace_privilege</CODE
+>(​<TT
+CLASS="PARAMETER"
+>user</TT
+>, <TT
+CLASS="PARAMETER"
+>tablespace</TT
+>, <TT
+CLASS="PARAMETER"
+>privilege</TT
+>)</TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>имеет ли пользователь указанное право для табличного пространства</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>has_tablespace_privilege</CODE
+>(​<TT
+CLASS="PARAMETER"
+>tablespace</TT
+>, <TT
+CLASS="PARAMETER"
+>privilege</TT
+>)</TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>имеет ли текущий пользователь указанное право для табличного пространства</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_has_role</CODE
+>(​<TT
+CLASS="PARAMETER"
+>user</TT
+>, <TT
+CLASS="PARAMETER"
+>role</TT
+>, <TT
+CLASS="PARAMETER"
+>privilege</TT
+>)</TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>имеет ли пользователь указанное право для роли</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_has_role</CODE
+>(​<TT
+CLASS="PARAMETER"
+>role</TT
+>, <TT
+CLASS="PARAMETER"
+>privilege</TT
+>)</TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>имеет ли текущий пользователь указанное право для роли</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+><CODE
+CLASS="FUNCTION"
+>has_table_privilege</CODE
+> проверяет, может ли пользователь выполнять с таблицей заданные действия. В качестве идентификатора пользователя можно задать его имя, OID (<TT
+CLASS="LITERAL"
+>pg_authid.oid</TT
+>) или <TT
+CLASS="LITERAL"
+>public</TT
+> (это будет указывать на псевдороль PUBLIC). Если этот аргумент опущен, подразумевается текущий пользователь (<CODE
+CLASS="FUNCTION"
+>current_user</CODE
+>). Таблицу можно указать по имени или по OID. (Таким образом, фактически есть шесть вариантов функции <CODE
+CLASS="FUNCTION"
+>has_table_privilege</CODE
+>, различающихся по числу и типу аргументов.) Когда указывается имя объекта, его можно дополнить именем схемы, если это необходимо. Интересующее право доступа записывается в виде текста и может быть одним из следующих: <TT
+CLASS="LITERAL"
+>SELECT</TT
+>, <TT
+CLASS="LITERAL"
+>INSERT</TT
+>, <TT
+CLASS="LITERAL"
+>UPDATE</TT
+>, <TT
+CLASS="LITERAL"
+>DELETE</TT
+>, <TT
+CLASS="LITERAL"
+>TRUNCATE</TT
+>, <TT
+CLASS="LITERAL"
+>REFERENCES</TT
+> и <TT
+CLASS="LITERAL"
+>TRIGGER</TT
+>. Дополнительно к названию права можно добавить <TT
+CLASS="LITERAL"
+>WITH GRANT OPTION</TT
+> и проверить, разрешено ли пользователю передавать это право другим. Кроме того, в одном параметре можно перечислить несколько названий прав через запятую, и тогда функция возвратит <TT
+CLASS="LITERAL"
+>true</TT
+>, если пользователь имеет одно из этих прав. (Регистр в названии прав не имеет значения, а между ними (но не внутри) разрешены пробельные символы.) Пара примеров: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT has_table_privilege('myschema.mytable', 'select');
+SELECT has_table_privilege('joe', 'mytable',
+  'INSERT, SELECT WITH GRANT OPTION');</PRE
+><P></P
+><P
+><CODE
+CLASS="FUNCTION"
+>has_sequence_privilege</CODE
+> проверяет, может ли пользователь выполнять заданные действия с последовательностью. В определении аргументов эта функция аналогична <CODE
+CLASS="FUNCTION"
+>has_table_privilege</CODE
+>. Допустимые для неё права складываются из <TT
+CLASS="LITERAL"
+>USAGE</TT
+>, <TT
+CLASS="LITERAL"
+>SELECT</TT
+> и <TT
+CLASS="LITERAL"
+>UPDATE</TT
+>.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>has_any_column_privilege</CODE
+> проверяет, может ли пользователь выполнять заданные действия с какой-либо колонкой таблицы. В определении аргументов эта функция аналогична <CODE
+CLASS="FUNCTION"
+>has_table_privilege</CODE
+>, а допустимые права складываются из <TT
+CLASS="LITERAL"
+>SELECT</TT
+>, <TT
+CLASS="LITERAL"
+>INSERT</TT
+>, <TT
+CLASS="LITERAL"
+>UPDATE</TT
+> и <TT
+CLASS="LITERAL"
+>REFERENCES</TT
+>. Заметьте, что любое из этих прав, назначенное на уровне таблицы, автоматически распространяется на все её колонки, так что <CODE
+CLASS="FUNCTION"
+>has_any_column_privilege</CODE
+> всегда возвращает <TT
+CLASS="LITERAL"
+>true</TT
+>, если <CODE
+CLASS="FUNCTION"
+>has_table_privilege</CODE
+> даёт положительный ответ для тех же аргументов. Но <CODE
+CLASS="FUNCTION"
+>has_any_column_privilege</CODE
+> возвращает <TT
+CLASS="LITERAL"
+>true</TT
+> ещё и тогда, когда право назначено только для некоторых колонок.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>has_column_privilege</CODE
+> проверяет, может ли пользователь выполнять заданные действия с колонкой таблицы. В определении аргументов эта функция аналогична <CODE
+CLASS="FUNCTION"
+>has_table_privilege</CODE
+>, с небольшим дополнением: колонку можно задать по имени или номеру атрибута. Для неё допустимые права складываются из <TT
+CLASS="LITERAL"
+>SELECT</TT
+>, <TT
+CLASS="LITERAL"
+>INSERT</TT
+>, <TT
+CLASS="LITERAL"
+>UPDATE</TT
+> и <TT
+CLASS="LITERAL"
+>REFERENCES</TT
+>. Заметьте, что любое из этих прав, назначенное на уровне таблицы, автоматически распространяется на все колонки таблицы.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>has_database_privilege</CODE
+> проверяет, может ли пользователь выполнять заданные действия с базой данных. В определении аргументов эта функция аналогична <CODE
+CLASS="FUNCTION"
+>has_table_privilege</CODE
+>. Для неё допустимые права складываются из <TT
+CLASS="LITERAL"
+>CREATE</TT
+>, <TT
+CLASS="LITERAL"
+>CONNECT</TT
+> и <TT
+CLASS="LITERAL"
+>TEMPORARY</TT
+> (или <TT
+CLASS="LITERAL"
+>TEMP</TT
+>, что равносильно <TT
+CLASS="LITERAL"
+>TEMPORARY</TT
+>).</P
+><P
+><CODE
+CLASS="FUNCTION"
+>has_function_privilege</CODE
+> проверяет, может ли пользователь обратиться к заданной функции. В определении аргументов эта функция аналогична <CODE
+CLASS="FUNCTION"
+>has_table_privilege</CODE
+>. Когда функция определяется не своим OID, а текстовой строкой, эта строка должна быть допустимой для вводимого значения типа <TT
+CLASS="TYPE"
+>regprocedure</TT
+> (см. <A
+HREF="datatype-oid.html"
+>Раздел 8.18</A
+>). Для этой функции допустимо только право <TT
+CLASS="LITERAL"
+>EXECUTE</TT
+>. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT has_function_privilege('joeuser', 'myfunc(int, text)', 'execute');</PRE
+><P></P
+><P
+><CODE
+CLASS="FUNCTION"
+>has_foreign_data_wrapper_privilege</CODE
+> проверяет, может ли пользователь обращаться к обёртке сторонних данных. В определении аргументов она аналогична <CODE
+CLASS="FUNCTION"
+>has_table_privilege</CODE
+>. Для неё допустимо только право <TT
+CLASS="LITERAL"
+>USAGE</TT
+>.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>has_language_privilege</CODE
+> проверяет, может ли пользователь обращаться к процедурному языку. В определении аргументов эта функция аналогична <CODE
+CLASS="FUNCTION"
+>has_table_privilege</CODE
+>. Для неё допустимо только право <TT
+CLASS="LITERAL"
+>USAGE</TT
+>.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>has_schema_privilege</CODE
+> проверяет, может ли пользователь выполнять заданные действия со схемой. В определении аргументов эта функция аналогична <CODE
+CLASS="FUNCTION"
+>has_table_privilege</CODE
+>. Для неё допустимые права складываются из <TT
+CLASS="LITERAL"
+>CREATE</TT
+> и <TT
+CLASS="LITERAL"
+>USAGE</TT
+>.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>has_server_privilege</CODE
+> проверяет, может ли пользователь обращаться к стороннему серверу. В определении аргументов она аналогична <CODE
+CLASS="FUNCTION"
+>has_table_privilege</CODE
+>. Для неё допустимо только право <TT
+CLASS="LITERAL"
+>USAGE</TT
+>.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>has_tablespace_privilege</CODE
+> проверяет, может ли пользователь выполнять заданное действие в табличном пространстве. В определении аргументов эта функция аналогична <CODE
+CLASS="FUNCTION"
+>has_table_privilege</CODE
+>. Для неё допустимо только право <TT
+CLASS="LITERAL"
+>CREATE</TT
+>.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_has_role</CODE
+> проверяет, может ли пользователь выполнять заданные действия с ролью. В определении аргументов эта функция аналогична <CODE
+CLASS="FUNCTION"
+>has_table_privilege</CODE
+>, за исключением того, что именем пользователя не может быть <TT
+CLASS="LITERAL"
+>public</TT
+>. Для неё допустимые права складываются из <TT
+CLASS="LITERAL"
+>MEMBER</TT
+> и <TT
+CLASS="LITERAL"
+>USAGE</TT
+>. <TT
+CLASS="LITERAL"
+>MEMBER</TT
+> обозначает прямое или косвенное членство в данной роли (то есть наличие права выполнить команду <TT
+CLASS="COMMAND"
+>SET ROLE</TT
+>), тогда как <TT
+CLASS="LITERAL"
+>USAGE</TT
+> показывает, что пользователь получает все права роли сразу, без <TT
+CLASS="COMMAND"
+>SET ROLE</TT
+>.</P
+><P
+>В <A
+HREF="functions-info.html#FUNCTIONS-INFO-SCHEMA-TABLE"
+>Таблице 9-58</A
+> перечислены функции, определяющие <I
+CLASS="FIRSTTERM"
+>видимость</I
+> объекта с текущим путём поиска схем. К примеру, таблица считается видимой, если содержащая её схема включена в путь поиска и нет другой таблицы с тем же именем, которая была бы найдена по пути поиска раньше. Другими словами, к этой таблице можно будет обратиться просто по её имени, без явного указания схемы. Просмотреть список всех видимых таблиц можно так: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT relname FROM pg_class WHERE pg_table_is_visible(oid);</PRE
+><P></P
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-INFO-SCHEMA-TABLE"
+></A
+><P
+><B
+>Таблица 9-58. Функции для определения видимости</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип результата</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_collation_is_visible(​<TT
+CLASS="PARAMETER"
+>collation_oid</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>видимо ли правило сортировки</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_conversion_is_visible(​<TT
+CLASS="PARAMETER"
+>conversion_oid</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>видимо ли преобразование</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_function_is_visible(​<TT
+CLASS="PARAMETER"
+>function_oid</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>видима ли функция</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_opclass_is_visible(​<TT
+CLASS="PARAMETER"
+>opclass_oid</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>видим ли класс операторов</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_operator_is_visible(​<TT
+CLASS="PARAMETER"
+>operator_oid</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>видим ли оператор</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_opfamily_is_visible(​<TT
+CLASS="PARAMETER"
+>opclass_oid</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>видимо ли семейство операторов</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_table_is_visible(​<TT
+CLASS="PARAMETER"
+>table_oid</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>видима ли таблица</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_ts_config_is_visible(​<TT
+CLASS="PARAMETER"
+>config_oid</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>видима ли конфигурация текстового поиска</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_ts_dict_is_visible(​<TT
+CLASS="PARAMETER"
+>dict_oid</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>видим ли словарь текстового поиска</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_ts_parser_is_visible(​<TT
+CLASS="PARAMETER"
+>parser_oid</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>видим ли анализатор текстового поиска</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_ts_template_is_visible(​<TT
+CLASS="PARAMETER"
+>template_oid</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>видим ли шаблон текстового поиска</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_type_is_visible(​<TT
+CLASS="PARAMETER"
+>type_oid</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>видим ли тип (или домен)</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Каждая из этих функций проверяет видимость объектов определённого типа. Заметьте, что <CODE
+CLASS="FUNCTION"
+>pg_table_is_visible</CODE
+> можно также использовать для представлений, индексов и последовательностей, <CODE
+CLASS="FUNCTION"
+>pg_type_is_visible</CODE
+> можно использовать и для доменов. Для функций и операторов объект считается видимым в пути поиска, если при просмотре пути не находится предшествующий ему другой объект с тем же именем <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>и типами аргументов</I
+></SPAN
+>. Для классов операторов во внимание принимается и имя оператора, и связанный с ним метод доступа к индексу.</P
+><P
+>Всем этим функциям должен передаваться OID проверяемого объекта. Если вы хотите проверить объект по имени, удобнее использовать типы-псевдонимы OID (<TT
+CLASS="TYPE"
+>regclass</TT
+>, <TT
+CLASS="TYPE"
+>regtype</TT
+>, <TT
+CLASS="TYPE"
+>regprocedure</TT
+>, <TT
+CLASS="TYPE"
+>regoperator</TT
+>, <TT
+CLASS="TYPE"
+>regconfig</TT
+> или <TT
+CLASS="TYPE"
+>regdictionary</TT
+>), например: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT pg_type_is_visible('myschema.widget'::regtype);</PRE
+><P> Заметьте, что проверять таким способом имена без указания схемы не имеет большого смысла &mdash; если имя удастся распознать, значит и объект будет видимым.</P
+><P
+>В <A
+HREF="functions-info.html#FUNCTIONS-INFO-CATALOG-TABLE"
+>Таблице 9-59</A
+> перечислены функции, извлекающие информацию из системных каталогов.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-INFO-CATALOG-TABLE"
+></A
+><P
+><B
+>Таблица 9-59. Функции для обращения к системным каталогам</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип результата</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>format_type(<TT
+CLASS="PARAMETER"
+>type_oid</TT
+>, <TT
+CLASS="PARAMETER"
+>typemod</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>получает имя типа данных в формате SQL</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>pg_describe_object(​<TT
+CLASS="PARAMETER"
+>catalog_id</TT
+>, <TT
+CLASS="PARAMETER"
+>object_id</TT
+>, <TT
+CLASS="PARAMETER"
+>object_sub_id</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>получает описание объекта базы данных</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>pg_identify_object(​<TT
+CLASS="PARAMETER"
+>catalog_id</TT
+> <TT
+CLASS="TYPE"
+>oid</TT
+>, <TT
+CLASS="PARAMETER"
+>object_id</TT
+> <TT
+CLASS="TYPE"
+>oid</TT
+>, <TT
+CLASS="PARAMETER"
+>object_sub_id</TT
+> <TT
+CLASS="TYPE"
+>integer</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+><TT
+CLASS="PARAMETER"
+>type</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>, <TT
+CLASS="PARAMETER"
+>schema</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>, <TT
+CLASS="PARAMETER"
+>name</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>, <TT
+CLASS="PARAMETER"
+>identity</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+></TD
+><TD
+>получает идентификатор объекта базы данных</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>pg_get_constraintdef(​<TT
+CLASS="PARAMETER"
+>constraint_oid</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>получает определение ограничения</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>pg_get_constraintdef(​<TT
+CLASS="PARAMETER"
+>constraint_oid</TT
+>, <TT
+CLASS="PARAMETER"
+>pretty_bool</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>получает определение ограничения</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>pg_get_expr(<TT
+CLASS="PARAMETER"
+>pg_node_tree</TT
+>, <TT
+CLASS="PARAMETER"
+>relation_oid</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>декомпилирует внутреннюю форму выражения, в предположении, что все переменные в нём ссылаются на таблицу или отношение, указанное вторым параметром</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>pg_get_expr(<TT
+CLASS="PARAMETER"
+>pg_node_tree</TT
+>, <TT
+CLASS="PARAMETER"
+>relation_oid</TT
+>, <TT
+CLASS="PARAMETER"
+>pretty_bool</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>декомпилирует внутреннюю форму выражения, в предположении, что все переменные в нём ссылаются на таблицу или отношение, указанное вторым параметром</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>pg_get_functiondef(<TT
+CLASS="PARAMETER"
+>func_oid</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>получает определение функции</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>pg_get_function_arguments(​<TT
+CLASS="PARAMETER"
+>func_oid</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>получает список аргументов из определения функции (со значениями по умолчанию)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>pg_get_function_identity_​arguments(<TT
+CLASS="PARAMETER"
+>func_oid</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>получает список аргументов, идентифицирующий функцию (без значений по умолчанию)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>pg_get_function_result(​<TT
+CLASS="PARAMETER"
+>func_oid</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>получает предложение <TT
+CLASS="LITERAL"
+>RETURNS</TT
+> для функции</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>pg_get_indexdef(<TT
+CLASS="PARAMETER"
+>index_oid</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>получает команду <TT
+CLASS="COMMAND"
+>CREATE INDEX</TT
+> для индекса</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>pg_get_indexdef(<TT
+CLASS="PARAMETER"
+>index_oid</TT
+>, <TT
+CLASS="PARAMETER"
+>column_no</TT
+>, <TT
+CLASS="PARAMETER"
+>pretty_bool</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>получает команду <TT
+CLASS="COMMAND"
+>CREATE INDEX</TT
+> для индекса или определение одной индексированной колонки, когда <TT
+CLASS="PARAMETER"
+>column_no</TT
+> не равен 0</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>pg_get_keywords()</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>setof record</TT
+>
+                </TD
+><TD
+>получает список ключевых слов SQL по категориям</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>pg_get_ruledef(<TT
+CLASS="PARAMETER"
+>rule_oid</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>получает команду <TT
+CLASS="COMMAND"
+>CREATE RULE</TT
+> для правила</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>pg_get_ruledef(<TT
+CLASS="PARAMETER"
+>rule_oid</TT
+>, <TT
+CLASS="PARAMETER"
+>pretty_bool</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>получает команду <TT
+CLASS="COMMAND"
+>CREATE RULE</TT
+> для правила</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>pg_get_serial_sequence(​<TT
+CLASS="PARAMETER"
+>table_name</TT
+>, <TT
+CLASS="PARAMETER"
+>column_name</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>получает имя последовательности, связанной с колонкой типа <TT
+CLASS="TYPE"
+>serial</TT
+>, <TT
+CLASS="TYPE"
+>smallserial</TT
+> или <TT
+CLASS="TYPE"
+>bigserial</TT
+></TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>pg_get_triggerdef</CODE
+>(​<TT
+CLASS="PARAMETER"
+>trigger_oid</TT
+>)</TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>получает команду <TT
+CLASS="COMMAND"
+>CREATE [ CONSTRAINT ] TRIGGER</TT
+> для триггера</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>pg_get_triggerdef</CODE
+>(​<TT
+CLASS="PARAMETER"
+>trigger_oid</TT
+>, <TT
+CLASS="PARAMETER"
+>pretty_bool</TT
+>)</TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>получает команду <TT
+CLASS="COMMAND"
+>CREATE [ CONSTRAINT ] TRIGGER</TT
+> для триггера</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>pg_get_userbyid(<TT
+CLASS="PARAMETER"
+>role_oid</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>name</TT
+>
+                </TD
+><TD
+>получает имя роли по заданному OID</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>pg_get_viewdef(<TT
+CLASS="PARAMETER"
+>view_name</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>получает команду <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, определяющую представление или материализованное представление (<SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>устаревшая</I
+></SPAN
+> функция)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>pg_get_viewdef(<TT
+CLASS="PARAMETER"
+>view_name</TT
+>, <TT
+CLASS="PARAMETER"
+>pretty_bool</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>получает команду <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, определяющую представление или материализованное представление (<SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>устаревшая</I
+></SPAN
+> функция)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>pg_get_viewdef(<TT
+CLASS="PARAMETER"
+>view_oid</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>получает команду <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, определяющую представление или материализованное представление</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>pg_get_viewdef(<TT
+CLASS="PARAMETER"
+>view_oid</TT
+>, <TT
+CLASS="PARAMETER"
+>pretty_bool</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>получает команду <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, определяющую представление или материализованное представление</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>pg_get_viewdef(<TT
+CLASS="PARAMETER"
+>view_oid</TT
+>, <TT
+CLASS="PARAMETER"
+>wrap_column_int</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>получает команду <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, определяющую представление или материализованное представление; при необходимости разбивает строки с полями, выходящие за wrap_int символов, подразумевая форматированный вывод</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>pg_options_to_table(​<TT
+CLASS="PARAMETER"
+>reloptions</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>setof record</TT
+>
+                </TD
+><TD
+>получает набор параметров хранилища в виде имя/значение</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>pg_tablespace_databases(​<TT
+CLASS="PARAMETER"
+>tablespace_oid</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>setof oid</TT
+>
+                </TD
+><TD
+>получает или устанавливает OID баз данных, объекты которых содержатся в заданном табличном пространстве</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>pg_tablespace_location(​<TT
+CLASS="PARAMETER"
+>tablespace_oid</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>получает путь в файловой системе к местоположению заданного табличного пространства</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>pg_typeof(<TT
+CLASS="PARAMETER"
+>any</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>regtype</TT
+>
+                </TD
+><TD
+>получает тип данных любого значения</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>collation for (<TT
+CLASS="PARAMETER"
+>any</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>получает правило сортировки для аргумента</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>to_regclass(<TT
+CLASS="PARAMETER"
+>rel_name</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>regclass</TT
+>
+                </TD
+><TD
+>получает OID указанного отношения</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>to_regproc(<TT
+CLASS="PARAMETER"
+>func_name</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>regproc</TT
+>
+                </TD
+><TD
+>получает OID указанной функции</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>to_regprocedure(<TT
+CLASS="PARAMETER"
+>func_name</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>regprocedure</TT
+>
+                </TD
+><TD
+>получает OID указанной функции</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>to_regoper(<TT
+CLASS="PARAMETER"
+>имя_оператора</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>regoper</TT
+>
+                </TD
+><TD
+>получает OID указанного оператора</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>to_regoperator(<TT
+CLASS="PARAMETER"
+>имя_оператора</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>regoperator</TT
+>
+                </TD
+><TD
+>получает OID указанного оператора</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>to_regtype(<TT
+CLASS="PARAMETER"
+>type_name</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>regtype</TT
+>
+                </TD
+><TD
+>получает OID указанного типа</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+><CODE
+CLASS="FUNCTION"
+>format_type</CODE
+> возвращает в формате SQL имя типа данных, определяемого по OID и, возможно, модификатору типа. Если модификатор неизвестен, вместо него можно передать NULL.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_get_keywords</CODE
+> возвращает таблицу с ключевыми словами SQL, которые воспринимает сервер. Колонка <TT
+CLASS="STRUCTFIELD"
+>word</TT
+> содержит ключевое слово, а <TT
+CLASS="STRUCTFIELD"
+>catcode</TT
+> &mdash; код категории: <TT
+CLASS="LITERAL"
+>U</TT
+> &mdash; не зарезервировано, <TT
+CLASS="LITERAL"
+>C</TT
+> &mdash; имя колонки, <TT
+CLASS="LITERAL"
+>T</TT
+> &mdash; имя типа или функции, <TT
+CLASS="LITERAL"
+>R</TT
+> &mdash; зарезервировано. Колонка <TT
+CLASS="STRUCTFIELD"
+>catdesc</TT
+> содержит возможно локализованное описание категории.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_get_constraintdef</CODE
+>, <CODE
+CLASS="FUNCTION"
+>pg_get_indexdef</CODE
+>, <CODE
+CLASS="FUNCTION"
+>pg_get_ruledef</CODE
+> и <CODE
+CLASS="FUNCTION"
+>pg_get_triggerdef</CODE
+> восстанавливают команду, создававшую заданное ограничение, индекс, правило или триггер, соответственно. (Учтите, что они возвращают не изначальный текст команды, а результат декомпиляции.) <CODE
+CLASS="FUNCTION"
+>pg_get_expr</CODE
+> декомпилирует внутреннюю форму отдельного выражения, например значения по умолчанию для колонки. Это может быть полезно для изучения содержимого системных каталогов. Если выражение может содержать переменные, укажите во втором параметре OID отношения, на который они ссылаются; если таких переменных нет, вместо OID можно передать 0. <CODE
+CLASS="FUNCTION"
+>pg_get_viewdef</CODE
+> восстанавливает запрос <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, определяющий представление. Многие из этих функций имеют две версии, одна из которых позволяет получить форматированный вывод (параметр pretty_bool). Форматированный текст легче читается, но нет гарантии, что он будет всегда восприниматься одинаково будущими версиями <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, поэтому не следует применять форматирование при выгрузке метаданных. Если параметр pretty_bool равен <TT
+CLASS="LITERAL"
+>false</TT
+>, эта версия функции выдаёт тот же результат, что и версия без параметров.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_get_functiondef</CODE
+> возвращает полный оператор <TT
+CLASS="COMMAND"
+>CREATE OR REPLACE FUNCTION</TT
+> для заданной функции. <CODE
+CLASS="FUNCTION"
+>pg_get_function_arguments</CODE
+> возвращает список аргументов функции, в виде достаточном для включения в команду <TT
+CLASS="COMMAND"
+>CREATE FUNCTION</TT
+>. <CODE
+CLASS="FUNCTION"
+>pg_get_function_result</CODE
+> в дополнение возвращает готовое предложение <TT
+CLASS="LITERAL"
+>RETURNS</TT
+> для функции. <CODE
+CLASS="FUNCTION"
+>pg_get_function_identity_arguments</CODE
+> возвращает список аргументов, достаточный для однозначной идентификации функции, в форме, допустимой, например для команды <TT
+CLASS="COMMAND"
+>ALTER FUNCTION</TT
+>. Значения по умолчанию в этой форме опускаются.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_get_serial_sequence</CODE
+> возвращает имя последовательности, связанной с колонкой, и NULL, если такой последовательности нет. В первом параметре функции указывается имя таблицы, возможно дополненное схемой, а во втором имя колонки. Так как первый параметр может содержать имя схемы и таблицы, он воспринимается не как идентификатор в кавычках и поэтому по умолчанию приводится к нижнему регистру, тогда как имя колонки воспринимается как заключённое в кавычки и в нём регистр символов сохраняется. Это функция возвращает имя в виде, пригодном для передачи функциям, работающим с последовательностями (см. <A
+HREF="functions-sequence.html"
+>Раздел 9.16</A
+>). Связь последовательности с колонкой можно изменить или удалить с помощью команды <TT
+CLASS="COMMAND"
+>ALTER SEQUENCE OWNED BY</TT
+>. (Данную функцию можно было бы назвать <CODE
+CLASS="FUNCTION"
+>pg_get_owned_sequence</CODE
+>; настоящее её имя отражает то, что она обычно используется с колонками <TT
+CLASS="TYPE"
+>serial</TT
+> и <TT
+CLASS="TYPE"
+>bigserial</TT
+>.)</P
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_get_userbyid</CODE
+> получает имя роли по её OID.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_options_to_table</CODE
+> возвращает набор параметров хранилища в виде (<TT
+CLASS="LITERAL"
+>имя_параметра</TT
+>/<TT
+CLASS="LITERAL"
+>значение_параметра</TT
+>), когда ей передаётся <TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+>.<TT
+CLASS="STRUCTFIELD"
+>reloptions</TT
+> или <TT
+CLASS="STRUCTNAME"
+>pg_attribute</TT
+>.<TT
+CLASS="STRUCTFIELD"
+>attoptions</TT
+>.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_tablespace_databases</CODE
+> позволяет изучить содержимое табличного пространства. Она возвращает набор OID баз данных, объекты которых размещены в этом табличном пространстве. Если эта функция возвращает строки, это означает, что табличное пространство не пустое и удалить его нельзя. Какие именно объекты находятся в табличном пространстве, можно узнать, подключаясь к базам данных, OID которых сообщила <CODE
+CLASS="FUNCTION"
+>pg_tablespace_databases</CODE
+>, и анализируя их каталоги <TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+>.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_describe_object</CODE
+> возвращает текстовое описание объекта БД, идентифицируемого по OID каталога, OID объекта и ID подобъекта (может быть нулевым). Это описание предназначено для человека и может переводиться, в зависимости от конфигурации сервера. С помощью этой функции, например, можно узнать, что за объект хранится в каталоге <TT
+CLASS="STRUCTNAME"
+>pg_depend</TT
+>.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_identify_object</CODE
+> возвращает строку, содержащую достаточно информации для однозначной идентификации объекта БД по OID каталога, OID объекта и ID подобъекта (может быть нулевым). Эта информация предназначена для машины и поэтому никогда не переводится. Параметр <TT
+CLASS="PARAMETER"
+>type</TT
+> задаёт тип объекта БД; <TT
+CLASS="PARAMETER"
+>schema</TT
+> &mdash; имя схемы, к которой относится объект (либо <TT
+CLASS="LITERAL"
+>NULL</TT
+> для объектов, не относящихся к схемам); <TT
+CLASS="PARAMETER"
+>name</TT
+> &mdash; имя объекта, при необходимости в кавычках, которое присутствует только если оно (возможно, вместе со схемой) однозначно идентифицирует объект (в противном случае <TT
+CLASS="LITERAL"
+>NULL</TT
+>); <TT
+CLASS="PARAMETER"
+>identity</TT
+> &mdash; полный идентификатор объекта, точный формат которого зависит от типа объекта, а каждая его часть дополняется схемой и заключается в кавычки, если требуется.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_typeof</CODE
+> возвращает OID типа данных для переданного значения. Это может быть полезно для разрешения проблем или динамического создания SQL-запросов. Эта функция объявлена как возвращающая тип <TT
+CLASS="TYPE"
+>regtype</TT
+>, который является псевдонимом типа OID (см. <A
+HREF="datatype-oid.html"
+>Раздел 8.18</A
+>); это означает, что значение этого типа можно сравнивать как OID, но выводится оно как название типа. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT pg_typeof(33);
+
+ pg_typeof 
+-----------
+ integer
+(1 row)
+
+SELECT typlen FROM pg_type WHERE oid = pg_typeof(33);
+ typlen 
+--------
+      4
+(1 row)</PRE
+><P></P
+><P
+>Выражение <TT
+CLASS="LITERAL"
+>collation for</TT
+> возвращает правило сортировки для переданного значения. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT collation for (description) FROM pg_description LIMIT 1;
+ pg_collation_for 
+------------------
+ "default"
+(1 row)
+
+SELECT collation for ('foo' COLLATE "de_DE");
+ pg_collation_for 
+------------------
+ "de_DE"
+(1 row)</PRE
+><P> Это значение может быть заключено в кавычки и дополнено схемой. Если для выражения аргумента нет правила сортировки, возвращается значение NULL. Если же правила сортировки не применимы для типа аргумента, происходит ошибка.</P
+><P
+>Функции <CODE
+CLASS="FUNCTION"
+>to_regclass</CODE
+>, <CODE
+CLASS="FUNCTION"
+>to_regproc</CODE
+>, <CODE
+CLASS="FUNCTION"
+>to_regprocedure</CODE
+>, <CODE
+CLASS="FUNCTION"
+>to_regoper</CODE
+>, <CODE
+CLASS="FUNCTION"
+>to_regoperator</CODE
+> и <CODE
+CLASS="FUNCTION"
+>to_regtype</CODE
+> преобразуют имена отношений, функций, операторов и типов в объекты типа <TT
+CLASS="TYPE"
+>regclass</TT
+>, <TT
+CLASS="TYPE"
+>regproc</TT
+>, <TT
+CLASS="TYPE"
+>regprocedure</TT
+>, <TT
+CLASS="TYPE"
+>regoper</TT
+>, <TT
+CLASS="TYPE"
+>regoperator</TT
+> и <TT
+CLASS="TYPE"
+>regtype</TT
+>, соответственно. Перечисленные функции отличаются от явных приведений к этим типам тем, что они не принимают числовые OID и возвращают NULL, вместо того, чтобы генерировать ошибку, если имя не найдено (или, в случае с <CODE
+CLASS="FUNCTION"
+>to_regproc</CODE
+> и <CODE
+CLASS="FUNCTION"
+>to_regoper</CODE
+>, если данному имени соответствуют несколько объектов).</P
+><P
+>Функции, перечисленные в <A
+HREF="functions-info.html#FUNCTIONS-INFO-COMMENT-TABLE"
+>Таблице 9-60</A
+>, извлекают комментарии, заданные для объектов с помощью команды <A
+HREF="sql-comment.html"
+>COMMENT</A
+>. Если найти комментарий для заданных параметров не удаётся, они возвращают NULL.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-INFO-COMMENT-TABLE"
+></A
+><P
+><B
+>Таблица 9-60. Функции получения комментариев</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип результата</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>col_description(<TT
+CLASS="PARAMETER"
+>table_oid</TT
+>, <TT
+CLASS="PARAMETER"
+>column_number</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>получает комментарий для колонки таблицы</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>obj_description(<TT
+CLASS="PARAMETER"
+>object_oid</TT
+>, <TT
+CLASS="PARAMETER"
+>catalog_name</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>получает комментарий для объекта базы данных</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>obj_description(<TT
+CLASS="PARAMETER"
+>object_oid</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>получает комментарий для объекта базы данных (<SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>устаревшая</I
+></SPAN
+> форма)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>shobj_description(​<TT
+CLASS="PARAMETER"
+>object_oid</TT
+>, <TT
+CLASS="PARAMETER"
+>catalog_name</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>получает комментарий для разделяемого объекта баз данных</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+><CODE
+CLASS="FUNCTION"
+>col_description</CODE
+> возвращает комментарий для колонки с заданным номером в таблице с указанным OID. (<CODE
+CLASS="FUNCTION"
+>obj_description</CODE
+> нельзя использовать для колонок таблицы, так колонки не имеют собственных OID.)</P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>obj_description</CODE
+> с двумя параметрами возвращает комментарий для объекта, имеющего заданный OID и находящегося в указанном системном каталоге. Например, <TT
+CLASS="LITERAL"
+>obj_description(123456,'pg_class')</TT
+> вернёт комментарий для таблицы с OID 123456. Форма <CODE
+CLASS="FUNCTION"
+>obj_description</CODE
+> с одним параметром принимает только OID. Она является устаревшей, так как значения OID могут повторяться в разных системных каталогах, и поэтому она может возвращать комментарий для другого объекта.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>shobj_description</CODE
+> работает подобно <CODE
+CLASS="FUNCTION"
+>obj_description</CODE
+>, но она получает комментарии для разделяемых объектов. Некоторые системные каталоги являются глобальными для всех баз данных в кластере и описания объектов в них также хранятся глобально.</P
+><P
+>Функции, перечисленные в <A
+HREF="functions-info.html#FUNCTIONS-TXID-SNAPSHOT"
+>Таблице 9-61</A
+>, выдают информацию о транзакциях сервера в форме во внешнем представлении. В основном эти функции используются, чтобы определить, какие транзакции были зафиксированы между двумя снимками состояния.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-TXID-SNAPSHOT"
+></A
+><P
+><B
+>Таблица 9-61. Идентификаторы транзакций и снимков состояния</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип результата</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>txid_current()</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                </TD
+><TD
+>получает идентификатор текущей транзакции</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>txid_current_snapshot()</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>txid_snapshot</TT
+>
+                </TD
+><TD
+>получает код текущего снимка</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>txid_snapshot_xip(​<TT
+CLASS="PARAMETER"
+>txid_snapshot</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>setof bigint</TT
+>
+                </TD
+><TD
+>возвращает идентификаторы выполняющихся транзакций в снимке</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>txid_snapshot_xmax(​<TT
+CLASS="PARAMETER"
+>txid_snapshot</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                </TD
+><TD
+>возвращает значение <TT
+CLASS="LITERAL"
+>xmax</TT
+> для заданного снимка</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>txid_snapshot_xmin(​<TT
+CLASS="PARAMETER"
+>txid_snapshot</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                </TD
+><TD
+>возвращает значение <TT
+CLASS="LITERAL"
+>xmin</TT
+> для заданного снимка</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>txid_visible_in_snapshot(​<TT
+CLASS="PARAMETER"
+>bigint</TT
+>, <TT
+CLASS="PARAMETER"
+>txid_snapshot</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>видима ли транзакция с указанным идентификатором в данном снимке? (коды подтранзакций не поддерживаются)</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Внутренний тип идентификаторов транзакций (<TT
+CLASS="TYPE"
+>xid</TT
+>) имеет размер 32 бита, поэтому они повторяются через 4 миллиарда транзакций. Однако эти функции выдают 64-битные значения, дополненные счётчиком <SPAN
+CLASS="QUOTE"
+>"эпохи"</SPAN
+>, так что эти значения останутся уникальными на протяжении всей жизни сервера. Используемый этими функциями тип данных <TT
+CLASS="TYPE"
+>txid_snapshot</TT
+> сохраняет информацию о видимости транзакций в определённый момент времени. Его состав описан в <A
+HREF="functions-info.html#FUNCTIONS-TXID-SNAPSHOT-PARTS"
+>Таблице 9-62</A
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-TXID-SNAPSHOT-PARTS"
+></A
+><P
+><B
+>Таблица 9-62. Состав информации о снимке</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>xmin</TT
+>
+                </TD
+><TD
+>Идентификатор самой ранней транзакции (txid) из активных. Все предыдущие транзакции либо зафиксированы и видимы, либо отменены и мертвы.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>xmax</TT
+>
+                </TD
+><TD
+>Первый txid из ещё не назначенных. На момент снимка не было запущенных (а значит и видимых) транзакций с идентификатором, большим или равным данному.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>xip_list</TT
+>
+                </TD
+><TD
+>Список идентификаторов транзакций, активных в момент снимка. Он включает только идентификаторы с номерами от <TT
+CLASS="LITERAL"
+>xmin</TT
+> до <TT
+CLASS="LITERAL"
+>xmax</TT
+>; хотя уже могут быть транзакции с идентификаторами больше <TT
+CLASS="LITERAL"
+>xmax</TT
+>. Если в этом списке не оказывается идентификатора транзакции <TT
+CLASS="LITERAL"
+>xmin &lt;= txid &lt; xmax</TT
+>, это означает, что она уже не выполнялась к моменту снимка и, таким образом, видима или мертва, в зависимости от типа завершения. Идентификаторы подтранзакций в этот список не включаются.</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>В текстовом виде <TT
+CLASS="TYPE"
+>txid_snapshot</TT
+> представляется как <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>xmin</I
+></TT
+>:<TT
+CLASS="REPLACEABLE"
+><I
+>xmax</I
+></TT
+>:<TT
+CLASS="REPLACEABLE"
+><I
+>xip_list</I
+></TT
+></TT
+>. Например, <TT
+CLASS="LITERAL"
+>10:20:10,14,15</TT
+> означает <TT
+CLASS="LITERAL"
+>xmin=10, xmax=20, xip_list=10, 14, 15</TT
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions-srf.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="functions-admin.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Функции, возвращающие множества</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Функции для системного администрирования</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

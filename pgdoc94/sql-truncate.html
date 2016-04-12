@@ -1,0 +1,455 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>TRUNCATE</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="START TRANSACTION"
+HREF="sql-start-transaction.html"><LINK
+REL="NEXT"
+TITLE="UNLISTEN"
+HREF="sql-unlisten.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="START TRANSACTION"
+HREF="sql-start-transaction.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="UNLISTEN"
+HREF="sql-unlisten.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-TRUNCATE"
+></A
+>TRUNCATE</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN84968"
+></A
+><H2
+>Название</H2
+>TRUNCATE&nbsp;--&nbsp;опустошить таблицу или набор таблиц</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN84971"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>TRUNCATE [ TABLE ] [ ONLY ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> [ * ] [, ... ]
+    [ RESTART IDENTITY | CONTINUE IDENTITY ] [ CASCADE | RESTRICT ]</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN84974"
+></A
+><H2
+>Описание</H2
+><P
+>Команда <TT
+CLASS="COMMAND"
+>TRUNCATE</TT
+> быстро удаляет все строки из набора таблиц. Она действует так же, как безусловная команда <TT
+CLASS="COMMAND"
+>DELETE</TT
+> для каждой таблицы, но гораздо быстрее, так как она фактически не сканирует таблицы. Более того, она немедленно высвобождает дисковое пространство, так что выполнять операцию <TT
+CLASS="COMMAND"
+>VACUUM</TT
+> после неё не требуется. Наиболее полезна она для больших таблиц.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN84980"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></DT
+><DD
+><P
+>Имя (возможно, дополненное схемой) таблицы, подлежащей опустошению. Если перед именем таблицы указано <TT
+CLASS="LITERAL"
+>ONLY</TT
+>, очищается только заданная таблица. Без <TT
+CLASS="LITERAL"
+>ONLY</TT
+> очищается и заданная таблица, и все её потомки (если таковые есть). После имени таблицы можно также добавить необязательное указание <TT
+CLASS="LITERAL"
+>*</TT
+>, чтобы явно обозначить, что блокировка затрагивает и все дочерние таблицы.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>RESTART IDENTITY</TT
+></DT
+><DD
+><P
+>Автоматически перезапускать последовательности, связанные с колонками опустошаемой таблицы.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>CONTINUE IDENTITY</TT
+></DT
+><DD
+><P
+>Не изменять значения последовательностей. Это поведение по умолчанию.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>CASCADE</TT
+></DT
+><DD
+><P
+>Автоматически опустошать все таблицы, ссылающиеся по внешнему ключу на заданные таблицы, или на таблицы, затронутые в результате действия <TT
+CLASS="LITERAL"
+>CASCADE</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>RESTRICT</TT
+></DT
+><DD
+><P
+>Отказать в опустошении любых таблиц, на которые по внешнему ключу ссылаются другие таблицы, не перечисленные в этой команде. Это поведение по умолчанию.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN85012"
+></A
+><H2
+>Замечания</H2
+><P
+>Чтобы опустошить таблицу, необходимо иметь право <TT
+CLASS="LITERAL"
+>TRUNCATE</TT
+> для этой таблицы.</P
+><P
+>Команда <TT
+CLASS="COMMAND"
+>TRUNCATE</TT
+> запрашивает блокировку <TT
+CLASS="LITERAL"
+>ACCESS EXCLUSIVE</TT
+> для каждой таблицы, которую она обрабатывает. Когда указано <TT
+CLASS="LITERAL"
+>RESTART IDENTITY</TT
+>, все последовательности, которые должны быть перезапущены, так же блокируются исключительно. В случаях, когда требуется обеспечить параллельный доступ к таблице, следует использовать <TT
+CLASS="COMMAND"
+>DELETE</TT
+>.</P
+><P
+><TT
+CLASS="COMMAND"
+>TRUNCATE</TT
+> нельзя использовать с таблицей, на которую по внешнему ключу ссылаются другие таблицы, если только и эти таблицы не опустошаются этой же командой. Проверка допустимости очистки в таких случаях потребовала бы сканирования таблицы, а главная идея данной команды в том, чтобы не делать этого. Для автоматической обработки всех зависимых таблиц можно использовать указание <TT
+CLASS="LITERAL"
+>CASCADE</TT
+> &mdash; но будьте очень осторожны с ним, иначе вы можете потерять данные, которые не собирались удалять!</P
+><P
+>При выполнении <TT
+CLASS="COMMAND"
+>TRUNCATE</TT
+> не срабатывают никакие триггеры <TT
+CLASS="LITERAL"
+>ON DELETE</TT
+>, которые могут быть настроены для таблиц. Однако при этом срабатывают триггеры <TT
+CLASS="LITERAL"
+>ON TRUNCATE</TT
+>. Если триггеры <TT
+CLASS="LITERAL"
+>ON TRUNCATE</TT
+> определены для любых из этих таблиц, то все триггеры <TT
+CLASS="LITERAL"
+>BEFORE TRUNCATE</TT
+> срабатывают до того, как происходит опустошение, а все триггеры <TT
+CLASS="LITERAL"
+>AFTER TRUNCATE</TT
+> срабатывают после того, как завершается опустошение последней таблицы и все последовательности сбрасываются. Триггеры срабатывают по порядку обработки таблиц (сначала для таблиц, перечисленных в команде, затем для тех, что затрагиваются каскадно).</P
+><DIV
+CLASS="WARNING"
+><P
+></P
+><TABLE
+CLASS="WARNING"
+BORDER="1"
+WIDTH="100%"
+><TR
+><TD
+ALIGN="CENTER"
+><B
+>Внимание</B
+></TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+><P
+>Команда <TT
+CLASS="COMMAND"
+>TRUNCATE</TT
+> не является безопасной с точки зрения MVCC (за общей информацией о MVCC обратитесь к <A
+HREF="mvcc.html"
+>Главе 13</A
+>). После опустошения таблица становится пустой для всех параллельных транзакций, даже если они работают со снимком, полученным до выполнения опустошения. Это может проявиться только в транзакции, которая не обращалась к опустошаемой таблице до того, как произошло опустошение &mdash; любая транзакция, которая обращалась к ней раньше, получила бы как минимум блокировку <TT
+CLASS="LITERAL"
+>ACCESS SHARE</TT
+>, которая заблокировала бы команду <TT
+CLASS="COMMAND"
+>TRUNCATE</TT
+> до завершения транзакции. Поэтому опустошение не приводит ни к каким видимым несоответствиям с содержимым таблицы при последовательных запросах к одной и той же таблице, хотя возможно видимое несоответствие между содержимым опустошённой таблицы и другими таблицами в базе данных.</P
+></TD
+></TR
+></TABLE
+></DIV
+><P
+><TT
+CLASS="COMMAND"
+>TRUNCATE</TT
+> является надёжной транзакционной операцией в отношении данных в таблицах: опустошение будет безопасно отменено, если окружающая транзакция не будет зафиксирована.</P
+><P
+>С указанием <TT
+CLASS="LITERAL"
+>RESTART IDENTITY</TT
+> подразумеваемые операции <TT
+CLASS="COMMAND"
+>ALTER SEQUENCE RESTART</TT
+> также выполняются транзакционно; то есть, они будут отменены, если окружающая транзакция не будет зафиксирована. Это отличается от обычного поведения <TT
+CLASS="COMMAND"
+>ALTER SEQUENCE RESTART</TT
+>. Учтите, что если до того, как транзакция отменится, будут выполнены какие-либо дополнительные операции с последовательностями, эффект этих операций также будет отменён, но не их влияние на значение <CODE
+CLASS="FUNCTION"
+>currval()</CODE
+>; то есть после транзакции <CODE
+CLASS="FUNCTION"
+>currval()</CODE
+> продолжит возвращать последнее значение последовательности, полученное внутри прерванной транзакции, хотя сама последовательность уже может быть несогласованной с ним. Подобным образом обычно ведёт себя <CODE
+CLASS="FUNCTION"
+>currval()</CODE
+> после сбоя транзакции.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN85046"
+></A
+><H2
+>Примеры</H2
+><P
+>Опустошение таблиц <TT
+CLASS="LITERAL"
+>bigtable</TT
+> и <TT
+CLASS="LITERAL"
+>fattable</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>TRUNCATE bigtable, fattable;</PRE
+><P></P
+><P
+>Та же операция и сброс всех связанных генераторов последовательностей: </P><PRE
+CLASS="PROGRAMLISTING"
+>TRUNCATE bigtable, fattable RESTART IDENTITY;</PRE
+><P></P
+><P
+>Опустошение таблицы <TT
+CLASS="LITERAL"
+>othertable</TT
+> и каскадная обработка всех таблиц, ссылающихся на <TT
+CLASS="LITERAL"
+>othertable</TT
+> по ограничениям внешнего ключа: </P><PRE
+CLASS="PROGRAMLISTING"
+>TRUNCATE othertable CASCADE;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN85058"
+></A
+><H2
+>Совместимость</H2
+><P
+>Стандарт SQL:2008 включает команду <TT
+CLASS="COMMAND"
+>TRUNCATE</TT
+> с синтаксисом <TT
+CLASS="LITERAL"
+>TRUNCATE TABLE <TT
+CLASS="REPLACEABLE"
+><I
+>имя_таблицы</I
+></TT
+></TT
+>. Предложения <TT
+CLASS="LITERAL"
+>CONTINUE IDENTITY</TT
+>/<TT
+CLASS="LITERAL"
+>RESTART IDENTITY</TT
+> также описаны в стандарте, но с небольшими отличиями, хотя их назначение похоже. Поведение этой команды при параллельных операциях, согласно стандарту, отчасти определяются реализацией, так что приведённые выше замечания при необходимости следует учитывать и сопоставлять с другими реализациями.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-start-transaction.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-unlisten.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>START TRANSACTION</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>UNLISTEN</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

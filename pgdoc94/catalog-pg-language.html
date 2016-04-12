@@ -1,0 +1,439 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>          pg_language
+        </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Системные каталоги"
+HREF="catalogs.html"><LINK
+REL="PREVIOUS"
+TITLE="          pg_inherits
+        "
+HREF="catalog-pg-inherits.html"><LINK
+REL="NEXT"
+TITLE="          pg_largeobject
+        "
+HREF="catalog-pg-largeobject.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="          pg_inherits
+        "
+HREF="catalog-pg-inherits.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 48. Системные каталоги</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="          pg_largeobject
+        "
+HREF="catalog-pg-largeobject.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CATALOG-PG-LANGUAGE"
+>48.28. <TT
+CLASS="STRUCTNAME"
+>pg_language</TT
+></A
+></H1
+><P
+>В каталоге <TT
+CLASS="STRUCTNAME"
+>pg_language</TT
+> регистрируются языки, на которых возможно писать функции или хранимые процедуры. За дополнительной информацией о языковых обработчиках обратитесь к описанию <A
+HREF="sql-createlanguage.html"
+>CREATE LANGUAGE</A
+> и <A
+HREF="xplang.html"
+>Главе 39</A
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="AEN97972"
+></A
+><P
+><B
+>Таблица 48-28. Колонки <TT
+CLASS="STRUCTNAME"
+>pg_language</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип</TH
+><TH
+>Ссылки</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Идентификатор строки (скрытый атрибут; должен выбираться явно)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>lanname</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>name</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Имя языка</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>lanowner</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-authid.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_authid</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Владелец языка</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>lanispl</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Для внутренних языков (например, <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>) содержит false, а для пользовательских языков — true. В настоящее время, <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+> всё ещё пользуется этим признаком, чтобы определить, какие языки нужно выгружать, но в будущем ему на смену может прийти другой механизм.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>lanpltrusted</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>True, если это доверенный язык, что означает, что можно рассчитывать на то, что он не открывает доступ куда-либо за пределы обычной среды исполнения SQL. Создавать функции на недоверенных языках могут только суперпользователи.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>lanplcallfoid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-proc.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Для не внутренних языков это значение указывает на языковой обработчик, который представляет собой специальную функцию, отвечающую за выполнение всех процедур, написанных на этом языке</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>laninline</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-proc.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Это значение указывает на функцию, отвечающую за выполнение <SPAN
+CLASS="QUOTE"
+>"внедрённых"</SPAN
+> анонимных блоков кода (блоков <A
+HREF="sql-do.html"
+>DO</A
+>). Ноль, если внедрённые блоки не поддерживаются.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>lanvalidator</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-proc.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Это значение указывает на функцию проверки языка, которая отвечает за проверку синтаксиса и правильности новых функций в момент их создания. Ноль, если функция проверки отсутствует.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>lanacl</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>aclitem[]</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Права доступа; за подробностями обратитесь к описанию <A
+HREF="sql-grant.html"
+>GRANT</A
+> и <A
+HREF="sql-revoke.html"
+>REVOKE</A
+></TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="catalog-pg-inherits.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="catalog-pg-largeobject.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_inherits</TT
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_largeobject</TT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

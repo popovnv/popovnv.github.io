@@ -1,0 +1,331 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>dblink_fetch</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="dblink"
+HREF="dblink.html"><LINK
+REL="PREVIOUS"
+TITLE="dblink_open"
+HREF="contrib-dblink-open.html"><LINK
+REL="NEXT"
+TITLE="dblink_close"
+HREF="contrib-dblink-close.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="dblink_open"
+HREF="contrib-dblink-open.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="dblink.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="dblink_close"
+HREF="contrib-dblink-close.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="CONTRIB-DBLINK-FETCH"
+></A
+>dblink_fetch</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN119812"
+></A
+><H2
+>Название</H2
+>dblink_fetch&nbsp;--&nbsp;возвращает строки из открытого курсора в удалённой базе данных</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN119815"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>dblink_fetch(text cursorname, int howmany [, bool fail_on_error]) returns setof record
+dblink_fetch(text connname, text cursorname, int howmany [, bool fail_on_error]) returns setof record</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN119817"
+></A
+><H2
+>Описание</H2
+><P
+><CODE
+CLASS="FUNCTION"
+>dblink_fetch</CODE
+> выбирает строки из курсора, ранее открытого функцией <CODE
+CLASS="FUNCTION"
+>dblink_open</CODE
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN119822"
+></A
+><H2
+>Аргументы</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="PARAMETER"
+>conname</TT
+></DT
+><DD
+><P
+>Имя используемого подключения; опустите этот параметр, чтобы использовать безымянное подключение.</P
+></DD
+><DT
+><TT
+CLASS="PARAMETER"
+>cursorname</TT
+></DT
+><DD
+><P
+>Имя курсора, из которого выбираются данные.</P
+></DD
+><DT
+><TT
+CLASS="PARAMETER"
+>howmany</TT
+></DT
+><DD
+><P
+>Максимальное число строк, которое нужно получить. Данная функция выбирает через курсор следующие <TT
+CLASS="PARAMETER"
+>howmany</TT
+> строк, начиная с текущей позиции курсора и двигаясь вперёд. Когда курсор доходит до конца, строки больше не выдаются.</P
+></DD
+><DT
+><TT
+CLASS="PARAMETER"
+>fail_on_error</TT
+></DT
+><DD
+><P
+>Если равен true (это значение по умолчанию), в случае ошибки, выданной на удалённой стороне соединения, ошибка также выдаётся локально. Если равен false, удалённая ошибка выдаётся локально как ЗАМЕЧАНИЕ, и функция не возвращает строки.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN119846"
+></A
+><H2
+>Возвращаемое значение</H2
+><P
+>Эта функция возвращает строки, выбираемые через курсор. Для использования этой функции необходимо задать ожидаемый набор колонок, как ранее говорилось в описании <CODE
+CLASS="FUNCTION"
+>dblink</CODE
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN119850"
+></A
+><H2
+>Замечания</H2
+><P
+>При несовпадении числа возвращаемых колонок, определённого в предложении <TT
+CLASS="LITERAL"
+>FROM</TT
+>, с фактическим числом колонок, возвращённых удалённым курсором, выдаётся ошибка. В этом случае удалённый курсор всё равно продвигается на столько строк, на сколько он продвинулся бы, если бы ошибка не произошла. То же самое верно для любых других ошибок, происходящих при локальной обработке результатов после выполнения удалённой команды <TT
+CLASS="COMMAND"
+>FETCH</TT
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN119855"
+></A
+><H2
+>Примеры</H2
+><PRE
+CLASS="SCREEN"
+>SELECT dblink_connect('dbname=postgres');
+ dblink_connect
+----------------
+ OK
+(1 row)
+
+SELECT dblink_open('foo', 'select proname, prosrc from pg_proc where proname like ''bytea%''');
+ dblink_open
+-------------
+ OK
+(1 row)
+
+SELECT * FROM dblink_fetch('foo', 5) AS (funcname name, source text);
+ funcname |  source
+----------+----------
+ byteacat | byteacat
+ byteacmp | byteacmp
+ byteaeq  | byteaeq
+ byteage  | byteage
+ byteagt  | byteagt
+(5 rows)
+
+SELECT * FROM dblink_fetch('foo', 5) AS (funcname name, source text);
+ funcname  |  source
+-----------+-----------
+ byteain   | byteain
+ byteale   | byteale
+ bytealike | bytealike
+ bytealt   | bytealt
+ byteane   | byteane
+(5 rows)
+
+SELECT * FROM dblink_fetch('foo', 5) AS (funcname name, source text);
+  funcname  |   source
+------------+------------
+ byteanlike | byteanlike
+ byteaout   | byteaout
+(2 rows)
+
+SELECT * FROM dblink_fetch('foo', 5) AS (funcname name, source text);
+ funcname | source
+----------+--------
+(0 rows)</PRE
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="contrib-dblink-open.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="contrib-dblink-close.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>dblink_open</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="dblink.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>dblink_close</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

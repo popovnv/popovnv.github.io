@@ -1,0 +1,716 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>EXPLAIN</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="EXECUTE"
+HREF="sql-execute.html"><LINK
+REL="NEXT"
+TITLE="FETCH"
+HREF="sql-fetch.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="EXECUTE"
+HREF="sql-execute.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="FETCH"
+HREF="sql-fetch.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-EXPLAIN"
+></A
+>EXPLAIN</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN80795"
+></A
+><H2
+>Название</H2
+>EXPLAIN&nbsp;--&nbsp;показать план выполнения оператора</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN80798"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>EXPLAIN [ ( <TT
+CLASS="REPLACEABLE"
+><I
+>параметр</I
+></TT
+> [, ...] ) ] <TT
+CLASS="REPLACEABLE"
+><I
+>оператор</I
+></TT
+>
+EXPLAIN [ ANALYZE ] [ VERBOSE ] <TT
+CLASS="REPLACEABLE"
+><I
+>оператор</I
+></TT
+>
+
+<SPAN
+CLASS="phrase"
+><SPAN
+CLASS="PHRASE"
+>Здесь допускается <TT
+CLASS="REPLACEABLE"
+><I
+>параметр</I
+></TT
+>:</SPAN
+></SPAN
+>
+
+    ANALYZE [ <TT
+CLASS="REPLACEABLE"
+><I
+>boolean</I
+></TT
+> ]
+    VERBOSE [ <TT
+CLASS="REPLACEABLE"
+><I
+>boolean</I
+></TT
+> ]
+    COSTS [ <TT
+CLASS="REPLACEABLE"
+><I
+>boolean</I
+></TT
+> ]
+    BUFFERS [ <TT
+CLASS="REPLACEABLE"
+><I
+>boolean</I
+></TT
+> ]
+    TIMING [ <TT
+CLASS="REPLACEABLE"
+><I
+>boolean</I
+></TT
+> ]
+    FORMAT { TEXT | XML | JSON | YAML }</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN80810"
+></A
+><H2
+>Описание</H2
+><P
+>Эта команда выводит план выполнения, генерируемый планировщиком <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> для заданного оператора. План выполнения показывает, как будут сканироваться таблицы, затрагиваемые оператором &mdash; просто последовательно, по индексу и т. д. &mdash; а если запрос связывает несколько таблиц, какой алгоритм соединения будет выбран для объединения считанных из них строк.</P
+><P
+>Наибольший интерес в выводимой информации представляет ожидаемая стоимость выполнения оператора, которая показывает, сколько, по мнению планировщика, будет выполняться этот оператор (это значение измеряется в единицах стоимости, которые не имеют точного определения, но обычно это обращение к странице на диске). Фактически выводятся два числа: стоимость запуска до выдачи первой строки и общая стоимость выдачи всех строк. Для большинства запросов важна общая стоимость, но в таких контекстах, как подзапрос в <TT
+CLASS="LITERAL"
+>EXISTS</TT
+>, планировщик будет минимизировать стоимость запуска, а не общую стоимость (так как исполнение запроса всё равно завершится сразу после получения одной строки). Кроме того, если количество возвращаемых строк ограничивается предложением <TT
+CLASS="LITERAL"
+>LIMIT</TT
+>, планировщик интерполирует стоимость между двумя этими числами, выбирая наиболее выгодный план.</P
+><P
+>С параметром <TT
+CLASS="LITERAL"
+>ANALYZE</TT
+> оператор будет выполнен на самом деле, а не только запланирован. При этом в вывод добавляются фактические сведения о времени выполнения, включая общее время, затраченное на каждый узел плана (в миллисекундах) и общее число строк, выданных в результате. Это помогает понять, насколько близки к реальности предварительные оценки планировщика.</P
+><DIV
+CLASS="IMPORTANT"
+><BLOCKQUOTE
+CLASS="IMPORTANT"
+><P
+><B
+>Важно: </B
+>Имейте в виду, что с указанием <TT
+CLASS="LITERAL"
+>ANALYZE</TT
+> оператор действительно выполняется. Хотя <TT
+CLASS="COMMAND"
+>EXPLAIN</TT
+> отбрасывает результат, который вернул бы <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, в остальном все действия выполняются как обычно. Если вы хотите выполнить <TT
+CLASS="COMMAND"
+>EXPLAIN ANALYZE</TT
+> с командой <TT
+CLASS="COMMAND"
+>INSERT</TT
+>, <TT
+CLASS="COMMAND"
+>UPDATE</TT
+>, <TT
+CLASS="COMMAND"
+>DELETE</TT
+>, <TT
+CLASS="COMMAND"
+>CREATE TABLE AS</TT
+> или <TT
+CLASS="COMMAND"
+>EXECUTE</TT
+>, не допуская изменения данных этой командой, воспользуйтесь таким приёмом: </P><PRE
+CLASS="PROGRAMLISTING"
+>BEGIN;
+EXPLAIN ANALYZE ...;
+ROLLBACK;</PRE
+><P></P
+></BLOCKQUOTE
+></DIV
+><P
+>Без скобок для этого оператора можно указать только параметры <TT
+CLASS="LITERAL"
+>ANALYZE</TT
+> и <TT
+CLASS="LITERAL"
+>VERBOSE</TT
+> и только в таком порядке. В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> до версии 9.0 поддерживался только синтаксис без скобок, однако в дальнейшем ожидается, что все новые параметры будут восприниматься только в скобках.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN80835"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>ANALYZE</TT
+></DT
+><DD
+><P
+>Выполнить команду и вывести фактическое время выполнения и другую статистику. По умолчанию этот параметр равен <TT
+CLASS="LITERAL"
+>FALSE</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>VERBOSE</TT
+></DT
+><DD
+><P
+>Вывести дополнительную информацию о плане запроса. В частности, включить список колонок результата для каждого узла в дереве плана, дополнить схемой имена таблиц и функций, всегда указывать для переменных в выражениях псевдоним их таблицы, а также выводить имена всех триггеров, для которых выдаётся статистика. По умолчанию этот параметр равен <TT
+CLASS="LITERAL"
+>FALSE</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>COSTS</TT
+></DT
+><DD
+><P
+>Вывести рассчитанную стоимость запуска и общую стоимость каждого узла плана, а также рассчитанное число строк и ширину каждой строки. Этот параметр по умолчанию равен <TT
+CLASS="LITERAL"
+>TRUE</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>BUFFERS</TT
+></DT
+><DD
+><P
+>Включить информацию об использовании буфера. В частности, вывести число попаданий, блоков прочитанных, загрязненных и записанных в разделяемом и локальном буфере, а также число прочитанных и записанных временных блоков. <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>Попаданием</I
+></SPAN
+> считается ситуация, когда требуемый блок уже находится в кеше и чтения с диска удаётся избежать. Блоки в общем буфере содержат данные обычных таблиц и индексов, в локальном — данные временных таблиц и индексов, а временные блоки предназначены для краткосрочного использования при выполнении сортировки, хеширования, материализации и подобных узлов плана. Число <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>загрязнённых</I
+></SPAN
+> блоков показывает, сколько ранее не модифицированных блоков изменила данная операция; тогда как число <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>записанных</I
+></SPAN
+> блоков показывает, сколько ранее загрязнённых блоков данный серверный процесс вынес из кеша при обработке запроса. Значения, указываемые для узла верхнего уровня, включают значения всех его дочерних узлов. В текстовом формате выводятся только ненулевые значения. Этот параметр действует только в режиме <TT
+CLASS="LITERAL"
+>ANALYZE</TT
+>. По умолчанию его значение равно <TT
+CLASS="LITERAL"
+>FALSE</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>TIMING</TT
+></DT
+><DD
+><P
+>Включить в вывод фактическое время запуска и время, затраченное на каждый узел. Постоянное чтение системных часов может значительно замедлить запрос, так что если достаточно знать фактическое число строк, имеет смысл сделать этот параметр равным <TT
+CLASS="LITERAL"
+>FALSE</TT
+>. Время выполнения всего оператора замеряется всегда, даже когда этот параметр выключен и на уровне узлов время не подсчитывается. Этот параметр действует только в режиме <TT
+CLASS="LITERAL"
+>ANALYZE</TT
+>. По умолчанию его значение равно <TT
+CLASS="LITERAL"
+>TRUE</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>FORMAT</TT
+></DT
+><DD
+><P
+>Установить один из следующих форматов вывода: TEXT, XML, JSON или YAML. Последние три формата содержат ту же информацию, что и текстовый, но больше подходят для программного разбора. По умолчанию выбирается формат <TT
+CLASS="LITERAL"
+>TEXT</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>boolean</I
+></TT
+></DT
+><DD
+><P
+>Включает или отключает заданный параметр. Для включения параметра можно написать <TT
+CLASS="LITERAL"
+>TRUE</TT
+>, <TT
+CLASS="LITERAL"
+>ON</TT
+> или <TT
+CLASS="LITERAL"
+>1</TT
+>, а для отключения — <TT
+CLASS="LITERAL"
+>FALSE</TT
+>, <TT
+CLASS="LITERAL"
+>OFF</TT
+> или <TT
+CLASS="LITERAL"
+>0</TT
+>. Значение <TT
+CLASS="REPLACEABLE"
+><I
+>boolean</I
+></TT
+> можно опустить, в этом случае подразумевается <TT
+CLASS="LITERAL"
+>TRUE</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>оператор</I
+></TT
+></DT
+><DD
+><P
+>Любой оператор <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, <TT
+CLASS="COMMAND"
+>INSERT</TT
+>, <TT
+CLASS="COMMAND"
+>UPDATE</TT
+>, <TT
+CLASS="COMMAND"
+>DELETE</TT
+>, <TT
+CLASS="COMMAND"
+>VALUES</TT
+>, <TT
+CLASS="COMMAND"
+>EXECUTE</TT
+>, <TT
+CLASS="COMMAND"
+>DECLARE</TT
+>, <TT
+CLASS="COMMAND"
+>CREATE TABLE AS</TT
+> и <TT
+CLASS="COMMAND"
+>CREATE MATERIALIZED VIEW AS</TT
+>, план выполнения которого вас интересует.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN80907"
+></A
+><H2
+>Выводимая информация</H2
+><P
+>Результатом команды будет текстовое описание плана, выбранного для <TT
+CLASS="REPLACEABLE"
+><I
+>оператора</I
+></TT
+>, возможно, дополненное статистикой выполнения. Представленная информация описана в <A
+HREF="using-explain.html"
+>Разделе 14.1</A
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN80912"
+></A
+><H2
+>Замечания</H2
+><P
+>Чтобы планировщик запросов <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> был достаточно информирован для эффективной оптимизации запросов, данные в <A
+HREF="catalog-pg-statistic.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_statistic</TT
+></A
+> должны быть актуальными для всех таблиц, задействованных в запросе. Обычно об этом автоматически заботится <A
+HREF="routine-vacuuming.html#AUTOVACUUM"
+>демон автоочистки</A
+>. Но если в таблице недавно произошли значительные изменения, может потребоваться вручную выполнить <A
+HREF="sql-analyze.html"
+>ANALYZE</A
+>, не дожидаясь, пока автоочистка обработает эти изменения.</P
+><P
+>Измеряя фактическую стоимость выполнения каждого узла в плане, текущая реализация <TT
+CLASS="COMMAND"
+>EXPLAIN ANALYZE</TT
+> привносит накладные расходы профилирования в выполнение запроса. В результате этого, при запуске запроса командой <TT
+CLASS="COMMAND"
+>EXPLAIN ANALYZE</TT
+> он может выполняться значительно дольше, чем при обычном выполнении. Объём накладных расходов зависит от природы запроса, а также от используемой платформы. Худшая ситуация наблюдается для узлов плана, которые сами по себе выполняются очень быстро, и в операционных системах, где получение текущего времени относительно длительная операция.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN80923"
+></A
+><H2
+>Примеры</H2
+><P
+>Получение плана простого запроса для таблицы, содержащей единственную колонку типа <TT
+CLASS="TYPE"
+>integer</TT
+>, с 10000 строк: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXPLAIN SELECT * FROM foo;
+
+                       QUERY PLAN
+---------------------------------------------------------
+ Seq Scan on foo  (cost=0.00..155.00 rows=10000 width=4)
+(1 row)</PRE
+><P></P
+><P
+>План того же запроса, но выведенный в формате JSON: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXPLAIN (FORMAT JSON) SELECT * FROM foo;
+           QUERY PLAN
+--------------------------------
+ [                             +
+   {                           +
+     "Plan": {                 +
+       "Node Type": "Seq Scan",+
+       "Relation Name": "foo", +
+       "Alias": "foo",         +
+       "Startup Cost": 0.00,   +
+       "Total Cost": 155.00,   +
+       "Plan Rows": 10000,     +
+       "Plan Width": 4         +
+     }                         +
+   }                           +
+ ]
+(1 row)</PRE
+><P></P
+><P
+>Если в таблице есть индекс, а в запросе присутствует условие <TT
+CLASS="LITERAL"
+>WHERE</TT
+>, для которого полезен этот индекс, <TT
+CLASS="COMMAND"
+>EXPLAIN</TT
+> может показать другой план: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXPLAIN SELECT * FROM foo WHERE i = 4;
+
+                         QUERY PLAN
+--------------------------------------------------------------
+ Index Scan using fi on foo  (cost=0.00..5.98 rows=1 width=4)
+   Index Cond: (i = 4)
+(2 rows)</PRE
+><P></P
+><P
+>План того же запроса, но в формате YAML: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXPLAIN (FORMAT YAML) SELECT * FROM foo WHERE i='4';
+          QUERY PLAN
+-------------------------------
+ - Plan:                      +
+     Node Type: "Index Scan"  +
+     Scan Direction: "Forward"+
+     Index Name: "fi"         +
+     Relation Name: "foo"     +
+     Alias: "foo"             +
+     Startup Cost: 0.00       +
+     Total Cost: 5.98         +
+     Plan Rows: 1             +
+     Plan Width: 4            +
+     Index Cond: "(i = 4)"    
+(1 row)</PRE
+><P> Рассмотрение формата XML оставлено в качестве упражнения для читателя.</P
+><P
+>План того же запроса без вывода оценок стоимости: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXPLAIN (COSTS FALSE) SELECT * FROM foo WHERE i = 4;
+
+        QUERY PLAN
+----------------------------
+ Index Scan using fi on foo
+   Index Cond: (i = 4)
+(2 rows)</PRE
+><P></P
+><P
+>Пример плана для запроса с агрегатной функцией: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXPLAIN SELECT sum(i) FROM foo WHERE i &lt; 10;
+
+                             QUERY PLAN
+---------------------------------------------------------------------
+ Aggregate  (cost=23.93..23.93 rows=1 width=4)
+   -&gt;  Index Scan using fi on foo  (cost=0.00..23.92 rows=6 width=4)
+         Index Cond: (i &lt; 10)
+(3 rows)</PRE
+><P></P
+><P
+>Пример использования <TT
+CLASS="COMMAND"
+>EXPLAIN EXECUTE</TT
+> для отображения плана выполнения подготовленного запроса: </P><PRE
+CLASS="PROGRAMLISTING"
+>PREPARE query(int, int) AS SELECT sum(bar) FROM test
+    WHERE id &gt; $1 AND id &lt; $2
+    GROUP BY foo;
+
+EXPLAIN ANALYZE EXECUTE query(100, 200);
+
+                                                       QUERY PLAN                                                       
+------------------------------------------------------------------------------------------------------------------------
+ HashAggregate  (cost=9.54..9.54 rows=1 width=8) (actual time=0.156..0.161 rows=11 loops=1)
+   Group Key: foo
+   -&gt;  Index Scan using test_pkey on test  (cost=0.29..9.29 rows=50 width=8) (actual time=0.039..0.091 rows=99 loops=1)
+         Index Cond: ((id &gt; $1) AND (id &lt; $2))
+ Planning time: 0.197 ms
+ Execution time: 0.225 ms
+(6 rows)</PRE
+><P></P
+><P
+>Разумеется, конкретные числа, показанные здесь, зависят от фактического содержимого задействованных таблиц. Также учтите, что эти числа и даже выбранная стратегия выполнения запроса могут меняться от версии к версии <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> вследствие усовершенствования планировщика. Кроме того, команда <TT
+CLASS="COMMAND"
+>ANALYZE</TT
+> при обработке статистических данных производит случайные выборки, так что оценки стоимости могут меняться при каждом чистом запуске <TT
+CLASS="COMMAND"
+>ANALYZE</TT
+>, даже когда фактическое распределение данных в таблице не меняется.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN80947"
+></A
+><H2
+>Совместимость</H2
+><P
+>Оператор <TT
+CLASS="COMMAND"
+>EXPLAIN</TT
+> отсутствует в стандарте SQL.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN80951"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-analyze.html"
+>ANALYZE</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-execute.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-fetch.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>EXECUTE</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>FETCH</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

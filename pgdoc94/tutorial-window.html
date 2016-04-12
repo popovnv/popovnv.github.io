@@ -1,0 +1,465 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Оконные функции</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Расширенные возможности"
+HREF="tutorial-advanced.html"><LINK
+REL="PREVIOUS"
+TITLE="Транзакции"
+HREF="tutorial-transactions.html"><LINK
+REL="NEXT"
+TITLE="Наследование"
+HREF="tutorial-inheritance.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Транзакции"
+HREF="tutorial-transactions.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="tutorial-advanced.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 3. Расширенные возможности</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Наследование"
+HREF="tutorial-inheritance.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="TUTORIAL-WINDOW"
+>3.5. Оконные функции</A
+></H1
+><P
+><I
+CLASS="FIRSTTERM"
+>Оконная функция</I
+> выполняет вычисления для набора строк, некоторым образом связанных с текущей строкой. Можно сравнить её с агрегатной функцией, но, в отличие от обычной агрегатной функции, при использовании оконной функции несколько строк не группируются в одну, а продолжают существовать отдельно. Внутри же, оконная функция, как и агрегатная, может обращаться не только к текущей строке результата запроса.</P
+><P
+>Вот пример, показывающий, как сравнить зарплату каждого сотрудника со средней зарплатой его отдела: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT depname, empno, salary, avg(salary) OVER (PARTITION BY depname)
+  FROM empsalary;</PRE
+><P>
+
+</P><PRE
+CLASS="SCREEN"
+>  depname  | empno | salary |          avg          
+-----------+-------+--------+-----------------------
+ develop   |    11 |   5200 | 5020.0000000000000000
+ develop   |     7 |   4200 | 5020.0000000000000000
+ develop   |     9 |   4500 | 5020.0000000000000000
+ develop   |     8 |   6000 | 5020.0000000000000000
+ develop   |    10 |   5200 | 5020.0000000000000000
+ personnel |     5 |   3500 | 3700.0000000000000000
+ personnel |     2 |   3900 | 3700.0000000000000000
+ sales     |     3 |   4800 | 4866.6666666666666667
+ sales     |     1 |   5000 | 4866.6666666666666667
+ sales     |     4 |   4800 | 4866.6666666666666667
+(10 rows)</PRE
+><P> Первые три колонки извлекаются непосредственно из таблицы <TT
+CLASS="STRUCTNAME"
+>empsalary</TT
+>, при этом для каждой строки таблицы есть строка результата. В четвёртой колонке оказалось среднее значение, вычисленное по всем строкам, имеющим то же значение <TT
+CLASS="STRUCTFIELD"
+>depname</TT
+>, что и текущая строка. (Фактически среднее вычисляет та же функция <CODE
+CLASS="FUNCTION"
+>avg</CODE
+>, которую мы знаем как агрегатную, но предложение <TT
+CLASS="LITERAL"
+>OVER</TT
+> превращает её в оконную, так что она обрабатывает лишь заданный набор строк.)</P
+><P
+>Вызов оконной функции всегда содержит предложение <TT
+CLASS="LITERAL"
+>OVER</TT
+>, следующее за названием и аргументами оконной функции. Это синтаксически отличает её от обычной или агрегатной функции. Предложение <TT
+CLASS="LITERAL"
+>OVER</TT
+> определяет, как именно нужно разделить строки запроса для обработки оконной функцией. Предложение <TT
+CLASS="LITERAL"
+>PARTITION BY</TT
+>, дополняющее <TT
+CLASS="LITERAL"
+>OVER</TT
+>, указывает, что строки нужно разделить по группам или разделам, объединяя одинаковые значения выражений <TT
+CLASS="LITERAL"
+>PARTITION BY</TT
+>. Оконная функция вычисляется по строкам, попадающим в один раздел с текущей строкой.</P
+><P
+>Вы можете также определять порядок, в котором строки будут обрабатываться оконными функциями, используя <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> в <TT
+CLASS="LITERAL"
+>OVER</TT
+>. (Порядок <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> для окна может даже не совпадать с порядком, в котором выводятся строки.) Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT depname, empno, salary,
+       rank() OVER (PARTITION BY depname ORDER BY salary DESC)
+FROM empsalary;</PRE
+><P>
+
+</P><PRE
+CLASS="SCREEN"
+>  depname  | empno | salary | rank 
+-----------+-------+--------+------
+ develop   |     8 |   6000 |    1
+ develop   |    10 |   5200 |    2
+ develop   |    11 |   5200 |    2
+ develop   |     9 |   4500 |    4
+ develop   |     7 |   4200 |    5
+ personnel |     2 |   3900 |    1
+ personnel |     5 |   3500 |    2
+ sales     |     1 |   5000 |    1
+ sales     |     4 |   4800 |    2
+ sales     |     3 |   4800 |    2
+(10 rows)</PRE
+><P> Как показано здесь, функция <CODE
+CLASS="FUNCTION"
+>rank</CODE
+> выдаёт порядковый номер в разделе текущей строки для каждого уникального значения, по которому выполняет сортировку предложение <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+>. У функции <CODE
+CLASS="FUNCTION"
+>rank</CODE
+> нет параметров, так как её поведение полностью определяется предложением <TT
+CLASS="LITERAL"
+>OVER</TT
+>.</P
+><P
+>Строки, обрабатываемые оконной функцией, представляют собой <SPAN
+CLASS="QUOTE"
+>"виртуальные таблицы"</SPAN
+>, созданные из предложения <TT
+CLASS="LITERAL"
+>FROM</TT
+> и затем прошедшие через фильтрацию и группировку <TT
+CLASS="LITERAL"
+>WHERE</TT
+> и <TT
+CLASS="LITERAL"
+>GROUP BY</TT
+> и, возможно, условие <TT
+CLASS="LITERAL"
+>HAVING</TT
+>. Например, строка, отфильтрованная из-за нарушения условия <TT
+CLASS="LITERAL"
+>WHERE</TT
+>, не будет видна для оконных функций. Запрос может содержать несколько оконных функций, разделяющих данные по-разному с помощью разных предложений <TT
+CLASS="LITERAL"
+>OVER</TT
+>, но все они будут обрабатывать один и тот же набор строк этой виртуальной таблицы.</P
+><P
+>Мы уже видели, что <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> можно опустить, если порядок строк не важен. Также возможно опустить <TT
+CLASS="LITERAL"
+>PARTITION BY</TT
+>, в этом случае будет только один раздел, содержащий все строки.</P
+><P
+>Есть ещё одно важное понятие, связанное с оконными функциями: для каждой строки существует набор строк в её разделе, называемый <I
+CLASS="FIRSTTERM"
+>рамкой окна</I
+>. По умолчанию, с указанием <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> рамка состоит из всех строк от начала раздела до текущей строки и строк, равных текущей по значению выражения <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+>. Без <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> рамка по умолчанию состоит из всех строк раздела. <A
+NAME="AEN1040"
+HREF="#FTN.AEN1040"
+><SPAN
+CLASS="footnote"
+>[1]</SPAN
+></A
+> Посмотрите на пример использования <CODE
+CLASS="FUNCTION"
+>sum</CODE
+>:</P
+><PRE
+CLASS="PROGRAMLISTING"
+>SELECT salary, sum(salary) OVER () FROM empsalary;</PRE
+><PRE
+CLASS="SCREEN"
+> salary |  sum  
+--------+-------
+   5200 | 47100
+   5000 | 47100
+   3500 | 47100
+   4800 | 47100
+   3900 | 47100
+   4200 | 47100
+   4500 | 47100
+   4800 | 47100
+   6000 | 47100
+   5200 | 47100
+(10 rows)</PRE
+><P
+>Так как в этом примере нет указания <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> в предложении <TT
+CLASS="LITERAL"
+>OVER</TT
+>, рамка окна содержит все строки раздела, а он, в свою очередь, без предложения <TT
+CLASS="LITERAL"
+>PARTITION BY</TT
+> включает все строки таблицы; другими словами, сумма вычисляется по всей таблице и мы получаем один результат для каждой строки результата. Но если мы добавим <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+>, мы получим совсем другие результаты:</P
+><PRE
+CLASS="PROGRAMLISTING"
+>SELECT salary, sum(salary) OVER (ORDER BY salary) FROM empsalary;</PRE
+><PRE
+CLASS="SCREEN"
+> salary |  sum  
+--------+-------
+   3500 |  3500
+   3900 |  7400
+   4200 | 11600
+   4500 | 16100
+   4800 | 25700
+   4800 | 25700
+   5000 | 30700
+   5200 | 41100
+   5200 | 41100
+   6000 | 47100
+(10 rows)</PRE
+><P
+>Здесь в сумме накапливаются зарплаты от первой (самой низкой) до текущей, включая повторяющиеся текущие значения (обратите внимание на результат в строках с одинаковой зарплатой).</P
+><P
+>Оконные функции разрешается использовать в запросе только в списке <TT
+CLASS="LITERAL"
+>SELECT</TT
+> и предложении <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+>. Во всех остальных предложениях, включая <TT
+CLASS="LITERAL"
+>GROUP BY</TT
+>, <TT
+CLASS="LITERAL"
+>HAVING</TT
+> и <TT
+CLASS="LITERAL"
+>WHERE</TT
+>, они запрещены. Это объясняется тем, что логически они выполняются после обычных агрегатных функций, а значит агрегатную функцию можно вызвать из оконной, но не наоборот.</P
+><P
+>Если вам нужно отфильтровать или сгруппировать строки после вычисления оконных функций, вы можете использовать вложенный запрос. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT depname, empno, salary, enroll_date
+FROM
+  (SELECT depname, empno, salary, enroll_date,
+    rank() OVER (PARTITION BY depname ORDER BY salary DESC, empno) AS pos
+   FROM empsalary
+  ) AS ss
+WHERE pos &lt; 3;</PRE
+><P> Данный запрос покажет только те строки внутреннего запроса, у которых <TT
+CLASS="LITERAL"
+>rank</TT
+> (порядковый номер) меньше 3.</P
+><P
+>Когда в запросе вычисляются несколько оконных функций для одинаково определённых окон, конечно можно написать для каждой из них отдельное предложение <TT
+CLASS="LITERAL"
+>OVER</TT
+>, но при этом оно будет дублироваться, что неизбежно будет провоцировать ошибки. Поэтому лучше определение окна выделить в предложение <TT
+CLASS="LITERAL"
+>WINDOW</TT
+>, а затем ссылаться на него в <TT
+CLASS="LITERAL"
+>OVER</TT
+>. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT sum(salary) OVER w, avg(salary) OVER w
+  FROM empsalary
+  WINDOW w AS (PARTITION BY depname ORDER BY salary DESC);</PRE
+><P></P
+><P
+>Подробнее об оконных функциях можно узнать в <A
+HREF="sql-expressions.html#SYNTAX-WINDOW-FUNCTIONS"
+>Подразделе 4.2.8</A
+>, <A
+HREF="functions-window.html"
+>Разделе 9.21</A
+>, <A
+HREF="queries-table-expressions.html#QUERIES-WINDOW"
+>Подразделе 7.2.4</A
+> и в справке <A
+HREF="sql-select.html"
+>SELECT</A
+>.</P
+></DIV
+><H3
+CLASS="FOOTNOTES"
+>Примечания</H3
+><TABLE
+BORDER="0"
+CLASS="FOOTNOTES"
+WIDTH="100%"
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+WIDTH="5%"
+><A
+NAME="FTN.AEN1040"
+HREF="tutorial-window.html#AEN1040"
+><SPAN
+CLASS="footnote"
+>[1]</SPAN
+></A
+></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+WIDTH="95%"
+><P
+>Рамки окна можно определять и другими способами, но в этом введении они не рассматриваются. Узнать о них подробнее вы можете в <A
+HREF="sql-expressions.html#SYNTAX-WINDOW-FUNCTIONS"
+>Подразделе 4.2.8</A
+>.</P
+></TD
+></TR
+></TABLE
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="tutorial-transactions.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="tutorial-inheritance.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Транзакции</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="tutorial-advanced.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Наследование</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

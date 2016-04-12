@@ -1,0 +1,509 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>ALTER INDEX</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="ALTER GROUP"
+HREF="sql-altergroup.html"><LINK
+REL="NEXT"
+TITLE="ALTER LANGUAGE"
+HREF="sql-alterlanguage.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="ALTER GROUP"
+HREF="sql-altergroup.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="ALTER LANGUAGE"
+HREF="sql-alterlanguage.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-ALTERINDEX"
+></A
+>ALTER INDEX</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN68188"
+></A
+><H2
+>Название</H2
+>ALTER INDEX&nbsp;--&nbsp;изменить определение индекса</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN68191"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>ALTER INDEX [ IF EXISTS ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> RENAME TO <TT
+CLASS="REPLACEABLE"
+><I
+>новое_имя</I
+></TT
+>
+ALTER INDEX [ IF EXISTS ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> SET TABLESPACE <TT
+CLASS="REPLACEABLE"
+><I
+>табл_пространство</I
+></TT
+>
+ALTER INDEX [ IF EXISTS ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> SET ( <TT
+CLASS="REPLACEABLE"
+><I
+>параметр_хранения</I
+></TT
+> = <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> [, ... ] )
+ALTER INDEX [ IF EXISTS ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> RESET ( <TT
+CLASS="REPLACEABLE"
+><I
+>параметр_хранения</I
+></TT
+> [, ... ] )
+ALTER INDEX ALL IN TABLESPACE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> [ OWNED BY <TT
+CLASS="REPLACEABLE"
+><I
+>имя_роли</I
+></TT
+> [, ... ] ]
+    SET TABLESPACE <TT
+CLASS="REPLACEABLE"
+><I
+>новое_табл_пространство</I
+></TT
+> [ NOWAIT ]</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN68205"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>ALTER INDEX</TT
+> меняет определение существующего индекса. Эта команда имеет несколько разновидностей: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>IF EXISTS</TT
+></DT
+><DD
+><P
+>Не считать ошибкой, если индекс не существует. В этом случае будет выдано замечание.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>RENAME</TT
+></DT
+><DD
+><P
+>Форма <TT
+CLASS="LITERAL"
+>RENAME</TT
+> меняет имя индекса. На сохранённые данные это не влияет.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>SET TABLESPACE</TT
+></DT
+><DD
+><P
+>Эта форма меняет табличное пространство индекса на заданное и переносит в него файл(ы) данных, связанные с индексом. Для изменения табличного пространства индекса нужно быть владельцем индекса и иметь право <TT
+CLASS="LITERAL"
+>CREATE</TT
+> в новом табличном пространстве. Форма <TT
+CLASS="LITERAL"
+>ALL IN TABLESPACE</TT
+> позволяет перенести из заданного пространства все индексы в текущей базе данных, блокируя их для перемещения и затем перемещая каждый индекс. Эта форма также поддерживает указание <TT
+CLASS="LITERAL"
+>OWNED BY</TT
+>, с которым будут перемещены только индексы, принадлежащие заданным ролям. Если указан параметр <TT
+CLASS="LITERAL"
+>NOWAIT</TT
+>, команда завершится ошибкой, если не сможет немедленно получить все требуемые блокировки. Заметьте, что эта команда не переместит системные каталоги; вместо неё следует использовать <TT
+CLASS="COMMAND"
+>ALTER DATABASE</TT
+> или явные вызовы <TT
+CLASS="COMMAND"
+>ALTER INDEX</TT
+>. См. также <A
+HREF="sql-createtablespace.html"
+>CREATE TABLESPACE</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>SET ( <TT
+CLASS="REPLACEABLE"
+><I
+>параметр_хранения</I
+></TT
+> = <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> [, ... ] )</TT
+></DT
+><DD
+><P
+>Эта форма настраивает один или несколько специфичных для индекса параметров хранения. Список доступных параметров приведён в <A
+HREF="sql-createindex.html"
+>CREATE INDEX</A
+>. Заметьте, что эта команда не меняет содержимое индекса немедленно; для получения желаемого эффекта в зависимости от параметров может потребоваться перестроить индекс командой <A
+HREF="sql-reindex.html"
+>REINDEX</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>RESET ( <TT
+CLASS="REPLACEABLE"
+><I
+>параметр_хранения</I
+></TT
+> [, ... ] )</TT
+></DT
+><DD
+><P
+>Эта форма сбрасывает один или несколько специфичных для индекса параметров хранения к значениям по умолчанию. Как и с <TT
+CLASS="LITERAL"
+>SET</TT
+>, для полного обновления индекса может потребоваться выполнить <TT
+CLASS="LITERAL"
+>REINDEX</TT
+>.</P
+></DD
+></DL
+></DIV
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN68250"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></DT
+><DD
+><P
+>Имя (возможно, дополненное схемой) существующего индекса, подлежащего изменению.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>новое_имя</I
+></TT
+></DT
+><DD
+><P
+>Новое имя индекса.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>табл_пространство</I
+></TT
+></DT
+><DD
+><P
+>Табличное пространство, в которое будет перемещён индекс.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>параметр_хранения</I
+></TT
+></DT
+><DD
+><P
+>Имя специфичного для индекса параметра хранения.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+></DT
+><DD
+><P
+>Новое значение специфичного для индекса параметра хранения. Это может быть число или строка, в зависимости от параметра.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN68278"
+></A
+><H2
+>Замечания</H2
+><P
+>Эти операции также возможно выполнить с помощью <A
+HREF="sql-altertable.html"
+>ALTER TABLE</A
+>. На самом деле <TT
+CLASS="COMMAND"
+>ALTER INDEX</TT
+> ­­­— это просто синоним нескольких форм <TT
+CLASS="COMMAND"
+>ALTER TABLE</TT
+>, работающих с индексами.</P
+><P
+>Ранее существовала форма <TT
+CLASS="COMMAND"
+>ALTER INDEX OWNER</TT
+>, но сейчас она игнорируется (с предупреждением). Владельцем индекса может быть только владелец соответствующей таблицы. При смене владельца таблицы владелец индекса меняется автоматически.</P
+><P
+>Какие-либо изменения индексов системного каталога не допускаются.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN68287"
+></A
+><H2
+>Примеры</H2
+><P
+>Переименование существующего индекса: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER INDEX distributors RENAME TO suppliers;</PRE
+><P></P
+><P
+>Перемещение индекса в другое табличное пространство: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER INDEX distributors SET TABLESPACE fasttablespace;</PRE
+><P></P
+><P
+>Изменение фактора заполнения индекса (предполагается, что это поддерживает метод индекса): </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER INDEX distributors SET (fillfactor = 75);
+REINDEX INDEX distributors;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN68295"
+></A
+><H2
+>Совместимость</H2
+><P
+><TT
+CLASS="COMMAND"
+>ALTER INDEX</TT
+> является расширением <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN68300"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-createindex.html"
+>CREATE INDEX</A
+>, <A
+HREF="sql-reindex.html"
+>REINDEX</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-altergroup.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-alterlanguage.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>ALTER GROUP</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>ALTER LANGUAGE</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

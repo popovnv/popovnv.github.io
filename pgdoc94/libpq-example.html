@@ -1,0 +1,688 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Примеры программ</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="libpq — библиотека для языка C"
+HREF="libpq.html"><LINK
+REL="PREVIOUS"
+TITLE="Сборка программ с libpq"
+HREF="libpq-build.html"><LINK
+REL="NEXT"
+TITLE="Большие объекты"
+HREF="largeobjects.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Сборка программ с libpq"
+HREF="libpq-build.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="libpq.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 31. <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> — библиотека для языка C</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Большие объекты"
+HREF="largeobjects.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="LIBPQ-EXAMPLE"
+>31.21. Примеры программ</A
+></H1
+><P
+>Эти и другие примеры можно найти в каталоге <TT
+CLASS="FILENAME"
+>src/test/examples</TT
+> в дистрибутиве исходного кода.</P
+><DIV
+CLASS="EXAMPLE"
+><A
+NAME="LIBPQ-EXAMPLE-1"
+></A
+><P
+><B
+>Пример 31-1. Первая программа, демонстрирующая использование <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+></B
+></P
+><PRE
+CLASS="PROGRAMLISTING"
+>/*
+ * testlibpq.c
+ *
+ *      Тестирование libpq (версии для C), клиентской библиотеки PostgreSQL.
+ */
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;libpq-fe.h&gt;
+
+static void
+exit_nicely(PGconn *conn)
+{
+    PQfinish(conn);
+    exit(1);
+}
+
+int
+main(int argc, char **argv)
+{
+    const char *conninfo;
+    PGconn     *conn;
+    PGresult   *res;
+    int         nFields;
+    int         i,
+                j;
+
+    /*
+     * Если пользователь передаёт параметр в командной строке, использовать его как
+     * строку соединения; иначе принять по умолчанию dbname=postgres и использовать
+     * переменные среды или значения по умолчанию для всех других параметров соединения.
+     */
+    if (argc &gt; 1)
+        conninfo = argv[1];
+    else
+        conninfo = "dbname = postgres";
+
+    /* Установить подключение к базе данных */
+    conn = PQconnectdb(conninfo);
+
+    /* Убедиться, что соединение с сервером установлено успешно */
+    if (PQstatus(conn) != CONNECTION_OK)
+    {
+        fprintf(stderr, "Connection to database failed: %s",
+                PQerrorMessage(conn));
+        exit_nicely(conn);
+    }
+
+    /*
+     * В нашем тестовом сценарии задействуется курсор, а работать с ним нужно
+     * в блоке транзакции. Мы могли бы сделать всё то же самое, обойдясь одним
+     * PQexec() с запросом "select * from pg_database", но это было бы
+     * слишком просто для хорошего примера.
+     */
+
+    /* Начать блок транзакции */
+    res = PQexec(conn, "BEGIN");
+    if (PQresultStatus(res) != PGRES_COMMAND_OK)
+    {
+        fprintf(stderr, "BEGIN command failed: %s", PQerrorMessage(conn));
+        PQclear(res);
+        exit_nicely(conn);
+    }
+
+    /*
+     * Когда PGresult становится не нужен, его нужно очистить (используя PQclear)
+     * во избежание утечек памяти
+     */
+    PQclear(res);
+
+    /*
+     * Выбрать строки из pg_database, системного каталога баз данных
+     */
+    res = PQexec(conn, "DECLARE myportal CURSOR FOR select * from pg_database");
+    if (PQresultStatus(res) != PGRES_COMMAND_OK)
+    {
+        fprintf(stderr, "DECLARE CURSOR failed: %s", PQerrorMessage(conn));
+        PQclear(res);
+        exit_nicely(conn);
+    }
+    PQclear(res);
+
+    res = PQexec(conn, "FETCH ALL in myportal");
+    if (PQresultStatus(res) != PGRES_TUPLES_OK)
+    {
+        fprintf(stderr, "FETCH ALL failed: %s", PQerrorMessage(conn));
+        PQclear(res);
+        exit_nicely(conn);
+    }
+
+    /* сначала напечатать имена атрибутов */
+    nFields = PQnfields(res);
+    for (i = 0; i &lt; nFields; i++)
+        printf("%-15s", PQfname(res, i));
+    printf("\n\n");
+
+    /* затем напечатать строки */
+    for (i = 0; i &lt; PQntuples(res); i++)
+    {
+        for (j = 0; j &lt; nFields; j++)
+            printf("%-15s", PQgetvalue(res, i, j));
+        printf("\n");
+    }
+
+    PQclear(res);
+
+    /* закрыть портал ... ошибки нас больше не интересуют ... */
+    res = PQexec(conn, "CLOSE myportal");
+    PQclear(res);
+
+    /* завершить транзакцию */
+    res = PQexec(conn, "END");
+    PQclear(res);
+
+    /* закрыть подключение к базе данных и провести очистку */
+    PQfinish(conn);
+
+    return 0;
+}</PRE
+></DIV
+><DIV
+CLASS="EXAMPLE"
+><A
+NAME="LIBPQ-EXAMPLE-2"
+></A
+><P
+><B
+>Пример 31-2. Вторая программа, демонстрирующая использование <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+></B
+></P
+><PRE
+CLASS="PROGRAMLISTING"
+>/*
+ * testlibpq2.c
+ *      Тестирование интерфейса асинхронных уведомлений
+ *
+ * Запустите эту программу, затем в psql в другом окне выполните
+ *   NOTIFY TBL2;
+ * Повторите эту команду четыре раза, чтобы программа завершилась.
+ *
+ * Либо, если хочется чего-то поинтереснее, попробуйте следующее:
+ * подготовьте базу данных следующими командами
+ * (они содержатся в src/test/examples/testlibpq2.sql):
+ *
+ *   CREATE TABLE TBL1 (i int4);
+ *
+ *   CREATE TABLE TBL2 (i int4);
+ *
+ *   CREATE RULE r1 AS ON INSERT TO TBL1 DO
+ *     (INSERT INTO TBL2 VALUES (new.i); NOTIFY TBL2);
+ *
+ * и проделайте это четыре раза:
+ *
+ *   INSERT INTO TBL1 VALUES (10);
+ */
+
+#ifdef WIN32
+#include &lt;windows.h&gt;
+#endif
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;errno.h&gt;
+#include &lt;sys/time.h&gt;
+#include &lt;sys/types.h&gt;
+#include "libpq-fe.h"
+
+static void
+exit_nicely(PGconn *conn)
+{
+    PQfinish(conn);
+    exit(1);
+}
+
+int
+main(int argc, char **argv)
+{
+    const char *conninfo;
+    PGconn     *conn;
+    PGresult   *res;
+    PGnotify   *notify;
+    int         nnotifies;
+
+    /*
+     * Если пользователь передаёт параметр в командной строке, использовать его как
+     * строку соединения; иначе принять по умолчанию dbname=postgres и использовать
+     * переменные среды или значения по умолчанию для всех других параметров соединения.
+     */
+    if (argc &gt; 1)
+        conninfo = argv[1];
+    else
+        conninfo = "dbname = postgres";
+
+    /* Установить подключение к базе данных */
+    conn = PQconnectdb(conninfo);
+
+    /* Убедиться, что соединение с сервером установлено успешно */
+    if (PQstatus(conn) != CONNECTION_OK)
+    {
+        fprintf(stderr, "Connection to database failed: %s",
+                PQerrorMessage(conn));
+        exit_nicely(conn);
+    }
+
+    /*
+     * Выполнить команду LISTEN для получения уведомлений, исходящих от NOTIFY в правиле.
+     */
+    res = PQexec(conn, "LISTEN TBL2");
+    if (PQresultStatus(res) != PGRES_COMMAND_OK)
+    {
+        fprintf(stderr, "LISTEN command failed: %s", PQerrorMessage(conn));
+        PQclear(res);
+        exit_nicely(conn);
+    }
+
+    /*
+     * Когда PGresult становится не нужен, его нужно очистить (используя PQclear)
+     * во избежание утечек памяти
+     */
+    PQclear(res);
+
+    /* Выйти после получения четырёх уведомлений. */
+    nnotifies = 0;
+    while (nnotifies &lt; 4)
+    {
+        /*
+         * Подождать, пока что-либо не произойдёт с соединением.  Мы ожидаем данные,
+         * используя select(2), но вы можете также использовать poll() или подобные
+         * средства.
+         */
+        int         sock;
+        fd_set      input_mask;
+
+        sock = PQsocket(conn);
+
+        if (sock &lt; 0)
+            break;              /* этого не должно случиться */
+
+        FD_ZERO(&amp;input_mask);
+        FD_SET(sock, &amp;input_mask);
+
+        if (select(sock + 1, &amp;input_mask, NULL, NULL, NULL) &lt; 0)
+        {
+            fprintf(stderr, "select() failed: %s\n", strerror(errno));
+            exit_nicely(conn);
+        }
+
+        /* Теперь нужно обработать поступивший сигнал */
+        PQconsumeInput(conn);
+        while ((notify = PQnotifies(conn)) != NULL)
+        {
+            fprintf(stderr,
+                    "ASYNC NOTIFY of '%s' received from backend PID %d\n",
+                    notify-&gt;relname, notify-&gt;be_pid);
+            PQfreemem(notify);
+            nnotifies++;
+        }
+    }
+
+    fprintf(stderr, "Done.\n");
+
+    /* закрыть подключение к базе данных и провести очистку */
+    PQfinish(conn);
+
+    return 0;
+}</PRE
+></DIV
+><DIV
+CLASS="EXAMPLE"
+><A
+NAME="LIBPQ-EXAMPLE-3"
+></A
+><P
+><B
+>Пример 31-3. Третья программа, демонстрирующая использование <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+></B
+></P
+><PRE
+CLASS="PROGRAMLISTING"
+>/*
+ * testlibpq3.c
+ *      Тестирование передачи параметров и двоичного ввода/вывода.
+ *
+ * Прежде чем запускать эту программу, наполните базу данных, выполнив следующие команды
+ * (они содержатся в src/test/examples/testlibpq3.sql):
+ *
+ * CREATE TABLE test1 (i int4, t text, b bytea);
+ *
+ * INSERT INTO test1 values (1, 'joe''s place', '\\000\\001\\002\\003\\004');
+ * INSERT INTO test1 values (2, 'ho there', '\\004\\003\\002\\001\\000');
+ *
+ * Ожидаемый вывод:
+ *
+ * tuple 0: got
+ *  i = (4 bytes) 1
+ *  t = (11 bytes) 'joe's place'
+ *  b = (5 bytes) \000\001\002\003\004
+ *
+ * tuple 0: got
+ *  i = (4 bytes) 2
+ *  t = (8 bytes) 'ho there'
+ *  b = (5 bytes) \004\003\002\001\000
+ */
+
+#ifdef WIN32
+#include &lt;windows.h&gt;
+#endif
+
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;string.h&gt;
+#include &lt;sys/types.h&gt;
+#include "libpq-fe.h"
+
+/* for ntohl/htonl */
+#include &lt;netinet/in.h&gt;
+#include &lt;arpa/inet.h&gt;
+
+
+static void
+exit_nicely(PGconn *conn)
+{
+    PQfinish(conn);
+    exit(1);
+}
+
+/*
+ * Эта функция печатает результат запроса, полученный в двоичном формате
+ * из таблицы, определённой как показано в комментарии выше. Мы выделили её,
+ * потому что функция main() делает это дважды.
+ */
+static void
+show_binary_results(PGresult *res)
+{
+    int         i,
+                j;
+    int         i_fnum,
+                t_fnum,
+                b_fnum;
+
+    /* PQfnumber используется, чтобы не привязываться к порядку полей в результате */
+    i_fnum = PQfnumber(res, "i");
+    t_fnum = PQfnumber(res, "t");
+    b_fnum = PQfnumber(res, "b");
+
+    for (i = 0; i &lt; PQntuples(res); i++)
+    {
+        char       *iptr;
+        char       *tptr;
+        char       *bptr;
+        int         blen;
+        int         ival;
+
+        /* Получить значения полей (мы не учитываем то, что они могут быть равны NULL!) */
+        iptr = PQgetvalue(res, i, i_fnum);
+        tptr = PQgetvalue(res, i, t_fnum);
+        bptr = PQgetvalue(res, i, b_fnum);
+
+        /*
+         * INT4 представляется в двоичном виде в сетевом порядке байт, так что лучше
+         * привести это значение к локальному порядку байт.
+         */
+        ival = ntohl(*((uint32_t *) iptr));
+
+        /*
+         * Двоичное представление типа TEXT — это ... текст, и так как libpq
+         * довольно мило добавила в конец строки нулевой байт, с результатом можно
+         * прекрасно работать как со строкой в стиле C.
+         *
+         * Двоичное представление BYTEA — это набор байт, который может включать и
+         * нулевые байты, так что мы должны смотреть на длину поля.
+         */
+        blen = PQgetlength(res, i, b_fnum);
+
+        printf("tuple %d: got\n", i);
+        printf(" i = (%d bytes) %d\n",
+               PQgetlength(res, i, i_fnum), ival);
+        printf(" t = (%d bytes) '%s'\n",
+               PQgetlength(res, i, t_fnum), tptr);
+        printf(" b = (%d bytes) ", blen);
+        for (j = 0; j &lt; blen; j++)
+            printf("\\%03o", bptr[j]);
+        printf("\n\n");
+    }
+}
+
+int
+main(int argc, char **argv)
+{
+    const char *conninfo;
+    PGconn     *conn;
+    PGresult   *res;
+    const char *paramValues[1];
+    int         paramLengths[1];
+    int         paramFormats[1];
+    uint32_t    binaryIntVal;
+
+    /*
+     * Если пользователь передаёт параметр в командной строке, использовать его как
+     * строку соединения; иначе принять по умолчанию dbname=postgres и использовать
+     * переменные среды или значения по умолчанию для всех других параметров соединения.
+     */
+    if (argc &gt; 1)
+        conninfo = argv[1];
+    else
+        conninfo = "dbname = postgres";
+
+    /* Установить подключение к базе данных */
+    conn = PQconnectdb(conninfo);
+
+    /* Убедиться, что соединение с сервером установлено успешно */
+    if (PQstatus(conn) != CONNECTION_OK)
+    {
+        fprintf(stderr, "Connection to database failed: %s",
+                PQerrorMessage(conn));
+        exit_nicely(conn);
+    }
+
+    /*
+     * Эта программа призвана проиллюстрировать использование PQexecParams() с
+     * внешними параметрами, а также двоичную передачу данных.
+     *
+     * Первый пример передаёт параметры в текстовом формате, а результаты получает
+     * в двоичном. Но используя внешние параметры, мы можем избежать
+     * множества кропотливых операций, связанных с экранированием и кавычками, даже
+     * когда данные текстовые. Обратите внимание, нам не пришлось делать ничего особенного
+     * с апострофом, содержащимся в значении параметра.
+     */
+
+    /* Это значение параметра, поступающее извне */
+    paramValues[0] = "joe's place";
+
+    res = PQexecParams(conn,
+                       "SELECT * FROM test1 WHERE t = $1",
+                       1,       /* один параметр */
+                       NULL,    /* пусть его тип сервер определит сам */
+                       paramValues,
+                       NULL,    /* длины параметров не задаются, так параметр текстовый */
+                       NULL,    /* по умолчанию все параметры текстовые */
+                       1);      /* результаты запрашиваются в двоичном виде */
+
+    if (PQresultStatus(res) != PGRES_TUPLES_OK)
+    {
+        fprintf(stderr, "SELECT failed: %s", PQerrorMessage(conn));
+        PQclear(res);
+        exit_nicely(conn);
+    }
+
+    show_binary_results(res);
+
+    PQclear(res);
+
+    /*
+     * Во втором примере мы передаём целочисленный параметр в двоичной форме
+     * и результаты получаем так же в двоичном виде.
+     *
+     * Хотя мы говорим PQexecParams, что оставляем выбор типа параметра
+     * на усмотрение сервера, на самом деле мы подталкиваем его к нужному решению,
+     * выполняя приведение символа в тексте запроса. Это хорошая подстраховка при
+     * передаче двоичных параметров.
+     */
+
+    /* Перевести целочисленное значение "2" в сетевой порядок байт */
+    binaryIntVal = htonl((uint32_t) 2);
+
+    /* Сформировать массивы параметров для PQexecParams */
+    paramValues[0] = (char *) &amp;binaryIntVal;
+    paramLengths[0] = sizeof(binaryIntVal);
+    paramFormats[0] = 1;        /* binary */
+
+    res = PQexecParams(conn,
+                       "SELECT * FROM test1 WHERE i = $1::int4",
+                       1,       /* один параметр */
+                       NULL,    /* пусть его тип сервер определит сам */
+                       paramValues,
+                       paramLengths,
+                       paramFormats,
+                       1);      /* результаты запрашиваются в двоичном виде */
+
+    if (PQresultStatus(res) != PGRES_TUPLES_OK)
+    {
+        fprintf(stderr, "SELECT failed: %s", PQerrorMessage(conn));
+        PQclear(res);
+        exit_nicely(conn);
+    }
+
+    show_binary_results(res);
+
+    PQclear(res);
+
+    /* закрыть подключение к базе данных и провести очистку */
+    PQfinish(conn);
+
+    return 0;
+}</PRE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="libpq-build.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="largeobjects.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Сборка программ с <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="libpq.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Большие объекты</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

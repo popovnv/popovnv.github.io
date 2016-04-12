@@ -1,0 +1,1283 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Основные операторы</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="PL/pgSQL — процедурный язык SQL"
+HREF="plpgsql.html"><LINK
+REL="PREVIOUS"
+TITLE="Выражения"
+HREF="plpgsql-expressions.html"><LINK
+REL="NEXT"
+TITLE="Управляющие структуры"
+HREF="plpgsql-control-structures.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Выражения"
+HREF="plpgsql-expressions.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="plpgsql.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 40. <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> — процедурный язык <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Управляющие структуры"
+HREF="plpgsql-control-structures.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="PLPGSQL-STATEMENTS"
+>40.5. Основные операторы</A
+></H1
+><P
+>В этом и последующих разделах описаны все типы операторов, которые понимает <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+>. Все, что не признается в качестве одного из этих типов операторов, считается командой SQL и отправляется для исполнения в основную машину базы данных, как описано в <A
+HREF="plpgsql-statements.html#PLPGSQL-STATEMENTS-SQL-NORESULT"
+>Подразделе 40.5.2</A
+> и <A
+HREF="plpgsql-statements.html#PLPGSQL-STATEMENTS-SQL-ONEROW"
+>Подразделе 40.5.3</A
+>.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="PLPGSQL-STATEMENTS-ASSIGNMENT"
+>40.5.1. Присваивания</A
+></H2
+><P
+>Присвоение значения переменной <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> записывается в виде: </P><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>variable</I
+></TT
+> { := | = } <TT
+CLASS="REPLACEABLE"
+><I
+>expression</I
+></TT
+>;</PRE
+><P> Как описывалось ранее, выражение в таком операторе вычисляется с помощью SQL-команды <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, посылаемой в основную машину базы данных. Выражение должно получить одно значение (возможно, значение строки, если переменная строкового типа или типа <TT
+CLASS="TYPE"
+>record</TT
+>). Целевая переменная может быть простой переменной (возможно, дополненной именем блока), полем в переменной строкового типа или записи; или элементом массива, который является простой переменной или полем. Для присвоения можно использовать знак равенства (<TT
+CLASS="LITERAL"
+>=</TT
+>) вместо совместимого с PL/SQL <TT
+CLASS="LITERAL"
+>:=</TT
+>.</P
+><P
+>Если результирующий тип данных выражения не соответствует типу данных переменной, или переменная имеет определённый размер/точность (как <TT
+CLASS="TYPE"
+>char(20)</TT
+>), то результирующее значение будет неявно преобразовано интерпретатором <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+>, используя функцию вывода типа данных результата и функцию ввода типа данных переменной. Заметим, что это потенциально может привести к ошибкам времени выполнения в функции ввода, если формат строки результирующего значения не допустим для функции ввода.</P
+><P
+>Примеры: </P><PRE
+CLASS="PROGRAMLISTING"
+>tax := subtotal * 0.06;
+my_record.user_id := 20;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="PLPGSQL-STATEMENTS-SQL-NORESULT"
+>40.5.2. Выполнение команды, не возвращающей результат</A
+></H2
+><P
+>В функции на <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> можно выполнить любую команду SQL, не возвращающую строк, просто написав эту команду (например, <TT
+CLASS="COMMAND"
+>INSERT</TT
+> без предложения <TT
+CLASS="LITERAL"
+>RETURNING</TT
+>).</P
+><P
+>Имя любой переменной <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> в тексте команды рассматривается как параметр, а затем текущее значение переменной подставляется в качестве значения параметра во время выполнения. Это в точности совпадает с описанной ранее обработкой для выражений; за подробностями обратитесь к <A
+HREF="plpgsql-implementation.html#PLPGSQL-VAR-SUBST"
+>Подразделу 40.10.1</A
+>.</P
+><P
+>При выполнении SQL-команды таким образом, <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> может кешировать и повторно использовать план выполнения команды, как обсуждается в <A
+HREF="plpgsql-implementation.html#PLPGSQL-PLAN-CACHING"
+>Подразделе 40.10.2</A
+>.</P
+><P
+>Иногда бывает полезно вычислить значение выражения или запроса <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, но отказаться от результата, например, при вызове функции, у которой есть побочные эффекты, но нет полезного результата. Для этого в <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+>, используется оператор <TT
+CLASS="COMMAND"
+>PERFORM</TT
+>: </P><PRE
+CLASS="SYNOPSIS"
+>PERFORM <TT
+CLASS="REPLACEABLE"
+><I
+>query</I
+></TT
+>;</PRE
+><P> Эта команда выполняет <TT
+CLASS="REPLACEABLE"
+><I
+>query</I
+></TT
+> и отбрасывает результат. Запросы (<TT
+CLASS="REPLACEABLE"
+><I
+>query</I
+></TT
+>) пишутся таким же образом, как и в команде SQL <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, но ключевое слово <TT
+CLASS="COMMAND"
+>SELECT</TT
+> заменяется на <TT
+CLASS="COMMAND"
+>PERFORM</TT
+>. Для запросов <TT
+CLASS="COMMAND"
+>WITH</TT
+> после <TT
+CLASS="COMMAND"
+>PERFORM</TT
+> нужно поместить запрос в скобки. (В этом случае запрос может вернуть только одну строку.) Переменные <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> будут подставлены в запрос так же, как и в команду, не возвращающую результат, план запроса также кешируется. Кроме того, специальная переменная <TT
+CLASS="LITERAL"
+>FOUND</TT
+> устанавливается в истину, если запрос возвращает, по крайней мере, одну строку, или ложь, если не возвращает ни одной строки (см. <A
+HREF="plpgsql-statements.html#PLPGSQL-STATEMENTS-DIAGNOSTICS"
+>Подраздел 40.5.5</A
+>).</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Можно предположить, что такой же результат получается непосредственно командой <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, но в настоящее время использование <TT
+CLASS="COMMAND"
+>PERFORM</TT
+> является единственным способом. Команда SQL, которая может возвращать строки, например <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, будет отклонена с ошибкой, если не имеет предложения <TT
+CLASS="LITERAL"
+>INTO</TT
+>, как описано в следующем разделе.</P
+></BLOCKQUOTE
+></DIV
+><P
+>Пример: </P><PRE
+CLASS="PROGRAMLISTING"
+>PERFORM create_mv('cs_session_page_requests_mv', my_query);</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="PLPGSQL-STATEMENTS-SQL-ONEROW"
+>40.5.3. Выполнение запроса, возвращающего одну строку</A
+></H2
+><P
+>Результат SQL-команды, возвращающей одну строку (возможно из нескольких столбцов), может быть присвоен переменной типа <TT
+CLASS="TYPE"
+>record</TT
+>, переменной строкового типа или списку скалярных переменных. Для этого нужно к основной команде SQL добавить предложение <TT
+CLASS="LITERAL"
+>INTO</TT
+>. Так, например: </P><PRE
+CLASS="SYNOPSIS"
+>SELECT <TT
+CLASS="REPLACEABLE"
+><I
+>select_expressions</I
+></TT
+> INTO [<SPAN
+CLASS="OPTIONAL"
+>STRICT</SPAN
+>] <TT
+CLASS="REPLACEABLE"
+><I
+>target</I
+></TT
+> FROM ...;
+INSERT ... RETURNING <TT
+CLASS="REPLACEABLE"
+><I
+>expressions</I
+></TT
+> INTO [<SPAN
+CLASS="OPTIONAL"
+>STRICT</SPAN
+>] <TT
+CLASS="REPLACEABLE"
+><I
+>target</I
+></TT
+>;
+UPDATE ... RETURNING <TT
+CLASS="REPLACEABLE"
+><I
+>expressions</I
+></TT
+> INTO [<SPAN
+CLASS="OPTIONAL"
+>STRICT</SPAN
+>] <TT
+CLASS="REPLACEABLE"
+><I
+>target</I
+></TT
+>;
+DELETE ... RETURNING <TT
+CLASS="REPLACEABLE"
+><I
+>expressions</I
+></TT
+> INTO [<SPAN
+CLASS="OPTIONAL"
+>STRICT</SPAN
+>] <TT
+CLASS="REPLACEABLE"
+><I
+>target</I
+></TT
+>;</PRE
+><P> где <TT
+CLASS="REPLACEABLE"
+><I
+>target</I
+></TT
+> может быть переменной типа <TT
+CLASS="TYPE"
+>record</TT
+>, строковой переменной или разделённым запятыми списком скалярных переменных, полей записи/строки. Переменные <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> подставляются в оставшуюся часть запроса, план выполнения кешируется, так же, как было описано выше для команд, не возвращающих строки. Это работает для команд <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, <TT
+CLASS="COMMAND"
+>INSERT</TT
+>/<TT
+CLASS="COMMAND"
+>UPDATE</TT
+>/<TT
+CLASS="COMMAND"
+>DELETE</TT
+> с предложением <TT
+CLASS="LITERAL"
+>RETURNING</TT
+> и утилит, возвращающих результат в виде набора строк (таких, как <TT
+CLASS="COMMAND"
+>EXPLAIN</TT
+>). За исключением предложения <TT
+CLASS="LITERAL"
+>INTO</TT
+>, это те же SQL-команды, как их можно написать вне <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+>.</P
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>Обратите внимание, что данная интерпретация <TT
+CLASS="COMMAND"
+>SELECT</TT
+> с <TT
+CLASS="LITERAL"
+>INTO</TT
+> полностью отличается от <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> команды <TT
+CLASS="COMMAND"
+>SELECT INTO</TT
+>, где в <TT
+CLASS="LITERAL"
+>INTO</TT
+> указывается вновь создаваемая таблица. Если вы хотите в функции на <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> создать таблицу, основанную на результате команды <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, используйте синтаксис <TT
+CLASS="COMMAND"
+>CREATE TABLE ... AS SELECT</TT
+>.</P
+></BLOCKQUOTE
+></DIV
+><P
+>Если результат запроса присваивается переменной строкового типа или списку переменных, то они должны в точности соответствовать по количеству и типам данных столбцам результата, иначе произойдёт ошибка во время выполнения. Если используется переменная типа <TT
+CLASS="TYPE"
+>record</TT
+>, то она автоматически приводится к строковому типу результата запроса.</P
+><P
+>Предложение INTO может появиться практически в любом месте SQL-команды. Обычно его записывают непосредственно перед или сразу после списка <TT
+CLASS="REPLACEABLE"
+><I
+>select_expressions</I
+></TT
+> в <TT
+CLASS="COMMAND"
+>SELECT</TT
+> или в конце команды для команд других типов. Рекомендуется следовать этому соглашению на случай, если правила разбора <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> ужесточатся в будущих версиях.</P
+><P
+>Если указание <TT
+CLASS="LITERAL"
+>STRICT</TT
+> отсутствует в предложении <TT
+CLASS="LITERAL"
+>INTO</TT
+>, то в <TT
+CLASS="REPLACEABLE"
+><I
+>target</I
+></TT
+> присваивается первая строка, возвращённая запросом; или NULL, если запрос не вернул строк. (Заметим, что понятие <SPAN
+CLASS="QUOTE"
+>"первая строка"</SPAN
+> определяется неоднозначно без <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+>.) Все остальные строки результата после первой отбрасываются. Можно проверить специальную переменную <TT
+CLASS="LITERAL"
+>FOUND</TT
+> (см. <A
+HREF="plpgsql-statements.html#PLPGSQL-STATEMENTS-DIAGNOSTICS"
+>Подраздел 40.5.5</A
+>), чтобы определить, была ли возвращена запись: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT * INTO myrec FROM emp WHERE empname = myname;
+IF NOT FOUND THEN
+    RAISE EXCEPTION 'Сотрудник % не найден', myname;
+END IF;</PRE
+><P> Если добавлено указание <TT
+CLASS="LITERAL"
+>STRICT</TT
+>, то запрос должен вернуть ровно одну строку или произойдёт ошибка во время выполнения: либо <TT
+CLASS="LITERAL"
+>NO_DATA_FOUND</TT
+> (нет строк), либо <TT
+CLASS="LITERAL"
+>TOO_MANY_ROWS</TT
+> (более одной строки). Можно использовать секцию исключений в блоке для обработки ошибок, например: </P><PRE
+CLASS="PROGRAMLISTING"
+>BEGIN
+    SELECT * INTO STRICT myrec FROM emp WHERE empname = myname;
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            RAISE EXCEPTION 'Сотрудник % не найден', myname;
+        WHEN TOO_MANY_ROWS THEN
+            RAISE EXCEPTION 'Сотрудник % уже существует', myname;
+END;</PRE
+><P> После успешного выполнения команды с указанием <TT
+CLASS="LITERAL"
+>STRICT</TT
+>, значение переменной <TT
+CLASS="LITERAL"
+>FOUND</TT
+> всегда устанавливается в истину.</P
+><P
+>Для <TT
+CLASS="COMMAND"
+>INSERT</TT
+>/<TT
+CLASS="COMMAND"
+>UPDATE</TT
+>/<TT
+CLASS="COMMAND"
+>DELETE</TT
+> с <TT
+CLASS="LITERAL"
+>RETURNING</TT
+>, <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> возвращает ошибку, если выбрано более одной строки, даже в том случае, когда указание <TT
+CLASS="LITERAL"
+>STRICT</TT
+> отсутствует. Так происходит потому, что у этих команд нет возможности, типа <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+>, указать какая из задействованных строк должна быть возвращена.</P
+><P
+>Если для функции включён режим <TT
+CLASS="LITERAL"
+>print_strict_params</TT
+>, то при возникновении ошибки, связанной с нарушением условия <TT
+CLASS="LITERAL"
+>STRICT</TT
+>, в детальную (<TT
+CLASS="LITERAL"
+>DETAIL</TT
+>) часть сообщения об ошибке будет включена информация о параметрах, переданных запросу. Изменить значение <TT
+CLASS="LITERAL"
+>print_strict_params</TT
+> можно установкой параметра <TT
+CLASS="VARNAME"
+>plpgsql.print_strict_params</TT
+>. Но это повлияет только на функции, скомпилированные после изменения. Для конкретной функции можно использовать указание компилятора, например: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION get_userid(username text) RETURNS int
+AS $$
+#print_strict_params on
+DECLARE
+    userid int;
+BEGIN
+    SELECT users.userid INTO STRICT userid
+        FROM users WHERE users.username = get_userid.username;
+    RETURN userid;
+END
+$$ LANGUAGE plpgsql;</PRE
+><P> В случае сбоя будет сформировано примерно такое сообщение об ошибке </P><PRE
+CLASS="PROGRAMLISTING"
+>ERROR:  query returned no rows
+DETAIL:  parameters: $1 = 'nosuchuser'
+CONTEXT:  PL/pgSQL function get_userid(text) line 6 at SQL statement</PRE
+><P></P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>С указанием <TT
+CLASS="LITERAL"
+>STRICT</TT
+> поведение <TT
+CLASS="COMMAND"
+>SELECT INTO</TT
+> и связанных операторов соответствует принятому в Oracle PL/SQL.</P
+></BLOCKQUOTE
+></DIV
+><P
+>Как действовать в случаях, когда требуется обработать несколько строк результата, описано в <A
+HREF="plpgsql-control-structures.html#PLPGSQL-RECORDS-ITERATING"
+>Подразделе 40.6.4</A
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="PLPGSQL-STATEMENTS-EXECUTING-DYN"
+>40.5.4. Выполнение динамически формируемых команд</A
+></H2
+><P
+>Часто требуется динамически формировать команды внутри функций на <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+>, то есть такие команды, в которых при каждом выполнении могут использоваться разные таблицы или типы данных. Обычно <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> кеширует планы выполнения (как описано в <A
+HREF="plpgsql-implementation.html#PLPGSQL-PLAN-CACHING"
+>Подразделе 40.10.2</A
+>), но в случае с динамическими командами это не будет работать. Для исполнения динамических команд предусмотрен оператор <TT
+CLASS="COMMAND"
+>EXECUTE</TT
+>: </P><PRE
+CLASS="SYNOPSIS"
+>EXECUTE <TT
+CLASS="REPLACEABLE"
+><I
+>command-string</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+> INTO [<SPAN
+CLASS="OPTIONAL"
+>STRICT</SPAN
+>] <TT
+CLASS="REPLACEABLE"
+><I
+>target</I
+></TT
+> </SPAN
+>] [<SPAN
+CLASS="OPTIONAL"
+> USING <TT
+CLASS="REPLACEABLE"
+><I
+>expression</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, ... </SPAN
+>] </SPAN
+>];</PRE
+><P> где <TT
+CLASS="REPLACEABLE"
+><I
+>command-string</I
+></TT
+> это выражение, формирующее строку (типа <TT
+CLASS="TYPE"
+>text</TT
+>) с текстом команды, которую нужно выполнить. Необязательный <TT
+CLASS="REPLACEABLE"
+><I
+>target</I
+></TT
+>, куда присваивается результат команды, может быть переменной типа <TT
+CLASS="TYPE"
+>record</TT
+>, строковой переменной или разделённым через запятую списком скалярных переменных, полей записи/строки. Необязательные выражения в <TT
+CLASS="LITERAL"
+>USING</TT
+> формируют значения, которые будут вставлены в команду.</P
+><P
+>В сформированном тексте команды замена имён переменных <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> на их значения проводиться не будет. Все необходимые значения переменных должны быть вставлены в командную строку при её построении, либо нужно использовать параметры, как описано ниже.</P
+><P
+>Также, нет никакого плана кеширования для команд, выполняемых с помощью <TT
+CLASS="COMMAND"
+>EXECUTE</TT
+>. Вместо этого план создаётся каждый раз при выполнении. Таким образом, строка команды может динамически создаваться внутри функции для выполнения действий с различными таблицами и столбцами.</P
+><P
+>Предложение <TT
+CLASS="LITERAL"
+>INTO</TT
+> указывает, куда должны быть помещены результаты SQL-команды, возвращающей строки. Если используется переменная строкового типа или список переменных, то они должны в точности соответствовать структуре результата запроса (когда используется переменная типа <TT
+CLASS="TYPE"
+>record</TT
+>, она автоматически приводится к строковому типу результата запроса). Если возвращается несколько строк, то только первая будет присвоена переменной(ым) в <TT
+CLASS="LITERAL"
+>INTO</TT
+>. Если не возвращается ни одной строки, то присваивается NULL. Без предложения <TT
+CLASS="LITERAL"
+>INTO</TT
+> результаты запроса отбрасываются.</P
+><P
+>С указанием <TT
+CLASS="LITERAL"
+>STRICT</TT
+> запрос должен вернуть ровно одну строку, иначе выдаётся сообщение об ошибке.</P
+><P
+>В тексте команды можно использовать значения параметров, ссылки на параметры обозначаются как <TT
+CLASS="LITERAL"
+>$1</TT
+>, <TT
+CLASS="LITERAL"
+>$2</TT
+> и т. д. Эти символы указывают на значения, находящиеся в предложении <TT
+CLASS="LITERAL"
+>USING</TT
+>. Такой метод зачастую предпочтительнее, чем вставка значений в команду в виде текста: он позволяет исключить во время исполнения дополнительные расходы на преобразования значений в текст и обратно, и не открывает возможности для SQL-инъекций, не требуя применять экранирование или кавычки для спецсимволов. Пример: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXECUTE 'SELECT count(*) FROM mytable WHERE inserted_by = $1 AND inserted &lt;= $2'
+   INTO c
+   USING checked_user, checked_date;</PRE
+><P></P
+><P
+>Обратите внимание, что символы параметров могут быть использованы только в местах, где должны быть значения. Если требуется динамически формировать имена таблиц или столбцов, то их необходимо вставлять в виде текста. Например, если в предыдущем запросе необходимо динамически задавать имя таблицы, можно сделать следующее: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXECUTE 'SELECT count(*) FROM '
+    || tabname::regclass
+    || ' WHERE inserted_by = $1 AND inserted &lt;= $2'
+   INTO c
+   USING checked_user, checked_date;</PRE
+><P> Ещё одно ограничение состоит в том, что символы параметров могут использоваться только в командах <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, <TT
+CLASS="COMMAND"
+>INSERT</TT
+>, <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> и <TT
+CLASS="COMMAND"
+>DELETE</TT
+>. В других типах операторов (обычно называемых утилитами), необходимо вставлять значения в виде текста даже там, где требуются просто значения.</P
+><P
+>Команда <TT
+CLASS="COMMAND"
+>EXECUTE</TT
+> c неизменяемым текстом и параметрами USING (как в первом примере выше), функционально эквивалентна команде, записанной напрямую в <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+>, в которой переменные <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> автоматически заменяются значениями. Важное отличие в том, что <TT
+CLASS="COMMAND"
+>EXECUTE</TT
+> при каждом исполнении заново строит план команды с учётом текущих значений параметров, тогда как <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> строит общий план выполнения и кеширует его при повторном использовании. В тех случаях, когда наилучший план выполнения сильно зависит от значений параметров, может быть полезно использовать <TT
+CLASS="COMMAND"
+>EXECUTE</TT
+> для гарантии того, что не будет выбран общий план.</P
+><P
+>В настоящее время команда <TT
+CLASS="COMMAND"
+>SELECT INTO</TT
+> не поддерживается в <TT
+CLASS="COMMAND"
+>EXECUTE</TT
+>, вместо этого нужно выполнять обычный <TT
+CLASS="COMMAND"
+>SELECT</TT
+> и указать <TT
+CLASS="LITERAL"
+>INTO</TT
+> для самой команды <TT
+CLASS="COMMAND"
+>EXECUTE</TT
+>.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Оператор <TT
+CLASS="COMMAND"
+>EXECUTE</TT
+> в <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> не имеет отношения к одноименному SQL-оператору сервера <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Серверный <TT
+CLASS="COMMAND"
+>EXECUTE</TT
+> не может напрямую использоваться в функциях на <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> (и в этом нет необходимости).</P
+></BLOCKQUOTE
+></DIV
+><DIV
+CLASS="EXAMPLE"
+><A
+NAME="PLPGSQL-QUOTE-LITERAL-EXAMPLE"
+></A
+><P
+><B
+>Пример 40-1. Использование кавычек в динамических запросах</B
+></P
+><P
+>При работе с динамическими командами часто приходится иметь дело с экранированием одинарных кавычек. Рекомендуемым методом для взятия текста в кавычки в теле функции является экранирование знаками доллара. (Если имеется унаследованный код, не использующий этот метод, пожалуйста, обратитесь к обзору в <A
+HREF="plpgsql-development-tips.html#PLPGSQL-QUOTE-TIPS"
+>Подразделе 40.11.1</A
+>, это поможет сэкономить усилия при переводе кода к более приемлемому виду.)</P
+><P
+>Необходимо соблюдать осторожность при вставке динамических значений в конструируемый текст запроса, так как они могут сами содержать кавычки. Пример (предполагается, что тело функции экранируется знаками доллара, поэтому кавычки не нужно дублировать): </P><PRE
+CLASS="PROGRAMLISTING"
+>EXECUTE 'UPDATE tbl SET '
+        || quote_ident(colname)
+        || ' = '
+        || quote_literal(newvalue)
+        || ' WHERE key = '
+        || quote_literal(keyvalue);</PRE
+><P></P
+><P
+>Этот пример демонстрирует использование функций <CODE
+CLASS="FUNCTION"
+>quote_ident</CODE
+> и <CODE
+CLASS="FUNCTION"
+>quote_literal</CODE
+> (см. <A
+HREF="functions-string.html"
+>Раздел 9.4</A
+>). Для надёжности, выражения, содержащие идентификаторы столбцов и таблиц должны использовать функцию <CODE
+CLASS="FUNCTION"
+>quote_ident</CODE
+> при добавлении в текст запроса. А для выражений со значениями, которые должны быть обычными строками, используется функция <CODE
+CLASS="FUNCTION"
+>quote_literal</CODE
+>. Эти функции выполняют соответствующие шаги, чтобы вернуть текст, по ситуации заключённый в двойные или одинарные кавычки и с правильно экранированными специальными символами.</P
+><P
+>Так как функция <CODE
+CLASS="FUNCTION"
+>quote_literal</CODE
+> помечена как <TT
+CLASS="LITERAL"
+>STRICT</TT
+>, то она всегда возвращает NULL, если переданный ей аргумент имеет значение NULL. В приведённом выше примере, если <TT
+CLASS="LITERAL"
+>newvalue</TT
+> или <TT
+CLASS="LITERAL"
+>keyvalue</TT
+> были NULL, вся строка с текстом запроса станет NULL, что приведёт к ошибке в <TT
+CLASS="COMMAND"
+>EXECUTE</TT
+>. Для предотвращения этой проблемы используйте функцию <CODE
+CLASS="FUNCTION"
+>quote_nullable</CODE
+>, которая работает так же, как <CODE
+CLASS="FUNCTION"
+>quote_literal</CODE
+> за исключением того, что при вызове с пустым аргументом возвращает строку 'NULL'. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXECUTE 'UPDATE tbl SET '
+        || quote_ident(colname)
+        || ' = '
+        || quote_nullable(newvalue)
+        || ' WHERE key = '
+        || quote_nullable(keyvalue);</PRE
+><P> Если вы имеете дело со значениями, которые могут быть пустыми, то, как правило, нужно использовать <CODE
+CLASS="FUNCTION"
+>quote_nullable</CODE
+> вместо <CODE
+CLASS="FUNCTION"
+>quote_literal</CODE
+>.</P
+><P
+>Как обычно, необходимо убедиться, что значения NULL в запросе не принесут неожиданных результатов. Например, следующее условие <TT
+CLASS="LITERAL"
+>WHERE</TT
+> </P><PRE
+CLASS="PROGRAMLISTING"
+>'WHERE key = ' || quote_nullable(keyvalue)</PRE
+><P> никогда не выполнится, если <TT
+CLASS="LITERAL"
+>keyvalue</TT
+> — NULL, так как применение <TT
+CLASS="LITERAL"
+>=</TT
+> с операндом, имеющим значение NULL, всегда даёт NULL. Если требуется, чтобы NULL обрабатывалось как обычное значение, то условие выше нужно переписать так: </P><PRE
+CLASS="PROGRAMLISTING"
+>'WHERE key IS NOT DISTINCT FROM ' || quote_nullable(keyvalue)</PRE
+><P> (В настоящее время <TT
+CLASS="LITERAL"
+>IS NOT DISTINCT FROM</TT
+> работает менее эффективно, чем <TT
+CLASS="LITERAL"
+>=</TT
+>, так что используйте этот способ, только если это действительно необходимо. Подробнее особенности NULL и <TT
+CLASS="LITERAL"
+>IS DISTINCT</TT
+> описаны в <A
+HREF="functions-comparison.html"
+>Разделе 9.2</A
+>.)</P
+><P
+>Обратите внимание, что использование знака $ полезно только для взятия в кавычки фиксированного текста. Плохая идея написать этот пример так: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXECUTE 'UPDATE tbl SET '
+        || quote_ident(colname)
+        || ' = $$'
+        || newvalue
+        || '$$ WHERE key = '
+        || quote_literal(keyvalue);</PRE
+><P> потому что <TT
+CLASS="LITERAL"
+>newvalue</TT
+> может также содержать <TT
+CLASS="LITERAL"
+>$$</TT
+>. Эта же проблема может возникнуть и с любым другим разделителем, используемым после знака <TT
+CLASS="LITERAL"
+>$</TT
+>. Поэтому, чтобы безопасно заключить заранее неизвестный текст в кавычки, <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>нужно</I
+></SPAN
+> использовать соответствующие функции: <CODE
+CLASS="FUNCTION"
+>quote_literal</CODE
+>, <CODE
+CLASS="FUNCTION"
+>quote_nullable</CODE
+>, или <CODE
+CLASS="FUNCTION"
+>quote_ident</CODE
+>.</P
+><P
+>Динамические операторы SQL также могут быть безопасно сконструированы при помощи функции <CODE
+CLASS="FUNCTION"
+>format</CODE
+> (см. <A
+HREF="functions-string.html"
+>Раздел 9.4</A
+>). Так, например: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXECUTE format('UPDATE tbl SET %I = %L WHERE key = %L', colname, newvalue, keyvalue);</PRE
+><P> Функцию <CODE
+CLASS="FUNCTION"
+>format</CODE
+> можно использовать в сочетании с предложением <TT
+CLASS="LITERAL"
+>USING</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXECUTE format('UPDATE tbl SET %I = $1 WHERE key = $2', colname)
+   USING newvalue, keyvalue;</PRE
+><P> Это более эффективная форма, так как параметры <TT
+CLASS="LITERAL"
+>newvalue</TT
+> и <TT
+CLASS="LITERAL"
+>keyvalue</TT
+> не преобразуются в текст.</P
+></DIV
+><P
+>Более объёмный пример использования динамической команды и <TT
+CLASS="COMMAND"
+>EXECUTE</TT
+> можно увидеть в <A
+HREF="plpgsql-porting.html#PLPGSQL-PORTING-EX2"
+>Примере 40-9</A
+>. В нём создаётся и динамически выполняется команда <TT
+CLASS="COMMAND"
+>CREATE FUNCTION</TT
+> для определения новой функции.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="PLPGSQL-STATEMENTS-DIAGNOSTICS"
+>40.5.5. Статус выполнения команды</A
+></H2
+><P
+>Существует несколько способов определить статус выполнения команды. Первый способ заключается в использовании команды <TT
+CLASS="COMMAND"
+>GET DIAGNOSTICS</TT
+>, которая имеет следующий вид: </P><PRE
+CLASS="SYNOPSIS"
+>GET [<SPAN
+CLASS="OPTIONAL"
+> CURRENT </SPAN
+>] DIAGNOSTICS <TT
+CLASS="REPLACEABLE"
+><I
+>variable</I
+></TT
+> { = | := } <TT
+CLASS="REPLACEABLE"
+><I
+>item</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+> , ... </SPAN
+>];</PRE
+><P> Эта команда позволяет получить значения индикаторов состояния системы. Каждый <TT
+CLASS="REPLACEABLE"
+><I
+>item</I
+></TT
+> является ключевым словом, идентифицирующим значение состояния, которое будет присвоено указанной переменной. Переменная должна быть соответствующего типа данных. В настоящий момент доступны следующие индикаторы: <TT
+CLASS="VARNAME"
+>ROW_COUNT</TT
+> — количество строк, обработанных последней командой <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>; <TT
+CLASS="VARNAME"
+>RESULT_OID</TT
+> — OID последней строки, вставленной последней выполненной командой <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>. Обратите внимание, что получать <TT
+CLASS="VARNAME"
+>RESULT_OID</TT
+> имеет смысл только после вставки (<TT
+CLASS="COMMAND"
+>INSERT</TT
+>) записей в таблицу, содержащую OID. Для <TT
+CLASS="COMMAND"
+>GET DIAGNOSTICS</TT
+> можно использовать двоеточие-равно (<TT
+CLASS="LITERAL"
+>:=</TT
+>) вместо <TT
+CLASS="LITERAL"
+>=</TT
+> в стандарте SQL.</P
+><P
+>Пример: </P><PRE
+CLASS="PROGRAMLISTING"
+>GET DIAGNOSTICS integer_var = ROW_COUNT;</PRE
+><P></P
+><P
+>Второй способ определения статуса выполнения команды заключается в проверке значения специальной переменной <TT
+CLASS="LITERAL"
+>FOUND</TT
+>, имеющей тип <TT
+CLASS="TYPE"
+>boolean</TT
+>. При вызове функции на <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+>, переменная <TT
+CLASS="LITERAL"
+>FOUND</TT
+> инициализируется в ложь. Далее, значение переменной изменяется следующими операторами: <P
+></P
+></P><UL
+><LI
+><P
+><TT
+CLASS="COMMAND"
+>SELECT INTO</TT
+> устанавливает <TT
+CLASS="LITERAL"
+>FOUND</TT
+> в истину, если строка присвоена, или в ложь, если строки не выбраны.</P
+></LI
+><LI
+><P
+><TT
+CLASS="COMMAND"
+>PERFORM</TT
+> устанавливает <TT
+CLASS="LITERAL"
+>FOUND</TT
+> в истину если строки выбраны (затем они отбрасываются), или в ложь, если строки не выбраны.</P
+></LI
+><LI
+><P
+><TT
+CLASS="COMMAND"
+>UPDATE</TT
+>, <TT
+CLASS="COMMAND"
+>INSERT</TT
+> и <TT
+CLASS="COMMAND"
+>DELETE</TT
+> устанавливают <TT
+CLASS="LITERAL"
+>FOUND</TT
+> в истину, если при их выполнении была задействована хотя бы одна строка, или в ложь, если ни одна строка не была задействована.</P
+></LI
+><LI
+><P
+><TT
+CLASS="COMMAND"
+>FETCH</TT
+> устанавливают <TT
+CLASS="LITERAL"
+>FOUND</TT
+> в истину, если команда вернула строку, или ложь, если строка не выбрана.</P
+></LI
+><LI
+><P
+><TT
+CLASS="COMMAND"
+>MOVE</TT
+> устанавливает <TT
+CLASS="LITERAL"
+>FOUND</TT
+> в истину при успешном перемещении курсора, в противном случае — в ложь.</P
+></LI
+><LI
+><P
+><TT
+CLASS="COMMAND"
+>FOR</TT
+>, как и <TT
+CLASS="COMMAND"
+>FOREACH</TT
+>, устанавливают <TT
+CLASS="LITERAL"
+>FOUND</TT
+> в истину, если была произведена хотя бы одна итерация цикла, в противном случае - в ложь. При этом значение <TT
+CLASS="LITERAL"
+>FOUND</TT
+> будет установлено только после выхода из цикла. Пока цикл выполняется, оператор цикла не изменяет значение переменной. Но другие операторы внутри цикла могут менять значение <TT
+CLASS="LITERAL"
+>FOUND</TT
+>.</P
+></LI
+><LI
+><P
+><TT
+CLASS="COMMAND"
+>RETURN QUERY</TT
+> и <TT
+CLASS="COMMAND"
+>RETURN QUERY EXECUTE</TT
+> устанавливают <TT
+CLASS="LITERAL"
+>FOUND</TT
+> в истину, если запрос вернул хотя бы одну строку, или в ложь, если строки не выбраны.</P
+></LI
+></UL
+><P> Другие операторы <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> не меняют значение <TT
+CLASS="LITERAL"
+>FOUND</TT
+>. Помните в частности, что <TT
+CLASS="COMMAND"
+>EXECUTE</TT
+> изменяет вывод <TT
+CLASS="COMMAND"
+>GET DIAGNOSTICS</TT
+>, но не меняет <TT
+CLASS="LITERAL"
+>FOUND</TT
+>.</P
+><P
+><TT
+CLASS="LITERAL"
+>FOUND</TT
+> является локальной переменной в каждой функции <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> и любые её изменения, влияют только на текущую функцию.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="PLPGSQL-STATEMENTS-NULL"
+>40.5.6. Не делать ничего</A
+></H2
+><P
+>Иногда бывает полезен оператор, который не делает ничего. Например, он может показывать, что одна из ветвей if/then/else сознательно оставлена пустой. Для этих целей используется <TT
+CLASS="COMMAND"
+>NULL</TT
+>: </P><PRE
+CLASS="SYNOPSIS"
+>NULL;</PRE
+><P></P
+><P
+>В следующем примере два фрагмента кода эквивалентны: </P><PRE
+CLASS="PROGRAMLISTING"
+>BEGIN
+    y := x / 0;
+EXCEPTION
+    WHEN division_by_zero THEN
+        NULL;  -- игнорируем ошибку
+END;</PRE
+><P>
+
+</P><PRE
+CLASS="PROGRAMLISTING"
+>BEGIN
+    y := x / 0;
+EXCEPTION
+    WHEN division_by_zero THEN  -- игнорируем ошибку
+END;</PRE
+><P> Какой вариант выбрать — дело вкуса.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>В Oracle PL/SQL не допускаются пустые списки операторов, поэтому <TT
+CLASS="COMMAND"
+>NULL</TT
+> <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>обязателен</I
+></SPAN
+> в подобных ситуациях. В <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> разрешается не писать ничего.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="plpgsql-expressions.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="plpgsql-control-structures.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Выражения</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="plpgsql.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Управляющие структуры</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

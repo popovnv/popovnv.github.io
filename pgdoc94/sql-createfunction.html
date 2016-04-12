@@ -1,0 +1,1207 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>CREATE FUNCTION</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="CREATE FOREIGN TABLE"
+HREF="sql-createforeigntable.html"><LINK
+REL="NEXT"
+TITLE="CREATE GROUP"
+HREF="sql-creategroup.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="CREATE FOREIGN TABLE"
+HREF="sql-createforeigntable.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="CREATE GROUP"
+HREF="sql-creategroup.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-CREATEFUNCTION"
+></A
+>CREATE FUNCTION</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN73457"
+></A
+><H2
+>Название</H2
+>CREATE FUNCTION&nbsp;--&nbsp;создать функцию</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN73460"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>CREATE [ OR REPLACE ] FUNCTION
+    <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> ( [ [ <TT
+CLASS="REPLACEABLE"
+><I
+>режим_аргумента</I
+></TT
+> ] [ <TT
+CLASS="REPLACEABLE"
+><I
+>имя_аргумента</I
+></TT
+> ] <TT
+CLASS="REPLACEABLE"
+><I
+>тип_аргумента</I
+></TT
+> [ { DEFAULT | = } <TT
+CLASS="REPLACEABLE"
+><I
+>выражение_по_умолчанию</I
+></TT
+> ] [, ...] ] )
+    [ RETURNS <TT
+CLASS="REPLACEABLE"
+><I
+>тип_результата</I
+></TT
+>
+      | RETURNS TABLE ( <TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>тип_колонки</I
+></TT
+> [, ...] ) ]
+  { LANGUAGE <TT
+CLASS="REPLACEABLE"
+><I
+>имя_языка</I
+></TT
+>
+    | WINDOW
+    | IMMUTABLE | STABLE | VOLATILE | [ NOT ] LEAKPROOF
+    | CALLED ON NULL INPUT | RETURNS NULL ON NULL INPUT | STRICT
+    | [ EXTERNAL ] SECURITY INVOKER | [ EXTERNAL ] SECURITY DEFINER
+    | COST <TT
+CLASS="REPLACEABLE"
+><I
+>стоимость_выполнения</I
+></TT
+>
+    | ROWS <TT
+CLASS="REPLACEABLE"
+><I
+>строк_в_результате</I
+></TT
+>
+    | SET <TT
+CLASS="REPLACEABLE"
+><I
+>параметр_конфигурации</I
+></TT
+> { TO <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> | = <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> | FROM CURRENT }
+    | AS '<TT
+CLASS="REPLACEABLE"
+><I
+>определение</I
+></TT
+>'
+    | AS '<TT
+CLASS="REPLACEABLE"
+><I
+>объектный_файл</I
+></TT
+>', '<TT
+CLASS="REPLACEABLE"
+><I
+>объектный_символ</I
+></TT
+>'
+  } ...
+    [ WITH ( <TT
+CLASS="REPLACEABLE"
+><I
+>атрибут</I
+></TT
+> [, ...] ) ]</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="SQL-CREATEFUNCTION-DESCRIPTION"
+></A
+><H2
+>Описание</H2
+><P
+>Команда <TT
+CLASS="COMMAND"
+>CREATE FUNCTION</TT
+> определяет новую функцию. <TT
+CLASS="COMMAND"
+>CREATE OR REPLACE FUNCTION</TT
+> создаёт новую функцию, либо заменяет определение уже существующей. Чтобы определить функцию, необходимо иметь право <TT
+CLASS="LITERAL"
+>USAGE</TT
+> для соответствующего языка.</P
+><P
+>Если указано имя схемы, функция создаётся в заданной схеме, в противном случае — в текущей. Имя новой функции должно отличаться от имён существующих функций с такими же типами аргументов в этой схеме. Однако, функции с аргументами разных типов могут иметь одно имя (это называется <I
+CLASS="FIRSTTERM"
+>перегрузкой</I
+>).</P
+><P
+>Чтобы заменить текущее определение существующей функции, используйте команду <TT
+CLASS="COMMAND"
+>CREATE OR REPLACE FUNCTION</TT
+>. Но учтите, что она не позволяет изменить имя или аргументы функции (если попытаться сделать это, на самом деле будет создана новая, независимая функция). Кроме того, <TT
+CLASS="COMMAND"
+>CREATE OR REPLACE FUNCTION</TT
+> не позволит изменить тип результата существующей функции. Чтобы сделать это, придётся удалить функцию и создать её заново. (Это означает, что если функция имеет выходные параметры (<TT
+CLASS="LITERAL"
+>OUT</TT
+>), то изменить типы параметров <TT
+CLASS="LITERAL"
+>OUT</TT
+> можно, только удалив функцию.)</P
+><P
+>Когда команда <TT
+CLASS="COMMAND"
+>CREATE OR REPLACE FUNCTION</TT
+> заменяет существующую функцию, владелец и права доступа к этой функции не меняются. Все другие свойства функции получают значения, задаваемые командой явно или по умолчанию. Чтобы заменить функцию, необходимо быть её владельцем (или быть членом роли-владельца).</P
+><P
+>Если вы удалите и затем вновь создадите функцию, новая функция станет другой сущностью, отличной от старой; вам потребуется так же удалить существующие правила, представления, триггеры и т. п., ссылающиеся на старую функцию. Поэтому, чтобы изменить определение функции, сохраняя ссылающиеся на неё объекты, следует использовать <TT
+CLASS="COMMAND"
+>CREATE OR REPLACE FUNCTION</TT
+>. Кроме того, многие дополнительные свойства существующей функции можно изменить с помощью <TT
+CLASS="COMMAND"
+>ALTER FUNCTION</TT
+>.</P
+><P
+>Владельцем функции становится пользователь её создавший.</P
+><P
+>Чтобы создать функцию, необходимо иметь право <TT
+CLASS="LITERAL"
+>USAGE</TT
+> для типов её аргументов и возвращаемого типа.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN73501"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></DT
+><DD
+><P
+>Имя (возможно, дополненное схемой) создаваемой функции.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>режим_аргумента</I
+></TT
+></DT
+><DD
+><P
+>Режим аргумента: <TT
+CLASS="LITERAL"
+>IN</TT
+> (входной), <TT
+CLASS="LITERAL"
+>OUT</TT
+> (выходной), <TT
+CLASS="LITERAL"
+>INOUT</TT
+> (входной и выходной) или <TT
+CLASS="LITERAL"
+>VARIADIC</TT
+> (переменный). По умолчанию подразумевается <TT
+CLASS="LITERAL"
+>IN</TT
+>. За единственным аргументом <TT
+CLASS="LITERAL"
+>VARIADIC</TT
+> могут следовать только аргументы <TT
+CLASS="LITERAL"
+>OUT</TT
+>. Кроме того, аргументы <TT
+CLASS="LITERAL"
+>OUT</TT
+> и <TT
+CLASS="LITERAL"
+>INOUT</TT
+> нельзя использовать с предложением <TT
+CLASS="LITERAL"
+>RETURNS TABLE</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_аргумента</I
+></TT
+></DT
+><DD
+><P
+>Имя аргумента. Некоторые языки (включая SQL и PL/pgSQL) позволяют использовать это имя в теле функции. Для других языков это имя служит просто дополнительным описанием, если говорить о самой функции; однако вы можете указывать имена аргументов при вызове функции для улучшения читаемости (см. <A
+HREF="sql-syntax-calling-funcs.html"
+>Раздел 4.3</A
+>). Имя выходного аргумента в любом случае имеет значение, так как оно определяет имя колонки в типе результата. (Если вы опустите имя выходного аргумента, система выберет для него имя по умолчанию.)</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>тип_аргумента</I
+></TT
+></DT
+><DD
+><P
+>Тип(ы) данных аргументов функции (возможно, дополненный схемой), при наличии аргументов. Тип аргументов может быть базовым, составным или доменным, либо это может быть ссылка на колонку таблицы.</P
+><P
+>В зависимости от языка реализации также может допускаться указание <SPAN
+CLASS="QUOTE"
+>"псевдотипов"</SPAN
+>, например, <TT
+CLASS="TYPE"
+>cstring</TT
+>. Псевдотипы показывают, что фактический тип аргумента либо определён не полностью, либо существует вне множества обычных типов SQL.</P
+><P
+>Ссылка на тип колонки записывается в виде <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_таблицы</I
+></TT
+>.<TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+>%TYPE</TT
+>. Иногда такое указание бывает полезно, так как позволяет создать функцию, независящую от изменений в определении таблицы.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>выражение_по_умолчанию</I
+></TT
+></DT
+><DD
+><P
+>Выражение, используемое для вычисления значения по умолчанию, если параметр не задан явно. Результат выражения должен сводиться к типу соответствующего параметра. Значения по умолчанию могут иметь только входные параметры (включая <TT
+CLASS="LITERAL"
+>INOUT</TT
+>). Для всех входных параметров, следующих за параметром с определённым значением по умолчанию, также должны быть определены значения по умолчанию.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>тип_результата</I
+></TT
+></DT
+><DD
+><P
+>Тип возвращаемых данных (возможно, дополненный схемой). Это может быть базовый, составной или доменный тип, либо ссылка на тип колонки таблицы. В зависимости от языка реализации здесь также могут допускаться <SPAN
+CLASS="QUOTE"
+>"псевдотипы"</SPAN
+>, например <TT
+CLASS="TYPE"
+>cstring</TT
+>. Если функция не должна возвращать значение, в качестве типа результата указывается <TT
+CLASS="TYPE"
+>void</TT
+>.</P
+><P
+>В случае наличия параметров <TT
+CLASS="LITERAL"
+>OUT</TT
+> или <TT
+CLASS="LITERAL"
+>INOUT</TT
+>, предложение <TT
+CLASS="LITERAL"
+>RETURNS</TT
+> можно опустить. Если оно присутствует, оно должно согласовываться с типом результата, выводимым из выходных параметров: в качестве возвращаемого типа указывается <TT
+CLASS="LITERAL"
+>RECORD</TT
+>, если выходных параметров несколько, либо тип единственного выходного параметра.</P
+><P
+>Указание <TT
+CLASS="LITERAL"
+>SETOF</TT
+> показывает, что функция возвращает множество, а не единственный элемент.</P
+><P
+>Ссылка на тип колонки записывается в виде <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_таблицы</I
+></TT
+>.<TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+>%TYPE</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+></DT
+><DD
+><P
+>Имя выходной колонки в записи <TT
+CLASS="LITERAL"
+>RETURNS TABLE</TT
+>. По сути это ещё один способ объявить именованный выходной параметр (<TT
+CLASS="LITERAL"
+>OUT</TT
+>), но <TT
+CLASS="LITERAL"
+>RETURNS TABLE</TT
+> также подразумевает и <TT
+CLASS="LITERAL"
+>RETURNS SETOF</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>тип_колонки</I
+></TT
+></DT
+><DD
+><P
+>Тип данных выходной колонки в записи <TT
+CLASS="LITERAL"
+>RETURNS TABLE</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_языка</I
+></TT
+></DT
+><DD
+><P
+>Имя языка, на котором реализована функция. Это может быть <TT
+CLASS="LITERAL"
+>sql</TT
+>, <TT
+CLASS="LITERAL"
+>c</TT
+>, <TT
+CLASS="LITERAL"
+>internal</TT
+>, либо имя процедурного языка, определённого пользователем, например, <TT
+CLASS="LITERAL"
+>plpgsql</TT
+>. Стиль написания этого имени в апострофах считается устаревшим и требует точного совпадения регистра.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>WINDOW</TT
+></DT
+><DD
+><P
+>Указание <TT
+CLASS="LITERAL"
+>WINDOW</TT
+> показывает, что создаётся не простая, а <I
+CLASS="FIRSTTERM"
+>оконная функция</I
+>. В настоящее время это имеет смысл только для функций, написанных на C. Атрибут <TT
+CLASS="LITERAL"
+>WINDOW</TT
+> нельзя изменить, модифицируя впоследствии определение функции.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>IMMUTABLE</TT
+><BR><TT
+CLASS="LITERAL"
+>STABLE</TT
+><BR><TT
+CLASS="LITERAL"
+>VOLATILE</TT
+></DT
+><DD
+><P
+>Эти атрибуты информируют оптимизатор запросов о поведении функции. Одновременно можно указать не более одного атрибута. Если никакой атрибут не задан, по умолчанию подразумевается <TT
+CLASS="LITERAL"
+>VOLATILE</TT
+>.</P
+><P
+>Характеристика <TT
+CLASS="LITERAL"
+>IMMUTABLE</TT
+> (постоянная) показывает, что функция не может модифицировать базу данных и всегда возвращает один и тот же результат при определённых значениях аргументов; то есть, она не обращается к базе данных и не использует информацию, не переданную ей явно в списке аргументов. Если функция имеет такую характеристику, любой её вызов с аргументами-константами можно немедленно заменить значением функции.</P
+><P
+>Характеристика <TT
+CLASS="LITERAL"
+>STABLE</TT
+> (стабильная) показывает, что функция не может модифицировать базу данных и в рамках одного сканирования таблицы она всегда возвращает один и тот же результат для определённых значений аргументов, но этот результат может быть разным в разных операторах SQL. Это подходящий выбор для функций, результаты которых зависят от содержимого базы данных и настраиваемых параметров (например, текущего часового пояса). (Но этот вариант не подходит для триггеров <TT
+CLASS="LITERAL"
+>AFTER</TT
+>, желающих прочитать строки, изменённые текущей командой.) Также заметьте, что функции семейства <CODE
+CLASS="FUNCTION"
+>current_timestamp</CODE
+> также считаются стабильными, так как их результаты не меняются внутри транзакции.</P
+><P
+>Характеристика <TT
+CLASS="LITERAL"
+>VOLATILE</TT
+> (изменчивая) показывает, что результат функции может меняться даже в рамках одного сканирования таблицы, так что её вызовы нельзя оптимизировать. Изменчивы в этом смысле относительно немногие функции баз данных, например: <TT
+CLASS="LITERAL"
+>random()</TT
+>, <TT
+CLASS="LITERAL"
+>currval()</TT
+> и <TT
+CLASS="LITERAL"
+>timeofday()</TT
+>. Но заметьте, что любая функция с побочными эффектами должна быть классифицирована как изменчивая, даже если её результат вполне предсказуем, чтобы её вызовы не были соптимизированы; пример такой функции: <TT
+CLASS="LITERAL"
+>setval()</TT
+>.</P
+><P
+>За дополнительными подробностями обратитесь к <A
+HREF="xfunc-volatility.html"
+>Разделу 35.6</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>LEAKPROOF</TT
+></DT
+><DD
+><P
+>Характеристика <TT
+CLASS="LITERAL"
+>LEAKPROOF</TT
+> (герметичная) показывает, что функция не имеет побочных эффектов. Она не раскрывает информацию о своих аргументах, кроме как возвращая результат. Например, функция, которая выдаёт сообщение об ошибке с некоторыми, но не всеми значениями аргументов, либо выводит значения аргументов в сообщении об ошибке, не является герметичной. Планировщик запросов может поместить герметичные (и только такие) функции в представления, созданные с барьером безопасности (с указанием <TT
+CLASS="LITERAL"
+>security_barrier</TT
+>). См. <A
+HREF="sql-createview.html"
+>CREATE VIEW</A
+> и <A
+HREF="rules-privileges.html"
+>Раздел 38.5</A
+>. Это свойство может установить только суперпользователь.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>CALLED ON NULL INPUT</TT
+><BR><TT
+CLASS="LITERAL"
+>RETURNS NULL ON NULL INPUT</TT
+><BR><TT
+CLASS="LITERAL"
+>STRICT</TT
+></DT
+><DD
+><P
+><TT
+CLASS="LITERAL"
+>CALLED ON NULL INPUT</TT
+> (по умолчанию) показывает, что функция будет вызвана как обычно, если среди её аргументов оказываются значения NULL. В этом случае ответственность за проверку значений NULL и соответствующую их обработку ложится на разработчика функции.</P
+><P
+>Указание <TT
+CLASS="LITERAL"
+>RETURNS NULL ON NULL INPUT</TT
+> или <TT
+CLASS="LITERAL"
+>STRICT</TT
+> показывает, что функция всегда возвращает NULL, получив NULL в одном из аргументов. Такая функция не будет вызываться с аргументами NULL, вместо этого автоматически будет полагаться результат NULL.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>[<SPAN
+CLASS="OPTIONAL"
+>EXTERNAL</SPAN
+>] SECURITY INVOKER</TT
+><BR><TT
+CLASS="LITERAL"
+>[<SPAN
+CLASS="OPTIONAL"
+>EXTERNAL</SPAN
+>] SECURITY DEFINER</TT
+></DT
+><DD
+><P
+>Характеристика <TT
+CLASS="LITERAL"
+>SECURITY INVOKER</TT
+> (безопасность вызывающего) показывает, что функция будет выполняться с правами пользователя, вызвавшего её. Этот вариант подразумевается по умолчанию. Вариант <TT
+CLASS="LITERAL"
+>SECURITY DEFINER</TT
+> (безопасность определившего) определяет, что функция выполняется с правами пользователя, создавшего её.</P
+><P
+>Ключевое слово <TT
+CLASS="LITERAL"
+>EXTERNAL</TT
+> (внешняя) допускается для соответствия стандарту SQL, но является необязательным, так как, в отличие от SQL, эта характеристика распространяется на все функции, а не только внешние.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>стоимость_выполнения</I
+></TT
+></DT
+><DD
+><P
+>Положительное число, задающее примерную стоимость выполнения функции, в единицах <A
+HREF="runtime-config-query.html#GUC-CPU-OPERATOR-COST"
+>cpu_operator_cost</A
+>. Если функция возвращает множество, это число задаёт стоимость для одной строки. Если стоимость не указана, для функций на C и внутренних функций она считается равной 1 единице, а для функций на всех других языках — 100 единицам. При больших значениях планировщик будет стараться не вызывать эту функцию чаще, чем это необходимо.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>строк_в_результате</I
+></TT
+></DT
+><DD
+><P
+>Положительное число, задающее примерное число строк, которое будет ожидать планировщик на выходе этой функции. Это указание допустимо, только если функция объявлена как возвращающая множество. Предполагаемое по умолчанию значение — 1000 строк.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>параметр_конфигурации</I
+></TT
+><BR><TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+></DT
+><DD
+><P
+>Предложение <TT
+CLASS="LITERAL"
+>SET</TT
+> определяет, что при вызове функции указанный параметр конфигурации должен принять заданное значение, а затем восстановить своё предыдущее значение при завершении функции. Предложение <TT
+CLASS="LITERAL"
+>SET FROM CURRENT</TT
+> сохраняет в качестве значения, которое будет применено при входе в функцию, текущее значение указанного параметра.</P
+><P
+>Если в определение функции добавлено <TT
+CLASS="LITERAL"
+>SET</TT
+>, то действие команды <TT
+CLASS="COMMAND"
+>SET LOCAL</TT
+>, выполняемой внутри функции для того же параметра, ограничивается телом функции: предыдущее значение параметра неизменно будет восстановлено при завершении функции. Однако обычная команда <TT
+CLASS="COMMAND"
+>SET</TT
+> (без <TT
+CLASS="LITERAL"
+>LOCAL</TT
+>) переопределяет предложение <TT
+CLASS="LITERAL"
+>SET</TT
+>, как и предыдущую команду <TT
+CLASS="COMMAND"
+>SET LOCAL</TT
+>: действие такой команды будет сохранено и после завершения функции, если только не произойдёт откат транзакции.</P
+><P
+>За подробными сведениями об именах и значениях параметров обратитесь к <A
+HREF="sql-set.html"
+>SET</A
+> и <A
+HREF="runtime-config.html"
+>Главе 18</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>определение</I
+></TT
+></DT
+><DD
+><P
+>Строковая константа, определяющая реализацию функции; её значение зависит от языка. Это может быть имя внутренней функции, путь к объектному файлу, команда SQL или код функции на процедурном языке.</P
+><P
+>Часто бывает полезно заключать определение функции в доллары (см. <A
+HREF="sql-syntax-lexical.html#SQL-SYNTAX-DOLLAR-QUOTING"
+>Подраздел 4.1.2.4</A
+>), а не в традиционные апострофы. Если не использовать доллары, все апострофы и обратные косые черты в определении функции придётся экранировать, дублируя их.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>объектный_файл</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>объектный_символ</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Эта форма предложения <TT
+CLASS="LITERAL"
+>AS</TT
+> применяется для динамически загружаемых функций на языке C, когда имя функции в коде C не совпадает с именем функции в SQL. Строка <TT
+CLASS="REPLACEABLE"
+><I
+>объектный_файл</I
+></TT
+> задаёт имя файла, содержащего динамически загружаемый объект, а <TT
+CLASS="REPLACEABLE"
+><I
+>объектный_символ</I
+></TT
+> — символ скомпонованной функций, то есть имя функции в исходном коде на языке C. Если объектный символ опущен, предполагается, что он совпадает с именем определяемой SQL-функции.</P
+><P
+>Если повторные вызовы <TT
+CLASS="COMMAND"
+>CREATE FUNCTION</TT
+> ссылаются на один и тот же объектный файл, файл загружается в рамках сеанса только один раз. Чтобы выгрузить и загрузить файл снова (например, в процессе разработки), начните новый сеанс.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>атрибут</I
+></TT
+></DT
+><DD
+><P
+>Исторически сложившийся способ передавать дополнительную информацию о функции. В этой записи могут присутствовать следующие атрибуты: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>isStrict</TT
+></DT
+><DD
+><P
+>Равнозначно указанию <TT
+CLASS="LITERAL"
+>STRICT</TT
+> или <TT
+CLASS="LITERAL"
+>RETURNS NULL ON NULL INPUT</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>isCachable</TT
+></DT
+><DD
+><P
+>Свойство <TT
+CLASS="LITERAL"
+>isCachable</TT
+> — устаревший эквивалент <TT
+CLASS="LITERAL"
+>IMMUTABLE</TT
+>; оно всё ещё поддерживается ради обратной совместимости.</P
+></DD
+></DL
+></DIV
+><P> Имена атрибутов являются регистронезависимыми.</P
+></DD
+></DL
+></DIV
+><P
+>За дополнительной информацией о разработке функций обратитесь к <A
+HREF="xfunc.html"
+>Разделу 35.3</A
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="SQL-CREATEFUNCTION-OVERLOADING"
+></A
+><H2
+>Перегрузка</H2
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> допускает <I
+CLASS="FIRSTTERM"
+>перегрузку</I
+> функций; то есть, позволяет использовать одно имя для нескольких различных функций, если у них различаются типы входных аргументов. Однако имена функций в коде C должны различаться, так что перегружаемым функциям C нужно давать различные имена в C (например, включить в имя функции на C типы аргументов).</P
+><P
+>Две функции считаются совпадающими, если они имеют одинаковые имена и типы <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>входных</I
+></SPAN
+> аргументов, параметры <TT
+CLASS="LITERAL"
+>OUT</TT
+> игнорируются. Таким образом, например, эти объявления вызовут конфликт: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION foo(int) ...
+CREATE FUNCTION foo(int, out text) ...</PRE
+><P></P
+><P
+>Функции, имеющие разные типы аргументов, не будут считаться конфликтующими в момент создания, но предоставленные для них значения по умолчанию могут вызвать конфликт в момент использования. Например, рассмотрите следующие определения: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION foo(int) ...
+CREATE FUNCTION foo(int, int default 42) ...</PRE
+><P> Вызов <TT
+CLASS="LITERAL"
+>foo(10)</TT
+> завершится ошибкой из-за неоднозначности в выборе вызываемой функции.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="SQL-CREATEFUNCTION-NOTES"
+></A
+><H2
+>Замечания</H2
+><P
+>В объявлении аргументов функции и возвращаемого значения допускается полный синтаксис описания типа <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>. Однако модификаторы типа в скобках (например, поле точности для типа <TT
+CLASS="TYPE"
+>numeric</TT
+>) команда <TT
+CLASS="COMMAND"
+>CREATE FUNCTION</TT
+> не учитывает. Так что, например, <TT
+CLASS="LITERAL"
+>CREATE FUNCTION foo (varchar(10)) ...</TT
+> создаст такую же функцию, что и <TT
+CLASS="LITERAL"
+>CREATE FUNCTION foo (varchar) ...</TT
+>.</P
+><P
+>При замене существующей функции с помощью <TT
+CLASS="COMMAND"
+>CREATE OR REPLACE FUNCTION</TT
+> есть ограничения на изменения имён параметров. В частности, нельзя изменить имя, уже назначенное любому входному параметру (хотя можно добавить имена ранее безымянным параметрам). Также, если у функции более одного выходного параметра, нельзя изменять имена выходных параметров, так как это приведёт к изменению имён колонок анонимного составного типа, описывающего результат функции. Эти ограничения позволяют гарантировать, что существующие вызовы функции не перестанут работать после её замены.</P
+><P
+>Если функция объявлена как <TT
+CLASS="LITERAL"
+>STRICT</TT
+> с аргументом <TT
+CLASS="LITERAL"
+>VARIADIC</TT
+>, при оценивании строгости проверяется, что весь переменный массив <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>в целом</I
+></SPAN
+> не NULL. Если же в этом массиве содержатся элементы NULL, функция будет вызываться.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="SQL-CREATEFUNCTION-EXAMPLES"
+></A
+><H2
+>Примеры</H2
+><P
+>Ниже приведено несколько простых вводных примеров. За дополнительными сведениями и примерами обратитесь к <A
+HREF="xfunc.html"
+>Разделу 35.3</A
+>. </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION add(integer, integer) RETURNS integer
+    AS 'select $1 + $2;'
+    LANGUAGE SQL
+    IMMUTABLE
+    RETURNS NULL ON NULL INPUT;</PRE
+><P></P
+><P
+>Функция увеличения целого числа на 1, использующая именованный аргумент, на языке <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE OR REPLACE FUNCTION increment(i integer) RETURNS integer AS $$
+        BEGIN
+                RETURN i + 1;
+        END;
+$$ LANGUAGE plpgsql;</PRE
+><P></P
+><P
+>Функция, возвращающая запись с несколькими выходными параметрами: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION dup(in int, out f1 int, out f2 text)
+    AS $$ SELECT $1, CAST($1 AS text) || ' is text' $$
+    LANGUAGE SQL;
+
+SELECT * FROM dup(42);</PRE
+><P> То же самое можно сделать более развёрнуто, явно объявив составной тип: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TYPE dup_result AS (f1 int, f2 text);
+
+CREATE FUNCTION dup(int) RETURNS dup_result
+    AS $$ SELECT $1, CAST($1 AS text) || ' is text' $$
+    LANGUAGE SQL;
+
+SELECT * FROM dup(42);</PRE
+><P> Ещё один способ вернуть несколько колонок — применить функцию <TT
+CLASS="LITERAL"
+>TABLE</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION dup(int) RETURNS TABLE(f1 int, f2 text)
+    AS $$ SELECT $1, CAST($1 AS text) || ' is text' $$
+    LANGUAGE SQL;
+
+SELECT * FROM dup(42);</PRE
+><P> Однако пример с <TT
+CLASS="LITERAL"
+>TABLE</TT
+> отличается от предыдущих, так как в нём функция на самом деле возвращает не одну, а <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>набор</I
+></SPAN
+> записей.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="SQL-CREATEFUNCTION-SECURITY"
+></A
+><H2
+>Разработка защищённых функций <TT
+CLASS="LITERAL"
+>SECURITY DEFINER</TT
+></H2
+><P
+>Так как функция <TT
+CLASS="LITERAL"
+>SECURITY DEFINER</TT
+> выполняется с правами пользователя, создавшего её, необходимо позаботиться о том, чтобы её нельзя было использовать не по назначению. В целях безопасности, в пути <A
+HREF="runtime-config-client.html#GUC-SEARCH-PATH"
+>search_path</A
+> следует исключить любые схемы, доступные на запись недоверенным пользователям. Это не позволит злонамеренным пользователям создать свои объекты, которые замаскируют объекты, используемые функцией. Особенно важно в этом отношении отключить схему временных таблиц, которая по умолчанию просматривается первой, а право записи в неё по умолчанию имеют все. Соответствующую защиту можно организовать, поместив временную схему в конец списка поиска. Для этого следует сделать <TT
+CLASS="LITERAL"
+>pg_temp</TT
+> последней записью в <TT
+CLASS="VARNAME"
+>search_path</TT
+>. Такую защиту демонстрирует следующая функция:</P
+><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION check_password(uname TEXT, pass TEXT)
+RETURNS BOOLEAN AS $$
+DECLARE passed BOOLEAN;
+BEGIN
+        SELECT  (pwd = $2) INTO passed
+        FROM    pwds
+        WHERE   username = $1;
+
+        RETURN passed;
+END;
+$$  LANGUAGE plpgsql
+    SECURITY DEFINER
+    -- Установить безопасный путь поиска: сначала доверенная схема(ы), затем 'pg_temp'.
+    SET search_path = admin, pg_temp;</PRE
+><P
+>До <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> 8.3 указание <TT
+CLASS="LITERAL"
+>SET</TT
+> отсутствовало, так что старые функции могут содержать довольно сложную логику для сохранения, изменения и восстановления переменной <TT
+CLASS="VARNAME"
+>search_path</TT
+>. Существующее теперь указание <TT
+CLASS="LITERAL"
+>SET</TT
+> позволяет сделать это намного проще.</P
+><P
+>Также следует помнить о том, что по умолчанию право выполнения для создаваемых функций имеет роль <TT
+CLASS="LITERAL"
+>PUBLIC</TT
+> (за подробностями обратитесь к <A
+HREF="sql-grant.html"
+>GRANT</A
+>). Однако часто требуется разрешить доступ к функциям, работающим в контексте определившего, только некоторым пользователям. Для этого необходимо отозвать стандартные права <TT
+CLASS="LITERAL"
+>PUBLIC</TT
+> и затем дать права на выполнение индивидуально. Чтобы не образовалось окно, в котором новая функция будет недоступна совсем, создайте её и назначьте права в одной транзакции. Например, так:</P
+><PRE
+CLASS="PROGRAMLISTING"
+>BEGIN;
+CREATE FUNCTION check_password(uname TEXT, pass TEXT) ... SECURITY DEFINER;
+REVOKE ALL ON FUNCTION check_password(uname TEXT, pass TEXT) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION check_password(uname TEXT, pass TEXT) TO admins;
+COMMIT;</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="SQL-CREATEFUNCTION-COMPAT"
+></A
+><H2
+>Совместимость</H2
+><P
+>Команда <TT
+CLASS="COMMAND"
+>CREATE FUNCTION</TT
+> определена в SQL:1999 и более поздних стандартах. Версия, реализованная в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, близка к стандартизированной, но соответствует ей не полностью. В частности, непереносимы атрибуты, а также различные языки реализаций.</P
+><P
+>Для совместимости с другими СУБД <TT
+CLASS="REPLACEABLE"
+><I
+>режим_аргумента</I
+></TT
+> можно записать после <TT
+CLASS="REPLACEABLE"
+><I
+>имя_аргумента</I
+></TT
+> или перед ним, но стандарту соответствует только первый вариант.</P
+><P
+>Для определения значений по умолчанию для параметров стандарт SQL поддерживает только синтаксис с ключевым словом <TT
+CLASS="LITERAL"
+>DEFAULT</TT
+>. Синтаксис со знаком <TT
+CLASS="LITERAL"
+>=</TT
+> используется в T-SQL и Firebird.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN73807"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-alterfunction.html"
+>ALTER FUNCTION</A
+>, <A
+HREF="sql-dropfunction.html"
+>DROP FUNCTION</A
+>, <A
+HREF="sql-grant.html"
+>GRANT</A
+>, <A
+HREF="sql-load.html"
+>LOAD</A
+>, <A
+HREF="sql-revoke.html"
+>REVOKE</A
+>, <A
+HREF="app-createlang.html"
+>            <SPAN
+CLASS="APPLICATION"
+>createlang</SPAN
+>
+          </A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-createforeigntable.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-creategroup.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>CREATE FOREIGN TABLE</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>CREATE GROUP</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

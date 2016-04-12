@@ -1,0 +1,264 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Защита соединений TCP/IP с применением туннелей SSH</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Подготовка к работе и сопровождение сервера"
+HREF="runtime.html"><LINK
+REL="PREVIOUS"
+TITLE="Защита соединений TCP/IP с применением SSL"
+HREF="ssl-tcp.html"><LINK
+REL="NEXT"
+TITLE="Регистрация журнала событий в Windows"
+HREF="event-log-registration.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Защита соединений TCP/IP с применением SSL"
+HREF="ssl-tcp.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="runtime.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 17. Подготовка к работе и сопровождение сервера</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Регистрация журнала событий в Windows"
+HREF="event-log-registration.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="SSH-TUNNELS"
+>17.10. Защита соединений TCP/IP с применением туннелей <SPAN
+CLASS="APPLICATION"
+>SSH</SPAN
+></A
+></H1
+><P
+>Для защиты сетевых соединений клиентов с сервером <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> можно применить <SPAN
+CLASS="APPLICATION"
+>SSH</SPAN
+>. При правильном подходе это позволяет обеспечить должный уровень защиты сетевого трафика, даже для клиентов, не поддерживающих SSL.</P
+><P
+>Прежде всего, убедитесь, что на компьютере с сервером <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> также работает сервер <SPAN
+CLASS="APPLICATION"
+>SSH</SPAN
+> и вы можете подключиться к нему через <TT
+CLASS="COMMAND"
+>ssh</TT
+> каким-нибудь пользователем. Затем вы можете установить защищённый тоннель с клиентской машины следующим образом: </P><PRE
+CLASS="PROGRAMLISTING"
+>ssh -L 63333:localhost:5432 joe@foo.com</PRE
+><P> Первое число в аргументе <TT
+CLASS="OPTION"
+>-L</TT
+>, 63333 — это номер порта с вашей стороны туннеля; это может быть номер любого свободного порта. (IANA резервирует порты с 49152 по 65535 для частного использования.) Второе число, 5432 — порт с удалённой стороны туннеля, порт вашего сервера. Имя или IP-адрес между этими номерами портов идентифицирует целевой компьютер (где работает сервер баз данных, к которому вы будете подключаться), с точки зрения компьютера, с которого выполняется подключение (в данном примере, <TT
+CLASS="LITERAL"
+>foo.com</TT
+>). Чтобы подключиться к этому серверу через созданный тоннель, вы можете подключиться к порту 63333 на локальном компьютере: </P><PRE
+CLASS="PROGRAMLISTING"
+>psql -h localhost -p 63333 postgres</PRE
+><P> Для сервера баз данных это будет выглядеть так, как будто вы действительно пользователь <TT
+CLASS="LITERAL"
+>joe</TT
+> компьютера <TT
+CLASS="LITERAL"
+>foo.com</TT
+>, подключающийся к <TT
+CLASS="LITERAL"
+>localhost</TT
+> в этом контексте, и он будет применять ту процедуру проверки подлинности, которая установлена для подключений данного пользователя с этого компьютера. Заметьте, что сервер не будет считать такое соединение защищённым SSL, так как на самом деле трафик между сервером <SPAN
+CLASS="APPLICATION"
+>SSH</SPAN
+> и сервером <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> не защищён. Это не должно нести какие-то дополнительные риски, так как эти серверы работают на одном компьютере.</P
+><P
+>Чтобы настроенный таким образом туннель работал, вы должны иметь возможность подключаться к компьютеру через <TT
+CLASS="COMMAND"
+>ssh</TT
+> под именем <TT
+CLASS="LITERAL"
+>joe@foo.com</TT
+>, так же, как это происходит при установлении терминального подключения с помощью <TT
+CLASS="COMMAND"
+>ssh</TT
+>.</P
+><P
+>Вы также можете настроить перенаправление портов примерно так: </P><PRE
+CLASS="PROGRAMLISTING"
+>ssh -L 63333:foo.com:5432 joe@foo.com</PRE
+><P> Но в этом случае для сервера баз данных подключение будет приходить с его интерфейса <TT
+CLASS="LITERAL"
+>foo.com</TT
+>, а этот интерфейс по умолчанию не прослушивается (вследствие указания <TT
+CLASS="LITERAL"
+>listen_addresses = 'localhost'</TT
+>). Обычно требуется другое поведение.</P
+><P
+>Если вам нужно <SPAN
+CLASS="QUOTE"
+>"перейти"</SPAN
+> к серверу баз данных через некоторый шлюз, это можно организовать примерно так: </P><PRE
+CLASS="PROGRAMLISTING"
+>ssh -L 63333:db.foo.com:5432 joe@shell.foo.com</PRE
+><P> Заметьте, что в этом случае трафик между <TT
+CLASS="LITERAL"
+>shell.foo.com</TT
+> и <TT
+CLASS="LITERAL"
+>db.foo.com</TT
+> не будет защищён туннелем SSH. SSH предлагает довольно много вариантов конфигурации, что позволяет организовывать защиту сети разными способами. За подробностями обратитесь к документации SSH.</P
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>Существуют и другие приложения, которые могут создавать безопасные туннели, применяя по сути тот же подход, что был описан выше.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ssl-tcp.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="event-log-registration.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Защита соединений TCP/IP с применением SSL</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="runtime.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Регистрация <SPAN
+CLASS="APPLICATION"
+>журнала событий</SPAN
+> в <SPAN
+CLASS="SYSTEMITEM"
+>Windows</SPAN
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

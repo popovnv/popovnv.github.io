@@ -1,0 +1,412 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Изменение таблиц</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Определение данных"
+HREF="ddl.html"><LINK
+REL="PREVIOUS"
+TITLE="Системные колонки"
+HREF="ddl-system-columns.html"><LINK
+REL="NEXT"
+TITLE="Права"
+HREF="ddl-priv.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Системные колонки"
+HREF="ddl-system-columns.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ddl.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 5. Определение данных</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Права"
+HREF="ddl-priv.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="DDL-ALTER"
+>5.5. Изменение таблиц</A
+></H1
+><P
+>Если вы создали таблицы, а затем поняли, что допустили ошибку, или изменились требования вашего приложения, вы можете удалить её и создать заново. Но это будет неудобно, если таблица уже заполнена данными, или если на неё ссылаются другие объекты базы данных (например, по внешнему ключу). Поэтому <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> предоставляет набор команд для модификации таблиц. Заметьте, что это по сути отличается от изменения данных, содержащихся в таблице: здесь мы обсуждаем модификацию определения, или структуры, таблицы.</P
+><P
+>Вы можете: <P
+></P
+></P><UL
+COMPACT="COMPACT"
+><LI
+><P
+>Добавлять колонки</P
+></LI
+><LI
+><P
+>Удалять колонки</P
+></LI
+><LI
+><P
+>Добавлять ограничения</P
+></LI
+><LI
+><P
+>Удалять ограничения</P
+></LI
+><LI
+><P
+>Изменять значения по умолчанию</P
+></LI
+><LI
+><P
+>Изменять типы колонок</P
+></LI
+><LI
+><P
+>Переименовывать колонки</P
+></LI
+><LI
+><P
+>Переименовывать таблицы</P
+></LI
+></UL
+><P> Все эти действия выполняются с помощью команды <A
+HREF="sql-altertable.html"
+>ALTER TABLE</A
+>; подробнее о ней вы можете узнать в её справке.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="DDL-ALTER-ADDING-A-COLUMN"
+>5.5.1. Добавление колонки</A
+></H2
+><P
+>Добавить колонку вы можете так: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER TABLE products ADD COLUMN description text;</PRE
+><P> Новая колонка заполняется заданным для неё значением по умолчанию (или значением NULL, если вы не добавите указание <TT
+CLASS="LITERAL"
+>DEFAULT</TT
+>).</P
+><P
+>При этом вы можете сразу определить ограничения колонки, используя обычный синтаксис: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER TABLE products ADD COLUMN description text CHECK (description &lt;&gt; '');</PRE
+><P> На самом деле здесь можно использовать все конструкции, допустимые в определении колонки в команде <TT
+CLASS="COMMAND"
+>CREATE TABLE</TT
+>. Помните однако, что значение по умолчанию должно удовлетворять данным ограничениям, чтобы операция <TT
+CLASS="LITERAL"
+>ADD</TT
+> выполнилась успешно. Вы также можете сначала заполнить колонку правильно, а затем добавить ограничения (см. ниже).</P
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>Добавление колонки со значением по умолчанию приводит к изменению всех строк таблицы (в них будет сохранено новое значение). Однако, если значение по умолчанию не указано, <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> может обойтись без физического изменения. Поэтому, если вы планируете заполнить колонку в основном не значениями по умолчанию, лучше будет добавить колонку без значения по умолчанию, затем вставить требуемые значения с помощью <TT
+CLASS="COMMAND"
+>UPDATE</TT
+>, а потом определить значение по умолчанию, как описано ниже.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="DDL-ALTER-REMOVING-A-COLUMN"
+>5.5.2. Удаление колонки</A
+></H2
+><P
+>Удалить колонку можно так: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER TABLE products DROP COLUMN description;</PRE
+><P> Данные, которые были в этой колонке, исчезают. Вместе с колонкой удаляются и включающие её ограничения таблицы. Однако, если на колонку ссылается ограничение внешнего ключа другой таблицы, <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> не удалит это ограничение неявно. Разрешить удаление всех зависящих от этой колонки объектов можно, добавив указание <TT
+CLASS="LITERAL"
+>CASCADE</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER TABLE products DROP COLUMN description CASCADE;</PRE
+><P> Общий механизм, стоящий за этим, описывается в <A
+HREF="ddl-depend.html"
+>Разделе 5.12</A
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="DDL-ALTER-ADDING-A-CONSTRAINT"
+>5.5.3. Добавление ограничения</A
+></H2
+><P
+>Для добавления ограничения используется синтаксис ограничения таблицы. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER TABLE products ADD CHECK (name &lt;&gt; '');
+ALTER TABLE products ADD CONSTRAINT some_name UNIQUE (product_no);
+ALTER TABLE products ADD FOREIGN KEY (product_group_id)
+  REFERENCES product_groups;</PRE
+><P> Чтобы добавить ограничение NOT NULL, которое нельзя записать в виде ограничения таблицы, используйте такой синтаксис: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER TABLE products ALTER COLUMN product_no SET NOT NULL;</PRE
+><P></P
+><P
+>Ограничение проходит проверку автоматически и будет добавлено, только если ему удовлетворяют данные таблицы.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="DDL-ALTER-REMOVING-A-CONSTRAINT"
+>5.5.4. Удаление ограничения</A
+></H2
+><P
+>Для удаления ограничения вы должны знать его имя. Если вы не присваивали ему имя, это неявно сделала система, и вы должны выяснить его. Здесь может быть полезна команда <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> <TT
+CLASS="LITERAL"
+>\d <TT
+CLASS="REPLACEABLE"
+><I
+>имя_таблицы</I
+></TT
+></TT
+> (или другие программы, показывающие подробную информацию о таблицах). Зная имя, вы можете использовать команду: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER TABLE products DROP CONSTRAINT some_name;</PRE
+><P> (Если вы имеете дело с именем ограничения вида <TT
+CLASS="LITERAL"
+>$2</TT
+>, не забудьте заключить его в кавычки, чтобы это был допустимый идентификатор.)</P
+><P
+>Как и при удалении колонки, если вы хотите удалить ограничение с зависимыми объектами, добавьте указание <TT
+CLASS="LITERAL"
+>CASCADE</TT
+>. Примером такой зависимости может быть ограничение внешнего ключа, связанное с колонками ограничения первичного ключа.</P
+><P
+>Так можно удалить ограничения любых типов, кроме NOT NULL. Чтобы удалить ограничение NOT NULL, используйте команду: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER TABLE products ALTER COLUMN product_no DROP NOT NULL;</PRE
+><P> (Вспомните, что у ограничений NOT NULL нет имён.)</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN2854"
+>5.5.5. Изменение значения по умолчанию</A
+></H2
+><P
+>Назначить колонке новое значение по умолчанию можно так: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER TABLE products ALTER COLUMN price SET DEFAULT 7.77;</PRE
+><P> Заметьте, что это никак не влияет на существующие строки таблицы, а просто задаёт значение по умолчанию для последующих команд <TT
+CLASS="COMMAND"
+>INSERT</TT
+>.</P
+><P
+>Чтобы удалить значение по умолчанию, выполните: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER TABLE products ALTER COLUMN price DROP DEFAULT;</PRE
+><P> При этом по сути значению по умолчанию просто присваивается NULL. Как следствие, ошибки не будет, если вы попытаетесь удалить значение по умолчанию, не определённое явно, так как неявно оно существует и равно NULL.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN2864"
+>5.5.6. Изменение типа данных колонки</A
+></H2
+><P
+>Чтобы преобразовать колонку в другой тип данных, используйте команду: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER TABLE products ALTER COLUMN price TYPE numeric(10,2);</PRE
+><P> Она будет успешна, только если все существующие значения в колонке могут быть неявно приведены к новому типу. Если требуется более сложное преобразование, вы можете добавить указание <TT
+CLASS="LITERAL"
+>USING</TT
+>, определяющее, как получить новые значения из старых.</P
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> попытается также преобразовать к новому типу значение колонки по умолчанию (если оно определено) и все связанные с ней ограничения. Но преобразование может оказаться неправильным, и тогда вы получите неожиданные результаты. Поэтому обычно лучше удалить все ограничения колонки, перед тем как менять её тип, а затем воссоздать модифицированные должным образом ограничения.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN2874"
+>5.5.7. Переименование колонки</A
+></H2
+><P
+>Чтобы переименовать колонку, выполните: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER TABLE products RENAME COLUMN product_no TO product_number;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN2881"
+>5.5.8. Переименование таблицы</A
+></H2
+><P
+>Таблицу можно переименовать так: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER TABLE products RENAME TO items;</PRE
+><P></P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ddl-system-columns.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ddl-priv.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Системные колонки</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ddl.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Права</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

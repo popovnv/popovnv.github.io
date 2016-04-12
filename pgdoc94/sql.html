@@ -1,0 +1,914 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Язык SQL</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="PREVIOUS"
+TITLE="Заключение"
+HREF="tutorial-conclusion.html"><LINK
+REL="NEXT"
+TITLE="Синтаксис SQL"
+HREF="sql-syntax.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="PART"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Заключение"
+HREF="tutorial-conclusion.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Синтаксис SQL"
+HREF="sql-syntax.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="PART"
+><A
+NAME="SQL"
+></A
+><DIV
+CLASS="TITLEPAGE"
+><H1
+CLASS="TITLE"
+>II. Язык SQL</H1
+><DIV
+CLASS="PARTINTRO"
+><A
+NAME="AEN1124"
+></A
+><P
+>В этой части книги описывается использование языка <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Мы начнём с описания общего синтаксиса <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>, затем расскажем, как создавать структуры для хранения данных, как наполнять базу данных и как выполнять запросы к ней. В продолжении будут перечислены существующие типы данных и функции, применяемые с командами <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>. И наконец, закончится эта часть рассмотрением важных аспектов настройки базы данных для оптимальной производительности.</P
+><P
+>Материал этой части упорядочен так, чтобы новичок мог прочитать её от начала до конца и полностью понять все темы, не забегая вперёд. При этом главы сделаны самодостаточными, так что опытные пользователи могут читать главы по отдельности. Информация в этой части книги представлена в повествовательном стиле и разделена по темам. Если же вас интересует формальное и полное описание определённой команды, см. <A
+HREF="reference.html"
+>Часть VI</A
+>.</P
+><P
+>Читатели этой части книги должны уже знать, как подключаться к базе данных <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> и выполнять команды <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>. Если вы ещё не знаете этого, рекомендуется сначала прочитать <A
+HREF="tutorial.html"
+>Часть I</A
+>. Команды <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> обычно вводятся в <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> &mdash; интерактивном терминальном приложении <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, но можно воспользоваться и другими программами с подобными функциями.</P
+></DIV
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Содержание</B
+></DT
+><DT
+>4. <A
+HREF="sql-syntax.html"
+>Синтаксис SQL</A
+></DT
+><DD
+><DL
+><DT
+>4.1. <A
+HREF="sql-syntax-lexical.html"
+>Лексическая структура</A
+></DT
+><DT
+>4.2. <A
+HREF="sql-expressions.html"
+>Выражения значения</A
+></DT
+><DT
+>4.3. <A
+HREF="sql-syntax-calling-funcs.html"
+>Вызов функций</A
+></DT
+></DL
+></DD
+><DT
+>5. <A
+HREF="ddl.html"
+>Определение данных</A
+></DT
+><DD
+><DL
+><DT
+>5.1. <A
+HREF="ddl-basics.html"
+>Основы таблиц</A
+></DT
+><DT
+>5.2. <A
+HREF="ddl-default.html"
+>Значения по умолчанию</A
+></DT
+><DT
+>5.3. <A
+HREF="ddl-constraints.html"
+>Ограничения</A
+></DT
+><DT
+>5.4. <A
+HREF="ddl-system-columns.html"
+>Системные колонки</A
+></DT
+><DT
+>5.5. <A
+HREF="ddl-alter.html"
+>Изменение таблиц</A
+></DT
+><DT
+>5.6. <A
+HREF="ddl-priv.html"
+>Права</A
+></DT
+><DT
+>5.7. <A
+HREF="ddl-schemas.html"
+>Схемы</A
+></DT
+><DT
+>5.8. <A
+HREF="ddl-inherit.html"
+>Наследование</A
+></DT
+><DT
+>5.9. <A
+HREF="ddl-partitioning.html"
+>Секционирование</A
+></DT
+><DT
+>5.10. <A
+HREF="ddl-foreign-data.html"
+>Сторонние данные</A
+></DT
+><DT
+>5.11. <A
+HREF="ddl-others.html"
+>Другие объекты баз данных</A
+></DT
+><DT
+>5.12. <A
+HREF="ddl-depend.html"
+>Отслеживание зависимостей</A
+></DT
+></DL
+></DD
+><DT
+>6. <A
+HREF="dml.html"
+>Модификация данных</A
+></DT
+><DD
+><DL
+><DT
+>6.1. <A
+HREF="dml-insert.html"
+>Добавление данных</A
+></DT
+><DT
+>6.2. <A
+HREF="dml-update.html"
+>Изменение данных</A
+></DT
+><DT
+>6.3. <A
+HREF="dml-delete.html"
+>Удаление данных</A
+></DT
+></DL
+></DD
+><DT
+>7. <A
+HREF="queries.html"
+>Запросы</A
+></DT
+><DD
+><DL
+><DT
+>7.1. <A
+HREF="queries-overview.html"
+>Обзор</A
+></DT
+><DT
+>7.2. <A
+HREF="queries-table-expressions.html"
+>Табличные выражения</A
+></DT
+><DT
+>7.3. <A
+HREF="queries-select-lists.html"
+>Списки выборки</A
+></DT
+><DT
+>7.4. <A
+HREF="queries-union.html"
+>Сочетание запросов</A
+></DT
+><DT
+>7.5. <A
+HREF="queries-order.html"
+>Сортировка строк</A
+></DT
+><DT
+>7.6. <A
+HREF="queries-limit.html"
+><TT
+CLASS="LITERAL"
+>LIMIT</TT
+> и <TT
+CLASS="LITERAL"
+>OFFSET</TT
+></A
+></DT
+><DT
+>7.7. <A
+HREF="queries-values.html"
+>Списки <TT
+CLASS="LITERAL"
+>VALUES</TT
+></A
+></DT
+><DT
+>7.8. <A
+HREF="queries-with.html"
+>Запросы <TT
+CLASS="LITERAL"
+>WITH</TT
+> (Общие табличные выражения)</A
+></DT
+></DL
+></DD
+><DT
+>8. <A
+HREF="datatype.html"
+>Типы данных</A
+></DT
+><DD
+><DL
+><DT
+>8.1. <A
+HREF="datatype-numeric.html"
+>Числовые типы</A
+></DT
+><DT
+>8.2. <A
+HREF="datatype-money.html"
+>Денежные типы</A
+></DT
+><DT
+>8.3. <A
+HREF="datatype-character.html"
+>Символьные типы</A
+></DT
+><DT
+>8.4. <A
+HREF="datatype-binary.html"
+>Двоичные типы данных</A
+></DT
+><DT
+>8.5. <A
+HREF="datatype-datetime.html"
+>Типы даты/времени</A
+></DT
+><DT
+>8.6. <A
+HREF="datatype-boolean.html"
+>Логический тип</A
+></DT
+><DT
+>8.7. <A
+HREF="datatype-enum.html"
+>Типы перечислений</A
+></DT
+><DT
+>8.8. <A
+HREF="datatype-geometric.html"
+>Геометрические типы</A
+></DT
+><DT
+>8.9. <A
+HREF="datatype-net-types.html"
+>Типы, описывающие сетевые адреса</A
+></DT
+><DT
+>8.10. <A
+HREF="datatype-bit.html"
+>Битовые строки</A
+></DT
+><DT
+>8.11. <A
+HREF="datatype-textsearch.html"
+>Типы, предназначенные для текстового поиска</A
+></DT
+><DT
+>8.12. <A
+HREF="datatype-uuid.html"
+>Тип <ACRONYM
+CLASS="ACRONYM"
+>UUID</ACRONYM
+></A
+></DT
+><DT
+>8.13. <A
+HREF="datatype-xml.html"
+>Тип <ACRONYM
+CLASS="ACRONYM"
+>XML</ACRONYM
+></A
+></DT
+><DT
+>8.14. <A
+HREF="datatype-json.html"
+>Типы <ACRONYM
+CLASS="ACRONYM"
+>JSON</ACRONYM
+></A
+></DT
+><DT
+>8.15. <A
+HREF="arrays.html"
+>Массивы</A
+></DT
+><DT
+>8.16. <A
+HREF="rowtypes.html"
+>Составные типы</A
+></DT
+><DT
+>8.17. <A
+HREF="rangetypes.html"
+>Диапазонные типы</A
+></DT
+><DT
+>8.18. <A
+HREF="datatype-oid.html"
+>Идентификаторы объектов</A
+></DT
+><DT
+>8.19. <A
+HREF="datatype-pg-lsn.html"
+><ACRONYM
+CLASS="ACRONYM"
+>Тип pg_lsn</ACRONYM
+></A
+></DT
+><DT
+>8.20. <A
+HREF="datatype-pseudo.html"
+>Псевдотипы</A
+></DT
+></DL
+></DD
+><DT
+>9. <A
+HREF="functions.html"
+>Функции и операторы</A
+></DT
+><DD
+><DL
+><DT
+>9.1. <A
+HREF="functions-logical.html"
+>Логические операторы</A
+></DT
+><DT
+>9.2. <A
+HREF="functions-comparison.html"
+>Операторы сравнения</A
+></DT
+><DT
+>9.3. <A
+HREF="functions-math.html"
+>Математические функции и операторы</A
+></DT
+><DT
+>9.4. <A
+HREF="functions-string.html"
+>Строковые функции и операторы</A
+></DT
+><DT
+>9.5. <A
+HREF="functions-binarystring.html"
+>Функции и операторы двоичных строк</A
+></DT
+><DT
+>9.6. <A
+HREF="functions-bitstring.html"
+>Функции и операторы для работы с битовыми строками</A
+></DT
+><DT
+>9.7. <A
+HREF="functions-matching.html"
+>Поиск по шаблону</A
+></DT
+><DT
+>9.8. <A
+HREF="functions-formatting.html"
+>Функции форматирования данных</A
+></DT
+><DT
+>9.9. <A
+HREF="functions-datetime.html"
+>Операторы и функции даты/времени</A
+></DT
+><DT
+>9.10. <A
+HREF="functions-enum.html"
+>Функции для перечислений</A
+></DT
+><DT
+>9.11. <A
+HREF="functions-geometry.html"
+>Геометрические функции и операторы</A
+></DT
+><DT
+>9.12. <A
+HREF="functions-net.html"
+>Функции и операторы для работы с сетевыми адресами</A
+></DT
+><DT
+>9.13. <A
+HREF="functions-textsearch.html"
+>Функции и операторы текстового поиска</A
+></DT
+><DT
+>9.14. <A
+HREF="functions-xml.html"
+>XML-функции</A
+></DT
+><DT
+>9.15. <A
+HREF="functions-json.html"
+>Функции и операторы JSON</A
+></DT
+><DT
+>9.16. <A
+HREF="functions-sequence.html"
+>Функции для работы с последовательностями</A
+></DT
+><DT
+>9.17. <A
+HREF="functions-conditional.html"
+>Условные выражения</A
+></DT
+><DT
+>9.18. <A
+HREF="functions-array.html"
+>Функции и операторы для работы с массивами</A
+></DT
+><DT
+>9.19. <A
+HREF="functions-range.html"
+>Диапазонные функции и операторы</A
+></DT
+><DT
+>9.20. <A
+HREF="functions-aggregate.html"
+>Агрегатные функции</A
+></DT
+><DT
+>9.21. <A
+HREF="functions-window.html"
+>Оконные функции</A
+></DT
+><DT
+>9.22. <A
+HREF="functions-subquery.html"
+>Выражения подзапросов</A
+></DT
+><DT
+>9.23. <A
+HREF="functions-comparisons.html"
+>Сравнение табличных строк и массивов</A
+></DT
+><DT
+>9.24. <A
+HREF="functions-srf.html"
+>Функции, возвращающие множества</A
+></DT
+><DT
+>9.25. <A
+HREF="functions-info.html"
+>Системные информационные функции</A
+></DT
+><DT
+>9.26. <A
+HREF="functions-admin.html"
+>Функции для системного администрирования</A
+></DT
+><DT
+>9.27. <A
+HREF="functions-trigger.html"
+>Триггерные функции</A
+></DT
+><DT
+>9.28. <A
+HREF="functions-event-triggers.html"
+>Функции событийных триггеров</A
+></DT
+></DL
+></DD
+><DT
+>10. <A
+HREF="typeconv.html"
+>Преобразование типов</A
+></DT
+><DD
+><DL
+><DT
+>10.1. <A
+HREF="typeconv-overview.html"
+>Обзор</A
+></DT
+><DT
+>10.2. <A
+HREF="typeconv-oper.html"
+>Операторы</A
+></DT
+><DT
+>10.3. <A
+HREF="typeconv-func.html"
+>Функции</A
+></DT
+><DT
+>10.4. <A
+HREF="typeconv-query.html"
+>Хранимое значение</A
+></DT
+><DT
+>10.5. <A
+HREF="typeconv-union-case.html"
+><TT
+CLASS="LITERAL"
+>UNION</TT
+>, <TT
+CLASS="LITERAL"
+>CASE</TT
+> и связанные конструкции</A
+></DT
+></DL
+></DD
+><DT
+>11. <A
+HREF="indexes.html"
+>Индексы</A
+></DT
+><DD
+><DL
+><DT
+>11.1. <A
+HREF="indexes-intro.html"
+>Введение</A
+></DT
+><DT
+>11.2. <A
+HREF="indexes-types.html"
+>Типы индексов</A
+></DT
+><DT
+>11.3. <A
+HREF="indexes-multicolumn.html"
+>Составные индексы</A
+></DT
+><DT
+>11.4. <A
+HREF="indexes-ordering.html"
+>Индексы и предложения <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+></A
+></DT
+><DT
+>11.5. <A
+HREF="indexes-bitmap-scans.html"
+>Объединение нескольких индексов</A
+></DT
+><DT
+>11.6. <A
+HREF="indexes-unique.html"
+>Уникальные индексы</A
+></DT
+><DT
+>11.7. <A
+HREF="indexes-expressional.html"
+>Индексы по выражениям</A
+></DT
+><DT
+>11.8. <A
+HREF="indexes-partial.html"
+>Частичные индексы</A
+></DT
+><DT
+>11.9. <A
+HREF="indexes-opclass.html"
+>Семейства и классы операторов</A
+></DT
+><DT
+>11.10. <A
+HREF="indexes-collations.html"
+>Индексы и правила сортировки</A
+></DT
+><DT
+>11.11. <A
+HREF="indexes-examine.html"
+>Контроль использования индексов</A
+></DT
+></DL
+></DD
+><DT
+>12. <A
+HREF="textsearch.html"
+>Полнотекстовый поиск</A
+></DT
+><DD
+><DL
+><DT
+>12.1. <A
+HREF="textsearch-intro.html"
+>Введение</A
+></DT
+><DT
+>12.2. <A
+HREF="textsearch-tables.html"
+>Таблицы и индексы</A
+></DT
+><DT
+>12.3. <A
+HREF="textsearch-controls.html"
+>Управление текстовым поиском</A
+></DT
+><DT
+>12.4. <A
+HREF="textsearch-features.html"
+>Дополнительные возможности</A
+></DT
+><DT
+>12.5. <A
+HREF="textsearch-parsers.html"
+>Анализаторы</A
+></DT
+><DT
+>12.6. <A
+HREF="textsearch-dictionaries.html"
+>Словари</A
+></DT
+><DT
+>12.7. <A
+HREF="textsearch-configuration.html"
+>Пример конфигурации</A
+></DT
+><DT
+>12.8. <A
+HREF="textsearch-debugging.html"
+>Тестирование и отладка текстового поиска</A
+></DT
+><DT
+>12.9. <A
+HREF="textsearch-indexes.html"
+>Типы индексов GiST и GIN</A
+></DT
+><DT
+>12.10. <A
+HREF="textsearch-psql.html"
+>Поддержка <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+></A
+></DT
+><DT
+>12.11. <A
+HREF="textsearch-limitations.html"
+>Ограничения</A
+></DT
+><DT
+>12.12. <A
+HREF="textsearch-migration.html"
+>Миграция с реализации текстового поиска в версиях до 8.3</A
+></DT
+></DL
+></DD
+><DT
+>13. <A
+HREF="mvcc.html"
+>Управление конкурентным доступом</A
+></DT
+><DD
+><DL
+><DT
+>13.1. <A
+HREF="mvcc-intro.html"
+>Введение</A
+></DT
+><DT
+>13.2. <A
+HREF="transaction-iso.html"
+>Изоляция транзакций</A
+></DT
+><DT
+>13.3. <A
+HREF="explicit-locking.html"
+>Явные блокировки</A
+></DT
+><DT
+>13.4. <A
+HREF="applevel-consistency.html"
+>Проверки целостности данных на уровне приложения</A
+></DT
+><DT
+>13.5. <A
+HREF="locking-indexes.html"
+>Блокировки и индексы</A
+></DT
+></DL
+></DD
+><DT
+>14. <A
+HREF="performance-tips.html"
+>Оптимизация производительности</A
+></DT
+><DD
+><DL
+><DT
+>14.1. <A
+HREF="using-explain.html"
+>Использование <TT
+CLASS="COMMAND"
+>EXPLAIN</TT
+></A
+></DT
+><DT
+>14.2. <A
+HREF="planner-stats.html"
+>Статистика, используемая планировщиком</A
+></DT
+><DT
+>14.3. <A
+HREF="explicit-joins.html"
+>Управление планировщиком с помощью явных предложений <TT
+CLASS="LITERAL"
+>JOIN</TT
+></A
+></DT
+><DT
+>14.4. <A
+HREF="populate.html"
+>Наполнение базы данных</A
+></DT
+><DT
+>14.5. <A
+HREF="non-durability.html"
+>Оптимизация, угрожающая стабильности</A
+></DT
+></DL
+></DD
+></DL
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="tutorial-conclusion.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-syntax.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Заключение</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Синтаксис SQL</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

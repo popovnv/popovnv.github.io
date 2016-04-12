@@ -1,0 +1,357 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Агрегатные функции</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Язык SQL"
+HREF="tutorial-sql.html"><LINK
+REL="PREVIOUS"
+TITLE="Соединения таблиц"
+HREF="tutorial-join.html"><LINK
+REL="NEXT"
+TITLE="Изменение данных"
+HREF="tutorial-update.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Соединения таблиц"
+HREF="tutorial-join.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="tutorial-sql.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 2. Язык <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Изменение данных"
+HREF="tutorial-update.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="TUTORIAL-AGG"
+>2.7. Агрегатные функции</A
+></H1
+><P
+>Как большинство других серверов реляционных баз данных, <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> поддерживает <I
+CLASS="FIRSTTERM"
+>агрегатные функции</I
+>. Агрегатная функция вычисляет единственное значение, обрабатывая множество строк. Например, есть агрегатные функции, вычисляющие: <CODE
+CLASS="FUNCTION"
+>count</CODE
+> (количество), <CODE
+CLASS="FUNCTION"
+>sum</CODE
+> (сумму), <CODE
+CLASS="FUNCTION"
+>avg</CODE
+> (среднее), <CODE
+CLASS="FUNCTION"
+>max</CODE
+> (максимум) и <CODE
+CLASS="FUNCTION"
+>min</CODE
+> (минимум) для набора строк.</P
+><P
+>К примеру, мы можем найти самую высокую температуру из всех наблюдений: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT max(temp_lo) FROM weather;</PRE
+><P>
+
+</P><PRE
+CLASS="SCREEN"
+> max
+-----
+  46
+(1 row)</PRE
+><P></P
+><P
+> Если мы хотим узнать, в каком городе (или городах) наблюдалась эта температура, можно попробовать: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT city FROM weather WHERE temp_lo = max(temp_lo);     <I
+CLASS="LINEANNOTATION"
+>НЕВЕРНО</I
+></PRE
+><P> но это не будет работать, так как агрегатную функцию <CODE
+CLASS="FUNCTION"
+>max</CODE
+> нельзя использовать в предложении <TT
+CLASS="LITERAL"
+>WHERE</TT
+>. (Это ограничение объясняется тем, что предложение <TT
+CLASS="LITERAL"
+>WHERE</TT
+> должно определить, для каких строк вычислять агрегатную функцию, так что оно, очевидно, должно вычисляться до агрегатных функций.) Однако, как часто бывает, запрос можно перезапустить и получить желаемый результат, применив <I
+CLASS="FIRSTTERM"
+>подзапрос</I
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT city FROM weather
+    WHERE temp_lo = (SELECT max(temp_lo) FROM weather);</PRE
+><P>
+
+</P><PRE
+CLASS="SCREEN"
+>     city
+---------------
+ San Francisco
+(1 row)</PRE
+><P> Теперь всё в порядке &mdash; подзапрос выполняется отдельно и результат агрегатной функции вычисляется вне зависимости от того, что происходит во внешнем запросе.</P
+><P
+> Агрегатные функции также очень полезны в сочетании с предложением <TT
+CLASS="LITERAL"
+>GROUP BY</TT
+>. Например, мы можем получить максимум минимальной дневной температуры в разрезе городов: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT city, max(temp_lo)
+    FROM weather
+    GROUP BY city;</PRE
+><P></P><PRE
+CLASS="SCREEN"
+>     city      | max
+---------------+-----
+ Hayward       |  37
+ San Francisco |  46
+(2 rows)</PRE
+><P> Здесь мы получаем по одной строке для каждого города. Каждый агрегатный результат вычисляется по строкам таблицы, соответствующим отдельному городу. Мы можем отфильтровать сгруппированные строки с помощью предложения <TT
+CLASS="LITERAL"
+>HAVING</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT city, max(temp_lo)
+    FROM weather
+    GROUP BY city
+    HAVING max(temp_lo) &lt; 40;</PRE
+><P>
+
+</P><PRE
+CLASS="SCREEN"
+>  city   | max
+---------+-----
+ Hayward |  37
+(1 row)</PRE
+><P> Мы получаем те же результаты, но только для тех городов, где все значения <TT
+CLASS="STRUCTFIELD"
+>temp_lo</TT
+> меньше 40. Наконец, если нас интересует только города, названия которых начинаются с <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>S</TT
+>"</SPAN
+>, мы можем сделать: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT city, max(temp_lo)
+    FROM weather
+    WHERE city LIKE 'S%'<A
+NAME="CO.TUTORIAL-AGG-LIKE"
+><B
+>(1)</B
+></A
+>
+    GROUP BY city
+    HAVING max(temp_lo) &lt; 40;</PRE
+><P>
+<DIV
+CLASS="CALLOUTLIST"
+><DL
+COMPACT="COMPACT"
+><DT
+><A
+HREF="tutorial-agg.html#CO.TUTORIAL-AGG-LIKE"
+><B
+>(1)</B
+></A
+></DT
+><DD
+>Оператор <TT
+CLASS="LITERAL"
+>LIKE</TT
+> (выполняющий сравнение по шаблону) рассматривается в <A
+HREF="functions-matching.html"
+>Разделе 9.7</A
+>.</DD
+></DL
+></DIV
+></P
+><P
+>Важно понимать, как соотносятся агрегатные функции и <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>-предложения <TT
+CLASS="LITERAL"
+>WHERE</TT
+> и <TT
+CLASS="LITERAL"
+>HAVING</TT
+>. Основное отличие <TT
+CLASS="LITERAL"
+>WHERE</TT
+> от <TT
+CLASS="LITERAL"
+>HAVING</TT
+> заключается в том, что <TT
+CLASS="LITERAL"
+>WHERE</TT
+> сначала выбирает строки, а затем группирует их и вычисляет агрегатные функции (таким образом, она отбирает строки для вычисления агрегатов), тогда как <TT
+CLASS="LITERAL"
+>HAVING</TT
+> отбирает строки групп после группировки и вычисления агрегатных функций. Как следствие, предложение <TT
+CLASS="LITERAL"
+>WHERE</TT
+> не должно содержать агрегатных функций; не имеет смысла использовать агрегатные функции для определения строк для вычисления агрегатных функций. Предложение <TT
+CLASS="LITERAL"
+>HAVING</TT
+>, напротив, всегда содержит агрегатные функции. (Строго говоря, вы можете написать предложение <TT
+CLASS="LITERAL"
+>HAVING</TT
+>, не используя агрегаты, но это редко бывает полезно. То же самое условие может работать более эффективно на стадии <TT
+CLASS="LITERAL"
+>WHERE</TT
+>.)</P
+><P
+>В предыдущем примере мы могли бы применить фильтр по названию города в предложении <TT
+CLASS="LITERAL"
+>WHERE</TT
+>, так как это не агрегатная функция. И это было бы более эффективно, чем ограничение <TT
+CLASS="LITERAL"
+>HAVING</TT
+>, так как при этом не потребуется группировать и вычислять агрегаты для всех строк, не удовлетворяющих условию <TT
+CLASS="LITERAL"
+>WHERE</TT
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="tutorial-join.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="tutorial-update.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Соединения таблиц</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="tutorial-sql.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Изменение данных</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,363 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Файлы конфигурации даты/времени</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Поддержка даты и времени"
+HREF="datetime-appendix.html"><LINK
+REL="PREVIOUS"
+TITLE="Ключевые слова для обозначения даты и времени"
+HREF="datetime-keywords.html"><LINK
+REL="NEXT"
+TITLE="История единиц измерения времени"
+HREF="datetime-units-history.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Ключевые слова для обозначения даты и времени"
+HREF="datetime-keywords.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="datetime-appendix.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Приложение B. Поддержка даты и времени</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="История единиц измерения времени"
+HREF="datetime-units-history.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="DATETIME-CONFIG-FILES"
+>B.3. Файлы конфигурации даты/времени</A
+></H1
+><P
+>Поскольку аббревиатуры часовых поясов недостаточно стандартизированы, <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> предлагает средства для определения набора аббревиатур, принимаемых сервером. Параметром выполнения <A
+HREF="runtime-config-client.html#GUC-TIMEZONE-ABBREVIATIONS"
+>timezone_abbreviations</A
+> определяется активный набор аббревиатур. Хотя данный параметр может быть изменён любым пользователем базы данных, возможные значения для него контролируются администратором базы данных и являются именами конфигурационных файлов, хранящихся в <TT
+CLASS="FILENAME"
+>.../share/timezonesets/</TT
+> каталога установки. Добавляя или изменяя файлы в этом каталоге, администратор может определить местную специфику выбора аббревиатур часовых поясов.</P
+><P
+>Значение <TT
+CLASS="VARNAME"
+>timezone_abbreviations</TT
+> может быть установлено в любое имя файла, находящегося в <TT
+CLASS="FILENAME"
+>.../share/timezonesets/</TT
+>, если имя файла состоит только из букв. (Запрет на использование небуквенных символов в <TT
+CLASS="VARNAME"
+>timezone_abbreviations</TT
+> делает невозможным чтение файлов, находящихся вне заданного каталога, а также резервных файлов редактора и прочих внешних файлов.)</P
+><P
+>Файл аббревиатур часовых поясов может содержать пустые строки и комментарии, начинающиеся с <TT
+CLASS="LITERAL"
+>#</TT
+>. Строки, не имеющие комментариев, должны иметь один из следующих форматов: </P><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>zone_abbreviation</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>offset</I
+></TT
+>
+<TT
+CLASS="REPLACEABLE"
+><I
+>zone_abbreviation</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>offset</I
+></TT
+> D
+<TT
+CLASS="REPLACEABLE"
+><I
+>zone_abbreviation</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>time_zone_name</I
+></TT
+>
+@INCLUDE <TT
+CLASS="REPLACEABLE"
+><I
+>file_name</I
+></TT
+>
+@OVERRIDE</PRE
+><P></P
+><P
+><TT
+CLASS="REPLACEABLE"
+><I
+>zone_abbreviation</I
+></TT
+> является лишь определяемой аббревиатурой. <TT
+CLASS="REPLACEABLE"
+><I
+>offset</I
+></TT
+> это эквивалентная разница с UTC в секундах, положительная — к востоку от Гринвичского меридиана, отрицательная — к западу от него. Например, -18000 означало бы пять часов к западу от Гринвича, или Североамериканское восточное время. <TT
+CLASS="LITERAL"
+>D</TT
+> указывает, что название пояса представляет местное летнее время, а не поясное время. В качестве альтернативы, может быть предоставлено значение <TT
+CLASS="REPLACEABLE"
+><I
+>time_zone_name</I
+></TT
+>. В этом случае предоставляется определение часового пояса, и используется значение аббревиатуры в этом поясе. Этот способ рекомендуется только для аббревиатур, значение которых изменилось, так как поиск значения заметно дороже простого использования постоянного целого значения.</P
+><P
+>Использование <TT
+CLASS="LITERAL"
+>@INCLUDE</TT
+> позволяет включить другой файл в каталоге <TT
+CLASS="FILENAME"
+>.../share/timezonesets/</TT
+>. Включение может быть вложенным до ограниченной глубины.</P
+><P
+>Использование <TT
+CLASS="LITERAL"
+>@OVERRIDE</TT
+> указывает, что последующие записи в файле могут переопределять предыдущие (как правило, это записи, полученные из включённых файлов). Без этого указания конфликтующие определения аббревиатуры одного и того же часового пояса считаются ошибкой.</P
+><P
+>При установке без внесения изменений, файл <TT
+CLASS="FILENAME"
+>Default</TT
+> содержит все неконфликтующие аббревиатуры часовых поясов для большей части земного шара. Дополнительные файлы <TT
+CLASS="FILENAME"
+>Australia</TT
+> и <TT
+CLASS="FILENAME"
+>India</TT
+> предоставляются для данных регионов. Эти файлы сначала включают файл <TT
+CLASS="LITERAL"
+>Default</TT
+>, а затем добавляют и изменяют аббревиатуры по мере необходимости.</P
+><P
+>В качестве справочной информации стандартная установка также содержит файлы <TT
+CLASS="FILENAME"
+>Africa.txt</TT
+>, <TT
+CLASS="FILENAME"
+>America.txt</TT
+> и т. д., содержащие информацию о каждой используемой аббревиатуре часового пояса, включённой в базу данных часовых поясов IANA. Определения названий часовых поясов, находящиеся в этих файлах, можно копировать и помещать в файл с нестандартной конфигурацией по мере необходимости. Заметьте, что данные файлы нельзя указывать непосредственно в значении <TT
+CLASS="VARNAME"
+>timezone_abbreviations</TT
+>, так как их имена включают точку.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Если при чтении набора аббревиатур часовых поясов возникает ошибка, новое значение не применяется и сохраняется старый набор. Если ошибка возникает при запуске базы данных, происходит сбой.</P
+></BLOCKQUOTE
+></DIV
+><DIV
+CLASS="CAUTION"
+><P
+></P
+><TABLE
+CLASS="CAUTION"
+BORDER="1"
+WIDTH="100%"
+><TR
+><TD
+ALIGN="CENTER"
+><B
+>Предостережение</B
+></TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+><P
+>Аббревиатуры часового пояса, определённые в файле конфигурации, переопределяют не относящиеся к часовому поясу значения, встроенные в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Например, файл конфигурации <TT
+CLASS="FILENAME"
+>Australia</TT
+> определяет <TT
+CLASS="LITERAL"
+>SAT</TT
+> (для Южноавстралийского стандартного времени, South Australian Standard Time). Когда этот файл активен, <TT
+CLASS="LITERAL"
+>SAT</TT
+> не будет распознаваться как сокращение слова "суббота".</P
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="CAUTION"
+><P
+></P
+><TABLE
+CLASS="CAUTION"
+BORDER="1"
+WIDTH="100%"
+><TR
+><TD
+ALIGN="CENTER"
+><B
+>Предостережение</B
+></TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+><P
+>Если вы модифицируете файлы в <TT
+CLASS="FILENAME"
+>.../share/timezonesets/</TT
+>, вы можете сами выполнить резервное копирование, так как обычный дамп базы данных не содержит этот каталог.</P
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="datetime-keywords.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="datetime-units-history.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Ключевые слова для обозначения даты и времени</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="datetime-appendix.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>История единиц измерения времени</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

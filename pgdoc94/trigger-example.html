@@ -1,0 +1,361 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Полный пример триггера</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Триггеры"
+HREF="triggers.html"><LINK
+REL="PREVIOUS"
+TITLE="Триггерные функции на языке C"
+HREF="trigger-interface.html"><LINK
+REL="NEXT"
+TITLE="Триггеры событий"
+HREF="event-triggers.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Триггерные функции на языке C"
+HREF="trigger-interface.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="triggers.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 36. Триггеры</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Триггеры событий"
+HREF="event-triggers.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="TRIGGER-EXAMPLE"
+>36.4. Полный пример триггера</A
+></H1
+><P
+>Вот очень простой пример триггерной функции, написанной на C. (Примеры триггеров для процедурных языков могут быть найдены в документации на процедурные языки.)</P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>trigf</CODE
+> сообщает количество строк в таблице <TT
+CLASS="STRUCTNAME"
+>ttest</TT
+> и пропускает операцию для строки при попытке вставить пустое значение в столбец <TT
+CLASS="STRUCTFIELD"
+>x</TT
+>. (Таким образом, триггер действует как ограничение <TT
+CLASS="LITERAL"
+>NOT NULL</TT
+>, но не прерывает транзакцию.)</P
+><P
+>Вначале определение таблицы: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE ttest (
+    x integer
+);</PRE
+><P></P
+><P
+>Теперь исходный код триггерной функции: </P><PRE
+CLASS="PROGRAMLISTING"
+>#include "postgres.h"
+#include "executor/spi.h"       /* это нужно для работы с SPI */
+#include "commands/trigger.h"   /* ... с триггерами ... */
+#include "utils/rel.h"          /* ... и с таблицами */
+
+#ifdef PG_MODULE_MAGIC
+PG_MODULE_MAGIC;
+#endif
+
+extern Datum trigf(PG_FUNCTION_ARGS);
+
+PG_FUNCTION_INFO_V1(trigf);
+
+Datum
+trigf(PG_FUNCTION_ARGS)
+{
+    TriggerData *trigdata = (TriggerData *) fcinfo-&gt;context;
+    TupleDesc   tupdesc;
+    HeapTuple   rettuple;
+    char       *when;
+    bool        checknull = false;
+    bool        isnull;
+    int         ret, i;
+
+    /* Убедимся, что функция вызвана триггером */
+    if (!CALLED_AS_TRIGGER(fcinfo))
+        elog(ERROR, "trigf: not called by trigger manager");
+
+    /* Строка, которую будем возвращать */
+    if (TRIGGER_FIRED_BY_UPDATE(trigdata-&gt;tg_event))
+        rettuple = trigdata-&gt;tg_newtuple;
+    else
+        rettuple = trigdata-&gt;tg_trigtuple;
+
+    /* Проверяем на пустые значения */
+    if (!TRIGGER_FIRED_BY_DELETE(trigdata-&gt;tg_event)
+        &amp;&amp; TRIGGER_FIRED_BEFORE(trigdata-&gt;tg_event))
+        checknull = true;
+
+    if (TRIGGER_FIRED_BEFORE(trigdata-&gt;tg_event))
+        when = "before";
+    else
+        when = "after ";
+
+    tupdesc = trigdata-&gt;tg_relation-&gt;rd_att;
+
+    /* Подключаемся к менеджеру SPI */
+    if ((ret = SPI_connect()) &lt; 0)
+        elog(ERROR, "trigf (сработал %s): SPI_connect вернула %d", when, ret);
+
+    /* Получаем число строк в таблице */
+    ret = SPI_exec("SELECT count(*) FROM ttest", 0);
+
+    if (ret &lt; 0)
+        elog(ERROR, "trigf (сработал %s): SPI_exec вернула %d", when, ret);
+
+    /* count(*) возвращает int8, требуется преобразование */
+    i = DatumGetInt64(SPI_getbinval(SPI_tuptable-&gt;vals[0],
+                                    SPI_tuptable-&gt;tupdesc,
+                                    1,
+                                    &amp;isnull));
+
+    elog (INFO, "trigf (сработал %s): в таблице ttest %d строк", when, i);
+
+    SPI_finish();
+
+    if (checknull)
+    {
+        SPI_getbinval(rettuple, tupdesc, 1, &amp;isnull);
+        if (isnull)
+            rettuple = NULL;
+    }
+
+    return PointerGetDatum(rettuple);
+}</PRE
+><P></P
+><P
+>После компиляции исходного кода (см. <A
+HREF="xfunc-c.html#DFUNC"
+>Подраздел 35.9.6</A
+>) объявляем функцию и триггеры: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION trigf() RETURNS trigger
+    AS '<TT
+CLASS="REPLACEABLE"
+><I
+>filename</I
+></TT
+>'
+    LANGUAGE C;
+
+CREATE TRIGGER tbefore BEFORE INSERT OR UPDATE OR DELETE ON ttest
+    FOR EACH ROW EXECUTE PROCEDURE trigf();
+
+CREATE TRIGGER tafter AFTER INSERT OR UPDATE OR DELETE ON ttest
+    FOR EACH ROW EXECUTE PROCEDURE trigf();</PRE
+><P></P
+><P
+>Теперь можно проверить работу триггера: </P><PRE
+CLASS="SCREEN"
+>=&gt; INSERT INTO ttest VALUES (NULL);
+
+INFO:  trigf (сработал before): в таблице ttest 0 строк
+INSERT 0 0
+
+-- Вставка записи пропущена (NULL значение), поэтому AFTER триггер не сработал
+
+=&gt; SELECT * FROM ttest;
+ x
+---
+(0 rows)
+
+=&gt; INSERT INTO ttest VALUES (1);
+INFO:  trigf (сработал before): в таблице ttest 0 строк
+INFO:  trigf (сработал after ): в таблице ttest 1 строк
+                                                ^^^^^^^
+                                   вспомним, что говорили о видимости
+INSERT 167793 1
+vac=&gt; SELECT * FROM ttest;
+ x
+---
+ 1
+(1 row)
+
+=&gt; INSERT INTO ttest SELECT x * 2 FROM ttest;
+INFO:  trigf (сработал before): в таблице ttest 1 строк
+INFO:  trigf (сработал after ): в таблице ttest 2 строк
+                                                ^^^^^^^
+                                   вспомним, что говорили о видимости
+INSERT 167794 1
+=&gt; SELECT * FROM ttest;
+ x
+---
+ 1
+ 2
+(2 rows)
+
+=&gt; UPDATE ttest SET x = NULL WHERE x = 2;
+INFO:  trigf (сработал before): в таблице ttest 2 строк
+UPDATE 0
+=&gt; UPDATE ttest SET x = 4 WHERE x = 2;
+INFO:  trigf (сработал before): в таблице ttest 2 строк
+INFO:  trigf (сработал after ): в таблице ttest 2 строк
+UPDATE 1
+vac=&gt; SELECT * FROM ttest;
+ x
+---
+ 1
+ 4
+(2 rows)
+
+=&gt; DELETE FROM ttest;
+INFO:  trigf (сработал before): в таблице ttest 2 строк
+INFO:  trigf (сработал before): в таблице ttest 1 строк
+INFO:  trigf (сработал after ): в таблице ttest 0 строк
+INFO:  trigf (сработал after ): в таблице ttest 0 строк
+                                                ^^^^^^^
+                                   вспомним, что говорили о видимости
+DELETE 2
+=&gt; SELECT * FROM ttest;
+ x
+---
+(0 rows)</PRE
+><P></P
+><P
+>Более сложные примеры можно найти в <TT
+CLASS="FILENAME"
+>src/test/regress/regress.c</TT
+> и в <A
+HREF="contrib-spi.html"
+>spi</A
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="trigger-interface.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="event-triggers.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Триггерные функции на языке C</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="triggers.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Триггеры событий</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,767 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>            pg_recvlogical
+          </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Клиентские приложения PostgreSQL"
+HREF="reference-client.html"><LINK
+REL="PREVIOUS"
+TITLE="pg_receivexlog"
+HREF="app-pgreceivexlog.html"><LINK
+REL="NEXT"
+TITLE="pg_restore"
+HREF="app-pgrestore.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="pg_receivexlog"
+HREF="app-pgreceivexlog.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="reference-client.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="pg_restore"
+HREF="app-pgrestore.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="APP-PGRECVLOGICAL"
+></A
+><SPAN
+CLASS="APPLICATION"
+>pg_recvlogical</SPAN
+></H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN89336"
+></A
+><H2
+>Название</H2
+>pg_recvlogical&nbsp;--&nbsp;управляет потоками логического декодирования <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN89340"
+></A
+><H2
+>Синтаксис</H2
+><P
+><TT
+CLASS="COMMAND"
+>pg_recvlogical</TT
+> [              <TT
+CLASS="REPLACEABLE"
+><I
+>параметр</I
+></TT
+>
+            ...]</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN89345"
+></A
+><H2
+>Описание</H2
+><P
+>Утилита <TT
+CLASS="COMMAND"
+>pg_recvlogical</TT
+> управляет слотами логического декодирования и принимает данные из таких слотов репликации.</P
+><P
+>Она создаёт соединение в режиме репликации, так что на него распространяются те же ограничения, что и с <A
+HREF="app-pgreceivexlog.html"
+>pg_receivexlog</A
+>, плюс ограничения логической репликации (см. <A
+HREF="logicaldecoding.html"
+>Главу 46</A
+>).</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN89352"
+></A
+><H2
+>Параметры</H2
+><P
+>Для выбора действия необходимо указать минимум один из этих параметров: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="OPTION"
+>--create-slot</TT
+></DT
+><DD
+><P
+>Создать новый слот логической репликации с именем, заданным аргументом <TT
+CLASS="OPTION"
+>--slot</TT
+>, используя модуль вывода, заданный аргументом <TT
+CLASS="OPTION"
+>--plugin</TT
+>, для базы данных, указанной в <TT
+CLASS="OPTION"
+>--dbname</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>--drop-slot</TT
+></DT
+><DD
+><P
+>Удалить слот репликации с именем, заданным аргументом <TT
+CLASS="OPTION"
+>--slot</TT
+>, и завершиться.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>--start</TT
+></DT
+><DD
+><P
+>Начать приём потока изменений из слота логической репликации с именем, заданным аргументом <TT
+CLASS="OPTION"
+>--slot</TT
+>, и продолжать до сигнала прерывания. Если передача потока прерывается на другой стороне из-за выключения или остановки сервера, цикл подключения и передачи повторяется (если не добавлен параметр <TT
+CLASS="OPTION"
+>--no-loop</TT
+>).</P
+><P
+>Формат потока определяется модулем вывода, выбранным при создании слота.</P
+><P
+>Для получения потока подключаться нужно к той же базе, для которой создавался слот.</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>Параметры <TT
+CLASS="OPTION"
+>--create-slot</TT
+> и <TT
+CLASS="OPTION"
+>--start</TT
+> исключают друг друга. Действие <TT
+CLASS="OPTION"
+>--drop-slot</TT
+> несовместимо с любыми другими действиями.</P
+><P
+>Следующие параметры командной строки управляют расположением и форматом выводимых данных, а также другим поведением репликации: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="OPTION"
+>-f <TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--file=<TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Записывать полученные и декодированные данные транзакций в указанный файл. Для вывода в stdout укажите <TT
+CLASS="LITERAL"
+>-</TT
+> (минус).</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-F <TT
+CLASS="REPLACEABLE"
+><I
+>секунды</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--fsync-interval=<TT
+CLASS="REPLACEABLE"
+><I
+>секунды</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Устанавливает, как часто <SPAN
+CLASS="APPLICATION"
+>pg_recvlogical</SPAN
+> будет вызывать <CODE
+CLASS="FUNCTION"
+>fsync()</CODE
+>, чтобы гарантировать, что выходной файл надёжно сохранён на диске.</P
+><P
+>Сервер время от времени даёт клиенту команду сохранить данные и сообщить сохранённую позицию, но этот параметр позволяет выполнять сохранение чаще.</P
+><P
+>При значении, равном <TT
+CLASS="LITERAL"
+>0</TT
+>, функция <CODE
+CLASS="FUNCTION"
+>fsync()</CODE
+> вообще не вызывается, но серверу сообщается новая позиция. Это может привести к потере данных в случае сбоя.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-I <TT
+CLASS="REPLACEABLE"
+><I
+>lsn</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--startpos=<TT
+CLASS="REPLACEABLE"
+><I
+>lsn</I
+></TT
+></TT
+></DT
+><DD
+><P
+>В режиме <TT
+CLASS="OPTION"
+>--start</TT
+> репликация начнётся с данного LSN. Как это работает, подробно описывается в <A
+HREF="logicaldecoding.html"
+>Главе 46</A
+> и <A
+HREF="protocol-replication.html"
+>Разделе 49.3</A
+>. В других режимах игнорируется.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-n</TT
+><BR><TT
+CLASS="OPTION"
+>--no-loop</TT
+></DT
+><DD
+><P
+>Когда подключение к серверу потеряно, не повторять цикл, просто завершить работу.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-o <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+>[=<TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+>]</TT
+><BR><TT
+CLASS="OPTION"
+>--option=<TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+>[=<TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+>]</TT
+></DT
+><DD
+><P
+>Передаёт параметр <TT
+CLASS="REPLACEABLE"
+><I
+>имя_параметра</I
+></TT
+> модулю вывода, при этом может быть передано и его <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+>. Набор параметров и их действия зависят от выбранного модуля вывода.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-P <TT
+CLASS="REPLACEABLE"
+><I
+>модуль</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--plugin=<TT
+CLASS="REPLACEABLE"
+><I
+>модуль</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Использовать указанный модуль вывода логического декодирования при создании слота. См. <A
+HREF="logicaldecoding.html"
+>Главу 46</A
+>. Этот параметр не действует, если слот уже существует.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-s <TT
+CLASS="REPLACEABLE"
+><I
+>секунды</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--status-interval=<TT
+CLASS="REPLACEABLE"
+><I
+>секунды</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Этот параметр действует так же, как одноимённый параметр <A
+HREF="app-pgreceivexlog.html"
+>pg_receivexlog</A
+> (см. его описание там).</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-S <TT
+CLASS="REPLACEABLE"
+><I
+>имя_слота</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--slot=<TT
+CLASS="REPLACEABLE"
+><I
+>имя_слота</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Этот параметр задаёт имя слота логической репликации, который будет использоваться в режиме <TT
+CLASS="OPTION"
+>--start</TT
+>, создаваться в режиме <TT
+CLASS="OPTION"
+>--create-slot</TT
+> или удаляться в режиме <TT
+CLASS="OPTION"
+>--drop-slot</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-v</TT
+><BR><TT
+CLASS="OPTION"
+>--verbose</TT
+></DT
+><DD
+><P
+>Включает режим подробных сообщений.</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>Далее описаны параметры управления подключением. <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="OPTION"
+>-d <TT
+CLASS="REPLACEABLE"
+><I
+>database</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--dbname=<TT
+CLASS="REPLACEABLE"
+><I
+>database</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Этот параметр выбирает базу данных для подключения. Как именно она используется, можно узнать в описании соответствующих действий. Это может быть строка подключения libpq; за дополнительными сведениями обратитесь к <A
+HREF="libpq-connect.html#LIBPQ-CONNSTRING"
+>Подразделу 31.1.1</A
+>. По умолчанию её имя определяется именем пользователя.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-h <TT
+CLASS="REPLACEABLE"
+><I
+>имя_компьютера-или-ip</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--host=<TT
+CLASS="REPLACEABLE"
+><I
+>имя_компьютера-или-ip</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Указывает имя компьютера, на котором запущен сервер. Если значение начинается с косой черты, оно интерпретируется как имя каталога с доменным сокетом Unix. Значение по умолчанию берётся из переменной окружения <TT
+CLASS="ENVAR"
+>PGHOST</TT
+>, если она установлена. В противном случае выполняется подключение к доменному сокету.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-p <TT
+CLASS="REPLACEABLE"
+><I
+>порт</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--port=<TT
+CLASS="REPLACEABLE"
+><I
+>порт</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Указывает TCP-порт или расширение локального файла Unix-сокета, на котором сервер слушает подключения. По умолчанию берётся значение переменной окружения <TT
+CLASS="ENVAR"
+>PGPORT</TT
+>, если оно установлено, либо значение времени компиляции.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-U <TT
+CLASS="REPLACEABLE"
+><I
+>user</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--username=<TT
+CLASS="REPLACEABLE"
+><I
+>user</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Имя пользователя для подключения. По умолчанию это имя текущего пользователя операционной системы.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-w</TT
+><BR><TT
+CLASS="OPTION"
+>--no-password</TT
+></DT
+><DD
+><P
+>Не выдавать запрос на ввод пароля. Если сервер требует аутентификацию по паролю и пароль не доступен с помощью других средств, таких как файл <TT
+CLASS="FILENAME"
+>.pgpass</TT
+>, попытка соединения не удастся. Этот параметр может быть полезен в пакетных заданиях и скриптах, где нет пользователя, который вводит пароль.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-W</TT
+><BR><TT
+CLASS="OPTION"
+>--password</TT
+></DT
+><DD
+><P
+>Принудительно запрашивать пароль перед подключением к базе данных.</P
+><P
+>Это несущественный параметр, так как <SPAN
+CLASS="APPLICATION"
+>pg_recvlogical</SPAN
+> запрашивает пароль автоматически, если сервер проверяет подлинность по паролю. Однако, чтобы понять это, <SPAN
+CLASS="APPLICATION"
+>pg_recvlogical</SPAN
+> лишний раз подключается к серверу. Поэтому иногда имеет смысл ввести <TT
+CLASS="OPTION"
+>-W</TT
+>, чтобы исключить эту ненужную попытку подключения.</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>Также есть следующие дополнительные параметры: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="OPTION"
+>-V</TT
+><BR><TT
+CLASS="OPTION"
+>--version</TT
+></DT
+><DD
+><P
+>Сообщить версию <SPAN
+CLASS="APPLICATION"
+>pg_recvlogical</SPAN
+> и завершиться.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-?</TT
+><BR><TT
+CLASS="OPTION"
+>--help</TT
+></DT
+><DD
+><P
+>Показать справку по аргументам командной строки <SPAN
+CLASS="APPLICATION"
+>pg_recvlogical</SPAN
+> и завершиться.</P
+></DD
+></DL
+></DIV
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN89559"
+></A
+><H2
+>Переменные окружения</H2
+><P
+>Как и большинство других утилит <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, приложение также использует переменные окружения, поддерживаемые <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> (см. <A
+HREF="libpq-envars.html"
+>Раздел 31.14</A
+>).</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN89565"
+></A
+><H2
+>Примеры</H2
+><P
+>Примеры использования можно найти в <A
+HREF="logicaldecoding-example.html"
+>Разделе 46.1</A
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN89569"
+></A
+><H2
+>См. также</H2
+><A
+HREF="app-pgreceivexlog.html"
+>pg_receivexlog</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="app-pgreceivexlog.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="app-pgrestore.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>pg_receivexlog</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="reference-client.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>pg_restore</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

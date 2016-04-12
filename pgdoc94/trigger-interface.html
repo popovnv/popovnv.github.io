@@ -1,0 +1,533 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Триггерные функции на языке C</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Триггеры"
+HREF="triggers.html"><LINK
+REL="PREVIOUS"
+TITLE="Видимость изменений в данных"
+HREF="trigger-datachanges.html"><LINK
+REL="NEXT"
+TITLE="Полный пример триггера"
+HREF="trigger-example.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Видимость изменений в данных"
+HREF="trigger-datachanges.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="triggers.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 36. Триггеры</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Полный пример триггера"
+HREF="trigger-example.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="TRIGGER-INTERFACE"
+>36.3. Триггерные функции на языке C</A
+></H1
+><P
+>Этот раздел описывает низкоуровневые детали интерфейса для триггерной функции. Эта информация необходима только при разработке триггерных функций на C. При использовании языка более высокого уровня эти детали обрабатываются автоматически. В большинстве случаев необходимо рассмотреть использование процедурного языка, прежде чем начать разрабатывать триггеры на C. В документации по каждому процедурному языку объясняется как создавать триггеры на этом языке.</P
+><P
+>Триггерные функции должны использовать <SPAN
+CLASS="QUOTE"
+>"version 1"</SPAN
+> интерфейса диспетчера функций.</P
+><P
+>Когда функция вызывается диспетчером триггеров, ей не передаются обычные аргументы, но передаётся указатель <SPAN
+CLASS="QUOTE"
+>"context"</SPAN
+>, ссылающийся на структуру <TT
+CLASS="STRUCTNAME"
+>TriggerData</TT
+>. Функции на C могут проверить вызваны ли они диспетчером триггеров или нет выполнив макрос: </P><PRE
+CLASS="PROGRAMLISTING"
+>CALLED_AS_TRIGGER(fcinfo)</PRE
+><P> который разворачивается в: </P><PRE
+CLASS="PROGRAMLISTING"
+>((fcinfo)-&gt;context != NULL &amp;&amp; IsA((fcinfo)-&gt;context, TriggerData))</PRE
+><P> Если возвращается истина, то <TT
+CLASS="LITERAL"
+>fcinfo-&gt;context</TT
+> можно безопасно привести к типу <TT
+CLASS="LITERAL"
+>TriggerData *</TT
+> и использовать указатель на структуру <TT
+CLASS="STRUCTNAME"
+>TriggerData</TT
+>. Функция <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>не</I
+></SPAN
+> должна изменять структуру <TT
+CLASS="STRUCTNAME"
+>TriggerData</TT
+> или любые данные, которые на неё указывают.</P
+><P
+><TT
+CLASS="STRUCTNAME"
+>struct TriggerData</TT
+> определяется в <TT
+CLASS="FILENAME"
+>commands/trigger.h</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>typedef struct TriggerData
+{
+    NodeTag       type;
+    TriggerEvent  tg_event;
+    Relation      tg_relation;
+    HeapTuple     tg_trigtuple;
+    HeapTuple     tg_newtuple;
+    Trigger      *tg_trigger;
+    Buffer        tg_trigtuplebuf;
+    Buffer        tg_newtuplebuf;
+} TriggerData;</PRE
+><P> где элементы определяются следующим образом: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="STRUCTFIELD"
+>type</TT
+></DT
+><DD
+><P
+>Всегда <TT
+CLASS="LITERAL"
+>T_TriggerData</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="STRUCTFIELD"
+>tg_event</TT
+></DT
+><DD
+><P
+>Описывает событие, для которого вызывается функция. Можно использовать следующие макросы для получения информации о <TT
+CLASS="LITERAL"
+>tg_event</TT
+>: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>TRIGGER_FIRED_BEFORE(tg_event)</TT
+></DT
+><DD
+><P
+>Возвращает истину, если триггер сработал до операции.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>TRIGGER_FIRED_AFTER(tg_event)</TT
+></DT
+><DD
+><P
+>Возвращает истину, если триггер сработал после операции.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>TRIGGER_FIRED_INSTEAD(tg_event)</TT
+></DT
+><DD
+><P
+>Возвращает истину, если триггер сработал вместо операции.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>TRIGGER_FIRED_FOR_ROW(tg_event)</TT
+></DT
+><DD
+><P
+>Возвращает истину, если триггер сработал на уровне строки.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>TRIGGER_FIRED_FOR_STATEMENT(tg_event)</TT
+></DT
+><DD
+><P
+>Возвращает истину, если триггер сработал на уровне оператора.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>TRIGGER_FIRED_BY_INSERT(tg_event)</TT
+></DT
+><DD
+><P
+>Возвращает истину, если триггер сработал для операции <TT
+CLASS="COMMAND"
+>INSERT</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>TRIGGER_FIRED_BY_UPDATE(tg_event)</TT
+></DT
+><DD
+><P
+>Возвращает истину, если триггер сработал для операции <TT
+CLASS="COMMAND"
+>UPDATE</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>TRIGGER_FIRED_BY_DELETE(tg_event)</TT
+></DT
+><DD
+><P
+>Возвращает истину, если триггер сработал для операции <TT
+CLASS="COMMAND"
+>DELETE</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>TRIGGER_FIRED_BY_TRUNCATE(tg_event)</TT
+></DT
+><DD
+><P
+>Возвращает истину, если триггер сработал для операции <TT
+CLASS="COMMAND"
+>TRUNCATE</TT
+>.</P
+></DD
+></DL
+></DIV
+><P></P
+></DD
+><DT
+><TT
+CLASS="STRUCTFIELD"
+>tg_relation</TT
+></DT
+><DD
+><P
+>Указатель на структуру, описывающую таблицу, для которой сработал триггер. Подробнее об этой структуре в <TT
+CLASS="FILENAME"
+>utils/rel.h</TT
+>. Самое интересное здесь это <TT
+CLASS="LITERAL"
+>tg_relation-&gt;rd_att</TT
+> (дескриптор записей таблицы) и <TT
+CLASS="LITERAL"
+>tg_relation-&gt;rd_rel-&gt;relname</TT
+> (имя таблицы; имеет тип <TT
+CLASS="TYPE"
+>NameData</TT
+>, а не <TT
+CLASS="TYPE"
+>char*</TT
+>; используйте <TT
+CLASS="LITERAL"
+>SPI_getrelname(tg_relation)</TT
+>, чтобы получить тип <TT
+CLASS="TYPE"
+>char*</TT
+> если потребуется копия имени).</P
+></DD
+><DT
+><TT
+CLASS="STRUCTFIELD"
+>tg_trigtuple</TT
+></DT
+><DD
+><P
+>Указатель на строку, для которой сработал триггер. Это строка, которая вставляется, обновляется или удаляется. При срабатывании триггера для <TT
+CLASS="COMMAND"
+>INSERT</TT
+> или <TT
+CLASS="COMMAND"
+>DELETE</TT
+> это значение нужно вернуть из функции, только если не планируется изменять строку (в случае <TT
+CLASS="COMMAND"
+>INSERT</TT
+>) или пропускать операцию для этой строки.</P
+></DD
+><DT
+><TT
+CLASS="STRUCTFIELD"
+>tg_newtuple</TT
+></DT
+><DD
+><P
+>Для триггера на <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> это указатель на новую версию строки либо <TT
+CLASS="SYMBOL"
+>NULL</TT
+>, если триггер на <TT
+CLASS="COMMAND"
+>INSERT</TT
+> или <TT
+CLASS="COMMAND"
+>DELETE</TT
+>. Это значение нужно вернуть из функции в случае <TT
+CLASS="COMMAND"
+>UPDATE</TT
+>, если не планируется изменять строку или пропускать операцию для этой строки.</P
+></DD
+><DT
+><TT
+CLASS="STRUCTFIELD"
+>tg_trigger</TT
+></DT
+><DD
+><P
+>Указатель на структуру с типом <TT
+CLASS="STRUCTNAME"
+>Trigger</TT
+>, определённую в <TT
+CLASS="FILENAME"
+>utils/reltrigger.h</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>typedef struct Trigger
+{
+    Oid         tgoid;
+    char       *tgname;
+    Oid         tgfoid;
+    int16       tgtype;
+    char        tgenabled;
+    bool        tgisinternal;
+    Oid         tgconstrrelid;
+    Oid         tgconstrindid;
+    Oid         tgconstraint;
+    bool        tgdeferrable;
+    bool        tginitdeferred;
+    int16       tgnargs;
+    int16       tgnattr;
+    int16      *tgattr;
+    char      **tgargs;
+    char       *tgqual;
+} Trigger;</PRE
+><P> где <TT
+CLASS="STRUCTFIELD"
+>tgname</TT
+> — имя триггера, <TT
+CLASS="STRUCTFIELD"
+>tgnargs</TT
+> — количество аргументов в <TT
+CLASS="STRUCTFIELD"
+>tgargs</TT
+>, и <TT
+CLASS="STRUCTFIELD"
+>tgargs</TT
+> — массив указателей на аргументы, указанные в команде <TT
+CLASS="COMMAND"
+>CREATE TRIGGER</TT
+>. Остальные члены структуры предназначены для внутреннего использования.</P
+></DD
+><DT
+><TT
+CLASS="STRUCTFIELD"
+>tg_trigtuplebuf</TT
+></DT
+><DD
+><P
+>Буфер, содержащий <TT
+CLASS="STRUCTFIELD"
+>tg_trigtuple</TT
+>, или содержащий <TT
+CLASS="SYMBOL"
+>InvalidBuffer</TT
+> — если нет такой строки или она не хранится в дисковом буфере.</P
+></DD
+><DT
+><TT
+CLASS="STRUCTFIELD"
+>tg_newtuplebuf</TT
+></DT
+><DD
+><P
+>Буфер, содержащий <TT
+CLASS="STRUCTFIELD"
+>tg_newtuple</TT
+>, или содержащий <TT
+CLASS="SYMBOL"
+>InvalidBuffer</TT
+> — если нет такой строки или она не хранится в дисковом буфере.</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>Триггерная функция должна возвращать указатель <TT
+CLASS="STRUCTNAME"
+>HeapTuple</TT
+> или указатель <TT
+CLASS="SYMBOL"
+>NULL</TT
+>(но <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>не</I
+></SPAN
+> SQL значение <TT
+CLASS="LITERAL"
+>null</TT
+>, то есть не нужно устанавливать <TT
+CLASS="PARAMETER"
+>isNull</TT
+> в истину). Не забудьте, что если не планируете менять обрабатываемую триггером строку, то нужно вернуть либо <TT
+CLASS="STRUCTFIELD"
+>tg_trigtuple</TT
+>, либо <TT
+CLASS="STRUCTFIELD"
+>tg_newtuple</TT
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="trigger-datachanges.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="trigger-example.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Видимость изменений в данных</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="triggers.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Полный пример триггера</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

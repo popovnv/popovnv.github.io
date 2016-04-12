@@ -1,0 +1,539 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>citext</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Дополнительно поставляемые модули"
+HREF="contrib.html"><LINK
+REL="PREVIOUS"
+TITLE="chkpass"
+HREF="chkpass.html"><LINK
+REL="NEXT"
+TITLE="cube"
+HREF="cube.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="chkpass"
+HREF="chkpass.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Приложение E. Дополнительно поставляемые модули</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="cube"
+HREF="cube.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CITEXT"
+>E.7. citext</A
+></H1
+><P
+>Модуль <TT
+CLASS="FILENAME"
+>citext</TT
+> предоставляет тип данных для строк, нечувствительных к регистру, <TT
+CLASS="TYPE"
+>citext</TT
+>. По сути он сравнивает значения, вызывая внутри себя функцию <CODE
+CLASS="FUNCTION"
+>lower</CODE
+>. В остальном он почти не отличается от типа <TT
+CLASS="TYPE"
+>text</TT
+>.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN119146"
+>E.7.1. Обоснование</A
+></H2
+><P
+>Стандартный способ выполнить сравнение строк без учёта регистра в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> заключается в использовании функции <CODE
+CLASS="FUNCTION"
+>lower</CODE
+> при сравнении значений, например </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT * FROM tab WHERE lower(col) = LOWER(?);</PRE
+><P></P
+><P
+>Этот подход работает довольно хорошо, но имеет ряд недостатков:</P
+><P
+></P
+><UL
+><LI
+><P
+>Операторы SQL становятся громоздкими, и нужно не забывать всегда обрабатывать функцией <CODE
+CLASS="FUNCTION"
+>lower</CODE
+> и колонку, и значение.</P
+></LI
+><LI
+><P
+>Индекс не будет использоваться, если только дополнительно не создать функциональный индекс с функцией <CODE
+CLASS="FUNCTION"
+>lower</CODE
+>.</P
+></LI
+><LI
+><P
+>Если вы объявляете колонку как <TT
+CLASS="LITERAL"
+>UNIQUE</TT
+> или <TT
+CLASS="LITERAL"
+>PRIMARY KEY</TT
+>, неявно создаваемый индекс будет чувствительным к регистру. Поэтому он бесполезен для регистронезависимого поиска, так же как он не будет обеспечивать уникальность без учёта регистра.</P
+></LI
+></UL
+><P
+>Тип данных <TT
+CLASS="TYPE"
+>citext</TT
+> позволяет исключить вызовы <CODE
+CLASS="FUNCTION"
+>lower</CODE
+> в SQL-запросах и позволяет сделать первичный ключ регистронезависимым. Тип <TT
+CLASS="TYPE"
+>citext</TT
+> учитывает локаль, так же, как и тип <TT
+CLASS="TYPE"
+>text</TT
+>, что означает, что сравнение символов в верхнем и нижнем регистре зависит от правил <TT
+CLASS="LITERAL"
+>LC_CTYPE</TT
+> для базы данных. Это поведение, опять же, не отличается от вызовов <CODE
+CLASS="FUNCTION"
+>lower</CODE
+> в запросах. Но так как оно реализуется прозрачно типом данных, в самих запросах дополнительно не нужно ничего делать.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN119171"
+>E.7.2. Как его использовать</A
+></H2
+><P
+>Простой пример использования: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE users (
+    nick CITEXT PRIMARY KEY,
+    pass TEXT   NOT NULL
+);
+
+INSERT INTO users VALUES ( 'larry',  md5(random()::text) );
+INSERT INTO users VALUES ( 'Tom',    md5(random()::text) );
+INSERT INTO users VALUES ( 'Damian', md5(random()::text) );
+INSERT INTO users VALUES ( 'NEAL',   md5(random()::text) );
+INSERT INTO users VALUES ( 'Bj&oslash;rn',  md5(random()::text) );
+
+SELECT * FROM users WHERE nick = 'Larry';</PRE
+><P> Оператор <TT
+CLASS="COMMAND"
+>SELECT</TT
+> вернёт один кортеж, несмотря на то, что в колонку <TT
+CLASS="STRUCTFIELD"
+>nick</TT
+> записано значение <TT
+CLASS="LITERAL"
+>larry</TT
+>, а в запросе фигурирует <TT
+CLASS="LITERAL"
+>Larry</TT
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN119179"
+>E.7.3. Поведение при сравнении строк</A
+></H2
+><P
+>Модуль <TT
+CLASS="TYPE"
+>citext</TT
+> выполняет сравнения, приводя каждую строку к нижнему регистру (как если бы вызывалась функция <CODE
+CLASS="FUNCTION"
+>lower</CODE
+>) и затем производя сравнения как обычно. Так, например, две строки будут считаться равными, если функция <CODE
+CLASS="FUNCTION"
+>lower</CODE
+>, обработав их, выдаст одинаковые результаты.</P
+><P
+>Чтобы имитировать правило сортировки без учёта регистра в максимально возможной степени, этот модуль предоставляет специальные, ориентированные на <TT
+CLASS="TYPE"
+>citext</TT
+>, операторы и функции для обработки строки. Так, например, операторы регулярных выражений <TT
+CLASS="LITERAL"
+>~</TT
+> и <TT
+CLASS="LITERAL"
+>~*</TT
+> действуют в том же ключе, когда применяются к типу <TT
+CLASS="TYPE"
+>citext</TT
+>: оба они не учитывают регистр. Это же распространяется на операторы <TT
+CLASS="LITERAL"
+>!~</TT
+> и <TT
+CLASS="LITERAL"
+>!~*</TT
+>, а также операторы <TT
+CLASS="LITERAL"
+>LIKE</TT
+> <TT
+CLASS="LITERAL"
+>~~</TT
+>, <TT
+CLASS="LITERAL"
+>~~*</TT
+>, <TT
+CLASS="LITERAL"
+>!~~</TT
+> и <TT
+CLASS="LITERAL"
+>!~~*</TT
+>. Если же вы хотите, чтобы эти операторы учитывали регистр, вы можете привести их аргументы к типу <TT
+CLASS="TYPE"
+>text</TT
+>.</P
+><P
+>Подобным образом, все следующие функции выполняют сопоставления без учёта регистра, если их аргументы имеют тип <TT
+CLASS="TYPE"
+>citext</TT
+>:</P
+><P
+></P
+><UL
+><LI
+><P
+>      <CODE
+CLASS="FUNCTION"
+>regexp_replace()</CODE
+>
+    </P
+></LI
+><LI
+><P
+>      <CODE
+CLASS="FUNCTION"
+>regexp_split_to_array()</CODE
+>
+    </P
+></LI
+><LI
+><P
+>      <CODE
+CLASS="FUNCTION"
+>regexp_split_to_table()</CODE
+>
+    </P
+></LI
+><LI
+><P
+>      <CODE
+CLASS="FUNCTION"
+>replace()</CODE
+>
+    </P
+></LI
+><LI
+><P
+>      <CODE
+CLASS="FUNCTION"
+>split_part()</CODE
+>
+    </P
+></LI
+><LI
+><P
+>      <CODE
+CLASS="FUNCTION"
+>strpos()</CODE
+>
+    </P
+></LI
+><LI
+><P
+>      <CODE
+CLASS="FUNCTION"
+>translate()</CODE
+>
+    </P
+></LI
+></UL
+><P
+>Для функций с регулярными выражениями, если вам нужно регистрозависимое сопоставление, вы можете добавить флаг <SPAN
+CLASS="QUOTE"
+>"c"</SPAN
+>, чтобы принудительно включить этот режим. Чтобы получить регистрозависимое поведение без этого флага, вы должны привести аргумент к типу <TT
+CLASS="TYPE"
+>text</TT
+>, прежде чем вызывать эту функцию.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN119225"
+>E.7.4. Ограничения</A
+></H2
+><P
+></P
+><UL
+><LI
+><P
+>Смена регистра символов в <TT
+CLASS="TYPE"
+>citext</TT
+> зависит от параметра <TT
+CLASS="LITERAL"
+>LC_CTYPE</TT
+> вашей базы данных. Таким образом, как будут сравниваться значения, определяется при создании базы данных. На самом деле, по определениям стандарта Unicode, это сравнение не будет истинно регистронезависимым. По сути это означает, что если вас устраивает установленное правило сортировки, вас должны устраивать и сравнения <TT
+CLASS="TYPE"
+>citext</TT
+>. Но если в вашей базе данных хранятся строки на разных языках, пользователи одного языка могут получать неожиданные результаты запросов, если правило сортировки предназначено для другого языка.</P
+></LI
+><LI
+><P
+>Начиная с <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> версии 9.1, вы можете добавлять указание <TT
+CLASS="LITERAL"
+>COLLATE</TT
+> к значениям данных или колонкам <TT
+CLASS="TYPE"
+>citext</TT
+>. В настоящее время операторы <TT
+CLASS="TYPE"
+>citext</TT
+> принимают во внимание такое явное указание <TT
+CLASS="LITERAL"
+>COLLATE</TT
+>, сравнивая строки в нижнем регистре, но изначальное приведение в нижний регистр всегда выполняется согласно параметру <TT
+CLASS="LITERAL"
+>LC_CTYPE</TT
+> базы данных (как если бы указывалось <TT
+CLASS="LITERAL"
+>COLLATE "default"</TT
+>). Это может быть изменено в будущем, чтобы на обоих этапах учитывалось указание <TT
+CLASS="LITERAL"
+>COLLATE</TT
+> во входных данных.</P
+></LI
+><LI
+><P
+>Тип <TT
+CLASS="TYPE"
+>citext</TT
+> не так эффективен, как <TT
+CLASS="TYPE"
+>text</TT
+>, так как функции операторов и функции сравнения для B-дерева должны делать копии данных и переводить их в нижний регистр для сравнения. Однако он несколько эффективнее варианта с применением <CODE
+CLASS="FUNCTION"
+>lower</CODE
+> для получения регистронезависимого сравнения.</P
+></LI
+><LI
+><P
+>Тип <TT
+CLASS="TYPE"
+>citext</TT
+> малополезен в ситуациях, когда вам нужно сравнивать данные без учёта регистра в одних контекстах, и с учётом регистра — в других. Обычно в таких случаях используют <TT
+CLASS="TYPE"
+>text</TT
+> и вручную применяют функцию <CODE
+CLASS="FUNCTION"
+>lower</CODE
+>, когда нужно выполнить сравнение без учёта регистра; это прекрасно работает, если регистронезависимое сравнение требуется выполнять относительно редко. Если же почти всегда сравнение должно быть регистронезависимым и только иногда регистрозависимым, имеет смысл сохранить данные в колонке типа <TT
+CLASS="TYPE"
+>citext</TT
+>, и явно приводить их к типу <TT
+CLASS="TYPE"
+>text</TT
+> для регистрозависимого сравнения. В любом случае, чтобы оба варианта поиска были быстрыми, вам потребуются два индекса.</P
+></LI
+><LI
+><P
+>Схема, содержащая операторы <TT
+CLASS="TYPE"
+>citext</TT
+>, должна находиться в текущем пути <TT
+CLASS="VARNAME"
+>search_path</TT
+> (обычно это схема <TT
+CLASS="LITERAL"
+>public</TT
+>); в противном случае будут вызываться регистрозависимые операторы для типа <TT
+CLASS="TYPE"
+>text</TT
+>.</P
+></LI
+></UL
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN119261"
+>E.7.5. Автор</A
+></H2
+><P
+>Дэвид Е. Уилер <CODE
+CLASS="EMAIL"
+>&#60;<A
+HREF="mailto:david@kineticode.com"
+>david@kineticode.com</A
+>&#62;</CODE
+></P
+><P
+>Разработку вдохновил оригинальный модуль <TT
+CLASS="TYPE"
+>citext</TT
+> Дональда Фрейзера.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="chkpass.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="cube.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>chkpass</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>cube</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

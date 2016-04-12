@@ -1,0 +1,386 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Функции оценки стоимости индекса</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Определение интерфейса для методов доступа индекса"
+HREF="indexam.html"><LINK
+REL="PREVIOUS"
+TITLE="Проверки уникальности в индексе"
+HREF="index-unique-checks.html"><LINK
+REL="NEXT"
+TITLE="Индексы GiST"
+HREF="gist.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Проверки уникальности в индексе"
+HREF="index-unique-checks.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="indexam.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 55. Определение интерфейса для методов доступа индекса</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Индексы GiST"
+HREF="gist.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="INDEX-COST-ESTIMATION"
+>55.6. Функции оценки стоимости индекса</A
+></H1
+><P
+>Функции <CODE
+CLASS="FUNCTION"
+>amcostestimate</CODE
+> даётся информация, описывающая возможное сканирование индекса, включая списки предложений WHERE и ORDER BY, которые были выбраны как применимые с данным индексом. Она должна вернуть оценки стоимости обращения к индексу и избирательность предложений WHERE (то есть, процент строк основной таблицы, который будет получен в ходе сканирования индекса). Для простых случаев почти всю работу оценщика стоимости можно произвести, вызывая стандартные процедуры оптимизатора; смысл существования функции <CODE
+CLASS="FUNCTION"
+>amcostestimate</CODE
+> в том, чтобы методы доступа индексов могли поделиться знаниями, специфичными для типа индекса, когда это может помочь улучшить стандартные оценки.</P
+><P
+>Каждая функция <CODE
+CLASS="FUNCTION"
+>amcostestimate</CODE
+> должна иметь такую сигнатуру: </P><PRE
+CLASS="PROGRAMLISTING"
+>void
+amcostestimate (PlannerInfo *root,
+                IndexPath *path,
+                double loop_count,
+                Cost *indexStartupCost,
+                Cost *indexTotalCost,
+                Selectivity *indexSelectivity,
+                double *indexCorrelation);</PRE
+><P> Первые три параметра передают входные значения: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="PARAMETER"
+>root</TT
+></DT
+><DD
+><P
+>Информация планировщика о выполняемом запросе.</P
+></DD
+><DT
+><TT
+CLASS="PARAMETER"
+>path</TT
+></DT
+><DD
+><P
+>Рассматриваемый путь доступа к индексу. В нём действительны все поля, кроме значений стоимости и избирательности.</P
+></DD
+><DT
+><TT
+CLASS="PARAMETER"
+>loop_count</TT
+></DT
+><DD
+><P
+>Число повторений сканирования индекса, которое должно приниматься во внимание при оценке стоимости. Обычно оно будет больше одного, когда при соединении со вложенным циклом планируется параметризованное сканирование. Заметьте, что оценки стоимости, тем не менее, должны рассчитываться для всего одного сканирования; большие значения <TT
+CLASS="PARAMETER"
+>loop_count</TT
+> лишь дают основания предположить, что при многократном сканировании положительное влияние может оказать кеширование.</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>Последние четыре параметра — указатели на переменные для выходных значений: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="PARAMETER"
+>*indexStartupCost</TT
+></DT
+><DD
+><P
+>Стоимость выполнения запуска индекса</P
+></DD
+><DT
+><TT
+CLASS="PARAMETER"
+>*indexTotalCost</TT
+></DT
+><DD
+><P
+>Общая стоимость использования индекса</P
+></DD
+><DT
+><TT
+CLASS="PARAMETER"
+>*indexSelectivity</TT
+></DT
+><DD
+><P
+>Избирательность индекса</P
+></DD
+><DT
+><TT
+CLASS="PARAMETER"
+>*indexCorrelation</TT
+></DT
+><DD
+><P
+>Коэффициент корреляции между порядком сканирования индекса и порядком записей в нижележащей таблице</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>Заметьте, что функции оценки стоимости должны разрабатываться на C, а не на SQL или другом доступном процедурном языке, так как они должны обращаться к внутренним структурам данным планировщика/оптимизатора.</P
+><P
+>Стоимости обращения к индексу следует вычислять с использованием параметров, объявленных в <TT
+CLASS="FILENAME"
+>src/backend/optimizer/path/costsize.c</TT
+>: последовательная выборка дискового блока имеет стоимость <TT
+CLASS="VARNAME"
+>seq_page_cost</TT
+>, непоследовательная выборка — <TT
+CLASS="VARNAME"
+>random_page_cost</TT
+>, а стоимостью обработки одной строки индекса обычно принимается <TT
+CLASS="VARNAME"
+>cpu_index_tuple_cost</TT
+>. Кроме того, за каждый оператор сравнения, вызываемый при обработке индекса, должна взиматься цена <TT
+CLASS="VARNAME"
+>cpu_operator_cost</TT
+> (особенно за вычисление собственно условий индекса).</P
+><P
+>Стоимость доступа должна включать стоимости всех дисковых и процессорных ресурсов, требующихся для сканирования самого индекса, <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>но</I
+></SPAN
+> не стоимости извлечения или обработки строк основной таблицы, с которой связан индекс.</P
+><P
+><SPAN
+CLASS="QUOTE"
+>"Стоимость запуска"</SPAN
+> составляет часть общей стоимости сканирования, которая должна быть потрачена, прежде чем можно будет начать чтение первой строки. Для большинства индексов она может считаться нулевой, но для типов индексов с высокими затратами на запуск она может быть больше нуля.</P
+><P
+>Значение в <TT
+CLASS="PARAMETER"
+>indexSelectivity</TT
+> должно показывать, какой процент строк основной таблицы ожидается получить при сканировании таблицы. В случае неточного запроса это обычно будет больше процента строк, действительно удовлетворяющих заданным ограничивающим условиям.</P
+><P
+>В <TT
+CLASS="PARAMETER"
+>indexCorrelation</TT
+> записывается корреляция (в диапазоне от -1.0 до 1.0) между порядком записей в индексе и в таблице. Это значение будет корректировать оценку стоимости выборки строк из основной таблицы.</P
+><P
+>Когда <TT
+CLASS="PARAMETER"
+>loop_count</TT
+> больше нуля, возвращаться должны средние значения, ожидаемые для одного сканирования индекса.</P
+><DIV
+CLASS="PROCEDURE"
+><P
+><B
+>Оценка стоимости</B
+></P
+><P
+>Типичная процедура оценки выглядит следующим образом:</P
+><OL
+TYPE="1"
+><LI
+CLASS="STEP"
+><P
+>Рассчитать и вернуть процент строк родительской таблицы, которые будут посещены при заданных ограничивающих условиях. В отсутствие каких-либо знаний, специфичных для типа индекса, использовать стандартную функцию оптимизатора <CODE
+CLASS="FUNCTION"
+>clauselist_selectivity()</CODE
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>*indexSelectivity = clauselist_selectivity(root, path-&gt;indexquals,
+                                           path-&gt;indexinfo-&gt;rel-&gt;relid,
+                                           JOIN_INNER, NULL);</PRE
+><P></P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Оценить число строк индекса, которые будут посещены при сканировании. Для многих типов индексов это будет произведение <TT
+CLASS="PARAMETER"
+>indexSelectivity</TT
+> и числа строк в индексе, но оно может быть и больше. (Заметьте, что размер индекса в страницах и строках можно узнать из структуры <TT
+CLASS="LITERAL"
+>path-&gt;indexinfo</TT
+>.)</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Рассчитать число страниц индекса, которые будут получены при сканировании. Это может быть просто произведение <TT
+CLASS="PARAMETER"
+>indexSelectivity</TT
+> и размера индекса в страницах.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Вычислить стоимость обращения к индексу. Универсальный оценщик может сделать следующее: </P><PRE
+CLASS="PROGRAMLISTING"
+>/*
+ * Вообще предполагается, что страницы индекса будут считываться последовательно,
+ * так что стоимость их чтения cost seq_page_cost, а не random_page_cost.
+ * Также мы добавляем стоимость за вычисление условия индекса для каждой строки.
+ * Все стоимости считаются пропорционально возрастающими при сканировании.
+ */
+cost_qual_eval(&amp;index_qual_cost, path-&gt;indexquals, root);
+*indexStartupCost = index_qual_cost.startup;
+*indexTotalCost = seq_page_cost * numIndexPages +
+    (cpu_index_tuple_cost + index_qual_cost.per_tuple) * numIndexTuples;</PRE
+><P> Однако при таком расчёте не учитывается амортизация чтения индекса при повторном сканировании.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Оценить корреляцию индекса. Для простого упорядоченного индекса по одному полю её можно получить из pg_statistic. Если корреляция неизвестна, вернуть консервативную оценку — ноль (корреляция отсутствует).</P
+></LI
+></OL
+></DIV
+><P
+>Примеры функций оценки стоимости можно найти в <TT
+CLASS="FILENAME"
+>src/backend/utils/adt/selfuncs.c</TT
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="index-unique-checks.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="gist.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Проверки уникальности в индексе</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="indexam.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Индексы GiST</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

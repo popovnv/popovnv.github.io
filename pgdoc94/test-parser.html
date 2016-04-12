@@ -1,0 +1,240 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>test_parser</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Дополнительно поставляемые модули"
+HREF="contrib.html"><LINK
+REL="PREVIOUS"
+TITLE="test_decoding"
+HREF="test-decoding.html"><LINK
+REL="NEXT"
+TITLE="test_shm_mq"
+HREF="test-shm-mq.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="test_decoding"
+HREF="test-decoding.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Приложение E. Дополнительно поставляемые модули</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="test_shm_mq"
+HREF="test-shm-mq.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="TEST-PARSER"
+>E.40. test_parser</A
+></H1
+><P
+>Модуль <TT
+CLASS="FILENAME"
+>test_parser</TT
+> представляет пример нестандартного разбора текста для полнотекстового поиска. Он не делает ничего особенно полезного, но может послужить отправной точкой для разработки собственной процедуры разбора.</P
+><P
+>Анализатор текста <TT
+CLASS="FILENAME"
+>test_parser</TT
+> распознаёт слова, разделённые пробельными символами, и возвращает только два типа фрагментов: </P><PRE
+CLASS="PROGRAMLISTING"
+>mydb=# SELECT * FROM ts_token_type('testparser');
+ tokid | alias |  description
+-------+-------+---------------
+     3 | word  | Word
+    12 | blank | Space symbols
+(2 rows)</PRE
+><P> Такие номера фрагментов выбраны для совместимости с нумерацией стандартного анализатора. Это позволяет использовать его функцию <CODE
+CLASS="FUNCTION"
+>headline()</CODE
+> ради простоты примера.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN125647"
+>E.40.1. Usage</A
+></H2
+><P
+>При установке расширения <TT
+CLASS="LITERAL"
+>test_parser</TT
+> в базе создаётся анализатор текстового поиска <TT
+CLASS="LITERAL"
+>testparser</TT
+>. Он не имеет параметров, настраиваемых пользователем.</P
+><P
+>Вы можете протестировать этот анализатор, например, так: </P><PRE
+CLASS="PROGRAMLISTING"
+>mydb=# SELECT * FROM ts_parse('testparser', 'That''s my first own parser');
+ tokid | token
+-------+--------
+     3 | That's
+    12 |
+     3 | my
+    12 |
+     3 | first
+    12 |
+     3 | own
+    12 |
+     3 | parser</PRE
+><P></P
+><P
+>Для применения на практике нужно создать конфигурацию текстового поиска, которая будет использовать этот анализатор. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>mydb=# CREATE TEXT SEARCH CONFIGURATION testcfg ( PARSER = testparser );
+CREATE TEXT SEARCH CONFIGURATION
+
+mydb=# ALTER TEXT SEARCH CONFIGURATION testcfg
+mydb-#   ADD MAPPING FOR word WITH english_stem;
+ALTER TEXT SEARCH CONFIGURATION
+
+mydb=#  SELECT to_tsvector('testcfg', 'That''s my first own parser');
+          to_tsvector
+-------------------------------
+ 'that':1 'first':3 'parser':5
+(1 row)
+
+mydb=# SELECT ts_headline('testcfg', 'Supernovae stars are the brightest phenomena in galaxies',
+mydb(#                    to_tsquery('testcfg', 'star'));
+                           ts_headline
+-----------------------------------------------------------------
+ Supernovae &lt;b&gt;stars&lt;/b&gt; are the brightest phenomena in galaxies
+(1 row)</PRE
+><P></P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="test-decoding.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="test-shm-mq.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>test_decoding</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>test_shm_mq</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

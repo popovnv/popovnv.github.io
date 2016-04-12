@@ -1,0 +1,648 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Типы, описывающие сетевые адреса</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Типы данных"
+HREF="datatype.html"><LINK
+REL="PREVIOUS"
+TITLE="Геометрические типы"
+HREF="datatype-geometric.html"><LINK
+REL="NEXT"
+TITLE="Битовые строки"
+HREF="datatype-bit.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Геометрические типы"
+HREF="datatype-geometric.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="datatype.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 8. Типы данных</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Битовые строки"
+HREF="datatype-bit.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="DATATYPE-NET-TYPES"
+>8.9. Типы, описывающие сетевые адреса</A
+></H1
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> предлагает типы данных для хранения адресов IPv4, IPv6 и MAC, показанные в <A
+HREF="datatype-net-types.html#DATATYPE-NET-TYPES-TABLE"
+>Таблице 8-21</A
+>. Для хранения сетевых адресов лучше использовать эти типы, а не простые текстовые строки, так как <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> проверяет вводимые значения данных типов и предоставляет специализированные операторы и функции для работы с ними (см. <A
+HREF="functions-net.html"
+>Раздел 9.12</A
+>).</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="DATATYPE-NET-TYPES-TABLE"
+></A
+><P
+><B
+>Таблица 8-21. Типы, описывающие сетевые адреса</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Размер</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>cidr</TT
+>
+                </TD
+><TD
+>7 или 19 байт</TD
+><TD
+>Сети IPv4 и IPv6</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>inet</TT
+>
+                </TD
+><TD
+>7 или 19 байт</TD
+><TD
+>Узлы и сети IPv4 и IPv6</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>macaddr</TT
+>
+                </TD
+><TD
+>6 байт</TD
+><TD
+>MAC-адреса</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>При сортировке типов <TT
+CLASS="TYPE"
+>inet</TT
+> и <TT
+CLASS="TYPE"
+>cidr</TT
+>, адреса IPv4 всегда идут до адресов IPv6, в том числе адреса IPv4, включённые в IPv6 или сопоставленные с ними, например ::10.2.3.4 или ::ffff:10.4.3.2.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="DATATYPE-INET"
+>8.9.1. <TT
+CLASS="TYPE"
+>inet</TT
+></A
+></H2
+><P
+>Тип <TT
+CLASS="TYPE"
+>inet</TT
+> содержит IPv4- или IPv6-адрес узла и может также содержать его подсеть, всё в одном поле. Подсеть представляется числом бит, определяющих адрес сети в адресе узла (или <SPAN
+CLASS="QUOTE"
+>"маску сети"</SPAN
+>). Если маска сети равна 32 для адреса IPv4, такое значение представляет не подсеть, а определённый узел. Адреса IPv6 имеют длину 128 бит, поэтому уникальный адрес узла задаётся с маской 128 бит. Заметьте, что когда нужно, чтобы принимались только адреса сетей, следует использовать тип <TT
+CLASS="TYPE"
+>cidr</TT
+>, а не <TT
+CLASS="TYPE"
+>inet</TT
+>.</P
+><P
+>Вводимые значения такого типа должны иметь формат <TT
+CLASS="REPLACEABLE"
+><I
+>IP-адрес/y</I
+></TT
+>, где <TT
+CLASS="REPLACEABLE"
+><I
+>IP-адрес</I
+></TT
+> &mdash; адрес IPv4 или IPv6, а <TT
+CLASS="REPLACEABLE"
+><I
+>y</I
+></TT
+> &mdash; число бит в маске сети. Если компонент <TT
+CLASS="REPLACEABLE"
+><I
+>/y</I
+></TT
+> отсутствует, маска сети считается равной 32 для IPv4 и 128 для IPv6, так что это значение будет представлять один узел. При выводе компонент <TT
+CLASS="REPLACEABLE"
+><I
+>/y</I
+></TT
+> опускается, если сетевой адрес определяет адрес одного узла.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="DATATYPE-CIDR"
+>8.9.2. <TT
+CLASS="TYPE"
+>cidr</TT
+></A
+></H2
+><P
+>Тип <TT
+CLASS="TYPE"
+>cidr</TT
+> содержит определение сети IPv4 или IPv6. Входные и выходные форматы соответствуют соглашениям CIDR (Classless Internet Domain Routing, Бесклассовая межсетевая адресация). Определение сети записывается в формате <TT
+CLASS="REPLACEABLE"
+><I
+>IP-адрес/y</I
+></TT
+>, где <TT
+CLASS="REPLACEABLE"
+><I
+>IP-адрес</I
+></TT
+> &mdash; адрес сети IPv4 или IPv6, а <TT
+CLASS="REPLACEABLE"
+><I
+>y</I
+></TT
+> &mdash; число бит в маске сети. Если <TT
+CLASS="REPLACEABLE"
+><I
+>y</I
+></TT
+> не указывается, это значение вычисляется по старой классовой схеме нумерации сетей, но при этом оно может быть увеличено, чтобы в него вошли все байты введённого адреса. Если в сетевом адресе справа от маски сети окажутся биты со значением 1, он будет считаться ошибочным.</P
+><P
+>В <A
+HREF="datatype-net-types.html#DATATYPE-NET-CIDR-TABLE"
+>Таблице 8-22</A
+> показаны несколько примеров адресов.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="DATATYPE-NET-CIDR-TABLE"
+></A
+><P
+><B
+>Таблица 8-22. Примеры допустимых значений типа <TT
+CLASS="TYPE"
+>cidr</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Вводимое значение <TT
+CLASS="TYPE"
+>cidr</TT
+></TH
+><TH
+>Выводимое значение <TT
+CLASS="TYPE"
+>cidr</TT
+></TH
+><TH
+>                    <TT
+CLASS="LITERAL"
+>                      <CODE
+CLASS="FUNCTION"
+>abbrev(<TT
+CLASS="TYPE"
+>cidr</TT
+>)</CODE
+>
+                    </TT
+>
+                  </TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>192.168.100.128/25</TD
+><TD
+>192.168.100.128/25</TD
+><TD
+>192.168.100.128/25</TD
+></TR
+><TR
+><TD
+>192.168/24</TD
+><TD
+>192.168.0.0/24</TD
+><TD
+>192.168.0/24</TD
+></TR
+><TR
+><TD
+>192.168/25</TD
+><TD
+>192.168.0.0/25</TD
+><TD
+>192.168.0.0/25</TD
+></TR
+><TR
+><TD
+>192.168.1</TD
+><TD
+>192.168.1.0/24</TD
+><TD
+>192.168.1/24</TD
+></TR
+><TR
+><TD
+>192.168</TD
+><TD
+>192.168.0.0/24</TD
+><TD
+>192.168.0/24</TD
+></TR
+><TR
+><TD
+>128.1</TD
+><TD
+>128.1.0.0/16</TD
+><TD
+>128.1/16</TD
+></TR
+><TR
+><TD
+>128</TD
+><TD
+>128.0.0.0/16</TD
+><TD
+>128.0/16</TD
+></TR
+><TR
+><TD
+>128.1.2</TD
+><TD
+>128.1.2.0/24</TD
+><TD
+>128.1.2/24</TD
+></TR
+><TR
+><TD
+>10.1.2</TD
+><TD
+>10.1.2.0/24</TD
+><TD
+>10.1.2/24</TD
+></TR
+><TR
+><TD
+>10.1</TD
+><TD
+>10.1.0.0/16</TD
+><TD
+>10.1/16</TD
+></TR
+><TR
+><TD
+>10</TD
+><TD
+>10.0.0.0/8</TD
+><TD
+>10/8</TD
+></TR
+><TR
+><TD
+>10.1.2.3/32</TD
+><TD
+>10.1.2.3/32</TD
+><TD
+>10.1.2.3/32</TD
+></TR
+><TR
+><TD
+>2001:4f8:3:ba::/64</TD
+><TD
+>2001:4f8:3:ba::/64</TD
+><TD
+>2001:4f8:3:ba::/64</TD
+></TR
+><TR
+><TD
+>2001:4f8:3:ba:2e0:81ff:fe22:​d1f1/128</TD
+><TD
+>2001:4f8:3:ba:2e0:81ff:fe22:​d1f1/128</TD
+><TD
+>2001:4f8:3:ba:2e0:81ff:fe22:​d1f1</TD
+></TR
+><TR
+><TD
+>::ffff:1.2.3.0/120</TD
+><TD
+>::ffff:1.2.3.0/120</TD
+><TD
+>::ffff:1.2.3/120</TD
+></TR
+><TR
+><TD
+>::ffff:1.2.3.0/128</TD
+><TD
+>::ffff:1.2.3.0/128</TD
+><TD
+>::ffff:1.2.3.0/128</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="DATATYPE-INET-VS-CIDR"
+>8.9.3. Различия <TT
+CLASS="TYPE"
+>inet</TT
+> и <TT
+CLASS="TYPE"
+>cidr</TT
+></A
+></H2
+><P
+>Существенным различием типов данных <TT
+CLASS="TYPE"
+>inet</TT
+> и <TT
+CLASS="TYPE"
+>cidr</TT
+> является то, что <TT
+CLASS="TYPE"
+>inet</TT
+> принимает значения с ненулевыми битами справа от маски сети, а <TT
+CLASS="TYPE"
+>cidr</TT
+> &mdash; нет.</P
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>Если вас не устраивает выходной формат значений <TT
+CLASS="TYPE"
+>inet</TT
+> или <TT
+CLASS="TYPE"
+>cidr</TT
+>, попробуйте функции <CODE
+CLASS="FUNCTION"
+>host</CODE
+>, <CODE
+CLASS="FUNCTION"
+>text</CODE
+> и <CODE
+CLASS="FUNCTION"
+>abbrev</CODE
+>.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="DATATYPE-MACADDR"
+>8.9.4. <TT
+CLASS="TYPE"
+>macaddr</TT
+></A
+></H2
+><P
+>Тип <TT
+CLASS="TYPE"
+>macaddr</TT
+> предназначен для хранения MAC-адреса, примером которого является адрес сетевой платы Ethernet (хотя MAC-адреса применяются и для других целей). Вводимые значения могут задаваться в следующих форматах: <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>'08:00:2b:01:02:03'</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>'08-00-2b-01-02-03'</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>'08002b:010203'</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>'08002b-010203'</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>'0800.2b01.0203'</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>'08002b010203'</TT
+></TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+> Все эти примеры определяют один и тот же адрес. Шестнадцатеричные цифры от <TT
+CLASS="LITERAL"
+>a</TT
+> до <TT
+CLASS="LITERAL"
+>f</TT
+> могут быть и в нижнем, и в верхнем регистре. Выводятся MAC-адреса всегда в первой форме.</P
+><P
+>Стандарт IEEE 802-2001 считает канонической формой MAC-адресов вторую (с минусами), а в первой (с двоеточиями) предполагает обратный порядок бит, так что 08-00-2b-01-02-03 = 01:00:4D:08:04:0C. В настоящее время этому соглашению практически никто не следует, и уместно оно было только для устаревших сетевых протоколов (таких как Token Ring). PostgreSQL не меняет порядок бит и во всех принимаемых форматах подразумевается традиционный порядок LSB.</P
+><P
+>Последние четыре входных формата не описаны в каком-либо стандарте.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="datatype-geometric.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="datatype-bit.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Геометрические типы</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="datatype.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Битовые строки</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

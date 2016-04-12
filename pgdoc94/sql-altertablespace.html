@@ -1,0 +1,369 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>ALTER TABLESPACE</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="ALTER TABLE"
+HREF="sql-altertable.html"><LINK
+REL="NEXT"
+TITLE="ALTER TEXT SEARCH CONFIGURATION"
+HREF="sql-altertsconfig.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="ALTER TABLE"
+HREF="sql-altertable.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="ALTER TEXT SEARCH CONFIGURATION"
+HREF="sql-altertsconfig.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-ALTERTABLESPACE"
+></A
+>ALTER TABLESPACE</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN70096"
+></A
+><H2
+>Название</H2
+>ALTER TABLESPACE&nbsp;--&nbsp;изменить определение табличного пространства</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN70099"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>ALTER TABLESPACE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> RENAME TO <TT
+CLASS="REPLACEABLE"
+><I
+>новое_имя</I
+></TT
+>
+ALTER TABLESPACE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> OWNER TO <TT
+CLASS="REPLACEABLE"
+><I
+>новый_владелец</I
+></TT
+>
+ALTER TABLESPACE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> SET ( <TT
+CLASS="REPLACEABLE"
+><I
+>параметр_табличного пространства</I
+></TT
+> = <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> [, ... ] )
+ALTER TABLESPACE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> RESET ( <TT
+CLASS="REPLACEABLE"
+><I
+>параметр_табличного пространства</I
+></TT
+> [, ... ] )</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN70110"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>ALTER TABLESPACE</TT
+> может применяться для изменения определения табличного пространства.</P
+><P
+>Чтобы изменить определение табличного пространства, нужно быть его владельцем. Чтобы изменить владельца, нужно быть непосредственным или опосредованным членом новой роли-владельца. (Заметьте, что суперпользователи наделяются этими правами автоматически.)</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN70115"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></DT
+><DD
+><P
+>Имя существующего табличного пространства.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>новое_имя</I
+></TT
+></DT
+><DD
+><P
+>Новое имя табличного пространства. Новое имя не может начинаться с <TT
+CLASS="LITERAL"
+>pg_</TT
+>, так как такие имена зарезервированы для системных табличных пространств.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>новый_владелец</I
+></TT
+></DT
+><DD
+><P
+>Новый владелец табличного пространства.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>параметр_табличного пространства</I
+></TT
+></DT
+><DD
+><P
+>Устанавливаемый или сбрасываемый параметр табличного пространства. В настоящее время поддерживаются только параметры <TT
+CLASS="VARNAME"
+>seq_page_cost</TT
+> и <TT
+CLASS="VARNAME"
+>random_page_cost</TT
+>. При установке этих значений для заданного табличного пространства будет переопределена обычная оценка стоимости чтения страниц из таблиц в этом пространстве, настраиваемая одноимённым параметром конфигурации (см. <A
+HREF="runtime-config-query.html#GUC-SEQ-PAGE-COST"
+>seq_page_cost</A
+>, <A
+HREF="runtime-config-query.html#GUC-RANDOM-PAGE-COST"
+>random_page_cost</A
+>). Это может быть полезно, если одно из табличных пространств размещено на диске, который быстрее или медленнее остальной дисковой системы.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN70143"
+></A
+><H2
+>Примеры</H2
+><P
+>Переименование табличного пространства <TT
+CLASS="LITERAL"
+>index_space</TT
+> в <TT
+CLASS="LITERAL"
+>fast_raid</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER TABLESPACE index_space RENAME TO fast_raid;</PRE
+><P></P
+><P
+>Смена владельца табличного пространства <TT
+CLASS="LITERAL"
+>index_space</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER TABLESPACE index_space OWNER TO mary;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN70152"
+></A
+><H2
+>Совместимость</H2
+><P
+>Оператор <TT
+CLASS="COMMAND"
+>ALTER TABLESPACE</TT
+> отсутствует в стандарте SQL.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN70156"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-createtablespace.html"
+>CREATE TABLESPACE</A
+>, <A
+HREF="sql-droptablespace.html"
+>DROP TABLESPACE</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-altertable.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-altertsconfig.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>ALTER TABLE</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>ALTER TEXT SEARCH CONFIGURATION</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

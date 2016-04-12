@@ -1,0 +1,252 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Введение</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Индексы"
+HREF="indexes.html"><LINK
+REL="PREVIOUS"
+TITLE="Индексы"
+HREF="indexes.html"><LINK
+REL="NEXT"
+TITLE="Типы индексов"
+HREF="indexes-types.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Индексы"
+HREF="indexes.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="indexes.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 11. Индексы</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Типы индексов"
+HREF="indexes-types.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="INDEXES-INTRO"
+>11.1. Введение</A
+></H1
+><P
+>Предположим, что у нас есть такая таблица: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE test1 (
+    id integer,
+    content varchar
+);</PRE
+><P> и приложение выполняет много подобных запросов: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT content FROM test1 WHERE id = <TT
+CLASS="REPLACEABLE"
+><I
+>константа</I
+></TT
+>;</PRE
+><P> Если система не будет заранее подготовлена, ей придётся сканировать всю таблицу <TT
+CLASS="STRUCTNAME"
+>test1</TT
+>, строку за строкой, чтобы найти все подходящие записи. Когда таблица <TT
+CLASS="STRUCTNAME"
+>test1</TT
+> содержит большое количество записей, а этот запрос должен вернуть всего несколько (возможно, одну или ноль), такое сканирование, очевидно, неэффективно. Но если создать в системе индекс по полю <TT
+CLASS="STRUCTFIELD"
+>id</TT
+>, она сможет находить строки гораздо быстрее. Возможно, для этого ей понадобится опуститься всего на несколько уровней в дереве поиска.</P
+><P
+>Подобный подход часто используется в технической литературе: термины и понятия, которые могут представлять интерес, собираются в алфавитном указателе в конце книги. Читатель может просмотреть этот указатель довольно быстро и затем перейти сразу к соответствующей странице, вместо того, чтобы пролистывать всю книгу в поисках нужного материала. Так же, как задача автора предугадать, что именно будут искать в книге читатели, задача программиста баз данных &mdash; заранее определить, какие индексы будут полезны.</P
+><P
+>Создать индекс для колонки <TT
+CLASS="STRUCTFIELD"
+>id</TT
+> рассмотренной ранее таблицы можно с помощью следующей команды: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE INDEX test1_id_index ON test1 (id);</PRE
+><P> Имя индекса <TT
+CLASS="STRUCTNAME"
+>test1_id_index</TT
+> может быть произвольным, главное, чтобы оно позволяло понять, для чего этот индекс.</P
+><P
+>Для удаления индекса используется команда <TT
+CLASS="COMMAND"
+>DROP INDEX</TT
+>. Добавлять и удалять индексы можно в любое время.</P
+><P
+>Когда индекс создан, никакие дополнительные действия не требуются: система сама будет обновлять его при изменении данных в таблице и сама будет использовать его в запросах, где, по её мнению, это будет эффективнее, чем сканирование всей таблицы. Вам, возможно, придётся только периодически запускать команду <TT
+CLASS="COMMAND"
+>ANALYZE</TT
+> для обновления статистических данных, на основе которых планировщик запросов принимает решения. В <A
+HREF="performance-tips.html"
+>Главе 14</A
+> вы можете узнать, как определить, используется ли определённый индекс и при каких условиях планировщик может решить <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>не</I
+></SPAN
+> использовать его.</P
+><P
+>Индексы могут быть полезны также при выполнении команд <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> и <TT
+CLASS="COMMAND"
+>DELETE</TT
+> с условиями поиска. Кроме того, они могут применяться в поиске с соединением. То есть, индекс, определённый для колонки, участвующей в условии соединения, может значительно ускорить запросы с JOIN.</P
+><P
+>Создание индекса для большой таблицы может занимать много времени. По умолчанию <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> позволяет параллельно с созданием индекса выполнять чтение (операторы <TT
+CLASS="COMMAND"
+>SELECT</TT
+>) таблицы, но операции записи (<TT
+CLASS="COMMAND"
+>INSERT</TT
+>, <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> и <TT
+CLASS="COMMAND"
+>DELETE</TT
+>) блокируются до окончания построения индекса. Для производственной среды это ограничение часто бывает неприемлемым. Хотя есть возможность разрешить запись параллельно с созданием индексов, при этом нужно учитывать ряд оговорок &mdash; они описаны в подразделе <A
+HREF="sql-createindex.html#SQL-CREATEINDEX-CONCURRENTLY"
+><I
+>Параллельное построение индексов</I
+></A
+>.</P
+><P
+>После создания индекса система должна поддерживать его в состоянии, соответствующем данным таблицы. С этим связаны неизбежные накладные расходы при изменении данных. Таким образом, индексы, которые используются в запросах редко или вообще никогда, должны быть удалены.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="indexes.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="indexes-types.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Индексы</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="indexes.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Типы индексов</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

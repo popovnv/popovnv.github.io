@@ -1,0 +1,697 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>ALTER ROLE</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="ALTER OPERATOR FAMILY"
+HREF="sql-alteropfamily.html"><LINK
+REL="NEXT"
+TITLE="ALTER RULE"
+HREF="sql-alterrule.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="ALTER OPERATOR FAMILY"
+HREF="sql-alteropfamily.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="ALTER RULE"
+HREF="sql-alterrule.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-ALTERROLE"
+></A
+>ALTER ROLE</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN68826"
+></A
+><H2
+>Название</H2
+>ALTER ROLE&nbsp;--&nbsp;изменить роль в базе данных</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN68829"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>ALTER ROLE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> [ [ WITH ] <TT
+CLASS="REPLACEABLE"
+><I
+>параметр</I
+></TT
+> [ ... ] ]
+
+<SPAN
+CLASS="phrase"
+><SPAN
+CLASS="PHRASE"
+>Здесь <TT
+CLASS="REPLACEABLE"
+><I
+>параметр</I
+></TT
+>:</SPAN
+></SPAN
+>
+
+      SUPERUSER | NOSUPERUSER
+    | CREATEDB | NOCREATEDB
+    | CREATEROLE | NOCREATEROLE
+    | CREATEUSER | NOCREATEUSER
+    | INHERIT | NOINHERIT
+    | LOGIN | NOLOGIN
+    | REPLICATION | NOREPLICATION
+    | CONNECTION LIMIT <TT
+CLASS="REPLACEABLE"
+><I
+>предел_подключений</I
+></TT
+>
+    | [ ENCRYPTED | UNENCRYPTED ] PASSWORD '<TT
+CLASS="REPLACEABLE"
+><I
+>пароль</I
+></TT
+>'
+    | VALID UNTIL '<TT
+CLASS="REPLACEABLE"
+><I
+>дата_время</I
+></TT
+>'
+
+ALTER ROLE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> RENAME TO <TT
+CLASS="REPLACEABLE"
+><I
+>новое_имя</I
+></TT
+>
+
+ALTER ROLE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> [ IN DATABASE <TT
+CLASS="REPLACEABLE"
+><I
+>имя_бд</I
+></TT
+> ] SET <TT
+CLASS="REPLACEABLE"
+><I
+>параметр_конфигурации</I
+></TT
+> { TO | = } { <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> | DEFAULT }
+ALTER ROLE { <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> | ALL } [ IN DATABASE <TT
+CLASS="REPLACEABLE"
+><I
+>имя_бд</I
+></TT
+> ] SET <TT
+CLASS="REPLACEABLE"
+><I
+>параметр_конфигурации</I
+></TT
+> FROM CURRENT
+ALTER ROLE { <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> | ALL } [ IN DATABASE <TT
+CLASS="REPLACEABLE"
+><I
+>имя_бд</I
+></TT
+> ] RESET <TT
+CLASS="REPLACEABLE"
+><I
+>параметр_конфигурации</I
+></TT
+>
+ALTER ROLE { <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> | ALL } [ IN DATABASE <TT
+CLASS="REPLACEABLE"
+><I
+>имя_бд</I
+></TT
+> ] RESET ALL</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN68852"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>ALTER ROLE</TT
+> изменяет атрибуты роли <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+><P
+>Первая форма команды в этой справке может изменить многие атрибуты роли, которые можно указать в <A
+HREF="sql-createrole.html"
+>CREATE ROLE</A
+>. (Покрываются все возможные атрибуты, отсутствуют только возможности добавления/удаления членов роли; для этого нужно использовать <A
+HREF="sql-grant.html"
+>GRANT</A
+> и <A
+HREF="sql-revoke.html"
+>REVOKE</A
+>.) Атрибуты, не упомянутые в команде, сохраняют свои предыдущие значения. Суперпользователи базы данных могут изменить любые параметры любой роли, а пользователи с правом <TT
+CLASS="LITERAL"
+>CREATEROLE</TT
+> могут также менять любые параметры, но только не ролей суперпользователей и репликации. Обычные пользователи (роли) могут менять только свой пароль.</P
+><P
+>Вторя форма меняет имя роли. Суперпользователи базы данных могут переименовать любую роль, а пользователи с правом <TT
+CLASS="LITERAL"
+>CREATEROLE</TT
+> могут переименовывать роли не суперпользователей. Также нельзя переименовать роль текущего пользователя в активном сеансе. (Если вам нужно сделать это, подключитесь другим пользователем.) Так как в паролях с <TT
+CLASS="LITERAL"
+>MD5</TT
+>-шифрованием имя роли используется в качестве криптосоли, при переименовании роли её пароль очищается, если он был зашифрован <TT
+CLASS="LITERAL"
+>MD5</TT
+>.</P
+><P
+>Оставшиеся формы меняют значение по умолчанию конфигурационной переменной, которое будет распространяться на сеансы роли во всех базах данных, либо, если добавлено предложение <TT
+CLASS="LITERAL"
+>IN DATABASE</TT
+>, только на сеансы роли в заданной базе. Если вместо имени роли указано <TT
+CLASS="LITERAL"
+>ALL</TT
+>, это значение переменной распространяется на все роли. Использование <TT
+CLASS="LITERAL"
+>ALL</TT
+> с <TT
+CLASS="LITERAL"
+>IN DATABASE</TT
+> по сути равносильно использованию команды <TT
+CLASS="LITERAL"
+>ALTER DATABASE ... SET ...</TT
+>.</P
+><P
+>Когда эта роль впоследствии установит новое подключение, указанное значение станет значением по умолчанию в сеансе, переопределяя значение, заданное в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+> или полученное из командной строки <TT
+CLASS="COMMAND"
+>postgres</TT
+>. Это происходит только в момент входа; при выполнении <A
+HREF="sql-set-role.html"
+>SET ROLE</A
+> или <A
+HREF="sql-set-session-authorization.html"
+>SET SESSION AUTHORIZATION</A
+> новые значения не применятся. Набор параметров для всех баз данных переопределяется параметрами уровня БД, установленными для роли. Параметры для конкретной базы данных или конкретной роли переопределяют параметры для всех ролей.</P
+><P
+>Суперпользователи могут менять значения переменных по умолчанию для любых ролей, а пользователи с правом <TT
+CLASS="LITERAL"
+>CREATEROLE</TT
+> могут менять их только для ролей не суперпользователей. Обычные пользователи могут определять переменные только для себя. Некоторые переменные конфигурации нельзя задать таким способом, а некоторые может настроить только суперпользователь. Параметры всех ролей во всех базах данных могут настраивать только суперпользователи.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN68879"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></DT
+><DD
+><P
+>Имя роли, атрибуты которой изменяются.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>SUPERUSER</TT
+><BR><TT
+CLASS="LITERAL"
+>NOSUPERUSER</TT
+><BR><TT
+CLASS="LITERAL"
+>CREATEDB</TT
+><BR><TT
+CLASS="LITERAL"
+>NOCREATEDB</TT
+><BR><TT
+CLASS="LITERAL"
+>CREATEROLE</TT
+><BR><TT
+CLASS="LITERAL"
+>NOCREATEROLE</TT
+><BR><TT
+CLASS="LITERAL"
+>CREATEUSER</TT
+><BR><TT
+CLASS="LITERAL"
+>NOCREATEUSER</TT
+><BR><TT
+CLASS="LITERAL"
+>INHERIT</TT
+><BR><TT
+CLASS="LITERAL"
+>NOINHERIT</TT
+><BR><TT
+CLASS="LITERAL"
+>LOGIN</TT
+><BR><TT
+CLASS="LITERAL"
+>NOLOGIN</TT
+><BR><TT
+CLASS="LITERAL"
+>REPLICATION</TT
+><BR><TT
+CLASS="LITERAL"
+>NOREPLICATION</TT
+><BR><TT
+CLASS="LITERAL"
+>CONNECTION LIMIT</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>предел_подключений</I
+></TT
+><BR><TT
+CLASS="LITERAL"
+>PASSWORD</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>пароль</I
+></TT
+><BR><TT
+CLASS="LITERAL"
+>ENCRYPTED</TT
+><BR><TT
+CLASS="LITERAL"
+>UNENCRYPTED</TT
+><BR><TT
+CLASS="LITERAL"
+>VALID UNTIL</TT
+> '<TT
+CLASS="REPLACEABLE"
+><I
+>дата_время</I
+></TT
+>'</DT
+><DD
+><P
+>Эти предложения меняют атрибуты, изначально установленные командой <A
+HREF="sql-createrole.html"
+>CREATE ROLE</A
+>. За дополнительными сведениями обратитесь к странице справки <TT
+CLASS="COMMAND"
+>CREATE ROLE</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>новое_имя</I
+></TT
+></DT
+><DD
+><P
+>Новое имя роли.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_бд</I
+></TT
+></DT
+><DD
+><P
+>Имя базы данных, в которой устанавливается конфигурационная переменная.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>параметр_конфигурации</I
+></TT
+><BR><TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+></DT
+><DD
+><P
+>Указанный параметр конфигурации принимает заданное значение по умолчанию в сеансах роли. Если <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> задано как <TT
+CLASS="LITERAL"
+>DEFAULT</TT
+> или, что то же самое, применяется операция <TT
+CLASS="LITERAL"
+>RESET</TT
+>, переопределение этого параметра для роли удаляется и роль будет получать в новых сеансах системное значение параметра. Для очистки значений всех параметров, связанных с ролью, применяется <TT
+CLASS="LITERAL"
+>RESET ALL</TT
+>. <TT
+CLASS="LITERAL"
+>SET FROM CURRENT</TT
+> сохраняет текущее значение параметра в активном сеансе в качестве значения для данной роли. Если указано <TT
+CLASS="LITERAL"
+>IN DATABASE</TT
+>, параметр конфигурации настраивается или удаляется только для данной роли и указанной базы данных.</P
+><P
+>Определения переменных для роли применяются только в начале сеанса; команды <A
+HREF="sql-set-role.html"
+>SET ROLE</A
+> и <A
+HREF="sql-set-session-authorization.html"
+>SET SESSION AUTHORIZATION</A
+> эти определения не обрабатывают.</P
+><P
+>За подробными сведениями об именах и значениях параметров обратитесь к <A
+HREF="sql-set.html"
+>SET</A
+> и <A
+HREF="runtime-config.html"
+>Главе 18</A
+>.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN68962"
+></A
+><H2
+>Замечания</H2
+><P
+>Для добавления новых ролей используйте команду <A
+HREF="sql-createrole.html"
+>CREATE ROLE</A
+>, а для удаления роли — <A
+HREF="sql-droprole.html"
+>DROP ROLE</A
+>.</P
+><P
+><TT
+CLASS="COMMAND"
+>ALTER ROLE</TT
+> не может управлять членством роли, для этого применяется <A
+HREF="sql-grant.html"
+>GRANT</A
+> и <A
+HREF="sql-revoke.html"
+>REVOKE</A
+>.</P
+><P
+>Указывая в этой команде незашифрованный пароль, следует проявлять осторожность. Пароль будет передаваться на сервер открытым текстом и может также записаться в историю команд клиента или в протокол работы сервера. В <A
+HREF="app-psql.html"
+>            <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>
+          </A
+> есть команда <TT
+CLASS="COMMAND"
+>\password</TT
+>, с помощью которой можно сменить пароль роли, не рискуя рассекретить пароль.</P
+><P
+>Также возможно связать сеансовые значения по умолчанию с определённой базой данных, а не с ролью (см. <A
+HREF="sql-alterdatabase.html"
+>ALTER DATABASE</A
+>). В случае конфликта параметры для базы данных и роли переопределяют параметры только для роли, которые, в свою очередь, переопределяют параметры для базы данных.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN68976"
+></A
+><H2
+>Примеры</H2
+><P
+>Изменение пароля роли: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER ROLE davide WITH PASSWORD 'hu8jmn3';</PRE
+><P></P
+><P
+>Удаление пароля роли: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER ROLE davide WITH PASSWORD NULL;</PRE
+><P></P
+><P
+>Изменение срока действия пароля (в частности, определяется, что пароль должен перестать действовать в полдень 4 мая 2015 г. в часовом поясе <ACRONYM
+CLASS="ACRONYM"
+>UTC</ACRONYM
+>+1): </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER ROLE chris VALID UNTIL 'May 4 12:00:00 2015 +1';</PRE
+><P></P
+><P
+>Установка бесконечного срока действия пароля: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER ROLE fred VALID UNTIL 'infinity';</PRE
+><P></P
+><P
+>Наделение роли правами на создание других ролей и новых баз данных: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER ROLE miriam CREATEROLE CREATEDB;</PRE
+><P></P
+><P
+>Определение нестандартного значения параметра <A
+HREF="runtime-config-resource.html#GUC-MAINTENANCE-WORK-MEM"
+>maintenance_work_mem</A
+> для роли: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER ROLE worker_bee SET maintenance_work_mem = 100000;</PRE
+><P></P
+><P
+>Определение нестандартного значения параметра <A
+HREF="runtime-config-logging.html#GUC-CLIENT-MIN-MESSAGES"
+>client_min_messages</A
+> для роли и заданной базы: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER ROLE fred IN DATABASE devel SET client_min_messages = DEBUG;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN68995"
+></A
+><H2
+>Совместимость</H2
+><P
+>Оператор <TT
+CLASS="COMMAND"
+>ALTER ROLE</TT
+> является расширением <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN69000"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-createrole.html"
+>CREATE ROLE</A
+>, <A
+HREF="sql-droprole.html"
+>DROP ROLE</A
+>, <A
+HREF="sql-alterdatabase.html"
+>ALTER DATABASE</A
+>, <A
+HREF="sql-set.html"
+>SET</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-alteropfamily.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-alterrule.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>ALTER OPERATOR FAMILY</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>ALTER RULE</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

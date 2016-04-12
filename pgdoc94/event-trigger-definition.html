@@ -1,0 +1,256 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Обзор механизма работы триггеров событий</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Триггеры событий"
+HREF="event-triggers.html"><LINK
+REL="PREVIOUS"
+TITLE="Триггеры событий"
+HREF="event-triggers.html"><LINK
+REL="NEXT"
+TITLE="Матрица срабатывания триггеров событий"
+HREF="event-trigger-matrix.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Триггеры событий"
+HREF="event-triggers.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="event-triggers.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 37. Триггеры событий</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Матрица срабатывания триггеров событий"
+HREF="event-trigger-matrix.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="EVENT-TRIGGER-DEFINITION"
+>37.1. Обзор механизма работы триггеров событий</A
+></H1
+><P
+>Триггер события срабатывает всякий раз, когда в базе данных, в которой он определён, происходит связанное с ним событие. В настоящий момент поддерживаются следующие события <TT
+CLASS="LITERAL"
+>ddl_command_start</TT
+>, <TT
+CLASS="LITERAL"
+>ddl_command_end</TT
+> и <TT
+CLASS="LITERAL"
+>sql_drop</TT
+>. Поддержка дополнительных событий может быть добавлена в ближайших релизах.</P
+><P
+>Событие <TT
+CLASS="LITERAL"
+>ddl_command_start</TT
+> происходит непосредственно перед выполнением команд <TT
+CLASS="LITERAL"
+>CREATE</TT
+>, <TT
+CLASS="LITERAL"
+>ALTER</TT
+> или <TT
+CLASS="LITERAL"
+>DROP</TT
+>. Проверка на существование объекта перед срабатыванием триггера не производится. В качестве исключения, однако, это событие не происходит для команд DDL, работающих с объектами, общими для кластера базы данных &mdash; базы данных, табличные пространства, роли, а также для самих триггеров событий. Механизм работы триггеров событий не поддерживает эти типы объектов. Событие <TT
+CLASS="LITERAL"
+>ddl_command_start</TT
+> происходит перед выполнением команды <TT
+CLASS="LITERAL"
+>SELECT INTO</TT
+>, так как это эквивалент для <TT
+CLASS="LITERAL"
+>CREATE TABLE AS</TT
+>.</P
+><P
+>Событие <TT
+CLASS="LITERAL"
+>ddl_command_end</TT
+> происходит сразу после выполнения этого же набора команд, что и <TT
+CLASS="LITERAL"
+>ddl_command_start</TT
+>.</P
+><P
+>Событие <TT
+CLASS="LITERAL"
+>sql_drop</TT
+> происходит непосредственно перед событием <TT
+CLASS="LITERAL"
+>ddl_command_end</TT
+> для команд, которые удаляют объекты базы данных. Для получения списка удалённых объектов используйте возвращающую набор строк функцию <TT
+CLASS="LITERAL"
+>pg_event_trigger_dropped_objects()</TT
+> в триггере события <TT
+CLASS="LITERAL"
+>sql_drop</TT
+> (см. <A
+HREF="functions-event-triggers.html"
+>Раздел 9.28</A
+>). Обратите внимание, что триггер выполняется после удаления объектов из таблиц системного каталога, поэтому их невозможно больше увидеть.</P
+><P
+>Триггеры событий (как и прочие функции) не могут выполняться в прерванной транзакции. Поэтому, если команда DDL завершается ошибкой, соответствующие триггеры <TT
+CLASS="LITERAL"
+>ddl_command_end</TT
+> не сработают. И наоборот, если триггер <TT
+CLASS="LITERAL"
+>ddl_command_end</TT
+> завершился с ошибкой, последующие триггеры событий не сработают, также как и сама команда не будет выполняться. Похожим образом, если триггер <TT
+CLASS="LITERAL"
+>ddl_command_end</TT
+> завершится ошибкой, действие команды DDL будет отменено, также как это происходит при возникновении ошибки внутри транзакции.</P
+><P
+>Полный список команд, которые поддерживаются триггерами событий, можно найти в <A
+HREF="event-trigger-matrix.html"
+>Разделе 37.2</A
+>.</P
+><P
+>Для создания триггера события используется команда <A
+HREF="sql-createeventtrigger.html"
+>CREATE EVENT TRIGGER</A
+>. Предварительно нужно создать функцию, со специальным возвращаемым типом <TT
+CLASS="LITERAL"
+>event_trigger</TT
+>. Данная функция не обязана возвращать значение (и может не возвращать). Возвращаемый тип служит лишь указанием на то, что функция будет вызываться из триггера события.</P
+><P
+>Если есть несколько триггеров на одно и то же событие, то они будут вызываться в алфавитном порядке по имени триггера.</P
+><P
+>В определении триггера можно использовать условие <TT
+CLASS="LITERAL"
+>WHEN</TT
+>, чтобы, например, триггер <TT
+CLASS="LITERAL"
+>ddl_command_start</TT
+> срабатывал только для отдельных команд, которые нужно перехватить. Триггеры событий часто используются для ограничения диапазона DDL-команд, доступных пользователям.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="event-triggers.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="event-trigger-matrix.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Триггеры событий</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="event-triggers.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Матрица срабатывания триггеров событий</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

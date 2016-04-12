@@ -1,0 +1,241 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Внутреннее устройство WAL</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Надёжность и журнал упреждающей записи"
+HREF="wal.html"><LINK
+REL="PREVIOUS"
+TITLE="Настройка WAL"
+HREF="wal-configuration.html"><LINK
+REL="NEXT"
+TITLE="Регрессионные тесты"
+HREF="regress.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Настройка WAL"
+HREF="wal-configuration.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="wal.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 29. Надёжность и журнал упреждающей записи</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Регрессионные тесты"
+HREF="regress.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="WAL-INTERNALS"
+>29.5. Внутреннее устройство WAL</A
+></H1
+><P
+><ACRONYM
+CLASS="ACRONYM"
+>WAL</ACRONYM
+> включается автоматически; от администратора не требуется никаких действий за исключением того, чтобы убедиться, что выполнены требования <ACRONYM
+CLASS="ACRONYM"
+>WAL</ACRONYM
+> к месту на диске, и что выполнены все необходимые действия по тонкой настройке (см. <A
+HREF="wal-configuration.html"
+>Раздел 29.4</A
+>).</P
+><P
+>Журналы <ACRONYM
+CLASS="ACRONYM"
+>WAL</ACRONYM
+> хранятся в каталоге <TT
+CLASS="FILENAME"
+>pg_xlog</TT
+>, который находится в каталоге data, в виде списка файлов сегментов, обычно 16MB каждый (этот размер может быть изменён с помощью указания configure <TT
+CLASS="OPTION"
+>--with-wal-segsize</TT
+> во время компиляции сервера). Каждый файл сегмента разделяется на страницы, обычно по 8KB каждая (данный размер может быть изменён с помощью указания configure <TT
+CLASS="OPTION"
+>--with-wal-blocksize</TT
+>). Заголовки записи журнала описываются в <TT
+CLASS="FILENAME"
+>access/xlog.h</TT
+>; содержимое самой записи зависит от типа события, которое сохраняется в журнал. Файлы сегментов имеют имена-номера, которые начинаются с <TT
+CLASS="FILENAME"
+>000000010000000000000000</TT
+> и увеличиваются автоматически. Эти номера не перекрываются, но пока доступные номера исчерпаются, пройдёт очень, очень долгое время.</P
+><P
+>Выгодно размещать журналы WAL на другом диске, отличном от того, где находятся основные файлы базы данных. Для этого можно переместить каталог <TT
+CLASS="FILENAME"
+>pg_xlog</TT
+> в другое место (разумеется, когда сервер остановлен) и создать символьную ссылку из исходного места на перемещённый каталог.</P
+><P
+>Для <ACRONYM
+CLASS="ACRONYM"
+>WAL</ACRONYM
+> важно, чтобы запись в журнал выполнялась до изменений данных в базе. Но этот порядок могут нарушить дисковые устройства, которые ложно сообщают ядру об успешном завершении записи, хотя фактически они только выполнили кеширование данных и пока не сохранили их на диск. Сбой питания в такой ситуации может привести к неисправимому повреждению данных. Администраторы должны убедиться, что диски, где хранятся файлы журналов <ACRONYM
+CLASS="ACRONYM"
+>WAL</ACRONYM
+> <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, не выдают таких ложных сообщений ядру. (См. <A
+HREF="wal-reliability.html"
+>Раздел 29.1</A
+>.)</P
+><P
+>При наступлении контрольной точки и сохранения журнала, позиция контрольной точки сохраняется в файл <TT
+CLASS="FILENAME"
+>pg_control</TT
+>. Таким образом, при старте восстановления, сервер сперва читает файл <TT
+CLASS="FILENAME"
+>pg_control</TT
+> и затем запись контрольной точки; затем он выполняет операцию REDO, сканируя вперёд от точки журнала, обозначенной в записи контрольной точки. Поскольку полное содержимое страниц данных сохраняется в журнале в первой странице после контрольной точки (предполагается, что включён режим <A
+HREF="runtime-config-wal.html#GUC-FULL-PAGE-WRITES"
+>full_page_writes</A
+>), все страницы, изменённые с момента контрольной точки будут восстановлены в целостное состояние.</P
+><P
+>В случае, если файл <TT
+CLASS="FILENAME"
+>pg_control</TT
+> повреждён, мы должны поддерживать возможность сканирования существующих сегментов журнала в обратном порядке &mdash; от новых к старым &mdash; чтобы найти последнюю контрольную точку. Это пока не реализовано. <TT
+CLASS="FILENAME"
+>pg_control</TT
+> является достаточно маленьким файлом (меньше, чем одна дисковая страница), который не должен попадать под проблему частичной записи и на момент написания данной документации, не было ни одного сообщения о сбоях СУБД исключительно из-за невозможности чтения самого файла <TT
+CLASS="FILENAME"
+>pg_control</TT
+>. Таким образом, хотя теоретически это является слабым местом, на практике проблем с <TT
+CLASS="FILENAME"
+>pg_control</TT
+> не обнаружено.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="wal-configuration.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="regress.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Настройка <ACRONYM
+CLASS="ACRONYM"
+>WAL</ACRONYM
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="wal.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Регрессионные тесты</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

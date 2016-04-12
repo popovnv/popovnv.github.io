@@ -1,0 +1,356 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Шаблоны баз данных</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Управление базами данных"
+HREF="managing-databases.html"><LINK
+REL="PREVIOUS"
+TITLE="Создание базы данных"
+HREF="manage-ag-createdb.html"><LINK
+REL="NEXT"
+TITLE="Конфигурирование баз данных"
+HREF="manage-ag-config.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Создание базы данных"
+HREF="manage-ag-createdb.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="managing-databases.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 21. Управление базами данных</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Конфигурирование баз данных"
+HREF="manage-ag-config.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="MANAGE-AG-TEMPLATEDBS"
+>21.3. Шаблоны баз данных</A
+></H1
+><P
+>По факту команда <TT
+CLASS="COMMAND"
+>CREATE DATABASE</TT
+> выполняет копирование существующей базы данных. По умолчанию копируется стандартная системная база <TT
+CLASS="LITERAL"
+>template1</TT
+>.  Таким образом, <TT
+CLASS="LITERAL"
+>template1</TT
+> это шаблон, на основе которого создаются новые базы. Если добавить объекты в <TT
+CLASS="LITERAL"
+>template1</TT
+>, то впоследствии они будут копироваться в новые базы данных. Это позволяет внести изменения в стандартный набор объектов. Например, если в <TT
+CLASS="LITERAL"
+>template1</TT
+> установить процедурный язык <SPAN
+CLASS="APPLICATION"
+>PL/Perl</SPAN
+>, то он будет доступен в новых базах без дополнительных действий.</P
+><P
+>Также существует вторая системная база <TT
+CLASS="LITERAL"
+>template0</TT
+>. При инициализации она содержит те же самые объекты, что и <TT
+CLASS="LITERAL"
+>template1</TT
+>, предопределённые в рамках устанавливаемой версии <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Не нужно вносить никаких изменений в <TT
+CLASS="LITERAL"
+>template0</TT
+> после инициализации кластера. Если в команде <TT
+CLASS="COMMAND"
+>CREATE DATABASE</TT
+> указать на необходимость копирования <TT
+CLASS="LITERAL"
+>template0</TT
+> вместо <TT
+CLASS="LITERAL"
+>template1</TT
+>, то на выходе можно получить <SPAN
+CLASS="QUOTE"
+>"чистую"</SPAN
+> пользовательскую базу данных без изменений, внесённых в <TT
+CLASS="LITERAL"
+>template1</TT
+>. Это удобно, когда производится восстановление из дампа данных с помощью утилиты <TT
+CLASS="LITERAL"
+>pg_dump</TT
+>: скрипт дампа лучше выполнять в чистую базу, во избежание каких-либо конфликтов с объектами, которые могли быть добавлены в <TT
+CLASS="LITERAL"
+>template1</TT
+>.</P
+><P
+>Другая причина, для копирования <TT
+CLASS="LITERAL"
+>template0</TT
+> вместо <TT
+CLASS="LITERAL"
+>template1</TT
+> заключается в том, что можно указать новые параметры локали и кодировку при копировании <TT
+CLASS="LITERAL"
+>template0</TT
+>, в то время как для копий <TT
+CLASS="LITERAL"
+>template1</TT
+> они не должны меняться. Это связано с тем, что <TT
+CLASS="LITERAL"
+>template1</TT
+> может содержать данные в специфических кодировках и локалях, в отличие от <TT
+CLASS="LITERAL"
+>template0</TT
+>.</P
+><P
+>Для создания базы данных на основе <TT
+CLASS="LITERAL"
+>template0</TT
+>, используйте: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE DATABASE <TT
+CLASS="REPLACEABLE"
+><I
+>dbname</I
+></TT
+> TEMPLATE template0;</PRE
+><P> из среды SQL, или: </P><PRE
+CLASS="PROGRAMLISTING"
+>createdb -T template0 <TT
+CLASS="REPLACEABLE"
+><I
+>dbname</I
+></TT
+></PRE
+><P> из командной строки ОС.</P
+><P
+>Можно создавать дополнительные шаблоны баз данных, и, более того, можно копировать любую базу данных кластера, если указать её имя в качестве шаблона в команде <TT
+CLASS="COMMAND"
+>CREATE DATABASE</TT
+>. Важно понимать, что это (пока) не рассматривается в качестве основного инструмента для реализации возможности <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="COMMAND"
+>COPY DATABASE</TT
+>"</SPAN
+>. Важным является то, что при копировании все сессии к копируемой базе данных должны быть закрыты. <TT
+CLASS="COMMAND"
+>CREATE DATABASE</TT
+> выдаст ошибку, если есть другие подключения; во время операции копирования новые подключения к этой базе данных не разрешены.</P
+><P
+>В таблице <TT
+CLASS="LITERAL"
+>pg_database</TT
+> есть два полезных флага для каждой базы данных: столбцы <TT
+CLASS="LITERAL"
+>datistemplate</TT
+> и <TT
+CLASS="LITERAL"
+>datallowconn</TT
+>. <TT
+CLASS="LITERAL"
+>datistemplate</TT
+> указывает на факт того, что база данных может выступать в качестве шаблона в команде <TT
+CLASS="COMMAND"
+>CREATE DATABASE</TT
+>. Если флаг установлен, то для пользователей с правом <TT
+CLASS="LITERAL"
+>CREATEDB</TT
+> клонирование доступно; если флаг не установлен, то лишь суперпользователь и владелец базы данных могут её клонировать. Если <TT
+CLASS="LITERAL"
+>datallowconn</TT
+> не установлен, то новые подключения к этой базе не допустимы (однако текущие сессии не закрываются при сбросе этого флага). База <TT
+CLASS="LITERAL"
+>template0</TT
+> обычно помечена как <TT
+CLASS="LITERAL"
+>datallowconn = false</TT
+> для избежания любых её модификаций. И <TT
+CLASS="LITERAL"
+>template0</TT
+>, и <TT
+CLASS="LITERAL"
+>template1</TT
+> всегда должны быть помечены флагом <TT
+CLASS="LITERAL"
+>datistemplate = true</TT
+>.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+><TT
+CLASS="LITERAL"
+>template1</TT
+> и <TT
+CLASS="LITERAL"
+>template0</TT
+> не выделены как-то особенно, кроме того факта, что <TT
+CLASS="LITERAL"
+>template1</TT
+> используется по умолчанию в команде <TT
+CLASS="COMMAND"
+>CREATE DATABASE</TT
+>. Например, можно удалить <TT
+CLASS="LITERAL"
+>template1</TT
+> и безболезненно создать заново из <TT
+CLASS="LITERAL"
+>template0</TT
+>. Это можно посоветовать в случае, если <TT
+CLASS="LITERAL"
+>template1</TT
+> был замусорен. (Чтобы удалить <TT
+CLASS="LITERAL"
+>template1</TT
+>, необходимо сбросить флаг <TT
+CLASS="LITERAL"
+>pg_database.datistemplate = false</TT
+>.)</P
+><P
+>База данных <TT
+CLASS="LITERAL"
+>postgres</TT
+> также создаётся при инициализации кластера. Она используется пользователями и приложениями для подключения по умолчанию. Представляет собой всего лишь копию <TT
+CLASS="LITERAL"
+>template1</TT
+>, и может быть удалена и повторно создана при необходимости.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="manage-ag-createdb.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="manage-ag-config.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Создание базы данных</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="managing-databases.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Конфигурирование баз данных</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

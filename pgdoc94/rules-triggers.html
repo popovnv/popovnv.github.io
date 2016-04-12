@@ -1,0 +1,300 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Сравнение правил и триггеров</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Система правил"
+HREF="rules.html"><LINK
+REL="PREVIOUS"
+TITLE="Правила и статус команд"
+HREF="rules-status.html"><LINK
+REL="NEXT"
+TITLE="Процедурные языки"
+HREF="xplang.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Правила и статус команд"
+HREF="rules-status.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="rules.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 38. Система правил</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Процедурные языки"
+HREF="xplang.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="RULES-TRIGGERS"
+>38.7. Сравнение правил и триггеров</A
+></H1
+><P
+>Многие вещи, которые можно сделать с помощью триггеров, можно также реализовать, используя систему правил <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Однако, используя правила, нельзя реализовать, например, некоторые типы ограничений, в частности, внешние ключи. Хотя можно определить правило с ограничивающим условием, которое будет преобразовать команду в <TT
+CLASS="LITERAL"
+>NOTHING</TT
+>, если значение ключа не находится в другой таблице, но при этом неподходящие данные будут отбрасываться молча, а это не самый лучший вариант. Также, если требуется проверить правильность значений и, обнаружив неверное значение, выдать ошибку, это нужно делать в триггере.</P
+><P
+>В этой главе мы разберём использование правил для изменения представлений. Все правила, приведённые в примерах этой главы, можно также заменить триггерами <TT
+CLASS="LITERAL"
+>INSTEAD OF</TT
+> для представлений. Написать такие триггеры часто бывает проще, чем разработать правила, особенно если для изменений применяется сложная логика.</P
+><P
+>Для тех задач, которые можно решить обоими способами, лучший выбирается в зависимости от характера использования базы данных. Следует учитывать, что триггер срабатывает для каждой обрабатываемой строки, а правило изменяет существующий запрос или создаёт ещё один. Поэтому, если один оператор обрабатывает сразу много строк, правило, добавляющее дополнительную команду, скорее всего, будет работать быстрее, чем триггер, который вызывается для каждой очередной строки и должен каждый раз определять, что с ней делать. Однако триггеры концептуально гораздо проще правил, и использовать их правильно новичкам гораздо проще.</P
+><P
+>Давайте рассмотрим пример, показывающий, как выбор в пользу правил вместо триггеров оказывается выигрышным в определённой ситуации. Пусть у нас есть две таблицы: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE computer (
+    hostname        text,    -- индексированное
+    manufacturer    text     -- индексированное
+);
+
+CREATE TABLE software (
+    software        text,    -- индексированное
+    hostname        text     -- индексированное
+);</PRE
+><P> Обе таблицы содержат несколько тысяч строк, а индексы по полю <TT
+CLASS="STRUCTFIELD"
+>hostname</TT
+> являются уникальными. Правило или триггер должны реализовать ограничение, которое удалит строки из таблицы <TT
+CLASS="LITERAL"
+>software</TT
+>, ссылающиеся на удаляемый компьютер. Триггер выполнял бы такую команду: </P><PRE
+CLASS="PROGRAMLISTING"
+>DELETE FROM software WHERE hostname = $1;</PRE
+><P> Так как триггер вызывается для каждой отдельной строки, удаляемой из таблицы <TT
+CLASS="LITERAL"
+>computer</TT
+>, он может подготовить и сохранить план этой команды, а затем передавать значение <TT
+CLASS="STRUCTFIELD"
+>hostname</TT
+> подготовленному запросу в параметрах. Правило же можно записать так: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE RULE computer_del AS ON DELETE TO computer
+    DO DELETE FROM software WHERE hostname = OLD.hostname;</PRE
+><P></P
+><P
+>Теперь давайте взглянем на разные варианты удаления. В этом случае: </P><PRE
+CLASS="PROGRAMLISTING"
+>DELETE FROM computer WHERE hostname = 'mypc.local.net';</PRE
+><P> таблица <TT
+CLASS="LITERAL"
+>computer</TT
+> сканируется по индексу (быстро), и команда, выполняемая триггером, так же будет применять сканирование по индексу (тоже быстро). Дополнительной командой правила будет: </P><PRE
+CLASS="PROGRAMLISTING"
+>DELETE FROM software WHERE computer.hostname = 'mypc.local.net'
+                       AND software.hostname = computer.hostname;</PRE
+><P> Так как созданы все необходимые индексы, планировщик создаст план: </P><PRE
+CLASS="LITERALLAYOUT"
+>Nestloop
+  -&gt;  Index Scan using comp_hostidx on computer
+  -&gt;  Index Scan using soft_hostidx on software</PRE
+><P> Таким образом, большого различия в скорости между реализациями с триггером и с правилом не будет.</P
+><P
+>Теперь мы хотим избавиться от 2000 компьютеров, у которых <TT
+CLASS="STRUCTFIELD"
+>hostname</TT
+> начинается с <TT
+CLASS="LITERAL"
+>old</TT
+>. Это можно сделать двумя командами. Первая: </P><PRE
+CLASS="PROGRAMLISTING"
+>DELETE FROM computer WHERE hostname &gt;= 'old'
+                       AND hostname &lt;  'ole'</PRE
+><P> Правило преобразует её в: </P><PRE
+CLASS="PROGRAMLISTING"
+>DELETE FROM software WHERE computer.hostname &gt;= 'old' AND computer.hostname &lt; 'ole'
+                       AND software.hostname = computer.hostname;</PRE
+><P> с планом: </P><PRE
+CLASS="LITERALLAYOUT"
+>Hash Join
+  -&gt;  Seq Scan on software
+  -&gt;  Hash
+    -&gt;  Index Scan using comp_hostidx on computer</PRE
+><P> С другой возможной командой: </P><PRE
+CLASS="PROGRAMLISTING"
+>DELETE FROM computer WHERE hostname ~ '^old';</PRE
+><P> для запроса, преобразованного правилом, получается следующий план: </P><PRE
+CLASS="LITERALLAYOUT"
+>Nestloop
+  -&gt;  Index Scan using comp_hostidx on computer
+  -&gt;  Index Scan using soft_hostidx on software</PRE
+><P> Это показывает, что планировщик не понимает, что ограничение по <TT
+CLASS="STRUCTFIELD"
+>hostname</TT
+> в <TT
+CLASS="LITERAL"
+>computer</TT
+> можно использовать для сканирования по индексу в <TT
+CLASS="LITERAL"
+>software</TT
+>, когда несколько условий объединяются с помощью <TT
+CLASS="LITERAL"
+>AND</TT
+>, что он успешно делает для варианта команды с регулярным выражением. Триггер будет вызываться для каждой из 2000 удаляемых записей о старых компьютерах, и это приведёт к одному сканированию индекса в таблице <TT
+CLASS="LITERAL"
+>computer</TT
+> и 2000 сканированиям индекса в таблице <TT
+CLASS="LITERAL"
+>software</TT
+>. Реализация с правилом делает это двумя командами, применяющими индексы. Будет ли правило быстрее при последовательном сканировании, зависит от общего размера таблицы <TT
+CLASS="LITERAL"
+>software</TT
+>. С другой стороны, выполнение 2000 команд из триггера через менеджер SPI всё равно займёт время, даже если все блоки индекса вскоре окажутся в кеше.</P
+><P
+>В завершение взгляните на эту команду: </P><PRE
+CLASS="PROGRAMLISTING"
+>DELETE FROM computer WHERE manufacturer = 'bim';</PRE
+><P> Она также может привести к удалению множества строк из таблицы <TT
+CLASS="LITERAL"
+>computer</TT
+>. Поэтому триггер снова пропустит через исполнитель такое же множество команд. Правило же выдаст следующую команду: </P><PRE
+CLASS="PROGRAMLISTING"
+>DELETE FROM software WHERE computer.manufacturer = 'bim'
+                       AND software.hostname = computer.hostname;</PRE
+><P> План для этой команды снова будет содержать вложенный цикл по двум сканированиям индекса, но на этот раз с другим индексом таблицы <TT
+CLASS="LITERAL"
+>computer</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>Nestloop
+  -&gt;  Index Scan using comp_manufidx on computer
+  -&gt;  Index Scan using soft_hostidx on software</PRE
+><P> Во всех этих случаях дополнительные команды будут более-менее независимыми от числа затрагиваемых строк.</P
+><P
+>Таким образом, правила будут значительно медленнее триггеров, только если их действия приводят к образованию больших и плохо связанных соединений, когда планировщик оказывается бессилен.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="rules-status.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="xplang.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Правила и статус команд</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="rules.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Процедурные языки</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

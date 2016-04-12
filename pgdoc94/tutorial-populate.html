@@ -1,0 +1,217 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Добавление строк в таблицу</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Язык SQL"
+HREF="tutorial-sql.html"><LINK
+REL="PREVIOUS"
+TITLE="Создание таблицы"
+HREF="tutorial-table.html"><LINK
+REL="NEXT"
+TITLE="Выполнение запроса"
+HREF="tutorial-select.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Создание таблицы"
+HREF="tutorial-table.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="tutorial-sql.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 2. Язык <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Выполнение запроса"
+HREF="tutorial-select.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="TUTORIAL-POPULATE"
+>2.4. Добавление строк в таблицу</A
+></H1
+><P
+>Для добавления строк в таблицу используется оператор <TT
+CLASS="COMMAND"
+>INSERT</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>INSERT INTO weather VALUES ('San Francisco', 46, 50, 0.25, '1994-11-27');</PRE
+><P> Заметьте, что для всех типов данных применяется довольно очевидные форматы. Константы, за исключением простых числовых значений, обычно заключаются в апострофы (<TT
+CLASS="LITERAL"
+>'</TT
+>), как в данном примере. Тип <TT
+CLASS="TYPE"
+>date</TT
+> на самом деле очень гибок и принимает разные форматы, но в данном введении мы будем придерживаться простого и однозначного.</P
+><P
+>Тип <TT
+CLASS="TYPE"
+>point</TT
+> требует ввода пары координат, например таким образом: </P><PRE
+CLASS="PROGRAMLISTING"
+>INSERT INTO cities VALUES ('San Francisco', '(-194.0, 53.0)');</PRE
+><P></P
+><P
+>Показанный здесь синтаксис требует, чтобы вы запомнили порядок колонок. Можно также применить альтернативную запись, перечислив колонки явно: </P><PRE
+CLASS="PROGRAMLISTING"
+>INSERT INTO weather (city, temp_lo, temp_hi, prcp, date)
+    VALUES ('San Francisco', 43, 57, 0.0, '1994-11-29');</PRE
+><P>Вы можете перечислить колонки в другом порядке, если желаете опустить некоторые из них, например, если уровень осадков (колонка prcp) неизвестен: </P><PRE
+CLASS="PROGRAMLISTING"
+>INSERT INTO weather (date, city, temp_hi, temp_lo)
+    VALUES ('1994-11-29', 'Hayward', 54, 37);</PRE
+><P> Многие разработчики предпочитают явно перечислять колонки, а не полагаться на их порядок в таблице.</P
+><P
+>Пожалуйста, введите все показанные выше команды, чтобы у вас были данные, с которыми можно будет работать дальше.</P
+><P
+> Вы также можете загрузить большой объём данных из обычных текстовых файлов, применив команду <TT
+CLASS="COMMAND"
+>COPY</TT
+>. Обычно это будет быстрее, так как команда <TT
+CLASS="COMMAND"
+>COPY</TT
+> оптимизирована для такого применения, хотя и менее гибка, чем <TT
+CLASS="COMMAND"
+>INSERT</TT
+>. Например, её можно использовать так: </P><PRE
+CLASS="PROGRAMLISTING"
+>COPY weather FROM '/home/user/weather.txt';</PRE
+><P> здесь подразумевается, что данный файл доступен на компьютере, где работает серверный процесс, а не на клиенте, так как указанный файл будет прочитан непосредственно на сервере. Подробнее об этом вы можете узнать в описании команды <A
+HREF="sql-copy.html"
+>COPY</A
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="tutorial-table.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="tutorial-select.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Создание таблицы</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="tutorial-sql.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Выполнение запроса</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

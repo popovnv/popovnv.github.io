@@ -1,0 +1,697 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>          pg_attribute
+        </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Системные каталоги"
+HREF="catalogs.html"><LINK
+REL="PREVIOUS"
+TITLE="          pg_attrdef
+        "
+HREF="catalog-pg-attrdef.html"><LINK
+REL="NEXT"
+TITLE="          pg_authid
+        "
+HREF="catalog-pg-authid.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="          pg_attrdef
+        "
+HREF="catalog-pg-attrdef.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 48. Системные каталоги</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="          pg_authid
+        "
+HREF="catalog-pg-authid.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CATALOG-PG-ATTRIBUTE"
+>48.7. <TT
+CLASS="STRUCTNAME"
+>pg_attribute</TT
+></A
+></H1
+><P
+>В каталоге <TT
+CLASS="STRUCTNAME"
+>pg_attribute</TT
+> хранится информация о колонках таблицы. Для каждой колонки каждой таблицы в <TT
+CLASS="STRUCTNAME"
+>pg_attribute</TT
+> существует ровно одна строка. (Также в этом каталоге будут записи для индексов и на самом деле для всех объектов, присутствующих в <TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+>.)</P
+><P
+>Термин &laquo;атрибут&raquo; равнозначен &laquo;колонке&raquo; и употребляется по историческим причинам.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="AEN95638"
+></A
+><P
+><B
+>Таблица 48-7. Колонки <TT
+CLASS="STRUCTNAME"
+>pg_attribute</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип</TH
+><TH
+>Ссылки</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>attrelid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-class.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Таблица, к которой принадлежит колонка</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>attname</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>name</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Имя колонки</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>atttypid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-type.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_type</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Тип данных этой колонки</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>attstattarget</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int4</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Колонка <TT
+CLASS="STRUCTFIELD"
+>attstattarget</TT
+> управляет детализацией статистики, собираемой по этой колонке командой <A
+HREF="sql-analyze.html"
+>ANALYZE</A
+>. Нулевое значение указывает, что статистика не собирается. При отрицательном значении используется системное ограничение статистики по умолчанию. Точное значение положительных величин определяется типом данных. Для скалярных типов данных, <TT
+CLASS="STRUCTFIELD"
+>attstattarget</TT
+> задаёт и целевое число собираемых <SPAN
+CLASS="QUOTE"
+>"самых частых значений"</SPAN
+>, и целевое число создаваемых групп гистограммы.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>attlen</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int2</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Копия <TT
+CLASS="LITERAL"
+>pg_type.typlen</TT
+> из записи типа колонки</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>attnum</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int2</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Порядковый номер колонки. Обычные колонки нумеруются по возрастанию, начиная с 1. Системные колонки, такие как <TT
+CLASS="STRUCTFIELD"
+>oid</TT
+>, имеют (обычно) отрицательные номера.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>attndims</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int4</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Число размерностей, если колонка имеет тип массива; 0 в противном случае. (В настоящее время число размерностей массива не контролируется, поэтому любое ненулевое значение по сути означает <SPAN
+CLASS="QUOTE"
+>"это массив"</SPAN
+>.)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>attcacheoff</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int4</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Всегда -1 в постоянном хранилище, но когда запись загружается в память, в этом поле может кешироваться смещение атрибута в строке</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>atttypmod</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int4</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>В поле <TT
+CLASS="STRUCTFIELD"
+>atttypmod</TT
+> записывается дополнительное число, связанное с определённым типом данных, указываемое при создании таблицы (например, максимальный размер колонки <TT
+CLASS="TYPE"
+>varchar</TT
+>). Это значение передаётся функциям ввода и преобразования длины конкретного типа. Для типов, которым не нужен <TT
+CLASS="STRUCTFIELD"
+>atttypmod</TT
+>, это обычно -1.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>attbyval</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Копия <TT
+CLASS="LITERAL"
+>pg_type.typbyval</TT
+> из записи типа колонки</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>attstorage</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>char</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Обычно копия <TT
+CLASS="LITERAL"
+>pg_type.typstorage</TT
+> из записи типа колонки. Для типов, поддерживающих TOAST, можно изменять это значение после создания колонки и таким образом управлять политикой хранения.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>attalign</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>char</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Копия <TT
+CLASS="LITERAL"
+>pg_type.typalign</TT
+> из записи типа колонки</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>attnotnull</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Это поле представляет ограничение &laquo;не NULL&raquo;. Изменив это поле, можно включить или отключить данное ограничение.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>atthasdef</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Колонка имеет значение по умолчанию, в этом случае в каталоге <TT
+CLASS="STRUCTNAME"
+>pg_attrdef</TT
+> будет соответствующая запись, определяющая это значение.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>attisdropped</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Колонка была удалена и теперь не является рабочей. Удалённая колонка может по-прежнему физически присутствовать в таблице, но анализатор запросов её игнорирует, так что обратиться к ней из SQL нельзя.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>attislocal</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Колонка определена локально в данном отношении. Заметьте, что колонка может быть определена локально и при этом наследоваться.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>attinhcount</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int4</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Число прямых потомков этой колонки. Колонку с ненулевым числом потомков нельзя удалить или переименовать.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>attcollation</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-collation.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_collation</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Заданное для колонки правило сортировки, либо 0, если тип колонки не сортируемый.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>attacl</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>aclitem[]</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Права доступа к колонке, если они были заданы непосредственно для этой колонки</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>attoptions</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text[]</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Параметры уровня атрибута, в виде строк <SPAN
+CLASS="QUOTE"
+>"ключ=значение"</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>attfdwoptions</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text[]</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Параметры уровня атрибута для обёрток сторонних данных, в виде строк <SPAN
+CLASS="QUOTE"
+>"ключ=значение"</SPAN
+></TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>В записи удалённой колонки в <TT
+CLASS="STRUCTNAME"
+>pg_attribute</TT
+> поле <TT
+CLASS="STRUCTFIELD"
+>atttypid</TT
+> сбрасывается в ноль, но <TT
+CLASS="STRUCTFIELD"
+>attlen</TT
+> и другие поля, копируемые из <TT
+CLASS="STRUCTNAME"
+>pg_type</TT
+>, сохраняют актуальные значения. Это нужно, чтобы справиться с ситуацией, когда после удаления колонки удаляется и её тип данных, так что записи в <TT
+CLASS="STRUCTNAME"
+>pg_type</TT
+> больше не будет. В таких случаях для интерпретации содержимого строки таблицы могут использоваться <TT
+CLASS="STRUCTFIELD"
+>attlen</TT
+> и другие поля.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="catalog-pg-attrdef.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="catalog-pg-authid.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_attrdef</TT
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_authid</TT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

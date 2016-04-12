@@ -1,0 +1,504 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>              pg_archivecleanup
+            </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Серверные приложения"
+HREF="contrib-prog-server.html"><LINK
+REL="PREVIOUS"
+TITLE="Серверные приложения"
+HREF="contrib-prog-server.html"><LINK
+REL="NEXT"
+TITLE="              pg_standby
+            "
+HREF="pgstandby.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Серверные приложения"
+HREF="contrib-prog-server.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="contrib-prog-server.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="              pg_standby
+            "
+HREF="pgstandby.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="PGARCHIVECLEANUP"
+></A
+><SPAN
+CLASS="APPLICATION"
+>pg_archivecleanup</SPAN
+></H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN127077"
+></A
+><H2
+>Название</H2
+>pg_archivecleanup&nbsp;--&nbsp;вычистить файлы архивов WAL <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN127081"
+></A
+><H2
+>Синтаксис</H2
+><P
+><TT
+CLASS="COMMAND"
+>pg_archivecleanup</TT
+> [                <TT
+CLASS="REPLACEABLE"
+><I
+>параметр</I
+></TT
+>
+              ...]                  <TT
+CLASS="REPLACEABLE"
+><I
+>расположение_архива</I
+></TT
+>
+                                 <TT
+CLASS="REPLACEABLE"
+><I
+>старейший_сохраняемый_файл</I
+></TT
+>
+               </P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN127090"
+></A
+><H2
+>Описание</H2
+><P
+>Утилита <SPAN
+CLASS="APPLICATION"
+>pg_archivecleanup</SPAN
+> предназначена для использования в качестве <TT
+CLASS="LITERAL"
+>archive_cleanup_command</TT
+> для удаления старых файлов WAL на резервном сервере (см. <A
+HREF="warm-standby.html"
+>Раздел 25.2</A
+>). <SPAN
+CLASS="APPLICATION"
+>pg_archivecleanup</SPAN
+> можно использовать и как отдельную программу для выполнения тех же действий.</P
+><P
+>Чтобы использовать <SPAN
+CLASS="APPLICATION"
+>pg_archivecleanup</SPAN
+> на резервном сервере, добавьте эту строку в файл конфигурации <TT
+CLASS="FILENAME"
+>recovery.conf</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>archive_cleanup_command = 'pg_archivecleanup <TT
+CLASS="REPLACEABLE"
+><I
+>расположение_архива</I
+></TT
+> %r'</PRE
+><P> Здесь <TT
+CLASS="REPLACEABLE"
+><I
+>расположение_архива</I
+></TT
+> определяет каталог, из которого должны удаляться файлы сегментов WAL.</P
+><P
+>Вызываемая в качестве <A
+HREF="archive-recovery-settings.html#ARCHIVE-CLEANUP-COMMAND"
+>archive_cleanup_command</A
+>, эта программа просматривает <TT
+CLASS="REPLACEABLE"
+><I
+>расположение_архива</I
+></TT
+> и удаляет все файлы WAL, логически предшествующие значению аргумента <TT
+CLASS="LITERAL"
+>%r</TT
+>. Целью этой операции является сокращение числа сохраняемых файлов без потери возможности восстановления при перезапуске. Такой вариант использования уместен, когда <TT
+CLASS="REPLACEABLE"
+><I
+>расположение_архива</I
+></TT
+> указывает на область рабочих файлов конкретного резервного сервера, но <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>не</I
+></SPAN
+> когда <TT
+CLASS="REPLACEABLE"
+><I
+>расположение_архива</I
+></TT
+> — каталог с архивом WAL для долговременного хранения, или когда несколько резервных серверов восстанавливают записи WAL из одного расположения.</P
+><P
+>При отдельном использовании этой программы из каталога <TT
+CLASS="REPLACEABLE"
+><I
+>расположение_архива</I
+></TT
+> будут удалены все файлы WAL, логически предшествующие файлу <TT
+CLASS="REPLACEABLE"
+><I
+>старейший_сохраняемый_файл</I
+></TT
+>. В этом режиме, если вы укажете имя файла с расширением <TT
+CLASS="FILENAME"
+>.backup</TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>старейший_сохраняемый_файл</I
+></TT
+> будет определяться по имени без расширения. Благодаря этому будут корректно удалены все файлы WAL, заархивированные до определённой базовой копии. Например, следующая команда удалит все файлы старее файла WAL с именем <TT
+CLASS="FILENAME"
+>000000010000003700000010</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>pg_archivecleanup -d archive 000000010000003700000010.00000020.backup
+
+pg_archivecleanup:  keep WAL file "archive/000000010000003700000010" and later
+pg_archivecleanup:  removing file "archive/00000001000000370000000F"
+pg_archivecleanup:  removing file "archive/00000001000000370000000E"</PRE
+><P></P
+><P
+><SPAN
+CLASS="APPLICATION"
+>pg_archivecleanup</SPAN
+> рассчитывает на то, что <TT
+CLASS="REPLACEABLE"
+><I
+>расположение_архива</I
+></TT
+> доступно для чтения и записи пользователю, владеющему серверным процессом.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN127120"
+></A
+><H2
+>Параметры</H2
+><P
+><SPAN
+CLASS="APPLICATION"
+>pg_archivecleanup</SPAN
+> принимает следующие аргументы командной строки: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="OPTION"
+>-d</TT
+></DT
+><DD
+><P
+>Выводить подробные отладочные сообщения в <TT
+CLASS="FILENAME"
+>stderr</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-n</TT
+></DT
+><DD
+><P
+>Вывести имена файлов, которые должны быть удалены, в <TT
+CLASS="FILENAME"
+>stdout</TT
+> (не выполняя удаление).</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-V</TT
+><BR><TT
+CLASS="OPTION"
+>--version</TT
+></DT
+><DD
+><P
+>Вывести версию <SPAN
+CLASS="APPLICATION"
+>pg_archivecleanup</SPAN
+> и завершиться.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-x</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>расширение</I
+></TT
+></DT
+><DD
+><P
+>При отдельном использовании этой программы укажите расширение, которое будет убрано из имён файлов до принятия решения об удалении определённых файлов. Это обычно полезно для очистки файлов архивов, которые сжимаются для хранения и получают расширение, задаваемое программой сжатия. Например: <TT
+CLASS="LITERAL"
+>-x .gz</TT
+>.</P
+><P
+>Заметьте, что расширение <TT
+CLASS="FILENAME"
+>.backup</TT
+> в передаваемом этой программе имени файла указывать не следует.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-?</TT
+><BR><TT
+CLASS="OPTION"
+>--help</TT
+></DT
+><DD
+><P
+>Вывести справку об аргументах командной строки <SPAN
+CLASS="APPLICATION"
+>pg_archivecleanup</SPAN
+> и завершиться.</P
+></DD
+></DL
+></DIV
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN127162"
+></A
+><H2
+>Замечания</H2
+><P
+>Программа <SPAN
+CLASS="APPLICATION"
+>pg_archivecleanup</SPAN
+> рассчитана на работу с <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> 8.0 и новее как отдельная утилита, а также с <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> 9.0 и новее как команда очистки архива.</P
+><P
+>Программа <SPAN
+CLASS="APPLICATION"
+>pg_archivecleanup</SPAN
+> написана на C; её исходный код легко поддаётся модификации (он содержит секции, предназначенные для изменения при надобности)</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN127170"
+></A
+><H2
+>Примеры</H2
+><P
+>В системах Linux или Unix можно использовать команду: </P><PRE
+CLASS="PROGRAMLISTING"
+>archive_cleanup_command = 'pg_archivecleanup -d /mnt/standby/archive %r 2&gt;&gt;cleanup.log'</PRE
+><P> Предполагается, что каталог архива физически располагается на резервном сервере, так что команда <TT
+CLASS="VARNAME"
+>archive_command</TT
+> обращается к нему по NFS, но для резервного сервера эти файлы локальные. Эта команда будет:</P
+><P
+></P
+><UL
+><LI
+><P
+>выводить отладочную информацию в <TT
+CLASS="FILENAME"
+>cleanup.log</TT
+></P
+></LI
+><LI
+><P
+>удалять ставшие ненужными файлы из каталога архива</P
+></LI
+></UL
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN127181"
+></A
+><H2
+>Автор</H2
+><P
+>Саймон Риггс <CODE
+CLASS="EMAIL"
+>&#60;<A
+HREF="mailto:simon@2ndquadrant.com"
+>simon@2ndquadrant.com</A
+>&#62;</CODE
+></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN127185"
+></A
+><H2
+>См. также</H2
+><A
+HREF="pgstandby.html"
+>              <SPAN
+CLASS="APPLICATION"
+>pg_standby</SPAN
+>
+            </A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="contrib-prog-server.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="pgstandby.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Серверные приложения</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="contrib-prog-server.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><SPAN
+CLASS="APPLICATION"
+>pg_standby</SPAN
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

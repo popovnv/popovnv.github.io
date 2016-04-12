@@ -1,0 +1,280 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Доверенный и недоверенный PL/Perl</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="PL/Perl — процедурный язык Perl"
+HREF="plperl.html"><LINK
+REL="PREVIOUS"
+TITLE="Глобальные значения в PL/Perl"
+HREF="plperl-global.html"><LINK
+REL="NEXT"
+TITLE="Триггеры на PL/Perl"
+HREF="plperl-triggers.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Глобальные значения в PL/Perl"
+HREF="plperl-global.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="plperl.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 42. PL/Perl — процедурный язык Perl</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Триггеры на PL/Perl"
+HREF="plperl-triggers.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="PLPERL-TRUSTED"
+>42.5. Доверенный и недоверенный PL/Perl</A
+></H1
+><P
+>Обычно PL/Perl устанавливается в базу данных как <SPAN
+CLASS="QUOTE"
+>"доверенный"</SPAN
+> язык программирования с именем <TT
+CLASS="LITERAL"
+>plperl</TT
+>. При этом в целях безопасности определённые операции в Perl запрещаются. Вообще говоря, запрещаются все операции, взаимодействующие с окружением. В том числе, это операции с файлами, <TT
+CLASS="LITERAL"
+>require</TT
+> и <TT
+CLASS="LITERAL"
+>use</TT
+> (для внешних модулей). Поэтому функции на PL/Perl, в отличие от функций на C, никаким образом не могут взаимодействовать с внутренними механизмами сервера баз данных или обращаться к операционной системе с правами серверного процесса. Вследствие этого, использовать этот язык можно разрешить любому непривилегированному пользователю баз данных.</P
+><P
+>В следующем примере показана функция, которая не будет работать, потому что операции с файловой системы запрещены по соображениям безопасности: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION badfunc() RETURNS integer AS $$
+    my $tmpfile = "/tmp/badfile";
+    open my $fh, '&gt;', $tmpfile
+        or elog(ERROR, qq{could not open the file "$tmpfile": $!});
+    print $fh "Testing writing to a file\n";
+    close $fh or elog(ERROR, qq{could not close the file "$tmpfile": $!});
+    return 1;
+$$ LANGUAGE plperl;</PRE
+><P> Создать эту функцию не удастся, так как при проверке её правильности будет обнаружено использование запрещённого оператора.</P
+><P
+>Иногда возникает желание написать на Perl код, функциональность которого не будет ограничиваться. Например, может потребоваться функция на Perl, которая будет посылать почту. Для таких потребностей PL/Perl также можно установить как <SPAN
+CLASS="QUOTE"
+>"недоверенный"</SPAN
+> язык (обычно его называют <SPAN
+CLASS="APPLICATION"
+>PL/PerlU</SPAN
+>). В этом случае будут доступны все возможности языка Perl. Устанавливая язык, укажите имя <TT
+CLASS="LITERAL"
+>plperlu</TT
+>, чтобы выбрать недоверенную вариацию PL/Perl.</P
+><P
+>Автор функции на <SPAN
+CLASS="APPLICATION"
+>PL/PerlU</SPAN
+> должен позаботиться о том, чтобы эту функцию нельзя было использовать не по назначению, так как она может делать всё, что может пользователь с правами администратора баз данных. Заметьте, что СУБД позволяет создавать функции на недоверенных языках только суперпользователям базы данных.</P
+><P
+>Если показанная выше функция будет создана суперпользователем, и при этом будет выбран язык <TT
+CLASS="LITERAL"
+>plperlu</TT
+>, она выполнится успешно.</P
+><P
+>Таким же образом, в анонимном блоке кода на Perl разрешены абсолютно любые операции, если в качестве языка вместо <TT
+CLASS="LITERAL"
+>plperl</TT
+> выбирается <TT
+CLASS="LITERAL"
+>plperlu</TT
+>, но выполнять этот код должен суперпользователь.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Тогда как функции на <SPAN
+CLASS="APPLICATION"
+>PL/Perl</SPAN
+> исполняются отдельными интерпретаторами Perl для каждой роли SQL, все функции на <SPAN
+CLASS="APPLICATION"
+>PL/PerlU</SPAN
+>, вызываемые в рамках сеанса, исполняются в одном интерпретаторе Perl (отличном от тех, что исполняют функции <SPAN
+CLASS="APPLICATION"
+>PL/Perl</SPAN
+>). Благодаря этому, функции <SPAN
+CLASS="APPLICATION"
+>PL/PerlU</SPAN
+> могут свободно разделять общие данные, но между функциями <SPAN
+CLASS="APPLICATION"
+>PL/Perl</SPAN
+> и <SPAN
+CLASS="APPLICATION"
+>PL/PerlU</SPAN
+> взаимодействие невозможно.</P
+></BLOCKQUOTE
+></DIV
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Perl поддерживает работу нескольких интерпретаторов в одном процессе, только если он был собран с нужными флагами, а именно, с флагом <TT
+CLASS="LITERAL"
+>usemultiplicity</TT
+> или с флагом <TT
+CLASS="LITERAL"
+>useithreads</TT
+>. (В отсутствие веских причин использовать потоки предпочтительным является вариант <TT
+CLASS="LITERAL"
+>usemultiplicity</TT
+>. Дополнительную информацию вы можете получить на странице man <SPAN
+CLASS="CITEREFENTRY"
+><SPAN
+CLASS="REFENTRYTITLE"
+>perlembed</SPAN
+></SPAN
+>.) При использовании <SPAN
+CLASS="APPLICATION"
+>PL/Perl</SPAN
+> с версией Perl, собранной без этих флагов, в рамках сеанса можно будет запустить только один интерпретатор Perl, так что в сеансе будет возможно выполнять либо функции <SPAN
+CLASS="APPLICATION"
+>PL/PerlU</SPAN
+>, либо функции <SPAN
+CLASS="APPLICATION"
+>PL/Perl</SPAN
+> (и вызывать их должна одна роль SQL).</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="plperl-global.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="plperl-triggers.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Глобальные значения в PL/Perl</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="plperl.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Триггеры на PL/Perl</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

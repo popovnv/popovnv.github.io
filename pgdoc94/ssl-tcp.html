@@ -1,0 +1,543 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Защита соединений TCP/IP с применением SSL</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Подготовка к работе и сопровождение сервера"
+HREF="runtime.html"><LINK
+REL="PREVIOUS"
+TITLE="Возможности шифрования"
+HREF="encryption-options.html"><LINK
+REL="NEXT"
+TITLE="Защита соединений TCP/IP с применением туннелей SSH"
+HREF="ssh-tunnels.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Возможности шифрования"
+HREF="encryption-options.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="runtime.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 17. Подготовка к работе и сопровождение сервера</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Защита соединений TCP/IP с применением туннелей SSH"
+HREF="ssh-tunnels.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="SSL-TCP"
+>17.9. Защита соединений TCP/IP с применением SSL</A
+></H1
+><P
+>В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> встроена поддержка <ACRONYM
+CLASS="ACRONYM"
+>SSL</ACRONYM
+> для шифрования трафика между клиентом и сервером, что повышает уровень безопасности системы. Для использования этой возможности необходимо, чтобы и на сервере, и на клиенте был установлен <SPAN
+CLASS="PRODUCTNAME"
+>OpenSSL</SPAN
+>, и поддержка <ACRONYM
+CLASS="ACRONYM"
+>SSL</ACRONYM
+> была разрешена в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> при сборке (см. <A
+HREF="installation.html"
+>Главу 15</A
+>).</P
+><P
+>Когда в установленном сервере <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> разрешена поддержка <ACRONYM
+CLASS="ACRONYM"
+>SSL</ACRONYM
+>, его можно запустить с включённым механизмом <ACRONYM
+CLASS="ACRONYM"
+>SSL</ACRONYM
+>, задав в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+> для параметра <A
+HREF="runtime-config-connection.html#GUC-SSL"
+>ssl</A
+> значение <TT
+CLASS="LITERAL"
+>on</TT
+>. Запущенный сервер будет принимать, как обычные, так и <ACRONYM
+CLASS="ACRONYM"
+>SSL</ACRONYM
+>-подключения в одном порту TCP и будет согласовывать использование <ACRONYM
+CLASS="ACRONYM"
+>SSL</ACRONYM
+> с каждым клиентом. По умолчанию клиент выбирает режим подключения сам; как настроить сервер, чтобы он требовал использовать только <ACRONYM
+CLASS="ACRONYM"
+>SSL</ACRONYM
+> для всех или некоторых подключений, вы можете узнать в <A
+HREF="auth-pg-hba-conf.html"
+>Разделе 19.1</A
+>.</P
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> читает системный файл конфигурации <SPAN
+CLASS="PRODUCTNAME"
+>OpenSSL</SPAN
+>. По умолчанию этот файл называется <TT
+CLASS="FILENAME"
+>openssl.cnf</TT
+> и находится в каталоге, который сообщает команда <TT
+CLASS="LITERAL"
+>openssl version -d</TT
+>. Если требуется указать другое расположение файла конфигурации, его можно задать в переменной окружения <TT
+CLASS="ENVAR"
+>OPENSSL_CONF</TT
+>.</P
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>OpenSSL</SPAN
+> предоставляет широкий выбор шифров и алгоритмов аутентификации разной защищённости. Хотя список шифров может быть задан непосредственно в файле конфигурации <SPAN
+CLASS="PRODUCTNAME"
+>OpenSSL</SPAN
+>, можно задать отдельные шифры именно для сервера баз данных, указав их в параметре <A
+HREF="runtime-config-connection.html#GUC-SSL-CIPHERS"
+>ssl_ciphers</A
+> в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+>.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Накладные расходы, связанные с шифрованием, в принципе можно исключить, ограничившись только проверкой подлинности, то есть применяя шифр <TT
+CLASS="LITERAL"
+>NULL-SHA</TT
+> или <TT
+CLASS="LITERAL"
+>NULL-MD5</TT
+>. Однако в этом случае посредник сможет пропускать через себя и читать весь трафик между клиентом и сервером. Кроме того, шифрование привносит минимальную дополнительную нагрузку по сравнению с проверкой подлинности. По этим причинам использовать шифры NULL не рекомендуется.</P
+></BLOCKQUOTE
+></DIV
+><P
+>Чтобы сервер мог работать в режиме <ACRONYM
+CLASS="ACRONYM"
+>SSL</ACRONYM
+>, ему необходимы файлы с сертификатом сервера и закрытым ключом. По умолчанию это должны быть файлы <TT
+CLASS="FILENAME"
+>server.crt</TT
+> и <TT
+CLASS="FILENAME"
+>server.key</TT
+>, соответственно, расположенные в каталоге данных, но можно использовать и другие имена и местоположения файлов, задав их в конфигурационных параметрах <A
+HREF="runtime-config-connection.html#GUC-SSL-CERT-FILE"
+>ssl_cert_file</A
+> и <A
+HREF="runtime-config-connection.html#GUC-SSL-KEY-FILE"
+>ssl_key_file</A
+>. В Unix-подобных системах к файлу <TT
+CLASS="FILENAME"
+>server.key</TT
+> должен быть запрещён любой доступ группы и всех остальных; чтобы установить такое ограничение, выполните <TT
+CLASS="COMMAND"
+>chmod 0600 server.key</TT
+>. Если закрытый ключ защищён паролем, сервер запросит пароль и не запустится, пока этот пароль не будет введён.</P
+><P
+>В некоторых случаях сертификат сервера может подписываться <SPAN
+CLASS="QUOTE"
+>"промежуточным"</SPAN
+> центром сертификации, сам этот сертификат не обязательно должен быть доверенным для клиентов. Чтобы использовать такой сертификат, нужно добавить к файлу <TT
+CLASS="FILENAME"
+>server.crt</TT
+> сертификат выдавшего его центра сертификации, затем сертификат вышестоящего центра и так далее, до сертификата <SPAN
+CLASS="QUOTE"
+>"корневого"</SPAN
+> или <SPAN
+CLASS="QUOTE"
+>"промежуточного"</SPAN
+> центра, которому доверяют клиенты. Клиенты считают сертификат доверенным, если он подписан сертификатом, содержащимся в их собственном файле <TT
+CLASS="FILENAME"
+>root.crt</TT
+>.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="SSL-CLIENT-CERTIFICATES"
+>17.9.1. Использование клиентских сертификатов</A
+></H2
+><P
+>Чтобы клиенты могли подключаться к серверу, только предоставив доверенный сертификат, поместите сертификаты доверенных центров сертификации (<ACRONYM
+CLASS="ACRONYM"
+>ЦС</ACRONYM
+>s) в файл <TT
+CLASS="FILENAME"
+>root.crt</TT
+> в каталоге данных, задайте для параметра <A
+HREF="runtime-config-connection.html#GUC-SSL-CA-FILE"
+>ssl_ca_file</A
+> в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+> значение <TT
+CLASS="LITERAL"
+>root.crt</TT
+> и присвойте значение 1 параметру <TT
+CLASS="LITERAL"
+>clientcert</TT
+> в соответствующих строках <TT
+CLASS="LITERAL"
+>hostssl</TT
+> в <TT
+CLASS="FILENAME"
+>pg_hba.conf</TT
+>. После этого сервер будет запрашивать от клиента сертификат при попытке установить SSL-соединение. (Как настроить сертификаты на клиенте, описывается в <A
+HREF="libpq-ssl.html"
+>Разделе 31.18</A
+>.) Получив сертификат клиента, сервер примет его, только если он подписан одним из доверенных центров сертификации. Если в <TT
+CLASS="FILENAME"
+>root.crt</TT
+> добавлены сертификаты промежуточных <ACRONYM
+CLASS="ACRONYM"
+>ЦС</ACRONYM
+>, этот файл должен также содержать цепочки сертификатов до соответствующих корневых <ACRONYM
+CLASS="ACRONYM"
+>ЦС</ACRONYM
+>. Если установлен параметр <A
+HREF="runtime-config-connection.html#GUC-SSL-CRL-FILE"
+>ssl_crl_file</A
+>, при подключении также проверяются списки отозванных сертификатов (CRL, Certificate Revocation List). (По ссылке <A
+HREF="http://h71000.www7.hp.com/DOC/83final/BA554_90007/ch04s02.html"
+TARGET="_top"
+>http://h71000.www7.hp.com/DOC/83final/BA554_90007/ch04s02.html</A
+> можно найти диаграммы, иллюстрирующие применение сертификатов SSL.)</P
+><P
+>Параметр <TT
+CLASS="LITERAL"
+>clientcert</TT
+> в файле конфигурации <TT
+CLASS="FILENAME"
+>pg_hba.conf</TT
+> можно использовать с любым методом аутентификации, но только для строк <TT
+CLASS="LITERAL"
+>hostssl</TT
+>. Когда <TT
+CLASS="LITERAL"
+>clientcert</TT
+> не задан или равен 0, сервер, тем не менее, будет проверять представленный клиентом сертификат по своему списку доверенных ЦС (если он настроен), но позволит клиенту подключиться без сертификата.</P
+><P
+>Заметьте, что файл <TT
+CLASS="FILENAME"
+>root.crt</TT
+> на сервере содержит сертификаты центров сертификации верхнего уровня, которые считаются доверенными для подписания клиентских сертификатов. В принципе в нём может отсутствовать сертификат ЦС, подписавшего сертификат сервера, хотя в большинстве случаев этот ЦС также должен быть доверенным для клиентских сертификатов.</P
+><P
+>Если вы используете клиентские сертификаты, вы можете также применить метод аутентификации <TT
+CLASS="LITERAL"
+>cert</TT
+>, чтобы сертификаты обеспечивали не только защиту соединений, но и проверку подлинности пользователей. За подробностями обратитесь к <A
+HREF="auth-methods.html#AUTH-CERT"
+>Подразделу 19.3.9</A
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="SSL-SERVER-FILES"
+>17.9.2. Файлы, используемые SSL-сервером</A
+></H2
+><P
+>В <A
+HREF="ssl-tcp.html#SSL-FILE-USAGE"
+>Таблице 17-2</A
+> кратко описаны все файлы, имеющие отношение к настройке SSL на сервере. (Здесь приведены стандартные или типичные имена файлов. В конкретной системе они могут быть другими.)</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="SSL-FILE-USAGE"
+></A
+><P
+><B
+>Таблица 17-2. Файлы, используемые SSL-сервером</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Файл</TH
+><TH
+>Содержимое</TH
+><TH
+>Назначение</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+><A
+HREF="runtime-config-connection.html#GUC-SSL-CERT-FILE"
+>ssl_cert_file</A
+> (<TT
+CLASS="FILENAME"
+>$PGDATA/server.crt</TT
+>)</TD
+><TD
+>сертификат сервера</TD
+><TD
+>отправляется клиенту для идентификации сервера</TD
+></TR
+><TR
+><TD
+><A
+HREF="runtime-config-connection.html#GUC-SSL-KEY-FILE"
+>ssl_key_file</A
+> (<TT
+CLASS="FILENAME"
+>$PGDATA/server.key</TT
+>)</TD
+><TD
+>закрытый ключ сервера</TD
+><TD
+>подтверждает, что сертификат сервера был передан его владельцем; не гарантирует, что его владельцу можно доверять</TD
+></TR
+><TR
+><TD
+><A
+HREF="runtime-config-connection.html#GUC-SSL-CA-FILE"
+>ssl_ca_file</A
+> (<TT
+CLASS="FILENAME"
+>$PGDATA/root.crt</TT
+>)</TD
+><TD
+>сертификаты доверенных ЦС</TD
+><TD
+>позволяет проверить, что сертификат клиента подписан доверенным центром сертификации</TD
+></TR
+><TR
+><TD
+><A
+HREF="runtime-config-connection.html#GUC-SSL-CRL-FILE"
+>ssl_crl_file</A
+> (<TT
+CLASS="FILENAME"
+>$PGDATA/root.crl</TT
+>)</TD
+><TD
+>сертификаты, отозванные центрами сертификации</TD
+><TD
+>сертификат клиента должен отсутствовать в этом списке</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Файлы <TT
+CLASS="FILENAME"
+>server.key</TT
+>, <TT
+CLASS="FILENAME"
+>server.crt</TT
+>, <TT
+CLASS="FILENAME"
+>root.crt</TT
+> и <TT
+CLASS="FILENAME"
+>root.crl</TT
+> (или альтернативные файлы, заменяющие их) считываются только при запуске сервера; поэтому сервер необходимо перезапустить, чтобы изменения в них вступили в силу.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="SSL-CERTIFICATE-CREATION"
+>17.9.3. Создание самоподписанного сертификата</A
+></H2
+><P
+>Чтобы создать самоподписанный сертификат для сервера быстрым способом, выполните следующую команду <SPAN
+CLASS="PRODUCTNAME"
+>OpenSSL</SPAN
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>openssl req -new -text -out server.req</PRE
+><P> Введите информацию, которую запрашивает <SPAN
+CLASS="APPLICATION"
+>openssl</SPAN
+>. Обязательно укажите правильное имя локального компьютера в поле <SPAN
+CLASS="QUOTE"
+>"Common Name"</SPAN
+> (Общее имя); пароль запроса можно оставить пустым. Программа сгенерирует ключ, защищённый паролем; она не примет пароль короче четырёх символов. Чтобы удалить пароль (вы должны сделать это, если хотите, чтобы сервер запускался автоматически), выполните такие команды: </P><PRE
+CLASS="PROGRAMLISTING"
+>openssl rsa -in privkey.pem -out server.key
+rm privkey.pem</PRE
+><P> Введите старый пароль, чтобы разблокировать файл ключа. Теперь выполните: </P><PRE
+CLASS="PROGRAMLISTING"
+>openssl req -x509 -in server.req -text -key server.key -out server.crt</PRE
+><P> В результате вы получите самоподписанный сертификат, и затем нужно будет скопировать ключ и сертификат туда, где их будет искать сервер. Наконец, выполните: </P><PRE
+CLASS="PROGRAMLISTING"
+>chmod og-rwx server.key</PRE
+><P> Сервер не примет этот файл, если для него будут заданы более либеральные права доступа. Подробнее узнать о том, как создаётся закрытый ключ и сертификат сервера, можно в документации <SPAN
+CLASS="PRODUCTNAME"
+>OpenSSL</SPAN
+>.</P
+><P
+>Самоподписанный сертификат можно использовать при тестировании, но для производственной среды необходимо получить сертификат, подписанный центром сертификации (<ACRONYM
+CLASS="ACRONYM"
+>ЦС</ACRONYM
+>) (одним из глобальных <ACRONYM
+CLASS="ACRONYM"
+>ЦС</ACRONYM
+> или локальным), чтобы клиенты могли проверять подлинность сервера. Если все клиенты относятся к одной организации, рекомендуется использовать локальный <ACRONYM
+CLASS="ACRONYM"
+>ЦС</ACRONYM
+>.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="encryption-options.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ssh-tunnels.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Возможности шифрования</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="runtime.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Защита соединений TCP/IP с применением туннелей <SPAN
+CLASS="APPLICATION"
+>SSH</SPAN
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

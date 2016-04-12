@@ -1,0 +1,321 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Системные колонки</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Определение данных"
+HREF="ddl.html"><LINK
+REL="PREVIOUS"
+TITLE="Ограничения"
+HREF="ddl-constraints.html"><LINK
+REL="NEXT"
+TITLE="Изменение таблиц"
+HREF="ddl-alter.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Ограничения"
+HREF="ddl-constraints.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ddl.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 5. Определение данных</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Изменение таблиц"
+HREF="ddl-alter.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="DDL-SYSTEM-COLUMNS"
+>5.4. Системные колонки</A
+></H1
+><P
+>В каждой таблице есть несколько <I
+CLASS="FIRSTTERM"
+>системных колонок</I
+>, неявно определённых системой. Как следствие, их имена нельзя использовать в качестве имён пользовательских колонок. (Заметьте, что это не зависит от того, является ли имя ключевым словом или нет; заключение имени в кавычки не поможет избежать этого ограничения.) Эти колонки не должны вас беспокоить, вам лишь достаточно знать об их существовании.</P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="STRUCTFIELD"
+>oid</TT
+></DT
+><DD
+><P
+> Идентификатор объекта (object ID) для строки. Эта колонка присутствует, только если таблица была создана с указанием <TT
+CLASS="LITERAL"
+>WITH OIDS</TT
+>, или если в момент её создания была установлена переменная конфигурации <A
+HREF="runtime-config-compatible.html#GUC-DEFAULT-WITH-OIDS"
+>default_with_oids</A
+>. Эта колонка имеет тип <TT
+CLASS="TYPE"
+>oid</TT
+> (с тем же именем, что и сама колонка); подробнее об этом типе см. <A
+HREF="datatype-oid.html"
+>Раздел 8.18</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="STRUCTFIELD"
+>tableoid</TT
+></DT
+><DD
+><P
+>Идентификатор объекта для таблицы, содержащей строку. Эта колонка особенно полезна для запросов, имеющих дело с иерархией наследования (см. <A
+HREF="ddl-inherit.html"
+>Раздел 5.8</A
+>), так как без неё сложно определить, из какой таблицы выбрана строка. Связав <TT
+CLASS="STRUCTFIELD"
+>tableoid</TT
+> с колонкой <TT
+CLASS="STRUCTFIELD"
+>oid</TT
+> в таблице <TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+>, можно будет получить имя таблицы.</P
+></DD
+><DT
+><TT
+CLASS="STRUCTFIELD"
+>xmin</TT
+></DT
+><DD
+><P
+>Идентификатор (код) транзакции, добавившей строку этой версии. (Версия строки &mdash; это её индивидуальное состояние; при каждом изменении создаётся новая версия одной и той же логической строки.)</P
+></DD
+><DT
+><TT
+CLASS="STRUCTFIELD"
+>cmin</TT
+></DT
+><DD
+><P
+>Номер команды (начиная с нуля) внутри транзакции, добавившей строку.</P
+></DD
+><DT
+><TT
+CLASS="STRUCTFIELD"
+>xmax</TT
+></DT
+><DD
+><P
+>Идентификатор транзакции, удалившей строку, или 0 для неудалённой версии строки. Значение этой колонки может быть ненулевым и для видимой версии строки. Это обычно означает, что удаляющая транзакция ещё не была зафиксирована, или удаление было отменено.</P
+></DD
+><DT
+><TT
+CLASS="STRUCTFIELD"
+>cmax</TT
+></DT
+><DD
+><P
+>Номер команды в удаляющей транзакции или ноль.</P
+></DD
+><DT
+><TT
+CLASS="STRUCTFIELD"
+>ctid</TT
+></DT
+><DD
+><P
+>Физическое расположение данной версии строки в таблице. Заметьте, что хотя по <TT
+CLASS="STRUCTFIELD"
+>ctid</TT
+> можно очень быстро найти версию строки, значение <TT
+CLASS="STRUCTFIELD"
+>ctid</TT
+> изменится при выполнении <TT
+CLASS="COMMAND"
+>VACUUM FULL</TT
+>. Таким образом, <TT
+CLASS="STRUCTFIELD"
+>ctid</TT
+> нельзя применять в качестве долгосрочного идентификатора строки. Для идентификации логических строк лучше использовать OID или даже дополнительный последовательный номер.</P
+></DD
+></DL
+></DIV
+><P
+>Коды OID представляют собой 32-битные значения и выбираются из единого для всей СУБД счётчика. В больших или долгоживущих базах данных этот счётчик может пойти по кругу. Таким образом, не рекомендуется рассчитывать на уникальность OID, если только вы не обеспечите её дополнительно. Если вам нужно идентифицировать строки таблицы, настоятельно рекомендуется использовать последовательности. Однако можно использовать и коды OID, при выполнении следующих условий: <P
+></P
+></P><UL
+><LI
+><P
+>Когда для идентификации строк таблиц применяется OID, в каждой такой таблице должно создаваться ограничение уникальности для колонки OID. Когда такое ограничение уникальности (или уникальный индекс) существует, система позаботится о том, чтобы OID новой строки не совпал с уже существующими. (Конечно, это возможно, только если в таблице меньше 2<SUP
+>32</SUP
+> (4 миллиардов) строк, а на практике таблицы должны быть гораздо меньше, иначе может пострадать производительность системы.)</P
+></LI
+><LI
+><P
+>Никогда не следует рассчитывать, что OID будут уникальны среди всех таблиц; в качестве глобального идентификатора в рамках базы данных используйте комбинацию <TT
+CLASS="STRUCTFIELD"
+>tableoid</TT
+> и OID строки.</P
+></LI
+><LI
+><P
+>Конечно, все эти таблицы должны быть созданы с указанием <TT
+CLASS="LITERAL"
+>WITH OIDS</TT
+>. В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> 8.1 и новее по умолчанию подразумевается <TT
+CLASS="LITERAL"
+>WITHOUT OIDS</TT
+>.</P
+></LI
+></UL
+><P></P
+><P
+>Идентификаторы транзакций также являются 32-битными. В долгоживущей базе данных они могут пойти по кругу. Это не критично при правильном обслуживании БД; подробнее об этом см. <A
+HREF="maintenance.html"
+>Главу 23</A
+>. Однако полагаться на уникальность кодов транзакций в течение длительного времени (при более чем миллиарде транзакций) не следует.</P
+><P
+>Идентификаторы команд также 32-битные. Это создаёт жёсткий лимит на 2<SUP
+>32</SUP
+> (4 миллиарда) команд <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> в одной транзакции. На практике это не проблема &mdash; заметьте, что это лимит числа команд <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>, а не количества обрабатываемых строк. Кроме того, идентификатор получают только те команды, которые фактически изменяют содержимое базы данных.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ddl-constraints.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ddl-alter.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Ограничения</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ddl.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Изменение таблиц</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

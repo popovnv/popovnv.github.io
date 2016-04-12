@@ -1,0 +1,994 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Дополнительные возможности</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Полнотекстовый поиск"
+HREF="textsearch.html"><LINK
+REL="PREVIOUS"
+TITLE="Управление текстовым поиском"
+HREF="textsearch-controls.html"><LINK
+REL="NEXT"
+TITLE="Анализаторы"
+HREF="textsearch-parsers.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Управление текстовым поиском"
+HREF="textsearch-controls.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="textsearch.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 12. Полнотекстовый поиск</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Анализаторы"
+HREF="textsearch-parsers.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="TEXTSEARCH-FEATURES"
+>12.4. Дополнительные возможности</A
+></H1
+><P
+>В этом разделе описываются дополнительные функции и операторы, которые могут быть полезны при поиске текста.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="TEXTSEARCH-MANIPULATE-TSVECTOR"
+>12.4.1. Обработка документов</A
+></H2
+><P
+>В <A
+HREF="textsearch-controls.html#TEXTSEARCH-PARSING-DOCUMENTS"
+>Подразделе 12.3.1</A
+> показывалось, как обычные текстовые документы можно преобразовать в значения <TT
+CLASS="TYPE"
+>tsvector</TT
+>. <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> предлагает также набор функций и операторов для обработки документов, уже представленных в формате <TT
+CLASS="TYPE"
+>tsvector</TT
+>.</P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+><TT
+CLASS="TYPE"
+>tsvector</TT
+> || <TT
+CLASS="TYPE"
+>tsvector</TT
+></TT
+></DT
+><DD
+><P
+>Оператор конкатенации значений <TT
+CLASS="TYPE"
+>tsvector</TT
+> возвращает вектор, объединяющий лексемы и позиционную информацию двух векторов, переданных ему в аргументах. В полученном результате сохраняются позиции и метки весов. При этом позиции в векторе справа сдвигаются на максимальное значение позиции в векторе слева, что почти равносильно применению <CODE
+CLASS="FUNCTION"
+>to_tsvector</CODE
+> к результату конкатенации двух исходных строк документов. (Почти, потому что стоп-слова, исключаемые в конце левого аргумента, при конкатенации исходных строк влияют на позиции лексем в правой части, а при конкатенации <TT
+CLASS="TYPE"
+>tsvector</TT
+> &mdash; нет.)</P
+><P
+>Преимущество же конкатенации документов в векторной форме по сравнению с конкатенацией текста до вызова <CODE
+CLASS="FUNCTION"
+>to_tsvector</CODE
+> заключается в том, что так можно разбирать разные части документа, применяя разные конфигурации. И так как функция <CODE
+CLASS="FUNCTION"
+>setweight</CODE
+> помечает все лексемы данного вектора одинаково, разбирать текст и выполнять <CODE
+CLASS="FUNCTION"
+>setweight</CODE
+> нужно до объединения разных частей документа с подразумеваемым разным весом.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>setweight(<TT
+CLASS="REPLACEABLE"
+><I
+>вектор</I
+></TT
+> <TT
+CLASS="TYPE"
+>tsvector</TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>вес</I
+></TT
+> <TT
+CLASS="TYPE"
+>"char"</TT
+>) returns <TT
+CLASS="TYPE"
+>tsvector</TT
+></TT
+></DT
+><DD
+><P
+><CODE
+CLASS="FUNCTION"
+>setweight</CODE
+> возвращает копию входного вектора, помечая в ней каждую позицию заданным <TT
+CLASS="REPLACEABLE"
+><I
+>весом</I
+></TT
+>, меткой <TT
+CLASS="LITERAL"
+>A</TT
+>, <TT
+CLASS="LITERAL"
+>B</TT
+>, <TT
+CLASS="LITERAL"
+>C</TT
+> или <TT
+CLASS="LITERAL"
+>D</TT
+>. (Метка <TT
+CLASS="LITERAL"
+>D</TT
+> по умолчанию назначается всем векторам, так что при выводе она опускается.) Эти метки сохраняются при конкатенации векторов, что позволяет придавать разные веса словам из разных частей документа, и, как следствие, ранжировать их по-разному.</P
+><P
+>Заметьте, что веса назначаются <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>позициям</I
+></SPAN
+>, а не <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>лексемам</I
+></SPAN
+>. Если входной вектор очищен от позиционной информации, <CODE
+CLASS="FUNCTION"
+>setweight</CODE
+> не делает ничего.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>length(<TT
+CLASS="REPLACEABLE"
+><I
+>вектор</I
+></TT
+> <TT
+CLASS="TYPE"
+>tsvector</TT
+>) returns <TT
+CLASS="TYPE"
+>integer</TT
+></TT
+></DT
+><DD
+><P
+>Возвращает число лексем, сохранённых в векторе.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>strip(<TT
+CLASS="REPLACEABLE"
+><I
+>вектор</I
+></TT
+> <TT
+CLASS="TYPE"
+>tsvector</TT
+>) returns <TT
+CLASS="TYPE"
+>tsvector</TT
+></TT
+></DT
+><DD
+><P
+>Возвращает вектор с теми же лексемами, что и в данном, но без информации о позиции и весе. Хотя возвращённый вектор малополезен для ранжирования по релевантности, он обычно имеет гораздо меньший размер, чем полный вектор.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="TEXTSEARCH-MANIPULATE-TSQUERY"
+>12.4.2. Обработка запросов</A
+></H2
+><P
+>В <A
+HREF="textsearch-controls.html#TEXTSEARCH-PARSING-QUERIES"
+>Подразделе 12.3.2</A
+> показывалось, как обычные текстовые запросы можно преобразовывать в значения <TT
+CLASS="TYPE"
+>tsquery</TT
+>. <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> предлагает также набор функций и операторов для обработки запросов, уже представленных в формате <TT
+CLASS="TYPE"
+>tsquery</TT
+>.</P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+><TT
+CLASS="TYPE"
+>tsquery</TT
+> &amp;&amp; <TT
+CLASS="TYPE"
+>tsquery</TT
+></TT
+></DT
+><DD
+><P
+>Возвращает логическое произведение (AND) двух данных запросов.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+><TT
+CLASS="TYPE"
+>tsquery</TT
+> || <TT
+CLASS="TYPE"
+>tsquery</TT
+></TT
+></DT
+><DD
+><P
+>Возвращает логическое объединение (OR) двух данных запросов.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>!! <TT
+CLASS="TYPE"
+>tsquery</TT
+></TT
+></DT
+><DD
+><P
+>Возвращает логическое отрицание (NOT) данного запроса.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>numnode(<TT
+CLASS="REPLACEABLE"
+><I
+>запрос</I
+></TT
+> <TT
+CLASS="TYPE"
+>tsquery</TT
+>) returns <TT
+CLASS="TYPE"
+>integer</TT
+></TT
+></DT
+><DD
+><P
+>Возвращает число узлов (лексем и операторов) в значении <TT
+CLASS="TYPE"
+>tsquery</TT
+>. Эта функция помогает определить, имеет ли смысл <TT
+CLASS="REPLACEABLE"
+><I
+>запрос</I
+></TT
+> (тогда её результат &gt; 0) или он содержит только стоп-слова (тогда она возвращает 0). Примеры: </P><PRE
+CLASS="SCREEN"
+> SELECT numnode(plainto_tsquery('the any'));
+ЗАМЕЧАНИЕ:  запрос поиска текста игнорируется, так как содержит
+ только стоп-слова или не содержит лексем
+ numnode
+---------
+       0
+
+SELECT numnode('foo &amp; bar'::tsquery);
+ numnode
+---------
+       3</PRE
+><P></P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>querytree(<TT
+CLASS="REPLACEABLE"
+><I
+>запрос</I
+></TT
+> <TT
+CLASS="TYPE"
+>tsquery</TT
+>) returns <TT
+CLASS="TYPE"
+>text</TT
+></TT
+></DT
+><DD
+><P
+>Возвращает часть <TT
+CLASS="TYPE"
+>tsquery</TT
+>, которую можно использовать для поиска по индексу. Эта функция помогает выявить неиндексируемые запросы, например, такие, которые содержат только стоп-слова или условия отрицания. Например: </P><PRE
+CLASS="SCREEN"
+>SELECT querytree(to_tsquery('!defined'));
+ querytree
+-----------</PRE
+><P></P
+></DD
+></DL
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="TEXTSEARCH-QUERY-REWRITING"
+>12.4.2.1. Перезапись запросов</A
+></H3
+><P
+>Семейство запросов <CODE
+CLASS="FUNCTION"
+>ts_rewrite</CODE
+> ищет в данном <TT
+CLASS="TYPE"
+>tsquery</TT
+> вхождения целевого подзапроса и заменяет каждое вхождение указанной подстановкой. По сути эта операция похожа на замену подстроки в строке, только рассчитана на работу с <TT
+CLASS="TYPE"
+>tsquery</TT
+>. Сочетание целевого подзапроса с подстановкой можно считать <I
+CLASS="FIRSTTERM"
+>правилом перезаписи запроса</I
+>. Набор таких правил перезаписи может быть очень полезен при поиске. Например, вы можете улучшить результаты, добавив синонимы (например, <TT
+CLASS="LITERAL"
+>big apple</TT
+>, <TT
+CLASS="LITERAL"
+>nyc</TT
+> и <TT
+CLASS="LITERAL"
+>gotham</TT
+> для <TT
+CLASS="LITERAL"
+>new york</TT
+>) или сузить область поиска, чтобы нацелить пользователя на некоторую область. Это в некотором смысле пересекается с функциональностью тезаурусов (<A
+HREF="textsearch-dictionaries.html#TEXTSEARCH-THESAURUS"
+>Подраздел 12.6.4</A
+>). Однако, при таком подходе вы можете изменять правила перезаписи &laquo;на лету&raquo;, тогда как при обновлении тезауруса необходима переиндексация.</P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>ts_rewrite (<TT
+CLASS="REPLACEABLE"
+><I
+>запрос</I
+></TT
+> <TT
+CLASS="TYPE"
+>tsquery</TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>цель</I
+></TT
+> <TT
+CLASS="TYPE"
+>tsquery</TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>замена</I
+></TT
+> <TT
+CLASS="TYPE"
+>tsquery</TT
+>) returns <TT
+CLASS="TYPE"
+>tsquery</TT
+></TT
+></DT
+><DD
+><P
+>Эта форма <CODE
+CLASS="FUNCTION"
+>ts_rewrite</CODE
+> просто применяет одно правило перезаписи: <TT
+CLASS="REPLACEABLE"
+><I
+>цель</I
+></TT
+> заменяется <TT
+CLASS="REPLACEABLE"
+><I
+>подстановкой</I
+></TT
+> везде, где она находится в <TT
+CLASS="REPLACEABLE"
+><I
+>запросе</I
+></TT
+>. Например: </P><PRE
+CLASS="SCREEN"
+>SELECT ts_rewrite('a &amp; b'::tsquery, 'a'::tsquery, 'c'::tsquery);
+ ts_rewrite
+------------
+ 'b' &amp; 'c'</PRE
+><P></P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>ts_rewrite (<TT
+CLASS="REPLACEABLE"
+><I
+>запрос</I
+></TT
+> <TT
+CLASS="TYPE"
+>tsquery</TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>выборка</I
+></TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>) returns <TT
+CLASS="TYPE"
+>tsquery</TT
+></TT
+></DT
+><DD
+><P
+>Эта форма <CODE
+CLASS="FUNCTION"
+>ts_rewrite</CODE
+> принимает начальный <TT
+CLASS="REPLACEABLE"
+><I
+>запрос</I
+></TT
+> и SQL-команду <TT
+CLASS="REPLACEABLE"
+><I
+>select</I
+></TT
+>, которая задаётся текстовой строкой. Команда <TT
+CLASS="REPLACEABLE"
+><I
+>select</I
+></TT
+> должна выдавать две колонки типа <TT
+CLASS="TYPE"
+>tsquery</TT
+>. Для каждой строки результата <TT
+CLASS="REPLACEABLE"
+><I
+>select</I
+></TT
+> вхождения первой колонки (цели) заменяются значениями второй колонки (подстановкой) в тексте <TT
+CLASS="REPLACEABLE"
+><I
+>запроса</I
+></TT
+>. Например: </P><PRE
+CLASS="SCREEN"
+>CREATE TABLE aliases (t tsquery PRIMARY KEY, s tsquery);
+INSERT INTO aliases VALUES('a', 'c');
+
+SELECT ts_rewrite('a &amp; b'::tsquery, 'SELECT t,s FROM aliases');
+ ts_rewrite
+------------
+ 'b' &amp; 'c'</PRE
+><P></P
+><P
+>Заметьте, что когда таким способом применяются несколько правил перезаписи, порядок их применения может иметь значение, поэтому в исходном запросе следует добавить <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> по какому-либо ключу.</P
+></DD
+></DL
+></DIV
+><P
+>Давайте рассмотрим практический пример на тему астрономии. Мы развернём запрос <TT
+CLASS="LITERAL"
+>supernovae</TT
+>, используя правила перезаписи в таблице: </P><PRE
+CLASS="SCREEN"
+>CREATE TABLE aliases (t tsquery primary key, s tsquery);
+INSERT INTO aliases VALUES(to_tsquery('supernovae'),
+  to_tsquery('supernovae|sn'));
+
+SELECT ts_rewrite(to_tsquery('supernovae &amp; crab'), 'SELECT * FROM aliases');
+           ts_rewrite            
+---------------------------------
+ 'crab' &amp; ( 'supernova' | 'sn' )</PRE
+><P> Мы можем скорректировать правила перезаписи, просто изменив таблицу: </P><PRE
+CLASS="SCREEN"
+>UPDATE aliases
+SET s = to_tsquery('supernovae|sn &amp; !nebulae')
+WHERE t = to_tsquery('supernovae');
+
+SELECT ts_rewrite(to_tsquery('supernovae &amp; crab'), 'SELECT * FROM aliases');
+                 ts_rewrite                  
+---------------------------------------------
+ 'crab' &amp; ( 'supernova' | 'sn' &amp; !'nebula' )</PRE
+><P></P
+><P
+>Перезапись может быть медленной, когда задано много правил перезаписи, так как соответствия будут проверяться для каждого правила. Чтобы отфильтровать явно неподходящие правила, можно использовать проверки включения для типа <TT
+CLASS="TYPE"
+>tsquery</TT
+>. В следующем примере выбираются только те правила, которые могут соответствовать исходному запросу: </P><PRE
+CLASS="SCREEN"
+>SELECT ts_rewrite('a &amp; b'::tsquery,
+                  'SELECT t,s FROM aliases WHERE ''a &amp; b''::tsquery @&gt; t');
+ ts_rewrite
+------------
+ 'b' &amp; 'c'</PRE
+><P></P
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="TEXTSEARCH-UPDATE-TRIGGERS"
+>12.4.3. Триггеры для автоматического обновления</A
+></H2
+><P
+>Когда представление документа в формате <TT
+CLASS="TYPE"
+>tsvector</TT
+> хранится в отдельной колонке, необходимо создать триггер, который будет обновлять её содержимое при изменении колонок, из которых составляется исходный документ. Для этого можно использовать две встроенные триггерные функции или написать свои собственные.</P
+><PRE
+CLASS="SYNOPSIS"
+>tsvector_update_trigger(<TT
+CLASS="REPLACEABLE"
+><I
+>колонка_tsvector</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>имя_конфигурации</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>колонка_текста</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, ...</SPAN
+>])
+tsvector_update_trigger_column(<TT
+CLASS="REPLACEABLE"
+><I
+>колонка_tsvector</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>колонка_конфигурации</I
+></TT
+>,
+<TT
+CLASS="REPLACEABLE"
+><I
+>колонка_текста</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, ...</SPAN
+>])</PRE
+><P
+>Эти триггерные функции автоматически вычисляют значение для колонки <TT
+CLASS="TYPE"
+>tsvector</TT
+> из одной или нескольких текстовых колонок с параметрами, указанными в команде <TT
+CLASS="COMMAND"
+>CREATE TRIGGER</TT
+>. Пример их использования: </P><PRE
+CLASS="SCREEN"
+>CREATE TABLE messages (
+    title       text,
+    body        text,
+    tsv         tsvector
+);
+
+CREATE TRIGGER tsvectorupdate BEFORE INSERT OR UPDATE
+ON messages FOR EACH ROW EXECUTE PROCEDURE
+tsvector_update_trigger(tsv, 'pg_catalog.english', title, body);
+
+INSERT INTO messages VALUES('title here', 'the body text is here');
+
+SELECT * FROM messages;
+   title    |         body          |            tsv             
+------------+-----------------------+----------------------------
+ title here | the body text is here | 'bodi':4 'text':5 'titl':1
+
+SELECT title, body FROM messages WHERE tsv @@ to_tsquery('title &amp; body');
+   title    |         body          
+------------+-----------------------
+ title here | the body text is here</PRE
+><P> С таким триггером любое изменение в полях <TT
+CLASS="STRUCTFIELD"
+>title</TT
+> или <TT
+CLASS="STRUCTFIELD"
+>body</TT
+> будет автоматически отражаться в содержимом <TT
+CLASS="STRUCTFIELD"
+>tsv</TT
+>, так что приложению не придётся заниматься этим.</P
+><P
+>Первым аргументом этих функций должно быть имя колонки <TT
+CLASS="TYPE"
+>tsvector</TT
+>, содержимое которой будет обновляться. Ещё один аргумент &mdash; конфигурация текстового поиска, которая будет использоваться для преобразования. Для <CODE
+CLASS="FUNCTION"
+>tsvector_update_trigger</CODE
+> имя конфигурации передаётся просто как второй аргумент триггера. Это имя должно быть определено полностью, чтобы поведение триггера не менялось при изменениях в пути поиска (<TT
+CLASS="VARNAME"
+>search_path</TT
+>). Для <CODE
+CLASS="FUNCTION"
+>tsvector_update_trigger_column</CODE
+> во втором аргументе триггера передаётся имя другой колонки таблицы, которая должна иметь тип <TT
+CLASS="TYPE"
+>regconfig</TT
+>. Это позволяет использовать разные конфигурации для разных строк. В оставшихся аргументах передаются имена текстовых колонок (типа <TT
+CLASS="TYPE"
+>text</TT
+>, <TT
+CLASS="TYPE"
+>varchar</TT
+>, или <TT
+CLASS="TYPE"
+>char</TT
+>). Их содержимое будет включено в документ в заданном порядке. При этом значения NULL будут пропущены (а другие колонки будут индексироваться).</P
+><P
+>Ограничение этих встроенных триггеров заключается в том, что они обрабатывают все колонки одинаково. Чтобы колонки обрабатывались по-разному, например для текста заголовка задавался не тот же вес, что для тела документа, потребуется разработать свой триггер. К примеру, так это можно сделать на языке <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION messages_trigger() RETURNS trigger AS $$
+begin
+  new.tsv :=
+     setweight(to_tsvector('pg_catalog.english', coalesce(new.title,'')),
+       'A') ||
+     setweight(to_tsvector('pg_catalog.english', coalesce(new.body,'')),
+       'D');
+  return new;
+end
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER tsvectorupdate BEFORE INSERT OR UPDATE
+    ON messages FOR EACH ROW EXECUTE PROCEDURE messages_trigger();</PRE
+><P></P
+><P
+>Помните, что, создавая значения <TT
+CLASS="TYPE"
+>tsvector</TT
+> в триггерах, важно явно указывать имя конфигурации, чтобы содержимое колонки не зависело от изменений <TT
+CLASS="VARNAME"
+>default_text_search_config</TT
+>. В противном случае могут возникнуть проблемы, например результаты поиска изменятся после выгрузки и восстановления данных.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="TEXTSEARCH-STATISTICS"
+>12.4.4. Сбор статистики по документу</A
+></H2
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>ts_stat</CODE
+> может быть полезна для проверки конфигурации и нахождения возможных стоп-слов.</P
+><PRE
+CLASS="SYNOPSIS"
+>ts_stat(<TT
+CLASS="REPLACEABLE"
+><I
+>sql_запрос</I
+></TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>, [<SPAN
+CLASS="OPTIONAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>веса</I
+></TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>,</SPAN
+>]
+        OUT <TT
+CLASS="REPLACEABLE"
+><I
+>слово</I
+></TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>, OUT <TT
+CLASS="REPLACEABLE"
+><I
+>число_док</I
+></TT
+> <TT
+CLASS="TYPE"
+>integer</TT
+>,
+        OUT <TT
+CLASS="REPLACEABLE"
+><I
+>число_вхожд</I
+></TT
+> <TT
+CLASS="TYPE"
+>integer</TT
+>) returns <TT
+CLASS="TYPE"
+>setof record</TT
+></PRE
+><P
+>Здесь <TT
+CLASS="REPLACEABLE"
+><I
+>sql_запрос</I
+></TT
+> &mdash; текстовая строка, содержащая SQL-запрос, который должен возвращать одну колонку <TT
+CLASS="TYPE"
+>tsvector</TT
+>. Функция <CODE
+CLASS="FUNCTION"
+>ts_stat</CODE
+> выполняет запрос и возвращает статистику по каждой отдельной лексеме (слову), содержащейся в данных <TT
+CLASS="TYPE"
+>tsvector</TT
+>. Её результат представляется в колонках <P
+></P
+></P><UL
+COMPACT="COMPACT"
+><LI
+STYLE="list-style-type: disc"
+><P
+><TT
+CLASS="REPLACEABLE"
+><I
+>слово</I
+></TT
+> <TT
+CLASS="TYPE"
+>text</TT
+> &mdash; значение лексемы</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+><TT
+CLASS="REPLACEABLE"
+><I
+>число_док</I
+></TT
+> <TT
+CLASS="TYPE"
+>integer</TT
+> &mdash; число документов (значений <TT
+CLASS="TYPE"
+>tsvector</TT
+>), в которых встретилось слово</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+><TT
+CLASS="REPLACEABLE"
+><I
+>число_вхожд</I
+></TT
+> <TT
+CLASS="TYPE"
+>integer</TT
+> &mdash; общее число вхождений слова</P
+></LI
+></UL
+><P> Если передаётся параметр <TT
+CLASS="REPLACEABLE"
+><I
+>weights</I
+></TT
+>, то подсчитываются только вхождения с указанными в нём весами.</P
+><P
+>Например, найти десять наиболее часто используемых слов в коллекции документов можно так: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT * FROM ts_stat('SELECT vector FROM apod')
+ORDER BY nentry DESC, ndoc DESC, word
+LIMIT 10;</PRE
+><P> Следующий запрос возвращает тоже десять слов, но при выборе их учитываются только вхождения с весами <TT
+CLASS="LITERAL"
+>A</TT
+> или <TT
+CLASS="LITERAL"
+>B</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT * FROM ts_stat('SELECT vector FROM apod', 'ab')
+ORDER BY nentry DESC, ndoc DESC, word
+LIMIT 10;</PRE
+><P></P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="textsearch-controls.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="textsearch-parsers.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Управление текстовым поиском</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="textsearch.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Анализаторы</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

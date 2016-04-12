@@ -1,0 +1,658 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Обращение к базе данных</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="PL/Python — процедурный язык Python"
+HREF="plpython.html"><LINK
+REL="PREVIOUS"
+TITLE="Триггерные функции"
+HREF="plpython-trigger.html"><LINK
+REL="NEXT"
+TITLE="Неявные подтранзакции"
+HREF="plpython-subtransaction.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Триггерные функции"
+HREF="plpython-trigger.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="plpython.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 43. PL/Python — процедурный язык Python</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Неявные подтранзакции"
+HREF="plpython-subtransaction.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="PLPYTHON-DATABASE"
+>43.7. Обращение к базе данных</A
+></H1
+><P
+>Исполнитель языка PL/Python автоматически импортирует модуль Python с именем <TT
+CLASS="LITERAL"
+>plpy</TT
+>. Вы в своём коде можете использовать функции и константы, объявленные в этом модуле, обращаясь к ним по именам вида <TT
+CLASS="LITERAL"
+>plpy.<TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></TT
+>.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN63536"
+>43.7.1. Функции обращения к базе данных</A
+></H2
+><P
+>Модуль <TT
+CLASS="LITERAL"
+>plpy</TT
+> содержит различные функции для выполнения команд в базе данных:</P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>plpy.<CODE
+CLASS="FUNCTION"
+>execute</CODE
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>запрос</I
+></TT
+> [, <TT
+CLASS="REPLACEABLE"
+><I
+>макс-строк</I
+></TT
+>])</TT
+></DT
+><DD
+><P
+>При вызове <CODE
+CLASS="FUNCTION"
+>plpy.execute</CODE
+> со строкой запроса и необязательным аргументом, ограничивающим число строк, выполняется заданный запрос, а то, что он выдаёт, возвращается в виде объекта результата.</P
+><P
+>Объект результата имитирует список или словарь. Получить из него данные можно по номеру строки и имени колонки. Например, команда: </P><PRE
+CLASS="PROGRAMLISTING"
+>rv = plpy.execute("SELECT * FROM my_table", 5)</PRE
+><P> вернёт не более 5 строк из отношения <TT
+CLASS="LITERAL"
+>my_table</TT
+>. Если в <TT
+CLASS="LITERAL"
+>my_table</TT
+> есть колонка <TT
+CLASS="LITERAL"
+>my_column</TT
+>, к ней можно обратиться так: </P><PRE
+CLASS="PROGRAMLISTING"
+>foo = rv[i]["my_column"]</PRE
+><P> Число возвращённых в этом объекте строк можно получить, воспользовавшись встроенной функцией <CODE
+CLASS="FUNCTION"
+>len</CODE
+>.</P
+><P
+>Для объекта результата определены следующие дополнительные методы: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>nrows</CODE
+>()</TT
+></DT
+><DD
+><P
+>Возвращает число строк, обработанных командой. Заметьте, что это число не обязательно будет равно числу возвращённых строк. Например, команда <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> устанавливает это значение, но не возвращает строк (без указания <TT
+CLASS="LITERAL"
+>RETURNING</TT
+>).</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>status</CODE
+>()</TT
+></DT
+><DD
+><P
+>Значение состояния, возвращённое <CODE
+CLASS="FUNCTION"
+>SPI_execute()</CODE
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>colnames</CODE
+>()</TT
+><BR><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>coltypes</CODE
+>()</TT
+><BR><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>coltypmods</CODE
+>()</TT
+></DT
+><DD
+><P
+>Возвращают список имён колонок, список OID типов колонок и список модификаторов типа этих колонок, соответственно.</P
+><P
+>Эти методы вызывают исключение, когда им передаётся объект, полученный от команды, не возвращающей результирующий набор, например, <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> без <TT
+CLASS="LITERAL"
+>RETURNING</TT
+>, либо <TT
+CLASS="COMMAND"
+>DROP TABLE</TT
+>. Но эти методы вполне можно использовать с результатом, содержащим ноль строк.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>__str__</CODE
+>()</TT
+></DT
+><DD
+><P
+>Стандартный метод <TT
+CLASS="LITERAL"
+>__str__</TT
+> определён так, чтобы можно было, например, вывести отладочное сообщение с результатами запроса, вызвав <TT
+CLASS="LITERAL"
+>plpy.debug(rv)</TT
+>.</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>Объект результата может быть изменён.</P
+><P
+>Заметьте, что при вызове <TT
+CLASS="LITERAL"
+>plpy.execute</TT
+> весь набор результатов будет прочитан в память. Эту функцию следует использовать, только если вы знаете, что набор будет относительно небольшим. Если вы хотите исключить риск переполнения памяти при выборке результатов большого объёма, используйте <TT
+CLASS="LITERAL"
+>plpy.cursor</TT
+> вместо <TT
+CLASS="LITERAL"
+>plpy.execute</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>plpy.<CODE
+CLASS="FUNCTION"
+>prepare</CODE
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>запрос</I
+></TT
+> [, <TT
+CLASS="REPLACEABLE"
+><I
+>типы_аргументов</I
+></TT
+>])</TT
+><BR><TT
+CLASS="LITERAL"
+>plpy.<CODE
+CLASS="FUNCTION"
+>execute</CODE
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>план</I
+></TT
+> [, <TT
+CLASS="REPLACEABLE"
+><I
+>аргументы</I
+></TT
+> [, <TT
+CLASS="REPLACEABLE"
+><I
+>макс-строк</I
+></TT
+>]])</TT
+></DT
+><DD
+><P
+>&#13;      Функция <CODE
+CLASS="FUNCTION"
+>plpy.prepare</CODE
+> подготавливает план выполнения для запроса. Она вызывается со строкой запроса и списком типов параметров (если в запросе есть параметры). Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>plan = plpy.prepare("SELECT last_name FROM my_users WHERE first_name = $1", ["text"])</PRE
+><P>
+      Здесь <TT
+CLASS="LITERAL"
+>text</TT
+> представляет переменную, передаваемую в качестве параметра <TT
+CLASS="LITERAL"
+>$1</TT
+>. Второй аргумент необязателен, если запросу не нужно передавать никакие параметры.</P
+><P
+>Чтобы запустить подготовленный оператор на выполнение, используйте вариацию функции <CODE
+CLASS="FUNCTION"
+>plpy.execute</CODE
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>rv = plpy.execute(plan, ["name"], 5)</PRE
+><P> Передайте план в первом аргументе (вместо строки запроса), а список значений, которые будут подставлены в запрос, — во втором. Второй аргумент можно опустить, если запрос не принимает никакие параметры. Третий аргумент, как и раньше, задаёт необязательное ограничение максимального числа строк.</P
+><P
+>Параметры запроса и поля в объекте результата преобразуются между типами данных PostgreSQL и Python как описано в <A
+HREF="plpython-data.html"
+>Разделе 43.3</A
+>. Но есть одно исключение — составные типы в настоящее время не поддерживаются: они не будут приняты в качестве параметров запроса и будут преобразованы в строки, если окажутся в результате запроса. В качестве обходного решения данной проблемы иногда можно переписать запрос так, чтобы результат составного типа выдавался как кортеж, а не как поле результирующего кортежа. Результирующую строку также можно вручную разобрать по частям, но этот подход не рекомендуется, так как он провоцирует проблемы в будущем.</P
+><P
+>Когда вы подготавливаете план, используя модуль PL/Python, он сохраняется автоматически. Что это означает, вы можете узнать в документации SPI (<A
+HREF="spi.html"
+>Глава 44</A
+>). Чтобы эффективно использовать это в нескольких вызовах функции, может потребоваться применить словарь постоянного хранения <TT
+CLASS="LITERAL"
+>SD</TT
+> или <TT
+CLASS="LITERAL"
+>GD</TT
+> (см. <A
+HREF="plpython-sharing.html"
+>Раздел 43.4</A
+>). Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION usesavedplan() RETURNS trigger AS $$
+    if "plan" in SD:
+        plan = SD["plan"]
+    else:
+        plan = plpy.prepare("SELECT 1")
+        SD["plan"] = plan
+    # остальной код функции
+$$ LANGUAGE plpythonu;</PRE
+><P></P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>plpy.<CODE
+CLASS="FUNCTION"
+>cursor</CODE
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>запрос</I
+></TT
+>)</TT
+><BR><TT
+CLASS="LITERAL"
+>plpy.<CODE
+CLASS="FUNCTION"
+>cursor</CODE
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>план</I
+></TT
+> [, <TT
+CLASS="REPLACEABLE"
+><I
+>аргументы</I
+></TT
+>])</TT
+></DT
+><DD
+><P
+>Функция <TT
+CLASS="LITERAL"
+>plpy.cursor</TT
+> принимает те же аргументы, что и <TT
+CLASS="LITERAL"
+>plpy.execute</TT
+> (кроме ограничения строк) и возвращает объект курсора, который позволяет обрабатывать объёмные наборы результатов небольшими порциями. Как и <TT
+CLASS="LITERAL"
+>plpy.execute</TT
+>, этой функции можно передать строку запроса или объекта плана, вместе со списком аргументов.</P
+><P
+>Объект курсора реализует метод <TT
+CLASS="LITERAL"
+>fetch</TT
+>, который принимает целочисленный параметр и возвращает объект результата. При каждом следующем вызове <TT
+CLASS="LITERAL"
+>fetch</TT
+> возвращаемый объект будет содержать следующий набор строк, в количестве, не превышающем значение параметра. Когда строки закончатся, <TT
+CLASS="LITERAL"
+>fetch</TT
+> начнёт возвращать пустой объект результата. Объекты курсора также предоставляют <A
+HREF="http://docs.python.org/library/stdtypes.html#iterator-types"
+TARGET="_top"
+>интерфейс итератора</A
+>, выдающий по строке за один раз, пока не будут выданы все строки. Данные, выбираемые таким образом, возвращаются не как объекты результата, а как словари (одной строке результата соответствует один словарь).</P
+><P
+>Следующий пример демонстрирует обработку содержимого большой таблицы двумя способами: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION count_odd_iterator() RETURNS integer AS $$
+odd = 0
+for row in plpy.cursor("select num from largetable"):
+    if row['num'] % 2:
+         odd += 1
+return odd
+$$ LANGUAGE plpythonu;
+
+CREATE FUNCTION count_odd_fetch(batch_size integer) RETURNS integer AS $$
+odd = 0
+cursor = plpy.cursor("select num from largetable")
+while True:
+    rows = cursor.fetch(batch_size)
+    if not rows:
+        break
+    for row in rows:
+        if row['num'] % 2:
+            odd += 1
+return odd
+$$ LANGUAGE plpythonu;
+
+CREATE FUNCTION count_odd_prepared() RETURNS integer AS $$
+odd = 0
+plan = plpy.prepare("select num from largetable where num % $1 &lt;&gt; 0", ["integer"])
+rows = list(plpy.cursor(plan, [2]))
+
+return len(rows)
+$$ LANGUAGE plpythonu;</PRE
+><P></P
+><P
+>Курсоры ликвидируются автоматически. Но если вы хотите явно освободить все ресурсы, занятые курсором, вызовите метод <TT
+CLASS="LITERAL"
+>close</TT
+>. Продолжать получать данные через курсор, который был закрыт, нельзя.</P
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>Не путайте объекты, создаваемые функцией <TT
+CLASS="LITERAL"
+>plpy.cursor</TT
+>, с курсорами DB-API, определёнными в <A
+HREF="http://www.python.org/dev/peps/pep-0249/"
+TARGET="_top"
+>спецификации API для работы с базами данных в Python</A
+>. Они не имеют ничего общего, кроме имени.</P
+></BLOCKQUOTE
+></DIV
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="PLPYTHON-TRAPPING"
+>43.7.2. Обработка ошибок</A
+></H2
+><P
+>Функции, обращающиеся к базе данных, могут сталкиваться с ошибками, в результате которых они будут прерываться и вызывать исключение. Обе функции <CODE
+CLASS="FUNCTION"
+>plpy.execute</CODE
+> и <CODE
+CLASS="FUNCTION"
+>plpy.prepare</CODE
+> могут вызывать экземпляр подкласса исключения <TT
+CLASS="LITERAL"
+>plpy.SPIError</TT
+>, которое по умолчание прекращает выполнение функции. Эту ошибку можно обработать, как и любое другое исключение в Python, применив конструкцию <TT
+CLASS="LITERAL"
+>try/except</TT
+>. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION try_adding_joe() RETURNS text AS $$
+    try:
+        plpy.execute("INSERT INTO users(username) VALUES ('joe')")
+    except plpy.SPIError:
+        return "something went wrong"
+    else:
+        return "Joe added"
+$$ LANGUAGE plpythonu;</PRE
+><P></P
+><P
+>Фактический класс вызываемого исключения соответствует определённому условию возникновения ошибки. Список всех возможных условий приведён в <A
+HREF="errcodes-appendix.html#ERRCODES-TABLE"
+>Таблице A-1</A
+>. В модуле <TT
+CLASS="LITERAL"
+>plpy.spiexceptions</TT
+> определяются классы исключений для каждого условия <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, с именами, производными от имён условий. Например, имя <TT
+CLASS="LITERAL"
+>division_by_zero</TT
+> становится именем <TT
+CLASS="LITERAL"
+>DivisionByZero</TT
+>, <TT
+CLASS="LITERAL"
+>unique_violation</TT
+> — именем <TT
+CLASS="LITERAL"
+>UniqueViolation</TT
+>, <TT
+CLASS="LITERAL"
+>fdw_error</TT
+> — именем <TT
+CLASS="LITERAL"
+>FdwError</TT
+> и т. д. Все эти классы исключений наследуются от <TT
+CLASS="LITERAL"
+>SPIError</TT
+>. Такое разделение на классы упрощает обработку определённых ошибок, например: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION insert_fraction(numerator int, denominator int) RETURNS text AS $$
+from plpy import spiexceptions
+try:
+    plan = plpy.prepare("INSERT INTO fractions (frac) VALUES ($1 / $2)", ["int", "int"])
+    plpy.execute(plan, [numerator, denominator])
+except spiexceptions.DivisionByZero:
+    return "denominator cannot equal zero"
+except spiexceptions.UniqueViolation:
+    return "already have that fraction"
+except plpy.SPIError, e:
+    return "other error, SQLSTATE %s" % e.sqlstate
+else:
+    return "fraction inserted"
+$$ LANGUAGE plpythonu;</PRE
+><P> Заметьте, что так как все исключения из модуля <TT
+CLASS="LITERAL"
+>plpy.spiexceptions</TT
+> наследуются от исключения <TT
+CLASS="LITERAL"
+>SPIError</TT
+>, команда <TT
+CLASS="LITERAL"
+>except</TT
+>, обрабатывающая это исключение, будет перехватывать все ошибки при обращении к базе данных.</P
+><P
+>В качестве другого варианта обработки различных условий ошибок, вы можете перехватывать исключение <TT
+CLASS="LITERAL"
+>SPIError</TT
+> и определять конкретное условие ошибки внутри блока <TT
+CLASS="LITERAL"
+>except</TT
+> по значению атрибута <TT
+CLASS="LITERAL"
+>sqlstate</TT
+> объекта исключения. Этот атрибут содержит строку с кодом ошибки <SPAN
+CLASS="QUOTE"
+>"SQLSTATE"</SPAN
+>. Конечный результат при таком подходе примерно тот же.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="plpython-trigger.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="plpython-subtransaction.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Триггерные функции</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="plpython.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Неявные подтранзакции</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,451 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Планирование запросов с обёртками сторонних данных</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Написание обёртки сторонних данных"
+HREF="fdwhandler.html"><LINK
+REL="PREVIOUS"
+TITLE="Вспомогательные функции для обёрток сторонних данных"
+HREF="fdw-helpers.html"><LINK
+REL="NEXT"
+TITLE="Генетический оптимизатор запросов"
+HREF="geqo.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Вспомогательные функции для обёрток сторонних данных"
+HREF="fdw-helpers.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="fdwhandler.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 53. Написание обёртки сторонних данных</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Генетический оптимизатор запросов"
+HREF="geqo.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="FDW-PLANNING"
+>53.4. Планирование запросов с обёртками сторонних данных</A
+></H1
+><P
+>Процедуры в FDW, реализующие функции <CODE
+CLASS="FUNCTION"
+>GetForeignRelSize</CODE
+>, <CODE
+CLASS="FUNCTION"
+>GetForeignPaths</CODE
+>, <CODE
+CLASS="FUNCTION"
+>GetForeignPlan</CODE
+> и <CODE
+CLASS="FUNCTION"
+>PlanForeignModify</CODE
+> должны вписываться в работу планировщика <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Здесь даётся несколько замечаний о том, как это должно происходить.</P
+><P
+>Для уменьшения объёма выбираемой из сторонней таблицы информации (и как следствие, сокращения стоимости) может использоваться информация, поступающая в <TT
+CLASS="LITERAL"
+>root</TT
+> и <TT
+CLASS="LITERAL"
+>baserel</TT
+>. Особый интерес представляет поле <TT
+CLASS="LITERAL"
+>baserel-&gt;baserestrictinfo</TT
+>, так как оно содержит ограничивающие условия (предложения <TT
+CLASS="LITERAL"
+>WHERE</TT
+>), по которым можно отфильтровать выбираемые строки. (Сама FDW не обязательно должна применять эти ограничения, так как их может проверить и ядро исполнителя.) Список <TT
+CLASS="LITERAL"
+>baserel-&gt;reltargetlist</TT
+> позволяет определять, какие именно колонки требуется выбрать; но учтите, что в нём перечисляются только те колонки, которые выдаются узлом плана <TT
+CLASS="STRUCTNAME"
+>ForeignScan</TT
+>, но не колонки, которые задействованы в ограничивающих условиях и при этом не выводятся запросом.</P
+><P
+>Когда функциям планирования FDW требуется сохранять свою информацию, они могут использовать различные частные поля. Вообще, все структуры, которые FDW помещает в закрытые поля, должны выделяться функцией palloc, чтобы они автоматически освобождались при завершении планирования.</P
+><P
+>Для хранения информации, относящейся к определённой сторонней таблице, функции планирования FDW могут использовать поле <TT
+CLASS="LITERAL"
+>baserel-&gt;fdw_private</TT
+>, которое может содержать указатель на <TT
+CLASS="TYPE"
+>void</TT
+>. Ядро планировщика никак не касается его, кроме того, что записывает в него NULL при создании узла <TT
+CLASS="LITERAL"
+>baserel</TT
+>. Оно полезно для передачи информации из <CODE
+CLASS="FUNCTION"
+>GetForeignRelSize</CODE
+> в <CODE
+CLASS="FUNCTION"
+>GetForeignPaths</CODE
+> и/или из <CODE
+CLASS="FUNCTION"
+>GetForeignPaths</CODE
+> в <CODE
+CLASS="FUNCTION"
+>GetForeignPlan</CODE
+> и позволяет избежать повторных вычислений.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>GetForeignPaths</CODE
+> может обозначить свойства различных путей доступа, сохранив частную информацию в поле <TT
+CLASS="STRUCTFIELD"
+>fdw_private</TT
+> узлов <TT
+CLASS="STRUCTNAME"
+>ForeignPath</TT
+>. Это поле <TT
+CLASS="STRUCTFIELD"
+>fdw_private</TT
+> объявлено как указатель на список (<TT
+CLASS="TYPE"
+>List</TT
+>), но в принципе может содержать всё, что угодно, так как ядро планировщика его не касается. Однако лучше поместить в него данные, которые сможет представить функция <CODE
+CLASS="FUNCTION"
+>nodeToString</CODE
+>, для применения средств отладки, имеющихся на сервере.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>GetForeignPlan</CODE
+> может изучить поле <TT
+CLASS="STRUCTFIELD"
+>fdw_private</TT
+> выбранного узла <TT
+CLASS="STRUCTNAME"
+>ForeignPath</TT
+> и сформировать списки <TT
+CLASS="STRUCTFIELD"
+>fdw_exprs</TT
+> и <TT
+CLASS="STRUCTFIELD"
+>fdw_private</TT
+>, которые будут помещены в узел <TT
+CLASS="STRUCTNAME"
+>ForeignScan</TT
+>, где они будут находиться во время выполнения запроса. Оба эти списка должны быть представлены в форме, которую способна копировать функция <CODE
+CLASS="FUNCTION"
+>copyObject</CODE
+>. Список <TT
+CLASS="STRUCTFIELD"
+>fdw_private</TT
+> не имеет других ограничений и никаким образом не интерпретируется ядром сервера. Список <TT
+CLASS="STRUCTFIELD"
+>fdw_exprs</TT
+>, если этот указатель не NULL, предположительно содержит деревья выражений, которые должны быть вычислены при выполнении запроса. Затем планировщик обрабатывает эти деревья, чтобы они были полностью готовы к выполнению.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>GetForeignPlan</CODE
+> обычно может скопировать полученный целевой список в узел плана как есть. Передаваемый список <TT
+CLASS="LITERAL"
+>scan_clauses</TT
+> содержит те же предложения, что и <TT
+CLASS="LITERAL"
+>baserel-&gt;baserestrictinfo</TT
+>, но, возможно, в другом порядке для более эффективного выполнения. В простых случаях FDW может просто убрать узлы <TT
+CLASS="STRUCTNAME"
+>RestrictInfo</TT
+> из списка <TT
+CLASS="LITERAL"
+>scan_clauses</TT
+> (используя функцию <CODE
+CLASS="FUNCTION"
+>extract_actual_clauses</CODE
+>) и поместить все предложения в список ограничений узла плана, что будет означать, что эти предложения будут проверяться исполнителем во время выполнения. Более сложные FDW могут самостоятельно проверять некоторые предложения, и в этом случае такие предложения можно удалить из списка ограничений узла, чтобы исполнитель не тратил время на их перепроверку.</P
+><P
+>Например, FDW может распознавать некоторые предложения ограничений вида <TT
+CLASS="REPLACEABLE"
+><I
+>сторонняя_переменная</I
+></TT
+> <TT
+CLASS="LITERAL"
+>=</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>подвыражение</I
+></TT
+>, которые, по её представлению, могут выполняться на удалённом сервере с локально вычисленным значением <TT
+CLASS="REPLACEABLE"
+><I
+>подвыражения</I
+></TT
+>. Собственно выявление такого предложения должно происходить в функции <CODE
+CLASS="FUNCTION"
+>GetForeignPaths</CODE
+>, так как это влияет на оценку стоимости пути. Эта функция может включить в поле <TT
+CLASS="STRUCTFIELD"
+>fdw_private</TT
+> конкретного пути указатель на узел <TT
+CLASS="STRUCTNAME"
+>RestrictInfo</TT
+> этого предложения. Затем <CODE
+CLASS="FUNCTION"
+>GetForeignPlan</CODE
+> удалит это предложение из <TT
+CLASS="LITERAL"
+>scan_clauses</TT
+>, но добавит <TT
+CLASS="REPLACEABLE"
+><I
+>подвыражение</I
+></TT
+> в <TT
+CLASS="STRUCTFIELD"
+>fdw_exprs</TT
+>, чтобы оно было приведено к исполняемой форме. Она также может поместить управляющую информацию в поле <TT
+CLASS="STRUCTFIELD"
+>fdw_private</TT
+> плана узла, которая скажет исполняющим функциям, что делать во время выполнения. Запрос, передаваемый удалённому серверу, будет содержать что-то вроде <TT
+CLASS="LITERAL"
+>WHERE <TT
+CLASS="REPLACEABLE"
+><I
+>сторонняя_переменная</I
+></TT
+> = $1</TT
+>, а значение параметра будет получено во время выполнения в результате вычисления дерева выражения <TT
+CLASS="STRUCTFIELD"
+>fdw_exprs</TT
+>.</P
+><P
+>FDW должна строить минимум один путь, зависящий только от предложений ограничения таблицы. В запросах с соединением она может также построить пути, зависящие от ограничения соединения, например <TT
+CLASS="REPLACEABLE"
+><I
+>сторонняя_переменная</I
+></TT
+> <TT
+CLASS="LITERAL"
+>=</TT
+>
+     <TT
+CLASS="REPLACEABLE"
+><I
+>локальная_переменная</I
+></TT
+>. Такие предложения будут отсутствовать в <TT
+CLASS="LITERAL"
+>baserel-&gt;baserestrictinfo</TT
+>; их нужно искать в списках соединений отношений. Путь, построенный с таким предложением, называется <SPAN
+CLASS="QUOTE"
+>"параметризованным"</SPAN
+>. Другие отношения, задействованные в выбранном предложении соединения, должны связываться c этим путём соответствующим значением <TT
+CLASS="LITERAL"
+>param_info</TT
+>; для получения этого значения используется <CODE
+CLASS="FUNCTION"
+>get_baserel_parampathinfo</CODE
+>. В <CODE
+CLASS="FUNCTION"
+>GetForeignPlan</CODE
+> часть <TT
+CLASS="REPLACEABLE"
+><I
+>локальная_переменная</I
+></TT
+> предложения соединения будет добавлена в <TT
+CLASS="STRUCTFIELD"
+>fdw_exprs</TT
+>, и затем, во время выполнения, это будет работать так же, как и обычное предложение ограничения.</P
+><P
+>При планировании запросов <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> или <TT
+CLASS="COMMAND"
+>DELETE</TT
+> <CODE
+CLASS="FUNCTION"
+>PlanForeignModify</CODE
+> может обратиться к структуре <TT
+CLASS="STRUCTNAME"
+>RelOptInfo</TT
+> сторонней таблицы и воспользоваться информацией <TT
+CLASS="LITERAL"
+>baserel-&gt;fdw_private</TT
+>, записанной ранее функциями планирования сканирования. Однако при запросе <TT
+CLASS="COMMAND"
+>INSERT</TT
+> целевая таблица не сканируется, так что для неё <TT
+CLASS="STRUCTNAME"
+>RelOptInfo</TT
+> не заполняется. На список (<TT
+CLASS="STRUCTNAME"
+>List</TT
+>), возвращаемый функцией <CODE
+CLASS="FUNCTION"
+>PlanForeignModify</CODE
+>, накладываются те же ограничения, что и на список <TT
+CLASS="STRUCTFIELD"
+>fdw_private</TT
+> в узле плана <TT
+CLASS="STRUCTNAME"
+>ForeignScan</TT
+>, то есть он должен содержать только такие структуры, которые способна копировать функция <CODE
+CLASS="FUNCTION"
+>copyObject</CODE
+>.</P
+><P
+>Для действий <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> и <TT
+CLASS="COMMAND"
+>DELETE</TT
+> во внешнем источнике данных, поддерживающем параллельные изменения, рекомендуется в <TT
+CLASS="LITERAL"
+>ForeignScan</TT
+> блокировать строки, выбираемые при этой операции, возможно, выполняя для этого команду вроде <TT
+CLASS="COMMAND"
+>SELECT FOR UPDATE</TT
+>. FDW может также решить заблокировать строки в момент выборки, когда сторонняя таблица фигурирует в <TT
+CLASS="COMMAND"
+>SELECT FOR UPDATE/SHARE</TT
+>; в противном случае указания <TT
+CLASS="LITERAL"
+>FOR UPDATE</TT
+> или <TT
+CLASS="LITERAL"
+>FOR SHARE</TT
+> по сути будет бесполезными применительно к данной сторонней таблице. Это поведение может несколько отличаться от операций с локальными таблицами, для которых установка блокировки строк откладывается, насколько это возможно: удалённые строки могут быть заблокированы, даже если они впоследствии не пройдут через локально установленные ограничения или условия соединений. Однако реализация поведения в точности совпадающего с локальным потребовала бы дополнительного удалённого обращения для каждой строки, и всё равно может быть невозможной, в зависимости от режимов блокировки, поддерживаемых внешним источником данным.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="fdw-helpers.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="geqo.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Вспомогательные функции для обёрток сторонних данных</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="fdwhandler.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Генетический оптимизатор запросов</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

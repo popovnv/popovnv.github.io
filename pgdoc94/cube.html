@@ -1,0 +1,901 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>cube</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Дополнительно поставляемые модули"
+HREF="contrib.html"><LINK
+REL="PREVIOUS"
+TITLE="citext"
+HREF="citext.html"><LINK
+REL="NEXT"
+TITLE="dblink"
+HREF="dblink.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="citext"
+HREF="citext.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Приложение E. Дополнительно поставляемые модули</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="dblink"
+HREF="dblink.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CUBE"
+>E.8. cube</A
+></H1
+><P
+>Этот модуль реализует тип данных <TT
+CLASS="TYPE"
+>cube</TT
+> для представления многомерных кубов.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN119273"
+>E.8.1. Синтаксис</A
+></H2
+><P
+>В <A
+HREF="cube.html#CUBE-REPR-TABLE"
+>Таблице E-1</A
+> показаны внешние представления типа <TT
+CLASS="TYPE"
+>cube</TT
+>. Буквы <TT
+CLASS="REPLACEABLE"
+><I
+>x</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>y</I
+></TT
+> и т. д. обозначают числа с плавающей точкой.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="CUBE-REPR-TABLE"
+></A
+><P
+><B
+>Таблица E-1. Внешние представления кубов</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><TBODY
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>                      <TT
+CLASS="REPLACEABLE"
+><I
+>x</I
+></TT
+>
+                    </TT
+>
+                  </TD
+><TD
+>Одномерная точка (или одномерный интервал нулевой длины)</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>x</I
+></TT
+>)</TT
+>
+                  </TD
+><TD
+>То же, что и выше</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>x1</I
+></TT
+>,<TT
+CLASS="REPLACEABLE"
+><I
+>x2</I
+></TT
+>,...,<TT
+CLASS="REPLACEABLE"
+><I
+>xn</I
+></TT
+></TT
+>
+                  </TD
+><TD
+>Точка в n-мерном пространстве, представленная внутри как куб нулевого объёма</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>x1</I
+></TT
+>,<TT
+CLASS="REPLACEABLE"
+><I
+>x2</I
+></TT
+>,...,<TT
+CLASS="REPLACEABLE"
+><I
+>xn</I
+></TT
+>)</TT
+>
+                  </TD
+><TD
+>То же, что и выше</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>x</I
+></TT
+>),(<TT
+CLASS="REPLACEABLE"
+><I
+>y</I
+></TT
+>)</TT
+>
+                  </TD
+><TD
+>Одномерный интервал, начинающийся в точке <TT
+CLASS="REPLACEABLE"
+><I
+>x</I
+></TT
+> и заканчивающийся в <TT
+CLASS="REPLACEABLE"
+><I
+>y</I
+></TT
+>, либо наоборот; порядок значения не имеет</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>[(<TT
+CLASS="REPLACEABLE"
+><I
+>x</I
+></TT
+>),(<TT
+CLASS="REPLACEABLE"
+><I
+>y</I
+></TT
+>)]</TT
+>
+                  </TD
+><TD
+>То же, что и выше</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>x1</I
+></TT
+>,...,<TT
+CLASS="REPLACEABLE"
+><I
+>xn</I
+></TT
+>),(<TT
+CLASS="REPLACEABLE"
+><I
+>y1</I
+></TT
+>,...,<TT
+CLASS="REPLACEABLE"
+><I
+>yn</I
+></TT
+>)</TT
+>
+                  </TD
+><TD
+>N-мерный куб, представленный парой диагонально противоположных углов</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>[(<TT
+CLASS="REPLACEABLE"
+><I
+>x1</I
+></TT
+>,...,<TT
+CLASS="REPLACEABLE"
+><I
+>xn</I
+></TT
+>),(<TT
+CLASS="REPLACEABLE"
+><I
+>y1</I
+></TT
+>,...,<TT
+CLASS="REPLACEABLE"
+><I
+>yn</I
+></TT
+>)]</TT
+>
+                  </TD
+><TD
+>То же, что и выше</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>В каком порядке вводятся противоположные углы куба, не имеет значения. Функции, принимающие тип <TT
+CLASS="TYPE"
+>cube</TT
+>, автоматически меняют углы местами, чтобы получить единое внутреннее представление <SPAN
+CLASS="QUOTE"
+>"левый нижний &mdash; правый верхний"</SPAN
+>.</P
+><P
+>Пробельные символы игнорируются, так что <TT
+CLASS="LITERAL"
+>[(<TT
+CLASS="REPLACEABLE"
+><I
+>x</I
+></TT
+>),(<TT
+CLASS="REPLACEABLE"
+><I
+>y</I
+></TT
+>)]</TT
+> не отличается от <TT
+CLASS="LITERAL"
+>[ ( <TT
+CLASS="REPLACEABLE"
+><I
+>x</I
+></TT
+> ), ( <TT
+CLASS="REPLACEABLE"
+><I
+>y</I
+></TT
+> ) ]</TT
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN119348"
+>E.8.2. Точность</A
+></H2
+><P
+>Значения хранятся внутри как 64-битные числа с плавающей точкой. Это значит, что числа с более чем 16 значащими цифрами будут усекаться.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN119351"
+>E.8.3. Usage</A
+></H2
+><P
+>Модуль <TT
+CLASS="FILENAME"
+>cube</TT
+> включает класс операторов индекса GiST для значений <TT
+CLASS="TYPE"
+>cube</TT
+>. Операторы, поддерживаемые этим классом операторов, перечислены в <A
+HREF="cube.html#CUBE-GIST-OPERATORS"
+>Таблице E-2</A
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="CUBE-GIST-OPERATORS"
+></A
+><P
+><B
+>Таблица E-2. Операторы GiST для кубов</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+>Оператор</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>a = b</TT
+>
+                  </TD
+><TD
+>Кубы a и b идентичны.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>a &amp;&amp; b</TT
+>
+                  </TD
+><TD
+>Кубы a и b пересекаются.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>a @&gt; b</TT
+>
+                  </TD
+><TD
+>Куб a включает куб b.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>a &lt;@ b</TT
+>
+                  </TD
+><TD
+>Куб a включён в куб b.</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>(До версии PostgreSQL 8.2 операторы включения <TT
+CLASS="LITERAL"
+>@&gt;</TT
+> и <TT
+CLASS="LITERAL"
+>&lt;@</TT
+> обозначались соответственно как <TT
+CLASS="LITERAL"
+>@</TT
+> и <TT
+CLASS="LITERAL"
+>~</TT
+>. Эти имена по-прежнему действуют, но считаются устаревшими и в конце концов будут упразднены. Заметьте, что старые имена произошли из соглашения, которому раньше следовали ключевые геометрические типы данных!)</P
+><P
+>Также поддерживаются стандартные операторы для B-дерева, например: <DIV
+CLASS="INFORMALTABLE"
+><P
+></P
+><A
+NAME="AEN119387"
+></A
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+>Оператор</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>[a, b] &lt; [c, d]</TT
+></TD
+><TD
+>Меньше</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>[a, b] &gt; [c, d]</TT
+></TD
+><TD
+>Больше</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+> Эти операторы не имеют большого смысла ни для какой практической цели, кроме сортировки. Эти операторы сначала сравнивают (a) с (c), и если они равны, сравнивают (b) с (d). Результат сравнения позволяет упорядочить значения образом, подходящим для большинства случаев, что полезно, если вы хотите применять ORDER BY с этим типом.</P
+><P
+>В <A
+HREF="cube.html#CUBE-FUNCTIONS-TABLE"
+>Таблице E-3</A
+> перечислены все доступные функции.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="CUBE-FUNCTIONS-TABLE"
+></A
+><P
+><B
+>Таблица E-3. Функции для работы с кубами</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><TBODY
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>cube(float8) returns cube</TT
+>
+                  </TD
+><TD
+>Создаёт одномерный куб, у которого обе координаты равны. <TT
+CLASS="LITERAL"
+>cube(1) == '(1)'</TT
+></TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>cube(float8, float8) returns cube</TT
+>
+                  </TD
+><TD
+>Создаёт одномерный куб. <TT
+CLASS="LITERAL"
+>cube(1,2) == '(1),(2)'</TT
+></TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>cube(float8[]) returns cube</TT
+>
+                  </TD
+><TD
+>Создаёт куб нулевого объёма по координатам, определяемым массивом. <TT
+CLASS="LITERAL"
+>cube(ARRAY[1,2]) == '(1,2)'</TT
+></TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>cube(float8[], float8[]) returns cube</TT
+>
+                  </TD
+><TD
+>Создаёт куб с координатами правого верхнего и левого нижнего углов, определяемыми двумя массивами, которые должны быть одинаковой длины. <TT
+CLASS="LITERAL"
+>cube('{1,2}'::float[], '{3,4}'::float[]) == '(1,2),(3,4)' </TT
+></TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>cube(cube, float8) returns cube</TT
+>
+                  </TD
+><TD
+>Создаёт новый куб, добавляя размерность к существующему кубу с одинаковым значением для обеих частей новой координаты. Это бывает полезно, когда нужно построить кубы поэтапно из вычисляемых значений. <TT
+CLASS="LITERAL"
+>cube('(1)',2) == '(1,2),(1,2)'</TT
+></TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>cube(cube, float8, float8) returns cube</TT
+>
+                  </TD
+><TD
+>Создаёт новый куб, добавляя размерность к существующему кубу. Это бывает полезно, когда нужно построить кубы поэтапно из вычисляемых значений. <TT
+CLASS="LITERAL"
+>cube('(1,2)',3,4) == '(1,3),(2,4)'</TT
+></TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>cube_dim(cube) returns int</TT
+>
+                  </TD
+><TD
+>Возвращает число размерностей куба</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>cube_ll_coord(cube, int) returns double</TT
+>
+                  </TD
+><TD
+>Возвращает значение n-ной координаты левого нижнего угла куба</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>cube_ur_coord(cube, int) returns double</TT
+>
+                  </TD
+><TD
+>Возвращает значение n-ной координаты правого верхнего угла куба</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>cube_is_point(cube) returns bool</TT
+>
+                  </TD
+><TD
+>Возвращает true, если куб является точкой, то есть если два определяющих его угла совпадают.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>cube_distance(cube, cube) returns double</TT
+>
+                  </TD
+><TD
+>Возвращает расстояние между двумя кубами. Если оба куба являются точками, вычисляется обычная функция расстояния.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>cube_subset(cube, int[]) returns cube</TT
+>
+                  </TD
+><TD
+>Создаёт новый куб из существующего, используя список размерностей из массива. Может применяться для нахождения координат углов в одном измерении, например <TT
+CLASS="LITERAL"
+>cube_subset(cube('(1,3,5),(6,7,8)'), ARRAY[2]) = '(3),(7)'</TT
+>. Также может применяться для удаления измерений или изменения их порядка, например так: <TT
+CLASS="LITERAL"
+>cube_subset(cube('(1,3,5),(6,7,8)'), ARRAY[3,2,1,1]) = '(5, 3, 1, 1),(8, 7, 6, 6)'</TT
+>.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>cube_union(cube, cube) returns cube</TT
+>
+                  </TD
+><TD
+>Создаёт объединение двух кубов</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>cube_inter(cube, cube) returns cube</TT
+>
+                  </TD
+><TD
+>Создаёт пересечение двух кубов</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>cube_enlarge(cube c, double r, int n) returns cube</TT
+>
+                  </TD
+><TD
+>Увеличивает размер куба на заданный радиус как минимум в n измерениях. Если радиус отрицательный, куб, наоборот, уменьшается. Это помогает создавать описанные вокруг точки кубы, полезные для поиска соседних точек. Все определённые измерения изменяются на величину радиуса r. Координаты левого нижнего угла уменьшаются на r, а координаты правого верхнего — увеличиваются. Если координата левого нижнего угла становится больше соответствующей координаты правого верхнего (это возможно, только когда r &lt; 0), обоим координатам присваивается среднее значение. Если n превышает число определённых измерений и куб увеличивается (r &gt;= 0), базой для дополнительных координат считается 0.</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN119476"
+>E.8.4. Поведение по умолчанию</A
+></H2
+><P
+>Я полагаю, что это объединение:</P
+><PRE
+CLASS="PROGRAMLISTING"
+>select cube_union('(0,5,2),(2,3,1)', '0');
+cube_union
+-------------------
+(0, 0, 0),(2, 5, 2)
+(1 row)</PRE
+><P
+>не противоречит здравому смыслу, как и это пересечение</P
+><PRE
+CLASS="PROGRAMLISTING"
+>select cube_inter('(0,-1),(1,1)', '(-2),(2)');
+cube_inter
+-------------
+(0, 0),(1, 0)
+(1 row)</PRE
+><P
+>Во всех бинарных операциях с кубами разных размерностей, я полагаю, что куб с меньшей размерностью является декартовой проекцией; то есть в опущенных в строковом представлении координатах предполагаются нули. Таким образом, показанные выше вызовы равнозначны следующим:</P
+><PRE
+CLASS="PROGRAMLISTING"
+>cube_union('(0,5,2),(2,3,1)','(0,0,0),(0,0,0)');
+cube_inter('(0,-1),(1,1)','(-2,0),(2,0)');</PRE
+><P
+>В следующем предикате включения применяется синтаксис точек, хотя фактически второй аргумент представляется внутри кубом. Этот синтаксис избавляет от необходимости определять отдельный тип точек и функции для предикатов (cube,point).</P
+><PRE
+CLASS="PROGRAMLISTING"
+>select cube_contains('(0,0),(1,1)', '0.5,0.5');
+cube_contains
+--------------
+t
+(1 row)</PRE
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN119486"
+>E.8.5. Замечания</A
+></H2
+><P
+>Примеры использования можно увидеть в регрессионном тесте <TT
+CLASS="FILENAME"
+>sql/cube.sql</TT
+>.</P
+><P
+>Во избежание некорректного применения этого типа, число размерностей кубов искусственно ограничено значением 100. Если это ограничение вас не устраивает, его можно изменить в <TT
+CLASS="FILENAME"
+>cubedata.h</TT
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN119492"
+>E.8.6. Благодарности</A
+></H2
+><P
+>Первый автор: Джин Селков мл. <CODE
+CLASS="EMAIL"
+>&#60;<A
+HREF="mailto:selkovjr@mcs.anl.gov"
+>selkovjr@mcs.anl.gov</A
+>&#62;</CODE
+>, Аргоннская национальная лаборатория, Отдел математики и компьютерных наук</P
+><P
+>Я очень благодарен в первую очередь профессору Джо Геллерштейну (<A
+HREF="http://db.cs.berkeley.edu/jmh/"
+TARGET="_top"
+>http://db.cs.berkeley.edu/jmh/</A
+>) за пояснение сути GiST (<A
+HREF="http://gist.cs.berkeley.edu/"
+TARGET="_top"
+>http://gist.cs.berkeley.edu/</A
+>) и его бывшему студенту, Энди Донгу (<A
+HREF="http://best.me.berkeley.edu/~adong/"
+TARGET="_top"
+>http://best.me.berkeley.edu/~adong/</A
+>), за его пример, написанный для Illustra, <A
+HREF="http://best.berkeley.edu/~adong/rtree/index.html"
+TARGET="_top"
+>http://best.berkeley.edu/~adong/rtree/index.html</A
+>. Я также признателен всем разработчикам Postgres в настоящем и прошлом за возможность создать свой собственный мир и спокойно жить в нём. Ещё я хотел бы выразить признательность Аргоннской лаборатории и Министерству энергетики США за годы постоянной поддержки моих исследований в области баз данных.</P
+><P
+>Небольшие изменения в этот пакет внёс Бруно Вольф III <CODE
+CLASS="EMAIL"
+>&#60;<A
+HREF="mailto:bruno@wolff.to"
+>bruno@wolff.to</A
+>&#62;</CODE
+> в августе/сентябре 2002 г. В том числе он перешёл от одинарной к двойной точности и добавил несколько новых функций.</P
+><P
+>Дополнительные изменения внёс Джошуа Рейх <CODE
+CLASS="EMAIL"
+>&#60;<A
+HREF="mailto:josh@root.net"
+>josh@root.net</A
+>&#62;</CODE
+> в июле 2006 г. В частности, он добавил <TT
+CLASS="LITERAL"
+>cube(float8[], float8[])</TT
+>, подчистил код и перевёл его на протокол вызовов версии V1 с устаревшего протокола V0.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="citext.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="dblink.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>citext</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>dblink</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

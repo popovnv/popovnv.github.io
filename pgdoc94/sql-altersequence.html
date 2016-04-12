@@ -1,0 +1,730 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>ALTER SEQUENCE</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="ALTER SCHEMA"
+HREF="sql-alterschema.html"><LINK
+REL="NEXT"
+TITLE="ALTER SERVER"
+HREF="sql-alterserver.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="ALTER SCHEMA"
+HREF="sql-alterschema.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="ALTER SERVER"
+HREF="sql-alterserver.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-ALTERSEQUENCE"
+></A
+>ALTER SEQUENCE</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN69127"
+></A
+><H2
+>Название</H2
+>ALTER SEQUENCE&nbsp;--&nbsp;изменить определение генератора последовательности</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN69130"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>ALTER SEQUENCE [ IF EXISTS ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> [ INCREMENT [ BY ] <TT
+CLASS="REPLACEABLE"
+><I
+>шаг</I
+></TT
+> ]
+    [ MINVALUE <TT
+CLASS="REPLACEABLE"
+><I
+>мин_значение</I
+></TT
+> | NO MINVALUE ] [ MAXVALUE <TT
+CLASS="REPLACEABLE"
+><I
+>макс_значение</I
+></TT
+> | NO MAXVALUE ]
+    [ START [ WITH ] <TT
+CLASS="REPLACEABLE"
+><I
+>начало</I
+></TT
+> ]
+    [ RESTART [ [ WITH ] <TT
+CLASS="REPLACEABLE"
+><I
+>перезапуск</I
+></TT
+> ] ]
+    [ CACHE <TT
+CLASS="REPLACEABLE"
+><I
+>кеш</I
+></TT
+> ] [ [ NO ] CYCLE ]
+    [ OWNED BY { <TT
+CLASS="REPLACEABLE"
+><I
+>table_name</I
+></TT
+>.<TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+> | NONE } ]
+ALTER SEQUENCE [ IF EXISTS ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> OWNER TO <TT
+CLASS="REPLACEABLE"
+><I
+>новый_владелец</I
+></TT
+>
+ALTER SEQUENCE [ IF EXISTS ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> RENAME TO <TT
+CLASS="REPLACEABLE"
+><I
+>новое_имя</I
+></TT
+>
+ALTER SEQUENCE [ IF EXISTS ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> SET SCHEMA <TT
+CLASS="REPLACEABLE"
+><I
+>новая_схема</I
+></TT
+></PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN69147"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>ALTER SEQUENCE</TT
+> меняет параметры существующего генератора последовательности. Параметры, не определяемые явно в команде <TT
+CLASS="COMMAND"
+>ALTER SEQUENCE</TT
+>, сохраняют свои предыдущие значения.</P
+><P
+>Выполнить <TT
+CLASS="COMMAND"
+>ALTER SEQUENCE</TT
+> может только владелец соответствующей последовательности. Чтобы сменить схему последовательности, необходимо также иметь право <TT
+CLASS="LITERAL"
+>CREATE</TT
+> в новой схеме. Чтобы сменить владельца, необходимо быть непосредственным или опосредованным членом новой роли-владельца, а эта роль должна иметь право <TT
+CLASS="LITERAL"
+>CREATE</TT
+> в схеме последовательности. (С такими ограничениями при смене владельца не происходит ничего такого, что нельзя было бы сделать, имея право удалить и вновь создать последовательность. Однако суперпользователь может сменить владельца последовательности в любом случае.)</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN69156"
+></A
+><H2
+>Параметры</H2
+><P
+>    <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></DT
+><DD
+><P
+>Имя (возможно, дополненное схемой) последовательности, подлежащей изменению.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>IF EXISTS</TT
+></DT
+><DD
+><P
+>Не считать ошибкой, если последовательность не существует. В этом случае будет выдано замечание.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>шаг</I
+></TT
+></DT
+><DD
+><P
+>Предложение <TT
+CLASS="LITERAL"
+>INCREMENT BY <TT
+CLASS="REPLACEABLE"
+><I
+>шаг</I
+></TT
+></TT
+> является необязательным. При положительном значении шага генерируется возрастающая последовательность, при отрицательном ­­­— убывающая; если шаг не указан, сохраняется предыдущее значение.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>мин_значение</I
+></TT
+><BR><TT
+CLASS="LITERAL"
+>NO MINVALUE</TT
+></DT
+><DD
+><P
+>Необязательное предложение <TT
+CLASS="LITERAL"
+>MINVALUE <TT
+CLASS="REPLACEABLE"
+><I
+>мин_значение</I
+></TT
+></TT
+> определяет минимальное значение, которое будет генерировать данная последовательность. Если указано <TT
+CLASS="LITERAL"
+>NO MINVALUE</TT
+>, для возрастающей последовательности этим значением будет 1, а для убывающей — -2<SUP
+>63</SUP
+>-1. В отсутствие этих указаний будет сохранено текущее минимальное значение.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>макс_значение</I
+></TT
+><BR><TT
+CLASS="LITERAL"
+>NO MAXVALUE</TT
+></DT
+><DD
+><P
+>Необязательное предложение <TT
+CLASS="LITERAL"
+>MAXVALUE <TT
+CLASS="REPLACEABLE"
+><I
+>макс_значение</I
+></TT
+></TT
+> определяет максимальное значение, которое будет генерировать данная последовательность. Если указано <TT
+CLASS="LITERAL"
+>NO MAXVALUE</TT
+>, для возрастающей последовательности этим значением будет 2<SUP
+>63</SUP
+>-1, а для убывающей — -1. В отсутствие этих указаний будет сохранено текущее максимальное значение.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>начало</I
+></TT
+></DT
+><DD
+><P
+>Необязательное предложение <TT
+CLASS="LITERAL"
+>START WITH <TT
+CLASS="REPLACEABLE"
+><I
+>начало</I
+></TT
+></TT
+> меняет записанное начальное значение последовательности. При этом <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>текущее</I
+></SPAN
+> значение последовательности не меняется, а только устанавливается значение, которое будет применено будущими командами <TT
+CLASS="COMMAND"
+>ALTER SEQUENCE RESTART</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>перезапуск</I
+></TT
+></DT
+><DD
+><P
+>Необязательное предложение <TT
+CLASS="LITERAL"
+>RESTART [ WITH <TT
+CLASS="REPLACEABLE"
+><I
+>перезапуск</I
+></TT
+> ]</TT
+> меняет текущее значение последовательности. Оно равнозначно вызову функции <CODE
+CLASS="FUNCTION"
+>setval</CODE
+> с параметром <TT
+CLASS="LITERAL"
+>is_called</TT
+> = <TT
+CLASS="LITERAL"
+>false</TT
+>: указанное значение перезапуска будет возвращено при <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>следующем</I
+></SPAN
+> вызове функции <CODE
+CLASS="FUNCTION"
+>nextval</CODE
+>. Отсутствие в <TT
+CLASS="LITERAL"
+>RESTART</TT
+> значения <TT
+CLASS="REPLACEABLE"
+><I
+>перезапуск</I
+></TT
+> равносильно передаче стартового значения, записанного командой <TT
+CLASS="COMMAND"
+>CREATE SEQUENCE</TT
+> или последнего установленного командой <TT
+CLASS="COMMAND"
+>ALTER SEQUENCE START WITH</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>кеш</I
+></TT
+></DT
+><DD
+><P
+>Предложение <TT
+CLASS="LITERAL"
+>CACHE <TT
+CLASS="REPLACEABLE"
+><I
+>кеш</I
+></TT
+></TT
+> разрешает предварительно выделять и сохранять в памяти числа последовательности для ускорения доступа к ним. Минимальное значение равно 1 (т. е. за один раз генерируется только одно значение, кеширования нет). Если это предложение отсутствует, сохраняется старое значение размера кеша.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>CYCLE</TT
+></DT
+><DD
+><P
+>Необязательное ключевое слово <TT
+CLASS="LITERAL"
+>CYCLE</TT
+> позволяет зациклить последовательность при достижении <TT
+CLASS="REPLACEABLE"
+><I
+>макс_значения</I
+></TT
+> или <TT
+CLASS="REPLACEABLE"
+><I
+>мин_значения</I
+></TT
+> для возрастающей и убывающей последовательности, соответственно. Когда этот предел достигается, следующим числом этих последовательностей будет соответственно <TT
+CLASS="REPLACEABLE"
+><I
+>мин_значение</I
+></TT
+> или <TT
+CLASS="REPLACEABLE"
+><I
+>макс_значение</I
+></TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>NO CYCLE</TT
+></DT
+><DD
+><P
+>Если добавляется необязательное указание <TT
+CLASS="LITERAL"
+>NO CYCLE</TT
+>, при каждом вызове <CODE
+CLASS="FUNCTION"
+>nextval</CODE
+> после достижения предельного значения будет возникать ошибка. Если же указания <TT
+CLASS="LITERAL"
+>CYCLE</TT
+> и <TT
+CLASS="LITERAL"
+>NO CYCLE</TT
+> отсутствуют, сохраняется предыдущее поведение зацикливания.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>OWNED BY</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>имя_таблицы</I
+></TT
+>.<TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+><BR><TT
+CLASS="LITERAL"
+>OWNED BY NONE</TT
+></DT
+><DD
+><P
+>Указание <TT
+CLASS="LITERAL"
+>OWNED BY</TT
+> связывает последовательность с определённой колонкой таблицы, с тем чтобы при удалении этой колонки (или всей таблицы) автоматически удалилась и последовательность. Это указание заменяет любую ранее установленную связь данной последовательности. Целевая таблица должна иметь того же владельца и находиться в той же схеме, что и последовательность. Указание <TT
+CLASS="LITERAL"
+>OWNED BY NONE</TT
+> убирает все существующие связи, обозначая последовательность <SPAN
+CLASS="QUOTE"
+>"независимой"</SPAN
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>новый_владелец</I
+></TT
+></DT
+><DD
+><P
+>Имя пользователя, назначаемого новым владельцем последовательности.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>новое_имя</I
+></TT
+></DT
+><DD
+><P
+>Новое имя последовательности.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>новая_схема</I
+></TT
+></DT
+><DD
+><P
+>Новая схема последовательности.</P
+></DD
+></DL
+></DIV
+><P>
+   </P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN69277"
+></A
+><H2
+>Замечания</H2
+><P
+>Во избежание блокировки параллельных транзакций, получающих числа из одной последовательности, воздействие <TT
+CLASS="COMMAND"
+>ALTER SEQUENCE</TT
+> на параметры генерирования последовательности никогда не отменяется, эти изменения необратимы и вступают в силу немедленно. Однако предложения <TT
+CLASS="LITERAL"
+>OWNED BY</TT
+>, <TT
+CLASS="LITERAL"
+>OWNER TO</TT
+>, <TT
+CLASS="LITERAL"
+>RENAME TO</TT
+> и <TT
+CLASS="LITERAL"
+>SET SCHEMA</TT
+> приводят к обычным изменениям каталога и могут быть отменены как часть транзакции.</P
+><P
+><TT
+CLASS="COMMAND"
+>ALTER SEQUENCE</TT
+> не оказывает немедленного влияния на результаты <CODE
+CLASS="FUNCTION"
+>nextval</CODE
+> в серверных процессах, кроме текущего, которые могли предварительно сгенерировать (кешировать) значения последовательности. Эти процессы заметят изменения только после того, как будут израсходованы все кешированные значения. Текущий серверный процесс реагирует на изменения сразу.</P
+><P
+><TT
+CLASS="COMMAND"
+>ALTER SEQUENCE</TT
+> не влияет на значение <CODE
+CLASS="FUNCTION"
+>currval</CODE
+> последовательности. (В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> до версии 8.3 это могло происходить.)</P
+><P
+>По историческим причинам <TT
+CLASS="COMMAND"
+>ALTER TABLE</TT
+> тоже может работать с последовательностями, но все разновидности <TT
+CLASS="COMMAND"
+>ALTER TABLE</TT
+>, допустимые для управления последовательностями, равнозначны вышеперечисленным формам.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN69295"
+></A
+><H2
+>Примеры</H2
+><P
+>Перезапуск последовательности <TT
+CLASS="LITERAL"
+>serial</TT
+> с числа 105: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER SEQUENCE serial RESTART WITH 105;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN69300"
+></A
+><H2
+>Совместимость</H2
+><P
+>Оператор <TT
+CLASS="COMMAND"
+>ALTER SEQUENCE</TT
+> соответствует стандарту <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>, за исключением предложений <TT
+CLASS="LITERAL"
+>START WITH</TT
+>, <TT
+CLASS="LITERAL"
+>OWNED BY</TT
+>, <TT
+CLASS="LITERAL"
+>OWNER TO</TT
+>, <TT
+CLASS="LITERAL"
+>RENAME TO</TT
+> и <TT
+CLASS="LITERAL"
+>SET SCHEMA</TT
+>, являющихся расширениями <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN69311"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-createsequence.html"
+>CREATE SEQUENCE</A
+>, <A
+HREF="sql-dropsequence.html"
+>DROP SEQUENCE</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-alterschema.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-alterserver.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>ALTER SCHEMA</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>ALTER SERVER</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

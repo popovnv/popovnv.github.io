@@ -1,0 +1,471 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>CREATE SCHEMA</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="CREATE RULE"
+HREF="sql-createrule.html"><LINK
+REL="NEXT"
+TITLE="CREATE SEQUENCE"
+HREF="sql-createsequence.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="CREATE RULE"
+HREF="sql-createrule.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="CREATE SEQUENCE"
+HREF="sql-createsequence.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-CREATESCHEMA"
+></A
+>CREATE SCHEMA</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN75243"
+></A
+><H2
+>Название</H2
+>CREATE SCHEMA&nbsp;--&nbsp;создать схему</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN75246"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>CREATE SCHEMA <TT
+CLASS="REPLACEABLE"
+><I
+>имя_схемы</I
+></TT
+> [ AUTHORIZATION <TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+> ] [ <TT
+CLASS="REPLACEABLE"
+><I
+>элемент_схемы</I
+></TT
+> [ ... ] ]
+CREATE SCHEMA AUTHORIZATION <TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+> [ <TT
+CLASS="REPLACEABLE"
+><I
+>элемент_схемы</I
+></TT
+> [ ... ] ]
+CREATE SCHEMA IF NOT EXISTS <TT
+CLASS="REPLACEABLE"
+><I
+>имя_схемы</I
+></TT
+> [ AUTHORIZATION <TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+> ]
+CREATE SCHEMA IF NOT EXISTS AUTHORIZATION <TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+></PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN75256"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>CREATE SCHEMA</TT
+> создаёт новую схему в текущей базе данных. Имя схемы должно отличаться от имён других существующих схем в текущей базе данных.</P
+><P
+>Схема по сути представляет собой пространство имён: она содержит именованные объекты (таблицы, типы данных, функции и операторы), имена которых могут совпадать с именами других объектов, существующих в других схемах. Для обращения к объекту нужно либо <SPAN
+CLASS="QUOTE"
+>"дополнить"</SPAN
+> его имя именем схемы в виде префикса, либо установить путь поиска, включающий требуемую схему. Команда <TT
+CLASS="LITERAL"
+>CREATE</TT
+>, в которой указывается неполное имя объекта, создаёт объект в текущей схеме (схеме, стоящей первой в пути поиска; узнать её позволяет функция <CODE
+CLASS="FUNCTION"
+>current_schema</CODE
+>).</P
+><P
+>Команда <TT
+CLASS="COMMAND"
+>CREATE SCHEMA</TT
+> может дополнительно включать подкоманды, создающие объекты в новой схеме. Эти подкоманды по сути воспринимаются как отдельные команды, выполняемые после создания схемы, за исключением того, что с предложением <TT
+CLASS="LITERAL"
+>AUTHORIZATION</TT
+> все создаваемые объекты будут принадлежать указанному в нём пользователю.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN75267"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_схемы</I
+></TT
+></DT
+><DD
+><P
+>Имя создаваемой схемы. Если оно опущено, именем схемы будет <TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+>. Это имя не может начинаться с <TT
+CLASS="LITERAL"
+>pg_</TT
+>, так как такие имена зарезервированы для системных схем.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+></DT
+><DD
+><P
+>Имя пользователя (роли), назначаемого владельцем новой схемы. Если опущено, по умолчанию владельцем будет пользователь, выполняющий команды. Чтобы назначить владельцем создаваемой схемы другую роль, необходимо быть непосредственным или опосредованным членом этой роли, либо суперпользователем.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>элемент_схемы</I
+></TT
+></DT
+><DD
+><P
+>Оператор SQL, определяющий объект, создаваемый в новой схеме. В настоящее время <TT
+CLASS="COMMAND"
+>CREATE SCHEMA</TT
+> может содержать только подкоманды <TT
+CLASS="COMMAND"
+>CREATE TABLE</TT
+>, <TT
+CLASS="COMMAND"
+>CREATE VIEW</TT
+>, <TT
+CLASS="COMMAND"
+>CREATE INDEX</TT
+>, <TT
+CLASS="COMMAND"
+>CREATE SEQUENCE</TT
+>, <TT
+CLASS="COMMAND"
+>CREATE TRIGGER</TT
+> и <TT
+CLASS="COMMAND"
+>GRANT</TT
+>. Создать объекты других типов можно отдельными командами после создания схемы.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>IF NOT EXISTS</TT
+></DT
+><DD
+><P
+>Не делать ничего (только выдать замечание), если схема с таким именем уже существует. Когда используется это указание, эта команда не может содержать подкоманды <TT
+CLASS="REPLACEABLE"
+><I
+>элемент_схемы</I
+></TT
+>.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN75300"
+></A
+><H2
+>Замечания</H2
+><P
+>Чтобы создать схему, пользователь должен иметь право <TT
+CLASS="LITERAL"
+>CREATE</TT
+> в текущей базе данных. (Разумеется, на суперпользователей это условие не распространяется.)</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN75304"
+></A
+><H2
+>Примеры</H2
+><P
+>Создание схемы: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE SCHEMA myschema;</PRE
+><P></P
+><P
+>Создание схемы для пользователя <TT
+CLASS="LITERAL"
+>joe</TT
+>; схема так же получит имя <TT
+CLASS="LITERAL"
+>joe</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE SCHEMA AUTHORIZATION joe;</PRE
+><P></P
+><P
+>Создание схемы с именем <TT
+CLASS="LITERAL"
+>test</TT
+>, владельцем которой будет пользователь <TT
+CLASS="LITERAL"
+>joe</TT
+>, если только схема <TT
+CLASS="LITERAL"
+>test</TT
+> ещё не существует. (Является ли владельцем существующей схемы пользователь <TT
+CLASS="LITERAL"
+>joe</TT
+>, значения не имеет.) </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE SCHEMA IF NOT EXISTS test AUTHORIZATION joe;</PRE
+><P></P
+><P
+>Создание схемы, в которой сразу создаются таблица и представление: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE SCHEMA hollywood
+    CREATE TABLE films (title text, release date, awards text[])
+    CREATE VIEW winners AS
+        SELECT title, release FROM films WHERE awards IS NOT NULL;</PRE
+><P> Заметьте, что отдельные подкоманды не завершаются точкой с запятой.</P
+><P
+>Следующие команды приводят к тому же результату другим способом: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE SCHEMA hollywood;
+CREATE TABLE hollywood.films (title text, release date, awards text[]);
+CREATE VIEW hollywood.winners AS
+    SELECT title, release FROM hollywood.films WHERE awards IS NOT NULL;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN75322"
+></A
+><H2
+>Совместимость</H2
+><P
+>Стандарт SQL также допускает в команде <TT
+CLASS="COMMAND"
+>CREATE SCHEMA</TT
+> предложение <TT
+CLASS="LITERAL"
+>DEFAULT CHARACTER SET</TT
+> и дополнительные типы подкоманд, которые <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> в настоящее время не принимает.</P
+><P
+>В стандарте SQL говорится, что подкоманды в <TT
+CLASS="COMMAND"
+>CREATE SCHEMA</TT
+> могут следовать в любом порядке. Однако текущая реализация в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> не воспринимает все возможные варианты ссылок вперёд в подкомандах, поэтому иногда возникает необходимость переупорядочить подкоманды, чтобы исключить такие ссылки.</P
+><P
+>Согласно стандарту SQL, владелец схемы всегда владеет всеми объектами в ней, но <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> допускает размещение в схемах объектов, принадлежащих не владельцу схемы. Такая ситуация возможна, только если владелец схемы даст право <TT
+CLASS="LITERAL"
+>CREATE</TT
+> в этой схеме кому-либо другому, либо объекты в ней будет создавать суперпользователь.</P
+><P
+>Указание <TT
+CLASS="LITERAL"
+>IF NOT EXISTS</TT
+> является расширением <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN75337"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-alterschema.html"
+>ALTER SCHEMA</A
+>, <A
+HREF="sql-dropschema.html"
+>DROP SCHEMA</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-createrule.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-createsequence.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>CREATE RULE</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>CREATE SEQUENCE</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,211 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Как устанавливаются соединения</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Обзор внутреннего устройства PostgreSQL"
+HREF="overview.html"><LINK
+REL="PREVIOUS"
+TITLE="Путь запроса"
+HREF="query-path.html"><LINK
+REL="NEXT"
+TITLE="Этап разбора"
+HREF="parser-stage.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Путь запроса"
+HREF="query-path.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="overview.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 47. Обзор внутреннего устройства PostgreSQL</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Этап разбора"
+HREF="parser-stage.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CONNECT-ESTAB"
+>47.2. Как устанавливаются соединения</A
+></H1
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> реализует простую клиент-серверную модель по схеме <SPAN
+CLASS="QUOTE"
+>"процесс для пользователя"</SPAN
+>. В такой схеме один <I
+CLASS="FIRSTTERM"
+>клиентский процесс</I
+> подключается к одному отдельному <I
+CLASS="FIRSTTERM"
+>серверному процессу</I
+>. Так как мы не знаем заранее, сколько подключений будет, нам нужен <I
+CLASS="FIRSTTERM"
+>главный процесс</I
+>, который будет запускать новый процесс при каждом запросе подключения. Главный процесс называется <TT
+CLASS="LITERAL"
+>postgres</TT
+> и принимает входящие подключения в заданном порту TCP/IP. Получив запрос на подключение, процесс <TT
+CLASS="LITERAL"
+>postgres</TT
+> порождает новый серверный процесс. Серверные задачи взаимодействуют между собой через <I
+CLASS="FIRSTTERM"
+>семафоры</I
+> и <I
+CLASS="FIRSTTERM"
+>разделяемую память</I
+>, чтобы обеспечить целостность данных при одновременном обращении к ним.</P
+><P
+>Клиентским процессом может быть любая программа, которая понимает протокол <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, описанный в <A
+HREF="protocol.html"
+>Главе 49</A
+>. Многие клиенты базируются на библиотеке <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> для языка C, но есть и другие независимые реализации этого протокола, например, драйвер <SPAN
+CLASS="APPLICATION"
+>JDBC</SPAN
+> для Java.</P
+><P
+>Установив подключение, клиентский процесс может передать запрос серверу. Запрос передаётся в обычном текстовом виде, клиент не занимается его анализом. Сервер разбирает запрос, строит <I
+CLASS="FIRSTTERM"
+>план выполнения</I
+>, выполняет его и возвращает полученные строки клиенту, передавая их через установленное подключение.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="query-path.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="parser-stage.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Путь запроса</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="overview.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Этап разбора</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

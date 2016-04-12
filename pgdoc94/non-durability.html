@@ -1,0 +1,232 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Оптимизация, угрожающая стабильности</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Оптимизация производительности"
+HREF="performance-tips.html"><LINK
+REL="PREVIOUS"
+TITLE="Наполнение базы данных"
+HREF="populate.html"><LINK
+REL="NEXT"
+TITLE="Администрирование сервера"
+HREF="admin.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Наполнение базы данных"
+HREF="populate.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="performance-tips.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 14. Оптимизация производительности</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Администрирование сервера"
+HREF="admin.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="NON-DURABILITY"
+>14.5. Оптимизация, угрожающая стабильности</A
+></H1
+><P
+>Стабильность &mdash; это свойство базы данных, гарантирующее, что результат зафиксированных транзакций будет сохранён даже в случае сбоя сервера или отключения питания. Однако обеспечивается стабильность за счёт значительной дополнительной нагрузки. Поэтому, если вы можете отказаться от такой гарантии, <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> можно ускорить ещё больше, применив следующие методы оптимизации. Кроме явно описанных исключений, даже с такими изменениями конфигурации при сбое программного ядра СУБД гарантия стабильности сохраняется; риск потери или разрушения данных возможен только в случае внезапной остановки операционной системы. <P
+></P
+></P><UL
+><LI
+><P
+>Поместите каталог данных кластера БД в файловую систему, размещённую в памяти (т. е. в <ACRONYM
+CLASS="ACRONYM"
+>RAM</ACRONYM
+>-диск). Так вы исключите всю активность ввода/вывода, связанную с базой данных, если только размер базы данных не превышает объём свободной памяти (возможно, с учётом файла подкачки).</P
+></LI
+><LI
+><P
+>Выключите <A
+HREF="runtime-config-wal.html#GUC-FSYNC"
+>fsync</A
+>; сбрасывать данные на диск не нужно.</P
+></LI
+><LI
+><P
+>Выключите <A
+HREF="runtime-config-wal.html#GUC-SYNCHRONOUS-COMMIT"
+>synchronous_commit</A
+>; нет необходимости принудительно записывать <ACRONYM
+CLASS="ACRONYM"
+>WAL</ACRONYM
+> на диск при фиксации каждой транзакции. Но учтите, это может привести к потере транзакций (хотя данные останутся согласованными) в случае сбоя <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>базы данных</I
+></SPAN
+>.</P
+></LI
+><LI
+><P
+>Выключите <A
+HREF="runtime-config-wal.html#GUC-FULL-PAGE-WRITES"
+>full_page_writes</A
+>; защита от частичной записи страниц не нужна.</P
+></LI
+><LI
+><P
+>Увеличьте <A
+HREF="runtime-config-wal.html#GUC-CHECKPOINT-SEGMENTS"
+>checkpoint_segments</A
+> и <A
+HREF="runtime-config-wal.html#GUC-CHECKPOINT-TIMEOUT"
+>checkpoint_timeout</A
+>; это уменьшит частоту контрольных точек, хотя объём <TT
+CLASS="FILENAME"
+>/pg_xlog</TT
+> при этом вырастет.</P
+></LI
+><LI
+><P
+>Создавайте <A
+HREF="sql-createtable.html#SQL-CREATETABLE-UNLOGGED"
+>нежурналируемые таблицы</A
+> для оптимизации записи в <ACRONYM
+CLASS="ACRONYM"
+>WAL</ACRONYM
+> (но учтите, что такие таблицы не защищены от сбоя).</P
+></LI
+></UL
+><P></P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="populate.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="admin.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Наполнение базы данных</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="performance-tips.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Администрирование сервера</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

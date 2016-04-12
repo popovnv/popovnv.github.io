@@ -1,0 +1,644 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>pg_receivexlog</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Клиентские приложения PostgreSQL"
+HREF="reference-client.html"><LINK
+REL="PREVIOUS"
+TITLE="            pg_isready
+          "
+HREF="app-pg-isready.html"><LINK
+REL="NEXT"
+TITLE="            pg_recvlogical
+          "
+HREF="app-pgrecvlogical.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="            pg_isready
+          "
+HREF="app-pg-isready.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="reference-client.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="            pg_recvlogical
+          "
+HREF="app-pgrecvlogical.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="APP-PGRECEIVEXLOG"
+></A
+>pg_receivexlog</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN89143"
+></A
+><H2
+>Название</H2
+>pg_receivexlog&nbsp;--&nbsp;получает журналы транзакций с сервера <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN89147"
+></A
+><H2
+>Синтаксис</H2
+><P
+><TT
+CLASS="COMMAND"
+>pg_receivexlog</TT
+> [              <TT
+CLASS="REPLACEABLE"
+><I
+>параметр</I
+></TT
+>
+            ...]</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN89152"
+></A
+><H2
+>Описание</H2
+><P
+>Утилита <SPAN
+CLASS="APPLICATION"
+>pg_receivexlog</SPAN
+> предназначена для приёма журнала транзакций от работающего кластера <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Журнал транзакций передаётся по протоколу потоковой репликации и записывается в локальный каталог. Затем этот каталог можно использовать в качестве архива для восстановления состояния на момент времени (см. <A
+HREF="continuous-archiving.html"
+>Раздел 24.3</A
+>).</P
+><P
+><SPAN
+CLASS="APPLICATION"
+>pg_receivexlog</SPAN
+> принимает журнал транзакций в реальном времени по мере того, как он генерируется на сервере, и не ждёт завершения сегментов, как это делает <A
+HREF="runtime-config-wal.html#GUC-ARCHIVE-COMMAND"
+>archive_command</A
+>. Поэтому <SPAN
+CLASS="APPLICATION"
+>pg_receivexlog</SPAN
+> можно использовать, не устанавливая <A
+HREF="runtime-config-wal.html#GUC-ARCHIVE-TIMEOUT"
+>archive_timeout</A
+>.</P
+><P
+>Журнал транзакций передаётся через обычное подключение к <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, с использованием протокола репликации. Подключение должен устанавливать суперпользователь или пользователь с правом <TT
+CLASS="LITERAL"
+>REPLICATION</TT
+> (см. <A
+HREF="role-attributes.html"
+>Раздел 20.2</A
+>), а на сервере в <TT
+CLASS="FILENAME"
+>pg_hba.conf</TT
+> должно явно разрешаться подключение для репликации. Кроме того, параметр <A
+HREF="runtime-config-replication.html#GUC-MAX-WAL-SENDERS"
+>max_wal_senders</A
+> на сервере должен быть достаточно большим, чтобы можно было создать ещё один сеанс для передачи потока.</P
+><P
+>Если подключение разорвалось или его c самого начала не удаётся установить с некритической ошибкой, <SPAN
+CLASS="APPLICATION"
+>pg_receivexlog</SPAN
+> будет бесконечно повторять попытки подключения и восстановит передачу, как только сможет. Чтобы отменить это поведение, воспользуйтесь параметром <TT
+CLASS="LITERAL"
+>-n</TT
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN89172"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="OPTION"
+>-D <TT
+CLASS="REPLACEABLE"
+><I
+>каталог</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--directory=<TT
+CLASS="REPLACEABLE"
+><I
+>каталог</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Каталог, в который будут записываться данные.</P
+><P
+>Этот параметр является обязательным.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-n</TT
+><BR><TT
+CLASS="OPTION"
+>--no-loop</TT
+></DT
+><DD
+><P
+>Не повторять цикл при ошибках подключения, а сразу завершать работу, возвращая ошибку.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-s <TT
+CLASS="REPLACEABLE"
+><I
+>interval</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--status-interval=<TT
+CLASS="REPLACEABLE"
+><I
+>interval</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Указывает интервал в секундах между отправкой пакетов статуса, отправляемых на сервер. Это позволяет упростить мониторинг прогресса. Чтобы выключить периодическое обновление статуса, необходимо установить значение в ноль. При этом обновление будет отправляться по запросу сервера для избежания отсоединения по истечению времени. Значение по умолчанию составляет 10 секунд.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-S <TT
+CLASS="REPLACEABLE"
+><I
+>имя_слота</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--slot=<TT
+CLASS="REPLACEABLE"
+><I
+>имя_слота</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Указать <SPAN
+CLASS="APPLICATION"
+>pg_receivexlog</SPAN
+> использовать существующий слот репликации (см. <A
+HREF="warm-standby.html#STREAMING-REPLICATION-SLOTS"
+>Подраздел 25.2.6</A
+>). Когда задан этот параметр, <SPAN
+CLASS="APPLICATION"
+>pg_receivexlog</SPAN
+> будет сообщать серверу текущую позицию, отмечая, какой сегмент был сохранён на диске, чтобы сервер мог удалить этот сегмент, если он больше не нужен. При этом очень важно, чтобы <SPAN
+CLASS="APPLICATION"
+>pg_receivexlog</SPAN
+> не оказался синхронным резервным сервером в результате непродуманной установки параметра <A
+HREF="runtime-config-replication.html#GUC-SYNCHRONOUS-STANDBY-NAMES"
+>synchronous_standby_names</A
+>; он не будет сбрасывать данные достаточно часто, чтобы это работало корректно.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-v</TT
+><BR><TT
+CLASS="OPTION"
+>--verbose</TT
+></DT
+><DD
+><P
+>Включает режим подробных сообщений.</P
+></DD
+></DL
+></DIV
+><P
+>Далее описаны параметры управления подключением. <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="OPTION"
+>-d <TT
+CLASS="REPLACEABLE"
+><I
+>строка подключения</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--dbname=<TT
+CLASS="REPLACEABLE"
+><I
+>строка подключения</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Указывает параметры подключения к серверу в формате строки подключения. См. <A
+HREF="libpq-connect.html#LIBPQ-CONNSTRING"
+>Подраздел 31.1.1</A
+> для более подробной информации.</P
+><P
+>Параметр называется <TT
+CLASS="LITERAL"
+>--dbname</TT
+> для согласованности с другими клиентскими приложениями, но так как <SPAN
+CLASS="APPLICATION"
+>pg_receivexlog</SPAN
+> не подключается к какой-либо конкретной базе, это имя в строке подключения игнорируется.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-h <TT
+CLASS="REPLACEABLE"
+><I
+>host</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--host=<TT
+CLASS="REPLACEABLE"
+><I
+>host</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Указывает имя компьютера, на котором запущен сервер. Если значение начинается с косой черты, оно интерпретируется как имя каталога с доменным сокетом Unix. Значение по умолчанию берётся из переменной окружения <TT
+CLASS="ENVAR"
+>PGHOST</TT
+>, если она установлена. В противном случае выполняется подключение к доменному сокету.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-p <TT
+CLASS="REPLACEABLE"
+><I
+>порт</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--port=<TT
+CLASS="REPLACEABLE"
+><I
+>порт</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Указывает TCP-порт или расширение локального файла Unix-сокета, на котором сервер слушает подключения. По умолчанию берётся значение переменной окружения <TT
+CLASS="ENVAR"
+>PGPORT</TT
+>, если оно установлено, либо значение времени компиляции.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-U <TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--username=<TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Имя пользователя, под которым производится подключение.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-w</TT
+><BR><TT
+CLASS="OPTION"
+>--no-password</TT
+></DT
+><DD
+><P
+>Не выдавать запрос на ввод пароля. Если сервер требует аутентификацию по паролю и пароль не доступен с помощью других средств, таких как файл <TT
+CLASS="FILENAME"
+>.pgpass</TT
+>, попытка соединения не удастся. Этот параметр может быть полезен в пакетных заданиях и скриптах, где нет пользователя, который вводит пароль.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-W</TT
+><BR><TT
+CLASS="OPTION"
+>--password</TT
+></DT
+><DD
+><P
+>Принудительно запрашивать пароль перед подключением к базе данных.</P
+><P
+>Это несущественный параметр, так как <SPAN
+CLASS="APPLICATION"
+>pg_receivexlog</SPAN
+> запрашивает пароль автоматически, если сервер проверяет подлинность по паролю. Однако, чтобы понять это, <SPAN
+CLASS="APPLICATION"
+>pg_receivexlog</SPAN
+> лишний раз подключается к серверу. Поэтому иногда имеет смысл ввести <TT
+CLASS="OPTION"
+>-W</TT
+>, чтобы исключить эту ненужную попытку подключения.</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>Другие флаги: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="OPTION"
+>-V</TT
+><BR><TT
+CLASS="OPTION"
+>--version</TT
+></DT
+><DD
+><P
+>Сообщить версию <SPAN
+CLASS="APPLICATION"
+>pg_receivexlog</SPAN
+> и завершиться.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-?</TT
+><BR><TT
+CLASS="OPTION"
+>--help</TT
+></DT
+><DD
+><P
+>Показать справку по аргументам командной строки <SPAN
+CLASS="APPLICATION"
+>pg_receivexlog</SPAN
+> и завершиться.</P
+></DD
+></DL
+></DIV
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN89303"
+></A
+><H2
+>Переменные окружения</H2
+><P
+>Как и большинство других утилит <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, приложение также использует переменные окружения, поддерживаемые <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> (см. <A
+HREF="libpq-envars.html"
+>Раздел 31.14</A
+>).</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN89309"
+></A
+><H2
+>Замечания</H2
+><P
+>Применяя <SPAN
+CLASS="APPLICATION"
+>pg_receivexlog</SPAN
+> вместо <A
+HREF="runtime-config-wal.html#GUC-ARCHIVE-COMMAND"
+>archive_command</A
+> в качестве основного способа резервного копирования WAL, настоятельно рекомендуется использовать слоты репликации. В противном случае сервер вполне может переписать или удалить файлы журнала транзакций, прежде чем они будут скопированы, так как он не получает никакой информации, через <A
+HREF="runtime-config-wal.html#GUC-ARCHIVE-COMMAND"
+>archive_command</A
+> или слоты репликации, о том, как проходит архивация потока WAL. Учтите, однако, что при использовании слота репликации может заполниться всё место на диске, если принимающая сторона не будет успевать принимать данные WAL.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN89315"
+></A
+><H2
+>Примеры</H2
+><P
+>Следующая команда принимает журнал транзакций с сервера <TT
+CLASS="LITERAL"
+>mydbserver</TT
+> и сохраняет его в локальном каталоге <TT
+CLASS="FILENAME"
+>/usr/local/pgsql/archive</TT
+>: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>pg_receivexlog -h mydbserver -D /usr/local/pgsql/archive</KBD
+></PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN89323"
+></A
+><H2
+>См. также</H2
+><A
+HREF="app-pgbasebackup.html"
+>pg_basebackup</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="app-pg-isready.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="app-pgrecvlogical.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><SPAN
+CLASS="APPLICATION"
+>pg_isready</SPAN
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="reference-client.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><SPAN
+CLASS="APPLICATION"
+>pg_recvlogical</SPAN
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

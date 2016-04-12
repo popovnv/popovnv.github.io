@@ -1,0 +1,504 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Фоновые рабочие процессы</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Серверное программирование"
+HREF="server-programming.html"><LINK
+REL="PREVIOUS"
+TITLE="Примеры"
+HREF="spi-examples.html"><LINK
+REL="NEXT"
+TITLE="Логическое декодирование"
+HREF="logicaldecoding.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="CHAPTER"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Примеры"
+HREF="spi-examples.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="server-programming.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Логическое декодирование"
+HREF="logicaldecoding.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="BGWORKER"
+></A
+>Глава 45. Фоновые рабочие процессы</H1
+><P
+>PostgreSQL поддерживает расширенную возможность запускать пользовательский код в отдельных процессах. Такие процессы запускаются, останавливаются и контролируются главным процессом <TT
+CLASS="COMMAND"
+>postgres</TT
+>, который позволяет тесно связать их жизненный цикл с состоянием сервера. Эти процессы могут получать доступ к области разделяемой памяти <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> и устанавливать внутренние подключения к базам данных; они также могут последовательно запускать транзакции, как и обычные серверные процессы, обслуживающие клиентов. Кроме того, используя <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>, они могут подключаться к серверу и работать как обычные клиентские приложения.</P
+><DIV
+CLASS="WARNING"
+><P
+></P
+><TABLE
+CLASS="WARNING"
+BORDER="1"
+WIDTH="100%"
+><TR
+><TD
+ALIGN="CENTER"
+><B
+>Внимание</B
+></TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+><P
+>С использованием фоновых рабочих процессов сопряжены угрозы стабильности и безопасности, так как они реализуются на языке <TT
+CLASS="LITERAL"
+>C</TT
+>, и значит имеют неограниченный доступ к данным. Администраторы, желающие использовать модули, в которых задействованы фоновые рабочие процессы, должны быть крайне осторожными. Запускать рабочие процессы можно разрешать только модулям, прошедшим всесторонний аудит.</P
+></TD
+></TR
+></TABLE
+></DIV
+><P
+>Рабочие процессы могут инициализироваться во время запуска <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, если имя соответствующего модуля добавлено в <TT
+CLASS="VARNAME"
+>shared_preload_libraries</TT
+>. Модуль, желающий запустить фоновый процесс, может зарегистрировать его, вызвав <CODE
+CLASS="FUNCTION"
+>RegisterBackgroundWorker(<TT
+CLASS="TYPE"
+>BackgroundWorker *worker</TT
+>)</CODE
+> из своей функции <CODE
+CLASS="FUNCTION"
+>_PG_init()</CODE
+>. Рабочие процессы также могут быть запущены после запуска системы с помощью функции <CODE
+CLASS="FUNCTION"
+>RegisterDynamicBackgroundWorker(<TT
+CLASS="TYPE"
+>BackgroundWorker *worker, BackgroundWorkerHandle **handle</TT
+>)</CODE
+>. В отличие от функции <CODE
+CLASS="FUNCTION"
+>RegisterBackgroundWorker</CODE
+>, которую можно вызывать только из управляющего процесса, <CODE
+CLASS="FUNCTION"
+>RegisterDynamicBackgroundWorker</CODE
+> должна вызываться из обычного обслуживающего процесса.</P
+><P
+>Структура <TT
+CLASS="STRUCTNAME"
+>BackgroundWorker</TT
+> определяется так: </P><PRE
+CLASS="PROGRAMLISTING"
+>typedef void (*bgworker_main_type)(Datum main_arg);
+typedef struct BackgroundWorker
+{
+    char        bgw_name[BGW_MAXLEN];
+    int         bgw_flags;
+    BgWorkerStartTime bgw_start_time;
+    int         bgw_restart_time;       /* в секундах, либо BGW_NEVER_RESTART */
+    bgworker_main_type bgw_main;
+    char        bgw_library_name[BGW_MAXLEN];   /* только если bgw_main — NULL */
+    char        bgw_function_name[BGW_MAXLEN];  /* только если bgw_main — NULL */
+    Datum       bgw_main_arg;
+    int         bgw_notify_pid;
+} BackgroundWorker;</PRE
+><P></P
+><P
+>Поле <TT
+CLASS="STRUCTFIELD"
+>bgw_name</TT
+> содержит строку, выводимую в отладочных сообщениях, списках процессов и подобных контекстах.</P
+><P
+>В поле <TT
+CLASS="STRUCTFIELD"
+>bgw_flags</TT
+> задаётся битовая маска, отмечающая возможности, которые нужны этому модулю. Допустимые флаги: <TT
+CLASS="LITERAL"
+>BGWORKER_SHMEM_ACCESS</TT
+> (запрашивается доступ к разделяемой памяти) и <TT
+CLASS="LITERAL"
+>BGWORKER_BACKEND_DATABASE_CONNECTION</TT
+> (запрашивается возможность устанавливать подключение к базе данных, через которое затем можно запускать транзакции и запросы). Рабочий процесс, использующий возможность <TT
+CLASS="LITERAL"
+>BGWORKER_BACKEND_DATABASE_CONNECTION</TT
+> для подключения к базе данных, должен также запросить доступ к разделяемой памяти, установив <TT
+CLASS="LITERAL"
+>BGWORKER_SHMEM_ACCESS</TT
+>; в противном случае процесс не запустится.</P
+><P
+>В <TT
+CLASS="STRUCTFIELD"
+>bgw_start_time</TT
+> определяется состояние сервера, в котором <TT
+CLASS="COMMAND"
+>postgres</TT
+> должен запустить этот процесс; возможные варианты: <TT
+CLASS="LITERAL"
+>BgWorkerStart_PostmasterStart</TT
+> (выполнить запуск сразу после того, как <TT
+CLASS="COMMAND"
+>postgres</TT
+> завершит инициализацию; процессы, выбирающие такой режим, не могут подключаться к базам данных), <TT
+CLASS="LITERAL"
+>BgWorkerStart_ConsistentState</TT
+> (выполнить запуск, когда будет достигнуто согласованное состояние горячего резерва, и когда процессы могут подключаться к базам данных и выполнять запросы на чтение), и <TT
+CLASS="LITERAL"
+>BgWorkerStart_RecoveryFinished</TT
+> (выполнить запуск, как только система перейдёт в обычный режим чтения-записи). Заметьте, что два последних варианта различаются только для серверов горячего резерва. Заметьте также, что этот параметр указывает только, когда должны запускаться процессы; при переходе в другое состояние они не будут останавливаться.</P
+><P
+><TT
+CLASS="STRUCTFIELD"
+>bgw_restart_time</TT
+> задаёт паузу (в секундах), которую должен сделать <TT
+CLASS="COMMAND"
+>postgres</TT
+>, прежде чем перезапускать процесс в случае его отказа. Это может быть любое положительное значение, либо <TT
+CLASS="LITERAL"
+>BGW_NEVER_RESTART</TT
+>, указывающее, что процесс не нужно перезапускать в случае сбоя.</P
+><P
+>В <TT
+CLASS="STRUCTFIELD"
+>bgw_main</TT
+> задаётся указатель на функцию, вызываемую при запуске процесса. Эта функция должна принимать один аргумент типа <TT
+CLASS="TYPE"
+>Datum</TT
+> и возвращать <TT
+CLASS="TYPE"
+>void</TT
+>. В качестве единственного аргумента ей будет передано значение <TT
+CLASS="STRUCTFIELD"
+>bgw_main_arg</TT
+>. Заметьте, что глобальная переменная <TT
+CLASS="LITERAL"
+>MyBgworkerEntry</TT
+> указывает на копию структуры <TT
+CLASS="STRUCTNAME"
+>BackgroundWorker</TT
+>, переданной при регистрации. Поле <TT
+CLASS="STRUCTFIELD"
+>bgw_main</TT
+> может содержать NULL; в этом случае точка входа будет определяться значениями <TT
+CLASS="STRUCTFIELD"
+>bgw_library_name</TT
+> и <TT
+CLASS="STRUCTFIELD"
+>bgw_function_name</TT
+>. Это полезно для рабочих процессов, запускаемых сразу после запуска управляющего процесса, когда он ещё не загрузил необходимую библиотеку.</P
+><P
+><TT
+CLASS="STRUCTFIELD"
+>bgw_library_name</TT
+> определяет имя библиотеки, в которой следует искать точку входа для запуска рабочего процесса. Это значение игнорируется, если <TT
+CLASS="STRUCTFIELD"
+>bgw_main</TT
+> не NULL. Но если <TT
+CLASS="STRUCTFIELD"
+>bgw_main</TT
+> содержит NULL, указанная библиотека будет динамически загружена рабочим процессом, а имя вызываемой функции будет определяться значением <TT
+CLASS="STRUCTFIELD"
+>bgw_function_name</TT
+>.</P
+><P
+><TT
+CLASS="STRUCTFIELD"
+>bgw_function_name</TT
+> определяет имя функции в динамически загружаемой библиотеке, которая будет точкой входа в новый рабочий процесс. Если <TT
+CLASS="STRUCTFIELD"
+>bgw_main</TT
+> не NULL, это значение игнорируется.</P
+><P
+>В <TT
+CLASS="STRUCTFIELD"
+>bgw_notify_pid</TT
+> задаётся PID обслуживающего процесса PostgreSQL, которому главный процесс должен посылать сигнал <TT
+CLASS="LITERAL"
+>SIGUSR1</TT
+> при запуске и завершении нового рабочего процесса. Это поле должно содержать 0 для рабочих процессов, регистрируемых при запуске главного процесса, либо когда обслуживающий процесс не желает ждать окончания запуска рабочего процесса. Во всех остальных случаях в нём должно быть значение <TT
+CLASS="LITERAL"
+>MyProcPid</TT
+>.</P
+><P
+>Запущенный процесс может подключиться к базе данных, вызвав <CODE
+CLASS="FUNCTION"
+>BackgroundWorkerInitializeConnection(<TT
+CLASS="PARAMETER"
+>char *dbname</TT
+>, <TT
+CLASS="PARAMETER"
+>char *username</TT
+>)</CODE
+>. Через это подключение процесс сможет выполнять транзакции и запросы, используя функции <TT
+CLASS="LITERAL"
+>SPI</TT
+>. Если в <TT
+CLASS="VARNAME"
+>dbname</TT
+> передаётся NULL, сеанс не подключается ни к какой конкретной базе данных, но может обращаться к общим каталогам. Если в <TT
+CLASS="VARNAME"
+>username</TT
+> передаётся NULL, этот процесс будет действовать от имени суперпользователя, созданного во время <TT
+CLASS="COMMAND"
+>initdb</TT
+>. BackgroundWorkerInitializeConnection может вызываться рабочим процессом только один раз, так что переключаться между базами данных нельзя.</P
+><P
+>Сигналы изначально блокируются при вызове функции <TT
+CLASS="STRUCTFIELD"
+>bgw_main</TT
+> и при необходимости должны быть разблокированы ей; это позволяет процессу настроить собственные обработчики событий. Новый процесс может разблокировать сигналы, вызвав <CODE
+CLASS="FUNCTION"
+>BackgroundWorkerUnblockSignals</CODE
+>, и заблокировать их, вызвав <CODE
+CLASS="FUNCTION"
+>BackgroundWorkerBlockSignals</CODE
+>.</P
+><P
+>Если <TT
+CLASS="STRUCTFIELD"
+>bgw_restart_time</TT
+> для рабочего процесса имеет значение <TT
+CLASS="LITERAL"
+>BGW_NEVER_RESTART</TT
+>, либо он завершается с кодом выхода 0, либо если его работа заканчивается вызовом <CODE
+CLASS="FUNCTION"
+>TerminateBackgroundWorker</CODE
+>, он автоматически перестаёт контролироваться управляющим процессом при выходе. В противном случае он будет перезапущен через время, заданное в <TT
+CLASS="STRUCTFIELD"
+>bgw_restart_time</TT
+>, либо немедленно, если управляющему серверу пришлось переинициализировать кластер из-за сбоя обслуживающего процесса. Обслуживающие процессы, которым нужно только приостановить своё выполнение на время, должны переходить в состояние прерываемого ожидания, а не завершаться; для этого используется функция <CODE
+CLASS="FUNCTION"
+>WaitLatch()</CODE
+>. При вызове этой функции обязательно установите флаг <TT
+CLASS="LITERAL"
+>WL_POSTMASTER_DEATH</TT
+> и проверьте код возврата, чтобы корректно выйти в экстренном случае, когда был завершён сам <TT
+CLASS="COMMAND"
+>postgres</TT
+>.</P
+><P
+>Когда рабочий процесс регистрируется функцией <CODE
+CLASS="FUNCTION"
+>RegisterDynamicBackgroundWorker</CODE
+>, обслуживающий процесс, производящий эту регистрацию, может получить информацию о состоянии порождённого процесса. Обслуживающие процессы, желающие сделать это, должны передать адрес <TT
+CLASS="TYPE"
+>BackgroundWorkerHandle *</TT
+> во втором аргументе <CODE
+CLASS="FUNCTION"
+>RegisterDynamicBackgroundWorker</CODE
+>. Если рабочий процесс успешно зарегистрирован, по этому адресу будет записан указатель на скрытую структуру, который можно затем передать функции <CODE
+CLASS="FUNCTION"
+>GetBackgroundWorkerPid(<TT
+CLASS="PARAMETER"
+>BackgroundWorkerHandle *</TT
+>, <TT
+CLASS="PARAMETER"
+>pid_t *</TT
+>)</CODE
+> или <CODE
+CLASS="FUNCTION"
+>TerminateBackgroundWorker(<TT
+CLASS="PARAMETER"
+>BackgroundWorkerHandle *</TT
+>)</CODE
+>. Вызывая <CODE
+CLASS="FUNCTION"
+>GetBackgroundWorkerPid</CODE
+>, можно опрашивать состояние рабочего процесса: значение результата <TT
+CLASS="LITERAL"
+>BGWH_NOT_YET_STARTED</TT
+> показывает, что рабочий процесс ещё не запущен управляющим; <TT
+CLASS="LITERAL"
+>BGWH_STOPPED</TT
+> показывает, что он был запущен, но сейчас не работает; и <TT
+CLASS="LITERAL"
+>BGWH_STARTED</TT
+> показывает, что он работает в данный момент. В последнем случае через второй аргумент также возвращается PID этого процесса. Обрабатывая вызов <CODE
+CLASS="FUNCTION"
+>TerminateBackgroundWorker</CODE
+>, управляющий процесс посылает <TT
+CLASS="LITERAL"
+>SIGTERM</TT
+> рабочему процессу, если он работает, и перестаёт его контролировать сразу по его завершении.</P
+><P
+>В некоторых случаях процессу, регистрирующему рабочий процесс, может потребоваться дождаться завершения запуска этого процесса. Это можно реализовать, записав в <TT
+CLASS="STRUCTFIELD"
+>bgw_notify_pid</TT
+> значение <TT
+CLASS="LITERAL"
+>MyProcPid</TT
+>, а затем передав указатель <TT
+CLASS="TYPE"
+>BackgroundWorkerHandle *</TT
+>, полученный во время регистрации, функции <CODE
+CLASS="FUNCTION"
+>WaitForBackgroundWorkerStartup(<TT
+CLASS="PARAMETER"
+>BackgroundWorkerHandle *handle</TT
+>, <TT
+CLASS="PARAMETER"
+>pid_t *</TT
+>)</CODE
+>. Эта функция заблокирует выполнение, пока управляющий процесс не попытается запустить рабочий процесс, либо пока сам управляющий процесс не завершится. Если рабочий процесс запущен, возвращается значение <TT
+CLASS="LITERAL"
+>BGWH_STARTED</TT
+>, и по переданному адресу записывается его PID. В противном случае возвращается значение <TT
+CLASS="LITERAL"
+>BGWH_STOPPED</TT
+> или <TT
+CLASS="LITERAL"
+>BGWH_POSTMASTER_DIED</TT
+>.</P
+><P
+>Рабочий пример, демонстрирующий некоторые полезные приёмы, можно найти в модуле <TT
+CLASS="FILENAME"
+>worker_spi</TT
+> в каталоге contrib.</P
+><P
+>Максимальное число рабочих процессов, которые можно зарегистрировать, ограничивается значением <A
+HREF="runtime-config-resource.html#GUC-MAX-WORKER-PROCESSES"
+>max_worker_processes</A
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="spi-examples.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="logicaldecoding.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Примеры</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="server-programming.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Логическое декодирование</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

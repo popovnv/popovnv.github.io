@@ -1,0 +1,275 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>SPI_returntuple</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Управление памятью"
+HREF="spi-memory.html"><LINK
+REL="PREVIOUS"
+TITLE="SPI_copytuple"
+HREF="spi-spi-copytuple.html"><LINK
+REL="NEXT"
+TITLE="SPI_modifytuple"
+HREF="spi-spi-modifytuple.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="SPI_copytuple"
+HREF="spi-spi-copytuple.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="spi-memory.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="SPI_modifytuple"
+HREF="spi-spi-modifytuple.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SPI-SPI-RETURNTUPLE"
+></A
+>SPI_returntuple</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN65972"
+></A
+><H2
+>Название</H2
+>SPI_returntuple&nbsp;--&nbsp;подготовить строку для возврата в виде Datum</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN65975"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>HeapTupleHeader SPI_returntuple(HeapTuple <TT
+CLASS="PARAMETER"
+>row</TT
+>, TupleDesc <TT
+CLASS="PARAMETER"
+>rowdesc</TT
+>)</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN65979"
+></A
+><H2
+>Описание</H2
+><P
+><CODE
+CLASS="FUNCTION"
+>SPI_returntuple</CODE
+> делает копию строки в верхнем контексте исполнителя и возвращает её в форме типа <TT
+CLASS="TYPE"
+>Datum</TT
+>. Чтобы выдать результат, полученный указатель остаётся только преобразовать в <TT
+CLASS="TYPE"
+>Datum</TT
+> функцией <CODE
+CLASS="FUNCTION"
+>PointerGetDatum</CODE
+>.</P
+><P
+>Заметьте, что эту операцию следует применять в функциях, объявленных как возвращающие составные типы. В триггерах она не применяется; чтобы вернуть изменённую строку из триггера, используйте <CODE
+CLASS="FUNCTION"
+>SPI_copytuple</CODE
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN65988"
+></A
+><H2
+>Аргументы</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>HeapTuple <TT
+CLASS="PARAMETER"
+>row</TT
+></TT
+></DT
+><DD
+><P
+>строка, подлежащая копированию</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>TupleDesc <TT
+CLASS="PARAMETER"
+>rowdesc</TT
+></TT
+></DT
+><DD
+><P
+>дескриптор строки (передавайте каждый раз один дескриптор для более эффективного кеширования)</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN66003"
+></A
+><H2
+>Возвращаемое значение</H2
+><P
+><TT
+CLASS="TYPE"
+>HeapTupleHeader</TT
+>, указывающий на скопированную строку; <TT
+CLASS="SYMBOL"
+>NULL</TT
+>, только если параметр <TT
+CLASS="PARAMETER"
+>row</TT
+> или <TT
+CLASS="PARAMETER"
+>rowdesc</TT
+> — <TT
+CLASS="SYMBOL"
+>NULL</TT
+></P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="spi-spi-copytuple.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="spi-spi-modifytuple.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>SPI_copytuple</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="spi-memory.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>SPI_modifytuple</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,319 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>          pg_enum
+        </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Системные каталоги"
+HREF="catalogs.html"><LINK
+REL="PREVIOUS"
+TITLE="          pg_description
+        "
+HREF="catalog-pg-description.html"><LINK
+REL="NEXT"
+TITLE="          pg_event_trigger
+        "
+HREF="catalog-pg-event-trigger.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="          pg_description
+        "
+HREF="catalog-pg-description.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 48. Системные каталоги</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="          pg_event_trigger
+        "
+HREF="catalog-pg-event-trigger.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CATALOG-PG-ENUM"
+>48.20. <TT
+CLASS="STRUCTNAME"
+>pg_enum</TT
+></A
+></H1
+><P
+>В каталоге <TT
+CLASS="STRUCTNAME"
+>pg_enum</TT
+> содержатся записи, определяющие значения и метки для всех типов-перечислений. Внутренним представлением значения перечисления на самом деле является OID соответствующей строки в <TT
+CLASS="STRUCTNAME"
+>pg_enum</TT
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="AEN97301"
+></A
+><P
+><B
+>Таблица 48-20. Колонки <TT
+CLASS="STRUCTNAME"
+>pg_enum</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип</TH
+><TH
+>Ссылки</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Идентификатор строки (скрытый атрибут; должен выбираться явно)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>enumtypid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-type.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_type</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>OID типа в <TT
+CLASS="STRUCTNAME"
+>pg_type</TT
+>, к которому относится данное значение перечисления</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>enumsortorder</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>float4</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Порядок сортировки этого значения внутри перечисления</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>enumlabel</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>name</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Текстовая метка данного значения перечисления</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Идентификаторы OID в строках <TT
+CLASS="STRUCTNAME"
+>pg_enum</TT
+> подчиняются особому правилу: чётные OID гарантированно упорядочиваются по порядку сортировки их типа перечисления. То есть, если к одному перечислению относятся два чётных OID, меньшему OID должно соответствовать меньшее значение <TT
+CLASS="STRUCTFIELD"
+>enumsortorder</TT
+>. Нечётные значения OID могут быть не связаны с этим порядком сортировки. Это правило позволяет во многих случаях сравнивать значения перечислений, не обращаясь к каталогам. Процедуры, создающие и изменяющие перечисления, пытаются присваивать значениям перечислений чётные OID, если это возможно.</P
+><P
+>Когда создаётся тип перечисления, его членам назначаются позиции по порядку сортировки 1..<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>. Но у членов, добавляемых позже, могут оказаться отрицательные или дробные значения <TT
+CLASS="STRUCTFIELD"
+>enumsortorder</TT
+>. Единственное, что требуется — чтобы эти значения были правильно упорядочены и уникальны в рамках перечисления.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="catalog-pg-description.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="catalog-pg-event-trigger.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_description</TT
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_event_trigger</TT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

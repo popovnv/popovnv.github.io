@@ -1,0 +1,297 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Триггерные функции событий на языке C</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Триггеры событий"
+HREF="event-triggers.html"><LINK
+REL="PREVIOUS"
+TITLE="Матрица срабатывания триггеров событий"
+HREF="event-trigger-matrix.html"><LINK
+REL="NEXT"
+TITLE="Полный пример триггера события"
+HREF="event-trigger-example.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Матрица срабатывания триггеров событий"
+HREF="event-trigger-matrix.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="event-triggers.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 37. Триггеры событий</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Полный пример триггера события"
+HREF="event-trigger-example.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="EVENT-TRIGGER-INTERFACE"
+>37.3. Триггерные функции событий на языке C</A
+></H1
+><P
+>Этот раздел описывает низкоуровневые детали интерфейса для триггерной функции. Эта информация необходима только при разработке триггерных функций событий на языке C. При использовании языка более высокого уровня, эти детали обрабатываются автоматически. В большинстве случаев необходимо рассмотреть использование процедурного языка прежде чем начать разрабатывать триггеры событий на C. В документации по каждому процедурному языку объясняется как создавать триггеры событий на этом языке.</P
+><P
+>Триггерные функции событий должны использовать <SPAN
+CLASS="QUOTE"
+>"version 1"</SPAN
+> интерфейса диспетчера функций.</P
+><P
+>Когда функция вызывается диспетчером триггеров событий, ей не передаются обычные аргументы, но передаётся указатель <SPAN
+CLASS="QUOTE"
+>"context"</SPAN
+>, ссылающийся на структуру <TT
+CLASS="STRUCTNAME"
+>EventTriggerData</TT
+>. Функции на C могут проверить вызваны ли они диспетчером триггеров событий или нет выполнив макрос: </P><PRE
+CLASS="PROGRAMLISTING"
+>CALLED_AS_EVENT_TRIGGER(fcinfo)</PRE
+><P> который разворачивается в: </P><PRE
+CLASS="PROGRAMLISTING"
+><TT
+CLASS="STRUCTNAME"
+>EventTriggerData</TT
+></PRE
+><P> Если возвращается истина, то <TT
+CLASS="LITERAL"
+>fcinfo-&gt;context</TT
+> можно безопасно привести к типу <TT
+CLASS="LITERAL"
+>EventTriggerData *</TT
+> и использовать указатель на структуру <TT
+CLASS="STRUCTNAME"
+>EventTriggerData</TT
+>. Функция <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>не</I
+></SPAN
+> должна изменять структуру <TT
+CLASS="STRUCTNAME"
+>EventTriggerData</TT
+> или любые данные, которые на неё указывают.</P
+><P
+><TT
+CLASS="STRUCTNAME"
+>struct EventTriggerData</TT
+> определена в <TT
+CLASS="FILENAME"
+>commands/event_trigger.h</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>typedef struct EventTriggerData
+{
+    NodeTag     type;
+    const char *event;      /* имя события */
+    Node       *parsetree;  /* дерево разбора */
+    const char *tag;        /* тег команды */
+} EventTriggerData;</PRE
+><P> со следующими членами структуры: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="STRUCTFIELD"
+>type</TT
+></DT
+><DD
+><P
+>Всегда <TT
+CLASS="LITERAL"
+>T_EventTriggerData</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="STRUCTFIELD"
+>event</TT
+></DT
+><DD
+><P
+>Описывает событие, для которого вызывается функция. Возможные значения: <TT
+CLASS="LITERAL"
+>"ddl_command_start"</TT
+>, <TT
+CLASS="LITERAL"
+>"ddl_command_end"</TT
+>, <TT
+CLASS="LITERAL"
+>"sql_drop"</TT
+>. Суть этих событий описывается в <A
+HREF="event-trigger-definition.html"
+>Разделе 37.1</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="STRUCTFIELD"
+>parsetree</TT
+></DT
+><DD
+><P
+>Указатель на дерево разбора команды. Детали можно посмотреть в исходном коде PostgreSQL. Структура дерева разбора может быть изменена без предупреждений.</P
+></DD
+><DT
+><TT
+CLASS="STRUCTFIELD"
+>tag</TT
+></DT
+><DD
+><P
+>Тег команды, для которой сработал триггер события. Например <TT
+CLASS="LITERAL"
+>"CREATE FUNCTION"</TT
+>.</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>Функция триггера события должна возвращать указатель <TT
+CLASS="SYMBOL"
+>NULL</TT
+> (но <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>не</I
+></SPAN
+> SQL значение null, то есть не нужно устанавливать <TT
+CLASS="PARAMETER"
+>isNull</TT
+> в истину).</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="event-trigger-matrix.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="event-trigger-example.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Матрица срабатывания триггеров событий</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="event-triggers.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Полный пример триггера события</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,396 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Триггеры на PL/Perl</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="PL/Perl — процедурный язык Perl"
+HREF="plperl.html"><LINK
+REL="PREVIOUS"
+TITLE="Доверенный и недоверенный PL/Perl"
+HREF="plperl-trusted.html"><LINK
+REL="NEXT"
+TITLE="Событийные триггеры на PL/Perl"
+HREF="plperl-event-triggers.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Доверенный и недоверенный PL/Perl"
+HREF="plperl-trusted.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="plperl.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 42. PL/Perl — процедурный язык Perl</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Событийные триггеры на PL/Perl"
+HREF="plperl-event-triggers.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="PLPERL-TRIGGERS"
+>42.6. Триггеры на PL/Perl</A
+></H1
+><P
+>PL/Perl можно использовать для написания триггерных функций. В триггерной функции хеш-массив <TT
+CLASS="VARNAME"
+>$_TD</TT
+> содержит информацию о произошедшем событии триггера. <TT
+CLASS="VARNAME"
+>$_TD</TT
+> — глобальная переменная, которая получает нужное локальное значение при каждом вызове триггера. Хеш-массив <TT
+CLASS="VARNAME"
+>$_TD</TT
+> содержит следующие поля: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>$_TD-&gt;{new}{foo}</TT
+></DT
+><DD
+><P
+>Новое значение колонки <TT
+CLASS="LITERAL"
+>foo</TT
+></P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>$_TD-&gt;{old}{foo}</TT
+></DT
+><DD
+><P
+>Старое значение колонки <TT
+CLASS="LITERAL"
+>foo</TT
+></P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>$_TD-&gt;{name}</TT
+></DT
+><DD
+><P
+>Имя вызываемого триггера</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>$_TD-&gt;{event}</TT
+></DT
+><DD
+><P
+>Событие триггера: <TT
+CLASS="LITERAL"
+>INSERT</TT
+>, <TT
+CLASS="LITERAL"
+>UPDATE</TT
+>, <TT
+CLASS="LITERAL"
+>DELETE</TT
+>, <TT
+CLASS="LITERAL"
+>TRUNCATE</TT
+> или <TT
+CLASS="LITERAL"
+>UNKNOWN</TT
+></P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>$_TD-&gt;{when}</TT
+></DT
+><DD
+><P
+>Когда вызывается триггер: <TT
+CLASS="LITERAL"
+>BEFORE</TT
+> (ДО), <TT
+CLASS="LITERAL"
+>AFTER</TT
+> (ПОСЛЕ), <TT
+CLASS="LITERAL"
+>INSTEAD OF</TT
+> (ВМЕСТО) или <TT
+CLASS="LITERAL"
+>UNKNOWN</TT
+> (НЕИЗВЕСТНО)</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>$_TD-&gt;{level}</TT
+></DT
+><DD
+><P
+>Уровень триггера: <TT
+CLASS="LITERAL"
+>ROW</TT
+> (СТРОКА), <TT
+CLASS="LITERAL"
+>STATEMENT</TT
+> (ОПЕРАТОР) или <TT
+CLASS="LITERAL"
+>UNKNOWN</TT
+> (НЕИЗВЕСТНЫЙ)</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>$_TD-&gt;{relid}</TT
+></DT
+><DD
+><P
+>OID таблицы, для которой сработал триггер</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>$_TD-&gt;{table_name}</TT
+></DT
+><DD
+><P
+>Имя таблицы, для которой сработал триггер</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>$_TD-&gt;{relname}</TT
+></DT
+><DD
+><P
+>Имя таблицы, для которой сработал триггер. Это обращение устарело и может быть ликвидировано в будущем выпуске. Используйте вместо него $_TD-&gt;{table_name}.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>$_TD-&gt;{table_schema}</TT
+></DT
+><DD
+><P
+>Имя схемы, содержащей таблицу, для которой сработал триггер</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>$_TD-&gt;{argc}</TT
+></DT
+><DD
+><P
+>Число аргументов в триггерной функции</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>@{$_TD-&gt;{args}}</TT
+></DT
+><DD
+><P
+>Аргументы триггерной функции. Не определено, если <TT
+CLASS="LITERAL"
+>$_TD-&gt;{argc}</TT
+> равно 0.</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>В триггерах уровня строки возможны следующие варианты возврата: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>return;</TT
+></DT
+><DD
+><P
+>Выполнить операцию</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>"SKIP"</TT
+></DT
+><DD
+><P
+>Не выполнять операцию</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>"MODIFY"</TT
+></DT
+><DD
+><P
+>Указывает, что строка <TT
+CLASS="LITERAL"
+>NEW</TT
+> была изменена триггерной функцией</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>Следующий пример триггерной функции иллюстрирует описанные выше варианты: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE test (
+    i int,
+    v varchar
+);
+
+CREATE OR REPLACE FUNCTION valid_id() RETURNS trigger AS $$
+    if (($_TD-&gt;{new}{i} &gt;= 100) || ($_TD-&gt;{new}{i} &lt;= 0)) {
+        return "SKIP";    # пропустить команду INSERT/UPDATE
+    } elsif ($_TD-&gt;{new}{v} ne "immortal") {
+        $_TD-&gt;{new}{v} .= "(modified by trigger)";
+        return "MODIFY";  # изменить строку и выполнить команду INSERT/UPDATE
+    } else {
+        return;           # выполнить команду INSERT/UPDATE
+    }
+$$ LANGUAGE plperl;
+
+CREATE TRIGGER test_valid_id_trig
+    BEFORE INSERT OR UPDATE ON test
+    FOR EACH ROW EXECUTE PROCEDURE valid_id();</PRE
+><P></P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="plperl-trusted.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="plperl-event-triggers.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Доверенный и недоверенный PL/Perl</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="plperl.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Событийные триггеры на PL/Perl</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

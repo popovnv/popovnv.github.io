@@ -1,0 +1,2502 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Функции для исполнения команд</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="libpq — библиотека для языка C"
+HREF="libpq.html"><LINK
+REL="PREVIOUS"
+TITLE="Функции, описывающие текущее состояние подключения"
+HREF="libpq-status.html"><LINK
+REL="NEXT"
+TITLE="Асинхронная обработка команд"
+HREF="libpq-async.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Функции, описывающие текущее состояние подключения"
+HREF="libpq-status.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="libpq.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 31. <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> — библиотека для языка C</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Асинхронная обработка команд"
+HREF="libpq-async.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="LIBPQ-EXEC"
+>31.3. Функции для исполнения команд</A
+></H1
+><P
+>После того как соединение с сервером было успешно установлено, функции, описанные в этом разделе, используются для выполнения SQL-запросов и команд.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="LIBPQ-EXEC-MAIN"
+>31.3.1. Главные функции</A
+></H2
+><P
+><P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="LIBPQ-PQEXEC"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQexec</CODE
+></DT
+><DD
+><P
+>Передаёт команду серверу и ожидает результата. </P><PRE
+CLASS="SYNOPSIS"
+>PGresult *PQexec(PGconn *conn, const char *command);</PRE
+><P></P
+><P
+>Возвращает указатель на <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+> или, возможно, пустой указатель (null). Как правило, возвращается непустой указатель, исключением являются ситуации нехватки памяти или серьёзные ошибки, такие, как невозможность отправки команды серверу. Для проверки возвращаемого значения на наличие ошибок следует вызывать функцию <CODE
+CLASS="FUNCTION"
+>PQresultStatus</CODE
+> (в случае нулевого указателя она возвратит <TT
+CLASS="SYMBOL"
+>PGRES_FATAL_ERROR</TT
+>). Для получения дополнительной информации о таких ошибках используйте функцию <CODE
+CLASS="FUNCTION"
+>PQerrorMessage</CODE
+>.</P
+></DD
+></DL
+></DIV
+><P> Строка команды может включать в себя более одной SQL-команды (которые разделяются точкой с запятой). Несколько запросов, отправленных с помощью одного вызова <CODE
+CLASS="FUNCTION"
+>PQexec</CODE
+>, обрабатываются в рамках одной транзакции, если только команды <TT
+CLASS="COMMAND"
+>BEGIN</TT
+>/<TT
+CLASS="COMMAND"
+>COMMIT</TT
+> не включены явно в строку запроса, чтобы разделить его на несколько транзакций. Обратите внимание, однако, что возвращаемая структура <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+> описывает только результат последней из выполненных команд, содержащихся в строке запроса. Если одна из команд завершается сбоем, то обработка строки запроса на этом останавливается, и возвращённая структура <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+> описывает состояние ошибки.</P
+><P
+>    <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="LIBPQ-PQEXECPARAMS"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQexecParams</CODE
+></DT
+><DD
+><P
+>Отправляет команду серверу и ожидает результата. Имеет возможность передать параметры отдельно от текста SQL-команды. </P><PRE
+CLASS="SYNOPSIS"
+>PGresult *PQexecParams(PGconn *conn,
+                       const char *command,
+                       int nParams,
+                       const Oid *paramTypes,
+                       const char * const *paramValues,
+                       const int *paramLengths,
+                       const int *paramFormats,
+                       int resultFormat);</PRE
+><P></P
+><P
+><CODE
+CLASS="FUNCTION"
+>PQexecParams</CODE
+> подобна <CODE
+CLASS="FUNCTION"
+>PQexec</CODE
+>, но предлагает дополнительную функциональность: значения параметров могут быть указаны отдельно от самой строки-команды, а результаты запроса могут быть затребованы либо в текстовом, либо в двоичном формате. <CODE
+CLASS="FUNCTION"
+>PQexecParams</CODE
+> поддерживается только при подключениях по протоколу версии 3.0 или более поздних версий. Её вызов завершится сбоем при использовании протокола версии 2.0.</P
+><P
+>Параметры функции следующие: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="PARAMETER"
+>conn</TT
+></DT
+><DD
+><P
+>Объект, описывающий подключение, через которое пересылается команда.</P
+></DD
+><DT
+><TT
+CLASS="PARAMETER"
+>command</TT
+></DT
+><DD
+><P
+>Строка SQL-команды, которая должна быть выполнена. Если используются параметры, то в строке команды на них ссылаются, как <TT
+CLASS="LITERAL"
+>$1</TT
+>, <TT
+CLASS="LITERAL"
+>$2</TT
+> и т. д.</P
+></DD
+><DT
+><TT
+CLASS="PARAMETER"
+>nParams</TT
+></DT
+><DD
+><P
+>Число предоставляемых параметров. Оно равно длине массивов <TT
+CLASS="PARAMETER"
+>paramTypes[]</TT
+>, <TT
+CLASS="PARAMETER"
+>paramValues[]</TT
+>, <TT
+CLASS="PARAMETER"
+>paramLengths[]</TT
+>, and <TT
+CLASS="PARAMETER"
+>paramFormats[]</TT
+>. (Указатели на массивы могут быть равны <TT
+CLASS="SYMBOL"
+>NULL</TT
+>, когда <TT
+CLASS="PARAMETER"
+>nParams</TT
+> равно нулю.)</P
+></DD
+><DT
+><TT
+CLASS="PARAMETER"
+>paramTypes[]</TT
+></DT
+><DD
+><P
+>Предписывает, посредством OID, типы данных, которые должны быть назначены параметрам. Если значение <TT
+CLASS="PARAMETER"
+>paramTypes </TT
+> равно <TT
+CLASS="SYMBOL"
+>NULL</TT
+> или какой-либо отдельный элемент в массиве равен нулю, тогда сервер самостоятельно определит тип данных для параметра точно таким же образом, как он сделал бы для литеральной строки, тип которой не указан.</P
+></DD
+><DT
+><TT
+CLASS="PARAMETER"
+>paramValues[]</TT
+></DT
+><DD
+><P
+>Указывает фактические значения параметров. Нулевой указатель в этом массиве означает, что соответствующий параметр равен null; в противном случае указатель указывает на текстовую строку, завершающуюся нулевым символом (для текстового формата), или на двоичные данные в формате, которого ожидает сервер (для двоичного формата).</P
+></DD
+><DT
+><TT
+CLASS="PARAMETER"
+>paramLengths[]</TT
+></DT
+><DD
+><P
+>Указывает фактические длины данных для параметров, представленных в двоичном формате. Он игнорируется для параметров, имеющих значение null, и для параметров, представленных в текстовом формате. Указатель на массив может быть нулевым, когда нет двоичных параметров.</P
+></DD
+><DT
+><TT
+CLASS="PARAMETER"
+>paramFormats[]</TT
+></DT
+><DD
+><P
+>Указывает, являются ли параметры текстовыми (поместите нуль в элемент массива, соответствующий такому параметру) или двоичными (поместите единицу в элемент массива, соответствующий такому параметру). Если указатель на массив является нулевым, тогда все параметры считаются текстовыми строками.</P
+><P
+>Значения, переданные в двоичном формате, требуют знания внутреннего представления, которого ожидает сервер. Например, целые числа должны передаваться с использованием сетевого порядка байтов. Передача значений типа <TT
+CLASS="TYPE"
+>numeric</TT
+> требует знания того формата, в котором их хранит сервер, как это реализовано в <TT
+CLASS="FILENAME"
+>src/backend/utils/adt/numeric.c::numeric_send()</TT
+> и <TT
+CLASS="FILENAME"
+>src/backend/utils/adt/numeric.c::numeric_recv()</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="PARAMETER"
+>resultFormat</TT
+></DT
+><DD
+><P
+>Требует указать ноль, чтобы получить результаты в текстовом формате, или единицу, чтобы получить результаты в двоичном формате. (В настоящее время нет возможности получить различные колонки результата в разных форматах, хотя это и возможно на уровне протокола, лежащего в основе подключений.)</P
+></DD
+></DL
+></DIV
+><P></P
+></DD
+></DL
+></DIV
+><P>
+   </P
+><P
+>Важнейшим преимуществом <CODE
+CLASS="FUNCTION"
+>PQexecParams</CODE
+> над <CODE
+CLASS="FUNCTION"
+>PQexec</CODE
+> является то, что значения параметров могут быть отделены от строки-команды. Это позволяет избежать использования кавычек и экранирующих символов, что является трудоемким методом, часто приводящим к ошибкам.</P
+><P
+>В отличие от <CODE
+CLASS="FUNCTION"
+>PQexec</CODE
+>, <CODE
+CLASS="FUNCTION"
+>PQexecParams</CODE
+> позволяет включать не более одной SQL-команды в строку запроса. (В ней могут содержаться точки с запятой, однако может присутствовать не более одной непустой команды.) Это ограничение накладывается базовым протоколом, но оно приносит и некоторую пользу в качестве дополнительной защиты от атак методом SQL-инъекций.</P
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>Указание типов параметров с помощью OID является трудоёмким, особенно если вы предпочитаете не указывать явно значений OID в вашей программе. Однако, вы можете избежать этого даже в случаях, когда сервер самостоятельно не может определить тип параметра или выбирает не тот тип, который вы хотите. В строке SQL-команды добавьте явное приведение типа для этого параметра, чтобы показать, какой тип данных вы будете отправлять. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT * FROM mytable WHERE x = $1::bigint;</PRE
+><P> Это приведёт к тому, что параметр <TT
+CLASS="LITERAL"
+>$1</TT
+> будет считаться имеющим тип <TT
+CLASS="TYPE"
+>bigint</TT
+>, в то время как по умолчанию ему был бы назначен тот же самый тип, что и <TT
+CLASS="LITERAL"
+>x</TT
+>. Такое явное принятие решения о типе параметра либо с помощью описанного метода, либо путём задания числового OID строго рекомендуется, когда значения параметров отправляются в двоичном формате, поскольку двоичный формат имеет меньшую избыточность, чем текстовый, и поэтому гораздо менее вероятно, что сервер обнаружит ошибку несоответствия типов, допущенную вами.</P
+></BLOCKQUOTE
+></DIV
+><P
+><P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="LIBPQ-PQPREPARE"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQprepare</CODE
+></DT
+><DD
+><P
+>Отправляет запрос, чтобы создать подготовленный оператор с конкретными параметрами, и ожидает завершения. </P><PRE
+CLASS="SYNOPSIS"
+>PGresult *PQprepare(PGconn *conn,
+                    const char *stmtName,
+                    const char *query,
+                    int nParams,
+                    const Oid *paramTypes);</PRE
+><P></P
+><P
+><CODE
+CLASS="FUNCTION"
+>PQprepare</CODE
+> создаёт подготовленный оператор для более позднего исполнения с помощью вызова <CODE
+CLASS="FUNCTION"
+>PQexecPrepared</CODE
+>. Это позволяет командам, которые будут использоваться многократно, подвергаться разбору и планированию только один раз, а не при каждом их исполнении. <CODE
+CLASS="FUNCTION"
+>PQprepare</CODE
+> поддерживается только в соединениях по протоколу версии 3.0 или более поздних версий. При использовании протокола версии 2.0 функция завершится сбоем.</P
+><P
+>Функция создаёт подготовленный оператор с именем <TT
+CLASS="PARAMETER"
+>stmtName</TT
+> из строки <TT
+CLASS="PARAMETER"
+>query</TT
+>, которая должна содержать единственную SQL-команду. <TT
+CLASS="PARAMETER"
+>stmtName</TT
+> может быть пустой строкой <TT
+CLASS="LITERAL"
+>""</TT
+>, тогда будет создан неименованный оператор (в таком случае любой уже существующий неименованный оператор будет автоматически заменён), в противном случае, если имя оператора уже определено в текущем сеансе работы, будет ошибка. Если используются параметры, то в запросе к ним обращаются таким образом: <TT
+CLASS="LITERAL"
+>$1</TT
+>, <TT
+CLASS="LITERAL"
+>$2</TT
+> и т. д. <TT
+CLASS="PARAMETER"
+>nParams</TT
+> представляет число параметров, типы данных для которых указаны в массиве <TT
+CLASS="PARAMETER"
+>paramTypes[]</TT
+>. (Указатель на массив может быть равен <TT
+CLASS="SYMBOL"
+>NULL</TT
+>, когда значение <TT
+CLASS="PARAMETER"
+>nParams</TT
+> равно нулю.) <TT
+CLASS="PARAMETER"
+>paramTypes[]</TT
+> указывает, посредством OID, типы данных, которые будут назначены параметрам. Если <TT
+CLASS="PARAMETER"
+>paramTypes</TT
+> равен <TT
+CLASS="SYMBOL"
+>NULL</TT
+> или какой-либо элемент в этом массиве равен нулю, то сервер назначает тип данных соответствующему параметру точно таким же способом, как он сделал бы для литеральной строки, не имеющей типа. Также в запросе можно использовать параметры с номерами, большими, чем <TT
+CLASS="PARAMETER"
+>nParams</TT
+>; типы данных для них сервер также сможет подобрать. (См. описание <CODE
+CLASS="FUNCTION"
+>PQdescribePrepared</CODE
+>, где сказано, какие существуют средства, чтобы определить, какие типы данных были подобраны).</P
+><P
+>Как и при вызове <CODE
+CLASS="FUNCTION"
+>PQexec</CODE
+>, результатом является объект <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+>, содержимое которого показывает успех или сбой на стороне сервера. Нулевой указатель означает нехватку памяти или невозможность вообще отправить команду. Для получения дополнительной информации о таких ошибках используйте <CODE
+CLASS="FUNCTION"
+>PQerrorMessage</CODE
+>.</P
+></DD
+></DL
+></DIV
+><P> Подготовленные операторы для использования с <CODE
+CLASS="FUNCTION"
+>PQexecPrepared</CODE
+> можно также создать путём исполнения SQL-команд <A
+HREF="sql-prepare.html"
+>PREPARE</A
+>. Также, хотя никакой функции <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> для удаления подготовленного оператора не предусмотрено, для этой цели можно воспользоваться SQL-командой <A
+HREF="sql-deallocate.html"
+>DEALLOCATE</A
+>.</P
+><P
+>    <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="LIBPQ-PQEXECPREPARED"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQexecPrepared</CODE
+></DT
+><DD
+><P
+>Отправляет запрос на исполнение подготовленного оператора с данными параметрами и ожидает результата. </P><PRE
+CLASS="SYNOPSIS"
+>PGresult *PQexecPrepared(PGconn *conn,
+                         const char *stmtName,
+                         int nParams,
+                         const char * const *paramValues,
+                         const int *paramLengths,
+                         const int *paramFormats,
+                         int resultFormat);</PRE
+><P></P
+><P
+><CODE
+CLASS="FUNCTION"
+>PQexecPrepared</CODE
+> подобна <CODE
+CLASS="FUNCTION"
+>PQexecParams</CODE
+>, но команда, подлежащая исполнению, указывается путём передачи имени предварительно подготовленного оператора вместо передачи строки запроса. Эта возможность позволяет командам, которые вызываются многократно, подвергаться разбору и планированию только один раз, а не при каждом их исполнении. Оператор должен быть подготовлен предварительно в рамках текущего сеанса работы. <CODE
+CLASS="FUNCTION"
+>PQexecPrepared</CODE
+> поддерживается только в соединениях по протоколу версии 3.0 или более поздних версий. При использовании протокола версии 2.0 функция завершится сбоем.</P
+><P
+>Параметры идентичны <CODE
+CLASS="FUNCTION"
+>PQexecParams</CODE
+>, за исключением того, что вместо строки запроса передаётся имя подготовленного оператора, и отсутствует параметр <TT
+CLASS="PARAMETER"
+>paramTypes[]</TT
+> (он не нужен, поскольку типы данных для параметров подготовленного оператора были определены при его создании).</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQDESCRIBEPREPARED"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQdescribePrepared</CODE
+></DT
+><DD
+><P
+>Передаёт запрос на получение информации об указанном подготовленном операторе и ожидает завершения. </P><PRE
+CLASS="SYNOPSIS"
+>PGresult *PQdescribePrepared(PGconn *conn, const char *stmtName);</PRE
+><P></P
+><P
+><CODE
+CLASS="FUNCTION"
+>PQdescribePrepared</CODE
+> позволяет приложению получить информацию о предварительно подготовленном операторе. <CODE
+CLASS="FUNCTION"
+>PQdescribePrepared</CODE
+> поддерживается только в соединениях по протоколу версии 3.0 или более поздних версий. При использовании протокола версии 2.0 функция завершится сбоем.</P
+><P
+>Для ссылки на неименованный оператор значение <TT
+CLASS="PARAMETER"
+>stmtName</TT
+> может быть пустой строкой <TT
+CLASS="LITERAL"
+>""</TT
+> или <TT
+CLASS="SYMBOL"
+>NULL</TT
+>, в противном случае оно должно быть именем существующего подготовленного оператора. В случае успешного выполнения возвращается <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+> со статусом <TT
+CLASS="LITERAL"
+>PGRES_COMMAND_OK</TT
+>. Функции <CODE
+CLASS="FUNCTION"
+>PQnparams</CODE
+> и <CODE
+CLASS="FUNCTION"
+>PQparamtype</CODE
+> позволяют извлечь из <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+> информацию о параметрах подготовленного оператора, а функции <CODE
+CLASS="FUNCTION"
+>PQnfields</CODE
+>, <CODE
+CLASS="FUNCTION"
+>PQfname</CODE
+>, <CODE
+CLASS="FUNCTION"
+>PQftype</CODE
+> и т. п. предоставляют информацию о результирующих столбцах (если они есть) данного оператора.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQDESCRIBEPORTAL"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQdescribePortal</CODE
+></DT
+><DD
+><P
+>Передаёт запрос на получение информации об указанном портале и ожидает завершения. </P><PRE
+CLASS="SYNOPSIS"
+>PGresult *PQdescribePortal(PGconn *conn, const char *portalName);</PRE
+><P></P
+><P
+><CODE
+CLASS="FUNCTION"
+>PQdescribePortal</CODE
+> позволяет приложению получить информацию о предварительно созданном портале. (<SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> не предоставляет прямого доступа к порталам, но вы можете использовать эту функцию для ознакомления со свойствами курсора, созданного с помощью SQL-команды <TT
+CLASS="COMMAND"
+>DECLARE CURSOR</TT
+>.) <CODE
+CLASS="FUNCTION"
+>PQdescribePortal</CODE
+> поддерживается только в соединениях по протоколу версии 3.0 или более поздних версий. При использовании протокола версии 2.0 функция завершится сбоем.</P
+><P
+>Для ссылки на неименованный портал значение <TT
+CLASS="PARAMETER"
+>portalName</TT
+> может быть пустой строкой <TT
+CLASS="LITERAL"
+>""</TT
+> или <TT
+CLASS="SYMBOL"
+>NULL</TT
+>, в противном случае оно должно быть именем существующего портала. В случае успешного завершения возвращается <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+> со статусом <TT
+CLASS="LITERAL"
+>PGRES_COMMAND_OK</TT
+>. С помощью функций <CODE
+CLASS="FUNCTION"
+>PQnfields</CODE
+>, <CODE
+CLASS="FUNCTION"
+>PQfname</CODE
+>, <CODE
+CLASS="FUNCTION"
+>PQftype</CODE
+> и т. д. можно извлечь из <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+> информацию о результирующих столбцах (если они есть) данного портала.</P
+></DD
+></DL
+></DIV
+><P>
+   </P
+><P
+>Структура <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+> содержит результат, возвращённый сервером. Разработчики приложений <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> должны тщательно поддерживать абстракцию <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+>. Для получения доступа к содержимому <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+> используйте функции доступа, описанные ниже. Избегайте непосредственного обращения к полям структуры <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+>, поскольку они могут измениться в будущем. <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="LIBPQ-PQRESULTSTATUS"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQresultStatus</CODE
+></DT
+><DD
+><P
+>Возвращает статус результата выполнения команды. </P><PRE
+CLASS="SYNOPSIS"
+>ExecStatusType PQresultStatus(const PGresult *res);</PRE
+><P></P
+><P
+><CODE
+CLASS="FUNCTION"
+>PQresultStatus</CODE
+> может возвращать одно из следующих значений: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="LIBPQ-PGRES-EMPTY-QUERY"
+></A
+><TT
+CLASS="LITERAL"
+>PGRES_EMPTY_QUERY</TT
+></DT
+><DD
+><P
+>Строка, отправленная серверу, была пустой.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PGRES-COMMAND-OK"
+></A
+><TT
+CLASS="LITERAL"
+>PGRES_COMMAND_OK</TT
+></DT
+><DD
+><P
+>Успешное завершение команды, не возвращающей никаких данных.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PGRES-TUPLES-OK"
+></A
+><TT
+CLASS="LITERAL"
+>PGRES_TUPLES_OK</TT
+></DT
+><DD
+><P
+>Успешное завершение команды, возвращающей данные (такой, как <TT
+CLASS="COMMAND"
+>SELECT</TT
+> или <TT
+CLASS="COMMAND"
+>SHOW</TT
+>).</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PGRES-COPY-OUT"
+></A
+><TT
+CLASS="LITERAL"
+>PGRES_COPY_OUT</TT
+></DT
+><DD
+><P
+>Начат перенос данных Copy Out (с сервера).</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PGRES-COPY-IN"
+></A
+><TT
+CLASS="LITERAL"
+>PGRES_COPY_IN</TT
+></DT
+><DD
+><P
+>Начат перенос данных Copy In (на сервер).</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PGRES-BAD-RESPONSE"
+></A
+><TT
+CLASS="LITERAL"
+>PGRES_BAD_RESPONSE</TT
+></DT
+><DD
+><P
+>Ответ сервера не был распознан.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PGRES-NONFATAL-ERROR"
+></A
+><TT
+CLASS="LITERAL"
+>PGRES_NONFATAL_ERROR</TT
+></DT
+><DD
+><P
+>Произошла не фатальная ошибка (уведомление или предупреждение).</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PGRES-FATAL-ERROR"
+></A
+><TT
+CLASS="LITERAL"
+>PGRES_FATAL_ERROR</TT
+></DT
+><DD
+><P
+>Произошла фатальная ошибка.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PGRES-COPY-BOTH"
+></A
+><TT
+CLASS="LITERAL"
+>PGRES_COPY_BOTH</TT
+></DT
+><DD
+><P
+>Начат перенос данных Copy In/Out (на сервер и с сервера). Эта функция в настоящее время используется только для потоковой репликации, поэтому такой статус не должен иметь место в обычных приложениях.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PGRES-SINGLE-TUPLE"
+></A
+><TT
+CLASS="LITERAL"
+>PGRES_SINGLE_TUPLE</TT
+></DT
+><DD
+><P
+>Структура <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+> содержит только одну результирующую строку, возвращённую текущей командой. Этот статус имеет место только тогда, когда для данного запроса был выбран режим построчного вывода (см. <A
+HREF="libpq-single-row-mode.html"
+>Раздел 31.5</A
+>).</P
+></DD
+></DL
+></DIV
+><P> Если статус результата <TT
+CLASS="LITERAL"
+>PGRES_TUPLES_OK</TT
+> или <TT
+CLASS="LITERAL"
+>PGRES_SINGLE_TUPLE</TT
+>, тогда для извлечения строк, возвращённых запросом, можно использовать функции, описанные ниже. Обратите внимание, что команда <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, даже когда она не извлекает ни одной строки, все же показывает <TT
+CLASS="LITERAL"
+>PGRES_TUPLES_OK</TT
+>. <TT
+CLASS="LITERAL"
+>PGRES_COMMAND_OK</TT
+> предназначен для команд, которые никогда не возвращают строки (<TT
+CLASS="COMMAND"
+>INSERT</TT
+> или <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> без использования предложения <TT
+CLASS="LITERAL"
+>RETURNING</TT
+> и др.). Ответ <TT
+CLASS="LITERAL"
+>PGRES_EMPTY_QUERY</TT
+> может указывать на наличие ошибки в клиентском программном обеспечении.</P
+><P
+>Результат со статусом <TT
+CLASS="SYMBOL"
+>PGRES_NONFATAL_ERROR</TT
+> никогда не будет возвращён напрямую функцией <CODE
+CLASS="FUNCTION"
+>PQexec</CODE
+> или другими функциями исполнения запросов; вместо этого результаты такого вида передаются обработчику уведомлений (см. <A
+HREF="libpq-notice-processing.html"
+>Раздел 31.12</A
+>).</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQRESSTATUS"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQresStatus</CODE
+></DT
+><DD
+><P
+>Преобразует значение перечислимого типа, возвращённое функцией <CODE
+CLASS="FUNCTION"
+>PQresultStatus</CODE
+>, в строковую константу, описывающую код статуса. Вызывающая функция не должна освобождать память, на которую указывает возвращаемый указатель. </P><PRE
+CLASS="SYNOPSIS"
+>char *PQresStatus(ExecStatusType status);</PRE
+><P></P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQRESULTERRORMESSAGE"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQresultErrorMessage</CODE
+></DT
+><DD
+><P
+>Возвращает сообщение об ошибке, связанное с командой, или пустую строку, если ошибки не произошло. </P><PRE
+CLASS="SYNOPSIS"
+>char *PQresultErrorMessage(const PGresult *res);</PRE
+><P> Если произошла ошибка, то возвращённая строка будет включать завершающий символ новой строки. Вызывающая функция не должна напрямую освобождать память, на которую указывает возвращаемый указатель. Она будет освобождена, когда соответствующий указатель <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+> будет передан функции <CODE
+CLASS="FUNCTION"
+>PQclear</CODE
+>.</P
+><P
+>Если непосредственно после вызова <CODE
+CLASS="FUNCTION"
+>PQexec</CODE
+> или <CODE
+CLASS="FUNCTION"
+>PQgetResult</CODE
+> вызвать функцию <CODE
+CLASS="FUNCTION"
+>PQerrorMessage</CODE
+> (для данного подключения), то она возвратит ту же самую строку, что и <CODE
+CLASS="FUNCTION"
+>PQresultErrorMessage</CODE
+> (для данного результата). Однако, <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+> сохранит свое сообщение об ошибке до тех пор, пока не будет уничтожен, в то время, как сообщение об ошибке, связанное с данным подключением, будет изменяться при выполнении последующих операций. Воспользуйтесь функцией <CODE
+CLASS="FUNCTION"
+>PQresultErrorMessage</CODE
+>, когда вы хотите узнать статус, связанный с конкретной структурой <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+>; используйте функцию <CODE
+CLASS="FUNCTION"
+>PQerrorMessage</CODE
+>, когда вы хотите узнать статус выполнения самой последней операции на данном соединении.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQRESULTERRORFIELD"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQresultErrorField</CODE
+></DT
+><DD
+><P
+>Возвращает индивидуальное поле из отчёта об ошибке. </P><PRE
+CLASS="SYNOPSIS"
+>char *PQresultErrorField(const PGresult *res, int fieldcode);</PRE
+><P>
+        <TT
+CLASS="PARAMETER"
+>fieldcode</TT
+> это идентификатор поля ошибки; см. символические константы, перечисленные ниже. Если <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+> не содержит ошибки или предупреждения или не включает указанное поле, то возвращается <TT
+CLASS="SYMBOL"
+>NULL</TT
+>. Значения полей обычно не включают завершающий символ новой строки. Вызывающая функция не должна напрямую освобождать память, на которую указывает возвращаемый указатель. Она будет освобождена, когда соответствующий указатель <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+> будет передан функции <CODE
+CLASS="FUNCTION"
+>PQclear</CODE
+>.</P
+><P
+>Доступны следующие коды полей: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="LIBPQ-PG-DIAG-SEVERITY"
+></A
+><TT
+CLASS="SYMBOL"
+>PG_DIAG_SEVERITY</TT
+></DT
+><DD
+><P
+>Серьёзность; содержанием поля могут быть <TT
+CLASS="LITERAL"
+>ERROR</TT
+>, <TT
+CLASS="LITERAL"
+>FATAL</TT
+> или <TT
+CLASS="LITERAL"
+>PANIC</TT
+> (в сообщении об ошибке) либо <TT
+CLASS="LITERAL"
+>WARNING</TT
+>, <TT
+CLASS="LITERAL"
+>NOTICE</TT
+>, <TT
+CLASS="LITERAL"
+>DEBUG</TT
+>, <TT
+CLASS="LITERAL"
+>INFO</TT
+> или <TT
+CLASS="LITERAL"
+>LOG</TT
+> (в сообщении-уведомлении), либо локализованный перевод одного из этих значений. Присутствует всегда.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PG-DIAG-SQLSTATE"
+></A
+><TT
+CLASS="SYMBOL"
+>PG_DIAG_SQLSTATE</TT
+></DT
+><DD
+><P
+>Код ошибки в соответствии с соглашением о кодах SQLSTATE. Код SQLSTATE идентифицирует тип случившейся ошибки; он может использоваться клиентскими приложениями, чтобы выполнять конкретные операции (такие, как обработка ошибок) в ответ на конкретную ошибку базы данных. Список возможных кодов SQLSTATE приведён в <A
+HREF="errcodes-appendix.html"
+>Приложении A</A
+>. Это поле не подлежит локализации. Оно всегда присутствует.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PG-DIAG-MESSAGE-PRIMARY"
+></A
+><TT
+CLASS="SYMBOL"
+>PG_DIAG_MESSAGE_PRIMARY</TT
+></DT
+><DD
+><P
+>Главное сообщение об ошибке, предназначенное для прочтения пользователем. Как правило составляет всего одну строку. Это поле всегда присутствует.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PG-DIAG-MESSAGE-DETAIL"
+></A
+><TT
+CLASS="SYMBOL"
+>PG_DIAG_MESSAGE_DETAIL</TT
+></DT
+><DD
+><P
+>Необязательное дополнительное сообщение об ошибке, передающее более детальную информацию о проблеме. Может занимать несколько строк.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PG-DIAG-MESSAGE-HINT"
+></A
+><TT
+CLASS="SYMBOL"
+>PG_DIAG_MESSAGE_HINT</TT
+></DT
+><DD
+><P
+>Подсказка: необязательное предположение о том, что можно сделать в данной проблемной ситуации. Оно должно отличаться от детальной информации в том смысле, что оно предлагает совет (возможно, и неподходящий), а не просто факты. Может занимать несколько строк.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PG-DIAG-STATEMENT-POSITION"
+></A
+><TT
+CLASS="SYMBOL"
+>PG_DIAG_STATEMENT_POSITION</TT
+></DT
+><DD
+><P
+>Строка, содержащая десятичное целое число, указывающее позицию расположения ошибки в качестве индекса в оригинальной строке оператора. Первый символ имеет позицию 1, при этом позиции измеряются в символах а не в байтах.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PG-DIAG-INTERNAL-POSITION"
+></A
+><TT
+CLASS="SYMBOL"
+>PG_DIAG_INTERNAL_POSITION</TT
+></DT
+><DD
+><P
+>Это поле определяется точно так же, как и поле <TT
+CLASS="SYMBOL"
+>PG_DIAG_STATEMENT_POSITION</TT
+>, но оно используется, когда позиция местонахождения ошибки относится к команде, сгенерированной внутренними модулями, а не к команде, представленной клиентом. Когда появляется это поле, то всегда появляется и поле <TT
+CLASS="SYMBOL"
+>PG_DIAG_INTERNAL_QUERY</TT
+>.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PG-DIAG-INTERNAL-QUERY"
+></A
+><TT
+CLASS="SYMBOL"
+>PG_DIAG_INTERNAL_QUERY</TT
+></DT
+><DD
+><P
+>Текст команды, сгенерированной внутренними модулями, завершившейся сбоем. Это мог бы быть, например, SQL-запрос, выданный функцией на языке PL/pgSQL.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PG-DIAG-CONTEXT"
+></A
+><TT
+CLASS="SYMBOL"
+>PG_DIAG_CONTEXT</TT
+></DT
+><DD
+><P
+>Характеристика контекста, в котором произошла ошибка. В настоящее время она включает вывод стека вызовов активных функций процедурного языка и запросов, сгенерированных внутренними модулями. Стек выводится по одному элементу в строке, при этом первым идет самый последний из элементов (самый недавний вызов).</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PG-DIAG-SCHEMA-NAME"
+></A
+><TT
+CLASS="SYMBOL"
+>PG_DIAG_SCHEMA_NAME</TT
+></DT
+><DD
+><P
+>Если ошибка была связана с конкретным объектом базы данных, то в это поле будет записано имя схемы, содержащей данный объект.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PG-DIAG-TABLE-NAME"
+></A
+><TT
+CLASS="SYMBOL"
+>PG_DIAG_TABLE_NAME</TT
+></DT
+><DD
+><P
+>Если ошибка была связана с конкретной таблицей, то в это поле будет записано имя таблицы. (Для получения имени схемы для данной таблицы обратитесь к полю, содержащему имя схемы.)</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PG-DIAG-COLUMN-NAME"
+></A
+><TT
+CLASS="SYMBOL"
+>PG_DIAG_COLUMN_NAME</TT
+></DT
+><DD
+><P
+>Если ошибка была связана с конкретным столбцом таблицы, то в это поле будет записано имя столбца. (Чтобы идентифицировать таблицу, обратитесь к полям, содержащим имена схемы и таблицы.)</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PG-DIAG-DATATYPE-NAME"
+></A
+><TT
+CLASS="SYMBOL"
+>PG_DIAG_DATATYPE_NAME</TT
+></DT
+><DD
+><P
+>Если ошибка была связана с конкретным типом данных, то в это поле будет записано имя типа данных. (Чтобы получить имя схемы, которой принадлежит этот тип данных, обратитесь к полю, содержащему имя схемы.)</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PG-DIAG-CONSTRAINT-NAME"
+></A
+><TT
+CLASS="SYMBOL"
+>PG_DIAG_CONSTRAINT_NAME</TT
+></DT
+><DD
+><P
+>Если ошибка была связана с конкретным ограничением, то в это поле будет записано имя ограничения. Чтобы получить имя таблицы или домена, связанных с этим ограничением, обратитесь к полям, перечисленным выше. (С этой целью индексы рассматриваются как ограничения, даже если они и не были созданы с помощью синтаксиса для создания ограничений.)</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PG-DIAG-SOURCE-FILE"
+></A
+><TT
+CLASS="SYMBOL"
+>PG_DIAG_SOURCE_FILE</TT
+></DT
+><DD
+><P
+>Имя файла, содержащего позицию в исходном коде, для которой было выдано сообщение об ошибка.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PG-DIAG-SOURCE-LINE"
+></A
+><TT
+CLASS="SYMBOL"
+>PG_DIAG_SOURCE_LINE</TT
+></DT
+><DD
+><P
+>Номер строки той позиции в исходном коде, для которой было выдано сообщение об ошибке.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PG-DIAG-SOURCE-FUNCTION"
+></A
+><TT
+CLASS="SYMBOL"
+>PG_DIAG_SOURCE_FUNCTION</TT
+></DT
+><DD
+><P
+>Имя функции в исходном коде, сообщающей об ошибке.</P
+></DD
+></DL
+></DIV
+><P></P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Поля для имени схемы, имени таблицы, имени столбца, имени типа данных и имени ограничения предоставляются лишь для ограниченного числа типов ошибок; см. <A
+HREF="errcodes-appendix.html"
+>Приложение A</A
+>. Не рассчитывайте на то, что присутствие любого из этих полей гарантирует и присутствие какого-то другого поля. Базовые источники ошибок придерживаются взаимосвязей, описанных выше, но функции, определённые пользователем, могут использовать эти поля другими способами. Аналогично, не рассчитывайте на то, что эти поля обозначают объекты, существующие в текущей базе данных в настоящий момент.</P
+></BLOCKQUOTE
+></DIV
+><P
+>Клиент отвечает за форматирование отображаемой информации в соответствии с его нуждами; в частности, он должен разбивать длинные строки, как требуется. Символы новой строки, встречающиеся в полях сообщения об ошибке, должны обрабатываться, как разрывы абзацев, а не строк.</P
+><P
+>Ошибки, сгенерированные внутренними модулями <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>, будут иметь поля серьёзности ошибки и основного сообщения, но, как правило, никаких других полей. Ошибки, возвращаемые сервером, работающим по протоколу версии ниже 3.0, будут включать поля серьёзности ошибки и основного сообщения, а также иногда детальное сообщение, но больше никаких полей.</P
+><P
+>Заметьте, что поля ошибки доступны только из объектов <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+>, а не из объектов <TT
+CLASS="STRUCTNAME"
+>PGconn</TT
+>. Не существует функции <CODE
+CLASS="FUNCTION"
+>PQerrorField</CODE
+>.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQCLEAR"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQclear</CODE
+></DT
+><DD
+><P
+>Освобождает область памяти, связанную с <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+>. Результат выполнения каждой команды должен быть освобождён с помощью <CODE
+CLASS="FUNCTION"
+>PQclear</CODE
+>, когда он больше не нужен. </P><PRE
+CLASS="SYNOPSIS"
+>void PQclear(PGresult *res);</PRE
+><P></P
+><P
+>Вы можете держать объект <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+> под рукой до тех пор, пока он вам нужен; он не исчезает, ни когда вы выдаёте новую команду, ни даже если вы закрываете соединение. Чтобы от него избавиться, вы должны вызвать <CODE
+CLASS="FUNCTION"
+>PQclear</CODE
+>. Если этого не делать, то в результате будут иметь место утечки памяти в вашем приложении.</P
+></DD
+></DL
+></DIV
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="LIBPQ-EXEC-SELECT-INFO"
+>31.3.2. Извлечение информации, связанной с результатом запроса</A
+></H2
+><P
+>Эти функции служат для извлечения информации из объекта <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+>, который представляет результат успешного запроса (то есть такого, который имеет статус <TT
+CLASS="LITERAL"
+>PGRES_TUPLES_OK</TT
+> или <TT
+CLASS="LITERAL"
+>PGRES_SINGLE_TUPLE</TT
+>). Их также можно использовать для извлечения информации об успешной операции DESCRIBE: результат этой операции содержит всю ту же самую информацию о столбцах, которая была бы получена при реальном исполнении запроса, но не содержит ни одной строки. Для объектов, имеющих другие значения статуса, эти функции будут действовать таким образом, как будто результат не содержит ни одной строки и ни одного столбца.</P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="LIBPQ-PQNTUPLES"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQntuples</CODE
+></DT
+><DD
+><P
+>Возвращает число строк (кортежей) в полученной выборке. Поскольку она возвращает целое число, большие выборки могут привести к переполнению возвращаемого значения в 32-разрядных операционных системах. </P><PRE
+CLASS="SYNOPSIS"
+>int PQntuples(const PGresult *res);</PRE
+><P></P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQNFIELDS"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQnfields</CODE
+></DT
+><DD
+><P
+>Возвращает число столбцов (полей) в каждой строке полученной выборки. </P><PRE
+CLASS="SYNOPSIS"
+>int PQnfields(const PGresult *res);</PRE
+><P></P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQFNAME"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQfname</CODE
+></DT
+><DD
+><P
+>Возвращает имя столбца, соответствующего данному номеру столбца. Номера столбцов начинаются с 0. Вызывающая функция не должна напрямую освобождать память, на которую указывает возвращаемый указатель. Она будет освобождена, когда соответствующий указатель на <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+> будет передан функции <CODE
+CLASS="FUNCTION"
+>PQclear</CODE
+>. </P><PRE
+CLASS="SYNOPSIS"
+>char *PQfname(const PGresult *res,
+              int column_number);</PRE
+><P></P
+><P
+>Если номер столбца выходит за пределы допустимого диапазона, то возвращается <TT
+CLASS="SYMBOL"
+>NULL</TT
+>.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQFNUMBER"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQfnumber</CODE
+></DT
+><DD
+><P
+>Возвращает номер столбца, соответствующий данному имени столбца. </P><PRE
+CLASS="SYNOPSIS"
+>int PQfnumber(const PGresult *res,
+              const char *column_name);</PRE
+><P></P
+><P
+>Если данное имя не совпадает с именем ни одного из столбцов, то возвращается -1.</P
+><P
+>Данное имя интерпретируется, как идентификатор в SQL-команде. Это означает, что оно переводится в нижний регистр, если только оно не заключено в двойные кавычки. Например, для выборки, сгенерированной с помощью такой SQL-команды: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT 1 AS FOO, 2 AS "BAR";</PRE
+><P> мы получили бы следующие результаты: </P><PRE
+CLASS="PROGRAMLISTING"
+>PQfname(res, 0)              <I
+CLASS="LINEANNOTATION"
+>foo</I
+>
+PQfname(res, 1)              <I
+CLASS="LINEANNOTATION"
+>BAR</I
+>
+PQfnumber(res, "FOO")        <I
+CLASS="LINEANNOTATION"
+>0</I
+>
+PQfnumber(res, "foo")        <I
+CLASS="LINEANNOTATION"
+>0</I
+>
+PQfnumber(res, "BAR")        <I
+CLASS="LINEANNOTATION"
+>-1</I
+>
+PQfnumber(res, "\"BAR\"")    <I
+CLASS="LINEANNOTATION"
+>1</I
+></PRE
+><P></P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQFTABLE"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQftable</CODE
+></DT
+><DD
+><P
+>Возвращает OID таблицы, из которой был получен данный столбец. Номера столбцов начинаются с 0. </P><PRE
+CLASS="SYNOPSIS"
+>Oid PQftable(const PGresult *res,
+             int column_number);</PRE
+><P></P
+><P
+>В следующих случаях возвращается <TT
+CLASS="LITERAL"
+>InvalidOid</TT
+>: если номер столбца выходит за пределы допустимого диапазона; если указанный столбец не является простой ссылкой на столбец таблицы; когда используется протокол версии более ранней, чем 3.0. Вы можете сделать запрос к системной таблице <TT
+CLASS="LITERAL"
+>pg_class</TT
+>, чтобы точно определить, к какой таблице было произведено обращение.</P
+><P
+>Тип данных <TT
+CLASS="TYPE"
+>Oid</TT
+> и константа <TT
+CLASS="LITERAL"
+>InvalidOid</TT
+> будут определены, когда вы включите заголовочный файл для <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>. Они будут принадлежать к одному из целочисленных типов.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQFTABLECOL"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQftablecol</CODE
+></DT
+><DD
+><P
+>Возвращает номер столбца (в пределах его таблицы) для указанного столбца в полученной выборке. Номера столбцов в полученной выборке начинаются с 0, но столбцы в таблице имеют ненулевые номера. </P><PRE
+CLASS="SYNOPSIS"
+>int PQftablecol(const PGresult *res,
+                int column_number);</PRE
+><P></P
+><P
+>В следующих случаях возвращается ноль: если номер столбца выходит за пределы допустимого диапазона; если указанный столбец не является простой ссылкой на столбец таблицы; когда используется протокол версии более ранней, чем 3.0.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQFFORMAT"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQfformat</CODE
+></DT
+><DD
+><P
+>Возвращает код формата, показывающий формат данного столбца. Номера столбцов начинаются с 0. </P><PRE
+CLASS="SYNOPSIS"
+>int PQfformat(const PGresult *res,
+              int column_number);</PRE
+><P></P
+><P
+>Значение кода формата, равное нулю, указывает на текстовое представление данных, в то время, как значение, равное единице, означает двоичное представление. (Другие значения кодов зарезервированы для определения в будущем.)</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQFTYPE"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQftype</CODE
+></DT
+><DD
+><P
+>Возвращает тип данных, соответствующий данному номеру столбца. Возвращаемое целое значение является внутренним номером OID для этого типа. Номера столбцов начинаются с 0. </P><PRE
+CLASS="SYNOPSIS"
+>Oid PQftype(const PGresult *res,
+            int column_number);</PRE
+><P></P
+><P
+>Вы может сделать запрос к системной таблице <TT
+CLASS="LITERAL"
+>pg_type</TT
+>, чтобы получить имена и свойства различных типов данных. Значения <ACRONYM
+CLASS="ACRONYM"
+>OID</ACRONYM
+> для встроенных типов данных определены в файле <TT
+CLASS="FILENAME"
+>src/include/catalog/pg_type.h</TT
+> в дереве исходных кодов.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQFMOD"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQfmod</CODE
+></DT
+><DD
+><P
+>Возвращает модификатор типа для столбца, соответствующего данному номеру. Номера столбцов начинаются с 0. </P><PRE
+CLASS="SYNOPSIS"
+>int PQfmod(const PGresult *res,
+           int column_number);</PRE
+><P></P
+><P
+>Интерпретация значений модификатора зависит от типа; они обычно показывают точность или предельные размеры. Значение -1 используется, чтобы показать <SPAN
+CLASS="QUOTE"
+>"нет доступной информации"</SPAN
+>. Большинство типов данных не используют модификаторов, в таком случае значение всегда будет -1.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQFSIZE"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQfsize</CODE
+></DT
+><DD
+><P
+>Возвращает размер в байтах для столбца, соответствующего данному номеру. Номера столбцов начинаются с 0. </P><PRE
+CLASS="SYNOPSIS"
+>int PQfsize(const PGresult *res,
+            int column_number);</PRE
+><P></P
+><P
+><CODE
+CLASS="FUNCTION"
+>PQfsize</CODE
+> возвращает размер пространства, выделенного для этого столбца в строке базы данных, другими словами, это размер внутреннего представления этого типа данных на сервере. (Следовательно, эта информация не является по-настоящему полезной для клиентов.) Отрицательное значение говорит о том, что тип данных имеет переменную длину.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQBINARYTUPLES"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQbinaryTuples</CODE
+></DT
+><DD
+><P
+>Возвращает 1, если <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+> содержит двоичные данные, или 0, если данные текстовые. </P><PRE
+CLASS="SYNOPSIS"
+>int PQbinaryTuples(const PGresult *res);</PRE
+><P></P
+><P
+>Эта функция не рекомендуется к использованию (за исключением применения в связи с командой <TT
+CLASS="COMMAND"
+>COPY</TT
+>), поскольку один и тот же <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+> может содержать в некоторых столбцах текстовые данные, а в остальных &mdash; двоичные. Предпочтительнее использовать <CODE
+CLASS="FUNCTION"
+>PQfformat</CODE
+>. <CODE
+CLASS="FUNCTION"
+>PQbinaryTuples</CODE
+> возвращает 1, только если все столбцы в выборке являются двоичными (код формата 1).</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQGETVALUE"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQgetvalue</CODE
+></DT
+><DD
+><P
+>Возвращает значение одного поля из одной строки, содержащейся в <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+>. Номера строк и столбцов начинаются с 0. Вызывающая функция не должна напрямую освобождать память, на которую указывает возвращаемый указатель. Она будет освобождена, когда соответствующий указатель на <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+> будет передан функции <CODE
+CLASS="FUNCTION"
+>PQclear</CODE
+>.  </P><PRE
+CLASS="SYNOPSIS"
+>char *PQgetvalue(const PGresult *res,
+                 int row_number,
+                 int column_number);</PRE
+><P></P
+><P
+>Для данных в текстовом формате значение, возвращаемое функцией <CODE
+CLASS="FUNCTION"
+>PQgetvalue</CODE
+>, является значением поля, представленным в виде символьной строки с завершающим нулевым символом. Для данных в двоичном формате используется двоичное представление значения. Оно определяется функциями <CODE
+CLASS="FUNCTION"
+>typsend</CODE
+> и <CODE
+CLASS="FUNCTION"
+>typreceive</CODE
+> для конкретного типа данных. (В этом случае к значению также добавляется нулевой байт, но обычно это не приносит пользы, поскольку вероятно, что значение уже содержит нулевые байты.)</P
+><P
+>Пустая строка возвращается в том случае, когда значение поля отсутствует (null). См. <CODE
+CLASS="FUNCTION"
+>PQgetisnull</CODE
+>, чтобы отличать отсутствие значения (null) от значения, равного пустой строке.</P
+><P
+>Указатель, возвращаемый функцией <CODE
+CLASS="FUNCTION"
+>PQgetvalue</CODE
+>, указывает на область хранения, которая является частью структуры <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+>. Не следует модифицировать данные, на которые указывает этот указатель, а нужно явно скопировать данные в другую область хранения, если предполагается их использовать за пределами времени жизни самой структуры <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+>.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQGETISNULL"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQgetisnull</CODE
+></DT
+><DD
+><P
+>Проверяет поле на предмет отсутствия значения (null). Номера строк и столбцов начинаются с 0. </P><PRE
+CLASS="SYNOPSIS"
+>int PQgetisnull(const PGresult *res,
+                int row_number,
+                int column_number);</PRE
+><P></P
+><P
+>Эта функция возвращает 1, если значение в поле отсутствует (null), и 0, если поле содержит непустое (non-null) значение. (Обратите внимание, что <CODE
+CLASS="FUNCTION"
+>PQgetvalue</CODE
+> возвратит пустую строку, а не нулевой указатель, если значение в поле отсутствует.)</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQGETLENGTH"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQgetlength</CODE
+></DT
+><DD
+><P
+>Возвращает фактическую длину значения поля в байтах. Номера строк и столбцов начинаются 0. </P><PRE
+CLASS="SYNOPSIS"
+>int PQgetlength(const PGresult *res,
+                int row_number,
+                int column_number);</PRE
+><P></P
+><P
+>Это фактическая длина данных для конкретного значения данных, то есть размер объекта, на который указывает <CODE
+CLASS="FUNCTION"
+>PQgetvalue</CODE
+>. Для текстового формата данных это то же самое, что <CODE
+CLASS="FUNCTION"
+>strlen()</CODE
+>. Для двоичного же формата это существенная информация. Обратите внимание, что <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>не</I
+></SPAN
+> следует полагаться на <CODE
+CLASS="FUNCTION"
+>PQfsize</CODE
+>, чтобы получить фактическую длину данных.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQNPARAMS"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQnparams</CODE
+></DT
+><DD
+><P
+>Возвращает число параметров подготовленного оператора. </P><PRE
+CLASS="SYNOPSIS"
+>int PQnparams(const PGresult *res);</PRE
+><P></P
+><P
+>Эта функция полезна только при исследовании результата работы функции <CODE
+CLASS="FUNCTION"
+>PQdescribePrepared</CODE
+>. Для других типов запросов она возвратит ноль.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQPARAMTYPE"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQparamtype</CODE
+></DT
+><DD
+><P
+>Возвращает тип данных для указанного параметра оператора. Номера параметров начинаются с 0. </P><PRE
+CLASS="SYNOPSIS"
+>Oid PQparamtype(const PGresult *res, int param_number);</PRE
+><P></P
+><P
+>Эта функция полезна только при исследовании результата работы функции <CODE
+CLASS="FUNCTION"
+>PQdescribePrepared</CODE
+>. Для других типов запросов она возвратит ноль.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQPRINT"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQprint</CODE
+></DT
+><DD
+><P
+>Выводит все строки и, по выбору, имена столбцов в указанный поток вывода. </P><PRE
+CLASS="SYNOPSIS"
+>void PQprint(FILE *fout,      /* поток вывода */
+             const PGresult *res,
+             const PQprintOpt *po);
+typedef struct
+{
+    pqbool  header;      /* печатать заголовки полей и счётчик строк */
+    pqbool  align;       /* выравнивать поля */
+    pqbool  standard;    /* старый формат */
+    pqbool  html3;       /* выводить HTML-таблицы */
+    pqbool  expanded;    /* расширять таблицы */
+    pqbool  pager;       /* использовать программу для постраничного просмотра, если нужно */
+    char    *fieldSep;   /* разделитель полей */
+    char    *tableOpt;   /* атрибуты для HTML-таблицы */
+    char    *caption;    /* заголовок HTML-таблицы */
+    char    **fieldName; /* массив заменителей для имён полей, завершающийся нулевым символом */
+} PQprintOpt;</PRE
+><P></P
+><P
+>Эту функцию прежде использовала утилита <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> для вывода результатов запроса, но больше она её не использует. Обратите внимание, предполагается, что все данные представлены в текстовом формате.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="LIBPQ-EXEC-NONSELECT"
+>31.3.3. Получение другой информации о результате</A
+></H2
+><P
+>Эти функции используются для получения остальной информации из объектов <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+>.</P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="LIBPQ-PQCMDSTATUS"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQcmdStatus</CODE
+></DT
+><DD
+><P
+>Возвращает дескриптор статуса для SQL-команды, которая сгенерировала <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+>. </P><PRE
+CLASS="SYNOPSIS"
+>char *PQcmdStatus(PGresult *res);</PRE
+><P></P
+><P
+>Как правило, это просто имя команды, но могут быть включены и дополнительные сведения, такие, как число обработанных строк. Вызывающая функция не должна напрямую освобождать память, на которую указывает возвращаемый указатель. Она будет освобождена, когда соответствующий указатель на <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+> будет передан функции <CODE
+CLASS="FUNCTION"
+>PQclear</CODE
+>.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQCMDTUPLES"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQcmdTuples</CODE
+></DT
+><DD
+><P
+>Возвращает число строк, которые затронула SQL-команда. </P><PRE
+CLASS="SYNOPSIS"
+>char *PQcmdTuples(PGresult *res);</PRE
+><P></P
+><P
+>Эта функция возвращает строковое значение, содержащее число строк, которые затронул <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>-оператор, сгенерировавший данный <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+>. Эту функцию можно использовать только сразу после выполнения команд <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, <TT
+CLASS="COMMAND"
+>CREATE TABLE AS</TT
+>, <TT
+CLASS="COMMAND"
+>INSERT</TT
+>, <TT
+CLASS="COMMAND"
+>UPDATE</TT
+>, <TT
+CLASS="COMMAND"
+>DELETE</TT
+>, <TT
+CLASS="COMMAND"
+>MOVE</TT
+>, <TT
+CLASS="COMMAND"
+>FETCH</TT
+> или <TT
+CLASS="COMMAND"
+>COPY</TT
+>, а также после оператора <TT
+CLASS="COMMAND"
+>EXECUTE</TT
+>, выполнившего подготовленный запрос, содержащий команды <TT
+CLASS="COMMAND"
+>INSERT</TT
+>, <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> или <TT
+CLASS="COMMAND"
+>DELETE</TT
+>. Если команда, которая сгенерировала <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+>, была какой-то иной, то <CODE
+CLASS="FUNCTION"
+>PQcmdTuples</CODE
+> возвращает пустую строку. Вызывающая функция не должна напрямую освобождать память, на которую указывает возвращаемый указатель. Она будет освобождена, когда соответствующий указатель на <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+> будет передан функции <CODE
+CLASS="FUNCTION"
+>PQclear</CODE
+>.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQOIDVALUE"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQoidValue</CODE
+></DT
+><DD
+><P
+>Возвращает OID вставленной строки, если <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>-команда была командой <TT
+CLASS="COMMAND"
+>INSERT</TT
+>, которая вставила ровно одну строку в таблицу, имеющую идентификаторы OID, или командой <TT
+CLASS="COMMAND"
+>EXECUTE</TT
+>, которая выполнила подготовленный запрос, содержащий соответствующий оператор <TT
+CLASS="COMMAND"
+>INSERT</TT
+>. В противном случае эта функция возвращает <TT
+CLASS="LITERAL"
+>InvalidOid</TT
+>. Эта функция также возвратит <TT
+CLASS="LITERAL"
+>InvalidOid</TT
+>, если таблица, затронутая командой <TT
+CLASS="COMMAND"
+>INSERT</TT
+>, не содержит идентификаторов OID. </P><PRE
+CLASS="SYNOPSIS"
+>Oid PQoidValue(const PGresult *res);</PRE
+><P></P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQOIDSTATUS"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQoidStatus</CODE
+></DT
+><DD
+><P
+>Эта функция считается не рекомендуемой к использованию (в качестве замены служит <CODE
+CLASS="FUNCTION"
+>PQoidValue</CODE
+>), а также она не отвечает требованиям потоковой безопасности. Она возвращает строковое значение, содержащее OID вставленной строки, в то время как <CODE
+CLASS="FUNCTION"
+>PQoidValue</CODE
+> возвращает значение OID. </P><PRE
+CLASS="SYNOPSIS"
+>char *PQoidStatus(const PGresult *res);</PRE
+><P></P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="LIBPQ-EXEC-ESCAPE-STRING"
+>31.3.4. Экранирование строковых значений для включения в SQL-команды</A
+></H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="LIBPQ-PQESCAPELITERAL"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQescapeLiteral</CODE
+></DT
+><DD
+><P
+></P><PRE
+CLASS="SYNOPSIS"
+>char *PQescapeLiteral(PGconn *conn, const char *str, size_t length);</PRE
+><P>
+     </P
+><P
+><CODE
+CLASS="FUNCTION"
+>PQescapeLiteral</CODE
+> экранирует строковое значение для использования внутри SQL-команды. Это полезно при вставке в SQL-команды значений данных в виде литеральных констант. Определённые символы (такие, как кавычки и символы обратной косой черты) должны экранироваться, чтобы предотвратить их специальную интерпретацию синтаксическим анализатором языка SQL. <CODE
+CLASS="FUNCTION"
+>PQescapeLiteral</CODE
+> выполняет эту операцию.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>PQescapeLiteral</CODE
+> возвращает экранированную версию параметра <TT
+CLASS="PARAMETER"
+>str</TT
+>, размещённую в области памяти, распределённой с помощью функции <CODE
+CLASS="FUNCTION"
+>malloc()</CODE
+>. Эту память нужно освобождать с помощью функции <CODE
+CLASS="FUNCTION"
+>PQfreemem()</CODE
+>, когда возвращённое значение больше не требуется. Завершающий нулевой байт не нужен и не должен учитываться в параметре <TT
+CLASS="PARAMETER"
+>length</TT
+>. (Если завершающий нулевой байт был найден до того, как были обработаны <TT
+CLASS="PARAMETER"
+>length</TT
+> байтов, то <CODE
+CLASS="FUNCTION"
+>PQescapeLiteral</CODE
+> останавливает работу на нулевом байте; таким образом, поведение функции напоминает <CODE
+CLASS="FUNCTION"
+>strncpy</CODE
+>.) В возвращённой строке все специальные символы заменены таким образом, что синтаксический анализатор строковых литералов <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> может обработать их должным образом. Завершающий нулевой байт также будет добавлен. Одинарные кавычки, которые должны окружать строковые литералы <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, включаются в результирующую строку.</P
+><P
+>В случае ошибки <CODE
+CLASS="FUNCTION"
+>PQescapeLiteral</CODE
+> возвращает <TT
+CLASS="SYMBOL"
+>NULL</TT
+>, и в объект <TT
+CLASS="PARAMETER"
+>conn</TT
+> помещается соответствующее сообщение.</P
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>Особенно важно выполнять надлежащее экранирование при обработке строк, полученных из ненадёжных источников. В противном случае ваша безопасность подвергается риску из-за уязвимости в отношении атак с использованием <SPAN
+CLASS="QUOTE"
+>"SQL-инъекций"</SPAN
+>, с помощью которых нежелательные SQL-команды направляются в вашу базу данных.</P
+></BLOCKQUOTE
+></DIV
+><P
+>Обратите внимание, что нет необходимости (и это будет даже некорректно) экранировать значения данных, передаваемых в виде отдельных параметров в функцию <CODE
+CLASS="FUNCTION"
+>PQexecParams</CODE
+> или родственные ей функции.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQESCAPEIDENTIFIER"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQescapeIdentifier</CODE
+></DT
+><DD
+><P
+></P><PRE
+CLASS="SYNOPSIS"
+>char *PQescapeIdentifier(PGconn *conn, const char *str, size_t length);</PRE
+><P>
+     </P
+><P
+><CODE
+CLASS="FUNCTION"
+>PQescapeIdentifier</CODE
+> экранирует строку, предназначенную для использования в качестве идентификатора SQL, такого, как таблица, столбец или имя функции. Это полезно, когда идентификатор, выбранный пользователем, может содержать специальные символы, которые в противном случае не интерпретировались бы синтаксическим анализатором SQL, как часть идентификатора, или когда идентификатор может содержать символы верхнего регистра, и этот регистр требуется сохранить.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>PQescapeIdentifier</CODE
+> возвращает версию параметра <TT
+CLASS="PARAMETER"
+>str</TT
+>, экранированную как SQL-идентификатор, и размещённую в области памяти, распределённой с помощью функции <CODE
+CLASS="FUNCTION"
+>malloc()</CODE
+>. Эту память нужно освобождать с помощью функции <CODE
+CLASS="FUNCTION"
+>PQfreemem()</CODE
+>, когда возвращённое значение больше не требуется. Завершающий нулевой байт не нужен и не должен учитываться в параметре <TT
+CLASS="PARAMETER"
+>length</TT
+>. (Если завершающий нулевой байт был найден до того, как были обработаны <TT
+CLASS="PARAMETER"
+>length</TT
+> байтов, то <CODE
+CLASS="FUNCTION"
+>PQescapeIdentifier</CODE
+> останавливает работу на нулевом байте; таким образом, поведение функции напоминает <CODE
+CLASS="FUNCTION"
+>strncpy</CODE
+>.) В возвращённой строке все специальные символы заменены таким образом, что она будет надлежащим образом обработана, как SQL-идентификатор. Завершающий нулевой байт также будет добавлен. Возвращённая строка также будет заключена в двойные кавычки.</P
+><P
+>В случае ошибки <CODE
+CLASS="FUNCTION"
+>PQescapeIdentifier</CODE
+> возвращает <TT
+CLASS="SYMBOL"
+>NULL</TT
+>, и в объект <TT
+CLASS="PARAMETER"
+>conn</TT
+> помещается соответствующее сообщение.</P
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>Как и в случае со строковыми литералами, для того чтобы предотвратить атаки с помощью SQL-инъекций, SQL-идентификаторы должны экранироваться, когда они получены из ненадёжного источника.</P
+></BLOCKQUOTE
+></DIV
+></DD
+><DT
+><A
+NAME="LIBPQ-PQESCAPESTRINGCONN"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQescapeStringConn</CODE
+></DT
+><DD
+><P
+></P><PRE
+CLASS="SYNOPSIS"
+>size_t PQescapeStringConn(PGconn *conn,
+                          char *to, const char *from, size_t length,
+                          int *error);</PRE
+><P>
+     </P
+><P
+><CODE
+CLASS="FUNCTION"
+>PQescapeStringConn</CODE
+> экранирует строковые литералы наподобие <CODE
+CLASS="FUNCTION"
+>PQescapeLiteral</CODE
+>. Но, в отличие от <CODE
+CLASS="FUNCTION"
+>PQescapeLiteral</CODE
+>, за предоставление буфера надлежащего размера отвечает вызывающая функция. Более того, <CODE
+CLASS="FUNCTION"
+>PQescapeStringConn</CODE
+> не добавляет одинарные кавычки, которые должны окружать строковые литералы <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>; они должны быть включены в SQL-команду, в которую вставляется результирующая строка. Параметр <TT
+CLASS="PARAMETER"
+>from</TT
+> указывает на первый символ строки, которая должна экранироваться, а параметр <TT
+CLASS="PARAMETER"
+>length</TT
+> задаёт число байтов в этой строке. Завершающий нулевой байт не требуется и не должен учитываться в параметре <TT
+CLASS="PARAMETER"
+>length</TT
+>. (Если завершающий нулевой байт был найден до того, как были обработаны <TT
+CLASS="PARAMETER"
+>length</TT
+> байтов, то <CODE
+CLASS="FUNCTION"
+>PQescapeStringConn</CODE
+> останавливает работу на нулевом байте; таким образом, поведение функции напоминает <CODE
+CLASS="FUNCTION"
+>strncpy</CODE
+>.) Параметр <TT
+CLASS="PARAMETER"
+>to</TT
+> должен указывать на буфер, который сможет вместить как минимум на один байт больше, чем предписывает удвоенное значение параметра <TT
+CLASS="PARAMETER"
+>length</TT
+>, в противном случае поведение функции не определено. Поведение будет также не определено, если строки <TT
+CLASS="PARAMETER"
+>to</TT
+> и <TT
+CLASS="PARAMETER"
+>from</TT
+> перекрываются.</P
+><P
+>Если параметр <TT
+CLASS="PARAMETER"
+>error</TT
+> не равен <TT
+CLASS="SYMBOL"
+>NULL</TT
+>, тогда значение <TT
+CLASS="LITERAL"
+>*error</TT
+> устанавливается равным нулю в случае успешной работы и не равным нулю в случае ошибки. В настоящее время единственным возможным условием возникновения ошибки является неверная мультибайтовая кодировка в исходной строке. Выходная строка формируется даже при наличии ошибки, но можно ожидать, что сервер отвергнет её как неверно сформированную. В случае ошибки в объект <TT
+CLASS="PARAMETER"
+>conn</TT
+> записывается соответствующее сообщение независимо от того, равно ли <TT
+CLASS="SYMBOL"
+>NULL</TT
+> значение параметра <TT
+CLASS="PARAMETER"
+>error</TT
+>.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>PQescapeStringConn</CODE
+> возвращает число байтов, записанных по адресу <TT
+CLASS="PARAMETER"
+>to</TT
+>, не включая завершающий нулевой байт.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQESCAPESTRING"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQescapeString</CODE
+></DT
+><DD
+><P
+><CODE
+CLASS="FUNCTION"
+>PQescapeString</CODE
+> является более старой, не рекомендованной к использованию версией функции <CODE
+CLASS="FUNCTION"
+>PQescapeStringConn</CODE
+>. </P><PRE
+CLASS="SYNOPSIS"
+>size_t PQescapeString (char *to, const char *from, size_t length);</PRE
+><P></P
+><P
+>Единственное отличие от <CODE
+CLASS="FUNCTION"
+>PQescapeStringConn</CODE
+> состоит в том, что функция <CODE
+CLASS="FUNCTION"
+>PQescapeString</CODE
+> не принимает <TT
+CLASS="STRUCTNAME"
+>PGconn</TT
+> или <TT
+CLASS="PARAMETER"
+>error</TT
+> в качестве параметров. Из-за этого она не может скорректировать свое поведение в зависимости от свойств подключения (таких, как кодировка символов) и, следовательно, <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>она может выдавать неверные результаты</I
+></SPAN
+>. Также она не имеет способа сообщить об ошибках.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>PQescapeString</CODE
+> может безопасно использоваться в клиентских программах, которые работают лишь с одним подключением к <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> за один раз (в этом случае функция может найти то, что ей нужно знать, <SPAN
+CLASS="QUOTE"
+>"за кулисами"</SPAN
+>). В других контекстах её использование несет в себе угрозу безопасности и его следует избегать в пользу применения функции <CODE
+CLASS="FUNCTION"
+>PQescapeStringConn</CODE
+>.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQESCAPEBYTEACONN"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQescapeByteaConn</CODE
+></DT
+><DD
+><P
+>Экранирует двоичные данные для их использования внутри SQL-команды с типом данных <TT
+CLASS="TYPE"
+>bytea</TT
+>. Как и в случае с <CODE
+CLASS="FUNCTION"
+>PQescapeStringConn</CODE
+>, эта функция применяется только тогда, когда данные вставляются непосредственно в строку SQL-команды. </P><PRE
+CLASS="SYNOPSIS"
+>unsigned char *PQescapeByteaConn(PGconn *conn,
+                                 const unsigned char *from,
+                                 size_t from_length,
+                                 size_t *to_length);</PRE
+><P></P
+><P
+>Байты, имеющие определённые значения, должны экранироваться, когда они используются в качестве составной части литерала, имеющего тип <TT
+CLASS="TYPE"
+>bytea</TT
+>, в <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>-операторе. <CODE
+CLASS="FUNCTION"
+>PQescapeByteaConn</CODE
+> экранирует байты, используя либо hex-кодирование, либо экранирование с помощью обратной косой черты. См. <A
+HREF="datatype-binary.html"
+>Раздел 8.4</A
+> для получения дополнительной информации.</P
+><P
+>Параметр <TT
+CLASS="PARAMETER"
+>from</TT
+> указывает на первый байт строки, которая должна экранироваться, а параметр <TT
+CLASS="PARAMETER"
+>from_length</TT
+> задаёт число байтов в этой двоичной строке. (Завершающий нулевой байт не нужен и не учитывается.) Параметр <TT
+CLASS="PARAMETER"
+>to_length</TT
+> указывает на переменную, которая будет содержать длину результирующей экранированной строки. Эта длина включает завершающий нулевой байт результирующей строки.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>PQescapeByteaConn</CODE
+> возвращает экранированную версию двоичной строки, на которую указывает параметр <TT
+CLASS="PARAMETER"
+>from</TT
+>, и размещает её в памяти, распределённой с помощью <CODE
+CLASS="FUNCTION"
+>malloc()</CODE
+>. Эта память должна быть освобождена с помощью функции <CODE
+CLASS="FUNCTION"
+>PQfreemem()</CODE
+>, когда результирующая строка больше не нужна. В возвращаемой строке все специальные символы заменены так, чтобы синтаксический анализатор литеральных строк <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> и функция ввода для типа <TT
+CLASS="TYPE"
+>bytea</TT
+> могли обработать их надлежащим образом. Завершающий нулевой байт также добавляется. Одинарные кавычки, которые должны окружать строковые литералы <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, не являются частью результирующей строки.</P
+><P
+>В случае ошибки возвращается нулевой указатель, и соответствующее сообщение об ошибке записывается в объект <TT
+CLASS="PARAMETER"
+>conn</TT
+>. В настоящее время единственной возможной ошибкой может быть нехватка памяти для результирующей строки.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQESCAPEBYTEA"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQescapeBytea</CODE
+></DT
+><DD
+><P
+><CODE
+CLASS="FUNCTION"
+>PQescapeBytea</CODE
+> является более старой, не рекомендуемой к использованию версией функции <CODE
+CLASS="FUNCTION"
+>PQescapeByteaConn</CODE
+>. </P><PRE
+CLASS="SYNOPSIS"
+>unsigned char *PQescapeBytea(const unsigned char *from,
+                             size_t from_length,
+                             size_t *to_length);</PRE
+><P></P
+><P
+>Единственное отличие от <CODE
+CLASS="FUNCTION"
+>PQescapeByteaConn</CODE
+> состоит в том, что функция <CODE
+CLASS="FUNCTION"
+>PQescapeBytea</CODE
+> не принимает <TT
+CLASS="STRUCTNAME"
+>PGconn</TT
+> в качестве параметра. Из-за этого <CODE
+CLASS="FUNCTION"
+>PQescapeBytea</CODE
+> может безопасно использоваться в клиентских программах, которые работают лишь с одним подключением к <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> за один раз (в этом случае функция может найти то, что ей нужно знать, <SPAN
+CLASS="QUOTE"
+>"за кулисами"</SPAN
+>). Она <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>может выдавать неверные результаты</I
+></SPAN
+> при использовании в программах, которые формируют множественные подключения к базе данных (в таких случаях используйте <CODE
+CLASS="FUNCTION"
+>PQescapeByteaConn</CODE
+>).</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQUNESCAPEBYTEA"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQunescapeBytea</CODE
+></DT
+><DD
+><P
+>Преобразует строковое представление двоичных данных в двоичные данные &mdash; является обратной функцией к функции <CODE
+CLASS="FUNCTION"
+>PQescapeBytea</CODE
+>. Она нужна, когда данные типа <TT
+CLASS="TYPE"
+>bytea</TT
+> извлекаются в текстовом формате, но не когда они извлекаются в двоичном формате. </P><PRE
+CLASS="SYNOPSIS"
+>unsigned char *PQunescapeBytea(const unsigned char *from, size_t *to_length);</PRE
+><P></P
+><P
+>Параметр <TT
+CLASS="PARAMETER"
+>from</TT
+> указывает на строку, такую, какую могла бы возвратить функция <CODE
+CLASS="FUNCTION"
+>PQgetvalue</CODE
+>, применённая к столбцу типа <TT
+CLASS="TYPE"
+>bytea</TT
+>. <CODE
+CLASS="FUNCTION"
+>PQunescapeBytea</CODE
+> преобразует это строковое представление в его двоичное представление. Она возвращает указатель на буфер, распределённый с помощью функции <CODE
+CLASS="FUNCTION"
+>malloc()</CODE
+> (или <TT
+CLASS="SYMBOL"
+>NULL</TT
+> в случае ошибки) и помещает размер буфера по адресу <TT
+CLASS="PARAMETER"
+>to_length</TT
+>. Когда результат не будет нужен, необходимо освободить его память, вызвав <CODE
+CLASS="FUNCTION"
+>PQfreemem</CODE
+>.</P
+><P
+>Это преобразование не является точной инверсией для <CODE
+CLASS="FUNCTION"
+>PQescapeBytea</CODE
+>, поскольку ожидается, что строка, полученная от <CODE
+CLASS="FUNCTION"
+>PQgetvalue</CODE
+>, не будет <SPAN
+CLASS="QUOTE"
+>"экранированной"</SPAN
+>. В частности, это означает, что учитывать режим спецпоследовательностей не нужно, и поэтому в параметре нет необходимости <TT
+CLASS="STRUCTNAME"
+>PGconn</TT
+>.</P
+></DD
+></DL
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="libpq-status.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="libpq-async.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Функции, описывающие текущее состояние подключения</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="libpq.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Асинхронная обработка команд</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

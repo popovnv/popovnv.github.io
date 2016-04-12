@@ -1,0 +1,474 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>SELECT INTO</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="SELECT"
+HREF="sql-select.html"><LINK
+REL="NEXT"
+TITLE="SET"
+HREF="sql-set.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="SELECT"
+HREF="sql-select.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="SET"
+HREF="sql-set.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-SELECTINTO"
+></A
+>SELECT INTO</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN84202"
+></A
+><H2
+>Название</H2
+>SELECT INTO&nbsp;--&nbsp;создать таблицу из результатов запроса</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN84205"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>[ WITH [ RECURSIVE ] <TT
+CLASS="REPLACEABLE"
+><I
+>запрос_WITH</I
+></TT
+> [, ...] ]
+SELECT [ ALL | DISTINCT [ ON ( <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> [, ...] ) ] ]
+    * | <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> [ [ AS ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_результата</I
+></TT
+> ] [, ...]
+    INTO [ TEMPORARY | TEMP | UNLOGGED ] [ TABLE ] <TT
+CLASS="REPLACEABLE"
+><I
+>новая_таблица</I
+></TT
+>
+    [ FROM <TT
+CLASS="REPLACEABLE"
+><I
+>элемент_FROM</I
+></TT
+> [, ...] ]
+    [ WHERE <TT
+CLASS="REPLACEABLE"
+><I
+>условие</I
+></TT
+> ]
+    [ GROUP BY <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> [, ...] ]
+    [ HAVING <TT
+CLASS="REPLACEABLE"
+><I
+>условие</I
+></TT
+> [, ...] ]
+    [ WINDOW <TT
+CLASS="REPLACEABLE"
+><I
+>имя_окна</I
+></TT
+> AS ( <TT
+CLASS="REPLACEABLE"
+><I
+>определение_окна</I
+></TT
+> ) [, ...] ]
+    [ { UNION | INTERSECT | EXCEPT } [ ALL | DISTINCT ] <TT
+CLASS="REPLACEABLE"
+><I
+>выборка</I
+></TT
+> ]
+    [ ORDER BY <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> [ ASC | DESC | USING <TT
+CLASS="REPLACEABLE"
+><I
+>оператор</I
+></TT
+> ] [ NULLS { FIRST | LAST } ] [, ...] ]
+    [ LIMIT { <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+> | ALL } ]
+    [ OFFSET <TT
+CLASS="REPLACEABLE"
+><I
+>начало</I
+></TT
+> [ ROW | ROWS ] ]
+    [ FETCH { FIRST | NEXT } [ <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+> ] { ROW | ROWS } ONLY ]
+    [ FOR { UPDATE | SHARE } [ OF <TT
+CLASS="REPLACEABLE"
+><I
+>table_name</I
+></TT
+> [, ...] ] [ NOWAIT ] [...] ]</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN84225"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>SELECT INTO</TT
+> создаёт новую таблицу и заполняет её данными, полученными из запроса. Данные не передаются клиенту, как с обычной командой <TT
+CLASS="COMMAND"
+>SELECT</TT
+>. Колонки новой таблицы получают имена и типы данных, связанные с выходными колонками <TT
+CLASS="COMMAND"
+>SELECT</TT
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN84231"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>TEMPORARY</TT
+> или <TT
+CLASS="LITERAL"
+>TEMP</TT
+></DT
+><DD
+><P
+>Если указано, создаваемая таблица будет временной. За подробностями обратитесь к <A
+HREF="sql-createtable.html"
+>CREATE TABLE</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>UNLOGGED</TT
+></DT
+><DD
+><P
+>Если указано, создаваемая таблица будет нежурналируемой. За подробностями обратитесь к <A
+HREF="sql-createtable.html"
+>CREATE TABLE</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>новая_таблица</I
+></TT
+></DT
+><DD
+><P
+>Имя (возможно, дополненное схемой) создаваемой таблицы.</P
+></DD
+></DL
+></DIV
+><P
+>Все другие параметры подробно описываются в <A
+HREF="sql-select.html"
+>SELECT</A
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN84254"
+></A
+><H2
+>Замечания</H2
+><P
+>Команда <TT
+CLASS="COMMAND"
+>SELECT INTO</TT
+> действует подобно <A
+HREF="sql-createtableas.html"
+>CREATE TABLE AS</A
+>, но рекомендуется использовать <TT
+CLASS="COMMAND"
+>CREATE TABLE AS</TT
+>, так как <TT
+CLASS="COMMAND"
+>SELECT INTO</TT
+> не поддерживается в <SPAN
+CLASS="APPLICATION"
+>ECPG</SPAN
+> и <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+>, вследствие того, что они воспринимают предложение <TT
+CLASS="LITERAL"
+>INTO</TT
+> по-своему. К тому же, <TT
+CLASS="COMMAND"
+>CREATE TABLE AS</TT
+> предоставляет больший набор возможностей, чем <TT
+CLASS="COMMAND"
+>SELECT INTO</TT
+>.</P
+><P
+>Чтобы добавить колонку OID в таблицу, создаваемую командой <TT
+CLASS="COMMAND"
+>SELECT INTO</TT
+>, необходимо установить конфигурационную переменную <A
+HREF="runtime-config-compatible.html#GUC-DEFAULT-WITH-OIDS"
+>default_with_oids</A
+>. С другой стороны, можно использовать <TT
+CLASS="COMMAND"
+>CREATE TABLE AS</TT
+> с предложением <TT
+CLASS="LITERAL"
+>WITH OIDS</TT
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN84271"
+></A
+><H2
+>Примеры</H2
+><P
+>Создание таблицы <TT
+CLASS="LITERAL"
+>films_recent</TT
+>, содержащей только последние записи из таблицы <TT
+CLASS="LITERAL"
+>films</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT * INTO films_recent FROM films WHERE date_prod &gt;= '2002-01-01';</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN84277"
+></A
+><H2
+>Совместимость</H2
+><P
+>В стандарте SQL команда <TT
+CLASS="COMMAND"
+>SELECT INTO</TT
+> применяется для передачи скалярных значений клиентской программе, но не для создания новой таблицы. Именно это применение имеет место в <SPAN
+CLASS="APPLICATION"
+>ECPG</SPAN
+> (см. <A
+HREF="ecpg.html"
+>Главу 33</A
+>) и в <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> (см. <A
+HREF="plpgsql.html"
+>Главу 40</A
+>). В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> команда <TT
+CLASS="COMMAND"
+>SELECT INTO</TT
+> связана с созданием таблицы по историческим причинам. В новом коде для этих целей лучше использовать <TT
+CLASS="COMMAND"
+>CREATE TABLE AS</TT
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN84288"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-createtableas.html"
+>CREATE TABLE AS</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-select.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-set.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>SELECT</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>SET</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

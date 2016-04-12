@@ -1,0 +1,344 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Структура PL/pgSQL</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="PL/pgSQL — процедурный язык SQL"
+HREF="plpgsql.html"><LINK
+REL="PREVIOUS"
+TITLE="Обзор"
+HREF="plpgsql-overview.html"><LINK
+REL="NEXT"
+TITLE="Объявления"
+HREF="plpgsql-declarations.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Обзор"
+HREF="plpgsql-overview.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="plpgsql.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 40. <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> — процедурный язык <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Объявления"
+HREF="plpgsql-declarations.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="PLPGSQL-STRUCTURE"
+>40.2. Структура <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+></A
+></H1
+><P
+><SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> это блочно-структурированный язык. Текст определения функции должен быть <I
+CLASS="FIRSTTERM"
+>блоком</I
+>. Структура блока: </P><PRE
+CLASS="SYNOPSIS"
+>[<SPAN
+CLASS="OPTIONAL"
+> &lt;&lt;<TT
+CLASS="REPLACEABLE"
+><I
+>метка</I
+></TT
+>&gt;&gt; </SPAN
+>]
+[<SPAN
+CLASS="OPTIONAL"
+> DECLARE
+    <TT
+CLASS="REPLACEABLE"
+><I
+>объявления</I
+></TT
+> </SPAN
+>]
+BEGIN
+    <TT
+CLASS="REPLACEABLE"
+><I
+>операторы</I
+></TT
+>
+END [<SPAN
+CLASS="OPTIONAL"
+> <TT
+CLASS="REPLACEABLE"
+><I
+>метка</I
+></TT
+> </SPAN
+>];</PRE
+><P></P
+><P
+>Каждое объявление и каждый оператор в блоке должны завершаться символом ";"(точка с запятой). Блок, вложенный в другой блок, должен иметь точку с запятой после <TT
+CLASS="LITERAL"
+>END</TT
+>, как показано выше. Однако финальный <TT
+CLASS="LITERAL"
+>END</TT
+>, завершающий тело функции, не требует точки с запятой.</P
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>Распространённой ошибкой является добавление точки с запятой сразу после <TT
+CLASS="LITERAL"
+>BEGIN</TT
+>. Это неправильно и приведёт к синтаксической ошибке.</P
+></BLOCKQUOTE
+></DIV
+><P
+><TT
+CLASS="REPLACEABLE"
+><I
+>Метка</I
+></TT
+> требуется только тогда, когда нужно идентифицировать блок в операторе <TT
+CLASS="LITERAL"
+>EXIT</TT
+>, или дополнить имена переменных, объявленных в этом блоке. Если метка указана после <TT
+CLASS="LITERAL"
+>END</TT
+>, то она должна совпадать с меткой в начале блока.</P
+><P
+>Ключевые слова не чувствительны к регистру символов. Как и в обычных SQL-командах, идентификаторы неявно преобразуются к нижнему регистру, если они не взяты в двойные кавычки.</P
+><P
+>Комментарии в <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> коде работают так же, как и в обычном SQL. Двойное тире (<TT
+CLASS="LITERAL"
+>--</TT
+>) начинает комментарий, который завершается в конце строки. Блочный комментарий начинается с <TT
+CLASS="LITERAL"
+>/*</TT
+> и завершается <TT
+CLASS="LITERAL"
+>*/</TT
+>. Блочные комментарии могут быть вложенными.</P
+><P
+>Любой оператор в выполняемой секции блока может быть <I
+CLASS="FIRSTTERM"
+>вложенным блоком</I
+>. Вложенные блоки используются для логической группировки нескольких операторов или локализации области действия переменных для группы операторов. Во время выполнения вложенного блока переменные, объявленные в нём, скрывают переменные внешних блоков с такими же именами. Чтобы получить доступ к внешним переменным, нужно дополнить их имена меткой блока. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION somefunc() RETURNS integer AS $$
+&lt;&lt; outerblock &gt;&gt;
+DECLARE
+    quantity integer := 30;
+BEGIN
+    RAISE NOTICE 'Сейчас quantity = %', quantity;  -- Выводится 30
+    quantity := 50;
+    --
+    -- Создаем вложенный блок
+    --
+    DECLARE
+        quantity integer := 80;
+    BEGIN
+        RAISE NOTICE 'Сейчас quantity = %', quantity;  -- Выводится 80
+        RAISE NOTICE 'Во внешнем блоке quantity = %', outerblock.quantity;  -- Выводится 50
+    END;
+
+    RAISE NOTICE 'Сейчас quantity = %', quantity;  -- Выводится 50
+
+    RETURN quantity;
+END;
+$$ LANGUAGE plpgsql;</PRE
+><P></P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Существует скрытый <SPAN
+CLASS="QUOTE"
+>"внешний блок"</SPAN
+>, окружающий тело каждой функции на <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+>. Этот блок содержит объявления параметров функции (если они есть), а также некоторые специальные переменные, такие как <TT
+CLASS="LITERAL"
+>FOUND</TT
+> (см. <A
+HREF="plpgsql-statements.html#PLPGSQL-STATEMENTS-DIAGNOSTICS"
+>Подраздел 40.5.5</A
+>). Этот блок имеет метку, совпадающую с именем функции, таким образом, параметры и специальные переменные могут быть дополнены именем функции.</P
+></BLOCKQUOTE
+></DIV
+><P
+>Важно не путать использование <TT
+CLASS="COMMAND"
+>BEGIN</TT
+>/<TT
+CLASS="COMMAND"
+>END</TT
+> для группировки операторов в <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> с одноименными SQL-командами для управления транзакциями. <TT
+CLASS="COMMAND"
+>BEGIN</TT
+>/<TT
+CLASS="COMMAND"
+>END</TT
+> в <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> служат только для группировки предложений; они не начинают и не заканчивают транзакции. Функции и триггерные процедуры всегда выполняются в рамках транзакции, начатой во внешнем запросе — они не могут начать или завершить эту транзакцию, так как у них внутри нет контекста для выполнения таких действий. Однако блок содержащий секцию <TT
+CLASS="LITERAL"
+>EXCEPTION</TT
+> создаёт вложенную транзакцию, которая может быть отменена, не затрагивая внешней транзакции. Подробнее это описано в <A
+HREF="plpgsql-control-structures.html#PLPGSQL-ERROR-TRAPPING"
+>Подразделе 40.6.6</A
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="plpgsql-overview.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="plpgsql-declarations.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Обзор</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="plpgsql.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Объявления</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

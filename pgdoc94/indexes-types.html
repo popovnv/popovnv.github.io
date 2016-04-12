@@ -1,0 +1,562 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Типы индексов</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Индексы"
+HREF="indexes.html"><LINK
+REL="PREVIOUS"
+TITLE="Введение"
+HREF="indexes-intro.html"><LINK
+REL="NEXT"
+TITLE="Составные индексы"
+HREF="indexes-multicolumn.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Введение"
+HREF="indexes-intro.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="indexes.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 11. Индексы</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Составные индексы"
+HREF="indexes-multicolumn.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="INDEXES-TYPES"
+>11.2. Типы индексов</A
+></H1
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> поддерживает несколько типов индексов: B-дерево, хеш, GiST, SP-GiST и GIN. Для разных типов индексов применяются разные алгоритмы, ориентированные на определённые типы запросов. По умолчанию команда <TT
+CLASS="COMMAND"
+>CREATE INDEX</TT
+> создаёт индексы типа B-дерево, эффективные в большинстве случаев.</P
+><P
+> B-деревья могут работать в условиях на равенство и в проверках диапазонов с данными, которые можно отсортировать в некотором порядке. Точнее, планировщик запросов <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> может задействовать индекс-B-дерево, когда индексируемая колонка участвует в сравнении с одним из следующих операторов: <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>&lt;</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>&lt;=</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>=</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>&gt;=</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>&gt;</TT
+></TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+> При обработке конструкций, представимых как сочетание этих операторов, например <TT
+CLASS="LITERAL"
+>BETWEEN</TT
+> и <TT
+CLASS="LITERAL"
+>IN</TT
+>, так же может выполняться поиск по индексу-B-дереву. Кроме того, такие индексы могут использоваться и в условиях <TT
+CLASS="LITERAL"
+>IS NULL</TT
+> и <TT
+CLASS="LITERAL"
+>IS NOT NULL</TT
+> по индексированным колонкам.</P
+><P
+>Также оптимизатор может использовать эти индексы в запросах с операторами сравнения по шаблону <TT
+CLASS="LITERAL"
+>LIKE</TT
+> и <TT
+CLASS="LITERAL"
+>~</TT
+>, <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>если</I
+></SPAN
+> этот шаблон определяется константой и он привязан к началу строки &mdash; например, <TT
+CLASS="LITERAL"
+>col LIKE 'foo%'</TT
+> или <TT
+CLASS="LITERAL"
+>col ~ '^foo'</TT
+>, но не <TT
+CLASS="LITERAL"
+>col LIKE '%bar'</TT
+>. Но если ваша база данных использует не локаль C, для поддержки индексирования запросов с шаблонами вам потребуется создать индекс со специальным классом операторов; см. <A
+HREF="indexes-opclass.html"
+>Раздел 11.9</A
+>. Индексы-B-деревья можно использовать и для <TT
+CLASS="LITERAL"
+>ILIKE</TT
+> и <TT
+CLASS="LITERAL"
+>~*</TT
+>, но только если шаблон начинается не с алфавитных символов, то есть символов, не подверженных преобразованию регистра.</P
+><P
+>B-деревья могут также применяться для получения данных, отсортированных по порядку. Это не всегда быстрее простого сканирования и сортировки, но иногда бывает полезно.</P
+><P
+> Хеш-индексы работают только с простыми условиями равенства. Планировщик запросов может применить хеш-индекс, только если индексируемая колонка участвует в сравнении с оператором <TT
+CLASS="LITERAL"
+>=</TT
+>. Создать такой индекс можно следующей командой: </P><PRE
+CLASS="SYNOPSIS"
+>CREATE INDEX <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> ON <TT
+CLASS="REPLACEABLE"
+><I
+>таблица</I
+></TT
+> USING hash (<TT
+CLASS="REPLACEABLE"
+><I
+>колонка</I
+></TT
+>);</PRE
+><P></P
+><DIV
+CLASS="CAUTION"
+><P
+></P
+><TABLE
+CLASS="CAUTION"
+BORDER="1"
+WIDTH="100%"
+><TR
+><TD
+ALIGN="CENTER"
+><B
+>Предостережение</B
+></TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+><P
+>Операции с хеш-индексами в настоящее время не проходят через WAL, так что после аварийной остановки базы данных может потребоваться перестроить хеш-индексы командой <TT
+CLASS="COMMAND"
+>REINDEX</TT
+>. Кроме того, изменения в хеш-индексах после начальной копии не переносятся при потоковой или файловой репликации, так что в последующих запросах они будут давать неправильные ответы. По этим причинам настоятельно рекомендуется не использовать их.</P
+></TD
+></TR
+></TABLE
+></DIV
+><P
+> GiST-индексы представляют собой не просто разновидность индексов, а инфраструктуру, позволяющую реализовать много разных стратегий индексирования. Как следствие, GiST-индексы могут применяться с разными операторами, в зависимости от стратегии индексирования (<I
+CLASS="FIRSTTERM"
+>класса операторов</I
+>). Например, стандартный дистрибутив <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> включает классы операторов GiST для нескольких двумерных типов геометрических данных, что позволяет применять индексы в запросах с операторами: <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>&lt;&lt;</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>&amp;&lt;</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>&amp;&gt;</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>&gt;&gt;</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>&lt;&lt;|</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>&amp;&lt;|</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>|&amp;&gt;</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>|&gt;&gt;</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>@&gt;</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>&lt;@</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>~=</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>&amp;&amp;</TT
+></TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+> (Эти операторы описаны в <A
+HREF="functions-geometry.html"
+>Разделе 9.11</A
+>.) Классы операторов GiST, включённые в стандартный дистрибутив, описаны в <A
+HREF="gist-builtin-opclasses.html#GIST-BUILTIN-OPCLASSES-TABLE"
+>Таблице 56-1</A
+>. В коллекции <TT
+CLASS="LITERAL"
+>contrib</TT
+> можно найти и другие классы операторов GiST, реализованные как отдельные проекты. За дополнительными сведениями обратитесь к <A
+HREF="gist.html"
+>Главе 56</A
+>.</P
+><P
+>GiST-индексы также могут оптимизировать поиск <SPAN
+CLASS="QUOTE"
+>"ближайшего соседа"</SPAN
+>, например такой: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT * FROM places ORDER BY location &lt;-&gt; point '(101,456)' LIMIT 10;</PRE
+><P> который возвращает десять расположений, ближайших к заданной точке. Возможность такого применения индекса опять же зависит от класса используемого оператора. Операторы, которые можно использовать таким образом, перечислены в <A
+HREF="gist-builtin-opclasses.html#GIST-BUILTIN-OPCLASSES-TABLE"
+>Таблице 56-1</A
+>, в колонке <SPAN
+CLASS="QUOTE"
+>"Операторы сортировки"</SPAN
+>.</P
+><P
+> Индексы SP-GiST, как и GiST, предоставляют инфраструктуру, поддерживающие различные типы поиска. SP-GiST позволяет организовывать на диске самые разные не сбалансированные структуры данных, такие как деревья квадрантов, к-мерные деревья и цифровые деревья. Например, стандартный дистрибутив <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> включает классы операторов SP-GiST для точек в двумерном пространстве, что позволяет применять индексы в запросах с операторами: <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>&lt;&lt;</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>&gt;&gt;</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>~=</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>&lt;@</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>&lt;^</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>&gt;^</TT
+></TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+> (Эти операторы описаны в <A
+HREF="functions-geometry.html"
+>Разделе 9.11</A
+>.) Классы операторов SP-GiST, включённые в стандартный дистрибутив, описаны в <A
+HREF="spgist-builtin-opclasses.html#SPGIST-BUILTIN-OPCLASSES-TABLE"
+>Таблице 57-1</A
+>. За дополнительными сведениями обратитесь к <A
+HREF="spgist.html"
+>Главе 57</A
+>.</P
+><P
+> GIN-индексы представляют собой инвертированные индексы, в которых могут содержаться значения с несколькими ключами, например массивы. Подобно GiST и SP-GiST, индексы GIN могут поддерживать различные определённые пользователем стратегии и в зависимости от них могут применяться с разными операторами. Например, стандартный дистрибутив <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> включает классы операторов GIN для одномерных массивов, что позволяет применять индексы в запросах с операторами: <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>&lt;@</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>@&gt;</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>=</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>&amp;&amp;</TT
+></TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+> (Эти операторы описаны в <A
+HREF="functions-array.html"
+>Разделе 9.18</A
+>.) Классы операторов GIN, включённые в стандартный дистрибутив, описаны в <A
+HREF="gin-builtin-opclasses.html#GIN-BUILTIN-OPCLASSES-TABLE"
+>Таблице 58-1</A
+>. В коллекции <TT
+CLASS="LITERAL"
+>contrib</TT
+> можно найти и другие классы операторов GIN, реализованные как отдельные проекты. За дополнительными сведениями обратитесь к <A
+HREF="gin.html"
+>Главе 58</A
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="indexes-intro.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="indexes-multicolumn.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Введение</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="indexes.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Составные индексы</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

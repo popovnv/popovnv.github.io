@@ -1,0 +1,534 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Директивы препроцессора</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="ECPG — встраиваемый SQL в C"
+HREF="ecpg.html"><LINK
+REL="PREVIOUS"
+TITLE="Обработка ошибок"
+HREF="ecpg-errors.html"><LINK
+REL="NEXT"
+TITLE="Компиляция программ со встраиваемым SQL"
+HREF="ecpg-process.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Обработка ошибок"
+HREF="ecpg-errors.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ecpg.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 33. <SPAN
+CLASS="APPLICATION"
+>ECPG</SPAN
+> — встраиваемый <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> в C</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Компиляция программ со встраиваемым SQL"
+HREF="ecpg-process.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="ECPG-PREPROC"
+>33.9. Директивы препроцессора</A
+></H1
+><P
+>Препроцессор <TT
+CLASS="COMMAND"
+>ecpg</TT
+> поддерживает ряд директив, которые позволяют управлять разбором и обработкой исходных файлов.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="ECPG-INCLUDE"
+>33.9.1. Включение файлов</A
+></H2
+><P
+>Для включения внешнего файла в программу со встраиваемым SQL, используется конструкция: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL INCLUDE <TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+>;
+EXEC SQL INCLUDE &lt;<TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+>&gt;;
+EXEC SQL INCLUDE "<TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+>";</PRE
+><P> Встретив такую директиву, препроцессор встраиваемого SQL будет искать файл <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+>.h</TT
+>, обрабатывать его и включать в выходной код C. В результате встраиваемые операторы SQL во включённом таким образом файле будут обработаны корректно.</P
+><P
+>Препроцессор <TT
+CLASS="COMMAND"
+>ecpg</TT
+> будет искать указанный файл в нескольких каталогах в следующем порядке: <P
+></P
+></P><UL
+><LI
+><P
+>текущий каталог</P
+></LI
+><LI
+><P
+><TT
+CLASS="FILENAME"
+>/usr/local/include</TT
+></P
+></LI
+><LI
+><P
+>каталог включаемых файлов PostgreSQL, определённый во время сборки (например, <TT
+CLASS="FILENAME"
+>/usr/local/pgsql/include</TT
+>)</P
+></LI
+><LI
+><P
+><TT
+CLASS="FILENAME"
+>/usr/include</TT
+></P
+></LI
+></UL
+><P> Но когда используется форма <TT
+CLASS="LITERAL"
+>EXEC SQL INCLUDE "<TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+>"</TT
+>, просматривается только текущий каталог.</P
+><P
+>В каждом каталоге препроцессор будет сначала искать файл с заданным именем, а если не обнаружит его, попытается найти файл с добавленным расширением <TT
+CLASS="LITERAL"
+>.h</TT
+> (если только заданное имя файла уже не содержит это расширение).</P
+><P
+>Заметьте, что команда <TT
+CLASS="COMMAND"
+>EXEC SQL INCLUDE</TT
+> <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>не</I
+></SPAN
+> равнозначна включению: </P><PRE
+CLASS="PROGRAMLISTING"
+>#include &lt;<TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+>.h&gt;</PRE
+><P> так как во втором случае включаемый файл не проходит через препроцессор SQL-команд. Естественно, директиву C <TT
+CLASS="LITERAL"
+>#include</TT
+> можно по-прежнему применять для включения других заголовочных файлов.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Имя включаемого файла чувствительно к регистру, несмотря на то, что остальная команда <TT
+CLASS="LITERAL"
+>EXEC SQL INCLUDE</TT
+> подчиняется обычным правилам чувствительности к регистру SQL.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="ECPG-DEFINE"
+>33.9.2. Директивы define и undef</A
+></H2
+><P
+>Во встраиваемом SQL есть конструкция, подобная директиве <TT
+CLASS="LITERAL"
+>#define</TT
+>, известной в C: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL DEFINE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+>;
+EXEC SQL DEFINE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+>;</PRE
+><P> Используя её, можно определить имя: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL DEFINE HAVE_FEATURE;</PRE
+><P> И также можно определить константы: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL DEFINE MYNUMBER 12;
+EXEC SQL DEFINE MYSTRING 'abc';</PRE
+><P> Удалить предыдущее определение позволяет команда <TT
+CLASS="LITERAL"
+>undef</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL UNDEF MYNUMBER;</PRE
+><P></P
+><P
+>Разумеется, в программе со встраиваемым SQL можно продолжать использовать версии <TT
+CLASS="LITERAL"
+>#define</TT
+> и <TT
+CLASS="LITERAL"
+>#undef</TT
+> языка C. Отличие состоит в том, когда вычисляются определяемые значения. Когда применяется команда <TT
+CLASS="LITERAL"
+>EXEC SQL DEFINE</TT
+>, вычислять определения и подставлять значения будет препроцессор <TT
+CLASS="COMMAND"
+>ecpg</TT
+>. Например, если написать: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL DEFINE MYNUMBER 12;
+...
+EXEC SQL UPDATE Tbl SET col = MYNUMBER;</PRE
+><P> подстановку выполнит <TT
+CLASS="COMMAND"
+>ecpg</TT
+> и компилятор C никогда не увидит имени или идентификатора <TT
+CLASS="LITERAL"
+>MYNUMBER</TT
+>. Заметьте, что с другой стороны <TT
+CLASS="LITERAL"
+>#define</TT
+> не подходит для определения константы, которую вы хотите использовать во встраиваемом SQL, так как препроцессор встраиваемого SQL не сможет увидеть это определение.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="ECPG-IFDEF"
+>33.9.3. Директивы ifdef, ifndef, else, elif и endif</A
+></H2
+><P
+>Для условной компиляции блоков кода можно использовать следующие указания: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>EXEC SQL ifdef <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+>;</TT
+></DT
+><DD
+><P
+>Проверяет <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> и обрабатывает последующие строки, если <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> было определено командой <TT
+CLASS="LITERAL"
+>EXEC SQL define <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>EXEC SQL ifndef <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+>;</TT
+></DT
+><DD
+><P
+>Проверяет <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> и обрабатывает последующие строки, если <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>не</I
+></SPAN
+> было определено командой <TT
+CLASS="LITERAL"
+>EXEC SQL define <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>EXEC SQL else;</TT
+></DT
+><DD
+><P
+>Начинает альтернативную ветвь условия, открытого командой <TT
+CLASS="LITERAL"
+>EXEC SQL ifdef <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></TT
+> или <TT
+CLASS="LITERAL"
+>EXEC SQL ifndef <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>EXEC SQL elif <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+>;</TT
+></DT
+><DD
+><P
+>Проверяет <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> и начинает альтернативную ветвь условия, если <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> было определено командой <TT
+CLASS="LITERAL"
+>EXEC SQL define <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>EXEC SQL endif;</TT
+></DT
+><DD
+><P
+>Завершает ветвь условия.</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>Пример: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL ifndef TZVAR;
+EXEC SQL SET TIMEZONE TO 'GMT';
+EXEC SQL elif TZNAME;
+EXEC SQL SET TIMEZONE TO TZNAME;
+EXEC SQL else;
+EXEC SQL SET TIMEZONE TO TZVAR;
+EXEC SQL endif;</PRE
+><P></P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ecpg-errors.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ecpg-process.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Обработка ошибок</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ecpg.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Компиляция программ со встраиваемым SQL</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,194 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Регулярная переиндексация</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Регламентные задачи обслуживания базы данных"
+HREF="maintenance.html"><LINK
+REL="PREVIOUS"
+TITLE="Регламентная очистка"
+HREF="routine-vacuuming.html"><LINK
+REL="NEXT"
+TITLE="Обслуживание журнала"
+HREF="logfile-maintenance.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Регламентная очистка"
+HREF="routine-vacuuming.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="maintenance.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 23. Регламентные задачи обслуживания базы данных</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Обслуживание журнала"
+HREF="logfile-maintenance.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="ROUTINE-REINDEX"
+>23.2. Регулярная переиндексация</A
+></H1
+><P
+>В некоторых ситуациях стоит периодически перестраивать индексы, выполняя команду <A
+HREF="sql-reindex.html"
+>REINDEX</A
+> или последовательность отдельных шагов по восстановлению индексов.</P
+><P
+>Страницы индексов на основе B-деревьев, которые стали абсолютно пустыми, могут быть использованы повторно. Однако возможность неэффективного использования пространства всё же остаётся: если со страницы были удалены почти все, но не все ключи индекса, страница всё равно остаётся занятой. Следовательно, шаблон использования, при котором со временем удаляются многие, но не все ключи в каждом диапазоне, приведёт к неэффективному расходованию пространства. В таких случаях рекомендуется периодически проводить переиндексацию.</P
+><P
+>Возможность потери пространства в индексах на основе не B-деревьев глубоко не исследовалась. Поэтому имеет смысл периодически отслеживать физический размер индекса, когда применяется индекс такого типа.</P
+><P
+>Кроме того, с B-деревьями доступ по недавно построенному индексу осуществляется немного быстрее, нежели доступ по индексу, который неоднократно изменялся, поскольку в недавно построенном индексе страницы, близкие логически, обычно расположены так же близко и физически. (Это соображение неприменимо к индексам, которые основаны не на B-деревьях.) Поэтому периодически проводить переиндексацию стоит хотя бы для того, чтобы увеличить скорость доступа.</P
+><P
+>Команду <A
+HREF="sql-reindex.html"
+>REINDEX</A
+> можно безопасно и просто применять во всех случаях. Но так как она требует исключительной блокировки таблицы, часто предпочтительнее перестраивать индекс в несколько этапов, включающих создание и замену индекса. Типы индексов, которые поддерживает <A
+HREF="sql-createindex.html"
+>CREATE INDEX</A
+> с указанием <TT
+CLASS="LITERAL"
+>CONCURRENTLY</TT
+>, можно построить именно так. Если это удаётся и получен рабочий индекс, изначальный индекс можно заменить им, выполнив <A
+HREF="sql-alterindex.html"
+>ALTER INDEX</A
+> и <A
+HREF="sql-dropindex.html"
+>DROP INDEX</A
+>. Когда индекс используется для обеспечения уникальности или других ограничений, может потребоваться команда <A
+HREF="sql-altertable.html"
+>ALTER TABLE</A
+>, чтобы поменять существующее ограничение на то, что обеспечивает новый индекс. Обстоятельно продумайте эту многоходовую процедуру, прежде чем выполнять её, так как не все индексы можно перестроить таким образом, и предусмотрите обработку ошибок.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="routine-vacuuming.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="logfile-maintenance.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Регламентная очистка</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="maintenance.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Обслуживание журнала</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

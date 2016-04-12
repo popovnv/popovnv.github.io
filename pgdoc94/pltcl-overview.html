@@ -1,0 +1,240 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Обзор</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="PL/Tcl — процедурный язык Tcl"
+HREF="pltcl.html"><LINK
+REL="PREVIOUS"
+TITLE="PL/Tcl — процедурный язык Tcl"
+HREF="pltcl.html"><LINK
+REL="NEXT"
+TITLE="Функции на PL/Tcl и их аргументы"
+HREF="pltcl-functions.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="PL/Tcl — процедурный язык Tcl"
+HREF="pltcl.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="pltcl.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 41. PL/Tcl — процедурный язык Tcl</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Функции на PL/Tcl и их аргументы"
+HREF="pltcl-functions.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="PLTCL-OVERVIEW"
+>41.1. Обзор</A
+></H1
+><P
+>PL/Tcl предоставляет большинство возможностей, которые имеет разработчик функций на C, с небольшими ограничениями, и позволяет применять мощные библиотеки обработки строк, существующие для Tcl.</P
+><P
+>Одним убедительным <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>хорошим</I
+></SPAN
+> ограничением является то, что весь код выполняется в контексте безопасности интерпретатора Tcl. Помимо ограниченного набора команд безопасного Tcl, разрешены только несколько команд для обращения к базе данных через SPI и вызовы <CODE
+CLASS="FUNCTION"
+>elog()</CODE
+> для выдачи сообщений. PL/Tcl не даёт возможности взаимодействовать с внутренним механизмом сервера баз данных или обращаться к ОС с правами серверного процесса <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, что возможно в функциях на C. Таким образом, использование этого языка можно доверить непривилегированным пользователям; это не даст им неограниченные полномочия.</P
+><P
+>Ещё одно существенное ограничение заключается в том, что функции на Tcl нельзя использовать для создания функций ввода/вывода для новых типов данных.</P
+><P
+>Иногда возникает желание написать функцию на Tcl, которая не будут ограничена безопасным Tcl. Например, может потребоваться функция, которая будет посылать сообщения по почте. Для этих случаев есть вариация <SPAN
+CLASS="APPLICATION"
+>PL/Tcl</SPAN
+>, названная <TT
+CLASS="LITERAL"
+>PL/TclU</TT
+> (название подразумевает &laquo;untrusted Tcl&raquo;, недоверенный Tcl). Это тот же язык, за исключением того, что для него используется полноценный интерпретатор Tcl. <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>Если применяется <SPAN
+CLASS="APPLICATION"
+>PL/TclU</SPAN
+>, он должен быть установлен как недоверенный процедурный язык</I
+></SPAN
+>, чтобы только суперпользователи могли создавать функции на нём. Автор функции на <SPAN
+CLASS="APPLICATION"
+>PL/TclU</SPAN
+> должен позаботиться о том, чтобы эту функцию нельзя было использовать не по назначению, так как она может делать всё, что может пользователь с правами администратора баз данных.</P
+><P
+>Разделяемый объектный код для обработчиков вызова <SPAN
+CLASS="APPLICATION"
+>PL/Tcl</SPAN
+> и <SPAN
+CLASS="APPLICATION"
+>PL/TclU</SPAN
+> собирается автоматически и устанавливается в каталог библиотек <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, если поддержка Tcl включена на этапе конфигурирования процедуры установки. Чтобы установить <SPAN
+CLASS="APPLICATION"
+>PL/Tcl</SPAN
+> и/или <SPAN
+CLASS="APPLICATION"
+>PL/TclU</SPAN
+> в конкретную базу данных, воспользуйтесь командой <TT
+CLASS="COMMAND"
+>CREATE EXTENSION</TT
+> или программой <TT
+CLASS="COMMAND"
+>createlang</TT
+>, например, так: <TT
+CLASS="LITERAL"
+>createlang pltcl <TT
+CLASS="REPLACEABLE"
+><I
+>имя_базы</I
+></TT
+></TT
+> или <TT
+CLASS="LITERAL"
+>createlang pltclu <TT
+CLASS="REPLACEABLE"
+><I
+>имя_базы</I
+></TT
+></TT
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="pltcl.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="pltcl-functions.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>PL/Tcl — процедурный язык Tcl</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="pltcl.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Функции на PL/Tcl и их аргументы</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

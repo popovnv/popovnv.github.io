@@ -1,0 +1,268 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Мониторинг работы СУБД</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Администрирование сервера"
+HREF="admin.html"><LINK
+REL="PREVIOUS"
+TITLE="Параметры резервного сервера"
+HREF="standby-settings.html"><LINK
+REL="NEXT"
+TITLE="Стандартные инструменты Unix"
+HREF="monitoring-ps.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="CHAPTER"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Параметры резервного сервера"
+HREF="standby-settings.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="admin.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Стандартные инструменты Unix"
+HREF="monitoring-ps.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="MONITORING"
+></A
+>Глава 27. Мониторинг работы СУБД</H1
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Содержание</B
+></DT
+><DT
+>27.1. <A
+HREF="monitoring-ps.html"
+>Стандартные инструменты Unix</A
+></DT
+><DT
+>27.2. <A
+HREF="monitoring-stats.html"
+>Сборщик статистики</A
+></DT
+><DD
+><DL
+><DT
+>27.2.1. <A
+HREF="monitoring-stats.html#MONITORING-STATS-SETUP"
+>Конфигурация системы сбора статистики</A
+></DT
+><DT
+>27.2.2. <A
+HREF="monitoring-stats.html#MONITORING-STATS-VIEWS"
+>Просмотр собранной статистики</A
+></DT
+><DT
+>27.2.3. <A
+HREF="monitoring-stats.html#MONITORING-STATS-FUNCTIONS"
+>Статистические функции</A
+></DT
+></DL
+></DD
+><DT
+>27.3. <A
+HREF="monitoring-locks.html"
+>Просмотр информации о блокировках</A
+></DT
+><DT
+>27.4. <A
+HREF="dynamic-trace.html"
+>Динамическая трассировка</A
+></DT
+><DD
+><DL
+><DT
+>27.4.1. <A
+HREF="dynamic-trace.html#COMPILING-FOR-TRACE"
+>Компиляция для включения динамической трассировки</A
+></DT
+><DT
+>27.4.2. <A
+HREF="dynamic-trace.html#TRACE-POINTS"
+>Встроенные точки трассировки</A
+></DT
+><DT
+>27.4.3. <A
+HREF="dynamic-trace.html#USING-TRACE-POINTS"
+>Использование точек трассировки</A
+></DT
+><DT
+>27.4.4. <A
+HREF="dynamic-trace.html#DEFINING-TRACE-POINTS"
+>Задание новых точек трассировки</A
+></DT
+></DL
+></DD
+></DL
+></DIV
+><P
+>Администратор базы данных часто задумывается &mdash; <SPAN
+CLASS="QUOTE"
+>"чем в данный момент занята система?"</SPAN
+> В этой главе рассказывается о том, как это выяснить.</P
+><P
+>Для мониторинга работы СУБД и анализа её производительности существуют различные инструменты. Большая часть этой главы посвящена описанию работы сборщика статистики <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, однако не следует пренебрегать и обычными командами мониторинга Unix, такими как <TT
+CLASS="COMMAND"
+>ps</TT
+>, <TT
+CLASS="COMMAND"
+>top</TT
+>, <TT
+CLASS="COMMAND"
+>iostat</TT
+>, и <TT
+CLASS="COMMAND"
+>vmstat</TT
+>. Кроме того, после обнаружения запроса с низкой производительностью может потребоваться дополнительное исследование с использованием <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> команды <A
+HREF="sql-explain.html"
+>EXPLAIN</A
+>. В <A
+HREF="using-explain.html"
+>Разделе 14.1</A
+> рассматриваются <TT
+CLASS="COMMAND"
+>EXPLAIN</TT
+> и другие методы для изучения поведения отдельного запроса.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="standby-settings.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="monitoring-ps.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Параметры резервного сервера</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="admin.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Стандартные инструменты Unix</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

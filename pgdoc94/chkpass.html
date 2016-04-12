@@ -1,0 +1,238 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>chkpass</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Дополнительно поставляемые модули"
+HREF="contrib.html"><LINK
+REL="PREVIOUS"
+TITLE="btree_gist"
+HREF="btree-gist.html"><LINK
+REL="NEXT"
+TITLE="citext"
+HREF="citext.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="btree_gist"
+HREF="btree-gist.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Приложение E. Дополнительно поставляемые модули</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="citext"
+HREF="citext.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CHKPASS"
+>E.6. chkpass</A
+></H1
+><P
+>Этот модуль реализует тип данных <TT
+CLASS="TYPE"
+>chkpass</TT
+>, предназначенный для хранения зашифрованных паролей. Каждый пароль автоматически преобразуется в зашифрованный вид при вводе и всегда хранится зашифрованным. Для проверки пароля его нужно сравнить с паролем в открытом виде, который будет также зашифрован перед сравнением.</P
+><P
+>В коде предусмотрена возможность выдавать ошибку, если вводимый пароль оказывается слишком простым. Однако в настоящее время это просто заглушка, которая ничего не делает.</P
+><P
+>Если вводимая строка начинается с двоеточия, предполагается, что это уже зашифрованный пароль и он сохраняется без дополнительного шифрования. Это позволяет сохранять ранее зашифрованные пароли.</P
+><P
+>Выводимая строка этого типа предваряется двоеточием. Это позволяет выгружать и заново загружать пароли, не расшифровывая их. Если вы хотите получить строку зашифрованного пароля без двоеточия, можно использовать функцию <CODE
+CLASS="FUNCTION"
+>raw()</CODE
+>. Благодаря этому, данный тип можно применять, например, с модулем <TT
+CLASS="LITERAL"
+>Auth_PostgreSQL</TT
+> для Apache.</P
+><P
+>Для шифрования используется стандартная функция Unix <CODE
+CLASS="FUNCTION"
+>crypt()</CODE
+>, так что на данную реализацию распространяются все обычные ограничения этой функции; в частности, учитываются только первые восемь символов пароля.</P
+><P
+>Заметьте, что тип данных <TT
+CLASS="TYPE"
+>chkpass</TT
+> не является индексируемым.</P
+><P
+>Пример использования:</P
+><PRE
+CLASS="PROGRAMLISTING"
+>test=# create table test (p chkpass);
+CREATE TABLE
+test=# insert into test values ('hello');
+INSERT 0 1
+test=# select * from test;
+       p
+----------------
+ :dVGkpXdOrE3ko
+(1 row)
+
+test=# select raw(p) from test;
+      raw
+---------------
+ dVGkpXdOrE3ko
+(1 row)
+
+test=# select p = 'hello' from test;
+ ?column?
+----------
+ t
+(1 row)
+
+test=# select p = 'goodbye' from test;
+ ?column?
+----------
+ f
+(1 row)</PRE
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN119133"
+>E.6.1. Автор</A
+></H2
+><P
+>Д'Арси Дж. М. Каин (<CODE
+CLASS="EMAIL"
+>&#60;<A
+HREF="mailto:darcy@druid.net"
+>darcy@druid.net</A
+>&#62;</CODE
+>)</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="btree-gist.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="citext.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>btree_gist</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>citext</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

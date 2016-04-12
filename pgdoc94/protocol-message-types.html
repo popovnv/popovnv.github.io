@@ -1,0 +1,293 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Типы данных в сообщениях</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Клиент-серверный протокол"
+HREF="protocol.html"><LINK
+REL="PREVIOUS"
+TITLE="Протокол потоковой репликации"
+HREF="protocol-replication.html"><LINK
+REL="NEXT"
+TITLE="Форматы сообщений"
+HREF="protocol-message-formats.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Протокол потоковой репликации"
+HREF="protocol-replication.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="protocol.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 49. Клиент-серверный протокол</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Форматы сообщений"
+HREF="protocol-message-formats.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="PROTOCOL-MESSAGE-TYPES"
+>49.4. Типы данных в сообщениях</A
+></H1
+><P
+>В этом разделе описываются базовые типы данных, применяемые в сообщениях. <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+>Int<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>i</I
+></TT
+>)</DT
+><DD
+><P
+>Целое число из <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+> бит с сетевым порядком байт (наиболее значащий байт первый). Если указано <TT
+CLASS="REPLACEABLE"
+><I
+>i</I
+></TT
+>, это поле будет содержать именно указанное значение, в противном случае значение переменное. Например: Int16, Int32(42).</P
+></DD
+><DT
+>Int<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>[<TT
+CLASS="REPLACEABLE"
+><I
+>k</I
+></TT
+>]</DT
+><DD
+><P
+>Массив из <TT
+CLASS="REPLACEABLE"
+><I
+>k</I
+></TT
+>
+                <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>-битовых целых, каждое записывается с сетевым порядком байт. Длина массива <TT
+CLASS="REPLACEABLE"
+><I
+>k</I
+></TT
+> всегда определяется по предыдущему полю сообщения, например Int16[M].</P
+></DD
+><DT
+>String(<TT
+CLASS="REPLACEABLE"
+><I
+>s</I
+></TT
+>)</DT
+><DD
+><P
+>Строка, оканчивающаяся нулём (строка в стиле C). На длину строк ограничение не накладывается. Если указывается <TT
+CLASS="REPLACEABLE"
+><I
+>s</I
+></TT
+>, это поле будет содержать именно указанное значение, в противном случае значение переменное. Например: String, String("user").</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+><SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>Нет никакого предопределённого ограничения</I
+></SPAN
+> длины строки, которую может возвратить сервер. Поэтому при реализации клиента лучше использовать расширяемый буфер, чтобы он мог принять строку любого размера, умещающуюся в памяти. Если такой возможности нет, прочитайте строку целиком и отбросьте последние символы, не помещающиеся в ваш буфер фиксированного размера.</P
+></BLOCKQUOTE
+></DIV
+></DD
+><DT
+>Byte<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>c</I
+></TT
+>)</DT
+><DD
+><P
+>В точности <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+> байт. Если размер поля <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+> задаётся не константой, он всегда определяется по предыдущему полю сообщения. Если указывается <TT
+CLASS="REPLACEABLE"
+><I
+>c</I
+></TT
+>, оно задаёт точное значение. Например: Byte2, Byte1('\n').</P
+></DD
+></DL
+></DIV
+><P></P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="protocol-replication.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="protocol-message-formats.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Протокол потоковой репликации</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="protocol.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Форматы сообщений</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

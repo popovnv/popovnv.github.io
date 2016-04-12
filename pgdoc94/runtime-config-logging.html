@@ -1,0 +1,2023 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Регистрация ошибок и протоколирование работы сервера</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Настройка сервера"
+HREF="runtime-config.html"><LINK
+REL="PREVIOUS"
+TITLE="Планирование запросов"
+HREF="runtime-config-query.html"><LINK
+REL="NEXT"
+TITLE="Статистика времени выполнения"
+HREF="runtime-config-statistics.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Планирование запросов"
+HREF="runtime-config-query.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="runtime-config.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 18. Настройка сервера</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Статистика времени выполнения"
+HREF="runtime-config-statistics.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="RUNTIME-CONFIG-LOGGING"
+>18.8. Регистрация ошибок и протоколирование работы сервера</A
+></H1
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="RUNTIME-CONFIG-LOGGING-WHERE"
+>18.8.1. Куда протоколировать</A
+></H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="GUC-LOG-DESTINATION"
+></A
+><TT
+CLASS="VARNAME"
+>log_destination</TT
+> (<TT
+CLASS="TYPE"
+>string</TT
+>) </DT
+><DD
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> поддерживает несколько методов протоколирования сообщений сервера: <SPAN
+CLASS="SYSTEMITEM"
+>stderr</SPAN
+>, <SPAN
+CLASS="SYSTEMITEM"
+>csvlog</SPAN
+> и <SPAN
+CLASS="SYSTEMITEM"
+>syslog</SPAN
+>. На Windows также поддерживается <SPAN
+CLASS="SYSTEMITEM"
+>eventlog</SPAN
+>. В качестве значения <TT
+CLASS="VARNAME"
+>log_destination</TT
+> указывается один или несколько методов протоколирования, разделённых запятыми. По умолчанию используется <SPAN
+CLASS="SYSTEMITEM"
+>stderr</SPAN
+>. Параметр можно задать только в конфигурационных файлах или в командной строке при запуске сервера.</P
+><P
+>Если в <TT
+CLASS="VARNAME"
+>log_destination</TT
+> включено значение <SPAN
+CLASS="SYSTEMITEM"
+>csvlog</SPAN
+>, то протоколирование ведётся в формате <ACRONYM
+CLASS="ACRONYM"
+>CSV</ACRONYM
+> (разделённые запятыми значения). Это удобно для программной обработки журнала. Подробнее об этом в <A
+HREF="runtime-config-logging.html#RUNTIME-CONFIG-LOGGING-CSVLOG"
+>Подразделе 18.8.4</A
+>. Для вывода в формате CSV должен быть включён <A
+HREF="runtime-config-logging.html#GUC-LOGGING-COLLECTOR"
+>logging_collector</A
+>.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>В большинстве систем Unix потребуется изменить конфигурацию системного демона <SPAN
+CLASS="APPLICATION"
+>syslog</SPAN
+> для использования варианта <SPAN
+CLASS="SYSTEMITEM"
+>syslog</SPAN
+> в <TT
+CLASS="VARNAME"
+>log_destination</TT
+>. Для указания типа протоколируемой программы (facility), <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> может использовать значения с <TT
+CLASS="LITERAL"
+>LOCAL0</TT
+> по <TT
+CLASS="LITERAL"
+>LOCAL7</TT
+> (см. <A
+HREF="runtime-config-logging.html#GUC-SYSLOG-FACILITY"
+>syslog_facility</A
+>). Однако, на большинстве платформ, конфигурация <SPAN
+CLASS="APPLICATION"
+>syslog</SPAN
+> по умолчанию не учитывает сообщения подобного типа. Чтобы это работало, потребуется добавить в конфигурацию демона <SPAN
+CLASS="APPLICATION"
+>syslog</SPAN
+> что-то подобное: </P><PRE
+CLASS="PROGRAMLISTING"
+>local0.*    /var/log/postgresql</PRE
+><P></P
+><P
+>Для использования <TT
+CLASS="LITERAL"
+>eventlog</TT
+> в <TT
+CLASS="VARNAME"
+>log_destination</TT
+> на Windows, необходимо зарегистрировать источник событий и его библиотеку в операционной системе. Тогда Windows Event Viewer сможет отображать сообщения журнала событий. Подробнее в <A
+HREF="event-log-registration.html"
+>Разделе 17.11</A
+>.</P
+></BLOCKQUOTE
+></DIV
+></DD
+><DT
+><A
+NAME="GUC-LOGGING-COLLECTOR"
+></A
+><TT
+CLASS="VARNAME"
+>logging_collector</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Параметр включает коллектор сообщений (<I
+CLASS="FIRSTTERM"
+>logging collector</I
+>). Это фоновый процесс, который собирает отправленные в <SPAN
+CLASS="SYSTEMITEM"
+>stderr</SPAN
+> сообщения и перенаправляет их в журнальные файлы. Такой подход зачастую более полезен чем запись в <SPAN
+CLASS="APPLICATION"
+>syslog</SPAN
+>, поскольку некоторые сообщения в <SPAN
+CLASS="APPLICATION"
+>syslog</SPAN
+> могут не попасть. (Типичный пример с сообщениями об ошибках динамического связывания, другой пример — ошибки в скриптах типа <TT
+CLASS="VARNAME"
+>archive_command</TT
+>.) Для установки параметра требуется перезапуск сервера.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Можно обойтись без коллектора сообщений и просто писать в <SPAN
+CLASS="SYSTEMITEM"
+>stderr</SPAN
+>. Сообщения будут записываться в место, куда направлен поток <SPAN
+CLASS="SYSTEMITEM"
+>stderr</SPAN
+>. Такой способ подойдёт только для небольших объёмов протоколирования, потому что не предоставляет удобных средств для организации ротации журнальных файлов. Кроме того, на некоторых платформах отказ от использования коллектора сообщений может привести к потере или искажению сообщений, так как несколько процессов, одновременно пишущих в один журнальный файл, могут перезаписывать информацию друг друга.</P
+></BLOCKQUOTE
+></DIV
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Коллектор спроектирован так, чтобы сообщения никогда не терялись. А это значит, что при очень высокой нагрузке, серверные процессы могут быть заблокированы при попытке отправить сообщения во время сбоя фонового процесса коллектора. В противоположность этому, <SPAN
+CLASS="APPLICATION"
+>syslog</SPAN
+> предпочитает удалять сообщения, при невозможности их записать. Поэтому часть сообщений может быть потеряна, но система не будет блокироваться.</P
+></BLOCKQUOTE
+></DIV
+></DD
+><DT
+><A
+NAME="GUC-LOG-DIRECTORY"
+></A
+><TT
+CLASS="VARNAME"
+>log_directory</TT
+> (<TT
+CLASS="TYPE"
+>string</TT
+>) </DT
+><DD
+><P
+>При включённом <TT
+CLASS="VARNAME"
+>logging_collector</TT
+>, определяет каталог, в котором создаются журнальные файлы. Можно задавать как абсолютный путь, так и относительный от каталога данных кластера. Параметр можно задать только в конфигурационных файлах или в командной строке при запуске сервера. Значение по умолчанию <TT
+CLASS="LITERAL"
+>pg_log</TT
+>.</P
+></DD
+><DT
+><A
+NAME="GUC-LOG-FILENAME"
+></A
+><TT
+CLASS="VARNAME"
+>log_filename</TT
+> (<TT
+CLASS="TYPE"
+>string</TT
+>) </DT
+><DD
+><P
+>При включённом <TT
+CLASS="VARNAME"
+>logging_collector</TT
+>, задаёт имена журнальных файлов. Значение трактуется как строка формата в функции <CODE
+CLASS="FUNCTION"
+>strftime</CODE
+>, поэтому в ней можно использовать спецификаторы <TT
+CLASS="LITERAL"
+>%</TT
+> для включения в имена файлов информации о дате и времени. (При наличии зависящих от часового пояса спецификаторов <TT
+CLASS="LITERAL"
+>%</TT
+>, будет использован пояс, заданный в <A
+HREF="runtime-config-logging.html#GUC-LOG-TIMEZONE"
+>log_timezone</A
+>.) Поддерживаемые спецификаторы <TT
+CLASS="LITERAL"
+>%</TT
+> похожи на те, что перечислены в описании <A
+HREF="http://pubs.opengroup.org/onlinepubs/009695399/functions/strftime.html"
+TARGET="_top"
+>strftime </A
+> спецификации Open Group. Обратите внимание, что системная функция <SPAN
+CLASS="SYSTEMITEM"
+>strftime</SPAN
+> напрямую не используется. Поэтому нестандартные, специфичные для платформы особенности не будут работать. Значение по умолчанию <TT
+CLASS="LITERAL"
+>postgresql-%Y-%m-%d_%H%M%S.log</TT
+>.</P
+><P
+>Если для задания имени файлов не используются спецификаторы <TT
+CLASS="LITERAL"
+>%</TT
+>, то для избежания переполнения диска, следует использовать утилиты для ротации журнальных файлов. В версиях до 8.4, при отсутствии спецификаторов <TT
+CLASS="LITERAL"
+>%</TT
+>, <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> автоматически добавлял время в формате Epoch к имени файла. Сейчас в этом больше нет необходимости.</P
+><P
+>Если в <TT
+CLASS="VARNAME"
+>log_destination</TT
+> включён вывод в формате CSV, то к имени журнального файла будет добавлено расширение <TT
+CLASS="LITERAL"
+>.csv</TT
+>. (Если <TT
+CLASS="VARNAME"
+>log_filename</TT
+> заканчивается на <TT
+CLASS="LITERAL"
+>.log</TT
+>, то это расширение заменится на <TT
+CLASS="LITERAL"
+>.csv</TT
+>.)</P
+><P
+>Задать этот параметр можно только в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+> или в командной строке при запуске сервера.</P
+></DD
+><DT
+><A
+NAME="GUC-LOG-FILE-MODE"
+></A
+><TT
+CLASS="VARNAME"
+>log_file_mode</TT
+> (<TT
+CLASS="TYPE"
+>integer</TT
+>) </DT
+><DD
+><P
+>В системах Unix задаёт права доступа к журнальным файлам, при включённом <TT
+CLASS="VARNAME"
+>logging_collector</TT
+>. (В Windows этот параметр игнорируется.) Значение параметра должно быть числовым, в формате команд <CODE
+CLASS="FUNCTION"
+>chmod</CODE
+> и <CODE
+CLASS="FUNCTION"
+>umask</CODE
+>. (Для восьмеричного формата, требуется задать лидирующий <TT
+CLASS="LITERAL"
+>0</TT
+> (ноль).)</P
+><P
+>Права доступа по умолчанию <TT
+CLASS="LITERAL"
+>0600</TT
+>, т. е. только владелец сервера может читать и писать в журнальные файлы. Также, может быть полезным значение <TT
+CLASS="LITERAL"
+>0640</TT
+>, разрешающее чтение файлов членам группы. Однако, чтобы установить такое значение, нужно каталог для хранения журнальных файлов (<A
+HREF="runtime-config-logging.html#GUC-LOG-DIRECTORY"
+>log_directory</A
+>) вынести за пределы каталога данных кластера. В любом случае, нежелательно открывать для всех доступ на чтение журнальных файлов, так как они могут содержать конфиденциальные данные.</P
+><P
+>Задать этот параметр можно только в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+> или в командной строке при запуске сервера.</P
+></DD
+><DT
+><A
+NAME="GUC-LOG-ROTATION-AGE"
+></A
+><TT
+CLASS="VARNAME"
+>log_rotation_age</TT
+> (<TT
+CLASS="TYPE"
+>integer</TT
+>) </DT
+><DD
+><P
+>Определяет максимальное время жизни отдельного журнального файла, при включённом <TT
+CLASS="VARNAME"
+>logging_collector</TT
+>. После того как прошло заданное количество минут, создаётся новый журнальный файл. Для запрета создания нового файла по прошествии определённого времени, нужно установить значение 0. Параметр можно задать только в конфигурационных файлах или в командной строке при запуске сервера.</P
+></DD
+><DT
+><A
+NAME="GUC-LOG-ROTATION-SIZE"
+></A
+><TT
+CLASS="VARNAME"
+>log_rotation_size</TT
+> (<TT
+CLASS="TYPE"
+>integer</TT
+>) </DT
+><DD
+><P
+>Определяет максимальный размер отдельного журнального файла, при включённом <TT
+CLASS="VARNAME"
+>logging_collector</TT
+>. После того как заданное количество килобайт записано в текущий файл, создаётся новый журнальный файл. Для запрета создания нового файла при превышении определённого размера, нужно установить значение 0. Задать этот параметр можно только в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+> или в командной строке при запуске сервера.</P
+></DD
+><DT
+><A
+NAME="GUC-LOG-TRUNCATE-ON-ROTATION"
+></A
+><TT
+CLASS="VARNAME"
+>log_truncate_on_rotation</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Если параметр <TT
+CLASS="VARNAME"
+>logging_collector</TT
+> включён, <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> будет перезаписывать существующие журнальные файлы, а не дописывать в них. Однако, перезапись при переключении на новый файл возможна только в результате ротации по времени, но не при старте сервера или ротации по размеру файла. При выключенном параметре всегда продолжается запись в существующий файл. Например, включение этого параметра в комбинации с <TT
+CLASS="VARNAME"
+>log_filename</TT
+> равным <TT
+CLASS="LITERAL"
+>postgresql-%H.log</TT
+>, приведёт к генерации 24-х часовых журнальных файлов, которые циклически перезаписываются. Параметр можно задать только в конфигурационных файлах или в командной строке при запуске сервера.</P
+><P
+>Пример: для хранения журнальных файлов в течение 7 дней, по одному файлу на каждый день с именами вида <TT
+CLASS="LITERAL"
+>server_log.Mon</TT
+>, <TT
+CLASS="LITERAL"
+>server_log.Tue</TT
+> и т. д., а также с автоматической перезаписью файлов прошлой недели, нужно установить <TT
+CLASS="VARNAME"
+>log_filename</TT
+> в <TT
+CLASS="LITERAL"
+>server_log.%a</TT
+>, <TT
+CLASS="VARNAME"
+>log_truncate_on_rotation</TT
+> в <TT
+CLASS="LITERAL"
+>on</TT
+> и <TT
+CLASS="VARNAME"
+>log_rotation_age</TT
+> в <TT
+CLASS="LITERAL"
+>1440</TT
+>.</P
+><P
+>Пример: для хранения журнальных файлов в течение 24 часов, по одному файлу на час, с дополнительной возможностью переключения файла при превышения 1ГБ, установите <TT
+CLASS="VARNAME"
+>log_filename</TT
+> в <TT
+CLASS="LITERAL"
+>server_log.%H%M</TT
+>, <TT
+CLASS="VARNAME"
+>log_truncate_on_rotation</TT
+> в <TT
+CLASS="LITERAL"
+>on</TT
+>, <TT
+CLASS="VARNAME"
+>log_rotation_age</TT
+> в <TT
+CLASS="LITERAL"
+>60</TT
+> и <TT
+CLASS="VARNAME"
+>log_rotation_size</TT
+> в <TT
+CLASS="LITERAL"
+>1000000</TT
+>. Добавление <TT
+CLASS="LITERAL"
+>%M</TT
+> в <TT
+CLASS="VARNAME"
+>log_filename</TT
+> позволит при переключении по размеру указать другое имя файла в пределах одного часа.</P
+></DD
+><DT
+><A
+NAME="GUC-SYSLOG-FACILITY"
+></A
+><TT
+CLASS="VARNAME"
+>syslog_facility</TT
+> (<TT
+CLASS="TYPE"
+>enum</TT
+>) </DT
+><DD
+><P
+>При включённом протоколировании в <SPAN
+CLASS="APPLICATION"
+>syslog</SPAN
+>, этот параметр определяет значение <SPAN
+CLASS="QUOTE"
+>"facility"</SPAN
+>. Допустимые значения <TT
+CLASS="LITERAL"
+>LOCAL0</TT
+>, <TT
+CLASS="LITERAL"
+>LOCAL1</TT
+>, <TT
+CLASS="LITERAL"
+>LOCAL2</TT
+>, <TT
+CLASS="LITERAL"
+>LOCAL3</TT
+>, <TT
+CLASS="LITERAL"
+>LOCAL4</TT
+>, <TT
+CLASS="LITERAL"
+>LOCAL5</TT
+>, <TT
+CLASS="LITERAL"
+>LOCAL6</TT
+>, <TT
+CLASS="LITERAL"
+>LOCAL7</TT
+>. По умолчанию используется <TT
+CLASS="LITERAL"
+>LOCAL0</TT
+>. Подробнее в документации на системный демон <SPAN
+CLASS="APPLICATION"
+>syslog</SPAN
+>. Параметр можно задать только в конфигурационных файлах или в командной строке при запуске сервера.</P
+></DD
+><DT
+><A
+NAME="GUC-SYSLOG-IDENT"
+></A
+><TT
+CLASS="VARNAME"
+>syslog_ident</TT
+> (<TT
+CLASS="TYPE"
+>string</TT
+>) </DT
+><DD
+><P
+>При включённом протоколировании в <SPAN
+CLASS="APPLICATION"
+>syslog</SPAN
+>, этот параметр задаёт имя программы, которое будет использоваться в <SPAN
+CLASS="APPLICATION"
+>syslog</SPAN
+> для идентификации сообщений относящихся к <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. По умолчанию используется <TT
+CLASS="LITERAL"
+>postgres</TT
+>. Задать этот параметр можно только в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+> или в командной строке при запуске сервера.</P
+></DD
+><DT
+><A
+NAME="GUC-EVENT-SOURCE"
+></A
+><TT
+CLASS="VARNAME"
+>event_source</TT
+> (<TT
+CLASS="TYPE"
+>string</TT
+>) </DT
+><DD
+><P
+>При включённом протоколировании в <SPAN
+CLASS="APPLICATION"
+>event log</SPAN
+>, этот параметр задаёт имя программы, которое будет использоваться в журнале событий для идентификации сообщений относящихся к <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. По умолчанию используется <TT
+CLASS="LITERAL"
+>PostgreSQL</TT
+>. Параметр можно задать только в конфигурационных файлах или в командной строке при запуске сервера.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="RUNTIME-CONFIG-LOGGING-WHEN"
+>18.8.2. Когда протоколировать</A
+></H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="GUC-CLIENT-MIN-MESSAGES"
+></A
+><TT
+CLASS="VARNAME"
+>client_min_messages</TT
+> (<TT
+CLASS="TYPE"
+>enum</TT
+>) </DT
+><DD
+><P
+>Управляет минимальным уровнем сообщений, посылаемых клиенту. Допустимые значения <TT
+CLASS="LITERAL"
+>DEBUG5</TT
+>, <TT
+CLASS="LITERAL"
+>DEBUG4</TT
+>, <TT
+CLASS="LITERAL"
+>DEBUG3</TT
+>, <TT
+CLASS="LITERAL"
+>DEBUG2</TT
+>, <TT
+CLASS="LITERAL"
+>DEBUG1</TT
+>, <TT
+CLASS="LITERAL"
+>LOG</TT
+>, <TT
+CLASS="LITERAL"
+>NOTICE</TT
+>, <TT
+CLASS="LITERAL"
+>WARNING</TT
+>, <TT
+CLASS="LITERAL"
+>ERROR</TT
+>, <TT
+CLASS="LITERAL"
+>FATAL</TT
+> и <TT
+CLASS="LITERAL"
+>PANIC</TT
+>. Каждый из перечисленных уровней включает все идущие после него. Чем дальше в этом списке уровень сообщения, тем меньше сообщений будет посылаться клиенту. По умолчанию используется <TT
+CLASS="LITERAL"
+>NOTICE</TT
+>. Обратите внимание, что <TT
+CLASS="LITERAL"
+>LOG</TT
+> расположен по-разному здесь и в <TT
+CLASS="VARNAME"
+>log_min_messages</TT
+>.</P
+></DD
+><DT
+><A
+NAME="GUC-LOG-MIN-MESSAGES"
+></A
+><TT
+CLASS="VARNAME"
+>log_min_messages</TT
+> (<TT
+CLASS="TYPE"
+>enum</TT
+>) </DT
+><DD
+><P
+>Управляет минимальным уровнем сообщений, записываемых в журнал сервера. Допустимые значения <TT
+CLASS="LITERAL"
+>DEBUG5</TT
+>, <TT
+CLASS="LITERAL"
+>DEBUG4</TT
+>, <TT
+CLASS="LITERAL"
+>DEBUG3</TT
+>, <TT
+CLASS="LITERAL"
+>DEBUG2</TT
+>, <TT
+CLASS="LITERAL"
+>DEBUG1</TT
+>, <TT
+CLASS="LITERAL"
+>INFO</TT
+>, <TT
+CLASS="LITERAL"
+>NOTICE</TT
+>, <TT
+CLASS="LITERAL"
+>WARNING</TT
+>, <TT
+CLASS="LITERAL"
+>ERROR</TT
+>, <TT
+CLASS="LITERAL"
+>LOG</TT
+>, <TT
+CLASS="LITERAL"
+>FATAL</TT
+> и <TT
+CLASS="LITERAL"
+>PANIC</TT
+>. Каждый из перечисленных уровней включает все идущие после него. Чем дальше в этом списке уровень сообщения, тем меньше сообщений будет записано в журнал сервера. По умолчанию используется <TT
+CLASS="LITERAL"
+>WARNING</TT
+>. Обратите внимание, что <TT
+CLASS="LITERAL"
+>LOG</TT
+> расположен по-разному здесь и в <TT
+CLASS="VARNAME"
+>client_min_messages</TT
+>. Только суперпользователи могут изменить этот параметр.</P
+></DD
+><DT
+><A
+NAME="GUC-LOG-MIN-ERROR-STATEMENT"
+></A
+><TT
+CLASS="VARNAME"
+>log_min_error_statement</TT
+> (<TT
+CLASS="TYPE"
+>enum</TT
+>) </DT
+><DD
+><P
+>Управляет тем, какие SQL-операторы, завершившиеся ошибкой, записываются в журнал сервера. SQL-оператор будет записан в журнал, если он завершится ошибкой с указанным уровнем важности или выше. Допустимые значения: <TT
+CLASS="LITERAL"
+>DEBUG5</TT
+>, <TT
+CLASS="LITERAL"
+>DEBUG4</TT
+>, <TT
+CLASS="LITERAL"
+>DEBUG3</TT
+>, <TT
+CLASS="LITERAL"
+>DEBUG2</TT
+>, <TT
+CLASS="LITERAL"
+>DEBUG1</TT
+>, <TT
+CLASS="LITERAL"
+>INFO</TT
+>, <TT
+CLASS="LITERAL"
+>NOTICE</TT
+>, <TT
+CLASS="LITERAL"
+>WARNING</TT
+>, <TT
+CLASS="LITERAL"
+>ERROR</TT
+>, <TT
+CLASS="LITERAL"
+>LOG</TT
+>, <TT
+CLASS="LITERAL"
+>FATAL</TT
+> и <TT
+CLASS="LITERAL"
+>PANIC</TT
+>. По умолчанию используется <TT
+CLASS="LITERAL"
+>ERROR</TT
+>. Это означает, что в журнал сервера будут записаны все операторы, завершившиеся сообщением с уровнем важности <TT
+CLASS="LITERAL"
+>ERROR</TT
+>, <TT
+CLASS="LITERAL"
+>LOG</TT
+>, <TT
+CLASS="LITERAL"
+>FATAL</TT
+> и <TT
+CLASS="LITERAL"
+>PANIC</TT
+>. Чтобы фактически отключить запись операторов с ошибками, установите для этого параметра значение <TT
+CLASS="LITERAL"
+>PANIC</TT
+>. Изменить этот параметр могут только суперпользователи.</P
+></DD
+><DT
+><A
+NAME="GUC-LOG-MIN-DURATION-STATEMENT"
+></A
+><TT
+CLASS="VARNAME"
+>log_min_duration_statement</TT
+> (<TT
+CLASS="TYPE"
+>integer</TT
+>) </DT
+><DD
+><P
+>Записывает в журнал продолжительность выполнения всех команд, время работы которых равно или превышает указанное количество миллисекунд. Значение 0 (ноль) заставляет записывать продолжительность работы всех команд. Значение -1 (по умолчанию) запрещает регистрировать продолжительность выполнения операторов. Например, при значении <TT
+CLASS="LITERAL"
+>250ms</TT
+>, все команды, которые выполняются за 250 миллисекунд и дольше будут записаны в журнал сервера. Включение параметра полезно для выявления плохо оптимизированных запросов в приложении. Только суперпользователи могут изменить этот параметр.</P
+><P
+>Для клиентов, использующих расширенный протокол запросов, будет записываться продолжительность фаз: разбор, связывание и выполнение.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>При использовании совместно с <A
+HREF="runtime-config-logging.html#GUC-LOG-STATEMENT"
+>log_statement</A
+>, текст SQL-операторов будет записываться только один раз (от использования <TT
+CLASS="VARNAME"
+>log_statement</TT
+>) и не будет задублирован в сообщении о длительности выполнения. Если не используется вывод в <SPAN
+CLASS="APPLICATION"
+>syslog</SPAN
+>, то рекомендуется в <A
+HREF="runtime-config-logging.html#GUC-LOG-LINE-PREFIX"
+>log_line_prefix</A
+> включить идентификатор процесса или сессии. Это позволит связать текст запроса с записью о продолжительности выполнения, которая появится позже.</P
+></BLOCKQUOTE
+></DIV
+></DD
+></DL
+></DIV
+><P
+>В <A
+HREF="runtime-config-logging.html#RUNTIME-CONFIG-SEVERITY-LEVELS"
+>Таблице 18-1</A
+> поясняются уровни важности сообщений в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Также в этой таблице показано, как эти уровни транслируются в системные при использовании <SPAN
+CLASS="SYSTEMITEM"
+>syslog</SPAN
+> или <SPAN
+CLASS="SYSTEMITEM"
+>eventlog</SPAN
+> в Windows.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="RUNTIME-CONFIG-SEVERITY-LEVELS"
+></A
+><P
+><B
+>Таблица 18-1. Уровни важности сообщений</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Уровень</TH
+><TH
+>Использование</TH
+><TH
+>                    <SPAN
+CLASS="SYSTEMITEM"
+>syslog</SPAN
+>
+                  </TH
+><TH
+>                    <SPAN
+CLASS="SYSTEMITEM"
+>eventlog</SPAN
+>
+                  </TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>DEBUG1..DEBUG5</TT
+>
+                  </TD
+><TD
+>Более детальная информация для разработчиков. Чем больше номер, тем детальнее.</TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>DEBUG</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>INFORMATION</TT
+>
+                  </TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>INFO</TT
+>
+                  </TD
+><TD
+>Неявно запрошенная пользователем информация, например вывод команды <TT
+CLASS="COMMAND"
+>VACUUM VERBOSE</TT
+>.</TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>INFO</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>INFORMATION</TT
+>
+                  </TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>NOTICE</TT
+>
+                  </TD
+><TD
+>Информация, которая может быть полезной пользователям. Например, уведомления об усечении длинных идентификаторов.</TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>NOTICE</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>INFORMATION</TT
+>
+                  </TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>WARNING</TT
+>
+                  </TD
+><TD
+>Предупреждения о возможных проблемах. Например, <TT
+CLASS="COMMAND"
+>COMMIT</TT
+> вне транзакционного блока.</TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>NOTICE</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>WARNING</TT
+>
+                  </TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>ERROR</TT
+>
+                  </TD
+><TD
+>Сообщает об ошибке, из-за которой прервана текущая команда.</TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>WARNING</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>ERROR</TT
+>
+                  </TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>LOG</TT
+>
+                  </TD
+><TD
+>Информация, полезная для администраторов. Например, выполнение контрольных точек.</TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>INFO</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>INFORMATION</TT
+>
+                  </TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>FATAL</TT
+>
+                  </TD
+><TD
+>Сообщает об ошибке, из-за которой прервана текущая сессия.</TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>ERR</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>ERROR</TT
+>
+                  </TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>PANIC</TT
+>
+                  </TD
+><TD
+>Сообщает об ошибке, из-за которой прерваны все сессии.</TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>CRIT</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>ERROR</TT
+>
+                  </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="RUNTIME-CONFIG-LOGGING-WHAT"
+>18.8.3. Что протоколировать</A
+></H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="GUC-APPLICATION-NAME"
+></A
+><TT
+CLASS="VARNAME"
+>application_name</TT
+> (<TT
+CLASS="TYPE"
+>string</TT
+>) </DT
+><DD
+><P
+><TT
+CLASS="VARNAME"
+>application_name</TT
+> это любая строка, не превышающая <TT
+CLASS="SYMBOL"
+>NAMEDATALEN</TT
+> символов (64 символа при стандартной сборке). Обычно устанавливается приложением при подключении к серверу. Значение отображается в представлении <TT
+CLASS="STRUCTNAME"
+>pg_stat_activity</TT
+> и добавляется в журнал сервера, при использовании формата CSV. Для прочих форматов, <TT
+CLASS="VARNAME"
+>application_name</TT
+> можно добавить в журнал через параметр <A
+HREF="runtime-config-logging.html#GUC-LOG-LINE-PREFIX"
+>log_line_prefix</A
+>. Значение <TT
+CLASS="VARNAME"
+>application_name</TT
+> может содержать только печатные ASCII символы. Остальные символы будут заменены знаками вопроса (<TT
+CLASS="LITERAL"
+>?</TT
+>).</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>debug_print_parse</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) <BR><TT
+CLASS="VARNAME"
+>debug_print_rewritten</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) <BR><TT
+CLASS="VARNAME"
+>debug_print_plan</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Эти параметры включают вывод различной отладочной информации. А именно: вывод дерева запроса, дерево запроса после применения правил или плана выполнения запроса, соответственно. Все эти сообщения имеют уровень <TT
+CLASS="LITERAL"
+>LOG</TT
+>. Поэтому, по умолчанию, они записываются в журнал сервера, но не отправляются клиенту. Отправку клиенту можно настроить через <A
+HREF="runtime-config-logging.html#GUC-CLIENT-MIN-MESSAGES"
+>client_min_messages</A
+> и/или <A
+HREF="runtime-config-logging.html#GUC-LOG-MIN-MESSAGES"
+>log_min_messages</A
+>. По умолчанию параметры выключены.</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>debug_pretty_print</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Включает выравнивание сообщений, выводимых <TT
+CLASS="VARNAME"
+>debug_print_parse</TT
+>, <TT
+CLASS="VARNAME"
+>debug_print_rewritten</TT
+> или <TT
+CLASS="VARNAME"
+>debug_print_plan</TT
+>. В результате сообщения легче читать, но они значительно длиннее, чем в формате <SPAN
+CLASS="QUOTE"
+>"compact"</SPAN
+>, который используется при выключенном значении. По умолчанию включён.</P
+></DD
+><DT
+><A
+NAME="GUC-LOG-CHECKPOINTS"
+></A
+><TT
+CLASS="VARNAME"
+>log_checkpoints</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Включает протоколирование выполнения контрольных точек и точек перезапуска сервера. При этом записывается некоторая статистическая информация. Например, число записанных буферов и время, затраченное на их запись. Параметр можно задать только в конфигурационных файлах или в командной строке при запуске сервера. По умолчанию выключен.</P
+></DD
+><DT
+><A
+NAME="GUC-LOG-CONNECTIONS"
+></A
+><TT
+CLASS="VARNAME"
+>log_connections</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Протоколирует каждую попытку подключения к серверу, в том числе успешную аутентификацию клиентов. Параметр нельзя изменить после старта сессии. По умолчанию выключен.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Некоторые программы, например <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>, предпринимают две попытки подключения (первая для определения нужен ли пароль). Поэтому дублирование сообщения <SPAN
+CLASS="QUOTE"
+>"connection received"</SPAN
+> не обязательно говорит о наличии проблемы.</P
+></BLOCKQUOTE
+></DIV
+></DD
+><DT
+><A
+NAME="GUC-LOG-DISCONNECTIONS"
+></A
+><TT
+CLASS="VARNAME"
+>log_disconnections</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Записывает в журнал сервера сообщения похожие на сообщения от <TT
+CLASS="VARNAME"
+>log_connections</TT
+>, но при завершении сессии. Сообщение содержит продолжительность сессии. По умолчанию выключен. Параметр нельзя изменить после старта сессии.</P
+></DD
+><DT
+><A
+NAME="GUC-LOG-DURATION"
+></A
+><TT
+CLASS="VARNAME"
+>log_duration</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Записывает продолжительность каждой завершённой команды. По умолчанию выключен. Только суперпользователи могут изменить этот параметр.</P
+><P
+>Для клиентов, использующих расширенный протокол запросов, будет записываться продолжительность фаз: разбор, связывание и выполнение.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Включение этого параметра и установка <A
+HREF="runtime-config-logging.html#GUC-LOG-MIN-DURATION-STATEMENT"
+>log_min_duration_statement</A
+> в 0 (ноль) различаются. Разница в том, что при превышении значения <TT
+CLASS="VARNAME"
+>log_min_duration_statement</TT
+>, в журнал записывается текст запроса, а при включении <TT
+CLASS="VARNAME"
+>log_duration</TT
+> нет. Таким образом, при <TT
+CLASS="VARNAME"
+>log_duration</TT
+> = <TT
+CLASS="LITERAL"
+>on</TT
+> и <TT
+CLASS="VARNAME"
+>log_min_duration_statement</TT
+> больше нуля, в журнал сервера будет записываться продолжительность выполнения всех команд, а текст запросов только для команд, превысивших заданное значение. Такое поведение может оказаться полезным при сборе статистики в условиях большой нагрузки.</P
+></BLOCKQUOTE
+></DIV
+></DD
+><DT
+><A
+NAME="GUC-LOG-ERROR-VERBOSITY"
+></A
+><TT
+CLASS="VARNAME"
+>log_error_verbosity</TT
+> (<TT
+CLASS="TYPE"
+>enum</TT
+>) </DT
+><DD
+><P
+>Управляет количеством детальной информации, записываемой в журнал сервера для каждого сообщения. Допустимые значения: <TT
+CLASS="LITERAL"
+>TERSE</TT
+>, <TT
+CLASS="LITERAL"
+>DEFAULT</TT
+> и <TT
+CLASS="LITERAL"
+>VERBOSE</TT
+>. Каждое последующее значение добавляет больше полей в выводимое сообщение. Для <TT
+CLASS="LITERAL"
+>TERSE</TT
+> из сообщения об ошибке исключаются поля <TT
+CLASS="LITERAL"
+>DETAIL</TT
+>, <TT
+CLASS="LITERAL"
+>HINT</TT
+>, <TT
+CLASS="LITERAL"
+>QUERY</TT
+> и <TT
+CLASS="LITERAL"
+>CONTEXT</TT
+>. Для <TT
+CLASS="LITERAL"
+>VERBOSE</TT
+> в сообщение включается код ошибки <TT
+CLASS="SYMBOL"
+>SQLSTATE</TT
+> (см. <A
+HREF="errcodes-appendix.html"
+>Приложение A</A
+>), а также имя файла с исходным кодом, имя функции и номер строки сгенерировавшей ошибку. Только суперпользователи могут изменить этот параметр.</P
+></DD
+><DT
+><A
+NAME="GUC-LOG-HOSTNAME"
+></A
+><TT
+CLASS="VARNAME"
+>log_hostname</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>По умолчанию, сообщения журнала содержат лишь IP-адрес подключившегося клиента. При включении этого параметра, дополнительно будет фиксироваться и имя сервера. Обратите внимание, что в зависимости от применяемого способа разрешения имён, это может отрицательно сказаться на производительности. Задать этот параметр можно только в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+> или в командной строке при запуске сервера.</P
+></DD
+><DT
+><A
+NAME="GUC-LOG-LINE-PREFIX"
+></A
+><TT
+CLASS="VARNAME"
+>log_line_prefix</TT
+> (<TT
+CLASS="TYPE"
+>string</TT
+>) </DT
+><DD
+><P
+>Строка, в стиле функции <CODE
+CLASS="FUNCTION"
+>printf</CODE
+>, которая выводится в начале каждой строки журнала сообщений. С символов <TT
+CLASS="LITERAL"
+>%</TT
+> начинаются управляющие последовательности, которые заменяются статусной информацией, описанной ниже. Неизвестные управляющие последовательности игнорируются. Все остальные символы напрямую копируются в журнальную строку. Некоторые управляющие последовательности используются только для пользовательских процессов и будут игнорироваться фоновыми процессами, например основным процессом сервера. Подставляемая информация может быть выровнена по ширине влево или вправо указанием числа после % и перед кодом последовательности. Отрицательное число дополняет значение пробелами справа, а положительное число дополняет пробелами слева. Выравнивание можно использовать для улучшения читаемости. Параметр можно задать только в конфигурационных файлах или в командной строке при запуске сервера. По умолчанию используется пустая строка. <DIV
+CLASS="INFORMALTABLE"
+><P
+></P
+><A
+NAME="AEN31735"
+></A
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Спецсимвол</TH
+><TH
+>Назначение</TH
+><TH
+>Только для пользовательского процесса</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>%a</TT
+></TD
+><TD
+>Имя приложения (<A
+HREF="runtime-config-logging.html#GUC-APPLICATION-NAME"
+>application_name</A
+>)</TD
+><TD
+>да</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>%u</TT
+></TD
+><TD
+>Имя пользователя</TD
+><TD
+>да</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>%d</TT
+></TD
+><TD
+>Имя базы данных</TD
+><TD
+>да</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>%r</TT
+></TD
+><TD
+>Имя удалённого узла или IP-адрес, а также номер порта</TD
+><TD
+>да</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>%h</TT
+></TD
+><TD
+>Имя удалённого узла или IP-адрес</TD
+><TD
+>да</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>%p</TT
+></TD
+><TD
+>Идентификатор процесса</TD
+><TD
+>нет</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>%t</TT
+></TD
+><TD
+>Штамп времени, без миллисекунд</TD
+><TD
+>нет</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>%m</TT
+></TD
+><TD
+>Штамп времени, с миллисекундами</TD
+><TD
+>нет</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>%i</TT
+></TD
+><TD
+>Тег команды: тип текущей команды в сессии</TD
+><TD
+>да</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>%e</TT
+></TD
+><TD
+>Код ошибки SQLSTATE</TD
+><TD
+>нет</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>%c</TT
+></TD
+><TD
+>Идентификатор сессии. Подробности ниже</TD
+><TD
+>нет</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>%l</TT
+></TD
+><TD
+>Номер строки журнала для каждой сессии или процесса. Начинается с 1</TD
+><TD
+>нет</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>%s</TT
+></TD
+><TD
+>Штамп времени начала процесса</TD
+><TD
+>нет</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>%v</TT
+></TD
+><TD
+>Идентификатор виртуальной транзакции (backendID/localXID)</TD
+><TD
+>нет</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>%x</TT
+></TD
+><TD
+>Идентификатор транзакции (0 если не присвоен)</TD
+><TD
+>нет</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>%q</TT
+></TD
+><TD
+>Ничего не выводит. Непользовательские процессы останавливаются в этой точке. Игнорируется пользовательскими процессами</TD
+><TD
+>нет</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>%%</TT
+></TD
+><TD
+>Выводит <TT
+CLASS="LITERAL"
+>%</TT
+></TD
+><TD
+>нет</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+> <TT
+CLASS="LITERAL"
+>%c</TT
+> выводит псевдоуникальный номер сессии, состоящий из двух 4-х битных шестнадцатеричных чисел (без лидирующих нулей), разделённых точкой. Эти числа представляют собой время старта процесса и идентификатор процесса, поэтому <TT
+CLASS="LITERAL"
+>%c</TT
+> можно использовать для экономии места при записи этих значений. Например, для получения идентификатора сессии из <TT
+CLASS="LITERAL"
+>pg_stat_activity</TT
+>, используйте запрос: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT to_hex(EXTRACT(EPOCH FROM backend_start)::integer) || '.' ||
+       to_hex(pid)
+FROM pg_stat_activity;</PRE
+><P></P
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>Последним символом в <TT
+CLASS="VARNAME"
+>log_line_prefix</TT
+> лучше оставлять пробел, чтобы отделить от остальной строки. Можно использовать и символы пунктуации.</P
+></BLOCKQUOTE
+></DIV
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+><SPAN
+CLASS="APPLICATION"
+>Syslog</SPAN
+> также формирует штамп времени и идентификатор процесса, поэтому вероятно нет смысла использовать соответствующие управляющие последовательности при использовании <SPAN
+CLASS="APPLICATION"
+>syslog</SPAN
+>.</P
+></BLOCKQUOTE
+></DIV
+></DD
+><DT
+><A
+NAME="GUC-LOG-LOCK-WAITS"
+></A
+><TT
+CLASS="VARNAME"
+>log_lock_waits</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Нужно ли фиксировать в журнале события, когда сессия ожидает получения блокировки больше чем указано в <A
+HREF="runtime-config-locks.html#GUC-DEADLOCK-TIMEOUT"
+>deadlock_timeout</A
+>. По умолчанию выключено.</P
+></DD
+><DT
+><A
+NAME="GUC-LOG-STATEMENT"
+></A
+><TT
+CLASS="VARNAME"
+>log_statement</TT
+> (<TT
+CLASS="TYPE"
+>enum</TT
+>) </DT
+><DD
+><P
+>Управляет тем, какие SQL-команды записывать в журнал. Допустимые значения: <TT
+CLASS="LITERAL"
+>none</TT
+> (отключено), <TT
+CLASS="LITERAL"
+>ddl</TT
+>, <TT
+CLASS="LITERAL"
+>mod</TT
+> и <TT
+CLASS="LITERAL"
+>all</TT
+> (все команды). <TT
+CLASS="LITERAL"
+>ddl</TT
+> записывает все команды определения данных, такие как <TT
+CLASS="COMMAND"
+>CREATE</TT
+>, <TT
+CLASS="COMMAND"
+>ALTER</TT
+>, <TT
+CLASS="COMMAND"
+>DROP</TT
+>. <TT
+CLASS="LITERAL"
+>mod</TT
+> записывает все команды <TT
+CLASS="LITERAL"
+>ddl</TT
+>, а также команды изменяющие данные, такие как <TT
+CLASS="COMMAND"
+>INSERT</TT
+>, <TT
+CLASS="COMMAND"
+>UPDATE</TT
+>, <TT
+CLASS="COMMAND"
+>DELETE</TT
+>, <TT
+CLASS="COMMAND"
+>TRUNCATE</TT
+> и <TT
+CLASS="COMMAND"
+>COPY FROM</TT
+>. <TT
+CLASS="COMMAND"
+>PREPARE</TT
+>, <TT
+CLASS="COMMAND"
+>EXECUTE</TT
+> и <TT
+CLASS="COMMAND"
+>EXPLAIN ANALYZE</TT
+> также записываются, если вызваны для команды соответствующего типа. Если клиент использует расширенный протокол запросов, то запись происходит на фазе выполнения и содержит значения всех связанных переменных (если есть символы одиночных кавычек, то они удваиваются).</P
+><P
+>По умолчанию <TT
+CLASS="LITERAL"
+>none</TT
+>. Только суперпользователи могут изменить этот параметр.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Команды с синтаксическими ошибками не записываются, даже если <TT
+CLASS="VARNAME"
+>log_statement</TT
+> = <TT
+CLASS="LITERAL"
+>all</TT
+>, так как сообщение формируется только после выполнения предварительного разбора, определяющего тип команды. При расширенном протоколе запросов, похожим образом не будут записываться команды, неуспешно завершившиеся до фазы выполнения (например, при разборе или построении плана запроса). Для включения в журнал таких команд установите <TT
+CLASS="VARNAME"
+>log_min_error_statement</TT
+> в <TT
+CLASS="LITERAL"
+>ERROR</TT
+> (или ниже).</P
+></BLOCKQUOTE
+></DIV
+></DD
+><DT
+><A
+NAME="GUC-LOG-TEMP-FILES"
+></A
+><TT
+CLASS="VARNAME"
+>log_temp_files</TT
+> (<TT
+CLASS="TYPE"
+>integer</TT
+>) </DT
+><DD
+><P
+>Управляет включением в журнал информации об именах и размерах временных файлов. Временные файлы могут использоваться для сортировок, хеширования и временного хранения результатов запросов. На каждый временный файл, при его удалении, в журнал записывается отдельное сообщение. Значение 0 говорит о том, что нужно записывать информацию о всех временных файлах. Положительное значение задаёт размер временных файлов в килобайтах, при достижении или превышении которого, информация о временном файле будет записана. Значение по умолчанию -1, что отключает запись информации о временных файлах. Только суперпользователи могут изменить этот параметр.</P
+></DD
+><DT
+><A
+NAME="GUC-LOG-TIMEZONE"
+></A
+><TT
+CLASS="VARNAME"
+>log_timezone</TT
+> (<TT
+CLASS="TYPE"
+>string</TT
+>) </DT
+><DD
+><P
+>Устанавливает часовой пояс для штампов времени при записи в журнал сервера. В отличие от <A
+HREF="runtime-config-client.html#GUC-TIMEZONE"
+>TimeZone</A
+>, это значение одинаково для всех баз данных кластера, поэтому для всех сессий используются согласованные значения штампов времени. Встроенное значение по умолчанию <TT
+CLASS="LITERAL"
+>GMT</TT
+>, но оно переопределяется в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+>: <SPAN
+CLASS="APPLICATION"
+>initdb</SPAN
+> записывает в него значение, соответствующее системной среде. Подробнее об этом в <A
+HREF="datatype-datetime.html#DATATYPE-TIMEZONES"
+>Подразделе 8.5.3</A
+>. Задать этот параметр можно только в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+> или в командной строке при запуске сервера.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="RUNTIME-CONFIG-LOGGING-CSVLOG"
+>18.8.4. Использование вывода журнала в формате CSV</A
+></H2
+><P
+>Добавление <TT
+CLASS="LITERAL"
+>csvlog</TT
+> в <TT
+CLASS="VARNAME"
+>log_destination</TT
+> делает удобным загрузку журнальных файлов в таблицу базы данных. Строки журнала представляют собой значения разделённые запятыми (CSV формат) со следующими полями: штамп времени с миллисекундами; имя пользователя; имя базы данных; идентификатор процесса; клиентский узел:номер порта; идентификатор сессии; номер строки каждой сессии; тег команды; время начала сессии; виртуальный идентификатор транзакции; идентификатор транзакции; уровень важности ошибки; код ошибки SQLSTATE; сообщение об ошибке; подробности к сообщению об ошибке; подсказка к сообщению об ошибке; внутренний запрос, приведший к ошибке (если есть); номер символа внутреннего запроса, где произошла ошибка; контекст ошибки; запрос пользователя, приведший к ошибке (если есть и включён <TT
+CLASS="VARNAME"
+>log_min_error_statement</TT
+>); номер символа в запросе пользователя, где произошла ошибка; расположение ошибки в исходном коде PostgreSQL (если <TT
+CLASS="VARNAME"
+>log_error_verbosity</TT
+> установлен в <TT
+CLASS="LITERAL"
+>verbose</TT
+>) и имя приложения. Вот пример определения таблицы, для хранения журналов в формате CSV: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE postgres_log
+(
+  log_time timestamp(3) with time zone,
+  user_name text,
+  database_name text,
+  process_id integer,
+  connection_from text,
+  session_id text,
+  session_line_num bigint,
+  command_tag text,
+  session_start_time timestamp with time zone,
+  virtual_transaction_id text,
+  transaction_id bigint,
+  error_severity text,
+  sql_state_code text,
+  message text,
+  detail text,
+  hint text,
+  internal_query text,
+  internal_query_pos integer,
+  context text,
+  query text,
+  query_pos integer,
+  location text,
+  application_name text,
+  PRIMARY KEY (session_id, session_line_num)
+);</PRE
+><P></P
+><P
+>Для загрузки журнального файла в такую таблицу можно использовать команду <TT
+CLASS="COMMAND"
+>COPY FROM</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>COPY postgres_log FROM '/full/path/to/logfile.csv' WITH csv;</PRE
+><P></P
+><P
+>Для упрощения загрузки журналов в CSV формате используйте следующее: <P
+></P
+></P><OL
+TYPE="1"
+><LI
+><P
+>Установите для <TT
+CLASS="VARNAME"
+>log_filename</TT
+> и <TT
+CLASS="VARNAME"
+>log_rotation_age</TT
+> значения, гарантирующие согласованную и предсказуемую схему именования журнальных файлов. Зная, какие имена будут у журнальных файлов, можно определить, когда конкретный файл заполнен и готов к загрузке.</P
+></LI
+><LI
+><P
+>Установите <TT
+CLASS="VARNAME"
+>log_rotation_size</TT
+> в 0, чтобы запретить ротацию файлов по достижении определённого размера, так как это делает непредсказуемой схему именования журнальных файлов.</P
+></LI
+><LI
+><P
+>Установите <TT
+CLASS="VARNAME"
+>log_truncate_on_rotation</TT
+> в <TT
+CLASS="LITERAL"
+>on</TT
+>, чтобы новые сообщения не смешивались со старыми при переключении на существующий файл.</P
+></LI
+><LI
+><P
+>Определение таблицы содержит первичный ключ. Это полезно для предотвращения случайной повторной загрузки данных. Команда <TT
+CLASS="COMMAND"
+>COPY</TT
+> фиксирует изменения один раз, поэтому любая ошибка приведёт к отмене всей загрузки. Если сначала загрузить неполный журнальный файл, то его повторная загрузка (по заполнении) приведёт к нарушению первичного ключа и, следовательно, к ошибке загрузки. Поэтому необходимо дожидаться окончания записи в журнальный файл перед началом загрузки. Похожим образом предотвращается случайная загрузка частично сформированной строки сообщения, что также приведёт к сбою в команде <TT
+CLASS="COMMAND"
+>COPY</TT
+>.</P
+></LI
+></OL
+><P></P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="runtime-config-query.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="runtime-config-statistics.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Планирование запросов</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="runtime-config.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Статистика времени выполнения</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

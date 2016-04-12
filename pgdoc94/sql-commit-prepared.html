@@ -1,0 +1,288 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>COMMIT PREPARED</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="COMMIT"
+HREF="sql-commit.html"><LINK
+REL="NEXT"
+TITLE="COPY"
+HREF="sql-copy.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="COMMIT"
+HREF="sql-commit.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="COPY"
+HREF="sql-copy.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-COMMIT-PREPARED"
+></A
+>COMMIT PREPARED</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN71566"
+></A
+><H2
+>Название</H2
+>COMMIT PREPARED&nbsp;--&nbsp;зафиксировать транзакцию, которая ранее была подготовлена для двухфазной фиксации</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN71569"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>COMMIT PREPARED <TT
+CLASS="REPLACEABLE"
+><I
+>id_транзакции</I
+></TT
+></PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN71572"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>COMMIT PREPARED</TT
+> фиксирует транзакцию, находящуюся в подготовленном состоянии.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN71576"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>id_транзакции</I
+></TT
+></DT
+><DD
+><P
+>Идентификатор транзакции, которая будет зафиксирована.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN71584"
+></A
+><H2
+>Замечания</H2
+><P
+>Зафиксировать подготовленную транзакцию может либо пользователь, выполнявший её изначально, либо суперпользователь. При этом не обязательно работать в том же сеансе, где выполнялась транзакция.</P
+><P
+>Эту команду нельзя выполнить внутри блока транзакции. Подготовленная транзакция фиксируется немедленно.</P
+><P
+>Все существующие в текущий момент подготовленные транзакции показываются в системном представлении <A
+HREF="view-pg-prepared-xacts.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_prepared_xacts</TT
+></A
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="SQL-COMMIT-PREPARED-EXAMPLES"
+></A
+><H2
+>Примеры</H2
+><P
+>Фиксация транзакции, имеющей идентификатор <TT
+CLASS="LITERAL"
+>foobar</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>COMMIT PREPARED 'foobar';</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN71596"
+></A
+><H2
+>Совместимость</H2
+><P
+>Оператор <TT
+CLASS="COMMAND"
+>COMMIT PREPARED</TT
+> является расширением <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Он предназначен для использования внешними системами управления транзакциями, некоторые из которых работают по стандартам (например, X/Open XA), но сторона SQL в этих системах не стандартизирована.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN71601"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-prepare-transaction.html"
+>PREPARE TRANSACTION</A
+>, <A
+HREF="sql-rollback-prepared.html"
+>ROLLBACK PREPARED</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commit.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-copy.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>COMMIT</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>COPY</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

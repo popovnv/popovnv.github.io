@@ -1,0 +1,695 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Выражения подзапросов</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Функции и операторы"
+HREF="functions.html"><LINK
+REL="PREVIOUS"
+TITLE="Оконные функции"
+HREF="functions-window.html"><LINK
+REL="NEXT"
+TITLE="Сравнение табличных строк и массивов"
+HREF="functions-comparisons.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Оконные функции"
+HREF="functions-window.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 9. Функции и операторы</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Сравнение табличных строк и массивов"
+HREF="functions-comparisons.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="FUNCTIONS-SUBQUERY"
+>9.22. Выражения подзапросов</A
+></H1
+><P
+>В этом разделе описаны выражения подзапросов, которые реализованы в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> в соответствии со стандартом <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>. Все рассмотренные здесь формы выражений возвращает булевы значения (true/false).</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="FUNCTIONS-SUBQUERY-EXISTS"
+>9.22.1. <TT
+CLASS="LITERAL"
+>EXISTS</TT
+></A
+></H2
+><PRE
+CLASS="SYNOPSIS"
+>EXISTS (<TT
+CLASS="REPLACEABLE"
+><I
+>подзапрос</I
+></TT
+>)</PRE
+><P
+>Аргументом <TT
+CLASS="TOKEN"
+>EXISTS</TT
+> является обычный оператор <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, т. е. <I
+CLASS="FIRSTTERM"
+>подзапрос</I
+>. Выполнив запрос, система проверяет, возвращает ли он строки в результате. Если он возвращает минимум одну строку, результатом <TT
+CLASS="TOKEN"
+>EXISTS</TT
+> будет <SPAN
+CLASS="QUOTE"
+>"true"</SPAN
+>, а если не возвращает ни одной &mdash; <SPAN
+CLASS="QUOTE"
+>"false"</SPAN
+>.</P
+><P
+>Подзапрос может обращаться к переменным внешнего запроса, которые в рамках одного вычисления подзапроса считаются константами.</P
+><P
+>Вообще говоря, подзапрос может выполняться не полностью, а завершаться, как только будет возвращена хотя бы одна строка. Поэтому в подзапросах следует избегать побочных эффектов (например, обращений к генераторам последовательностей); проявление побочного эффекта может быть непредсказуемым.</P
+><P
+>Так как результат этого выражения зависит только от того, возвращаются строки или нет, но не от их содержимого, список выходных значений подзапроса обычно не имеет значения. Как следствие, широко распространена практика, когда проверки <TT
+CLASS="LITERAL"
+>EXISTS</TT
+> записываются в форме <TT
+CLASS="LITERAL"
+>EXISTS(SELECT 1 WHERE ...)</TT
+>. Однако из этого правила есть и исключения, например с подзапросами с предложением <TT
+CLASS="TOKEN"
+>INTERSECT</TT
+>.</P
+><P
+>Этот простой пример похож на внутреннее соединение по колонке <TT
+CLASS="LITERAL"
+>col2</TT
+>, но он выдаёт максимум одну строку для каждой строки в <TT
+CLASS="LITERAL"
+>tab1</TT
+>, даже если в <TT
+CLASS="LITERAL"
+>tab2</TT
+> ей соответствуют несколько строк: </P><PRE
+CLASS="SCREEN"
+>SELECT col1
+FROM tab1
+WHERE EXISTS (SELECT 1 FROM tab2 WHERE col2 = tab1.col2);</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="FUNCTIONS-SUBQUERY-IN"
+>9.22.2. <TT
+CLASS="LITERAL"
+>IN</TT
+></A
+></H2
+><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> IN (<TT
+CLASS="REPLACEABLE"
+><I
+>подзапрос</I
+></TT
+>)</PRE
+><P
+>В правой стороне этого выражения в скобках задаётся подзапрос, который должен возвращать ровно одну колонку. Вычисленное значение левого выражения сравнивается со значениями во всех строках, возвращённых подзапросом. Результатом всего выражения <TT
+CLASS="TOKEN"
+>IN</TT
+> будет <SPAN
+CLASS="QUOTE"
+>"true"</SPAN
+>, если строка с таким значением находится, и <SPAN
+CLASS="QUOTE"
+>"false"</SPAN
+> в противном случае (в том числе, когда подзапрос вообще не возвращает строк).</P
+><P
+>Заметьте, что если результатом выражения слева оказывается NULL или равных значений справа не находится, а хотя бы одно из значений справа равно NULL, конструкция <TT
+CLASS="TOKEN"
+>IN</TT
+> возвращает NULL, а не false. Это соответствует принятым в SQL правилам сравнения переменных со значениями NULL.</P
+><P
+>Так же, как и с <TT
+CLASS="TOKEN"
+>EXISTS</TT
+>, здесь не следует рассчитывать на то, что подзапрос будет всегда выполняться полностью.</P
+><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>конструктор_строки</I
+></TT
+> IN (<TT
+CLASS="REPLACEABLE"
+><I
+>подзапрос</I
+></TT
+>)</PRE
+><P
+>В левой части этой формы <TT
+CLASS="TOKEN"
+>IN</TT
+> записывается конструктор строки (подробнее они рассматриваются в <A
+HREF="sql-expressions.html#SQL-SYNTAX-ROW-CONSTRUCTORS"
+>Подразделе 4.2.13</A
+>). Справа в скобках записывается подзапрос, который должен вернуть ровно столько колонок, сколько содержит строка в выражении слева. Вычисленные значения левого выражения сравниваются построчно со значениями во всех строках, возвращённых подзапросом. Результатом всего выражения <TT
+CLASS="TOKEN"
+>IN</TT
+> будет <SPAN
+CLASS="QUOTE"
+>"true"</SPAN
+>, если строка с такими значениями находится, и <SPAN
+CLASS="QUOTE"
+>"false"</SPAN
+> в противном случае (в том числе, когда подзапрос вообще не возвращает строк).</P
+><P
+>Как обычно, значения NULL в строках обрабатываются при этом по принятым в SQL правилам сравнения. Две строки считаются равными, если все их соответствующие элементы не равны NULL, но равны между собой; неравными они считаются, когда в них находятся элементы, не равные NULL, и не равные друг другу; в противном случае результат сравнения строк не определён (равен NULL). Если в результатах сравнения строк нет ни одного положительного, но есть хотя бы один NULL, результатом <TT
+CLASS="TOKEN"
+>IN</TT
+> будет NULL.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="FUNCTIONS-SUBQUERY-NOTIN"
+>9.22.3. <TT
+CLASS="LITERAL"
+>NOT IN</TT
+></A
+></H2
+><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> NOT IN (<TT
+CLASS="REPLACEABLE"
+><I
+>подзапрос</I
+></TT
+>)</PRE
+><P
+>Справа в скобках записывается подзапрос, который должен возвращать ровно одну колонку. Вычисленное значение левого выражения сравнивается со значением во всех строках, возвращённых подзапросом. Результатом всего выражения <TT
+CLASS="TOKEN"
+>NOT IN</TT
+> будет <SPAN
+CLASS="QUOTE"
+>"true"</SPAN
+>, если находятся только несовпадающие строки (в том числе, когда подзапрос вообще не возвращает строк). Если же находится хотя бы одна подходящая строка, результатом будет <SPAN
+CLASS="QUOTE"
+>"false"</SPAN
+>.</P
+><P
+>Заметьте, что если результатом выражения слева оказывается NULL или равных значений справа не находится, а хотя бы одно из значений справа равно NULL, конструкция <TT
+CLASS="TOKEN"
+>NOT IN</TT
+> возвращает NULL, а не true. Это соответствует принятым в SQL правилам сравнения переменных со значениями NULL.</P
+><P
+>Так же, как и с <TT
+CLASS="TOKEN"
+>EXISTS</TT
+>, здесь не следует рассчитывать на то, что подзапрос будет всегда выполняться полностью.</P
+><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>конструктор_строки</I
+></TT
+> NOT IN (<TT
+CLASS="REPLACEABLE"
+><I
+>подзапрос</I
+></TT
+>)</PRE
+><P
+>В левой части этой формы <TT
+CLASS="TOKEN"
+>NOT IN</TT
+> записывается конструктор строки (подробнее они описываются в <A
+HREF="sql-expressions.html#SQL-SYNTAX-ROW-CONSTRUCTORS"
+>Подразделе 4.2.13</A
+>). Справа в скобках записывается подзапрос, который должен вернуть ровно столько колонок, сколько содержит строка в выражении слева. Вычисленные значения левого выражения сравниваются построчно со значениями во всех строках, возвращённых подзапросом. Результатом всего выражения <TT
+CLASS="TOKEN"
+>NOT IN</TT
+> будет <SPAN
+CLASS="QUOTE"
+>"true"</SPAN
+>, если равных строк не найдётся (в том числе, и когда подзапрос не возвращает строк), и <SPAN
+CLASS="QUOTE"
+>"false"</SPAN
+>, если такие строки есть.</P
+><P
+>Как обычно, значения NULL в строках обрабатываются при этом по принятым в SQL правилам сравнения. Две строки считаются равными, если все их соответствующие элементы не равны NULL, но равны между собой; неравными они считаются, когда в них находятся элементы, не равные NULL, и не равные друг другу; в противном случае результат сравнения строк не определён (равен NULL). Если в результатах сравнения строк нет ни одного положительного, но есть хотя бы один NULL, результатом <TT
+CLASS="TOKEN"
+>NOT IN</TT
+> будет NULL.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="FUNCTIONS-SUBQUERY-ANY-SOME"
+>9.22.4. <TT
+CLASS="LITERAL"
+>ANY</TT
+>/<TT
+CLASS="LITERAL"
+>SOME</TT
+></A
+></H2
+><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>оператор</I
+></TT
+> ANY (<TT
+CLASS="REPLACEABLE"
+><I
+>подзапрос</I
+></TT
+>)
+<TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>оператор</I
+></TT
+> SOME (<TT
+CLASS="REPLACEABLE"
+><I
+>подзапрос</I
+></TT
+>)</PRE
+><P
+>В правой части конструкции в скобках записывается подзапрос, который должен возвращать ровно одну колонку. Вычисленное значение левого выражения сравнивается со значением в каждой строке результата подзапроса с помощью заданного <TT
+CLASS="REPLACEABLE"
+><I
+>оператора</I
+></TT
+> условия, который должен выдавать логическое значение. Результатом <TT
+CLASS="TOKEN"
+>ANY</TT
+> будет <SPAN
+CLASS="QUOTE"
+>"true"</SPAN
+>, если хотя бы для одной строки условие истинно, и <SPAN
+CLASS="QUOTE"
+>"false"</SPAN
+> в противном случае (в том числе, и когда подзапрос не возвращает строк).</P
+><P
+>Ключевое слово <TT
+CLASS="TOKEN"
+>SOME</TT
+> является синонимом <TT
+CLASS="TOKEN"
+>ANY</TT
+>. Конструкцию <TT
+CLASS="TOKEN"
+>IN</TT
+> можно записать также записать как <TT
+CLASS="LITERAL"
+>= ANY</TT
+>.</P
+><P
+>Заметьте, что если условие не выполняется ни для одной из строк, а хотя бы для одной строки условный оператор выдаёт NULL, конструкция <TT
+CLASS="TOKEN"
+>ANY</TT
+> возвращает NULL, а не false. Это соответствует принятым в SQL правилам сравнения переменных со значениями NULL.</P
+><P
+>Так же, как и с <TT
+CLASS="TOKEN"
+>EXISTS</TT
+>, здесь не следует рассчитывать на то, что подзапрос будет всегда выполняться полностью.</P
+><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>конструктор_строки</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>оператор</I
+></TT
+> ANY (<TT
+CLASS="REPLACEABLE"
+><I
+>подзапрос</I
+></TT
+>)
+<TT
+CLASS="REPLACEABLE"
+><I
+>конструктор_строки</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>оператор</I
+></TT
+> SOME (<TT
+CLASS="REPLACEABLE"
+><I
+>подзапрос</I
+></TT
+>)</PRE
+><P
+>В левой части этой формы <TT
+CLASS="TOKEN"
+>ANY</TT
+> записывается конструктор строки (подробнее они описываются в <A
+HREF="sql-expressions.html#SQL-SYNTAX-ROW-CONSTRUCTORS"
+>Подразделе 4.2.13</A
+>). Справа в скобках записывается подзапрос, который должен возвращать ровно столько колонок, сколько содержит строка в выражении слева. Вычисленные значения левого выражения сравниваются построчно со значениями во всех строках, возвращённых подзапросом, с применением заданного <TT
+CLASS="REPLACEABLE"
+><I
+>оператора</I
+></TT
+>. Результатом всего выражения <TT
+CLASS="TOKEN"
+>ANY</TT
+> будет <SPAN
+CLASS="QUOTE"
+>"true"</SPAN
+>, если для какой-либо из строк результатом сравнения будет true, и <SPAN
+CLASS="QUOTE"
+>"false"</SPAN
+>, если для всех строк результатом сравнения оказывается false (в том числе, и когда подзапрос не возвращает строк). Результат будет равен NULL, если сравнение не возвращает true ни для одной из строк, но как минимум для одной результат сравнения NULL.</P
+><P
+>Подробнее логика сравнения конструкторов строк описана в <A
+HREF="functions-comparisons.html#ROW-WISE-COMPARISON"
+>Подразделе 9.23.5</A
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="FUNCTIONS-SUBQUERY-ALL"
+>9.22.5. <TT
+CLASS="LITERAL"
+>ALL</TT
+></A
+></H2
+><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>оператор</I
+></TT
+> ALL (<TT
+CLASS="REPLACEABLE"
+><I
+>подзапрос</I
+></TT
+>)</PRE
+><P
+>В правой части конструкции в скобках записывается подзапрос, который должен возвращать ровно одну колонку. Вычисленное значение левого выражения сравнивается со значением в каждой строке результата подзапроса с помощью заданного <TT
+CLASS="REPLACEABLE"
+><I
+>оператора</I
+></TT
+> условия, который должен выдавать логическое значение. Результатом <TT
+CLASS="TOKEN"
+>ALL</TT
+> будет <SPAN
+CLASS="QUOTE"
+>"true"</SPAN
+>, если условие истинно для всех строк (и когда подзапрос не возвращает строк), и <SPAN
+CLASS="QUOTE"
+>"false"</SPAN
+>, если находятся строки, для которых оно ложно. Результат будет равен NULL, если сравнение не возвращает false ни для одной из строк, но как минимум для одной результат сравнения NULL.</P
+><P
+>Конструкция <TT
+CLASS="TOKEN"
+>NOT IN</TT
+> равнозначна <TT
+CLASS="LITERAL"
+>&lt;&gt; ALL</TT
+>.</P
+><P
+>Так же, как и с <TT
+CLASS="TOKEN"
+>EXISTS</TT
+>, здесь не следует рассчитывать на то, что подзапрос будет всегда выполняться полностью.</P
+><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>конструктор_строки</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>оператор</I
+></TT
+> ALL (<TT
+CLASS="REPLACEABLE"
+><I
+>подзапрос</I
+></TT
+>)</PRE
+><P
+>В левой части этой формы <TT
+CLASS="TOKEN"
+>ALL</TT
+> записывается конструктор строки (подробнее они описываются в <A
+HREF="sql-expressions.html#SQL-SYNTAX-ROW-CONSTRUCTORS"
+>Подразделе 4.2.13</A
+>). Справа в скобках записывается подзапрос, который должен возвращать ровно столько колонок, сколько содержит строка в выражении слева. Вычисленные значения левого выражения сравниваются построчно со значениями во всех строках, возвращённых подзапросом, с применением заданного <TT
+CLASS="REPLACEABLE"
+><I
+>оператора</I
+></TT
+>. Результатом всего выражения <TT
+CLASS="TOKEN"
+>ALL</TT
+> будет <SPAN
+CLASS="QUOTE"
+>"true"</SPAN
+>, если для всех строк подзапроса результатом сравнения будет true (или если подзапрос не возвращает строк), и <SPAN
+CLASS="QUOTE"
+>"false"</SPAN
+>, если результат сравнения равен false для любой из строк подзапроса. Результат будет равен NULL, если сравнение не возвращает false ни для одной из строк, но как минимум для одной результат сравнения NULL.</P
+><P
+>Подробнее логика сравнения конструкторов строк описана в <A
+HREF="functions-comparisons.html#ROW-WISE-COMPARISON"
+>Подразделе 9.23.5</A
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN19608"
+>9.22.6. Сравнение единичных строк</A
+></H2
+><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>конструктор_строки</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>оператор</I
+></TT
+> (<TT
+CLASS="REPLACEABLE"
+><I
+>подзапрос</I
+></TT
+>)</PRE
+><P
+>В левой части конструкции записывается конструктор строки (подробнее они описываются в <A
+HREF="sql-expressions.html#SQL-SYNTAX-ROW-CONSTRUCTORS"
+>Подразделе 4.2.13</A
+>). Справа в скобках записывается подзапрос, который должен возвращать ровно столько колонок, сколько содержит строка в выражении слева. Более того, подзапрос может вернуть максимум одну строку. (Если он не вернёт строк, результатом будет NULL.) Конструкция возвращает результат сравнения строки слева с этой одной строкой результата подзапроса.</P
+><P
+>Подробнее логика сравнения конструкторов строк описана в <A
+HREF="functions-comparisons.html#ROW-WISE-COMPARISON"
+>Подразделе 9.23.5</A
+>.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions-window.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="functions-comparisons.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Оконные функции</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Сравнение табличных строк и массивов</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

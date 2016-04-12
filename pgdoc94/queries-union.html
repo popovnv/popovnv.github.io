@@ -1,0 +1,294 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Сочетание запросов</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Запросы"
+HREF="queries.html"><LINK
+REL="PREVIOUS"
+TITLE="Списки выборки"
+HREF="queries-select-lists.html"><LINK
+REL="NEXT"
+TITLE="Сортировка строк"
+HREF="queries-order.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Списки выборки"
+HREF="queries-select-lists.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="queries.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 7. Запросы</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Сортировка строк"
+HREF="queries-order.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="QUERIES-UNION"
+>7.4. Сочетание запросов</A
+></H1
+><P
+>Результаты двух запросов можно обработать, используя операции над множествами: объединение, пересечение и вычитание. Эти операции записываются соответственно так: </P><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>запрос1</I
+></TT
+> UNION [<SPAN
+CLASS="OPTIONAL"
+>ALL</SPAN
+>] <TT
+CLASS="REPLACEABLE"
+><I
+>запрос2</I
+></TT
+>
+<TT
+CLASS="REPLACEABLE"
+><I
+>запрос1</I
+></TT
+> INTERSECT [<SPAN
+CLASS="OPTIONAL"
+>ALL</SPAN
+>] <TT
+CLASS="REPLACEABLE"
+><I
+>запрос2</I
+></TT
+>
+<TT
+CLASS="REPLACEABLE"
+><I
+>запрос1</I
+></TT
+> EXCEPT [<SPAN
+CLASS="OPTIONAL"
+>ALL</SPAN
+>] <TT
+CLASS="REPLACEABLE"
+><I
+>запрос2</I
+></TT
+></PRE
+><P>
+Здесь <TT
+CLASS="REPLACEABLE"
+><I
+>запрос1</I
+></TT
+> и <TT
+CLASS="REPLACEABLE"
+><I
+>запрос2</I
+></TT
+> &mdash; это запросы, в которых могут использоваться все возможности, рассмотренные до этого. Операции над множествами тоже можно вкладывать и соединять, например:</P><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>запрос1</I
+></TT
+> UNION <TT
+CLASS="REPLACEABLE"
+><I
+>запрос2</I
+></TT
+> UNION <TT
+CLASS="REPLACEABLE"
+><I
+>запрос3</I
+></TT
+></PRE
+><P> Этот сложный запрос выполняется так: </P><PRE
+CLASS="SYNOPSIS"
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>запрос1</I
+></TT
+> UNION <TT
+CLASS="REPLACEABLE"
+><I
+>запрос2</I
+></TT
+>) UNION <TT
+CLASS="REPLACEABLE"
+><I
+>запрос3</I
+></TT
+></PRE
+><P></P
+><P
+><TT
+CLASS="LITERAL"
+>UNION</TT
+> по сути добавляет результаты второго запроса к результатам первого (хотя никакой порядок возвращаемых строк при этом не гарантируется). Более того, эта операция убирает дублирующиеся строки из результата так же, как это делает <TT
+CLASS="LITERAL"
+>DISTINCT</TT
+>, если только не указано <TT
+CLASS="LITERAL"
+>UNION ALL</TT
+>.</P
+><P
+><TT
+CLASS="LITERAL"
+>INTERSECT</TT
+> возвращает все строки, содержащиеся в результате и первого, и второго запроса. Дублирующиеся строки отфильтровываются, если не указано <TT
+CLASS="LITERAL"
+>ALL</TT
+>.</P
+><P
+><TT
+CLASS="LITERAL"
+>EXCEPT</TT
+> возвращает все строки, которые есть в результате первого запроса, но отсутствуют в результате второго. (Иногда это называют <I
+CLASS="FIRSTTERM"
+>разницей</I
+> двух запросов.) И здесь дублирующиеся строки отфильтровываются, если не указано <TT
+CLASS="LITERAL"
+>ALL</TT
+>.</P
+><P
+>Чтобы можно было вычислить объединение, пересечение или разницу результатов двух запросов, эти запросы должны быть <SPAN
+CLASS="QUOTE"
+>"совместимыми для объединения"</SPAN
+>, что означает, что они должны иметь одинаковое число колонок и соответствующие колонки должны быть совместимых типов, как описывается в <A
+HREF="typeconv-union-case.html"
+>Разделе 10.5</A
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="queries-select-lists.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="queries-order.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Списки выборки</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="queries.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Сортировка строк</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

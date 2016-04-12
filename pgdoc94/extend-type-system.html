@@ -1,0 +1,382 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Система типов PostgreSQL</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Расширение SQL"
+HREF="extend.html"><LINK
+REL="PREVIOUS"
+TITLE="Как реализована расширяемость"
+HREF="extend-how.html"><LINK
+REL="NEXT"
+TITLE="Пользовательские функции"
+HREF="xfunc.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Как реализована расширяемость"
+HREF="extend-how.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="extend.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 35. Расширение <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Пользовательские функции"
+HREF="xfunc.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="EXTEND-TYPE-SYSTEM"
+>35.2. Система типов <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></A
+></H1
+><P
+>Типы данных <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> делятся на базовые, составные, доменные и псевдотипы.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN54752"
+>35.2.1. Базовые типы</A
+></H2
+><P
+>Базовые типы — это типы вроде <TT
+CLASS="TYPE"
+>int4</TT
+>, которые реализуются ниже уровня языка <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> (обычно на низкоуровневом языке, например, C). В общих чертах они соответствуют так называемым абстрактным типам данных. <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> может работать с такими типами только через функции, предоставленные пользователем, и понимать их поведение только в той степени, в какой его опишет пользователь. Базовые типы подразделяются на скалярные типы и массивы. Для каждого скалярного типа автоматически создаётся тип массива, который может содержать множество значений этого скалярного типа переменного размера.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN54758"
+>35.2.2. Составные типы</A
+></H2
+><P
+>Составные типы, или типы строк, образуются при создании любой таблицы. С помощью команды <A
+HREF="sql-createtype.html"
+>CREATE TYPE</A
+> также можно определить <SPAN
+CLASS="QUOTE"
+>"независимый"</SPAN
+> составной тип, не связанный с таблицей. Составной тип представляет собой просто список типов с определёнными именами полей. Значением составного типа является строка таблицы или запись из значений полей. Пользователь может обращаться к этим полям из запросов <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>. За дополнительными сведениями о составных типах обратитесь к <A
+HREF="rowtypes.html"
+>Разделу 8.16</A
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="EXTEND-TYPE-SYSTEM-DOMAINS"
+>35.2.3. Домены</A
+></H2
+><P
+>Домен основывается на определённом базовом типе и во многих аспектах взаимозаменяем с ним. Однако домен может иметь дополнительные ограничения, уменьшающие множество допустимых значений относительно нижележащего базового типа.</P
+><P
+>Доменные типы можно создавать, используя <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>-команду <A
+HREF="sql-createdomain.html"
+>CREATE DOMAIN</A
+>. Их создание и применение в этой главе не рассматривается.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN54771"
+>35.2.4. Псевдотипы</A
+></H2
+><P
+>Для специальных целей существует также несколько <SPAN
+CLASS="QUOTE"
+>"псевдотипов"</SPAN
+>. Псевдотипы не могут применяться в колонках таблицы или атрибутах составных типов, но их можно использовать в объявлениях аргументов и результатов функций. Это даёт возможность выделить в системе типов специальные классы функций. Все существующие псевдотипы перечислены в <A
+HREF="datatype-pseudo.html#DATATYPE-PSEUDOTYPES-TABLE"
+>Таблице 8-25</A
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="EXTEND-TYPES-POLYMORPHIC"
+>35.2.5. Полиморфные типы</A
+></H2
+><P
+>Особый интерес представляют пять псевдотипов: <TT
+CLASS="TYPE"
+>anyelement</TT
+>, <TT
+CLASS="TYPE"
+>anyarray</TT
+>, <TT
+CLASS="TYPE"
+>anynonarray</TT
+>, <TT
+CLASS="TYPE"
+>anyenum</TT
+> и <TT
+CLASS="TYPE"
+>anyrange</TT
+>, которые называются <I
+CLASS="FIRSTTERM"
+>полиморфными типами</I
+>. Функция, в объявлении которой используются эти типы, называется <I
+CLASS="FIRSTTERM"
+>полиморфной</I
+>. Полиморфная функция может работать со множеством различных типов данных; конкретный тип определяется в зависимости от значения, переданного при вызове.</P
+><P
+>Полиморфные аргументы и результаты связываются друг с другом и сводятся к определённому типу данных при разборе запроса, вызывающего полиморфную функцию. В каждой позиции (в аргументах или возвращаемом значении), объявленной как <TT
+CLASS="TYPE"
+>anyelement</TT
+>, может передаваться любой фактический тип данных, но в каждом конкретном вызове все эти фактические типы должны быть <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>одинаковыми</I
+></SPAN
+>. Аналогичным образом, в каждой позиции, объявленной как <TT
+CLASS="TYPE"
+>anyarray</TT
+>, может передаваться любой тип данных массива, но все фактические типы массивов должны совпадать. Так же и во всех позициях, объявленных как <TT
+CLASS="TYPE"
+>anyrange</TT
+>, должен передаваться одинаковый тип-диапазон. Более того, если некоторые позиции объявлены как <TT
+CLASS="TYPE"
+>anyarray</TT
+>, а другие как <TT
+CLASS="TYPE"
+>anyelement</TT
+>, то фактическим типом в позициях <TT
+CLASS="TYPE"
+>anyarray</TT
+> должен быть массив, элементы которого имеют тот же тип, что и значения в позициях <TT
+CLASS="TYPE"
+>anyelement</TT
+>. Подобным образом, если одни позиции объявлены как <TT
+CLASS="TYPE"
+>anyrange</TT
+>, а другие как <TT
+CLASS="TYPE"
+>anyelement</TT
+>, фактическим типом в позициях <TT
+CLASS="TYPE"
+>anyrange</TT
+> должен быть диапазон, подтип которого совпадает с типом, передаваемым в позициях <TT
+CLASS="TYPE"
+>anyelement</TT
+>. Псевдотип <TT
+CLASS="TYPE"
+>anynonarray</TT
+> обрабатывается так же, как <TT
+CLASS="TYPE"
+>anyelement</TT
+>, но с дополнительным ограничением — фактический тип не должен быть типом массива. Псевдотип <TT
+CLASS="TYPE"
+>anyenum</TT
+> тоже обрабатывается как <TT
+CLASS="TYPE"
+>anyelement</TT
+>, но его фактические типы ограничиваются перечислениями.</P
+><P
+>Таким образом, когда с полиморфным типом объявлено несколько аргументов, в итоге допускаются только определённые комбинации фактических типов. Например, функция, объявленная как <TT
+CLASS="LITERAL"
+>equal(anyelement, anyelement)</TT
+>, примет в аргументах любые два значения, но только если их типы данных совпадают.</P
+><P
+>Когда с полиморфным типом объявлено возвращаемое значение функции, так же полиморфным должен быть минимум один аргумент, и фактический тип результата при конкретном вызове определится по типу фактически переданного аргумента. Например, если бы отсутствовал механизм обращения к элементам массива, его можно было бы реализовать, создав функцию <TT
+CLASS="LITERAL"
+>subscript(anyarray, integer) returns anyelement</TT
+>. С таким объявлением первым фактическим аргументом должен быть массив, и из него будет выведен правильный тип результата при разборе запроса. В качестве другого примера можно привести функцию <TT
+CLASS="LITERAL"
+>f(anyarray) returns anyenum</TT
+>, которая будет принимать только массивы перечислений.</P
+><P
+>Заметьте, что <TT
+CLASS="TYPE"
+>anynonarray</TT
+> и <TT
+CLASS="TYPE"
+>anyenum</TT
+> представляют не отдельные типы переменных; это те же типы, что и <TT
+CLASS="TYPE"
+>anyelement</TT
+>, но с дополнительными ограничениями. Например, объявление функции <TT
+CLASS="LITERAL"
+>f(anyelement, anyenum)</TT
+> равнозначно объявлению <TT
+CLASS="LITERAL"
+>f(anyenum, anyenum)</TT
+>: оба фактических аргумента должны быть одинаковыми типами-перечислениями.</P
+><P
+>Функции с переменным числом аргументом (описанные в <A
+HREF="xfunc-sql.html#XFUNC-SQL-VARIADIC-FUNCTIONS"
+>Подразделе 35.4.5</A
+>) тоже могут полиморфными: для этого их последний параметр описывается как <TT
+CLASS="LITERAL"
+>VARIADIC</TT
+> <TT
+CLASS="TYPE"
+>anyarray</TT
+>. Для целей сопоставления аргументов и определения фактического типа результата такая функция представляется так же, как если бы в ней явно объявлялось нужное число параметров <TT
+CLASS="TYPE"
+>anynonarray</TT
+>.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="extend-how.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="xfunc.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Как реализована расширяемость</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="extend.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Пользовательские функции</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

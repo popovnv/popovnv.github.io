@@ -1,0 +1,688 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>SPI_execute</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Интерфейсные функции"
+HREF="spi-interface.html"><LINK
+REL="PREVIOUS"
+TITLE="SPI_pop"
+HREF="spi-spi-pop.html"><LINK
+REL="NEXT"
+TITLE="SPI_exec"
+HREF="spi-spi-exec.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="SPI_pop"
+HREF="spi-spi-pop.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="spi-interface.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="SPI_exec"
+HREF="spi-spi-exec.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SPI-SPI-EXECUTE"
+></A
+>SPI_execute</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN63948"
+></A
+><H2
+>Название</H2
+>SPI_execute&nbsp;--&nbsp;выполнить команду</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN63951"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>int SPI_execute(const char * <TT
+CLASS="PARAMETER"
+>command</TT
+>, bool <TT
+CLASS="PARAMETER"
+>read_only</TT
+>, long <TT
+CLASS="PARAMETER"
+>count</TT
+>)</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN63956"
+></A
+><H2
+>Описание</H2
+><P
+><CODE
+CLASS="FUNCTION"
+>SPI_execute</CODE
+> выполняет заданную команду SQL для получения строк в количестве, ограниченном <TT
+CLASS="PARAMETER"
+>count</TT
+>. С параметром <TT
+CLASS="PARAMETER"
+>read_only</TT
+>, равным <TT
+CLASS="LITERAL"
+>true</TT
+>, команда должна только читать данные; это несколько сокращает издержки на её выполнение.</P
+><P
+>Эту функцию можно вызывать только из подключённой процедуры.</P
+><P
+>Если <TT
+CLASS="PARAMETER"
+>count</TT
+> равен 0, команда выполняется для всех строк, к которым она применима. Если <TT
+CLASS="PARAMETER"
+>count</TT
+> больше нуля, будет получено не более чем <TT
+CLASS="PARAMETER"
+>count</TT
+> строк; выполнение команды остановится при достижении этого предела, практически так же, как и с предложением <TT
+CLASS="LITERAL"
+>LIMIT</TT
+> в запросе. Например, команда: </P><PRE
+CLASS="PROGRAMLISTING"
+>SPI_execute("SELECT * FROM foo", true, 5);</PRE
+><P> получит из таблицы не более 5 строк. Заметьте, что это ограничение действует, только когда команда действительно возвращает строки. Например, эта команда: </P><PRE
+CLASS="PROGRAMLISTING"
+>SPI_execute("INSERT INTO foo SELECT * FROM bar", false, 5);</PRE
+><P> вставляет все строки из <TT
+CLASS="STRUCTNAME"
+>bar</TT
+>, игнорируя параметр <TT
+CLASS="PARAMETER"
+>count</TT
+>. Однако, команда </P><PRE
+CLASS="PROGRAMLISTING"
+>SPI_execute("INSERT INTO foo SELECT * FROM bar RETURNING *", false, 5);</PRE
+><P> вставит не более 5 строк, так как её выполнение будет остановлено после получения пятой строки, выданной предложением <TT
+CLASS="LITERAL"
+>RETURNING</TT
+>.</P
+><P
+>В одной строке можно передать несколько команд; <CODE
+CLASS="FUNCTION"
+>SPI_execute</CODE
+> возвращает результат команды, выполненной последней. Параметр <TT
+CLASS="PARAMETER"
+>count</TT
+> при этом будет применяться к каждой команде по отдельности (несмотря даже на то, что возвращён будет только последний результат). Это ограничение не будет распространяться на скрытые команды, генерируемые правилами.</P
+><P
+>Когда параметр <TT
+CLASS="PARAMETER"
+>read_only</TT
+> равен <TT
+CLASS="LITERAL"
+>false</TT
+>, <CODE
+CLASS="FUNCTION"
+>SPI_execute</CODE
+> увеличивает счётчик команд и получает новый <I
+CLASS="FIRSTTERM"
+>снимок</I
+> перед выполнением каждой очередной команды в строке. Этот снимок фактически не меняется при текущем уровне изоляции транзакций <TT
+CLASS="LITERAL"
+>SERIALIZABLE</TT
+> или <TT
+CLASS="LITERAL"
+>REPEATABLE READ</TT
+>, но в режиме <TT
+CLASS="LITERAL"
+>READ COMMITTED</TT
+> после обновления снимка очередная команда может видеть результаты только что зафиксированных транзакций из других сеансов. Это важно для согласованного поведения, когда команды модифицируют базу данных.</P
+><P
+>Когда параметр <TT
+CLASS="PARAMETER"
+>read_only</TT
+> равен <TT
+CLASS="LITERAL"
+>true</TT
+>, <CODE
+CLASS="FUNCTION"
+>SPI_execute</CODE
+> не обновляет снимок и не увеличивает счётчик команд, и допускает в строке команд только <TT
+CLASS="COMMAND"
+>SELECT</TT
+>. Заданные команды выполняются со снимком, ранее полученным для окружающего запроса. Этот режим выполнения несколько быстрее режима чтения/записи вследствие исключения издержек, связанных с отдельными командами. Он также позволяет создавать подлинно <I
+CLASS="FIRSTTERM"
+>стабильные</I
+> функции: так как последующие вызовы в транзакции будут использовать один снимок, результаты команд не изменятся.</P
+><P
+>Смешивать команды, только читающие, с командами, читающими и пишущими, в одной процедуре, использующей SPI, обычно неразумно; запросы только на чтение не увидят результатов изменений в базе данных, произведённых пишущими запросами.</P
+><P
+>Число строк, которые были фактически обработаны командой (последней), возвращается в глобальной переменной <TT
+CLASS="VARNAME"
+>SPI_processed</TT
+>. Если эта функция возвращает значение <TT
+CLASS="SYMBOL"
+>SPI_OK_SELECT</TT
+>, <TT
+CLASS="SYMBOL"
+>SPI_OK_INSERT_RETURNING</TT
+>, <TT
+CLASS="SYMBOL"
+>SPI_OK_DELETE_RETURNING</TT
+> или <TT
+CLASS="SYMBOL"
+>SPI_OK_UPDATE_RETURNING</TT
+>, вы можете обратиться по глобальному указателю <TT
+CLASS="LITERAL"
+>SPITupleTable *SPI_tuptable</TT
+> и прочитать строки результата. Некоторые служебные команды (например, <TT
+CLASS="COMMAND"
+>EXPLAIN</TT
+>) также возвращают наборы строк, и <TT
+CLASS="LITERAL"
+>SPI_tuptable</TT
+> будет содержать их результаты и в этих случаях. Другие вспомогательные команды (<TT
+CLASS="COMMAND"
+>COPY</TT
+>, <TT
+CLASS="COMMAND"
+>CREATE TABLE AS</TT
+>) не возвращают набор строк, так что указатель <TT
+CLASS="LITERAL"
+>SPI_tuptable</TT
+> равен NULL, но они так же возвращают число обработанных строк в <TT
+CLASS="VARNAME"
+>SPI_processed</TT
+>.</P
+><P
+>Структура <TT
+CLASS="STRUCTNAME"
+>SPITupleTable</TT
+> определена так: </P><PRE
+CLASS="PROGRAMLISTING"
+>typedef struct
+{
+    MemoryContext tuptabcxt;    /* контекст таблицы результатов в памяти */
+    uint32      alloced;        /* число занятых значений */
+    uint32      free;           /* число свободных значений */
+    TupleDesc   tupdesc;        /* дескриптор строки */
+    HeapTuple  *vals;           /* данные строк */
+} SPITupleTable;</PRE
+><P>
+   <TT
+CLASS="STRUCTFIELD"
+>vals</TT
+> представляет собой массив указателей на строки. (Число записей в нём указывается в <TT
+CLASS="VARNAME"
+>SPI_processed</TT
+>.) Поле <TT
+CLASS="STRUCTFIELD"
+>tupdesc</TT
+> содержит дескриптор строки, который вы сможете передать функциям SPI, работающими со строками. Поля <TT
+CLASS="STRUCTFIELD"
+>tuptabcxt</TT
+>, <TT
+CLASS="STRUCTFIELD"
+>alloced</TT
+> и <TT
+CLASS="STRUCTFIELD"
+>free</TT
+> предназначены для внутреннего использования, а не для процедур, работающих с SPI.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>SPI_finish</CODE
+> освобождает все структуры <TT
+CLASS="STRUCTNAME"
+>SPITupleTable</TT
+>, размещённые в памяти для текущей процедуры. Вы можете освободить структуру конкретной результирующей таблицы, если она вам не нужна, вызвав <CODE
+CLASS="FUNCTION"
+>SPI_freetuptable</CODE
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN64019"
+></A
+><H2
+>Аргументы</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>const char * <TT
+CLASS="PARAMETER"
+>command</TT
+></TT
+></DT
+><DD
+><P
+>строка с командой, которая должна быть выполнена</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>bool <TT
+CLASS="PARAMETER"
+>read_only</TT
+></TT
+></DT
+><DD
+><P
+><TT
+CLASS="LITERAL"
+>true</TT
+> для режима выполнения &laquo;только чтение&raquo;</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>long <TT
+CLASS="PARAMETER"
+>count</TT
+></TT
+></DT
+><DD
+><P
+>максимальное число строк, которое должно быть возвращено; с <TT
+CLASS="LITERAL"
+>0</TT
+> ограничения нет</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN64042"
+></A
+><H2
+>Возвращаемое значение</H2
+><P
+>Если команда была выполнена успешно, возвращается одно из следующих (неотрицательных) значений: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="SYMBOL"
+>SPI_OK_SELECT</TT
+></DT
+><DD
+><P
+>если выполнялась команда <TT
+CLASS="COMMAND"
+>SELECT</TT
+> (но не <TT
+CLASS="COMMAND"
+>SELECT INTO</TT
+>)</P
+></DD
+><DT
+><TT
+CLASS="SYMBOL"
+>SPI_OK_SELINTO</TT
+></DT
+><DD
+><P
+>если выполнялась команда <TT
+CLASS="COMMAND"
+>SELECT INTO</TT
+></P
+></DD
+><DT
+><TT
+CLASS="SYMBOL"
+>SPI_OK_INSERT</TT
+></DT
+><DD
+><P
+>если выполнялась команда <TT
+CLASS="COMMAND"
+>INSERT</TT
+></P
+></DD
+><DT
+><TT
+CLASS="SYMBOL"
+>SPI_OK_DELETE</TT
+></DT
+><DD
+><P
+>если выполнялась команда <TT
+CLASS="COMMAND"
+>DELETE</TT
+></P
+></DD
+><DT
+><TT
+CLASS="SYMBOL"
+>SPI_OK_UPDATE</TT
+></DT
+><DD
+><P
+>если выполнялась команда <TT
+CLASS="COMMAND"
+>UPDATE</TT
+></P
+></DD
+><DT
+><TT
+CLASS="SYMBOL"
+>SPI_OK_INSERT_RETURNING</TT
+></DT
+><DD
+><P
+>если выполнялась команда <TT
+CLASS="COMMAND"
+>INSERT RETURNING</TT
+></P
+></DD
+><DT
+><TT
+CLASS="SYMBOL"
+>SPI_OK_DELETE_RETURNING</TT
+></DT
+><DD
+><P
+>если выполнялась команда <TT
+CLASS="COMMAND"
+>DELETE RETURNING</TT
+></P
+></DD
+><DT
+><TT
+CLASS="SYMBOL"
+>SPI_OK_UPDATE_RETURNING</TT
+></DT
+><DD
+><P
+>если выполнялась команда <TT
+CLASS="COMMAND"
+>UPDATE RETURNING</TT
+></P
+></DD
+><DT
+><TT
+CLASS="SYMBOL"
+>SPI_OK_UTILITY</TT
+></DT
+><DD
+><P
+>если выполнялась служебная команда (например, <TT
+CLASS="COMMAND"
+>CREATE TABLE</TT
+>)</P
+></DD
+><DT
+><TT
+CLASS="SYMBOL"
+>SPI_OK_REWRITTEN</TT
+></DT
+><DD
+><P
+>если команда была преобразована <A
+HREF="rules.html"
+>правилом</A
+> в команду другого вида (например, <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> стал командой <TT
+CLASS="COMMAND"
+>INSERT</TT
+>).</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>В случае ошибки возвращается одно из следующих отрицательных значений: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="SYMBOL"
+>SPI_ERROR_ARGUMENT</TT
+></DT
+><DD
+><P
+>если в качестве <TT
+CLASS="PARAMETER"
+>command</TT
+> передан <TT
+CLASS="SYMBOL"
+>NULL</TT
+> или <TT
+CLASS="PARAMETER"
+>count</TT
+> меньше 0</P
+></DD
+><DT
+><TT
+CLASS="SYMBOL"
+>SPI_ERROR_COPY</TT
+></DT
+><DD
+><P
+>при попытке выполнить <TT
+CLASS="COMMAND"
+>COPY TO stdout</TT
+> или <TT
+CLASS="COMMAND"
+>COPY FROM stdin</TT
+></P
+></DD
+><DT
+><TT
+CLASS="SYMBOL"
+>SPI_ERROR_TRANSACTION</TT
+></DT
+><DD
+><P
+>при попытке выполнить команду управления транзакциями (<TT
+CLASS="COMMAND"
+>BEGIN</TT
+>, <TT
+CLASS="COMMAND"
+>COMMIT</TT
+>, <TT
+CLASS="COMMAND"
+>ROLLBACK</TT
+>, <TT
+CLASS="COMMAND"
+>SAVEPOINT</TT
+>, <TT
+CLASS="COMMAND"
+>PREPARE TRANSACTION</TT
+>, <TT
+CLASS="COMMAND"
+>COMMIT PREPARED</TT
+>, <TT
+CLASS="COMMAND"
+>ROLLBACK PREPARED</TT
+> или любую их вариацию)</P
+></DD
+><DT
+><TT
+CLASS="SYMBOL"
+>SPI_ERROR_OPUNKNOWN</TT
+></DT
+><DD
+><P
+>если тип команды неизвестен (такого быть не должно)</P
+></DD
+><DT
+><TT
+CLASS="SYMBOL"
+>SPI_ERROR_UNCONNECTED</TT
+></DT
+><DD
+><P
+>если вызывается из неподключённой процедуры</P
+></DD
+></DL
+></DIV
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN64148"
+></A
+><H2
+>Замечания</H2
+><P
+>Все функции SPI, выполняющие запросы, заполняют и <TT
+CLASS="VARNAME"
+>SPI_processed</TT
+>, и <TT
+CLASS="VARNAME"
+>SPI_tuptable</TT
+> (только указатель, но не содержимое структуры). Сохраните эти две глобальные переменные в локальных переменных процедуры, если хотите обращаться к таблице результата <CODE
+CLASS="FUNCTION"
+>SPI_execute</CODE
+> или другой функции, выполняющей запрос, в нескольких вызовах процедуры.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="spi-spi-pop.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="spi-spi-exec.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>SPI_pop</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="spi-interface.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>SPI_exec</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

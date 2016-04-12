@@ -1,0 +1,241 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>pg_prewarm</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Дополнительно поставляемые модули"
+HREF="contrib.html"><LINK
+REL="PREVIOUS"
+TITLE="pg_freespacemap"
+HREF="pgfreespacemap.html"><LINK
+REL="NEXT"
+TITLE="pgrowlocks"
+HREF="pgrowlocks.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="pg_freespacemap"
+HREF="pgfreespacemap.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Приложение E. Дополнительно поставляемые модули</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="pgrowlocks"
+HREF="pgrowlocks.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="PGPREWARM"
+>E.27. pg_prewarm</A
+></H1
+><P
+>Модуль <TT
+CLASS="FILENAME"
+>pg_prewarm</TT
+> предоставляет удобную возможность загружать данные отношений в кеш операционной системы или в кеш буферов <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN123545"
+>E.27.1. Функции</A
+></H2
+><PRE
+CLASS="SYNOPSIS"
+>pg_prewarm(regclass, mode text default 'buffer', fork text default 'main',
+           first_block int8 default null,
+           last_block int8 default null) RETURNS int8</PRE
+><P
+>Первый аргумент задаёт отношение, которое будет &laquo;разогрето&raquo;. Во втором указывается метод &laquo;разогрева&raquo;, из описанных ниже; в третьем задаётся целевой слой отношения, обычно <TT
+CLASS="LITERAL"
+>main</TT
+>. В четвёртом аргументе можно передать номер первого разогреваемого блока (<TT
+CLASS="LITERAL"
+>NULL</TT
+> принимается как синоним нуля), а в пятом — номер последнего блока (<TT
+CLASS="LITERAL"
+>NULL</TT
+> означает последний блок отношения). Возвращает эта функция количество разогретых блоков.</P
+><P
+>Эта функция поддерживает три режима разогрева. В режиме <TT
+CLASS="LITERAL"
+>prefetch</TT
+> выдаются асинхронные запросы предвыборки данных операционной системе, если они поддерживаются, либо происходит ошибка. В режиме <TT
+CLASS="LITERAL"
+>read</TT
+> считывается заданный диапазон блоков; в отличие от <TT
+CLASS="LITERAL"
+>prefetch</TT
+> это происходит синхронно и поддерживается во всех ОС и любыми сборками, но может быть медленнее. В режиме <TT
+CLASS="LITERAL"
+>buffer</TT
+> запрошенный диапазон блоков считывается в кеш буферов базы данных.</P
+><P
+>Заметьте, что с любым из этих методов попытка разогреть больше блоков, чем может уместиться в кеше (в кеше ОС в режимах <TT
+CLASS="LITERAL"
+>prefetch</TT
+> и <TT
+CLASS="LITERAL"
+>read</TT
+>, либо в кеше <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> в режиме <TT
+CLASS="LITERAL"
+>buffer</TT
+>) скорее всего приведёт к тому, что блоки с меньшими номерами будут вытеснены из кеша при чтении последующих блоков. Кроме того, разогретые данные никаким специальным образом не защищаются от вытеснения из кеша, так что возможна ситуация, когда только что разогретые блоки будут вытеснены вскоре после чтения; с другой стороны при таком разогреве из кеша могут быть вытеснены другие данные. Поэтому разогрев обычно наиболее полезен при загрузке, когда кеши в основном пусты.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN123562"
+>E.27.2. Автор</A
+></H2
+><P
+>Роберт Хаас <CODE
+CLASS="EMAIL"
+>&#60;<A
+HREF="mailto:rhaas@postgresql.org"
+>rhaas@postgresql.org</A
+>&#62;</CODE
+></P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="pgfreespacemap.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="pgrowlocks.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>pg_freespacemap</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>pgrowlocks</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

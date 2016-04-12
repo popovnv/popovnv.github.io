@@ -1,0 +1,857 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>ALTER FOREIGN TABLE</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="ALTER FOREIGN DATA WRAPPER"
+HREF="sql-alterforeigndatawrapper.html"><LINK
+REL="NEXT"
+TITLE="ALTER FUNCTION"
+HREF="sql-alterfunction.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="ALTER FOREIGN DATA WRAPPER"
+HREF="sql-alterforeigndatawrapper.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="ALTER FUNCTION"
+HREF="sql-alterfunction.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-ALTERFOREIGNTABLE"
+></A
+>ALTER FOREIGN TABLE</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN67671"
+></A
+><H2
+>Название</H2
+>ALTER FOREIGN TABLE&nbsp;--&nbsp;изменить определение сторонней таблицы</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN67674"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>ALTER FOREIGN TABLE [ IF EXISTS ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+>
+    <TT
+CLASS="REPLACEABLE"
+><I
+>действие</I
+></TT
+> [, ... ]
+ALTER FOREIGN TABLE [ IF EXISTS ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+>
+    RENAME [ COLUMN ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+> TO <TT
+CLASS="REPLACEABLE"
+><I
+>новое_имя_колонки</I
+></TT
+>
+ALTER FOREIGN TABLE [ IF EXISTS ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+>
+    RENAME TO <TT
+CLASS="REPLACEABLE"
+><I
+>новое_имя</I
+></TT
+>
+ALTER FOREIGN TABLE [ IF EXISTS ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+>
+    SET SCHEMA <TT
+CLASS="REPLACEABLE"
+><I
+>новая_схема</I
+></TT
+>
+
+<SPAN
+CLASS="phrase"
+><SPAN
+CLASS="PHRASE"
+>Где возможные варианты <TT
+CLASS="REPLACEABLE"
+><I
+>действие</I
+></TT
+>:</SPAN
+></SPAN
+>
+
+    ADD [ COLUMN ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>тип_данных</I
+></TT
+> [ COLLATE <TT
+CLASS="REPLACEABLE"
+><I
+>правило_сортировки</I
+></TT
+> ] [ <TT
+CLASS="REPLACEABLE"
+><I
+>ограничение_колонки</I
+></TT
+> [ ... ] ]
+    DROP [ COLUMN ] [ IF EXISTS ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+> [ RESTRICT | CASCADE ]
+    ALTER [ COLUMN ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+> [ SET DATA ] TYPE <TT
+CLASS="REPLACEABLE"
+><I
+>тип_данных</I
+></TT
+>
+    ALTER [ COLUMN ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+> SET DEFAULT <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+>
+    ALTER [ COLUMN ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+> DROP DEFAULT
+    ALTER [ COLUMN ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+> { SET | DROP } NOT NULL
+    ALTER [ COLUMN ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+> SET STATISTICS <TT
+CLASS="REPLACEABLE"
+><I
+>integer</I
+></TT
+>
+    ALTER [ COLUMN ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+> SET ( <TT
+CLASS="REPLACEABLE"
+><I
+>атрибут</I
+></TT
+> = <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> [, ... ] )
+    ALTER [ COLUMN ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+> RESET ( <TT
+CLASS="REPLACEABLE"
+><I
+>атрибут</I
+></TT
+> [, ... ] )
+    ALTER [ COLUMN ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+> OPTIONS ( [ ADD | SET | DROP ] <TT
+CLASS="REPLACEABLE"
+><I
+>параметр</I
+></TT
+> ['<TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+>'] [, ... ])
+    DISABLE TRIGGER [ <TT
+CLASS="REPLACEABLE"
+><I
+>имя_триггера</I
+></TT
+> | ALL | USER ]
+    ENABLE TRIGGER [ <TT
+CLASS="REPLACEABLE"
+><I
+>имя_триггера</I
+></TT
+> | ALL | USER ]
+    ENABLE REPLICA TRIGGER <TT
+CLASS="REPLACEABLE"
+><I
+>имя_триггера</I
+></TT
+>
+    ENABLE ALWAYS TRIGGER <TT
+CLASS="REPLACEABLE"
+><I
+>имя_триггера</I
+></TT
+>
+    OWNER TO <TT
+CLASS="REPLACEABLE"
+><I
+>новый_владелец</I
+></TT
+>
+    OPTIONS ( [ ADD | SET | DROP ] <TT
+CLASS="REPLACEABLE"
+><I
+>параметр</I
+></TT
+> ['<TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+>'] [, ... ])</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN67715"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>ALTER FOREIGN TABLE</TT
+> меняет определение существующей сторонней таблицы. Эта команда имеет несколько разновидностей: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>ADD COLUMN</TT
+></DT
+><DD
+><P
+>Эта форма добавляет в стороннюю таблицу новую колонку, следуя тому же синтаксису, что и <A
+HREF="sql-createforeigntable.html"
+>CREATE FOREIGN TABLE</A
+>. В отличие от добавления колонки в обычную таблицу, при данной операции в базовом хранилище ничего не меняется; эта команда просто объявляет о доступности новой колонки через данную стороннюю таблицу.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>DROP COLUMN [ IF EXISTS ]</TT
+></DT
+><DD
+><P
+>Эта форма удаляет колонку из сторонней таблицы. Если что-либо зависит от этой колонки, например, представление, для успешного результата потребуется добавить <TT
+CLASS="LITERAL"
+>CASCADE</TT
+>. Если указано <TT
+CLASS="LITERAL"
+>IF EXISTS</TT
+> и эта колонка не существует, ошибка не происходит, вместо этого выдаётся замечание.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>IF EXISTS</TT
+></DT
+><DD
+><P
+>Не считать ошибкой, если сторонняя таблица не существует. В этом случае будет выдано замечание.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>SET DATA TYPE</TT
+></DT
+><DD
+><P
+>Эта форма меняет тип колонки в сторонней таблице.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>SET</TT
+>/<TT
+CLASS="LITERAL"
+>DROP DEFAULT</TT
+></DT
+><DD
+><P
+>Эти формы задают или удаляют значение по умолчанию для колонок. Значения по умолчанию применяются только при последующих командах <TT
+CLASS="COMMAND"
+>INSERT</TT
+> или <TT
+CLASS="COMMAND"
+>UPDATE</TT
+>; их изменения не отражаются в строках, уже существующих в таблице.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>SET</TT
+>/<TT
+CLASS="LITERAL"
+>DROP NOT NULL</TT
+></DT
+><DD
+><P
+>Устанавливает, будет ли колонка принимать значения NULL или нет.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>SET STATISTICS</TT
+></DT
+><DD
+><P
+>Эта форма задаёт цель сбора статистики по колонкам для последующих операций <A
+HREF="sql-analyze.html"
+>ANALYZE</A
+>. За подробностями обратитесь к описанию подобной формы <A
+HREF="sql-altertable.html"
+>ALTER TABLE</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>SET ( <TT
+CLASS="REPLACEABLE"
+><I
+>атрибут</I
+></TT
+> = <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> [, ... ] )</TT
+><BR><TT
+CLASS="LITERAL"
+>RESET ( <TT
+CLASS="REPLACEABLE"
+><I
+>атрибут</I
+></TT
+> [, ... ] )</TT
+></DT
+><DD
+><P
+>Эта форма задаёт или сбрасывает значения атрибутов. За подробностями обратитесь к описанию подобной формы <A
+HREF="sql-altertable.html"
+>ALTER TABLE</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>DISABLE</TT
+>/<TT
+CLASS="LITERAL"
+>ENABLE [ REPLICA | ALWAYS ] TRIGGER</TT
+></DT
+><DD
+><P
+>Эти формы управляют триггерами, принадлежащими сторонней таблице. За подробностями обратитесь к описанию подобной формы <A
+HREF="sql-altertable.html"
+>ALTER TABLE</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>OWNER</TT
+></DT
+><DD
+><P
+>Эта форма меняет владельца сторонней таблицы на заданного пользователя.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>RENAME</TT
+></DT
+><DD
+><P
+>Формы <TT
+CLASS="LITERAL"
+>RENAME</TT
+> меняют имя сторонней таблицы или имя колонки в сторонней таблице.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>SET SCHEMA</TT
+></DT
+><DD
+><P
+>Эта форма переносит стороннюю таблицу в другую схему.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>OPTIONS ( [ ADD | SET | DROP ] <TT
+CLASS="REPLACEABLE"
+><I
+>параметр</I
+></TT
+> ['<TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+>'] [, ... ] )</TT
+></DT
+><DD
+><P
+>Эта форма настраивает параметры сторонней таблицы или одной из её колонок. <TT
+CLASS="LITERAL"
+>ADD</TT
+>, <TT
+CLASS="LITERAL"
+>SET</TT
+> и <TT
+CLASS="LITERAL"
+>DROP</TT
+> определяют, какое действие будет выполнено (добавление, установка и удаление, соответственно). Если действие не задано явно, подразумевается <TT
+CLASS="LITERAL"
+>ADD</TT
+>. Имена параметров не должны повторяться (хотя параметр таблицы и параметр колонки вполне могут иметь одно имя). Имена и значения параметров также проверяются библиотекой обёртки сторонних данных.</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>Все действия, кроме <TT
+CLASS="LITERAL"
+>RENAME</TT
+> и <TT
+CLASS="LITERAL"
+>SET SCHEMA</TT
+>, можно объединить в один список изменений и выполнить одновременно. Например, можно добавить несколько колонок и/или изменить тип колонок одной командой.</P
+><P
+>Выполнить <TT
+CLASS="COMMAND"
+>ALTER FOREIGN TABLE</TT
+> может только владелец соответствующей таблицы. Чтобы сменить схему сторонней таблицы, необходимо также иметь право <TT
+CLASS="LITERAL"
+>CREATE</TT
+> в новой схеме. Чтобы сменить владельца, необходимо быть непосредственным или опосредованным членом новой роли-владельца, а эта роль должна иметь право <TT
+CLASS="LITERAL"
+>CREATE</TT
+> в схеме таблицы. (С такими ограничениями при смене владельца не происходит ничего такого, что нельзя было бы сделать, имея право удалить и вновь создать таблицу. Однако суперпользователь может сменить владельца таблицы в любом случае.) Чтобы добавить колонку или изменить тип колонки, ещё требуется иметь право <TT
+CLASS="LITERAL"
+>USAGE</TT
+> для её типа данных.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN67817"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></DT
+><DD
+><P
+>Имя (возможно, дополненное схемой) существующей сторонней таблицы, подлежащей изменению.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+></DT
+><DD
+><P
+>Имя новой или существующей колонки.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>новое_имя_колонки</I
+></TT
+></DT
+><DD
+><P
+>Новое имя существующей колонки.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>новое_имя</I
+></TT
+></DT
+><DD
+><P
+>Новое имя таблицы.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>тип_данных</I
+></TT
+></DT
+><DD
+><P
+>Тип данных новой колонки или новый тип данных существующей колонки.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>CASCADE</TT
+></DT
+><DD
+><P
+>Автоматически удалять объекты, зависящие от удаляемой колонки (например, представления, содержащие эту колонку).</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>RESTRICT</TT
+></DT
+><DD
+><P
+>Отказать в удалении колонки, если существуют зависящие от неё объекты. Это поведение по умолчанию.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_триггера</I
+></TT
+></DT
+><DD
+><P
+>Имя включаемого или отключаемого триггера.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>ALL</TT
+></DT
+><DD
+><P
+>Отключает или включает все триггеры, принадлежащие сторонней таблице. (Если какие-либо из триггеров являются внутрисистемными, для этого требуются права суперпользователя. Сама система не добавляет такие триггеры в сторонние таблицы, но дополнительный код может сделать это.)</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>USER</TT
+></DT
+><DD
+><P
+>Отключает или включает все триггеры, принадлежащие сторонней таблице, кроме сгенерированных внутрисистемных.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>новый_владелец</I
+></TT
+></DT
+><DD
+><P
+>Имя пользователя, назначаемого новым владельцем таблицы.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>новая_схема</I
+></TT
+></DT
+><DD
+><P
+>Имя схемы, в которую будет перемещена таблица.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN67880"
+></A
+><H2
+>Замечания</H2
+><P
+>Ключевое слово <TT
+CLASS="LITERAL"
+>COLUMN</TT
+> не несёт смысловой нагрузки и может быть опущено.</P
+><P
+>При добавлении или удалении колонок (<TT
+CLASS="LITERAL"
+>ADD COLUMN</TT
+>/<TT
+CLASS="LITERAL"
+>DROP COLUMN</TT
+>), добавлении ограничений <TT
+CLASS="LITERAL"
+>NOT NULL</TT
+> или изменении типа колонки (<TT
+CLASS="LITERAL"
+>SET DATA TYPE</TT
+>) согласованность этих определений с внешним сервером не гарантируется. Ответственность за соответствие определений таблицы удалённой стороне лежит на пользователе.</P
+><P
+>За более полным описанием параметров обратитесь к <A
+HREF="sql-createforeigntable.html"
+>CREATE FOREIGN TABLE</A
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN67891"
+></A
+><H2
+>Примеры</H2
+><P
+>Установление ограничения NOT NULL для колонки: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER FOREIGN TABLE distributors ALTER COLUMN street SET NOT NULL;</PRE
+><P></P
+><P
+>Изменение параметров сторонней таблицы: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER FOREIGN TABLE myschema.distributors OPTIONS (ADD opt1 'value', SET opt2, 'value2', DROP opt3 'value3');</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN67897"
+></A
+><H2
+>Совместимость</H2
+><P
+>Формы <TT
+CLASS="LITERAL"
+>ADD</TT
+>, <TT
+CLASS="LITERAL"
+>DROP</TT
+> и <TT
+CLASS="LITERAL"
+>SET DATA TYPE</TT
+> соответствуют стандарту SQL. Другие формы являются собственными расширениями <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Кроме того, возможность указать в одной команде <TT
+CLASS="COMMAND"
+>ALTER FOREIGN TABLE</TT
+> несколько операций так же является расширением.</P
+><P
+><TT
+CLASS="COMMAND"
+>ALTER FOREIGN TABLE DROP COLUMN</TT
+> позволяет удалить единственную колонку сторонней таблицы и оставить таблицу без колонок. Это является расширением стандарта SQL, который не допускает существование сторонних таблиц с нулём колонок.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-alterforeigndatawrapper.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-alterfunction.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>ALTER FOREIGN DATA WRAPPER</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>ALTER FUNCTION</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

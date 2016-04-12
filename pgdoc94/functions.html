@@ -1,0 +1,618 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Функции и операторы</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Язык SQL"
+HREF="sql.html"><LINK
+REL="PREVIOUS"
+TITLE="Псевдотипы"
+HREF="datatype-pseudo.html"><LINK
+REL="NEXT"
+TITLE="Логические операторы"
+HREF="functions-logical.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="CHAPTER"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Псевдотипы"
+HREF="datatype-pseudo.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Логические операторы"
+HREF="functions-logical.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="FUNCTIONS"
+></A
+>Глава 9. Функции и операторы</H1
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Содержание</B
+></DT
+><DT
+>9.1. <A
+HREF="functions-logical.html"
+>Логические операторы</A
+></DT
+><DT
+>9.2. <A
+HREF="functions-comparison.html"
+>Операторы сравнения</A
+></DT
+><DT
+>9.3. <A
+HREF="functions-math.html"
+>Математические функции и операторы</A
+></DT
+><DT
+>9.4. <A
+HREF="functions-string.html"
+>Строковые функции и операторы</A
+></DT
+><DT
+>9.5. <A
+HREF="functions-binarystring.html"
+>Функции и операторы двоичных строк</A
+></DT
+><DT
+>9.6. <A
+HREF="functions-bitstring.html"
+>Функции и операторы для работы с битовыми строками</A
+></DT
+><DT
+>9.7. <A
+HREF="functions-matching.html"
+>Поиск по шаблону</A
+></DT
+><DD
+><DL
+><DT
+>9.7.1. <A
+HREF="functions-matching.html#FUNCTIONS-LIKE"
+><CODE
+CLASS="FUNCTION"
+>LIKE</CODE
+></A
+></DT
+><DT
+>9.7.2. <A
+HREF="functions-matching.html#FUNCTIONS-SIMILARTO-REGEXP"
+>Регулярные выражения <CODE
+CLASS="FUNCTION"
+>SIMILAR TO</CODE
+></A
+></DT
+><DT
+>9.7.3. <A
+HREF="functions-matching.html#FUNCTIONS-POSIX-REGEXP"
+>Регулярные выражения <ACRONYM
+CLASS="ACRONYM"
+>POSIX</ACRONYM
+></A
+></DT
+></DL
+></DD
+><DT
+>9.8. <A
+HREF="functions-formatting.html"
+>Функции форматирования данных</A
+></DT
+><DT
+>9.9. <A
+HREF="functions-datetime.html"
+>Операторы и функции даты/времени</A
+></DT
+><DD
+><DL
+><DT
+>9.9.1. <A
+HREF="functions-datetime.html#FUNCTIONS-DATETIME-EXTRACT"
+><CODE
+CLASS="FUNCTION"
+>EXTRACT</CODE
+>, <CODE
+CLASS="FUNCTION"
+>date_part</CODE
+></A
+></DT
+><DT
+>9.9.2. <A
+HREF="functions-datetime.html#FUNCTIONS-DATETIME-TRUNC"
+><CODE
+CLASS="FUNCTION"
+>date_trunc</CODE
+></A
+></DT
+><DT
+>9.9.3. <A
+HREF="functions-datetime.html#FUNCTIONS-DATETIME-ZONECONVERT"
+><TT
+CLASS="LITERAL"
+>AT TIME ZONE</TT
+></A
+></DT
+><DT
+>9.9.4. <A
+HREF="functions-datetime.html#FUNCTIONS-DATETIME-CURRENT"
+>Текущая дата/время</A
+></DT
+><DT
+>9.9.5. <A
+HREF="functions-datetime.html#FUNCTIONS-DATETIME-DELAY"
+>Задержка выполнения</A
+></DT
+></DL
+></DD
+><DT
+>9.10. <A
+HREF="functions-enum.html"
+>Функции для перечислений</A
+></DT
+><DT
+>9.11. <A
+HREF="functions-geometry.html"
+>Геометрические функции и операторы</A
+></DT
+><DT
+>9.12. <A
+HREF="functions-net.html"
+>Функции и операторы для работы с сетевыми адресами</A
+></DT
+><DT
+>9.13. <A
+HREF="functions-textsearch.html"
+>Функции и операторы текстового поиска</A
+></DT
+><DT
+>9.14. <A
+HREF="functions-xml.html"
+>XML-функции</A
+></DT
+><DD
+><DL
+><DT
+>9.14.1. <A
+HREF="functions-xml.html#FUNCTIONS-PRODUCING-XML"
+>Создание XML-контента</A
+></DT
+><DT
+>9.14.2. <A
+HREF="functions-xml.html#FUNCTIONS-XML-PREDICATES"
+>Условия с XML</A
+></DT
+><DT
+>9.14.3. <A
+HREF="functions-xml.html#FUNCTIONS-XML-PROCESSING"
+>Обработка XML</A
+></DT
+><DT
+>9.14.4. <A
+HREF="functions-xml.html#FUNCTIONS-XML-MAPPING"
+>Отображение таблиц в XML</A
+></DT
+></DL
+></DD
+><DT
+>9.15. <A
+HREF="functions-json.html"
+>Функции и операторы JSON</A
+></DT
+><DT
+>9.16. <A
+HREF="functions-sequence.html"
+>Функции для работы с последовательностями</A
+></DT
+><DT
+>9.17. <A
+HREF="functions-conditional.html"
+>Условные выражения</A
+></DT
+><DD
+><DL
+><DT
+>9.17.1. <A
+HREF="functions-conditional.html#FUNCTIONS-CASE"
+><TT
+CLASS="LITERAL"
+>CASE</TT
+></A
+></DT
+><DT
+>9.17.2. <A
+HREF="functions-conditional.html#FUNCTIONS-COALESCE-NVL-IFNULL"
+><TT
+CLASS="LITERAL"
+>COALESCE</TT
+></A
+></DT
+><DT
+>9.17.3. <A
+HREF="functions-conditional.html#FUNCTIONS-NULLIF"
+><TT
+CLASS="LITERAL"
+>NULLIF</TT
+></A
+></DT
+><DT
+>9.17.4. <A
+HREF="functions-conditional.html#FUNCTIONS-GREATEST-LEAST"
+><TT
+CLASS="LITERAL"
+>GREATEST</TT
+> и <TT
+CLASS="LITERAL"
+>LEAST</TT
+></A
+></DT
+></DL
+></DD
+><DT
+>9.18. <A
+HREF="functions-array.html"
+>Функции и операторы для работы с массивами</A
+></DT
+><DT
+>9.19. <A
+HREF="functions-range.html"
+>Диапазонные функции и операторы</A
+></DT
+><DT
+>9.20. <A
+HREF="functions-aggregate.html"
+>Агрегатные функции</A
+></DT
+><DT
+>9.21. <A
+HREF="functions-window.html"
+>Оконные функции</A
+></DT
+><DT
+>9.22. <A
+HREF="functions-subquery.html"
+>Выражения подзапросов</A
+></DT
+><DD
+><DL
+><DT
+>9.22.1. <A
+HREF="functions-subquery.html#FUNCTIONS-SUBQUERY-EXISTS"
+><TT
+CLASS="LITERAL"
+>EXISTS</TT
+></A
+></DT
+><DT
+>9.22.2. <A
+HREF="functions-subquery.html#FUNCTIONS-SUBQUERY-IN"
+><TT
+CLASS="LITERAL"
+>IN</TT
+></A
+></DT
+><DT
+>9.22.3. <A
+HREF="functions-subquery.html#FUNCTIONS-SUBQUERY-NOTIN"
+><TT
+CLASS="LITERAL"
+>NOT IN</TT
+></A
+></DT
+><DT
+>9.22.4. <A
+HREF="functions-subquery.html#FUNCTIONS-SUBQUERY-ANY-SOME"
+><TT
+CLASS="LITERAL"
+>ANY</TT
+>/<TT
+CLASS="LITERAL"
+>SOME</TT
+></A
+></DT
+><DT
+>9.22.5. <A
+HREF="functions-subquery.html#FUNCTIONS-SUBQUERY-ALL"
+><TT
+CLASS="LITERAL"
+>ALL</TT
+></A
+></DT
+><DT
+>9.22.6. <A
+HREF="functions-subquery.html#AEN19608"
+>Сравнение единичных строк</A
+></DT
+></DL
+></DD
+><DT
+>9.23. <A
+HREF="functions-comparisons.html"
+>Сравнение табличных строк и массивов</A
+></DT
+><DD
+><DL
+><DT
+>9.23.1. <A
+HREF="functions-comparisons.html#AEN19651"
+><TT
+CLASS="LITERAL"
+>IN</TT
+></A
+></DT
+><DT
+>9.23.2. <A
+HREF="functions-comparisons.html#AEN19667"
+><TT
+CLASS="LITERAL"
+>NOT IN</TT
+></A
+></DT
+><DT
+>9.23.3. <A
+HREF="functions-comparisons.html#AEN19689"
+><TT
+CLASS="LITERAL"
+>ANY</TT
+>/<TT
+CLASS="LITERAL"
+>SOME</TT
+> (с массивом)</A
+></DT
+><DT
+>9.23.4. <A
+HREF="functions-comparisons.html#AEN19712"
+><TT
+CLASS="LITERAL"
+>ALL</TT
+> (с массивом)</A
+></DT
+><DT
+>9.23.5. <A
+HREF="functions-comparisons.html#ROW-WISE-COMPARISON"
+>Сравнение конструкторов строк</A
+></DT
+><DT
+>9.23.6. <A
+HREF="functions-comparisons.html#COMPOSITE-TYPE-COMPARISON"
+>Сравнение составных типов</A
+></DT
+></DL
+></DD
+><DT
+>9.24. <A
+HREF="functions-srf.html"
+>Функции, возвращающие множества</A
+></DT
+><DT
+>9.25. <A
+HREF="functions-info.html"
+>Системные информационные функции</A
+></DT
+><DT
+>9.26. <A
+HREF="functions-admin.html"
+>Функции для системного администрирования</A
+></DT
+><DD
+><DL
+><DT
+>9.26.1. <A
+HREF="functions-admin.html#FUNCTIONS-ADMIN-SET"
+>Функции для управления конфигурацией</A
+></DT
+><DT
+>9.26.2. <A
+HREF="functions-admin.html#FUNCTIONS-ADMIN-SIGNAL"
+>Функции для передачи сигналов серверу</A
+></DT
+><DT
+>9.26.3. <A
+HREF="functions-admin.html#FUNCTIONS-ADMIN-BACKUP"
+>Функции управления резервным копированием</A
+></DT
+><DT
+>9.26.4. <A
+HREF="functions-admin.html#FUNCTIONS-RECOVERY-CONTROL"
+>Функции управления восстановлением</A
+></DT
+><DT
+>9.26.5. <A
+HREF="functions-admin.html#FUNCTIONS-SNAPSHOT-SYNCHRONIZATION"
+>Функции синхронизации снимков</A
+></DT
+><DT
+>9.26.6. <A
+HREF="functions-admin.html#FUNCTIONS-REPLICATION"
+>Функции репликации</A
+></DT
+><DT
+>9.26.7. <A
+HREF="functions-admin.html#FUNCTIONS-ADMIN-DBOBJECT"
+>Функции управления объектами баз данных</A
+></DT
+><DT
+>9.26.8. <A
+HREF="functions-admin.html#FUNCTIONS-ADMIN-GENFILE"
+>Функции для работы с обычными файлами</A
+></DT
+><DT
+>9.26.9. <A
+HREF="functions-admin.html#FUNCTIONS-ADVISORY-LOCKS"
+>Функции управления рекомендательными блокировками</A
+></DT
+></DL
+></DD
+><DT
+>9.27. <A
+HREF="functions-trigger.html"
+>Триггерные функции</A
+></DT
+><DT
+>9.28. <A
+HREF="functions-event-triggers.html"
+>Функции событийных триггеров</A
+></DT
+></DL
+></DIV
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> предоставляет огромное количество функций и операторов для встроенных типов данных. Кроме того, пользователи могут определять свои функции операторы, как описано в <A
+HREF="server-programming.html"
+>Части V</A
+>. Просмотреть все существующие функции и операторы можно в <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> с помощью команд <TT
+CLASS="COMMAND"
+>\df</TT
+> и <TT
+CLASS="COMMAND"
+>\do</TT
+>, соответственно.</P
+><P
+>Если для вас важна переносимость, учтите, что практически все функции и операторы, описанные в этой главе, за исключением простейших арифметических и операторов сравнения, а также явно отмеченных функций, не описаны в стандарте <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>. Тем не менее, частично эта расширенная функциональность присутствует и в других СУБД <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> и во многих случаях различные реализации одинаковых функций оказываются аналогичными и совместимыми. В этой главе не описываются абсолютно все функции; некоторые дополнительные функции рассматриваются в других разделах документации.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="datatype-pseudo.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="functions-logical.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Псевдотипы</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Логические операторы</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

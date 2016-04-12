@@ -1,0 +1,1114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>pg_basebackup</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Клиентские приложения PostgreSQL"
+HREF="reference-client.html"><LINK
+REL="PREVIOUS"
+TITLE="            ecpg
+          "
+HREF="app-ecpg.html"><LINK
+REL="NEXT"
+TITLE="pg_config"
+HREF="app-pgconfig.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="            ecpg
+          "
+HREF="app-ecpg.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="reference-client.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="pg_config"
+HREF="app-pgconfig.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="APP-PGBASEBACKUP"
+></A
+>pg_basebackup</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN87289"
+></A
+><H2
+>Название</H2
+>pg_basebackup&nbsp;--&nbsp;создать резервную копию кластера <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN87293"
+></A
+><H2
+>Синтаксис</H2
+><P
+><TT
+CLASS="COMMAND"
+>pg_basebackup</TT
+> [              <TT
+CLASS="REPLACEABLE"
+><I
+>параметр</I
+></TT
+>
+            ...]</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN87298"
+></A
+><H2
+>Описание</H2
+><P
+><SPAN
+CLASS="APPLICATION"
+>pg_basebackup</SPAN
+> предназначен для создания резервных копий работающего кластера баз данных <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Процедура создания копии не влияет на работу других клиентов. Полученные копии могут использоваться для обеих стратегий восстановления — на заданный момент в прошлом (см. <A
+HREF="continuous-archiving.html"
+>Раздел 24.3</A
+>) и в качестве отправной точки для резервного сервера при реализации трансляции файлов или потоковой репликации (см. <A
+HREF="warm-standby.html"
+>Раздел 25.2</A
+>).</P
+><P
+><SPAN
+CLASS="APPLICATION"
+>pg_basebackup</SPAN
+> создаёт бинарную копию файлов кластера, контролируя режим создания копии автоматически. Резервные копии всегда создаются для кластера целиком и невозможно создать копию для какой-либо сущности базы отдельно. Для этой цели можно использовать, например, утилиту <A
+HREF="app-pgdump.html"
+>pg_dump</A
+>.</P
+><P
+>Копия создаётся через обычное подключение к <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, и при этом используется протокол репликации. Подключение должно осуществляться от лица суперпользователя или пользователя с правом <TT
+CLASS="LITERAL"
+>REPLICATION</TT
+> (см. <A
+HREF="role-attributes.html"
+>Раздел 20.2</A
+>), а в <TT
+CLASS="FILENAME"
+>pg_hba.conf</TT
+> должно быть прописано подключение для репликации. Значение <A
+HREF="runtime-config-replication.html#GUC-MAX-WAL-SENDERS"
+>max_wal_senders</A
+> на сервере должно быть достаточно большим, чтобы допускать минимум ещё одно подключение для копирования.</P
+><P
+>Можно запустить одновременно несколько команд <TT
+CLASS="COMMAND"
+>pg_basebackup</TT
+>, но с точки зрения производительности лучше делать всего одну копию одновременно, а затем копировать получаемый результат.</P
+><P
+>С помощью <SPAN
+CLASS="APPLICATION"
+>pg_basebackup</SPAN
+> можно получить базовую копию не только на ведущем, но и на резервном сервере. Для этого на резервном сервере необходимо разрешить подключения репликации (параметры <TT
+CLASS="VARNAME"
+>max_wal_senders</TT
+> и <A
+HREF="runtime-config-replication.html#GUC-HOT-STANDBY"
+>hot_standby</A
+>, а также настроить <A
+HREF="auth-pg-hba-conf.html"
+>аутентификацию компьютера</A
+>). При этом на ведущем необходимо включить <A
+HREF="runtime-config-wal.html#GUC-FULL-PAGE-WRITES"
+>full_page_writes</A
+>.</P
+><P
+>Стоит обратить внимание на существующие ограничения при удалённом резервировании, где источником служит резервный сервер: <P
+></P
+></P><UL
+><LI
+><P
+>Файл истории резервного копирования в целевом кластере баз данных не создаётся.</P
+></LI
+><LI
+><P
+>Нет гарантии, что все необходимые файлы журналов WAL будут доступны на момент завершения создания резервной копии. Если планируется использовать резервную копию для восстановления из журнала, то для обеспечения гарантированной целостности необходимо самостоятельно добавлять их с помощью параметра <TT
+CLASS="LITERAL"
+>-x</TT
+>.</P
+></LI
+><LI
+><P
+>Если резервный сервер переводится в роль главного во время удалённого резервирования, то операция создания копии не исполнится.</P
+></LI
+><LI
+><P
+>Все необходимые для резервной копии WAL-записи должны содержать полные страницы, для чего нужно включить режим <TT
+CLASS="VARNAME"
+>full_page_writes</TT
+> на ведущем и не использовать в <TT
+CLASS="VARNAME"
+>archive_command</TT
+> такие утилиты, как <SPAN
+CLASS="APPLICATION"
+>pg_compresslog</SPAN
+>, которые могут удалить записанные полные страницы из WAL.</P
+></LI
+></UL
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN87336"
+></A
+><H2
+>Параметры</H2
+><P
+>Описанные далее аргументы командной строки влияют на размещение и формат вывода. <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="OPTION"
+>-D <TT
+CLASS="REPLACEABLE"
+><I
+>каталог</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--pgdata=<TT
+CLASS="REPLACEABLE"
+><I
+>каталог</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Целевой каталог для записи данных. <SPAN
+CLASS="APPLICATION"
+>pg_basebackup</SPAN
+> создаст его и родительские, если необходимо. Каталог может быть создан заранее, но должен быть пустым, иначе возникнет ошибка.</P
+><P
+>Если резервирование работает в режиме <TT
+CLASS="LITERAL"
+>tar</TT
+>, а имя каталога имеет значение <TT
+CLASS="LITERAL"
+>-</TT
+> (тире), то tar-файл будет писаться в <TT
+CLASS="LITERAL"
+>stdout</TT
+>.</P
+><P
+>Этот флаг является обязательным.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-F <TT
+CLASS="REPLACEABLE"
+><I
+>format</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--format=<TT
+CLASS="REPLACEABLE"
+><I
+>format</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Устанавливает формат вывода. <TT
+CLASS="REPLACEABLE"
+><I
+>формат</I
+></TT
+> может принимать следующие значения: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>p</TT
+><BR><TT
+CLASS="LITERAL"
+>plain</TT
+></DT
+><DD
+><P
+>Записывает в целевой каталог файлы данных, с той же компоновкой табличных пространств и каталога хранения данных. Если кластер не имеет дополнительных табличных пространств, то вся база будет помещена в заданный каталог. Иначе основной каталог хранения данных будет помещён в целевой каталог, а табличные пространства — по их абсолютным путям аналогично серверу, с которого происходит резервирование.</P
+><P
+>Это формат по умолчанию.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>t</TT
+><BR><TT
+CLASS="LITERAL"
+>tar</TT
+></DT
+><DD
+><P
+>Записывает в целевой каталог файлы в формате tar. Основной каталог хранения данных будет писаться в файл <TT
+CLASS="FILENAME"
+>base.tar</TT
+>, а табличные пространства — в файлы, именованные в соответствии с их OID.</P
+><P
+>Если имя целевого каталога задано как <TT
+CLASS="LITERAL"
+>-</TT
+> (тире), то данные будут писаться в стандартный вывод, что позволяет, например, использовать <SPAN
+CLASS="PRODUCTNAME"
+>gzip</SPAN
+>. Это возможно лишь в случае без использования дополнительных табличных пространств.</P
+></DD
+></DL
+></DIV
+><P></P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-r <TT
+CLASS="REPLACEABLE"
+><I
+>скорость передачи</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--max-rate=<TT
+CLASS="REPLACEABLE"
+><I
+>скорость передачи</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Максимальная скорость передачи данных с сервера. Значение задаётся в Кб/с. Для установки значения в мегабайтах, можно использовать суффикс <TT
+CLASS="LITERAL"
+>M</TT
+>. Также допустим суффикс <TT
+CLASS="LITERAL"
+>k</TT
+>, но он не принципиален. Допустимые значения лежат в рамках между 32 Кб/с и 1024 Мб/с.</P
+><P
+>Служит для снижения влияния на производительность сервера со стороны работающего <SPAN
+CLASS="APPLICATION"
+>pg_basebackup</SPAN
+>.</P
+><P
+>Параметр всегда влияет на передачу данных каталога хранения. На передачу данных файлов WAL влияние оказывается лишь при методе сбора <TT
+CLASS="LITERAL"
+>fetch</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-R</TT
+><BR><TT
+CLASS="OPTION"
+>--write-recovery-conf</TT
+></DT
+><DD
+><P
+>Записать минимальный файл <TT
+CLASS="FILENAME"
+>recovery.conf</TT
+> в каталог вывода (или базовый tar-файл в режиме упаковки) для упрощения настройки резервного сервера.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-T <TT
+CLASS="REPLACEABLE"
+><I
+>старый каталог</I
+></TT
+>=<TT
+CLASS="REPLACEABLE"
+><I
+>новый каталог</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--tablespace-mapping=<TT
+CLASS="REPLACEABLE"
+><I
+>старый каталог</I
+></TT
+>=<TT
+CLASS="REPLACEABLE"
+><I
+>новый каталог</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Переместить табличное пространство из <TT
+CLASS="REPLACEABLE"
+><I
+>старого каталога</I
+></TT
+> в <TT
+CLASS="REPLACEABLE"
+><I
+>новый каталог</I
+></TT
+> во время копирования. Для эффективности <TT
+CLASS="REPLACEABLE"
+><I
+>старый каталог</I
+></TT
+> должен в точности совпадать с тем, как он был определён. Не будет ошибкой, если в <TT
+CLASS="REPLACEABLE"
+><I
+>старом каталоге</I
+></TT
+> нет указанного табличного пространства. И <TT
+CLASS="REPLACEABLE"
+><I
+>старый каталог</I
+></TT
+>, и <TT
+CLASS="REPLACEABLE"
+><I
+>новый каталог</I
+></TT
+> должны задаваться абсолютными путями. Если в имени пути встречается символ <TT
+CLASS="LITERAL"
+>=</TT
+>, его необходимо экранировать через обратную косую черту. Параметр может задаваться множество раз. См. пример ниже.</P
+><P
+>Если табличное пространство перемещается таким способом, символьные ссылки внутри основного каталога хранения данных также приводятся в соответствие с новым местоположением. Таким образом, для экземпляра сервера подготавливается новый каталог данных, в котором все табличные пространства оказываются в новом расположении.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>--xlogdir=<TT
+CLASS="REPLACEABLE"
+><I
+>xlog-каталог</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Указывает размещение каталога хранения журналов транзакций. <TT
+CLASS="REPLACEABLE"
+><I
+>xlog-каталог</I
+></TT
+> должен задаваться абсолютным путём. Параметр может устанавливаться лишь для режима резервирования посредством текстовых файлов.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-x</TT
+><BR><TT
+CLASS="OPTION"
+>--xlog</TT
+></DT
+><DD
+><P
+>Использование параметра эквивалентно <TT
+CLASS="LITERAL"
+>-X</TT
+> в режиме <TT
+CLASS="LITERAL"
+>fetch</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-X <TT
+CLASS="REPLACEABLE"
+><I
+>метод</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--xlog-method=<TT
+CLASS="REPLACEABLE"
+><I
+>метод</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Включает все необходимые файлы журналов транзакций (файлы WAL) в резервную копию. Если параметр указан, то возможно запустить новый экземпляр прямо для развёрнутого каталога без необходимости обращения к журналу. По сути это полная автономная резервная копия.</P
+><P
+>Для сбора журналов транзакций поддерживаются следующие методы: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>f</TT
+><BR><TT
+CLASS="LITERAL"
+>fetch</TT
+></DT
+><DD
+><P
+>Файлы журналов транзакций собираются в конце процесса резервирования. Таким образом необходимо выставить достаточное значение параметра <A
+HREF="runtime-config-replication.html#GUC-WAL-KEEP-SEGMENTS"
+>wal_keep_segments</A
+>, чтобы избежать преждевременного удаления файлов журнала. В случае удаления файлов до завершения процесса резервирования возникнет ошибка, а копия будет непригодной к использованию.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>s</TT
+><BR><TT
+CLASS="LITERAL"
+>stream</TT
+></DT
+><DD
+><P
+>Передавать журнал транзакций в процесс создания резервной копии. При этом открывается второе соединение к серверу, по которому будет передаваться журнал транзакций, одновременно с созданием резервной копии. Таким образом будут использоваться два слота из разрешённых параметром <A
+HREF="runtime-config-replication.html#GUC-MAX-WAL-SENDERS"
+>max_wal_senders</A
+>. И если клиент будет успевать получать журнал транзакций, мастеру не потребуется дополнительно хранить журналы транзакций.</P
+></DD
+></DL
+></DIV
+><P></P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-z</TT
+><BR><TT
+CLASS="OPTION"
+>--gzip</TT
+></DT
+><DD
+><P
+>Включает gzip-сжатие для выводимого tar-файла с уровнем компрессии по умолчанию. Сжатие поддерживается лишь в режиме упаковки.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-Z <TT
+CLASS="REPLACEABLE"
+><I
+>уровень</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--compress=<TT
+CLASS="REPLACEABLE"
+><I
+>уровень</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Включает gzip-сжатие для выводимого tar-файла и заданным уровнем компрессии от 1 (минимальный) до 9 (максимальный). Сжатие поддерживается лишь в режиме упаковки.</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>Описанные далее аргументы командной строки влияют на генерацию резервной копии и ход выполнения приложения. <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="OPTION"
+>-c <TT
+CLASS="REPLACEABLE"
+><I
+>fast|spread</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--checkpoint=<TT
+CLASS="REPLACEABLE"
+><I
+>fast|spread</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Устанавливает режим контрольных точек в быстрый или протяженный (по умолчанию). Подробнее см. <A
+HREF="continuous-archiving.html#BACKUP-LOWLEVEL-BASE-BACKUP"
+>Подраздел 24.3.3</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-l <TT
+CLASS="REPLACEABLE"
+><I
+>метка</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--label=<TT
+CLASS="REPLACEABLE"
+><I
+>метка</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Устанавливает метку для созданной резервной копии. Если не указана, то по умолчанию будет использовано значение <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>pg_basebackup base backup</TT
+>"</SPAN
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-P</TT
+><BR><TT
+CLASS="OPTION"
+>--progress</TT
+></DT
+><DD
+><P
+>Включает отчёт о прогрессе. Если отчёт включён, то во время создания копии будет выводится примерное состояние прогресса операции. Так как данные базы могут изменяться во время создания копии, то оценка может быть лишь приблизительной и не давать точности в <TT
+CLASS="LITERAL"
+>100%</TT
+>. Когда журнал WAL включён в копию, невозможно предсказать конечный объём заранее, и это будет значительно влиять на погрешность оценки прогресса операции.</P
+><P
+>Если режим включён, то процесс резервирования начнется с перечисления размеров всей базы, а затем продолжится отправкой непосредственно данных. Это может немного увеличить время операции, а именно будет отсрочена первая отправка самих данных.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-v</TT
+><BR><TT
+CLASS="OPTION"
+>--verbose</TT
+></DT
+><DD
+><P
+>Включает режим подробного вывода. Будет выводится некоторая дополнительная информация при начале и завершении, а также имена обрабатываемых файлов, если включён отчёт о прогрессе.</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>Далее описаны параметры управления подключением. <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="OPTION"
+>-d <TT
+CLASS="REPLACEABLE"
+><I
+>строка подключения</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--dbname=<TT
+CLASS="REPLACEABLE"
+><I
+>строка подключения</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Указывает параметры подключения к серверу в формате строки подключения. См. <A
+HREF="libpq-connect.html#LIBPQ-CONNSTRING"
+>Подраздел 31.1.1</A
+> для более подробной информации.</P
+><P
+>Параметр называется <TT
+CLASS="LITERAL"
+>--dbname</TT
+> для согласованности с другими клиентскими приложениями, но так как <SPAN
+CLASS="APPLICATION"
+>pg_basebackup</SPAN
+> не подключается к какой-либо конкретной базе, это имя в строке подключения игнорируется.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-h <TT
+CLASS="REPLACEABLE"
+><I
+>host</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--host=<TT
+CLASS="REPLACEABLE"
+><I
+>host</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Указывает имя компьютера, на котором запущен сервер. Если значение начинается с косой черты, оно интерпретируется как имя каталога с доменным сокетом Unix. Значение по умолчанию берётся из переменной окружения <TT
+CLASS="ENVAR"
+>PGHOST</TT
+>, если она установлена. В противном случае выполняется подключение к доменному сокету.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-p <TT
+CLASS="REPLACEABLE"
+><I
+>порт</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--port=<TT
+CLASS="REPLACEABLE"
+><I
+>порт</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Указывает TCP-порт или расширение локального файла Unix-сокета, на котором сервер слушает подключения. По умолчанию берётся значение переменной окружения <TT
+CLASS="ENVAR"
+>PGPORT</TT
+>, если оно установлено, либо значение времени компиляции.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-s <TT
+CLASS="REPLACEABLE"
+><I
+>interval</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--status-interval=<TT
+CLASS="REPLACEABLE"
+><I
+>interval</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Указывает интервал в секундах между отправкой пакетов статуса, отправляемых на сервер. Это позволяет упростить мониторинг прогресса. Чтобы выключить периодическое обновление статуса, необходимо установить значение в ноль. При этом обновление будет отправляться по запросу сервера для избежания отсоединения по истечению времени. Значение по умолчанию составляет 10 секунд.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-U <TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--username=<TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Имя пользователя, под которым производится подключение.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-w</TT
+><BR><TT
+CLASS="OPTION"
+>--no-password</TT
+></DT
+><DD
+><P
+>Не выдавать запрос на ввод пароля. Если сервер требует аутентификацию по паролю и пароль не доступен с помощью других средств, таких как файл <TT
+CLASS="FILENAME"
+>.pgpass</TT
+>, попытка соединения не удастся. Этот параметр может быть полезен в пакетных заданиях и скриптах, где нет пользователя, который вводит пароль.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-W</TT
+><BR><TT
+CLASS="OPTION"
+>--password</TT
+></DT
+><DD
+><P
+>Принудительно запрашивать пароль перед подключением к базе данных.</P
+><P
+>Это несущественный параметр, так как <SPAN
+CLASS="APPLICATION"
+>pg_basebackup</SPAN
+> запрашивает пароль автоматически, если сервер проверяет подлинность по паролю. Однако, чтобы понять это, <SPAN
+CLASS="APPLICATION"
+>pg_basebackup</SPAN
+> лишний раз подключается к серверу. Поэтому иногда имеет смысл ввести <TT
+CLASS="OPTION"
+>-W</TT
+>, чтобы исключить эту ненужную попытку подключения.</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>Другие флаги: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="OPTION"
+>-V</TT
+><BR><TT
+CLASS="OPTION"
+>--version</TT
+></DT
+><DD
+><P
+>Вывести версию <SPAN
+CLASS="APPLICATION"
+>pg_basebackup</SPAN
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-?</TT
+><BR><TT
+CLASS="OPTION"
+>--help</TT
+></DT
+><DD
+><P
+>Вывести справку по команде <SPAN
+CLASS="APPLICATION"
+>pg_basebackup</SPAN
+>.</P
+></DD
+></DL
+></DIV
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN87615"
+></A
+><H2
+>Переменные окружения</H2
+><P
+>Как и большинство других утилит <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, приложение также использует переменные окружения, поддерживаемые <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> (см. <A
+HREF="libpq-envars.html"
+>Раздел 31.14</A
+>).</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN87621"
+></A
+><H2
+>Замечания</H2
+><P
+>Резервная копия будет включать в себя все файлы каталога хранения данных и табличных пространств, а также конфигурационные файлы и прочие файлы, размещённые в каталоге данных. Однако копируются лишь простые файлы и каталоги. Символьные ссылки (кроме тех, что указывают на табличные пространства) и файлы спецустройств игнорируются. Более подробно см. <A
+HREF="protocol-replication.html"
+>Раздел 49.3</A
+>.</P
+><P
+>Если не указан параметр <TT
+CLASS="REPLACEABLE"
+><I
+>--tablespace-mapping</I
+></TT
+>, табличные пространства в режиме <TT
+CLASS="REPLACEABLE"
+><I
+>plain</I
+></TT
+> будут резервироваться в тоже самое место, где они расположены на сервере. Поэтому, при наличии табличных пространств, утилиту нельзя запускать в формате <TT
+CLASS="REPLACEABLE"
+><I
+>plain</I
+></TT
+> без указания этого параметра, так как резервные файлы табличных пространств будут записываться в те же каталоги, где лежат оригинальные файлы.</P
+><P
+><SPAN
+CLASS="APPLICATION"
+>pg_basebackup</SPAN
+> совместим с серверами той же или более младших версий, но не ниже 9.1. При этом режим потоковой отправки WAL (-X stream) работает с версиями не ниже 9.3.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN87631"
+></A
+><H2
+>Примеры</H2
+><P
+>Чтобы создать резервную копию сервера <TT
+CLASS="LITERAL"
+>mydbserver</TT
+> и сохранить её локально в каталог <TT
+CLASS="FILENAME"
+>/usr/local/pgsql/data</TT
+>: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>pg_basebackup -h mydbserver -D /usr/local/pgsql/data</KBD
+></PRE
+><P></P
+><P
+>Чтобы создать резервную копию локального сервера с применением сжатия и упаковки, отчётом о прогрессе выполнения, а затем разместить копию в каталоге <TT
+CLASS="FILENAME"
+>backup</TT
+>: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>pg_basebackup -D backup -Ft -z -P</KBD
+></PRE
+><P></P
+><P
+>Чтобы создать резервную копию локальной базы с единым табличным пространством и сжатием через <SPAN
+CLASS="PRODUCTNAME"
+>bzip2</SPAN
+>: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>pg_basebackup -D - -Ft | bzip2 &gt; backup.tar.bz2</KBD
+></PRE
+><P> Команда завершится ошибкой, если в базе будет более одного табличного пространства.</P
+><P
+>Чтобы создать резервную копию локальной базы данных с перемещением табличного пространства <TT
+CLASS="FILENAME"
+>/opt/ts</TT
+> в <TT
+CLASS="FILENAME"
+>./backup/ts</TT
+>: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>pg_basebackup -D backup/data -T /opt/ts=$(pwd)/backup/ts</KBD
+></PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN87655"
+></A
+><H2
+>См. также</H2
+><A
+HREF="app-pgdump.html"
+>pg_dump</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="app-ecpg.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="app-pgconfig.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><SPAN
+CLASS="APPLICATION"
+>ecpg</SPAN
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="reference-client.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>pg_config</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

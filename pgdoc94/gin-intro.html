@@ -1,0 +1,224 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Введение</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Индексы GIN"
+HREF="gin.html"><LINK
+REL="PREVIOUS"
+TITLE="Индексы GIN"
+HREF="gin.html"><LINK
+REL="NEXT"
+TITLE="Встроенные классы операторов"
+HREF="gin-builtin-opclasses.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Индексы GIN"
+HREF="gin.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="gin.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 58. Индексы GIN</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Встроенные классы операторов"
+HREF="gin-builtin-opclasses.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="GIN-INTRO"
+>58.1. Введение</A
+></H1
+><P
+><ACRONYM
+CLASS="ACRONYM"
+>GIN</ACRONYM
+> расшифровывается как &laquo;Generalized Inverted Index&raquo; (Обобщённый инвертированный индекс). <ACRONYM
+CLASS="ACRONYM"
+>GIN</ACRONYM
+> предназначается для случаев, когда индексируемые значения являются составными, а запросы, на обработку которых рассчитан индекс, ищут значения элементов в этих составных объектах. Например, такими объектами могут быть документы, а запросы могут выполнять поиск документов, содержащих определённые слова.</P
+><P
+>Здесь мы используем термин <I
+CLASS="FIRSTTERM"
+>объект</I
+>, говоря о составном значении, который индексируется, и термин <I
+CLASS="FIRSTTERM"
+>ключ</I
+>, говоря о включённом в него элементе. <ACRONYM
+CLASS="ACRONYM"
+>GIN</ACRONYM
+> всегда хранит и ищет ключи, а не объекты как таковые.</P
+><P
+>Индекс <ACRONYM
+CLASS="ACRONYM"
+>GIN</ACRONYM
+> сохраняет набор пар (ключ, список идентификаторов), где <I
+CLASS="FIRSTTERM"
+>список идентификаторов</I
+> содержит идентификаторы строк, в которых находится ключ. Один и тот же идентификатор строки может фигурировать в нескольких списках, так как объект может содержать больше одного ключа. Значение каждого ключа хранится только один раз, так что индекс <ACRONYM
+CLASS="ACRONYM"
+>GIN</ACRONYM
+> очень компактен в случаях, когда один ключ встречается много раз.</P
+><P
+><ACRONYM
+CLASS="ACRONYM"
+>GIN</ACRONYM
+> является обобщённым в том смысле, что код метода доступа <ACRONYM
+CLASS="ACRONYM"
+>GIN</ACRONYM
+> не должен знать о конкретных операциях, которые он ускоряет. Вместо этого задаются специальные стратегии для конкретных типов данных. Стратегия определяет, как извлекаются ключи из индексируемых объектов и условий запросов, и как установить, действительно ли удовлетворяет запросу строка, содержащая некоторые значения ключей.</P
+><P
+>Ключевым преимуществом <ACRONYM
+CLASS="ACRONYM"
+>GIN</ACRONYM
+> является то, что он позволяет разрабатывать дополнительные типы данных с соответствующими методами доступа экспертам в предметной области типа данных, а не специалистам по СУБД. В этом аспекте он похож на <ACRONYM
+CLASS="ACRONYM"
+>GiST</ACRONYM
+>.</P
+><P
+>Сопровождением реализации <ACRONYM
+CLASS="ACRONYM"
+>GIN</ACRONYM
+> в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> в основном занимаются Фёдор Сигаев и Олег Бартунов. Дополнительные сведения о <ACRONYM
+CLASS="ACRONYM"
+>GIN</ACRONYM
+> можно получить на их <A
+HREF="http://www.sai.msu.su/~megera/wiki/Gin"
+TARGET="_top"
+>сайте</A
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="gin.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="gin-builtin-opclasses.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Индексы GIN</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="gin.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Встроенные классы операторов</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

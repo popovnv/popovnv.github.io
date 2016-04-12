@@ -1,0 +1,476 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>ALTER DEFAULT PRIVILEGES</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="ALTER DATABASE"
+HREF="sql-alterdatabase.html"><LINK
+REL="NEXT"
+TITLE="ALTER DOMAIN"
+HREF="sql-alterdomain.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="ALTER DATABASE"
+HREF="sql-alterdatabase.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="ALTER DOMAIN"
+HREF="sql-alterdomain.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-ALTERDEFAULTPRIVILEGES"
+></A
+>ALTER DEFAULT PRIVILEGES</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN67033"
+></A
+><H2
+>Название</H2
+>ALTER DEFAULT PRIVILEGES&nbsp;--&nbsp;определить права доступа по умолчанию</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN67036"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>ALTER DEFAULT PRIVILEGES
+    [ FOR { ROLE | USER } <TT
+CLASS="REPLACEABLE"
+><I
+>целевая_роль</I
+></TT
+> [, ...] ]
+    [ IN SCHEMA <TT
+CLASS="REPLACEABLE"
+><I
+>имя_схемы</I
+></TT
+> [, ...] ]
+    <TT
+CLASS="REPLACEABLE"
+><I
+>предложение_GRANT_или_REVOKE</I
+></TT
+>
+
+<SPAN
+CLASS="phrase"
+><SPAN
+CLASS="PHRASE"
+>Где возможные варианты <TT
+CLASS="REPLACEABLE"
+><I
+>предложение_GRANT_или_REVOKE</I
+></TT
+>:</SPAN
+></SPAN
+>
+
+GRANT { { SELECT | INSERT | UPDATE | DELETE | TRUNCATE | REFERENCES | TRIGGER }
+    [, ...] | ALL [ PRIVILEGES ] }
+    ON TABLES
+    TO { [ GROUP ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_роли</I
+></TT
+> | PUBLIC } [, ...] [ WITH GRANT OPTION ]
+
+GRANT { { USAGE | SELECT | UPDATE }
+    [, ...] | ALL [ PRIVILEGES ] }
+    ON SEQUENCES
+    TO { [ GROUP ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_роли</I
+></TT
+> | PUBLIC } [, ...] [ WITH GRANT OPTION ]
+
+GRANT { EXECUTE | ALL [ PRIVILEGES ] }
+    ON FUNCTIONS
+    TO { [ GROUP ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_роли</I
+></TT
+> | PUBLIC } [, ...] [ WITH GRANT OPTION ]
+
+GRANT { USAGE | ALL [ PRIVILEGES ] }
+    ON TYPES
+    TO { [ GROUP ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_роли</I
+></TT
+> | PUBLIC } [, ...] [ WITH GRANT OPTION ]
+
+REVOKE [ GRANT OPTION FOR ]
+    { { SELECT | INSERT | UPDATE | DELETE | TRUNCATE | REFERENCES | TRIGGER }
+    [, ...] | ALL [ PRIVILEGES ] }
+    ON TABLES
+    FROM { [ GROUP ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_роли</I
+></TT
+> | PUBLIC } [, ...]
+    [ CASCADE | RESTRICT ]
+
+REVOKE [ GRANT OPTION FOR ]
+    { { USAGE | SELECT | UPDATE }
+    [, ...] | ALL [ PRIVILEGES ] }
+    ON SEQUENCES
+    FROM { [ GROUP ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_роли</I
+></TT
+> | PUBLIC } [, ...]
+    [ CASCADE | RESTRICT ]
+
+REVOKE [ GRANT OPTION FOR ]
+    { EXECUTE | ALL [ PRIVILEGES ] }
+    ON FUNCTIONS
+    FROM { [ GROUP ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_роли</I
+></TT
+> | PUBLIC } [, ...]
+    [ CASCADE | RESTRICT ]
+
+REVOKE [ GRANT OPTION FOR ]
+    { USAGE | ALL [ PRIVILEGES ] }
+    ON TYPES
+    FROM { [ GROUP ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_роли</I
+></TT
+> | PUBLIC } [, ...]
+    [ CASCADE | RESTRICT ]</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="SQL-ALTERDEFAULTPRIVILEGES-DESCRIPTION"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>ALTER DEFAULT PRIVILEGES</TT
+> позволяет задавать права, применяемые к объектам, которые будут создаваться в будущем. (Эта команда не затрагивает права, назначенные уже существующим объектам.) В настоящее время можно задавать права только для таблиц (включая представления и сторонние таблицы), последовательностей, функций и типов (включая домены).</P
+><P
+>Вы можете изменить права по умолчанию только для объектов, которые будут созданы вами или ролями, членами которых вы являетесь. Права можно задать глобально (т. е. для всех объектов, создаваемых в текущей базе данных) или для определённых схем. Заданные на уровне схемы права по умолчанию добавляются к тем, что определены глобально для конкретного типа объекта.</P
+><P
+>Как объясняется в <A
+HREF="sql-grant.html"
+>GRANT</A
+>, права по умолчанию для объектов любого типа обычно дают все назначаемые разрешения владельцу объекта, а также могут давать некоторые разрешения роли <TT
+CLASS="LITERAL"
+>PUBLIC</TT
+>. Однако это поведение можно поменять, изменив права по умолчанию командой <TT
+CLASS="COMMAND"
+>ALTER DEFAULT PRIVILEGES</TT
+>.</P
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN67060"
+></A
+><H3
+>Параметры</H3
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>целевая_роль</I
+></TT
+></DT
+><DD
+><P
+>Имя существующей роли, членом которой является текущая. Если <TT
+CLASS="LITERAL"
+>FOR ROLE</TT
+> опущено, подразумевается текущая роль.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_схемы</I
+></TT
+></DT
+><DD
+><P
+>Имя существующей схемы. Если указано, права по умолчанию меняются для объектов, которые будут созданы в этой схеме. Если <TT
+CLASS="LITERAL"
+>IN SCHEMA</TT
+> опущено, меняются глобальные права по умолчанию.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_роли</I
+></TT
+></DT
+><DD
+><P
+>Имя существующей роли, для которой даются или отзываются права. Этот и все другие параметры в <TT
+CLASS="REPLACEABLE"
+><I
+>предложении_grant_или_revoke</I
+></TT
+> действуют как описано в <A
+HREF="sql-grant.html"
+>GRANT</A
+> или <A
+HREF="sql-revoke.html"
+>REVOKE</A
+>, за исключением того, что они распространяются не на один конкретный объект, а на целый класс объектов.</P
+></DD
+></DL
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="SQL-ALTERDEFAULTPRIVILEGES-NOTES"
+></A
+><H2
+>Замечания</H2
+><P
+>Чтобы узнать текущие назначенные права по умолчанию, воспользуйтесь командой <TT
+CLASS="COMMAND"
+>\ddp</TT
+> в <A
+HREF="app-psql.html"
+>            <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>
+          </A
+>. Интерпретация значений прав приведена в описании команды <TT
+CLASS="COMMAND"
+>\dp</TT
+> в <A
+HREF="sql-grant.html"
+>GRANT</A
+>.</P
+><P
+>Если вы желаете удалить роль, права по умолчанию для которой были изменены, необходимо явно отменить изменения прав по умолчанию или воспользоваться командой <TT
+CLASS="COMMAND"
+>DROP OWNED BY</TT
+> для избавления от назначенных для этой роли прав по умолчанию.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="SQL-ALTERDEFAULTPRIVILEGES-EXAMPLES"
+></A
+><H2
+>Примеры</H2
+><P
+>Наделение всех правом SELECT для всех таблиц (и представлений), которые будут созданы в дальнейшем в схеме <TT
+CLASS="LITERAL"
+>myschema</TT
+>, и наделение роли <TT
+CLASS="LITERAL"
+>webuser</TT
+> правом INSERT для этих же таблиц: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER DEFAULT PRIVILEGES IN SCHEMA myschema GRANT SELECT ON TABLES TO PUBLIC;
+ALTER DEFAULT PRIVILEGES IN SCHEMA myschema GRANT INSERT ON TABLES TO webuser;</PRE
+><P></P
+><P
+>Отмена предыдущих изменений с тем, чтобы для таблиц, создаваемых в будущем, были определены только обычные права, без дополнительных: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER DEFAULT PRIVILEGES IN SCHEMA myschema REVOKE SELECT ON TABLES FROM PUBLIC;
+ALTER DEFAULT PRIVILEGES IN SCHEMA myschema REVOKE INSERT ON TABLES FROM webuser;</PRE
+><P></P
+><P
+>Лишение роли public права на выполнение (EXECUTE), которое обычно даётся для функций (для всех функций, которые будут созданы ролью <TT
+CLASS="LITERAL"
+>admin</TT
+>): </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER DEFAULT PRIVILEGES FOR ROLE admin REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN67103"
+></A
+><H2
+>Совместимость</H2
+><P
+>Оператор <TT
+CLASS="COMMAND"
+>ALTER DEFAULT PRIVILEGES</TT
+> отсутствует в стандарте SQL.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN67107"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-grant.html"
+>GRANT</A
+>, <A
+HREF="sql-revoke.html"
+>REVOKE</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-alterdatabase.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-alterdomain.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>ALTER DATABASE</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>ALTER DOMAIN</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

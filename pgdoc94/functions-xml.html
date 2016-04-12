@@ -1,0 +1,1281 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>XML-функции</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Функции и операторы"
+HREF="functions.html"><LINK
+REL="PREVIOUS"
+TITLE="Функции и операторы текстового поиска"
+HREF="functions-textsearch.html"><LINK
+REL="NEXT"
+TITLE="Функции и операторы JSON"
+HREF="functions-json.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Функции и операторы текстового поиска"
+HREF="functions-textsearch.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 9. Функции и операторы</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Функции и операторы JSON"
+HREF="functions-json.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="FUNCTIONS-XML"
+>9.14. XML-функции</A
+></H1
+><P
+>Функции и подобные им выражения, описанные в этом разделе, работают со значениями типа <TT
+CLASS="TYPE"
+>xml</TT
+>. Информацию о типе <TT
+CLASS="TYPE"
+>xml</TT
+> вы можете найти в <A
+HREF="datatype-xml.html"
+>Разделе 8.13</A
+>. Выражения <CODE
+CLASS="FUNCTION"
+>xmlparse</CODE
+> и <CODE
+CLASS="FUNCTION"
+>xmlserialize</CODE
+>, преобразующие значения <TT
+CLASS="TYPE"
+>xml</TT
+> в текст и обратно, здесь повторно не рассматриваются. Для использования большинства этих функций дистрибутив должен быть собран с ключом <TT
+CLASS="COMMAND"
+>configure --with-libxml</TT
+>.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="FUNCTIONS-PRODUCING-XML"
+>9.14.1. Создание XML-контента</A
+></H2
+><P
+>Для получения XML-контента из данных SQL существует целый набор функций и функциональных выражений, особенно полезных для выдачи клиентским приложениям результатов запроса в виде XML-документов.</P
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN16663"
+>9.14.1.1. <TT
+CLASS="LITERAL"
+>xmlcomment</TT
+></A
+></H3
+><PRE
+CLASS="SYNOPSIS"
+><CODE
+CLASS="FUNCTION"
+>xmlcomment</CODE
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>текст</I
+></TT
+>)</PRE
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>xmlcomment</CODE
+> создаёт XML-значение, содержащее XML-комментарий с заданным текстом. Этот текст не должен содержать <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>--</TT
+>"</SPAN
+> или заканчиваться знаком <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>-</TT
+>"</SPAN
+>, чтобы результирующая конструкция была допустимой в XML. Если аргумент этой функции NULL, результатом её тоже будет NULL.</P
+><P
+>Пример: </P><PRE
+CLASS="SCREEN"
+>SELECT xmlcomment('hello');
+
+  xmlcomment
+--------------
+ &lt;!--hello--&gt;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN16679"
+>9.14.1.2. <TT
+CLASS="LITERAL"
+>xmlconcat</TT
+></A
+></H3
+><PRE
+CLASS="SYNOPSIS"
+><CODE
+CLASS="FUNCTION"
+>xmlconcat</CODE
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>xml</I
+></TT
+>[<SPAN
+CLASS="OPTIONAL"
+>, ...</SPAN
+>])</PRE
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>xmlconcat</CODE
+> объединяет несколько XML-значений и выдаёт в результате один фрагмент XML-контента. Значения NULL отбрасываются, так что результат будет равен NULL, только если все аргументы равны NULL.</P
+><P
+>Пример: </P><PRE
+CLASS="SCREEN"
+>SELECT xmlconcat('&lt;abc/&gt;', '&lt;bar&gt;foo&lt;/bar&gt;');
+
+      xmlconcat
+----------------------
+ &lt;abc/&gt;&lt;bar&gt;foo&lt;/bar&gt;</PRE
+><P></P
+><P
+>XML-объявления, если они присутствуют, обрабатываются следующим образом. Если во всех аргументах содержатся объявления одной версии XML, эта версия будет выдана в результате; в противном случае версии не будет. Если во всех аргументах определён атрибут standalone со значением <SPAN
+CLASS="QUOTE"
+>"yes"</SPAN
+>, это же значение будет выдано в результате. Если во всех аргументах есть объявление standalone, но минимум в одном со значением <SPAN
+CLASS="QUOTE"
+>"no"</SPAN
+>, в результате будет это значение. В противном случае в результате не будет объявления standalone. Если же окажется, что в результате должно присутствовать объявление standalone, а версия не определена, тогда в результате будет выведена версия 1.0, так как XML-объявление не будет допустимым без указания версии. Указания кодировки игнорируются и будут удалены в любых случаях.</P
+><P
+>Пример: </P><PRE
+CLASS="SCREEN"
+>SELECT xmlconcat('&lt;?xml version="1.1"?&gt;&lt;foo/&gt;',
+ '&lt;?xml version="1.1" standalone="no"?&gt;&lt;bar/&gt;');
+
+             xmlconcat
+-----------------------------------
+ &lt;?xml version="1.1"?&gt;&lt;foo/&gt;&lt;bar/&gt;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN16697"
+>9.14.1.3. <TT
+CLASS="LITERAL"
+>xmlelement</TT
+></A
+></H3
+><PRE
+CLASS="SYNOPSIS"
+><CODE
+CLASS="FUNCTION"
+>xmlelement</CODE
+>(name <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, xmlattributes(<TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>AS <TT
+CLASS="REPLACEABLE"
+><I
+>атрибут</I
+></TT
+></SPAN
+>] [<SPAN
+CLASS="OPTIONAL"
+>, ...</SPAN
+>])</SPAN
+>]
+  [<SPAN
+CLASS="OPTIONAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>, содержимое, ...</I
+></TT
+></SPAN
+>])</PRE
+><P
+>Выражение <CODE
+CLASS="FUNCTION"
+>xmlelement</CODE
+> создаёт XML-элемент с заданным именем, атрибутами и содержимым.</P
+><P
+>Примеры: </P><PRE
+CLASS="SCREEN"
+>SELECT xmlelement(name foo);
+
+ xmlelement
+------------
+ &lt;foo/&gt;
+
+SELECT xmlelement(name foo, xmlattributes('xyz' as bar));
+
+    xmlelement
+------------------
+ &lt;foo bar="xyz"/&gt;
+
+SELECT xmlelement(name foo, xmlattributes(current_date as bar),
+  'cont', 'ent');
+
+             xmlelement
+-------------------------------------
+ &lt;foo bar="2007-01-26"&gt;content&lt;/foo&gt;</PRE
+><P></P
+><P
+>Если имена элементов и атрибутов содержат символы, недопустимые в XML, эти символы заменяются последовательностями <TT
+CLASS="LITERAL"
+>_x<TT
+CLASS="REPLACEABLE"
+><I
+>HHHH</I
+></TT
+>_</TT
+>, где <TT
+CLASS="REPLACEABLE"
+><I
+>HHHH</I
+></TT
+> &mdash; шестнадцатеричный код символа в Unicode. Например: </P><PRE
+CLASS="SCREEN"
+>SELECT xmlelement(name "foo$bar", xmlattributes('xyz' as "a&amp;b"));
+
+            xmlelement
+----------------------------------
+ &lt;foo_x0024_bar a_x0026_b="xyz"/&gt;</PRE
+><P></P
+><P
+>Если в качестве значения атрибута используется колонка таблицы, имя атрибута можно не указывать явно, этим именем станет имя колонки. Во всех остальных случаях имя атрибута должно быть определено явно. Таким образом, это выражение допустимо: </P><PRE
+CLASS="SCREEN"
+>CREATE TABLE test (a xml, b xml);
+SELECT xmlelement(name test, xmlattributes(a, b)) FROM test;</PRE
+><P> А следующие варианты &mdash; нет: </P><PRE
+CLASS="SCREEN"
+>SELECT xmlelement(name test, xmlattributes('constant'), a, b) FROM test;
+SELECT xmlelement(name test, xmlattributes(func(a, b))) FROM test;</PRE
+><P></P
+><P
+>Содержимое элемента, если оно задано, будет форматировано согласно его типу данных. Когда оно имеет тип <TT
+CLASS="TYPE"
+>xml</TT
+>, из него можно конструировать сложные XML-документы. Например: </P><PRE
+CLASS="SCREEN"
+>SELECT xmlelement(name foo, xmlattributes('xyz' as bar),
+                            xmlelement(name abc),
+                            xmlcomment('test'),
+                            xmlelement(name xyz));
+
+                  xmlelement
+----------------------------------------------
+ &lt;foo bar="xyz"&gt;&lt;abc/&gt;&lt;!--test--&gt;&lt;xyz/&gt;&lt;/foo&gt;</PRE
+><P> Содержимое других типов будет оформлено в виде блока символьных данных XML. Это, в частности, означает, что символы &lt;, &gt; и &amp; будут преобразованы в сущности XML. Двоичные данные (данные типа <TT
+CLASS="TYPE"
+>bytea</TT
+>) представляются в кодировке base64 или в шестнадцатеричном виде, в зависимости от значения параметра <A
+HREF="runtime-config-client.html#GUC-XMLBINARY"
+>xmlbinary</A
+>. Следует ожидать, что конкретные представления отдельных типов данных могут быть изменены для приведения типов SQL и PostgreSQL в соответствие со стандартом XML Schema, когда появится его более полное описание.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN16729"
+>9.14.1.4. <TT
+CLASS="LITERAL"
+>xmlforest</TT
+></A
+></H3
+><PRE
+CLASS="SYNOPSIS"
+><CODE
+CLASS="FUNCTION"
+>xmlforest</CODE
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>содержимое</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>AS <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></SPAN
+>] [<SPAN
+CLASS="OPTIONAL"
+>, ...</SPAN
+>])</PRE
+><P
+>Выражение <CODE
+CLASS="FUNCTION"
+>xmlforest</CODE
+> создаёт последовательность XML-элементов с заданными именами и содержимым.</P
+><P
+>Примеры: </P><PRE
+CLASS="SCREEN"
+>SELECT xmlforest('abc' AS foo, 123 AS bar);
+
+          xmlforest
+------------------------------
+ &lt;foo&gt;abc&lt;/foo&gt;&lt;bar&gt;123&lt;/bar&gt;
+
+
+SELECT xmlforest(table_name, column_name)
+FROM information_schema.columns
+WHERE table_schema = 'pg_catalog';
+
+                              xmlforest
+---------------------------------------------------------------------------
+ &lt;table_name&gt;pg_authid&lt;/table_name&gt;&lt;column_name&gt;rolname&lt;/column_name&gt;
+ &lt;table_name&gt;pg_authid&lt;/table_name&gt;&lt;column_name&gt;rolsuper&lt;/column_name&gt;
+ ...</PRE
+><P> Как показано во втором примере, имя элемента можно опустить, если источником содержимого служит колонка (в этом случае именем элемента по умолчанию будет имя колонки). В противном случае имя элемента необходимо указывать.</P
+><P
+>Имена элементов с символами, недопустимыми для XML, преобразуются так же, как и для <CODE
+CLASS="FUNCTION"
+>xmlelement</CODE
+>. Данные содержимого тоже приводятся к виду, допустимому для XML (кроме данных, которые уже имеют тип <TT
+CLASS="TYPE"
+>xml</TT
+>).</P
+><P
+>Заметьте, что такие XML-последовательности не являются допустимыми XML-документами, если они содержат больше одного элемента на верхнем уровне, поэтому может иметь смысл вложить выражения <CODE
+CLASS="FUNCTION"
+>xmlforest</CODE
+> в <CODE
+CLASS="FUNCTION"
+>xmlelement</CODE
+>.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN16750"
+>9.14.1.5. <TT
+CLASS="LITERAL"
+>xmlpi</TT
+></A
+></H3
+><PRE
+CLASS="SYNOPSIS"
+><CODE
+CLASS="FUNCTION"
+>xmlpi</CODE
+>(name <TT
+CLASS="REPLACEABLE"
+><I
+>цель</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>содержимое</I
+></TT
+></SPAN
+>])</PRE
+><P
+>Выражение <CODE
+CLASS="FUNCTION"
+>xmlpi</CODE
+> создаёт инструкцию обработки XML. Содержимое, если оно задано, не должно содержать последовательность символов <TT
+CLASS="LITERAL"
+>?&gt;</TT
+>.</P
+><P
+>Пример: </P><PRE
+CLASS="SCREEN"
+>SELECT xmlpi(name php, 'echo "hello world";');
+
+            xmlpi
+-----------------------------
+ &lt;?php echo "hello world";?&gt;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN16765"
+>9.14.1.6. <TT
+CLASS="LITERAL"
+>xmlroot</TT
+></A
+></H3
+><PRE
+CLASS="SYNOPSIS"
+><CODE
+CLASS="FUNCTION"
+>xmlroot</CODE
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>xml</I
+></TT
+>, version <TT
+CLASS="REPLACEABLE"
+><I
+>текст</I
+></TT
+> | нет значения [<SPAN
+CLASS="OPTIONAL"
+>, standalone yes|no|нет значения</SPAN
+>])</PRE
+><P
+>Выражение <CODE
+CLASS="FUNCTION"
+>xmlroot</CODE
+> изменяет свойства корневого узла XML-значения. Если в нём указывается версия, она заменяет значение в объявлении версии корневого узла; также в корневой узел переносится значение свойства standalone.</P
+><P
+></P><PRE
+CLASS="SCREEN"
+>SELECT xmlroot(xmlparse(document '&lt;?xml version="1.1"?&gt;
+ &lt;content&gt;abc&lt;/content&gt;'),
+               version '1.0', standalone yes);
+
+                xmlroot
+----------------------------------------
+ &lt;?xml version="1.0" standalone="yes"?&gt;
+ &lt;content&gt;abc&lt;/content&gt;</PRE
+><P>
+    </P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="FUNCTIONS-XML-XMLAGG"
+>9.14.1.7. <TT
+CLASS="LITERAL"
+>xmlagg</TT
+></A
+></H3
+><PRE
+CLASS="SYNOPSIS"
+><CODE
+CLASS="FUNCTION"
+>xmlagg</CODE
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>xml</I
+></TT
+>)</PRE
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>xmlagg</CODE
+>, в отличие от других описанных здесь функций, является агрегатной. Она соединяет значения, поступающие на вход агрегатной функции, подобно функции <CODE
+CLASS="FUNCTION"
+>xmlconcat</CODE
+>, но делает это, обрабатывая множество строк, а не несколько выражений в одной строке. Дополнительно агрегатные функции описаны в <A
+HREF="functions-aggregate.html"
+>Разделе 9.20</A
+>.</P
+><P
+>Пример: </P><PRE
+CLASS="SCREEN"
+>CREATE TABLE test (y int, x xml);
+INSERT INTO test VALUES (1, '&lt;foo&gt;abc&lt;/foo&gt;');
+INSERT INTO test VALUES (2, '&lt;bar/&gt;');
+SELECT xmlagg(x) FROM test;
+        xmlagg
+----------------------
+ &lt;foo&gt;abc&lt;/foo&gt;&lt;bar/&gt;</PRE
+><P></P
+><P
+>Чтобы задать порядок объединения элементов, в агрегатный вызов можно добавить предложение <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+>, описанное в <A
+HREF="sql-expressions.html#SYNTAX-AGGREGATES"
+>Подразделе 4.2.7</A
+>. Например: </P><PRE
+CLASS="SCREEN"
+>SELECT xmlagg(x ORDER BY y DESC) FROM test;
+        xmlagg
+----------------------
+ &lt;bar/&gt;&lt;foo&gt;abc&lt;/foo&gt;</PRE
+><P></P
+><P
+>Следующий нестандартный подход рекомендовался в предыдущих версиях и может быть по-прежнему полезен в некоторых случаях: </P><PRE
+CLASS="SCREEN"
+>SELECT xmlagg(x) FROM (SELECT * FROM test ORDER BY y DESC) AS tab;
+        xmlagg
+----------------------
+ &lt;bar/&gt;&lt;foo&gt;abc&lt;/foo&gt;</PRE
+><P></P
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="FUNCTIONS-XML-PREDICATES"
+>9.14.2. Условия с XML</A
+></H2
+><P
+>Описанные в этом разделе выражения проверяют свойства значений <TT
+CLASS="TYPE"
+>xml</TT
+>.</P
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN16803"
+>9.14.2.1. <TT
+CLASS="LITERAL"
+>IS DOCUMENT</TT
+></A
+></H3
+><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>xml</I
+></TT
+> IS DOCUMENT</PRE
+><P
+>Выражение <TT
+CLASS="LITERAL"
+>IS DOCUMENT</TT
+> возвращает true, если аргумент представляет собой правильный XML-документ, false в противном случае (т. е. если это фрагмент содержимого) и NULL, если его аргумент также NULL. Чем документы отличаются от фрагментов содержимого, вы можете узнать в <A
+HREF="datatype-xml.html"
+>Разделе 8.13</A
+>.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="XML-EXISTS"
+>9.14.2.2. <TT
+CLASS="LITERAL"
+>XMLEXISTS</TT
+></A
+></H3
+><PRE
+CLASS="SYNOPSIS"
+><CODE
+CLASS="FUNCTION"
+>XMLEXISTS</CODE
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>текст</I
+></TT
+>
+ PASSING [<SPAN
+CLASS="OPTIONAL"
+>BY REF</SPAN
+>] <TT
+CLASS="REPLACEABLE"
+><I
+>xml</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>BY REF</SPAN
+>])</PRE
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>xmlexists</CODE
+> возвращает true, если выражение XPath в первом аргументе возвращает какие либо узлы, и false &mdash; в противном случае. (Если один из аргументов равен NULL, результатом также будет NULL.)</P
+><P
+>Пример: </P><PRE
+CLASS="SCREEN"
+>SELECT xmlexists('//town[text() = ''Toronto'']' PASSING BY REF
+  '&lt;towns&gt;&lt;town&gt;Toronto&lt;/town&gt;&lt;town&gt;Ottawa&lt;/town&gt;&lt;/towns&gt;');
+
+ xmlexists
+------------
+ t
+(1 row)</PRE
+><P></P
+><P
+>Указания <TT
+CLASS="LITERAL"
+>BY REF</TT
+> не несут смысловой нагрузки в PostgreSQL, но могут присутствовать для соответствия стандарту SQL и совместимости с другими реализациями. По стандарту SQL первое указание <TT
+CLASS="LITERAL"
+>BY REF</TT
+> является обязательным, а второе &mdash; нет. Также заметьте, что, согласно стандарту SQL, конструкция <CODE
+CLASS="FUNCTION"
+>xmlexists</CODE
+> должна принимать в первом аргументе выражение XQuery, но PostgreSQL в настоящее время поддерживает только XPath, подмножество XQuery.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="XML-IS-WELL-FORMED"
+>9.14.2.3. <TT
+CLASS="LITERAL"
+>xml_is_well_formed</TT
+></A
+></H3
+><PRE
+CLASS="SYNOPSIS"
+><CODE
+CLASS="FUNCTION"
+>xml_is_well_formed</CODE
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>текст</I
+></TT
+>)
+<CODE
+CLASS="FUNCTION"
+>xml_is_well_formed_document</CODE
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>текст</I
+></TT
+>)
+<CODE
+CLASS="FUNCTION"
+>xml_is_well_formed_content</CODE
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>текст</I
+></TT
+>)</PRE
+><P
+>Эти функции проверяют, является ли <TT
+CLASS="TYPE"
+>текст</TT
+> правильно оформленным XML, и возвращают соответствующее логическое значение. Функция <CODE
+CLASS="FUNCTION"
+>xml_is_well_formed_document</CODE
+> проверяет аргумент как правильно оформленный документ, а <CODE
+CLASS="FUNCTION"
+>xml_is_well_formed_content</CODE
+> &mdash; правильно оформленное содержание. Функция <CODE
+CLASS="FUNCTION"
+>xml_is_well_formed</CODE
+> может делать первое или второе, в зависимости от значения параметра конфигурации <A
+HREF="runtime-config-client.html#GUC-XMLOPTION"
+>xmloption</A
+> (<TT
+CLASS="LITERAL"
+>DOCUMENT</TT
+> или <TT
+CLASS="LITERAL"
+>CONTENT</TT
+>, соответственно). Это значит, что <CODE
+CLASS="FUNCTION"
+>xml_is_well_formed</CODE
+> помогает понять, будет ли успешным простое приведение к типу <TT
+CLASS="TYPE"
+>xml</TT
+>, тогда как две другие функции проверяют, будут ли успешны соответствующие варианты <CODE
+CLASS="FUNCTION"
+>XMLPARSE</CODE
+>.</P
+><P
+>Примеры: </P><PRE
+CLASS="SCREEN"
+>SET xmloption TO DOCUMENT;
+SELECT xml_is_well_formed('&lt;&gt;');
+ xml_is_well_formed 
+--------------------
+ f
+(1 row)
+
+SELECT xml_is_well_formed('&lt;abc/&gt;');
+ xml_is_well_formed 
+--------------------
+ t
+(1 row)
+
+SET xmloption TO CONTENT;
+SELECT xml_is_well_formed('abc');
+ xml_is_well_formed 
+--------------------
+ t
+(1 row)
+
+SELECT xml_is_well_formed_document(
+ '&lt;pg:foo xmlns:pg="http://postgresql.org/stuff"&gt;bar&lt;/pg:foo&gt;');
+ xml_is_well_formed_document 
+-----------------------------
+ t
+(1 row)
+
+SELECT xml_is_well_formed_document(
+ '&lt;pg:foo xmlns:pg="http://postgresql.org/stuff"&gt;bar&lt;/my:foo&gt;');
+ xml_is_well_formed_document 
+-----------------------------
+ f
+(1 row)</PRE
+><P> Последний пример показывает, что при проверке также учитывается, совпадают ли пространства имён.</P
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="FUNCTIONS-XML-PROCESSING"
+>9.14.3. Обработка XML</A
+></H2
+><P
+>Для обработки значений типа <TT
+CLASS="TYPE"
+>xml</TT
+> с помощью выражений XPath 1.0 в PostgreSQL представлены функции <CODE
+CLASS="FUNCTION"
+>xpath</CODE
+> и <CODE
+CLASS="FUNCTION"
+>xpath_exists</CODE
+>.</P
+><PRE
+CLASS="SYNOPSIS"
+><CODE
+CLASS="FUNCTION"
+>xpath</CODE
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>xpath</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>xml</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>nsarray</I
+></TT
+></SPAN
+>])</PRE
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>xpath</CODE
+> вычисляет выражение XPath (аргумент <TT
+CLASS="REPLACEABLE"
+><I
+>xpath</I
+></TT
+> типа <TT
+CLASS="TYPE"
+>text</TT
+>) для заданного <TT
+CLASS="REPLACEABLE"
+><I
+>xml</I
+></TT
+>. Она возвращает массив XML-значений с набором узлов, полученных в результате выражения XPath. Если выражение XPath выдаёт не набор узлов, а скалярное значение, возвращается массив из одного элемента.</P
+><P
+>Вторым аргументом должен быть правильно оформленный XML-документ. В частности, в нём должен быть единственный корневой элемент.</P
+><P
+>В необязательном третьем аргументе функции передаются сопоставления пространств имён. Эти сопоставления должны определяться в двумерном массиве типа <TT
+CLASS="TYPE"
+>text</TT
+>, во второй размерности которого 2 элемента (т. е. это должен быть массив массивов, состоящих из 2 элементов). В первом элементе каждого массива определяется псевдоним (префикс) пространства имён, а во втором &mdash; его URI. Псевдонимы, определённые в этом массиве, не обязательно должны совпадать с префиксами пространств имён в самом XML-документе (другими словами, для XML-документа и функции <CODE
+CLASS="FUNCTION"
+>xpath</CODE
+> псевдонимы имеют <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>локальный</I
+></SPAN
+> характер).</P
+><P
+>Пример: </P><PRE
+CLASS="SCREEN"
+>SELECT xpath('/my:a/text()',
+             '&lt;my:a xmlns:my="http://example.com"&gt;test&lt;/my:a&gt;',
+             ARRAY[ARRAY['my', 'http://example.com']]);
+
+ xpath  
+--------
+ {test}
+(1 row)</PRE
+><P></P
+><P
+>Для пространства имён по умолчанию (анонимного) это выражение можно записать так: </P><PRE
+CLASS="SCREEN"
+>SELECT xpath('//mydefns:b/text()',
+             '&lt;a xmlns="http://example.com"&gt;&lt;b&gt;test&lt;/b&gt;&lt;/a&gt;',
+             ARRAY[ARRAY['mydefns', 'http://example.com']]);
+
+ xpath
+--------
+ {test}
+(1 row)</PRE
+><P></P
+><PRE
+CLASS="SYNOPSIS"
+><CODE
+CLASS="FUNCTION"
+>xpath_exists</CODE
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>xpath</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>xml</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>nsarray</I
+></TT
+></SPAN
+>])</PRE
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>xpath_exists</CODE
+> представляет собой специализированную форму функции <CODE
+CLASS="FUNCTION"
+>xpath</CODE
+>. Она возвращает не весь набор XML-узлов, удовлетворяющих выражению XPath, а только одно логическое значение, показывающее, есть ли такие узлы. Эта функция равнозначна стандартному условию <TT
+CLASS="LITERAL"
+>XMLEXISTS</TT
+>, за исключением того, что она также поддерживает сопоставления пространств имён.</P
+><P
+>Пример: </P><PRE
+CLASS="SCREEN"
+>SELECT xpath_exists('/my:a/text()',
+                     '&lt;my:a xmlns:my="http://example.com"&gt;test&lt;/my:a&gt;',
+                     ARRAY[ARRAY['my', 'http://example.com']]);
+
+ xpath_exists  
+--------------
+ t
+(1 row)</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="FUNCTIONS-XML-MAPPING"
+>9.14.4. Отображение таблиц в XML</A
+></H2
+><P
+>Следующие функции отображают содержимое реляционных таблиц в значения XML. Их можно рассматривать как средства экспорта в XML: </P><PRE
+CLASS="SYNOPSIS"
+>table_to_xml(tbl regclass, nulls boolean, tableforest boolean, targetns text)
+query_to_xml(query text, nulls boolean, tableforest boolean, targetns text)
+cursor_to_xml(cursor refcursor, count int, nulls boolean,
+              tableforest boolean, targetns text)</PRE
+><P> Результат всех этих функций имеет тип <TT
+CLASS="TYPE"
+>xml</TT
+>.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>table_to_xml</CODE
+> отображает в xml содержимое таблицы, имя которой задаётся в параметре <TT
+CLASS="PARAMETER"
+>tbl</TT
+>. Тип <TT
+CLASS="TYPE"
+>regclass</TT
+> принимает идентификаторы строк в обычной записи, которые могут содержать указание схемы и кавычки. Функция <CODE
+CLASS="FUNCTION"
+>query_to_xml</CODE
+> выполняет запрос, текст которого передаётся в параметре <TT
+CLASS="PARAMETER"
+>query</TT
+>, и отображает в xml результирующий набор. Последняя функция, <CODE
+CLASS="FUNCTION"
+>cursor_to_xml</CODE
+> выбирает указанное число строк из курсора, переданного в параметре <TT
+CLASS="PARAMETER"
+>cursor</TT
+>. Этот вариант рекомендуется использовать с большими таблицами, так как все эти функции создают результирующий xml в памяти.</P
+><P
+>Если параметр <TT
+CLASS="PARAMETER"
+>tableforest</TT
+> имеет значение false, результирующий XML-документ выглядит так: </P><PRE
+CLASS="SCREEN"
+>&lt;имя_таблицы&gt;
+  &lt;row&gt;
+    &lt;имя_колонки1&gt;данные&lt;/имя_колонки1&gt;
+    &lt;имя_колонки2&gt;данные&lt;/имя_колонки2&gt;
+  &lt;/row&gt;
+
+  &lt;row&gt;
+    ...
+  &lt;/row&gt;
+
+  ...
+&lt;/имя_таблицы&gt;</PRE
+><P> А если <TT
+CLASS="PARAMETER"
+>tableforest</TT
+> равен true, в результате будет выведен следующий фрагмент XML: </P><PRE
+CLASS="SCREEN"
+>&lt;имя_таблицы&gt;
+  &lt;имя_колонки1&gt;data&lt;/имя_колонки1&gt;
+  &lt;имя_колонки2&gt;data&lt;/имя_колонки2&gt;
+&lt;/имя_таблицы&gt;
+
+&lt;имя_таблицы&gt;
+  ...
+&lt;/имя_таблицы&gt;
+
+...</PRE
+><P> Если имя таблицы неизвестно, например, при отображении результатов запроса или курсора, вместо него в первом случае вставляется <TT
+CLASS="LITERAL"
+>table</TT
+>, а во втором &mdash; <TT
+CLASS="LITERAL"
+>row</TT
+>.</P
+><P
+>Выбор между этими форматами остаётся за пользователем. Первый вариант позволяет создать готовый XML-документ, что может быть полезно для многих приложений, а второй удобно применять с функцией <CODE
+CLASS="FUNCTION"
+>cursor_to_xml</CODE
+>, если её результаты будут собираться в документ позже. Полученный результат можно изменить по вкусу с помощью рассмотренных выше функций создания XML-содержимого, в частности <CODE
+CLASS="FUNCTION"
+>xmlelement</CODE
+>.</P
+><P
+>Значения данных эти функции отображают так же, как и ранее описанная функция <CODE
+CLASS="FUNCTION"
+>xmlelement</CODE
+>.</P
+><P
+>Параметр <TT
+CLASS="PARAMETER"
+>nulls</TT
+> определяет, нужно ли включать в результат значения NULL. Если он установлен, значения NULL в колонках представляются так: </P><PRE
+CLASS="SCREEN"
+>&lt;имя_колонки xsi:nil="true"/&gt;</PRE
+><P>Здесь <TT
+CLASS="LITERAL"
+>xsi</TT
+> &mdash; это префикс пространства имён XML Schema Instance. При этом в результирующий XML будет добавлено соответствующее объявление пространства имён. Если же данный параметр имеет значение false, колонки со значениями NULL просто не будут выводиться.</P
+><P
+>Параметр <TT
+CLASS="PARAMETER"
+>targetns</TT
+> определяет целевое пространство имён для результирующего XML. Если пространство имён не нужно, значением этого параметра должна быть пустая строка.</P
+><P
+>Следующие функции выдают документы XML Schema, которые содержат схемы отображений, выполняемых соответствующими ранее рассмотренными функциями: </P><PRE
+CLASS="SYNOPSIS"
+>table_to_xmlschema(tbl regclass, nulls boolean, tableforest boolean,
+  targetns text)
+query_to_xmlschema(query text, nulls boolean, tableforest boolean,
+  targetns text)
+cursor_to_xmlschema(cursor refcursor, nulls boolean, tableforest boolean,
+  targetns text)</PRE
+><P> Чтобы результаты отображения данных в XML соответствовали XML-схемам, важно, чтобы паре функций передавались одинаковые параметры.</P
+><P
+>Следующие функции выдают отображение данных в XML и соответствующую XML-схему в одном документе (или фрагменте), объединяя их вместе. Это может быть полезно там, где желательно получить самодостаточные результаты с описанием: </P><PRE
+CLASS="SYNOPSIS"
+>table_to_xml_and_xmlschema(tbl regclass, nulls boolean, tableforest boolean,
+  targetns text)
+query_to_xml_and_xmlschema(query text, nulls boolean, tableforest boolean,
+  targetns text)</PRE
+><P></P
+><P
+>В дополнение к ним есть следующие функции, способные выдать аналогичные представления для целых схем в базе данных или даже всей текущей базы данных: </P><PRE
+CLASS="SYNOPSIS"
+>schema_to_xml(schema name, nulls boolean, tableforest boolean,
+  targetns text)
+schema_to_xmlschema(schema name, nulls boolean, tableforest boolean,
+  targetns text)
+schema_to_xml_and_xmlschema(schema name, nulls boolean, tableforest boolean,
+  targetns text)
+
+database_to_xml(nulls boolean, tableforest boolean, targetns text)
+database_to_xmlschema(nulls boolean, tableforest boolean, targetns text)
+database_to_xml_and_xmlschema(nulls boolean, tableforest boolean,
+  targetns text)</PRE
+><P> Заметьте, что объём таких данных может быть очень большим, а XML будет создаваться в памяти. Поэтому, вместо того, чтобы пытаться отобразить в XML сразу всё содержимое больших схем или баз данных, лучше делать это по таблицам, возможно даже используя курсор.</P
+><P
+>Результат отображения содержимого схемы будет выглядеть так: </P><PRE
+CLASS="SCREEN"
+>&lt;имя_схемы&gt;
+
+отображение_таблицы1
+
+отображение_таблицы2
+
+...
+
+&lt;/имя_схемы&gt;</PRE
+><P>Формат отображения таблицы определяется параметром <TT
+CLASS="PARAMETER"
+>tableforest</TT
+>, описанным выше.</P
+><P
+>Результат отображения содержимого базы данных будет таким: </P><PRE
+CLASS="SCREEN"
+>&lt;имя_БД&gt;
+
+&lt;имя_схемы1&gt;
+  ...
+&lt;/имя_схемы1&gt;
+
+&lt;имя_схемы2&gt;
+  ...
+&lt;/имя_схемы2&gt;
+
+...
+
+&lt;/имя_БД&gt;</PRE
+><P>Здесь отображение схемы имеет вид, показанный выше.</P
+><P
+>В качестве примера, иллюстрирующего использование результата этих функций, на <A
+HREF="functions-xml.html#XSLT-XML-HTML"
+>Рисунке 9-1</A
+> показано XSLT-преобразование, которое переводит результат функции <CODE
+CLASS="FUNCTION"
+>table_to_xml_and_xmlschema</CODE
+> в HTML-документ, содержащий таблицу с данными. Подобным образом результаты этих функций можно преобразовать и в другие форматы на базе XML.</P
+><DIV
+CLASS="FIGURE"
+><A
+NAME="XSLT-XML-HTML"
+></A
+><P
+><B
+>Рисунок 9-1. XSLT-преобразование, переводящее результат SQL/XML в формат HTML</B
+></P
+><PRE
+CLASS="PROGRAMLISTING"
+>&lt;?xml version="1.0"?&gt;
+&lt;xsl:stylesheet version="1.0"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns="http://www.w3.org/1999/xhtml"
+&gt;
+
+  &lt;xsl:output method="xml"
+      doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"
+      doctype-public="-//W3C/DTD XHTML 1.0 Strict//EN"
+      indent="yes"/&gt;
+
+  &lt;xsl:template match="/*"&gt;
+    &lt;xsl:variable name="schema" select="//xsd:schema"/&gt;
+    &lt;xsl:variable name="tabletypename"
+              select="$schema/xsd:element[@name=name(current())]/@type"/&gt;
+    &lt;xsl:variable name="rowtypename"
+              select="$schema/xsd:complexType[@name=$tabletypename]
+                    /xsd:sequence/xsd:element[@name='row']/@type"/&gt;
+
+    &lt;html&gt;
+      &lt;head&gt;
+        &lt;title&gt;&lt;xsl:value-of select="name(current())"/&gt;&lt;/title&gt;
+      &lt;/head&gt;
+      &lt;body&gt;
+        &lt;table&gt;
+          &lt;tr&gt;
+            &lt;xsl:for-each select="$schema/xsd:complexType
+                    [@name=$rowtypename]/xsd:sequence/xsd:element/@name"&gt;
+              &lt;th&gt;&lt;xsl:value-of select="."/&gt;&lt;/th&gt;
+            &lt;/xsl:for-each&gt;
+          &lt;/tr&gt;
+
+          &lt;xsl:for-each select="row"&gt;
+            &lt;tr&gt;
+              &lt;xsl:for-each select="*"&gt;
+                &lt;td&gt;&lt;xsl:value-of select="."/&gt;&lt;/td&gt;
+              &lt;/xsl:for-each&gt;
+            &lt;/tr&gt;
+          &lt;/xsl:for-each&gt;
+        &lt;/table&gt;
+      &lt;/body&gt;
+    &lt;/html&gt;
+  &lt;/xsl:template&gt;
+
+&lt;/xsl:stylesheet&gt;</PRE
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions-textsearch.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="functions-json.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Функции и операторы текстового поиска</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Функции и операторы JSON</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

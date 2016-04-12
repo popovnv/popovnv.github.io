@@ -1,0 +1,669 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>CREATE TABLE AS</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="CREATE TABLE"
+HREF="sql-createtable.html"><LINK
+REL="NEXT"
+TITLE="CREATE TABLESPACE"
+HREF="sql-createtablespace.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="CREATE TABLE"
+HREF="sql-createtable.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="CREATE TABLESPACE"
+HREF="sql-createtablespace.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-CREATETABLEAS"
+></A
+>CREATE TABLE AS</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN76391"
+></A
+><H2
+>Название</H2
+>CREATE TABLE AS&nbsp;--&nbsp;создать таблицу из результатов запроса</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN76394"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>CREATE [ [ GLOBAL | LOCAL ] { TEMPORARY | TEMP } | UNLOGGED ] TABLE <TT
+CLASS="REPLACEABLE"
+><I
+>table_name</I
+></TT
+>
+    [ (<TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+> [, ...] ) ]
+    [ WITH ( <TT
+CLASS="REPLACEABLE"
+><I
+>параметр_хранения</I
+></TT
+> [= <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+>] [, ... ] ) | WITH OIDS | WITHOUT OIDS ]
+    [ ON COMMIT { PRESERVE ROWS | DELETE ROWS | DROP } ]
+    [ TABLESPACE <TT
+CLASS="REPLACEABLE"
+><I
+>табл_пространство</I
+></TT
+> ]
+    AS <TT
+CLASS="REPLACEABLE"
+><I
+>запрос</I
+></TT
+>
+    [ WITH [ NO ] DATA ]</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN76402"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>CREATE TABLE AS</TT
+> создаёт таблицу и наполняет её данными, полученными в результате выполнения <TT
+CLASS="COMMAND"
+>SELECT</TT
+>. Колонки этой таблицы получают имена и типы данных в соответствии с колонками результата <TT
+CLASS="COMMAND"
+>SELECT</TT
+> (хотя имена колонок можно переопределить, добавив явно список новых имён колонок).</P
+><P
+><TT
+CLASS="COMMAND"
+>CREATE TABLE AS</TT
+> напоминает создание представления, но на самом деле есть значительная разница: эта команда создаёт новую таблицу и выполняет запрос только раз, чтобы наполнить таблицу начальными данными. Последующие изменения в исходных таблицах запроса в новой таблице отражаться не будут. С представлением, напротив, определяющая его команда <TT
+CLASS="COMMAND"
+>SELECT</TT
+> выполняется при каждой выборке из него.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN76411"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>GLOBAL</TT
+> или <TT
+CLASS="LITERAL"
+>LOCAL</TT
+></DT
+><DD
+><P
+>Для совместимости игнорируются. Использование этих ключевых слов считается устаревшим; за подробностями обратитесь к <A
+HREF="sql-createtable.html"
+>CREATE TABLE</A
+>.</P
+></DD
+></DL
+></DIV
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>TEMPORARY</TT
+> или <TT
+CLASS="LITERAL"
+>TEMP</TT
+></DT
+><DD
+><P
+>Если указано, создаваемая таблица будет временной. За подробностями обратитесь к <A
+HREF="sql-createtable.html"
+>CREATE TABLE</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>UNLOGGED</TT
+></DT
+><DD
+><P
+>Если указано, создаваемая таблица будет нежурналируемой. За подробностями обратитесь к <A
+HREF="sql-createtable.html"
+>CREATE TABLE</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>table_name</I
+></TT
+></DT
+><DD
+><P
+>Имя (возможно, дополненное схемой) создаваемой таблицы.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+></DT
+><DD
+><P
+>Имя колонки в создаваемой таблице. Если имена колонок не заданы явно, они определяются по именам колонок результата запроса.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>WITH ( <TT
+CLASS="REPLACEABLE"
+><I
+>параметр_хранения</I
+></TT
+> [= <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+>] [, ... ] )</TT
+></DT
+><DD
+><P
+>Это предложение определяет дополнительные параметры хранения для новой таблицы: за подробностями обратитесь к <A
+HREF="sql-createtable.html#SQL-CREATETABLE-STORAGE-PARAMETERS"
+><I
+>Параметры хранения</I
+></A
+>. Предложение <TT
+CLASS="LITERAL"
+>WITH</TT
+> может также включать указание <TT
+CLASS="LITERAL"
+>OIDS=TRUE</TT
+> (или просто <TT
+CLASS="LITERAL"
+>OIDS</TT
+>), с которым строкам в новой таблице будут назначаться идентификаторы объектов (OID), либо указание <TT
+CLASS="LITERAL"
+>OIDS=FALSE</TT
+>, с которым строки не будут содержать OID. За дополнительными сведениями обратитесь к <A
+HREF="sql-createtable.html"
+>CREATE TABLE</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>WITH OIDS</TT
+><BR><TT
+CLASS="LITERAL"
+>WITHOUT OIDS</TT
+></DT
+><DD
+><P
+>Это устаревшее написание указаний <TT
+CLASS="LITERAL"
+>WITH (OIDS)</TT
+> и <TT
+CLASS="LITERAL"
+>WITH (OIDS=FALSE)</TT
+>, соответственно. Если требуется определить одновременно свойство <TT
+CLASS="LITERAL"
+>OIDS</TT
+> и параметры хранения, необходимо использовать синтаксис <TT
+CLASS="LITERAL"
+>WITH ( ... )</TT
+>; см. ниже.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>ON COMMIT</TT
+></DT
+><DD
+><P
+>Поведением временных таблиц в конце блока транзакции позволяет управлять предложение <TT
+CLASS="LITERAL"
+>ON COMMIT</TT
+>, которое принимает три параметра: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>PRESERVE ROWS</TT
+></DT
+><DD
+><P
+>Никакое специальное действие в конце транзакции не выполняется. Это поведение по умолчанию.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>DELETE ROWS</TT
+></DT
+><DD
+><P
+>Все строки в этой временной таблице будут удаляться в конце каждого блока транзакции. По сути, при каждой фиксации транзакции будет автоматически выполняться <A
+HREF="sql-truncate.html"
+>TRUNCATE</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>DROP</TT
+></DT
+><DD
+><P
+>Эта временная таблица будет удаляться в конце текущего блока транзакции.</P
+></DD
+></DL
+></DIV
+><P></P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>TABLESPACE <TT
+CLASS="REPLACEABLE"
+><I
+>табл_пространство</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Здесь <TT
+CLASS="REPLACEABLE"
+><I
+>табл_пространство</I
+></TT
+> — имя табличного пространства, в котором будет создаваться новая таблица. Если оно не указано, выбирается <A
+HREF="runtime-config-client.html#GUC-DEFAULT-TABLESPACE"
+>default_tablespace</A
+> или <A
+HREF="runtime-config-client.html#GUC-TEMP-TABLESPACES"
+>temp_tablespaces</A
+>, если таблица временная.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>запрос</I
+></TT
+></DT
+><DD
+><P
+>Команда <A
+HREF="sql-select.html"
+>SELECT</A
+>, <A
+HREF="sql-select.html#SQL-TABLE"
+>TABLE</A
+> или <A
+HREF="sql-values.html"
+>VALUES</A
+>, либо команда <A
+HREF="sql-execute.html"
+>EXECUTE</A
+>, выполняющая подготовленный запрос <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, <TT
+CLASS="COMMAND"
+>TABLE</TT
+> или <TT
+CLASS="COMMAND"
+>VALUES</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>WITH [ NO ] DATA</TT
+></DT
+><DD
+><P
+>Это предложение определяет, будут ли данные, выданные запросом, копироваться в новую таблицу. Если нет, то копируется только структура. По умолчанию данные копируются.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN76518"
+></A
+><H2
+>Замечания</H2
+><P
+>Функциональность этой команды подобна <A
+HREF="sql-selectinto.html"
+>SELECT INTO</A
+>, но предпочтительнее использовать её, во избежание путаницы с другими применениями синтаксиса <TT
+CLASS="COMMAND"
+>SELECT INTO</TT
+>. Кроме того, набор возможностей <TT
+CLASS="COMMAND"
+>CREATE TABLE AS</TT
+> шире, чем у <TT
+CLASS="COMMAND"
+>SELECT INTO</TT
+>.</P
+><P
+>Команда <TT
+CLASS="COMMAND"
+>CREATE TABLE AS</TT
+> позволяет пользователю явно определить, добавлять ли OID в таблицу. Если присутствие OID не определено явно, оно определяется конфигурационной переменной <A
+HREF="runtime-config-compatible.html#GUC-DEFAULT-WITH-OIDS"
+>default_with_oids</A
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN76528"
+></A
+><H2
+>Примеры</H2
+><P
+>Создание таблицы <TT
+CLASS="LITERAL"
+>films_recent</TT
+>, содержащей только последние записи из таблицы <TT
+CLASS="LITERAL"
+>films</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE films_recent AS
+  SELECT * FROM films WHERE date_prod &gt;= '2002-01-01';</PRE
+><P></P
+><P
+>Чтобы скопировать таблицу полностью, можно также использовать короткую форму команды <TT
+CLASS="LITERAL"
+>TABLE</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE films2 AS
+  TABLE films;</PRE
+><P></P
+><P
+>Создание временной таблицы <TT
+CLASS="LITERAL"
+>films_recent</TT
+>, содержащей только последние записи таблицы <TT
+CLASS="LITERAL"
+>films</TT
+>, с применением подготовленного оператора. Новая таблица будет содержать OID и прекратит существование при фиксации транзакции: </P><PRE
+CLASS="PROGRAMLISTING"
+>PREPARE recentfilms(date) AS
+  SELECT * FROM films WHERE date_prod &gt; $1;
+CREATE TEMP TABLE films_recent WITH (OIDS) ON COMMIT DROP AS
+  EXECUTE recentfilms('2002-01-01');</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN76541"
+></A
+><H2
+>Совместимость</H2
+><P
+><TT
+CLASS="COMMAND"
+>CREATE TABLE AS</TT
+> соответствует стандарту <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>. Нестандартные расширения перечислены ниже: <P
+></P
+></P><UL
+COMPACT="COMPACT"
+><LI
+><P
+>Стандарт требует заключать предложение подзапроса в скобки, но в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> эти скобки необязательны.</P
+></LI
+><LI
+><P
+>Стандарт требует присутствия указания <TT
+CLASS="LITERAL"
+>WITH [ NO ] DATA</TT
+>, в PostgreSQL оно необязательно.</P
+></LI
+><LI
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> работает с временными таблицами не так, как описано в стандарте; за подробностями обратитесь к <A
+HREF="sql-createtable.html"
+>CREATE TABLE</A
+>.</P
+></LI
+><LI
+><P
+>Предложение <TT
+CLASS="LITERAL"
+>WITH</TT
+> является расширением <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>; в стандарте ни параметры хранения, ни OID не оговариваются.</P
+></LI
+><LI
+><P
+>Концепция табличных пространств в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> отсутствует в стандарте. Как следствие, предложение <TT
+CLASS="LITERAL"
+>TABLESPACE</TT
+> является расширением.</P
+></LI
+></UL
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN76565"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-creatematerializedview.html"
+>CREATE MATERIALIZED VIEW</A
+>, <A
+HREF="sql-createtable.html"
+>CREATE TABLE</A
+>, <A
+HREF="sql-execute.html"
+>EXECUTE</A
+>, <A
+HREF="sql-select.html"
+>SELECT</A
+>, <A
+HREF="sql-selectinto.html"
+>SELECT INTO</A
+>, <A
+HREF="sql-values.html"
+>VALUES</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-createtable.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-createtablespace.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>CREATE TABLE</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>CREATE TABLESPACE</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

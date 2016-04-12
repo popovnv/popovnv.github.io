@@ -1,0 +1,256 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Приёмы и советы по применению GIN</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Индексы GIN"
+HREF="gin.html"><LINK
+REL="PREVIOUS"
+TITLE="Реализация"
+HREF="gin-implementation.html"><LINK
+REL="NEXT"
+TITLE="Ограничения"
+HREF="gin-limit.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Реализация"
+HREF="gin-implementation.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="gin.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 58. Индексы GIN</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Ограничения"
+HREF="gin-limit.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="GIN-TIPS"
+>58.5. Приёмы и советы по применению GIN</A
+></H1
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+>Создание или добавление</DT
+><DD
+><P
+>Добавление объектов в индекс <ACRONYM
+CLASS="ACRONYM"
+>GIN</ACRONYM
+> может выполняться медленно, так как для каждого объекта скорее всего потребуется добавлять множество ключей. Поэтому при массовом добавлении данных в таблицу рекомендуется удалить индекс GIN и пересоздать его по окончании добавления.</P
+><P
+>Начиная с <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> 8.4, этот совет менее актуален, так как выполнение индексации может быть отложенным (подробнее об этом в <A
+HREF="gin-implementation.html#GIN-FAST-UPDATE"
+>Подразделе 58.4.1</A
+>). Но при очень большом объёме изменений может быть лучше всё-таки удалить и пересоздать индекс.</P
+></DD
+><DT
+><A
+HREF="runtime-config-resource.html#GUC-MAINTENANCE-WORK-MEM"
+>maintenance_work_mem</A
+></DT
+><DD
+><P
+>Время построения индекса <ACRONYM
+CLASS="ACRONYM"
+>GIN</ACRONYM
+> очень сильно зависит от параметра <TT
+CLASS="VARNAME"
+>maintenance_work_mem</TT
+>; не стоит экономить на рабочей памяти при создании индекса.</P
+></DD
+><DT
+><A
+HREF="runtime-config-resource.html#GUC-WORK-MEM"
+>work_mem</A
+></DT
+><DD
+><P
+>В процессе последовательных добавлений в существующий индекс <ACRONYM
+CLASS="ACRONYM"
+>GIN</ACRONYM
+> с включённым режимом <TT
+CLASS="LITERAL"
+>FASTUPDATE</TT
+> система будет очищать список ожидающих индексации записей, когда его размер будет превышать <TT
+CLASS="VARNAME"
+>work_mem</TT
+>. Во избежание значительных колебаний конечного времени ответа, имеет смысл проводить очистку этого списка в фоновом режиме (например, применяя автоочистку). Избежать операций очистки на переднем плане можно, увеличив <TT
+CLASS="VARNAME"
+>work_mem</TT
+> или проводя автоочистку более активно. Однако, если с увеличенным значением <TT
+CLASS="VARNAME"
+>work_mem</TT
+> запустится очистка на переднем плане, она будет выполняться ещё дольше.</P
+></DD
+><DT
+><A
+HREF="runtime-config-client.html#GUC-GIN-FUZZY-SEARCH-LIMIT"
+>gin_fuzzy_search_limit</A
+></DT
+><DD
+><P
+>Основной целью разработки индексов <ACRONYM
+CLASS="ACRONYM"
+>GIN</ACRONYM
+> было обеспечить поддержку хорошо расширяемого полнотекстового поиска в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, а при полнотекстовом поиске нередко возникают ситуации, когда возвращается очень большой набор результатов. Однако чаще всего так происходит, когда запрос содержит очень часто встречающиеся слова, так что полученный результат всё равно оказывается бесполезным. Так как чтение множества записей с диска и последующая сортировка их может занять много времени, это неприемлемо в производственных условиях. (Заметьте, что поиск по индексу при этом выполняется очень быстро.)</P
+><P
+>Для управляемого выполнения таких запросов в <ACRONYM
+CLASS="ACRONYM"
+>GIN</ACRONYM
+> введено настраиваемое мягкое ограничение сверху для числа возвращаемых строк: конфигурационный параметр <TT
+CLASS="VARNAME"
+>gin_fuzzy_search_limit</TT
+>. По умолчанию он равен 0 (то есть ограничение отсутствует). Если он имеет ненулевое значение, возвращаемый набор строк будет случайно выбранным подмножеством всего набора результатов.</P
+><P
+><SPAN
+CLASS="QUOTE"
+>"Мягким"</SPAN
+> оно называется потому, что фактическое число возвращаемых строк может несколько отличаться от заданного значения, в зависимости от запроса и качества системного генератора случайных чисел.</P
+><P
+>Из практики, со значениями в несколько тысяч (например, 5000 &mdash; 20000) получаются приемлемые результаты.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="gin-implementation.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="gin-limit.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Реализация</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="gin.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Ограничения</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,297 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>pg_freespacemap</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Дополнительно поставляемые модули"
+HREF="contrib.html"><LINK
+REL="PREVIOUS"
+TITLE="pgcrypto"
+HREF="pgcrypto.html"><LINK
+REL="NEXT"
+TITLE="pg_prewarm"
+HREF="pgprewarm.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="pgcrypto"
+HREF="pgcrypto.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Приложение E. Дополнительно поставляемые модули</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="pg_prewarm"
+HREF="pgprewarm.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="PGFREESPACEMAP"
+>E.26. pg_freespacemap</A
+></H1
+><P
+>Модуль <TT
+CLASS="FILENAME"
+>pg_freespacemap</TT
+> предоставляет средства для исследования карты свободного пространства (FSM). В нём реализована функция <CODE
+CLASS="FUNCTION"
+>pg_freespace</CODE
+>, точнее, две перегруженных функции. Эти функции показывают значение, записанное в карте свободного пространства для данной страницы, либо для всех страниц отношения.</P
+><P
+>По умолчанию, роли public на всякий случай, во избежание угрозы безопасности, запрещён доступ к этим функциям.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN123507"
+>E.26.1. Функции</A
+></H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><CODE
+CLASS="FUNCTION"
+>pg_freespace(rel regclass IN, blkno bigint IN) returns int2</CODE
+></DT
+><DD
+><P
+>Возвращает объём свободного пространства на странице для отношения, заданного параметром <TT
+CLASS="LITERAL"
+>blkno</TT
+>, согласно FSM.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>pg_freespace(rel regclass IN, blkno OUT bigint, avail OUT int2)</CODE
+></DT
+><DD
+><P
+>Выдаёт объём свободного пространства на каждой странице отношения, согласно FSM. Возвращается набор кортежей <TT
+CLASS="LITERAL"
+>(blkno bigint, avail int2)</TT
+>, по одному кортежу для каждой страницы в отношении.</P
+></DD
+></DL
+></DIV
+><P
+>Значения, хранимые в карте свободного пространства, не являются точными. Они округляются до 1/256 величины <TT
+CLASS="SYMBOL"
+>BLCKSZ</TT
+> (до 32 байт со значением <TT
+CLASS="SYMBOL"
+>BLCKSZ</TT
+> по умолчанию) и не поддерживаются в актуальном состоянии при каждом добавлении и изменении кортежей.</P
+><P
+>Для индексов отслеживаются полностью неиспользованные страницы, а не свободное пространство в страницах. Таким образом, эти значения отражают только то, что страница занята или свободна.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Интерфейс был изменён в версии 8.4, в соответствии с нововведениями реализации FSM, которые появились в этой версии.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN123530"
+>E.26.2. Пример вывода</A
+></H2
+><PRE
+CLASS="SCREEN"
+>postgres=# SELECT * FROM pg_freespace('foo');
+ blkno | avail 
+-------+-------
+     0 |     0
+     1 |     0
+     2 |     0
+     3 |    32
+     4 |   704
+     5 |   704
+     6 |   704
+     7 |  1216
+     8 |   704
+     9 |   704
+    10 |   704
+    11 |   704
+    12 |   704
+    13 |   704
+    14 |   704
+    15 |   704
+    16 |   704
+    17 |   704
+    18 |   704
+    19 |  3648
+(20 rows)
+
+postgres=# SELECT * FROM pg_freespace('foo', 7);
+ pg_freespace 
+--------------
+         1216
+(1 row)</PRE
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN123533"
+>E.26.3. Автор</A
+></H2
+><P
+>Исходную версию разработал Марк Кирквуд <CODE
+CLASS="EMAIL"
+>&#60;<A
+HREF="mailto:markir@paradise.net.nz"
+>markir@paradise.net.nz</A
+>&#62;</CODE
+>. Для версии 8.4 с новой реализацией FSM код адаптировал Хейкки Линнакангас <CODE
+CLASS="EMAIL"
+>&#60;<A
+HREF="mailto:heikki@enterprisedb.com"
+>heikki@enterprisedb.com</A
+>&#62;</CODE
+></P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="pgcrypto.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="pgprewarm.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>pgcrypto</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>pg_prewarm</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

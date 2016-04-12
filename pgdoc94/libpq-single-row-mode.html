@@ -1,0 +1,293 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Построчное извлечение результатов запроса</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="libpq — библиотека для языка C"
+HREF="libpq.html"><LINK
+REL="PREVIOUS"
+TITLE="Асинхронная обработка команд"
+HREF="libpq-async.html"><LINK
+REL="NEXT"
+TITLE="Отмена запросов в процессе выполнения"
+HREF="libpq-cancel.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Асинхронная обработка команд"
+HREF="libpq-async.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="libpq.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 31. <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> — библиотека для языка C</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Отмена запросов в процессе выполнения"
+HREF="libpq-cancel.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="LIBPQ-SINGLE-ROW-MODE"
+>31.5. Построчное извлечение результатов запроса</A
+></H1
+><P
+>Обычно <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> собирает весь результат выполнения SQL-команды и возвращает его приложению в виде единственной структуры <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+>. Это может оказаться неприемлемым для команд, которые возвращают большое число строк. В таких случаях приложение может воспользоваться функциями <CODE
+CLASS="FUNCTION"
+>PQsendQuery</CODE
+> и <CODE
+CLASS="FUNCTION"
+>PQgetResult</CODE
+> в <I
+CLASS="FIRSTTERM"
+>однострочном режиме</I
+>. В этом режиме результирующие строки передаются приложению по одной за один раз, по мере того, как они принимаются от сервера.</P
+><P
+>Для того чтобы войти в однострочный режим, вызовите <CODE
+CLASS="FUNCTION"
+>PQsetSingleRowMode</CODE
+> сразу же после успешного вызова функции <CODE
+CLASS="FUNCTION"
+>PQsendQuery</CODE
+> (или родственной функции). Выбор этого режима действителен только для текущего исполняющегося запроса. Затем повторно вызывайте функцию <CODE
+CLASS="FUNCTION"
+>PQgetResult</CODE
+> до те пор, пока она не возвратит нуль (null), как описано в <A
+HREF="libpq-async.html"
+>Раздел 31.4</A
+>. Если запрос возвращает какое-то число строк, то они возвращаются в виде индивидуальных объектов <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+>, которые выглядят, как обычные выборки, за исключением того, что их код статуса будет <TT
+CLASS="LITERAL"
+>PGRES_SINGLE_TUPLE</TT
+> вместо <TT
+CLASS="LITERAL"
+>PGRES_TUPLES_OK</TT
+>. После последней строки (или сразу же, если запрос не возвращает ни одной строки) будет возвращён объект, не содержащий ни одной строки и имеющий статус <TT
+CLASS="LITERAL"
+>PGRES_TUPLES_OK</TT
+>; это сигнал о том, что строк больше не будет. (Но обратите внимание, что все же необходимо продолжать вызывать функцию <CODE
+CLASS="FUNCTION"
+>PQgetResult</CODE
+>, пока она не возвратит значение null.) Все эти объекты <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+> будут содержать те же самые описательные данные (имена столбцов, типы и т. д.), которые имел бы обычный объект <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+>. Память, занимаемую каждым объектом, нужно освобождать с помощью <CODE
+CLASS="FUNCTION"
+>PQclear</CODE
+>, как обычно.</P
+><P
+>   <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="LIBPQ-PQSETSINGLEROWMODE"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQsetSingleRowMode</CODE
+></DT
+><DD
+><P
+>Выбирает однострочный режим для текущего выполняющегося запроса. </P><PRE
+CLASS="SYNOPSIS"
+>int PQsetSingleRowMode(PGconn *conn);</PRE
+><P></P
+><P
+>Эту функцию можно вызывать только непосредственно после функции <CODE
+CLASS="FUNCTION"
+>PQsendQuery</CODE
+> или одной из её родственных функций, до выполнения любой другой операции на этом подключении, такой, как <CODE
+CLASS="FUNCTION"
+>PQconsumeInput</CODE
+> или <CODE
+CLASS="FUNCTION"
+>PQgetResult</CODE
+>. Будучи вызванной своевременно, функция активирует однострочный режим для текущего запроса и возвращает 1. В противном случае режим остаётся не изменённым, а функция возвращает 0. В любом случае режим возвращается в нормальное состояние после завершения текущего запроса.</P
+></DD
+></DL
+></DIV
+><P>
+  </P
+><DIV
+CLASS="CAUTION"
+><P
+></P
+><TABLE
+CLASS="CAUTION"
+BORDER="1"
+WIDTH="100%"
+><TR
+><TD
+ALIGN="CENTER"
+><B
+>Предостережение</B
+></TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+><P
+>В процессе обработки запроса сервер может возвратить некоторое количество строк, а затем столкнуться с ошибкой, вынуждающей его аварийно завершить запрос. Обычно <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> отбрасывает такие строки и сообщает только об ошибке. Но в однострочном режиме эти строки уже будут возвращены приложению. Следовательно, приложение увидит ряд объектов <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+>, имеющих статус <TT
+CLASS="LITERAL"
+>PGRES_SINGLE_TUPLE</TT
+>, за которыми последует объект со статусом <TT
+CLASS="LITERAL"
+>PGRES_FATAL_ERROR</TT
+>. Для обеспечения надлежащего поведения транзакций приложение должно быть спроектировано таким образом, чтобы отбрасывать или отменять все операции, проведённые с уже обработанными строками, если запрос в конечном итоге завершается сбоем.</P
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="libpq-async.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="libpq-cancel.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Асинхронная обработка команд</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="libpq.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Отмена запросов в процессе выполнения</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

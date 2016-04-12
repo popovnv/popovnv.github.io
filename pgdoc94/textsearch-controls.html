@@ -1,0 +1,1065 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Управление текстовым поиском</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Полнотекстовый поиск"
+HREF="textsearch.html"><LINK
+REL="PREVIOUS"
+TITLE="Таблицы и индексы"
+HREF="textsearch-tables.html"><LINK
+REL="NEXT"
+TITLE="Дополнительные возможности"
+HREF="textsearch-features.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Таблицы и индексы"
+HREF="textsearch-tables.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="textsearch.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 12. Полнотекстовый поиск</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Дополнительные возможности"
+HREF="textsearch-features.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="TEXTSEARCH-CONTROLS"
+>12.3. Управление текстовым поиском</A
+></H1
+><P
+>Для реализации полнотекстового поиска необходимы функции, позволяющие создать <TT
+CLASS="TYPE"
+>tsvector</TT
+> из документа и <TT
+CLASS="TYPE"
+>tsquery</TT
+> из запроса пользователя. Кроме того, результаты нужно выдавать в удобном порядке, так что нам потребуется функция, оценивающая релевантность документа для данного запроса. Важно также иметь возможность выводить найденный текст подходящим образом. В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> есть все необходимые для этого функции.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="TEXTSEARCH-PARSING-DOCUMENTS"
+>12.3.1. Разбор документов</A
+></H2
+><P
+>Для преобразования документа в тип <TT
+CLASS="TYPE"
+>tsvector</TT
+> <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> предоставляет функцию <CODE
+CLASS="FUNCTION"
+>to_tsvector</CODE
+>.</P
+><PRE
+CLASS="SYNOPSIS"
+>to_tsvector([<SPAN
+CLASS="OPTIONAL"
+> <TT
+CLASS="REPLACEABLE"
+><I
+>конфигурация</I
+></TT
+> <TT
+CLASS="TYPE"
+>regconfig</TT
+>, </SPAN
+>] <TT
+CLASS="REPLACEABLE"
+><I
+>документ</I
+></TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>) возвращает <TT
+CLASS="TYPE"
+>tsvector</TT
+></PRE
+><P
+><CODE
+CLASS="FUNCTION"
+>to_tsvector</CODE
+> разбирает текстовые документ на фрагменты, сводит фрагменты к лексемам и возвращает значение <TT
+CLASS="TYPE"
+>tsvector</TT
+>, в котором перечисляются лексемы и их позиции в документе. При обработке документа используется указанная конфигурация текстового поиска или конфигурация по умолчанию. Простой пример: </P><PRE
+CLASS="SCREEN"
+>SELECT to_tsvector('english', 'a fat  cat sat on a mat - it ate a fat rats');
+                  to_tsvector
+-----------------------------------------------------
+ 'ate':9 'cat':3 'fat':2,11 'mat':7 'rat':12 'sat':4</PRE
+><P></P
+><P
+>В этом примере мы видим, что результирующий <TT
+CLASS="TYPE"
+>tsvector</TT
+> не содержит слова <TT
+CLASS="LITERAL"
+>a</TT
+>, <TT
+CLASS="LITERAL"
+>on</TT
+> и <TT
+CLASS="LITERAL"
+>it</TT
+>, слово <TT
+CLASS="LITERAL"
+>rats</TT
+> превратилось <TT
+CLASS="LITERAL"
+>rat</TT
+>, а знак препинания <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>-</TT
+>"</SPAN
+> был проигнорирован.</P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>to_tsvector</CODE
+> внутри вызывает анализатор, который разбивает текст документа на фрагменты и классифицирует их. Для каждого фрагмента она проверяет список словарей (<A
+HREF="textsearch-dictionaries.html"
+>Раздел 12.6</A
+>), определяемый типом фрагмента. Первый же словарь, <I
+CLASS="FIRSTTERM"
+>распознавший</I
+> фрагмент, выдаёт одну или несколько представляющих его <I
+CLASS="FIRSTTERM"
+>лексем</I
+>. Например, <TT
+CLASS="LITERAL"
+>rats</TT
+> превращается в <TT
+CLASS="LITERAL"
+>rat</TT
+>, так как один из словарей понимает, что слово <TT
+CLASS="LITERAL"
+>rats</TT
+> &mdash; это слово <TT
+CLASS="LITERAL"
+>rat</TT
+> во множественном числе. Некоторое слова распознаются как <I
+CLASS="FIRSTTERM"
+>стоп-слова</I
+> (<A
+HREF="textsearch-dictionaries.html#TEXTSEARCH-STOPWORDS"
+>Подраздел 12.6.1</A
+>) и игнорируются как слова, фигурирующие в тексте настолько часто, что искать их бессмысленно. В нашем примере это <TT
+CLASS="LITERAL"
+>a</TT
+>, <TT
+CLASS="LITERAL"
+>on</TT
+> и <TT
+CLASS="LITERAL"
+>it</TT
+>. Если фрагмент не воспринимается ни одним словарём из списка, он так же игнорируется. В данном примере это происходит со знаком препинания <TT
+CLASS="LITERAL"
+>-</TT
+>, так как с таким типом фрагмента (<TT
+CLASS="LITERAL"
+>символы-разделители</TT
+>) не связан никакой словарь и значит такие фрагменты никогда не будут индексироваться. Выбор анализатора, словарей и индексируемых типов фрагментов определяется конфигурацией текстового поиска (<A
+HREF="textsearch-configuration.html"
+>Раздел 12.7</A
+>). В одной базе данных можно использовать разные конфигурации, в том числе, предопределённые конфигурации для разных языков. В нашем примере мы использовали конфигурацию по умолчанию для английского языка &mdash; <TT
+CLASS="LITERAL"
+>english</TT
+>.</P
+><P
+>Для назначения элементам <TT
+CLASS="TYPE"
+>tsvector</TT
+> разных <I
+CLASS="FIRSTTERM"
+>весов</I
+> используется функция <CODE
+CLASS="FUNCTION"
+>setweight</CODE
+>. Вес элемента задаётся буквой <TT
+CLASS="LITERAL"
+>A</TT
+>, <TT
+CLASS="LITERAL"
+>B</TT
+>, <TT
+CLASS="LITERAL"
+>C</TT
+> или <TT
+CLASS="LITERAL"
+>D</TT
+>. Обычно это применяется для обозначения важности слов в разных частях документа, например в заголовке или в теле документа. Затем эта информация может использоваться при ранжировании результатов поиска.</P
+><P
+>Так как <CODE
+CLASS="FUNCTION"
+>to_tsvector</CODE
+>(<TT
+CLASS="LITERAL"
+>NULL</TT
+>) вернёт <TT
+CLASS="LITERAL"
+>NULL</TT
+>, мы советуем использовать <CODE
+CLASS="FUNCTION"
+>coalesce</CODE
+> везде, где соответствующее поле может быть NULL. Создавать <TT
+CLASS="TYPE"
+>tsvector</TT
+> из структурированного документа рекомендуется так: </P><PRE
+CLASS="PROGRAMLISTING"
+>UPDATE tt SET ti =
+    setweight(to_tsvector(coalesce(title,'')), 'A')    ||
+    setweight(to_tsvector(coalesce(keyword,'')), 'B')  ||
+    setweight(to_tsvector(coalesce(abstract,'')), 'C') ||
+    setweight(to_tsvector(coalesce(body,'')), 'D');</PRE
+><P> Здесь мы использовали <CODE
+CLASS="FUNCTION"
+>setweight</CODE
+> для пометки происхождения каждой лексемы в сформированных значениях <TT
+CLASS="TYPE"
+>tsvector</TT
+> и объединили помеченные значения с помощью оператора конкатенации типов <TT
+CLASS="TYPE"
+>tsvector</TT
+> <TT
+CLASS="LITERAL"
+>||</TT
+>. (Подробнее эти операции рассматриваются в <A
+HREF="textsearch-features.html#TEXTSEARCH-MANIPULATE-TSVECTOR"
+>Подразделе 12.4.1</A
+>.)</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="TEXTSEARCH-PARSING-QUERIES"
+>12.3.2. Разбор запросов</A
+></H2
+><P
+>Для преобразования запросов в тип <TT
+CLASS="TYPE"
+>tsquery</TT
+> в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> реализованы функции <CODE
+CLASS="FUNCTION"
+>to_tsquery</CODE
+> и <CODE
+CLASS="FUNCTION"
+>plainto_tsquery</CODE
+>. Функция <CODE
+CLASS="FUNCTION"
+>to_tsquery</CODE
+> более мощная, чем <CODE
+CLASS="FUNCTION"
+>plainto_tsquery</CODE
+>, но и более требовательная к входным данным.</P
+><PRE
+CLASS="SYNOPSIS"
+>to_tsquery([<SPAN
+CLASS="OPTIONAL"
+> <TT
+CLASS="REPLACEABLE"
+><I
+>конфигурация</I
+></TT
+> <TT
+CLASS="TYPE"
+>regconfig</TT
+>, </SPAN
+>] <TT
+CLASS="REPLACEABLE"
+><I
+>текст_запроса</I
+></TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>) возвращает <TT
+CLASS="TYPE"
+>tsquery</TT
+></PRE
+><P
+><CODE
+CLASS="FUNCTION"
+>to_tsquery</CODE
+> создаёт значение <TT
+CLASS="TYPE"
+>tsquery</TT
+> из <TT
+CLASS="REPLACEABLE"
+><I
+>текста_запроса</I
+></TT
+>, который может состоять из простых фрагментов, разделённых логическими операторами <TT
+CLASS="LITERAL"
+>&amp;</TT
+> (AND), <TT
+CLASS="LITERAL"
+>|</TT
+> (OR) и <TT
+CLASS="LITERAL"
+>!</TT
+> (NOT). Эти операторы могут быть заключены в скобки. Другими словами, входное значение для <CODE
+CLASS="FUNCTION"
+>to_tsquery</CODE
+> должно уже соответствовать общим правилам для значений <TT
+CLASS="TYPE"
+>tsquery</TT
+>, описанным в <A
+HREF="datatype-textsearch.html"
+>Разделе 8.11</A
+>. Различие их состоит в том, что во вводимом в <TT
+CLASS="TYPE"
+>tsquery</TT
+> значении фрагменты воспринимаются буквально, тогда как <CODE
+CLASS="FUNCTION"
+>to_tsquery</CODE
+> нормализует фрагменты, приводя их к лексемам, используя явно указанную или подразумеваемую конфигурацию, и отбрасывая стоп-слова. Например: </P><PRE
+CLASS="SCREEN"
+>SELECT to_tsquery('english', 'The &amp; Fat &amp; Rats');
+  to_tsquery   
+---------------
+ 'fat' &amp; 'rat'</PRE
+><P> Как и при вводе значения <TT
+CLASS="TYPE"
+>tsquery</TT
+>, для каждой лексемы можно задать вес, чтобы при поиске можно было выбрать из <TT
+CLASS="TYPE"
+>tsvector</TT
+> только лексемы с заданными весами. Например: </P><PRE
+CLASS="SCREEN"
+>SELECT to_tsquery('english', 'Fat | Rats:AB');
+    to_tsquery    
+------------------
+ 'fat' | 'rat':AB</PRE
+><P> К лексеме также можно добавить <TT
+CLASS="LITERAL"
+>*</TT
+>, определив таким образом условие поиска по префиксу: </P><PRE
+CLASS="SCREEN"
+>SELECT to_tsquery('supern:*A &amp; star:A*B');
+        to_tsquery        
+--------------------------
+ 'supern':*A &amp; 'star':*AB</PRE
+><P> Такая лексема будет соответствовать любому слову в <TT
+CLASS="TYPE"
+>tsvector</TT
+>, начинающемуся с данной подстроки.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>to_tsquery</CODE
+> может также принимать фразы в апострофах. Это полезно в основном когда конфигурация включает тезаурус, который может обрабатывать такие фразы. В показанном ниже примере предполагается, что тезаурус содержит правило <TT
+CLASS="LITERAL"
+>supernovae stars : sn</TT
+>: </P><PRE
+CLASS="SCREEN"
+>SELECT to_tsquery(' ''supernovae stars'' &amp; !crab');
+  to_tsquery
+---------------
+ 'sn' &amp; !'crab'</PRE
+><P> Если убрать эти апострофы, <CODE
+CLASS="FUNCTION"
+>to_tsquery</CODE
+> не примет фрагменты, не разделённые операторами AND и OR, и выдаст синтаксическую ошибку.</P
+><PRE
+CLASS="SYNOPSIS"
+>plainto_tsquery([<SPAN
+CLASS="OPTIONAL"
+> <TT
+CLASS="REPLACEABLE"
+><I
+>конфигурация</I
+></TT
+> <TT
+CLASS="TYPE"
+>regconfig</TT
+>, </SPAN
+>] <TT
+CLASS="REPLACEABLE"
+><I
+>текст_запроса</I
+></TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>) возвращает <TT
+CLASS="TYPE"
+>tsquery</TT
+></PRE
+><P
+><CODE
+CLASS="FUNCTION"
+>plainto_tsquery</CODE
+> преобразует неформатированный <TT
+CLASS="REPLACEABLE"
+><I
+>текст_запроса</I
+></TT
+> в значение <TT
+CLASS="TYPE"
+>tsquery</TT
+>. Текст разбирается и нормализуется подобно тому, как это делает <CODE
+CLASS="FUNCTION"
+>to_tsvector</CODE
+>, а затем между оставшимися словами вставляются логические операторы <TT
+CLASS="LITERAL"
+>&amp;</TT
+> (AND).</P
+><P
+>Пример: </P><PRE
+CLASS="SCREEN"
+>SELECT plainto_tsquery('english', 'The Fat Rats');
+ plainto_tsquery 
+-----------------
+ 'fat' &amp; 'rat'</PRE
+><P> Заметьте, что <CODE
+CLASS="FUNCTION"
+>plainto_tsquery</CODE
+> не распознаёт во входной строке логические операторы, метки весов или обозначения префиксов: </P><PRE
+CLASS="SCREEN"
+>SELECT plainto_tsquery('english', 'The Fat &amp; Rats:C');
+   plainto_tsquery   
+---------------------
+ 'fat' &amp; 'rat' &amp; 'c'</PRE
+><P> В данном случае все знаки пунктуации были отброшены как символы-разделители.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="TEXTSEARCH-RANKING"
+>12.3.3. Ранжирование результатов поиска</A
+></H2
+><P
+>Ранжирование документов можно представить как попытку оценить, насколько они релевантны заданному запросу и отсортировать их так, чтобы наиболее релевантные выводились первыми. В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> встроены две функции ранжирования, принимающие во внимание лексическую, позиционную и структурную информацию; то есть, они учитывают, насколько часто и насколько близко встречаются в документе ключевые слова и какова важность содержащей их части документа. Однако само понятие релевантности довольно размытое и во многом определяется приложением. Приложения могут использовать для ранжирования и другую информацию, например, время изменения документа. Встроенные функции ранжирования можно рассматривать лишь как примеры реализации. Для своих конкретных задач вы можете разработать собственные функции ранжирования и/или учесть при обработке их результатов дополнительные факторы.</P
+><P
+>Ниже описаны две встроенные функции ранжирования: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>ts_rank([<SPAN
+CLASS="OPTIONAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>веса</I
+></TT
+> <TT
+CLASS="TYPE"
+>float4[]</TT
+>,</SPAN
+>] <TT
+CLASS="REPLACEABLE"
+><I
+>вектор</I
+></TT
+> <TT
+CLASS="TYPE"
+>tsvector</TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>запрос</I
+></TT
+> <TT
+CLASS="TYPE"
+>tsquery</TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>нормализация</I
+></TT
+> <TT
+CLASS="TYPE"
+>integer</TT
+></SPAN
+>]) возвращает <TT
+CLASS="TYPE"
+>float4</TT
+></TT
+></DT
+><DD
+><P
+>Ранжирует векторы по частоте найденных лексем.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>ts_rank_cd([<SPAN
+CLASS="OPTIONAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>веса</I
+></TT
+> <TT
+CLASS="TYPE"
+>float4[]</TT
+>,</SPAN
+>] <TT
+CLASS="REPLACEABLE"
+><I
+>вектор</I
+></TT
+> <TT
+CLASS="TYPE"
+>tsvector</TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>запрос</I
+></TT
+> <TT
+CLASS="TYPE"
+>tsquery</TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>нормализация</I
+></TT
+> <TT
+CLASS="TYPE"
+>integer</TT
+></SPAN
+>]) возвращает <TT
+CLASS="TYPE"
+>float4</TT
+></TT
+></DT
+><DD
+><P
+>Эта функция вычисляет <I
+CLASS="FIRSTTERM"
+>плотность покрытия</I
+> для данного вектора документа и запроса, используя метод, разработанный Кларком, Кормаком и Тадхоуп и описанный в статье "Relevance Ranking for One to Three Term Queries" в журнале "Information Processing and Management" в 1999 г. Плотность покрытия вычисляется подобно рангу <CODE
+CLASS="FUNCTION"
+>ts_rank</CODE
+>, но в расчёт берётся ещё и близость соответствующих лексем друг к другу.</P
+><P
+>Для вычисления результата этой функции требуется информация о позиции лексем. Поэтому она игнорируют <SPAN
+CLASS="QUOTE"
+>"очищенные"</SPAN
+> от этой информации лексемы в <TT
+CLASS="TYPE"
+>tsvector</TT
+>. Если во входных данных нет неочищенных лексем, результат будет равен нулю. (За дополнительными сведениями о функции <CODE
+CLASS="FUNCTION"
+>strip</CODE
+> и позиционной информации в данных <TT
+CLASS="TYPE"
+>tsvector</TT
+> обратитесь к <A
+HREF="textsearch-features.html#TEXTSEARCH-MANIPULATE-TSVECTOR"
+>Подразделу 12.4.1</A
+>.)</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>Для обеих этих функций аргумент <TT
+CLASS="REPLACEABLE"
+><I
+>веса</I
+></TT
+> позволяет придать больший или меньший вес словам, в зависимости от их меток. В передаваемом массиве весов определяется, насколько весома каждая категория слов, в следующем порядке: </P><PRE
+CLASS="SYNOPSIS"
+>{вес D, вес C, вес B, вес A}</PRE
+><P> Если этот аргумент опускается, подразумеваются следующие значения: </P><PRE
+CLASS="PROGRAMLISTING"
+>{0.1, 0.2, 0.4, 1.0}</PRE
+><P> Обычно весами выделяются слова из особых областей документа, например из заголовка или краткого введения, с тем, чтобы эти слова считались более и менее значимыми, чем слова в основном тексте документа.</P
+><P
+>Так как вероятность найти ключевые слова увеличивается с размером документа, при ранжировании имеет смысл учитывать его, чтобы, например, документ с сотней слов, содержащий пять вхождений искомых слов, считался более релевантным, чем документ с тысячей слов и теми же пятью вхождениями. Обе функции ранжирования принимают целочисленный параметр <TT
+CLASS="REPLACEABLE"
+><I
+>нормализации</I
+></TT
+>, определяющий, как ранг документа будет зависеть от его размера. Этот параметр представляет собой битовую маску и управляет несколькими режимами: вы можете включить сразу несколько режимов, объединив значения оператором <TT
+CLASS="LITERAL"
+>|</TT
+> (например так: <TT
+CLASS="LITERAL"
+>2|4</TT
+>). <P
+></P
+></P><UL
+COMPACT="COMPACT"
+><LI
+STYLE="list-style-type: disc"
+><P
+>0 (по умолчанию): длина документа не учитывается</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>1: ранг документа делится на 1 + логарифм длины документа</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>2: ранг документа делится на его длину</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>4: ранг документа делится на среднее гармоническое расстояние между блоками (это реализовано только в <CODE
+CLASS="FUNCTION"
+>ts_rank_cd</CODE
+>)</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>8: ранг документа делится на число уникальных слов в документе</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>16: ранг документа делится на 1 + логарифм числа уникальных слов в документе</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>32: ранг делится своё же значение + 1</P
+></LI
+></UL
+><P> Если включены несколько флагов, соответствующие операции выполняются в показанном порядке.</P
+><P
+>Важно заметить, что функции ранжирования не используют никакую внешнюю информацию, так что добиться нормализации до 1% или 100% невозможно, хотя иногда это желательно. Применив параметр 32 (<TT
+CLASS="LITERAL"
+>rank/(rank+1)</TT
+>), можно свести все ранги к диапазону 0..1, но это изменение будет лишь косметическим, на порядке сортировки результатов это не отразится.</P
+><P
+>В данном примере выбираются десять найденных документов с максимальным рангом: </P><PRE
+CLASS="SCREEN"
+>SELECT title, ts_rank_cd(textsearch, query) AS rank
+FROM apod, to_tsquery('neutrino|(dark &amp; matter)') query
+WHERE query @@ textsearch
+ORDER BY rank DESC
+LIMIT 10;
+                     title                     |   rank
+-----------------------------------------------+----------
+ Neutrinos in the Sun                          |      3.1
+ The Sudbury Neutrino Detector                 |      2.4
+ A MACHO View of Galactic Dark Matter          |  2.01317
+ Hot Gas and Dark Matter                       |  1.91171
+ The Virgo Cluster: Hot Plasma and Dark Matter |  1.90953
+ Rafting for Solar Neutrinos                   |      1.9
+ NGC 4650A: Strange Galaxy and Dark Matter     |  1.85774
+ Hot Gas and Dark Matter                       |   1.6123
+ Ice Fishing for Cosmic Neutrinos              |      1.6
+ Weak Lensing Distorts the Universe            | 0.818218</PRE
+><P> Тот же пример с нормализованным рангом: </P><PRE
+CLASS="SCREEN"
+>SELECT title, ts_rank_cd(textsearch, query, 32 /* rank/(rank+1) */ ) AS rank
+FROM apod, to_tsquery('neutrino|(dark &amp; matter)') query
+WHERE  query @@ textsearch
+ORDER BY rank DESC
+LIMIT 10;
+                     title                     |        rank
+-----------------------------------------------+-------------------
+ Neutrinos in the Sun                          | 0.756097569485493
+ The Sudbury Neutrino Detector                 | 0.705882361190954
+ A MACHO View of Galactic Dark Matter          | 0.668123210574724
+ Hot Gas and Dark Matter                       |  0.65655958650282
+ The Virgo Cluster: Hot Plasma and Dark Matter | 0.656301290640973
+ Rafting for Solar Neutrinos                   | 0.655172410958162
+ NGC 4650A: Strange Galaxy and Dark Matter     | 0.650072921219637
+ Hot Gas and Dark Matter                       | 0.617195790024749
+ Ice Fishing for Cosmic Neutrinos              | 0.615384618911517
+ Weak Lensing Distorts the Universe            | 0.450010798361481</PRE
+><P></P
+><P
+>Ранжирование может быть довольно дорогостоящей операцией, так как для вычисления ранга необходимо прочитать <TT
+CLASS="TYPE"
+>tsvector</TT
+> каждого подходящего документа и это займёт значительное время, если придётся обращаться к диску. К сожалению, избежать этого вряд ли возможно, так как на практике по многим запросам выдаётся большое количество результатов.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="TEXTSEARCH-HEADLINE"
+>12.3.4. Выделение результатов</A
+></H2
+><P
+>Представляя результаты поиска, в идеале нужно выделять часть документа и показывать, как он связан с запросом. Обычно поисковые системы показывают фрагменты документа с отмеченными искомыми словами. В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> для реализации этой возможности представлена функция <CODE
+CLASS="FUNCTION"
+>ts_headline</CODE
+>.</P
+><PRE
+CLASS="SYNOPSIS"
+>ts_headline([<SPAN
+CLASS="OPTIONAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>конфигурация</I
+></TT
+> <TT
+CLASS="TYPE"
+>regconfig</TT
+>,</SPAN
+>] <TT
+CLASS="REPLACEABLE"
+><I
+>документ</I
+></TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>запрос</I
+></TT
+> <TT
+CLASS="TYPE"
+>tsquery</TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>параметры</I
+></TT
+> <TT
+CLASS="TYPE"
+>text</TT
+></SPAN
+>])
+  returns <TT
+CLASS="TYPE"
+>text</TT
+></PRE
+><P
+><CODE
+CLASS="FUNCTION"
+>ts_headline</CODE
+> принимает документ вместе с запросом и возвращает выдержку из документа, в которой выделяются слова из запроса. Применяемую для разбора документа конфигурацию можно указать в параметре <TT
+CLASS="REPLACEABLE"
+><I
+>config</I
+></TT
+>; если этот параметр опущен, применяется конфигурация <TT
+CLASS="VARNAME"
+>default_text_search_config</TT
+>.</P
+><P
+>Если в параметрах передаётся строка <TT
+CLASS="REPLACEABLE"
+><I
+>options</I
+></TT
+>, она должна состоять из списка разделённых запятыми пар <TT
+CLASS="REPLACEABLE"
+><I
+>параметр</I
+></TT
+><TT
+CLASS="LITERAL"
+>=</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+>. Параметры могут быть следующими: <P
+></P
+></P><UL
+COMPACT="COMPACT"
+><LI
+STYLE="list-style-type: disc"
+><P
+><TT
+CLASS="LITERAL"
+>StartSel</TT
+>, <TT
+CLASS="LITERAL"
+>StopSel</TT
+>: строки, которые будут разграничивать слова запроса в документе, выделяя их среди остальных. Если эти строки содержат пробелы или запятые, их нужно заключить в кавычки.</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+><TT
+CLASS="LITERAL"
+>MaxWords</TT
+>, <TT
+CLASS="LITERAL"
+>MinWords</TT
+>: эти числа определяет нижний и верхний предел размера выдержки.</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+><TT
+CLASS="LITERAL"
+>ShortWord</TT
+>: слова такой длины или короче в начале и конце выдержки будут отбрасываться. Значение по умолчанию, равное 3, исключает распространённые английские артикли.</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+><TT
+CLASS="LITERAL"
+>HighlightAll</TT
+>: логический флаг; если он равен <TT
+CLASS="LITERAL"
+>true</TT
+>, выдержкой будет весь документ и три предыдущие параметра игнорируются.</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+><TT
+CLASS="LITERAL"
+>MaxFragments</TT
+>: максимальное число выводимых текстовых выдержек или фрагментов. Значение по умолчанию, равное 0, выбирает метод создания выдержки без фрагментов. При значении большем 0 выбирается метод с фрагментами, когда находятся все фрагменты, содержащие как можно больше слов запроса, а затем они сжимаются до слов запроса. Такие фрагменты могут содержать какие-то ключевые слова в середине и ограничиваются двумя искомыми словами. При этом фрагменты могут содержать не больше <TT
+CLASS="LITERAL"
+>MaxWords</TT
+> слов, а в начале и конце они будут очищены от слов длины <TT
+CLASS="LITERAL"
+>ShortWord</TT
+> и меньше. Если в документе найдены не все слова запроса, выводится один фрагмент, включающий первые <TT
+CLASS="LITERAL"
+>MinWords</TT
+> слов в документе.</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+><TT
+CLASS="LITERAL"
+>FragmentDelimiter</TT
+>: Когда выводятся несколько фрагментов, они будут разделяться этой строкой.</P
+></LI
+></UL
+><P> Все явно не определённые параметры получают такие значения по умолчанию: </P><PRE
+CLASS="PROGRAMLISTING"
+>StartSel=&lt;b&gt;, StopSel=&lt;/b&gt;,
+MaxWords=35, MinWords=15, ShortWord=3, HighlightAll=FALSE,
+MaxFragments=0, FragmentDelimiter=" ... "</PRE
+><P></P
+><P
+>Пример использования: </P><PRE
+CLASS="SCREEN"
+>SELECT ts_headline('english',
+  'The most common type of search
+is to find all documents containing given query terms
+and return them in order of their similarity to the
+query.',
+  to_tsquery('query &amp; similarity'));
+                        ts_headline                         
+------------------------------------------------------------
+ containing given &lt;b&gt;query&lt;/b&gt; terms
+ and return them in order of their &lt;b&gt;similarity&lt;/b&gt; to the
+ &lt;b&gt;query&lt;/b&gt;.
+
+SELECT ts_headline('english',
+  'The most common type of search
+is to find all documents containing given query terms
+and return them in order of their similarity to the
+query.',
+  to_tsquery('query &amp; similarity'),
+  'StartSel = &lt;, StopSel = &gt;');
+                      ts_headline                      
+-------------------------------------------------------
+ containing given &lt;query&gt; terms
+ and return them in order of their &lt;similarity&gt; to the
+ &lt;query&gt;.</PRE
+><P></P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>ts_headline</CODE
+> работает с оригинальным документом, а не с его сжатым представлением <TT
+CLASS="TYPE"
+>tsvector</TT
+>, так что она может быть медленной и использовать её следует осмотрительно. Типичная ошибка &mdash; вызывать <CODE
+CLASS="FUNCTION"
+>ts_headline</CODE
+> для <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>всех</I
+></SPAN
+> подходящих документов, когда показываются только десять. Правильный подход можно реализовать, применив подзапросы <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>, например так: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT id, ts_headline(body, q), rank
+FROM (SELECT id, body, q, ts_rank_cd(ti, q) AS rank
+      FROM apod, to_tsquery('stars') q
+      WHERE ti @@ q
+      ORDER BY rank DESC
+      LIMIT 10) AS foo;</PRE
+><P></P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="textsearch-tables.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="textsearch-features.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Таблицы и индексы</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="textsearch.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Дополнительные возможности</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,602 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Расширяемость</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Индексы GIN"
+HREF="gin.html"><LINK
+REL="PREVIOUS"
+TITLE="Встроенные классы операторов"
+HREF="gin-builtin-opclasses.html"><LINK
+REL="NEXT"
+TITLE="Реализация"
+HREF="gin-implementation.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Встроенные классы операторов"
+HREF="gin-builtin-opclasses.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="gin.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 58. Индексы GIN</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Реализация"
+HREF="gin-implementation.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="GIN-EXTENSIBILITY"
+>58.3. Расширяемость</A
+></H1
+><P
+>Интерфейс <ACRONYM
+CLASS="ACRONYM"
+>GIN</ACRONYM
+> характеризуется высоким уровнем абстракции и таким образом требует от разработчика метода доступа реализовать только смысловое наполнение обрабатываемого типа данных. Уровень <ACRONYM
+CLASS="ACRONYM"
+>GIN</ACRONYM
+> берёт на себя заботу о параллельном доступе, поддержке журнала и поиске в структуре дерева.</P
+><P
+>Всё, что нужно, чтобы получить работающий метод доступа <ACRONYM
+CLASS="ACRONYM"
+>GIN</ACRONYM
+> — это реализовать несколько пользовательских методов, определяющих поведение ключей в дереве и отношения между ключами, индексируемыми объектами и поддерживаемыми запросами. Словом, <ACRONYM
+CLASS="ACRONYM"
+>GIN</ACRONYM
+> сочетает расширяемость с универсальностью, повторным использованием кода и аккуратным интерфейсом.</P
+><P
+>Класс операторов должен предоставить <ACRONYM
+CLASS="ACRONYM"
+>GIN</ACRONYM
+> следующие три метода: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><CODE
+CLASS="FUNCTION"
+>int compare(Datum a, Datum b)</CODE
+></DT
+><DD
+><P
+>Сравнивает два ключа (не индексированные объекты!) и возвращает целое меньше нуля, ноль или целое больше нуля, показывающее, что первый ключ меньше, равен или больше второго. Ключи NULL никогда не передаются этой функции.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>Datum *extractValue(Datum itemValue, int32 *nkeys, bool **nullFlags)</CODE
+></DT
+><DD
+><P
+>Возвращает массив ключей (выделенный через palloc) для индексируемого объекта. Число возвращаемых ключей должно записываться в <TT
+CLASS="LITERAL"
+>*nkeys</TT
+>. Если какой-либо из ключей может быть NULL, нужно так же выделить через palloc массив из <TT
+CLASS="LITERAL"
+>*nkeys</TT
+> полей <TT
+CLASS="TYPE"
+>bool</TT
+>, записать его адрес в <TT
+CLASS="LITERAL"
+>*nullFlags</TT
+> и установить эти флаги NULL как требуется. В <TT
+CLASS="LITERAL"
+>*nullFlags</TT
+> можно оставить значение <TT
+CLASS="SYMBOL"
+>NULL</TT
+> (это начальное значение), если все ключи отличны от NULL. Эта функция может возвратить <TT
+CLASS="SYMBOL"
+>NULL</TT
+>, если объект не содержит ключей.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>Datum *extractQuery(Datum query, int32 *nkeys, StrategyNumber n, bool **pmatch, Pointer **extra_data, bool **nullFlags, int32 *searchMode)</CODE
+></DT
+><DD
+><P
+>Возвращает массив ключей (выделенный через palloc) для запрашиваемого значения; то есть, в <TT
+CLASS="LITERAL"
+>query</TT
+> поступает значение, находящееся по правую сторону индексируемого оператора, по левую сторону которого указана индексируемая колонка. Аргумент <TT
+CLASS="LITERAL"
+>n</TT
+> задаёт номер стратегии оператора в классе операторов (см. <A
+HREF="xindex.html#XINDEX-STRATEGIES"
+>Подраздел 35.14.2</A
+>). Часто функция <CODE
+CLASS="FUNCTION"
+>extractQuery</CODE
+> должна проанализировать <TT
+CLASS="LITERAL"
+>n</TT
+>, чтобы определить тип данных аргумента <TT
+CLASS="LITERAL"
+>query</TT
+> и выбрать метод для извлечения значений ключей. Число возвращаемых ключей должно быть записано в <TT
+CLASS="LITERAL"
+>*nkeys</TT
+>. Если какие-либо ключи могут быть NULL, нужно так же выделить через palloc массив из <TT
+CLASS="LITERAL"
+>*nkeys</TT
+> полей <TT
+CLASS="TYPE"
+>bool</TT
+>, сохранить его адрес в <TT
+CLASS="LITERAL"
+>*nullFlags</TT
+>, и установить эти флаги NULL как требуется. В <TT
+CLASS="LITERAL"
+>*nullFlags</TT
+> можно оставить значение <TT
+CLASS="SYMBOL"
+>NULL</TT
+> (это начальное значение), если все ключи отличны от NULL. Эта функция может возвратить <TT
+CLASS="SYMBOL"
+>NULL</TT
+>, если <TT
+CLASS="LITERAL"
+>query</TT
+> не содержит ключей.</P
+><P
+>Выходной аргумент <TT
+CLASS="LITERAL"
+>searchMode</TT
+> позволяет функции <CODE
+CLASS="FUNCTION"
+>extractQuery</CODE
+> выбрать режим, в котором должен выполняться поиск. Если <TT
+CLASS="LITERAL"
+>*searchMode</TT
+> имеет значение <TT
+CLASS="LITERAL"
+>GIN_SEARCH_MODE_DEFAULT</TT
+> (это значение устанавливается перед вызовом), подходящими кандидатами считаются только те объекты, которые соответствуют минимум одному из возвращённых ключей. Если в <TT
+CLASS="LITERAL"
+>*searchMode</TT
+> установлено значение <TT
+CLASS="LITERAL"
+>GIN_SEARCH_MODE_INCLUDE_EMPTY</TT
+>, то в дополнение к объектам с минимум одним совпадением ключа, подходящими кандидатами будут считаться и объекты, вообще не содержащие ключей. (Этот режим полезен для реализации, например, операторов A-является-подмножеством-B.) Если в <TT
+CLASS="LITERAL"
+>*searchMode</TT
+> установлено значение <TT
+CLASS="LITERAL"
+>GIN_SEARCH_MODE_ALL</TT
+>, подходящими кандидатами считаются все отличные от NULL объекты в индексе, независимо от того, встречаются ли в них возвращаемые ключи. (Этот режим намного медленнее двух других, так как он по сути требует сканирования всего индекса, но он может быть необходим для корректной обработки крайних случаев. Оператор, который выбирает этот режим в большинстве ситуаций, скорее всего не подходит для реализации в классе операторов GIN.) Символы для этих значений режима определены в <TT
+CLASS="FILENAME"
+>access/gin.h</TT
+>.</P
+><P
+>Выходной аргумент <TT
+CLASS="LITERAL"
+>pmatch</TT
+> используется, когда поддерживается частичное соответствие. Чтобы использовать его, <CODE
+CLASS="FUNCTION"
+>extractQuery</CODE
+> должна выделить массив из <TT
+CLASS="LITERAL"
+>*nkeys</TT
+> булевских элементов и сохранить его адрес в <TT
+CLASS="LITERAL"
+>*pmatch</TT
+>. Элемент этого массива должен содержать TRUE, если соответствующий ключ требует частичного соответствия, и FALSE в противном случае. Если переменная <TT
+CLASS="LITERAL"
+>*pmatch</TT
+> содержит <TT
+CLASS="SYMBOL"
+>NULL</TT
+>, GIN полагает, что частичное соответствие не требуется. В эту переменную записывается <TT
+CLASS="SYMBOL"
+>NULL</TT
+> перед вызовом, так что этот аргумент можно просто игнорировать в классах операторов, не поддерживающих частичное соответствие.</P
+><P
+>Выходной аргумент <TT
+CLASS="LITERAL"
+>extra_data</TT
+> позволяет функции <CODE
+CLASS="FUNCTION"
+>extractQuery</CODE
+> передать дополнительные данные методам <CODE
+CLASS="FUNCTION"
+>consistent</CODE
+> и <CODE
+CLASS="FUNCTION"
+>comparePartial</CODE
+>. Чтобы использовать его, <CODE
+CLASS="FUNCTION"
+>extractQuery</CODE
+> должна выделить массив из <TT
+CLASS="LITERAL"
+>*nkeys</TT
+> указателей и сохранить его адрес в <TT
+CLASS="LITERAL"
+>*extra_data</TT
+>, а затем сохранить всё, что ей требуется, в отдельных указателях. В эту переменную записывается <TT
+CLASS="SYMBOL"
+>NULL</TT
+> перед вызовом, поэтому данный аргумент может просто игнорироваться классами операторов, которым не нужны дополнительные данные. Если массив <TT
+CLASS="LITERAL"
+>*extra_data</TT
+> задан, он целиком передаётся в метод <CODE
+CLASS="FUNCTION"
+>consistent</CODE
+>, а в <CODE
+CLASS="FUNCTION"
+>comparePartial</CODE
+> передаётся соответствующий его элемент.</P
+></DD
+></DL
+></DIV
+><P> Класс операторов должен также предоставить функцию для проверки, соответствует ли индексированный объект запросу. Поддерживаются две её вариации: булевская <CODE
+CLASS="FUNCTION"
+>consistent</CODE
+> и троичная <CODE
+CLASS="FUNCTION"
+>triConsistent</CODE
+>. Функция <CODE
+CLASS="FUNCTION"
+>triConsistent</CODE
+> покрывает функциональность обоих, так что достаточно реализовать только triConsistent. Однако, если вычисление булевской вариации оказывается значительно дешевле, может иметь смысл реализовать их обе. Если представлена только булевская вариация, некоторые оптимизации, построенные на отбраковывании объектов до выборки всех ключей, отключаются. <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><CODE
+CLASS="FUNCTION"
+>bool consistent(bool check[], StrategyNumber n, Datum query, int32 nkeys, Pointer extra_data[], bool *recheck, Datum queryKeys[], bool nullFlags[])</CODE
+></DT
+><DD
+><P
+>Возвращает TRUE, если индексированный объект удовлетворяет оператору запроса с номером стратегии <TT
+CLASS="LITERAL"
+>n</TT
+> (или потенциально удовлетворяет, когда возвращается указание перепроверки). Эта функция не имеет прямого доступа к значению индексированного объекта, так как <ACRONYM
+CLASS="ACRONYM"
+>GIN</ACRONYM
+> не хранит сами объекты. Вместо этого, она знает о значениях ключей, извлечённых из запроса и встречающихся в данном индексированном объекте. Массив <TT
+CLASS="LITERAL"
+>check</TT
+> имеет длину <TT
+CLASS="LITERAL"
+>nkeys</TT
+>, что равняется числу ключей, ранее возвращённых функцией <CODE
+CLASS="FUNCTION"
+>extractQuery</CODE
+> для данного значения <TT
+CLASS="LITERAL"
+>query</TT
+>. Элемент массива <TT
+CLASS="LITERAL"
+>check</TT
+> равняется TRUE, если индексированный объект содержит соответствующий ключ запроса; то есть, если (check[i] == TRUE), то i-ый ключ в массиве результата <CODE
+CLASS="FUNCTION"
+>extractQuery</CODE
+> присутствует в индексированном объекте. Исходное значение <TT
+CLASS="LITERAL"
+>query</TT
+> передаётся на случай, если оно потребуется методу <CODE
+CLASS="FUNCTION"
+>consistent</CODE
+>; с той же целью ему передаются массивы <TT
+CLASS="LITERAL"
+>queryKeys[]</TT
+> и <TT
+CLASS="LITERAL"
+>nullFlags[]</TT
+>, ранее возвращённые функцией <CODE
+CLASS="FUNCTION"
+>extractQuery</CODE
+>. В аргументе <TT
+CLASS="LITERAL"
+>extra_data</TT
+> передаётся массив дополнительных данных, возвращённый функцией <CODE
+CLASS="FUNCTION"
+>extractQuery</CODE
+>, или <TT
+CLASS="SYMBOL"
+>NULL</TT
+>, если дополнительных данных нет.</P
+><P
+>Когда <CODE
+CLASS="FUNCTION"
+>extractQuery</CODE
+> возвращает ключ NULL в <TT
+CLASS="LITERAL"
+>queryKeys[]</TT
+>, соответствующий элемент <TT
+CLASS="LITERAL"
+>check[]</TT
+> содержит TRUE, если индексированный объект содержит ключ NULL; то есть можно считать, что элементы <TT
+CLASS="LITERAL"
+>check[]</TT
+> отражают условие <TT
+CLASS="LITERAL"
+>IS NOT DISTINCT FROM</TT
+>. Функция <CODE
+CLASS="FUNCTION"
+>consistent</CODE
+> может проверить соответствующий элемент <TT
+CLASS="LITERAL"
+>nullFlags[]</TT
+>, если ей нужно различать соответствие с обычным значением и соответствие с NULL.</P
+><P
+>В случае успеха в <TT
+CLASS="LITERAL"
+>*recheck</TT
+> нужно записать TRUE, если кортеж данных нужно перепроверить с оператором запроса, либо FALSE, если проверка по индексу была точной. То есть результат FALSE гарантирует, что кортеж данных не соответствует запросу; результат TRUE со значением <TT
+CLASS="LITERAL"
+>*recheck</TT
+>, равным FALSE, гарантирует, что кортеж данных соответствует запросу; а результат TRUE со значением <TT
+CLASS="LITERAL"
+>*recheck</TT
+>, равным TRUE, означает, что кортеж данных может соответствовать запросу, поэтому его нужно выбрать и перепроверить, применив оператор запроса непосредственно к исходному индексированному элементу.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>GinTernaryValue triConsistent(GinTernaryValue check[], StrategyNumber n, Datum query, int32 nkeys, Pointer extra_data[], Datum queryKeys[], bool nullFlags[])</CODE
+></DT
+><DD
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>triConsistent</CODE
+> подобна <CODE
+CLASS="FUNCTION"
+>consistent</CODE
+>, но вместо булевского массива <TT
+CLASS="LITERAL"
+>check[]</TT
+>, ей передаются три варианта сравнений для каждого ключа: <TT
+CLASS="LITERAL"
+>GIN_TRUE</TT
+>, <TT
+CLASS="LITERAL"
+>GIN_FALSE</TT
+> и <TT
+CLASS="LITERAL"
+>GIN_MAYBE</TT
+>. <TT
+CLASS="LITERAL"
+>GIN_FALSE</TT
+> и <TT
+CLASS="LITERAL"
+>GIN_TRUE</TT
+> имеют обычное булевское значение. <TT
+CLASS="LITERAL"
+>GIN_MAYBE</TT
+> означает, что присутствие этого ключа неизвестно. Когда в <TT
+CLASS="LITERAL"
+>check[]</TT
+> есть элементы <TT
+CLASS="LITERAL"
+>GIN_MAYBE</TT
+>, эта функция должна возвращать GIN_TRUE, только если объект удовлетворяет запросу независимо от того, содержит ли индекс соответствующие ключи запроса. Подобным образом, функция должна возвращать GIN_FALSE, только если объект не удовлетворяет запросу независимо от того, содержит ли он ключи GIN_MAYBE. Если результат зависит от элементов GIN_MAYBE, то есть соответствие нельзя утверждать или отрицать в зависимости от известных ключей запроса, функция должна вернуть GIN_MAYBE.</P
+><P
+>Когда в массиве <TT
+CLASS="LITERAL"
+>check</TT
+> нет элементов GIN_MAYBE, возвращаемое значение <TT
+CLASS="LITERAL"
+>GIN_MAYBE</TT
+> равнозначно установленному флагу <TT
+CLASS="LITERAL"
+>recheck</TT
+> в булевской функции <CODE
+CLASS="FUNCTION"
+>consistent</CODE
+>.</P
+></DD
+></DL
+></DIV
+><P> Дополнительно класс операторов может предоставить <ACRONYM
+CLASS="ACRONYM"
+>GIN</ACRONYM
+> следующий метод: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><CODE
+CLASS="FUNCTION"
+>int comparePartial(Datum partial_key, Datum key, StrategyNumber n, Pointer extra_data)</CODE
+></DT
+><DD
+><P
+>Сравнивает ключ запроса с частичным соответствием с ключом индекса. Возвращает целое число, знак которого отражает результат сравнения: отрицательное число означает, что ключ индекса не соответствует запросу, но нужно продолжать сканирование индекса; ноль означает, что ключ индекса соответствует запросу; положительное число означает, что сканирование индекса нужно прекратить, так как других соответствий не будет. Функции передаётся номер стратегии <TT
+CLASS="LITERAL"
+>n</TT
+> оператора, сформировавшего запрос частичного соответствия, на случай, если нужно знать его смысл, чтобы определить, когда прекращать сканирование. Кроме того, ей передаётся <TT
+CLASS="LITERAL"
+>extra_data</TT
+> — соответствующий элемент массива дополнительных данных, сформированного функцией <CODE
+CLASS="FUNCTION"
+>extractQuery</CODE
+>, либо <TT
+CLASS="SYMBOL"
+>NULL</TT
+>, если дополнительных данных нет. Значения NULL этой функции никогда не передаются.</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>Для поддержки проверок на <SPAN
+CLASS="QUOTE"
+>"частичное соответствие"</SPAN
+> класс операторов должен предоставить метод <CODE
+CLASS="FUNCTION"
+>comparePartial</CODE
+>, а метод <CODE
+CLASS="FUNCTION"
+>extractQuery</CODE
+> должен устанавливать параметр <TT
+CLASS="LITERAL"
+>pmatch</TT
+>, когда встречается запрос на частичное соответствие. За подробностями обратитесь к <A
+HREF="gin-implementation.html#GIN-PARTIAL-MATCH"
+>Подразделу 58.4.2</A
+>.</P
+><P
+>Фактические типы данных различных значений <TT
+CLASS="LITERAL"
+>Datum</TT
+>, упоминаемых выше, зависят от класса операторов. Значения объектов, передаваемые в <CODE
+CLASS="FUNCTION"
+>extractValue</CODE
+>, всегда имеют входной тип класса операторов, а все значения ключей должны быть типа, заданного параметром <TT
+CLASS="LITERAL"
+>STORAGE</TT
+> для класса. Типом аргумента <TT
+CLASS="LITERAL"
+>query</TT
+>, передаваемого функциям <CODE
+CLASS="FUNCTION"
+>extractQuery</CODE
+>, <CODE
+CLASS="FUNCTION"
+>consistent</CODE
+> и <CODE
+CLASS="FUNCTION"
+>triConsistent</CODE
+> будет тот тип, что указан в качестве типа правого операнда оператора-члена класса, определяемого по номеру стратегии. Это не обязательно должен быть тип объекта, достаточно лишь, чтобы из него можно было извлечь значения ключей, имеющие нужный тип.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="gin-builtin-opclasses.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="gin-implementation.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Встроенные классы операторов</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="gin.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Реализация</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,262 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Путь запроса</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Обзор внутреннего устройства PostgreSQL"
+HREF="overview.html"><LINK
+REL="PREVIOUS"
+TITLE="Обзор внутреннего устройства PostgreSQL"
+HREF="overview.html"><LINK
+REL="NEXT"
+TITLE="Как устанавливаются соединения"
+HREF="connect-estab.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Обзор внутреннего устройства PostgreSQL"
+HREF="overview.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="overview.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 47. Обзор внутреннего устройства PostgreSQL</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Как устанавливаются соединения"
+HREF="connect-estab.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="QUERY-PATH"
+>47.1. Путь запроса</A
+></H1
+><P
+>Ниже мы кратко опишем этапы, которые проходит запрос для получения результата.</P
+><DIV
+CLASS="PROCEDURE"
+><OL
+TYPE="1"
+><LI
+CLASS="STEP"
+><P
+>Прикладная программа устанавливает подключение к серверу <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Эта программа передаёт запрос на сервер и ждёт от него результатов.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>На <I
+CLASS="FIRSTTERM"
+>этапе разбора запроса</I
+> сервер выполняет синтаксическую проверку запроса, переданного прикладной программой, и создаёт <I
+CLASS="FIRSTTERM"
+>дерево запроса</I
+>.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+><I
+CLASS="FIRSTTERM"
+>Система правил</I
+> принимает дерево запроса, созданное на стадии разбора, и ищет в <I
+CLASS="FIRSTTERM"
+>системных каталогах</I
+> <I
+CLASS="FIRSTTERM"
+>правила</I
+> для применения к этому дереву. Обнаружив подходящие правила, она выполняет преобразования, заданные в <I
+CLASS="FIRSTTERM"
+>теле правил</I
+>.</P
+><P
+>Одно из применений системы правил заключается в реализации <I
+CLASS="FIRSTTERM"
+>представлений</I
+>. Когда выполняется запрос к представлению (т. е. <I
+CLASS="FIRSTTERM"
+>виртуальной таблице</I
+>), система правил преобразует запрос пользователя в запрос, обращающийся не к представлению, а к <I
+CLASS="FIRSTTERM"
+>базовым таблицам</I
+> из <I
+CLASS="FIRSTTERM"
+>определения представления</I
+>.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+><I
+CLASS="FIRSTTERM"
+>Планировщик/оптимизатор</I
+> принимает дерево запроса (возможно, переписанное) и создаёт <I
+CLASS="FIRSTTERM"
+>план запроса</I
+>, который будет передан <I
+CLASS="FIRSTTERM"
+>исполнителю</I
+>.</P
+><P
+>Он выбирает план, сначала рассматривая все возможные варианты получения одного и того же результата. Например, если для обрабатываемого отношения создан индекс, прочитать отношение можно двумя способами. Во-первых, можно выполнить простое последовательное сканирование, а во-вторых, можно использовать индекс. Затем оценивается стоимость каждого варианта и выбирается самый дешёвый. Затем выбранный вариант разворачивается в полноценный план, который сможет использовать исполнитель.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Исполнитель рекурсивно проходит по <I
+CLASS="FIRSTTERM"
+>дереву плана</I
+> и получает строки тем способом, который указан в плане. Он сканирует отношения, обращаясь к <I
+CLASS="FIRSTTERM"
+>системе хранения</I
+>, выполняет <I
+CLASS="FIRSTTERM"
+>сортировку</I
+> и <I
+CLASS="FIRSTTERM"
+>соединения</I
+>, вычисляет <I
+CLASS="FIRSTTERM"
+>условия фильтра</I
+> и, наконец, возвращает полученные строки.</P
+></LI
+></OL
+></DIV
+><P
+>В следующих разделах мы более подробно рассмотрим каждый из этих этапов, чтобы дать представление о внутренних механизмах и структурах данных <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="overview.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="connect-estab.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Обзор внутреннего устройства PostgreSQL</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="overview.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Как устанавливаются соединения</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

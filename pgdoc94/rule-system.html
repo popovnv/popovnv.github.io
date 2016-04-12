@@ -1,0 +1,224 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Система правил PostgreSQL</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Обзор внутреннего устройства PostgreSQL"
+HREF="overview.html"><LINK
+REL="PREVIOUS"
+TITLE="Этап разбора"
+HREF="parser-stage.html"><LINK
+REL="NEXT"
+TITLE="Планировщик/оптимизатор"
+HREF="planner-optimizer.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Этап разбора"
+HREF="parser-stage.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="overview.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 47. Обзор внутреннего устройства PostgreSQL</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Планировщик/оптимизатор"
+HREF="planner-optimizer.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="RULE-SYSTEM"
+>47.4. Система правил <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></A
+></H1
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> поддерживает мощную <I
+CLASS="FIRSTTERM"
+>систему правил</I
+> для создания <I
+CLASS="FIRSTTERM"
+>представлений</I
+> и возможности <I
+CLASS="FIRSTTERM"
+>изменения представлений</I
+>. Система правил <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> претерпела две реализации: <P
+></P
+></P><UL
+><LI
+><P
+>Первый вариант производил обработку на <I
+CLASS="FIRSTTERM"
+>уровне строк</I
+> и был внедрён глубоко в <I
+CLASS="FIRSTTERM"
+>исполнителе</I
+>. Этот обработчик правил вызывался при обращении к каждой отдельной строке. Эта реализация была ликвидирована в 1995 г., когда последний официальный выпуск <SPAN
+CLASS="PRODUCTNAME"
+>Berkeley Postgres</SPAN
+> превратился в <SPAN
+CLASS="PRODUCTNAME"
+>Postgres95</SPAN
+>.</P
+></LI
+><LI
+><P
+>Во втором воплощении системы правил применили так называемое <I
+CLASS="FIRSTTERM"
+>переписывание запроса</I
+>. <I
+CLASS="FIRSTTERM"
+>Система переписывания</I
+> реализована в механизме, внедрённом между <I
+CLASS="FIRSTTERM"
+>анализатором</I
+> и <I
+CLASS="FIRSTTERM"
+>планировщиком/оптимизатором</I
+>. Этот механизм работает и сегодня.</P
+></LI
+></UL
+><P></P
+><P
+>Механизм переписывания запросов подробно обсуждается в <A
+HREF="rules.html"
+>Главе 38</A
+>, так что здесь мы его не рассматриваем. Мы только отметим, что и на входе, и на выходе у него деревья запросов, то есть представление или уровень семантической детализации он не меняет. Переписывание запроса можно считать формой расширения макросов.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="parser-stage.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="planner-optimizer.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Этап разбора</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="overview.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Планировщик/оптимизатор</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

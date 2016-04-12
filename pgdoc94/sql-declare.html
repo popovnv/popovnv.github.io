@@ -1,0 +1,678 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>DECLARE</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="DEALLOCATE"
+HREF="sql-deallocate.html"><LINK
+REL="NEXT"
+TITLE="DELETE"
+HREF="sql-delete.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="DEALLOCATE"
+HREF="sql-deallocate.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="DELETE"
+HREF="sql-delete.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-DECLARE"
+></A
+>DECLARE</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN78110"
+></A
+><H2
+>Название</H2
+>DECLARE&nbsp;--&nbsp;определить курсор</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN78113"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>DECLARE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> [ BINARY ] [ INSENSITIVE ] [ [ NO ] SCROLL ]
+    CURSOR [ { WITH | WITHOUT } HOLD ] FOR <TT
+CLASS="REPLACEABLE"
+><I
+>запрос</I
+></TT
+></PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN78117"
+></A
+><H2
+>Описание</H2
+><P
+>Оператор <TT
+CLASS="COMMAND"
+>DECLARE</TT
+> позволяет пользователю создавать курсоры, с помощью которых можно выбирать по очереди некоторое количество строк из результата большого запроса. Когда курсор создан, через него можно получать строки, применяя команду <A
+HREF="sql-fetch.html"
+>FETCH</A
+>.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>На этой странице описывается применение курсоров на уровне команд SQL. Если вы попытаетесь использовать курсоры внутри функции <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+>, правила будут другими &mdash; см. <A
+HREF="plpgsql-cursors.html"
+>Раздел 40.7</A
+>.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN78126"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></DT
+><DD
+><P
+>Имя создаваемого курсора.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>BINARY</TT
+></DT
+><DD
+><P
+>Курсор с таким свойством возвращает данные в двоичном, а не текстовом формате.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>INSENSITIVE</TT
+></DT
+><DD
+><P
+>Указывает, что данные, считываемые из курсора, не должны зависеть от изменений, которые могут происходить в нижележащих таблицах после создания курсора. В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> это поведение подразумевается по умолчанию, так что это ключевое слово ни на что не влияет и принимается только для совместимости со стандартом SQL.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>SCROLL</TT
+><BR><TT
+CLASS="LITERAL"
+>NO SCROLL</TT
+></DT
+><DD
+><P
+>Указание <TT
+CLASS="LITERAL"
+>SCROLL</TT
+> определяет, что курсор может прокручивать набор данных и получать строки непоследовательно (например, в обратном порядке). В зависимости от сложности плана запроса указание <TT
+CLASS="LITERAL"
+>SCROLL</TT
+> может отрицательно отразиться на скорости выполнения запроса. Указание <TT
+CLASS="LITERAL"
+>NO SCROLL</TT
+>, напротив, определяет, что через курсор нельзя будет получать строки в произвольном порядке. По умолчанию прокрутка в некоторых случаях разрешается; но это не равнозначно эффекту указания <TT
+CLASS="LITERAL"
+>SCROLL</TT
+>. За подробностями обратитесь к <A
+HREF="sql-declare.html#SQL-DECLARE-NOTES"
+><I
+>Замечания</I
+></A
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>WITH HOLD</TT
+><BR><TT
+CLASS="LITERAL"
+>WITHOUT HOLD</TT
+></DT
+><DD
+><P
+>Указание <TT
+CLASS="LITERAL"
+>WITH HOLD</TT
+> определяет, что курсор можно продолжать использовать после успешной фиксации создавшей его транзакции. <TT
+CLASS="LITERAL"
+>WITHOUT HOLD</TT
+> определяет, что курсор нельзя будет использовать за рамками транзакции, создавшей его. Если не указано ни <TT
+CLASS="LITERAL"
+>WITHOUT HOLD</TT
+>, ни <TT
+CLASS="LITERAL"
+>WITH HOLD</TT
+>, по умолчанию подразумевается <TT
+CLASS="LITERAL"
+>WITHOUT HOLD</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>запрос</I
+></TT
+></DT
+><DD
+><P
+>Команда <A
+HREF="sql-select.html"
+>SELECT</A
+> или <A
+HREF="sql-values.html"
+>VALUES</A
+>, выдающая строки, которые будут получены через курсор.</P
+></DD
+></DL
+></DIV
+><P
+>Ключевые слова <TT
+CLASS="LITERAL"
+>BINARY</TT
+>, <TT
+CLASS="LITERAL"
+>INSENSITIVE</TT
+> и <TT
+CLASS="LITERAL"
+>SCROLL</TT
+> могут указываться в любом порядке.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="SQL-DECLARE-NOTES"
+></A
+><H2
+>Замечания</H2
+><P
+>Обычный курсор выдаёт данные в текстовом виде, в каком их выдаёт <TT
+CLASS="COMMAND"
+>SELECT</TT
+>. Однако с указанием <TT
+CLASS="LITERAL"
+>BINARY</TT
+> курсор может выдавать их и в двоичном формате. Это упрощает операции преобразования данных для сервера и клиента, за счёт дополнительных усилий, требующихся от программиста для работы с платформозависимыми двоичными форматами. Например, если запрос получает значение 1 из целочисленной колонки, обычный курсор выдаст строку, содержащую <TT
+CLASS="LITERAL"
+>1</TT
+>, тогда как через двоичный курсор будет получено четырёхбайтовое поле, содержащее внутреннее представление значения (с сетевым порядком байтов).</P
+><P
+>Двоичные курсоры должны применяться с осмотрительностью. Многие приложения, в том числе <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>, не приспособлены к работе с двоичными курсорами и ожидают, что данные будут поступать в текстовом формате.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Когда клиентское приложение выполняет команду <TT
+CLASS="COMMAND"
+>FETCH</TT
+>, используя протокол <SPAN
+CLASS="QUOTE"
+>"расширенных запросов"</SPAN
+>, в сообщении Bind этого протокола указывается, в каком формате, текстовом или двоичном, должны быть получены данные. Это указание переопределяет свойство курсора, заданное в его объявлении. Таким образом, концепция курсора, объявляемого двоичным, становится устаревшей при использовании протокола расширенных запросов &mdash; любой курсор может быть прочитан как текстовый или двоичный.</P
+></BLOCKQUOTE
+></DIV
+><P
+>Если в команде объявления курсора не указано <TT
+CLASS="LITERAL"
+>WITH HOLD</TT
+>, созданный ей курсор может использоваться только в текущей транзакции. Таким образом, оператор <TT
+CLASS="COMMAND"
+>DECLARE</TT
+> без <TT
+CLASS="LITERAL"
+>WITH HOLD</TT
+> бесполезен вне блока транзакции: курсор будет существовать только до завершения этого оператора. Поэтому <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> сообщает об ошибке, если такая команда выполняется вне блока транзакции. Чтобы определить блок транзакции, примените команды <A
+HREF="sql-begin.html"
+>BEGIN</A
+> и <A
+HREF="sql-commit.html"
+>COMMIT</A
+> (или <A
+HREF="sql-rollback.html"
+>ROLLBACK</A
+>).</P
+><P
+>Если в объявлении курсора указано <TT
+CLASS="LITERAL"
+>WITH HOLD</TT
+> и транзакция, создавшая курсор, успешно фиксируется, к этому курсору могут продолжать обращаться последующие транзакции в этом сеансе. (Но если создавшая курсор транзакция прерывается, курсор уничтожается.) Курсор со свойством <TT
+CLASS="LITERAL"
+>WITH HOLD</TT
+> (удерживаемый) может быть закрыт явно, командой <TT
+CLASS="COMMAND"
+>CLOSE</TT
+>, либо неявно, по завершении сеанса. В текущей реализации строки, представляемые удерживаемым курсором, копируются во временный файл или в область памяти, так что они остаются доступными для следующих транзакций.</P
+><P
+>Объявить курсор со свойством <TT
+CLASS="LITERAL"
+>WITH HOLD</TT
+> можно, только если запрос не содержит указаний <TT
+CLASS="LITERAL"
+>FOR UPDATE</TT
+> и <TT
+CLASS="LITERAL"
+>FOR SHARE</TT
+>.</P
+><P
+>Указание <TT
+CLASS="LITERAL"
+>SCROLL</TT
+> добавляется при определении курсора, который будет выбирать данные в обратном порядке. Это поведение требуется стандартом SQL. Однако для совместимости с предыдущими версиями, <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> допускает выборку в обратном направлении и без указания <TT
+CLASS="LITERAL"
+>SCROLL</TT
+>, если план запроса курсора достаточно прост, чтобы реализовать прокрутку назад без дополнительных операций. Тем не менее, разработчикам приложений не следует рассчитывать на то, что курсор, созданный без указания <TT
+CLASS="LITERAL"
+>SCROLL</TT
+>, можно будет прокручивать назад. С указанием <TT
+CLASS="LITERAL"
+>NO SCROLL</TT
+> прокрутка назад запрещается в любом случае.</P
+><P
+>Выборка в обратном направлении также запрещается, если запрос содержит указания <TT
+CLASS="LITERAL"
+>FOR UPDATE</TT
+> и <TT
+CLASS="LITERAL"
+>FOR SHARE</TT
+>; в этом случае указание <TT
+CLASS="LITERAL"
+>SCROLL</TT
+> не принимается.</P
+><DIV
+CLASS="CAUTION"
+><P
+></P
+><TABLE
+CLASS="CAUTION"
+BORDER="1"
+WIDTH="100%"
+><TR
+><TD
+ALIGN="CENTER"
+><B
+>Предостережение</B
+></TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+><P
+>Прокручиваемые и удерживаемые (<TT
+CLASS="LITERAL"
+>WITH HOLD</TT
+>) курсоры могут выдавать неожиданные результаты, если они вызывают изменчивые функции (см. <A
+HREF="xfunc-volatility.html"
+>Раздел 35.6</A
+>). Когда повторно выбирается ранее прочитанная строка, функции могут вызываться снова и выдавать результаты, отличные от полученных в первый раз. Один из способов обойти эту проблему — объявить курсор с указанием <TT
+CLASS="LITERAL"
+>WITH HOLD</TT
+> и зафиксировать транзакцию, прежде чем читать из него какие-либо строки. В этом случае весь набор данных курсора будет материализован во временном хранилище, так что изменчивые функции будут выполнены для каждой строки лишь единожды.</P
+></TD
+></TR
+></TABLE
+></DIV
+><P
+>Если запрос в определении курсора включает указания <TT
+CLASS="LITERAL"
+>FOR UPDATE</TT
+> или <TT
+CLASS="LITERAL"
+>FOR SHARE</TT
+>, возвращаемые курсором строки блокируются в момент первой выборки, так же, как это происходит при выполнении <A
+HREF="sql-select.html"
+>SELECT</A
+> с этими указаниями. Кроме того, при чтении строк будут возвращаться их наиболее актуальные версии; таким образом, с этими указаниями курсор будет вести себя как <SPAN
+CLASS="QUOTE"
+>"чувствительный курсор"</SPAN
+>, определённый в стандарте SQL. (Указать <TT
+CLASS="LITERAL"
+>INSENSITIVE</TT
+> для курсора с запросом <TT
+CLASS="LITERAL"
+>FOR UPDATE</TT
+> или <TT
+CLASS="LITERAL"
+>FOR SHARE</TT
+> нельзя.)</P
+><DIV
+CLASS="CAUTION"
+><P
+></P
+><TABLE
+CLASS="CAUTION"
+BORDER="1"
+WIDTH="100%"
+><TR
+><TD
+ALIGN="CENTER"
+><B
+>Предостережение</B
+></TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+><P
+>Обычно рекомендуется использовать <TT
+CLASS="LITERAL"
+>FOR UPDATE</TT
+>, если курсор предназначается для применения в командах <TT
+CLASS="COMMAND"
+>UPDATE ... WHERE CURRENT OF</TT
+> и <TT
+CLASS="COMMAND"
+>DELETE ... WHERE CURRENT OF</TT
+>. Указание <TT
+CLASS="LITERAL"
+>FOR UPDATE</TT
+> предотвращает изменение строк другими сеансами после того, как они были считаны, и до того, как выполнится команда. Без <TT
+CLASS="LITERAL"
+>FOR UPDATE</TT
+> последующая команда с <TT
+CLASS="LITERAL"
+>WHERE CURRENT OF</TT
+> не сработает, если строка будет изменена после создания курсора.</P
+><P
+>Ещё одна причина использовать указание <TT
+CLASS="LITERAL"
+>FOR UPDATE</TT
+> в том, что без него последующие команды с <TT
+CLASS="LITERAL"
+>WHERE CURRENT OF</TT
+> могут выдать ошибку, если запрос курсора не удовлетворяет оговоренному в стандарте SQL критерию <SPAN
+CLASS="QUOTE"
+>"простой изменяемости"</SPAN
+> (в частности, курсор должен ссылаться только на одну таблицу и не должен использовать группировку и сортировку (<TT
+CLASS="LITERAL"
+>ORDER BY</TT
+>)). Курсоры, не удовлетворяющие этому критерию, могут работать, либо не работать, в зависимости от конкретного выбранного плана; так что в худшем случае приложение может работать в тестовой, но сломается в производственной среде.</P
+><P
+>Не использовать же <TT
+CLASS="LITERAL"
+>FOR UPDATE</TT
+> для команд с <TT
+CLASS="LITERAL"
+>WHERE CURRENT OF</TT
+> в основном имеет смысл, только если требуется получить прокручиваемый курсор или курсор, не отражающий последующие изменения (то есть, продолжающий показывать прежние данные). Если это действительно необходимо, обязательно учтите при реализации приведённые выше замечания.</P
+></TD
+></TR
+></TABLE
+></DIV
+><P
+>В стандарте SQL механизм курсоров предусмотрен только для встраиваемого <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>. Сервер <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> не реализует для курсоров оператор <TT
+CLASS="COMMAND"
+>OPEN</TT
+>; курсор считается открытым при объявлении. Однако <SPAN
+CLASS="APPLICATION"
+>ECPG</SPAN
+>, встраиваемый препроцессор SQL для <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, следует соглашениям стандарта, в том числе поддерживая для курсоров операторы <TT
+CLASS="COMMAND"
+>DECLARE</TT
+> и <TT
+CLASS="COMMAND"
+>OPEN</TT
+>.</P
+><P
+>Получить список всех доступных курсоров можно, обратившись к системному представлению <A
+HREF="view-pg-cursors.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_cursors</TT
+></A
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN78258"
+></A
+><H2
+>Примеры</H2
+><P
+>Объявление курсора: </P><PRE
+CLASS="PROGRAMLISTING"
+>DECLARE liahona CURSOR FOR SELECT * FROM films;</PRE
+><P> Другие примеры использования курсора можно найти в <A
+HREF="sql-fetch.html"
+>FETCH</A
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN78263"
+></A
+><H2
+>Совместимость</H2
+><P
+>В стандарте SQL говорится, что чувствительность курсоров к параллельному обновлению нижележащих данных по умолчанию определяется реализацией. В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> курсоры по умолчанию нечувствительные, а чувствительными их можно сделать с помощью указания <TT
+CLASS="LITERAL"
+>FOR UPDATE</TT
+>. Другие СУБД могут работать иначе.</P
+><P
+>Стандарт SQL допускает курсоры только во встраиваемом <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> и в модулях. <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> позволяет использовать курсоры интерактивно.</P
+><P
+>Двоичные курсоры являются расширением <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN78273"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-close.html"
+>CLOSE</A
+>, <A
+HREF="sql-fetch.html"
+>FETCH</A
+>, <A
+HREF="sql-move.html"
+>MOVE</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-deallocate.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-delete.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>DEALLOCATE</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>DELETE</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

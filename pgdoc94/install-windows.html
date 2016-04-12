@@ -1,0 +1,335 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Установка из исходного кода в Windows</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Администрирование сервера"
+HREF="admin.html"><LINK
+REL="PREVIOUS"
+TITLE="Замечания по отдельным платформам"
+HREF="installation-platform-notes.html"><LINK
+REL="NEXT"
+TITLE="Сборка с помощью Visual C++ или Microsoft Windows SDK"
+HREF="install-windows-full.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="CHAPTER"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Замечания по отдельным платформам"
+HREF="installation-platform-notes.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="admin.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Сборка с помощью Visual C++ или Microsoft Windows SDK"
+HREF="install-windows-full.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="INSTALL-WINDOWS"
+></A
+>Глава 16. Установка из исходного кода в <SPAN
+CLASS="PRODUCTNAME"
+>Windows</SPAN
+></H1
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Содержание</B
+></DT
+><DT
+>16.1. <A
+HREF="install-windows-full.html"
+>Сборка с помощью <SPAN
+CLASS="PRODUCTNAME"
+>Visual C++</SPAN
+> или <SPAN
+CLASS="PRODUCTNAME"
+>Microsoft Windows SDK</SPAN
+></A
+></DT
+><DD
+><DL
+><DT
+>16.1.1. <A
+HREF="install-windows-full.html#AEN27845"
+>Требования</A
+></DT
+><DT
+>16.1.2. <A
+HREF="install-windows-full.html#AEN27964"
+>Специальные замечания для 64-битной Windows</A
+></DT
+><DT
+>16.1.3. <A
+HREF="install-windows-full.html#AEN27972"
+>Сборка</A
+></DT
+><DT
+>16.1.4. <A
+HREF="install-windows-full.html#AEN27988"
+>Очистка и установка</A
+></DT
+><DT
+>16.1.5. <A
+HREF="install-windows-full.html#AEN28002"
+>Запуск регрессионных тестов</A
+></DT
+><DT
+>16.1.6. <A
+HREF="install-windows-full.html#AEN28018"
+>Сборка документации</A
+></DT
+></DL
+></DD
+><DT
+>16.2. <A
+HREF="install-windows-libpq.html"
+>Сборка <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> с помощью <SPAN
+CLASS="PRODUCTNAME"
+>Visual C++</SPAN
+> или <SPAN
+CLASS="PRODUCTNAME"
+>Borland C++</SPAN
+></A
+></DT
+></DL
+></DIV
+><P
+>Для большинства пользователей рекомендуется просто загрузить дистрибутив для Windows с сайта <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Компиляция из исходного кода описана только для разработчиков сервера <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> или его расширений.</P
+><P
+>Существует несколько различных способов сборки PostgreSQL для <SPAN
+CLASS="PRODUCTNAME"
+>Windows</SPAN
+>. Самый простой способ сборки с применением инструментов Microsoft — установить <SPAN
+CLASS="PRODUCTNAME"
+>Visual Studio Express 2013 для Windows Desktop</SPAN
+> и использовать входящий в её состав компилятор. Также возможна сборка с помощью полной версии <SPAN
+CLASS="PRODUCTNAME"
+>Microsoft Visual C++ 2005-2013</SPAN
+>. В некоторых случаях помимо компилятора требуется установить <SPAN
+CLASS="PRODUCTNAME"
+>Windows SDK</SPAN
+>.</P
+><P
+>Также возможно собрать PostgreSQL с помощью средств компиляции GNU, используя среду <SPAN
+CLASS="PRODUCTNAME"
+>MinGW</SPAN
+>, либо с помощью <SPAN
+CLASS="PRODUCTNAME"
+>Cygwin</SPAN
+> для более старых версий <SPAN
+CLASS="PRODUCTNAME"
+>Windows</SPAN
+>.</P
+><P
+>Наконец, клиентскую библиотеку (<SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>) можно собрать с помощью <SPAN
+CLASS="PRODUCTNAME"
+>Visual C++ 7.1</SPAN
+> или <SPAN
+CLASS="PRODUCTNAME"
+>Borland C++</SPAN
+> для совместимости со статически компилируемыми приложениями, создаваемыми этими средствами разработки.</P
+><P
+>При компиляции с помощью <SPAN
+CLASS="PRODUCTNAME"
+>MinGW</SPAN
+> или <SPAN
+CLASS="PRODUCTNAME"
+>Cygwin</SPAN
+> сборка производится как обычно, см. <A
+HREF="installation.html"
+>Главу 15</A
+> и дополнительные замечания в <A
+HREF="installation-platform-notes.html#INSTALLATION-NOTES-MINGW"
+>Подразделе 15.7.4</A
+> и <A
+HREF="installation-platform-notes.html#INSTALLATION-NOTES-CYGWIN"
+>Подразделе 15.7.2</A
+>. Чтобы получить в этих окружениях &laquo;родные&raquo; 64-битные двоичные файлы, используйте инструменты из <SPAN
+CLASS="PRODUCTNAME"
+>MinGW-w64</SPAN
+>. Данные инструменты также могут быть использованы для кросс-компиляции для 32- и 64-битной <SPAN
+CLASS="PRODUCTNAME"
+>Windows</SPAN
+> в других системах, например в <SPAN
+CLASS="PRODUCTNAME"
+>Linux</SPAN
+> и <SPAN
+CLASS="PRODUCTNAME"
+>Darwin</SPAN
+>. <SPAN
+CLASS="PRODUCTNAME"
+>Cygwin</SPAN
+> не рекомендуется применять в производственной среде, его следует использовать только для запуска в старых версиях <SPAN
+CLASS="PRODUCTNAME"
+>Windows</SPAN
+>, где &laquo;родная&raquo; сборка невозможна, таких как <SPAN
+CLASS="PRODUCTNAME"
+>Windows 98</SPAN
+>. Официальные двоичные файлы собираются с использованием <SPAN
+CLASS="PRODUCTNAME"
+>Visual Studio</SPAN
+>.</P
+><P
+>&laquo;Родные&raquo; сборки <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> не поддерживают редактирование командной строки. Однако сборка в <SPAN
+CLASS="PRODUCTNAME"
+>Cygwin</SPAN
+> это поддерживает, так что следует выбрать её, когда необходимо интерактивно использовать psql в <SPAN
+CLASS="PRODUCTNAME"
+>Windows</SPAN
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="installation-platform-notes.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="install-windows-full.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Замечания по отдельным платформам</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="admin.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Сборка с помощью <SPAN
+CLASS="PRODUCTNAME"
+>Visual C++</SPAN
+> или <SPAN
+CLASS="PRODUCTNAME"
+>Microsoft Windows SDK</SPAN
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

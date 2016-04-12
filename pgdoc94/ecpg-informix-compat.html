@@ -1,0 +1,2253 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Режим совместимости с Informix</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="ECPG — встраиваемый SQL в C"
+HREF="ecpg.html"><LINK
+REL="PREVIOUS"
+TITLE="WHENEVER"
+HREF="ecpg-sql-whenever.html"><LINK
+REL="NEXT"
+TITLE="Внутреннее устройство"
+HREF="ecpg-develop.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="WHENEVER"
+HREF="ecpg-sql-whenever.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ecpg.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 33. <SPAN
+CLASS="APPLICATION"
+>ECPG</SPAN
+> — встраиваемый <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> в C</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Внутреннее устройство"
+HREF="ecpg-develop.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="ECPG-INFORMIX-COMPAT"
+>33.15. Режим совместимости с <SPAN
+CLASS="PRODUCTNAME"
+>Informix</SPAN
+></A
+></H1
+><P
+>Препроцессор <TT
+CLASS="COMMAND"
+>ecpg</TT
+> может работать в так называемом <I
+CLASS="FIRSTTERM"
+>режиме совместимости с Informix</I
+>. Если этот режим включён, <TT
+CLASS="COMMAND"
+>ecpg</TT
+> старается работать как предкомпилятор <SPAN
+CLASS="PRODUCTNAME"
+>Informix</SPAN
+> для кода <SPAN
+CLASS="PRODUCTNAME"
+>Informix</SPAN
+> E/SQL. Вообще говоря, это позволяет записывать встраиваемые команды SQL, используя знак доллара вместо слов <TT
+CLASS="LITERAL"
+>EXEC SQL</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>$int j = 3;
+$CONNECT TO :dbname;
+$CREATE TABLE test(i INT PRIMARY KEY, j INT);
+$INSERT INTO test(i, j) VALUES (7, :j);
+$COMMIT;</PRE
+><P></P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Между <TT
+CLASS="LITERAL"
+>$</TT
+> и последующей директивой препроцессора (в частности, <TT
+CLASS="LITERAL"
+>include</TT
+>, <TT
+CLASS="LITERAL"
+>define</TT
+>, <TT
+CLASS="LITERAL"
+>ifdef</TT
+> и т. п.) не должно быть пробельных символов. В противном случае препроцессор воспримет следующее слово как имя переменной среды.</P
+></BLOCKQUOTE
+></DIV
+><P
+>Поддерживаются два режима совместимости: <TT
+CLASS="LITERAL"
+>INFORMIX</TT
+> и <TT
+CLASS="LITERAL"
+>INFORMIX_SE</TT
+></P
+><P
+>При компоновке программ, использующих этот режим совместимости, обязательно подключите библиотеку <TT
+CLASS="LITERAL"
+>libcompat</TT
+>, поставляемую с ECPG.</P
+><P
+>Помимо ранее упомянутого синтаксического сахара, режим совместимости с <SPAN
+CLASS="PRODUCTNAME"
+>Informix</SPAN
+> приносит из E/SQL в ECPG набор функций для ввода, вывода и преобразования данных, а также встраиваемые операторы SQL.</P
+><P
+>Режим совместимости с <SPAN
+CLASS="PRODUCTNAME"
+>Informix</SPAN
+> тесно связан с библиотекой pgtypeslib из ECPG. Библиотека pgtypeslib сопоставляет типы данных SQL с типами данных в ведущей программе на C, а большинство дополнительных функций режима совместимости с <SPAN
+CLASS="PRODUCTNAME"
+>Informix</SPAN
+> позволяют работать с этими типами C. Заметьте, однако, что степень совместимости ограничена. ECPG не пытается копировать поведение <SPAN
+CLASS="PRODUCTNAME"
+>Informix</SPAN
+>; вы можете выполнять примерно те же операции и пользоваться функции с теми же именами и с тем же поведением, но если вы используете <SPAN
+CLASS="PRODUCTNAME"
+>Informix</SPAN
+>, просто заменить одно средство другим на данный момент нельзя. Более того, есть различия и в типах данных. В частности, типы даты и интервала в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> не воспринимают диапазоны, как например, <TT
+CLASS="LITERAL"
+>YEAR TO MINUTE</TT
+>, так что и в ECPG это не будет поддерживаться.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="ECPG-INFORMIX-TYPES"
+>33.15.1. Дополнительные типы</A
+></H2
+><P
+>Теперь в режиме Informix без указания <TT
+CLASS="LITERAL"
+>typedef</TT
+> поддерживается специальный псевдотип Informix "string" для хранения символьной строки, обрезаемой справа. На самом деле, в режиме Informix ECPG откажется обрабатывать исходные файлы, содержащие определение типа <TT
+CLASS="LITERAL"
+>typedef некоторый_тип string;</TT
+>
+</P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL BEGIN DECLARE SECTION;
+string userid; /* эта переменная будет содержать обрезанные данные */
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL FETCH MYCUR INTO :userid;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="ECPG-INFORMIX-STATEMENTS"
+>33.15.2. Дополнительные/недостающие операторы встраиваемого SQL</A
+></H2
+><P
+>    <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>CLOSE DATABASE</TT
+></DT
+><DD
+><P
+>Этот оператор закрывает текущее подключение. Фактически это синоним команды <TT
+CLASS="LITERAL"
+>DISCONNECT CURRENT</TT
+> в ECPG: </P><PRE
+CLASS="PROGRAMLISTING"
+>$CLOSE DATABASE;                /* закрыть текущее подключение */
+EXEC SQL CLOSE DATABASE;</PRE
+><P></P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>FREE имя_курсора</TT
+></DT
+><DD
+><P
+>Из-за различий в подходах ECPG и ESQL/C Informix (т. е. другого разделения на чисто грамматические преобразования и вызовы нижележащей библиотеки времени выполнения), в ECPG нет оператора <TT
+CLASS="LITERAL"
+>FREE имя_курсора</TT
+>. Это связано с тем, что в ECPG команда <TT
+CLASS="LITERAL"
+>DECLARE CURSOR</TT
+> не сводится к вызову функции в библиотеке времени выполнения, которая бы принимала имя курсора. Это значит, что курсоры SQL в библиотеке ECPG не требуют обслуживания, оно требуется только на уровне сервера PostgreSQL.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>FREE имя_оператора</TT
+></DT
+><DD
+><P
+>Команда <TT
+CLASS="LITERAL"
+>FREE имя_оператора</TT
+> является синонимом команды <TT
+CLASS="LITERAL"
+>DEALLOCATE PREPARE имя_оператора</TT
+>.</P
+></DD
+></DL
+></DIV
+><P>
+   </P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="ECPG-INFORMIX-SQLDA"
+>33.15.3. Области дескрипторов SQLDA, совместимые с Informix</A
+></H2
+><P
+>Режим совместимости с Informix поддерживает структуру, отличную от описанной в <A
+HREF="ecpg-descriptors.html#ECPG-SQLDA-DESCRIPTORS"
+>Подразделе 33.7.2</A
+>. См. ниже: </P><PRE
+CLASS="PROGRAMLISTING"
+>struct sqlvar_compat
+{
+    short   sqltype;
+    int     sqllen;
+    char   *sqldata;
+    short  *sqlind;
+    char   *sqlname;
+    char   *sqlformat;
+    short   sqlitype;
+    short   sqlilen;
+    char   *sqlidata;
+    int     sqlxid;
+    char   *sqltypename;
+    short   sqltypelen;
+    short   sqlownerlen;
+    short   sqlsourcetype;
+    char   *sqlownername;
+    int     sqlsourceid;
+    char   *sqlilongdata;
+    int     sqlflags;
+    void   *sqlreserved;
+};
+
+struct sqlda_compat
+{
+    short  sqld;
+    struct sqlvar_compat *sqlvar;
+    char   desc_name[19];
+    short  desc_occ;
+    struct sqlda_compat *desc_next;
+    void  *reserved;
+};
+
+typedef struct sqlvar_compat    sqlvar_t;
+typedef struct sqlda_compat     sqlda_t;</PRE
+><P></P
+><P
+>Глобальные свойства: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>sqld</TT
+></DT
+><DD
+><P
+>Число полей в дескрипторе <TT
+CLASS="LITERAL"
+>SQLDA</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>sqlvar</TT
+></DT
+><DD
+><P
+>Указатель на свойства по полям.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>desc_name</TT
+></DT
+><DD
+><P
+>Не используется, заполняется нулями.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>desc_occ</TT
+></DT
+><DD
+><P
+>Размер структуры в памяти.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>desc_next</TT
+></DT
+><DD
+><P
+>Указатель на следующую структуру SQLDA, если набор результатов содержит больше одной записи.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>reserved</TT
+></DT
+><DD
+><P
+>Неиспользуемый указатель, содержит NULL. Сохраняется для совместимости с Informix.</P
+></DD
+></DL
+></DIV
+><P> Свойства, относящиеся к полям, описаны ниже, они хранятся в массиве <TT
+CLASS="LITERAL"
+>sqlvar</TT
+>: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>sqltype</TT
+></DT
+><DD
+><P
+>Тип поля. Соответствующие константы представлены в <TT
+CLASS="LITERAL"
+>sqltypes.h</TT
+></P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>sqllen</TT
+></DT
+><DD
+><P
+>Длина данных поля.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>sqldata</TT
+></DT
+><DD
+><P
+>Указатель на данные поля. Этот указатель имеет тип <TT
+CLASS="LITERAL"
+>char *</TT
+>, но он указывает на данные в двоичном формате. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>int intval;
+
+switch (sqldata-&gt;sqlvar[i].sqltype)
+{
+    case SQLINTEGER:
+        intval = *(int *)sqldata-&gt;sqlvar[i].sqldata;
+        break;
+  ...
+}</PRE
+><P></P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>sqlind</TT
+></DT
+><DD
+><P
+>Указатель на индикатор NULL. Если возвращается командами DESCRIBE или FETCH, это всегда действительный указатель. Если передаётся на вход команде <TT
+CLASS="LITERAL"
+>EXECUTE ... USING sqlda;</TT
+>, NULL вместо указателя означает, что значение этого поля отлично от NULL. Чтобы обозначить NULL в поле, необходимо корректно установить этот указатель и <TT
+CLASS="LITERAL"
+>sqlitype</TT
+>. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>if (*(int2 *)sqldata-&gt;sqlvar[i].sqlind != 0)
+    printf("value is NULL\n");</PRE
+><P></P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>sqlname</TT
+></DT
+><DD
+><P
+>Имя поля, в виде строки с завершающим 0.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>sqlformat</TT
+></DT
+><DD
+><P
+>Зарезервировано в Informix, значение <CODE
+CLASS="FUNCTION"
+>PQfformat()</CODE
+> для данного поля.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>sqlitype</TT
+></DT
+><DD
+><P
+>Тип данных индикатора NULL. При получении данных с сервера это всегда SQLSMINT. Когда <TT
+CLASS="LITERAL"
+>SQLDA</TT
+> используется в параметризованном запросе, данные индикатора обрабатываются в соответствии с указанным здесь типом.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>sqlilen</TT
+></DT
+><DD
+><P
+>Длина данных индикатора NULL.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>sqlxid</TT
+></DT
+><DD
+><P
+>Расширенный тип поля, результат функции <CODE
+CLASS="FUNCTION"
+>PQftype()</CODE
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>sqltypename</TT
+><BR><TT
+CLASS="LITERAL"
+>sqltypelen</TT
+><BR><TT
+CLASS="LITERAL"
+>sqlownerlen</TT
+><BR><TT
+CLASS="LITERAL"
+>sqlsourcetype</TT
+><BR><TT
+CLASS="LITERAL"
+>sqlownername</TT
+><BR><TT
+CLASS="LITERAL"
+>sqlsourceid</TT
+><BR><TT
+CLASS="LITERAL"
+>sqlflags</TT
+><BR><TT
+CLASS="LITERAL"
+>sqlreserved</TT
+></DT
+><DD
+><P
+>Не используются.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>sqlilongdata</TT
+></DT
+><DD
+><P
+>Совпадает с <TT
+CLASS="LITERAL"
+>sqldata</TT
+>, если <TT
+CLASS="LITERAL"
+>sqllen</TT
+> превышает 32 Кбайта.</P
+></DD
+></DL
+></DIV
+><P> Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL INCLUDE sqlda.h;
+
+    sqlda_t        *sqlda; /* Это объявление не обязательно должно быть внутри DECLARE SECTION */
+
+    EXEC SQL BEGIN DECLARE SECTION;
+    char *prep_stmt = "select * from table1";
+    int i;
+    EXEC SQL END DECLARE SECTION;
+
+    ...
+
+    EXEC SQL PREPARE mystmt FROM :prep_stmt;
+
+    EXEC SQL DESCRIBE mystmt INTO sqlda;
+
+    printf("# of fields: %d\n", sqlda-&gt;sqld);
+    for (i = 0; i &lt; sqlda-&gt;sqld; i++)
+      printf("field %d: \"%s\"\n", sqlda-&gt;sqlvar[i]-&gt;sqlname);
+
+    EXEC SQL DECLARE mycursor CURSOR FOR mystmt;
+    EXEC SQL OPEN mycursor;
+    EXEC SQL WHENEVER NOT FOUND GOTO out;
+
+    while (1)
+    {
+      EXEC SQL FETCH mycursor USING sqlda;
+    }
+
+    EXEC SQL CLOSE mycursor;
+
+    free(sqlda); /* Освобождать нужно только основную структуру,
+                  * sqlda и sqlda-&gt;sqlvar находятся в одной выделенной области. */</PRE
+><P> Дополнительную информацию можно найти в заголовочном файле <TT
+CLASS="LITERAL"
+>sqlda.h</TT
+> и в регрессионном тесте <TT
+CLASS="LITERAL"
+>src/interfaces/ecpg/test/compat_informix/sqlda.pgc</TT
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="ECPG-INFORMIX-FUNCTIONS"
+>33.15.4. Дополнительные функции</A
+></H2
+><P
+>    <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><CODE
+CLASS="FUNCTION"
+>decadd</CODE
+></DT
+><DD
+><P
+>Складывает два значения типа decimal. </P><PRE
+CLASS="SYNOPSIS"
+>int decadd(decimal *arg1, decimal *arg2, decimal *sum);</PRE
+><P> Эта функция получает указатель на первый операнд типа decimal (<TT
+CLASS="LITERAL"
+>arg1</TT
+>), указатель на второй операнд типа decimal (<TT
+CLASS="LITERAL"
+>arg2</TT
+>) и указатель на переменную типа decimal, в которую будет записана сумма (<TT
+CLASS="LITERAL"
+>sum</TT
+>). В случае успеха эта функция возвращает 0. <TT
+CLASS="SYMBOL"
+>ECPG_INFORMIX_NUM_OVERFLOW</TT
+> возвращается в случае переполнения, а <TT
+CLASS="SYMBOL"
+>ECPG_INFORMIX_NUM_UNDERFLOW</TT
+> в случае антипереполнения. При любых других ошибках возвращается -1, а в <TT
+CLASS="VARNAME"
+>errno</TT
+> устанавливается код <TT
+CLASS="VARNAME"
+>errno</TT
+> из pgtypeslib.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>deccmp</CODE
+></DT
+><DD
+><P
+>Сравнивает два значения типа decimal. </P><PRE
+CLASS="SYNOPSIS"
+>int deccmp(decimal *arg1, decimal *arg2);</PRE
+><P> Эта функция получает указатель на первое значение типа decimal (<TT
+CLASS="LITERAL"
+>arg1</TT
+>), указатель на второе значение типа decimal (<TT
+CLASS="LITERAL"
+>arg2</TT
+>) и возвращает целое, отражающее результат сравнения этих чисел. <P
+></P
+></P><UL
+><LI
+><P
+>1, если значение, на которое указывает <TT
+CLASS="LITERAL"
+>arg1</TT
+>, больше значения, на которое указывает <TT
+CLASS="LITERAL"
+>var2</TT
+></P
+></LI
+><LI
+><P
+>-1, если значение, на которое указывает <TT
+CLASS="LITERAL"
+>arg1</TT
+>, меньше значения, на которое указывает <TT
+CLASS="LITERAL"
+>arg2</TT
+></P
+></LI
+><LI
+><P
+>0, если значение, на которое указывает <TT
+CLASS="LITERAL"
+>arg1</TT
+>, равно значению, на которое указывает <TT
+CLASS="LITERAL"
+>arg2</TT
+></P
+></LI
+></UL
+><P></P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>deccopy</CODE
+></DT
+><DD
+><P
+>Копирует значение типа decimal. </P><PRE
+CLASS="SYNOPSIS"
+>void deccopy(decimal *src, decimal *target);</PRE
+><P> Функция принимает в первом аргументе (<TT
+CLASS="LITERAL"
+>src</TT
+>) указатель на значение decimal, которое должно быть скопировано, а во втором аргументе (<TT
+CLASS="LITERAL"
+>target</TT
+>) принимает указатель на структуру типа decimal для скопированного значения.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>deccvasc</CODE
+></DT
+><DD
+><P
+>Преобразует значение из представления ASCII в тип decimal. </P><PRE
+CLASS="SYNOPSIS"
+>int deccvasc(char *cp, int len, decimal *np);</PRE
+><P> Эта функция получает указатель на строку, содержащую строковое представление числа, которое нужно преобразовать, (<TT
+CLASS="LITERAL"
+>cp</TT
+>), а также его длину <TT
+CLASS="LITERAL"
+>len</TT
+>. В <TT
+CLASS="LITERAL"
+>np</TT
+> передаётся указатель на переменную типа decimal, в которую будет помещён результат преобразования.</P
+><P
+>Допустимыми являются, например следующие форматы: <TT
+CLASS="LITERAL"
+>-2</TT
+>, <TT
+CLASS="LITERAL"
+>.794</TT
+>, <TT
+CLASS="LITERAL"
+>+3.44</TT
+>, <TT
+CLASS="LITERAL"
+>592.49E07</TT
+> или <TT
+CLASS="LITERAL"
+>-32.84e-4</TT
+>.</P
+><P
+>В случае успеха эта функция возвращает 0. При переполнении или антипереполнении возвращается <TT
+CLASS="LITERAL"
+>ECPG_INFORMIX_NUM_OVERFLOW</TT
+> или <TT
+CLASS="LITERAL"
+>ECPG_INFORMIX_NUM_UNDERFLOW</TT
+>, соответственно. Если разобрать ASCII-представление не удаётся, возвращается <TT
+CLASS="LITERAL"
+>ECPG_INFORMIX_BAD_NUMERIC</TT
+> или <TT
+CLASS="LITERAL"
+>ECPG_INFORMIX_BAD_EXPONENT</TT
+>, если не удаётся разобрать компонент экспоненты.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>deccvdbl</CODE
+></DT
+><DD
+><P
+>Преобразует значение double в значение типа decimal. </P><PRE
+CLASS="SYNOPSIS"
+>int deccvdbl(double dbl, decimal *np);</PRE
+><P> Данная функция принимает в первом аргументе (<TT
+CLASS="LITERAL"
+>dbl</TT
+>) переменную типа double, которая должна быть преобразована. Во втором аргументе (<TT
+CLASS="LITERAL"
+>np</TT
+>) она принимает указатель на переменную decimal, в которую будет помещён результат операции.</P
+><P
+>Эта функция возвращает 0 в случае успеха, либо отрицательное значение, если выполнить преобразование не удалось.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>deccvint</CODE
+></DT
+><DD
+><P
+>Преобразует значение int в значение типа decimal. </P><PRE
+CLASS="SYNOPSIS"
+>int deccvint(int in, decimal *np);</PRE
+><P> Данная функция принимает в первом аргументе (<TT
+CLASS="LITERAL"
+>in</TT
+>) переменную типа int, которая должна быть преобразована. Во втором аргументе (<TT
+CLASS="LITERAL"
+>np</TT
+>) она принимает указатель на переменную decimal, в которую будет помещён результат операции.</P
+><P
+>Эта функция возвращает 0 в случае успеха, либо отрицательное значение, если выполнить преобразование не удалось.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>deccvlong</CODE
+></DT
+><DD
+><P
+>Преобразует значение long в значение типа decimal. </P><PRE
+CLASS="SYNOPSIS"
+>int deccvlong(long lng, decimal *np);</PRE
+><P> Данная функция принимает в первом аргументе (<TT
+CLASS="LITERAL"
+>lng</TT
+>) переменную типа long, которая должна быть преобразована. Во втором аргументе (<TT
+CLASS="LITERAL"
+>np</TT
+>) она принимает указатель на переменную decimal, в которую будет помещён результат операции.</P
+><P
+>Эта функция возвращает 0 в случае успеха, либо отрицательное значение, если выполнить преобразование не удалось.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>decdiv</CODE
+></DT
+><DD
+><P
+>Делит одну переменную типа decimal на другую. </P><PRE
+CLASS="SYNOPSIS"
+>int decdiv(decimal *n1, decimal *n2, decimal *result);</PRE
+><P> Эта функция получает указатели на переменные (<TT
+CLASS="LITERAL"
+>n1</TT
+> и <TT
+CLASS="LITERAL"
+>n2</TT
+>) и вычисляет частное <TT
+CLASS="LITERAL"
+>n1</TT
+>/<TT
+CLASS="LITERAL"
+>n2</TT
+>. В <TT
+CLASS="LITERAL"
+>result</TT
+> передаётся указатель на переменную, в которую будет помещён результат операции.</P
+><P
+>В случае успеха возвращается 0, а при ошибке — отрицательное значение. В случае переполнения или антипереполнения данная функция возвращает <TT
+CLASS="LITERAL"
+>ECPG_INFORMIX_NUM_OVERFLOW</TT
+> или <TT
+CLASS="LITERAL"
+>ECPG_INFORMIX_NUM_UNDERFLOW</TT
+>, соответственно. При попытке деления на ноль возвращается <TT
+CLASS="LITERAL"
+>ECPG_INFORMIX_DIVIDE_ZERO</TT
+>.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>decmul</CODE
+></DT
+><DD
+><P
+>Перемножает два значения типа decimal. </P><PRE
+CLASS="SYNOPSIS"
+>int decmul(decimal *n1, decimal *n2, decimal *result);</PRE
+><P> Эта функция получает указатели на переменные (<TT
+CLASS="LITERAL"
+>n1</TT
+> и <TT
+CLASS="LITERAL"
+>n2</TT
+>) и вычисляет произведение <TT
+CLASS="LITERAL"
+>n1</TT
+>*<TT
+CLASS="LITERAL"
+>n2</TT
+>. В <TT
+CLASS="LITERAL"
+>result</TT
+> передаётся указатель на переменную, в которую будет помещён результат операции.</P
+><P
+>В случае успеха возвращается 0, а при ошибке — отрицательное значение. В случае переполнения или антипереполнения данная функция возвращает <TT
+CLASS="LITERAL"
+>ECPG_INFORMIX_NUM_OVERFLOW</TT
+> или <TT
+CLASS="LITERAL"
+>ECPG_INFORMIX_NUM_UNDERFLOW</TT
+>, соответственно.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>decsub</CODE
+></DT
+><DD
+><P
+>Вычитает одно значение типа decimal из другого. </P><PRE
+CLASS="SYNOPSIS"
+>int decsub(decimal *n1, decimal *n2, decimal *result);</PRE
+><P> Эта функция получает указатели на переменные (<TT
+CLASS="LITERAL"
+>n1</TT
+> и <TT
+CLASS="LITERAL"
+>n2</TT
+>) и вычисляет разность <TT
+CLASS="LITERAL"
+>n1</TT
+>-<TT
+CLASS="LITERAL"
+>n2</TT
+>. В <TT
+CLASS="LITERAL"
+>result</TT
+> передаётся указатель на переменную, в которую будет помещён результат операции.</P
+><P
+>В случае успеха возвращается 0, а при ошибке — отрицательное значение. В случае переполнения или антипереполнения данная функция возвращает <TT
+CLASS="LITERAL"
+>ECPG_INFORMIX_NUM_OVERFLOW</TT
+> или <TT
+CLASS="LITERAL"
+>ECPG_INFORMIX_NUM_UNDERFLOW</TT
+>, соответственно.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>dectoasc</CODE
+></DT
+><DD
+><P
+>Преобразует переменную типа decimal в представление ASCII (в строку C char*). </P><PRE
+CLASS="SYNOPSIS"
+>int dectoasc(decimal *np, char *cp, int len, int right)</PRE
+><P> Эта функция получает указатель на переменную типа decimal (<TT
+CLASS="LITERAL"
+>np</TT
+>), которая будет преобразована в текстовое представление. Аргумент <TT
+CLASS="LITERAL"
+>cp</TT
+> указывает на буфер, в который будет помещён результат операции. Аргумент <TT
+CLASS="LITERAL"
+>right</TT
+> определяет, сколько должно выводиться цифр правее десятичной точки. Результат будет округлён до этого числа десятичных цифр. Значение <TT
+CLASS="LITERAL"
+>right</TT
+>, равное -1, указывает, что выводиться должны все имеющиеся десятичные цифры. Если длина выходного буфера, которую задаёт <TT
+CLASS="LITERAL"
+>len</TT
+>, недостаточна для помещения в него текстового представления, включая завершающий нулевой байт, в буфере сохраняется один знак <TT
+CLASS="LITERAL"
+>*</TT
+> и возвращается -1.</P
+><P
+>Эта функция возвращает -1, если буфер <TT
+CLASS="LITERAL"
+>cp</TT
+> слишком мал, либо <TT
+CLASS="LITERAL"
+>ECPG_INFORMIX_OUT_OF_MEMORY</TT
+> при нехватке памяти.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>dectodbl</CODE
+></DT
+><DD
+><P
+>Преобразует переменную типа decimal в тип double. </P><PRE
+CLASS="SYNOPSIS"
+>int dectodbl(decimal *np, double *dblp);</PRE
+><P> Эта функция получает указатель (<TT
+CLASS="LITERAL"
+>np</TT
+>) на значение decimal, которое нужно преобразовать, и указатель (<TT
+CLASS="LITERAL"
+>dblp</TT
+>) на переменную double, в которую будет помещён результат операции.</P
+><P
+>В случае успеха возвращается 0, или отрицательное значение, если выполнить преобразование не удалось.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>dectoint</CODE
+></DT
+><DD
+><P
+>Преобразует переменную типа decimal в тип integer. </P><PRE
+CLASS="SYNOPSIS"
+>int dectoint(decimal *np, int *ip);</PRE
+><P> Эта функция получает указатель (<TT
+CLASS="LITERAL"
+>np</TT
+>) на значение decimal, которое нужно преобразовать, и указатель (<TT
+CLASS="LITERAL"
+>ip</TT
+>) на целочисленную переменную, в которую будет помещён результат операции.</P
+><P
+>В случае успеха возвращается 0, или отрицательное значение, если выполнить преобразование не удалось. В случае переполнения возвращается <TT
+CLASS="LITERAL"
+>ECPG_INFORMIX_NUM_OVERFLOW</TT
+>.</P
+><P
+>Заметьте, что реализация ECPG отличается от реализации <SPAN
+CLASS="PRODUCTNAME"
+>Informix</SPAN
+>. В <SPAN
+CLASS="PRODUCTNAME"
+>Informix</SPAN
+> целое ограничивается диапазоном -32767 .. 32767, тогда как в ECPG ограничение зависит от архитектуры (<TT
+CLASS="LITERAL"
+>-INT_MAX .. INT_MAX</TT
+>).</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>dectolong</CODE
+></DT
+><DD
+><P
+>Преобразует переменную типа decimal в тип long. </P><PRE
+CLASS="SYNOPSIS"
+>int dectolong(decimal *np, long *lngp);</PRE
+><P> Эта функция получает указатель (<TT
+CLASS="LITERAL"
+>np</TT
+>) на значение decimal, которое нужно преобразовать, и указатель (<TT
+CLASS="LITERAL"
+>lngp</TT
+>) на переменную типа long, в которую будет помещён результат операции.</P
+><P
+>В случае успеха возвращается 0, или отрицательное значение, если выполнить преобразование не удалось. В случае переполнения возвращается <TT
+CLASS="LITERAL"
+>ECPG_INFORMIX_NUM_OVERFLOW</TT
+>.</P
+><P
+>Заметьте, что реализация ECPG отличается от реализации <SPAN
+CLASS="PRODUCTNAME"
+>Informix</SPAN
+>. В <SPAN
+CLASS="PRODUCTNAME"
+>Informix</SPAN
+> длинное целое ограничено диапазоном -2&nbsp;147&nbsp;483&nbsp;647 .. 2&nbsp;147&nbsp;483&nbsp;647, тогда как в ECPG ограничение зависит от архитектуры (<TT
+CLASS="LITERAL"
+>-LONG_MAX .. LONG_MAX</TT
+>).</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>rdatestr</CODE
+></DT
+><DD
+><P
+>Преобразует дату в строку C char*. </P><PRE
+CLASS="SYNOPSIS"
+>int rdatestr(date d, char *str);</PRE
+><P> Эта функция принимает два аргумента. В первом (<TT
+CLASS="LITERAL"
+>d</TT
+>) передаётся дата, которую нужно преобразовать, а во втором указатель на целевую строку. Результат всегда выводится в формате <TT
+CLASS="LITERAL"
+>yyyy-mm-dd</TT
+>, так что для этой строки нужно выделить минимум 11 байт (включая завершающий нулевой байт).</P
+><P
+>Эта функция возвращает 0 в случае успеха, а в случае ошибки — отрицательное значение.</P
+><P
+>Заметьте, что реализация ECPG отличается от реализации <SPAN
+CLASS="PRODUCTNAME"
+>Informix</SPAN
+>. В <SPAN
+CLASS="PRODUCTNAME"
+>Informix</SPAN
+> формат вывода можно изменить переменными окружения, а в ECPG он фиксирован.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>rstrdate</CODE
+></DT
+><DD
+><P
+>Разбирает текстовое представление даты. </P><PRE
+CLASS="SYNOPSIS"
+>int rstrdate(char *str, date *d);</PRE
+><P> Эта функция получает текстовое представление (<TT
+CLASS="LITERAL"
+>str</TT
+>) даты, которую нужно преобразовать, и указатель на переменную типа date (<TT
+CLASS="LITERAL"
+>d</TT
+>). Для данной функции нельзя задать маску формата. Она использует стандартную маску формата <SPAN
+CLASS="PRODUCTNAME"
+>Informix</SPAN
+>, а именно: <TT
+CLASS="LITERAL"
+>mm/dd/yyyy</TT
+>. Внутри эта функция вызывает <CODE
+CLASS="FUNCTION"
+>rdefmtdate</CODE
+>. Таким образом, <CODE
+CLASS="FUNCTION"
+>rstrdate</CODE
+> не будет быстрее, и если у вас есть выбор, используйте функцию <CODE
+CLASS="FUNCTION"
+>rdefmtdate</CODE
+>, которая позволяет явно задать маску формата.</P
+><P
+>Эта функция возвращает те же значения, что и <CODE
+CLASS="FUNCTION"
+>rdefmtdate</CODE
+>.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>rtoday</CODE
+></DT
+><DD
+><P
+>Выдаёт текущую дату. </P><PRE
+CLASS="SYNOPSIS"
+>void rtoday(date *d);</PRE
+><P> Эта функция получает указатель на переменную (<TT
+CLASS="LITERAL"
+>d</TT
+>) типа date, в которую будет записана текущая дата.</P
+><P
+>Внутри эта функция вызывает <A
+HREF="ecpg-pgtypes.html#PGTYPESDATETODAY"
+><I
+CLASS="TERM"
+><CODE
+CLASS="FUNCTION"
+>PGTYPESdate_today</CODE
+></I
+></A
+>.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>rjulmdy</CODE
+></DT
+><DD
+><P
+>Извлекает значения дня, месяца и года из переменной типа date. </P><PRE
+CLASS="SYNOPSIS"
+>int rjulmdy(date d, short mdy[3]);</PRE
+><P> Эта функция получает дату <TT
+CLASS="LITERAL"
+>d</TT
+> и указатель на 3 коротких целочисленных значения <TT
+CLASS="LITERAL"
+>mdy</TT
+>. Имя переменной указывает на порядок значений: в <TT
+CLASS="LITERAL"
+>mdy[0]</TT
+> записывается номер месяца, в <TT
+CLASS="LITERAL"
+>mdy[1]</TT
+> — номер дня, а в <TT
+CLASS="LITERAL"
+>mdy[2]</TT
+> — год.</P
+><P
+>В текущем состоянии эта функция всегда возвращает 0.</P
+><P
+>Внутри эта функция вызывает <A
+HREF="ecpg-pgtypes.html#PGTYPESDATEJULMDY"
+><I
+CLASS="TERM"
+><CODE
+CLASS="FUNCTION"
+>PGTYPESdate_julmdy</CODE
+></I
+></A
+>.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>rdefmtdate</CODE
+></DT
+><DD
+><P
+>Преобразует символьную строку в значение типа date по маске формата. </P><PRE
+CLASS="SYNOPSIS"
+>int rdefmtdate(date *d, char *fmt, char *str);</PRE
+><P> Эта функция принимает указатель на переменную типа date (<TT
+CLASS="LITERAL"
+>d</TT
+>), в которую будет помещён результат операции, маску формата для разбора даты (<TT
+CLASS="LITERAL"
+>fmt</TT
+>) и строку C char*, содержащую текстовое представление даты (<TT
+CLASS="LITERAL"
+>str</TT
+>). Ожидается, что текстовое представление будет соответствовать маске формата. Однако это соответствие не обязательно должно быть точным. Данная функция анализирует только порядок элементов и ищет в нём подстроки <TT
+CLASS="LITERAL"
+>yy</TT
+> или <TT
+CLASS="LITERAL"
+>yyyy</TT
+>, обозначающие позицию года, подстроку <TT
+CLASS="LITERAL"
+>mm</TT
+>, обозначающую позицию месяца, и <TT
+CLASS="LITERAL"
+>dd</TT
+>, обозначающую позицию дня.</P
+><P
+>Эта функция возвращает следующие значения: <P
+></P
+></P><UL
+><LI
+><P
+>0 — Функция выполнена успешно.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>ECPG_INFORMIX_ENOSHORTDATE</TT
+> — Дата не содержит разделителей между днём, месяцем и годом. С таким форматом входная строка должна быть длиной ровно 6 или 8 байт, но это не так.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>ECPG_INFORMIX_ENOTDMY</TT
+> — Строка формата не определяет корректно последовательный порядок года, месяца и дня.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>ECPG_INFORMIX_BAD_DAY</TT
+> — Во входной строке отсутствует корректное указание дня.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>ECPG_INFORMIX_BAD_MONTH</TT
+> — Во входной строке отсутствует корректное указание месяца.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>ECPG_INFORMIX_BAD_YEAR</TT
+> — Во входной строке отсутствует корректное указание года.</P
+></LI
+></UL
+><P></P
+><P
+>В реализации этой функции вызывается <A
+HREF="ecpg-pgtypes.html#PGTYPESDATEDEFMTASC"
+><I
+CLASS="TERM"
+><CODE
+CLASS="FUNCTION"
+>PGTYPESdate_defmt_asc</CODE
+></I
+></A
+>. Примеры вводимых строк приведены в таблице в её описании.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>rfmtdate</CODE
+></DT
+><DD
+><P
+>Преобразует переменную типа date в текстовое представление по маске формата. </P><PRE
+CLASS="SYNOPSIS"
+>int rfmtdate(date d, char *fmt, char *str);</PRE
+><P> Эта функция принимает дату для преобразования (<TT
+CLASS="LITERAL"
+>d</TT
+>), маску формата (<TT
+CLASS="LITERAL"
+>fmt</TT
+>) и строку, в которую будет помещено текстовое представление даты (<TT
+CLASS="LITERAL"
+>str</TT
+>).</P
+><P
+>В случае успеха возвращается 0, а в случае ошибки — отрицательное значение.</P
+><P
+>Внутри эта функция вызывает <A
+HREF="ecpg-pgtypes.html#PGTYPESDATEFMTASC"
+><I
+CLASS="TERM"
+><CODE
+CLASS="FUNCTION"
+>PGTYPESdate_fmt_asc</CODE
+></I
+></A
+>, примеры форматов можно найти в её описании.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>rmdyjul</CODE
+></DT
+><DD
+><P
+>Образует значение даты из массива 3 коротких целых, задающих день, месяц и год даты. </P><PRE
+CLASS="SYNOPSIS"
+>int rmdyjul(short mdy[3], date *d);</PRE
+><P> Эта функция получает в первом аргументе массив из 3 коротких целых (<TT
+CLASS="LITERAL"
+>mdy</TT
+>), а во втором указатель на переменную типа date, в которую будет помещён результат операции.</P
+><P
+>В настоящее время эта функция всегда возвращает 0.</P
+><P
+>В реализации этой функции вызывается <A
+HREF="ecpg-pgtypes.html#PGTYPESDATEMDYJUL"
+><I
+CLASS="TERM"
+><CODE
+CLASS="FUNCTION"
+>PGTYPESdate_mdyjul</CODE
+></I
+></A
+>.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>rdayofweek</CODE
+></DT
+><DD
+><P
+>Возвращает число, представляющее день недели для заданной даты. </P><PRE
+CLASS="SYNOPSIS"
+>int rdayofweek(date d);</PRE
+><P> Эта функция принимает в единственном аргументе переменную <TT
+CLASS="LITERAL"
+>d</TT
+> типа date и возвращает целое число, выражающее день недели для этой даты. <P
+></P
+></P><UL
+><LI
+><P
+>0 — Воскресенье</P
+></LI
+><LI
+><P
+>1 — Понедельник</P
+></LI
+><LI
+><P
+>2 — Вторник</P
+></LI
+><LI
+><P
+>3 — Среда</P
+></LI
+><LI
+><P
+>4 — Четверг</P
+></LI
+><LI
+><P
+>5 — Пятница</P
+></LI
+><LI
+><P
+>6 — Суббота</P
+></LI
+></UL
+><P></P
+><P
+>В реализации этой функции вызывается <A
+HREF="ecpg-pgtypes.html#PGTYPESDATEDAYOFWEEK"
+><I
+CLASS="TERM"
+><CODE
+CLASS="FUNCTION"
+>PGTYPESdate_dayofweek</CODE
+></I
+></A
+>.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>dtcurrent</CODE
+></DT
+><DD
+><P
+>Получает текущее время. </P><PRE
+CLASS="SYNOPSIS"
+>void dtcurrent(timestamp *ts);</PRE
+><P> Эта функция получает текущее время и сохраняет его в переменной типа timestamp, на которую указывает <TT
+CLASS="LITERAL"
+>ts</TT
+>.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>dtcvasc</CODE
+></DT
+><DD
+><P
+>Разбирает время из текстового представления в переменную типа timestamp. </P><PRE
+CLASS="SYNOPSIS"
+>int dtcvasc(char *str, timestamp *ts);</PRE
+><P> Эта функция получает строку (<TT
+CLASS="LITERAL"
+>str</TT
+>), которую нужно разобрать, и указатель на переменную типа timestamp, в которую будет помещён результат операции (<TT
+CLASS="LITERAL"
+>ts</TT
+>).</P
+><P
+>Эта функция возвращает 0 в случае успеха, а в случае ошибки — отрицательное значение.</P
+><P
+>Внутри эта функция вызывает <A
+HREF="ecpg-pgtypes.html#PGTYPESTIMESTAMPFROMASC"
+><I
+CLASS="TERM"
+><CODE
+CLASS="FUNCTION"
+>PGTYPEStimestamp_from_asc</CODE
+></I
+></A
+>. Примеры вводимых строк приведены в таблице в её описании.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>dtcvfmtasc</CODE
+></DT
+><DD
+><P
+>Разбирает время из текстового представления в переменную типа timestamp по маске формата. </P><PRE
+CLASS="SYNOPSIS"
+>dtcvfmtasc(char *inbuf, char *fmtstr, timestamp *dtvalue)</PRE
+><P> Эта функция получает строку (<TT
+CLASS="LITERAL"
+>inbuf</TT
+>), которую нужно разобрать, маску формата (<TT
+CLASS="LITERAL"
+>fmtstr</TT
+>) и указатель на переменную timestamp, в которой будет содержаться результат операции (<TT
+CLASS="LITERAL"
+>dtvalue</TT
+>).</P
+><P
+>В реализации этой функции используется <A
+HREF="ecpg-pgtypes.html#PGTYPESTIMESTAMPDEFMTASC"
+><I
+CLASS="TERM"
+><CODE
+CLASS="FUNCTION"
+>PGTYPEStimestamp_defmt_asc</CODE
+></I
+></A
+>. Список допустимых кодов формата приведён в её описании.</P
+><P
+>Эта функция возвращает 0 в случае успеха, а в случае ошибки — отрицательное значение.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>dtsub</CODE
+></DT
+><DD
+><P
+>Вычитает одно значение времени из другого и возвращает переменную типа interval. </P><PRE
+CLASS="SYNOPSIS"
+>int dtsub(timestamp *ts1, timestamp *ts2, interval *iv);</PRE
+><P> Эта функция вычитает значение timestamp, на которое указывает <TT
+CLASS="LITERAL"
+>ts2</TT
+>, из значения timestamp, на которое указывает <TT
+CLASS="LITERAL"
+>ts1</TT
+>, и сохраняет результат в переменной типа interval, на которую указывает <TT
+CLASS="LITERAL"
+>iv</TT
+>.</P
+><P
+>В случае успеха возвращается 0, а в случае ошибки — отрицательное значение.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>dttoasc</CODE
+></DT
+><DD
+><P
+>Преобразует переменную типа timestamp в строку C char*. </P><PRE
+CLASS="SYNOPSIS"
+>int dttoasc(timestamp *ts, char *output);</PRE
+><P> Эта функция получает указатель (<TT
+CLASS="LITERAL"
+>ts</TT
+>) на переменную типа timestamp, которую нужно преобразовать, и строку (<TT
+CLASS="LITERAL"
+>output</TT
+>) для сохранения результата операции. Она преобразует <TT
+CLASS="LITERAL"
+>ts</TT
+> в текстовое представление согласно стандарту SQL, то есть по маске <TT
+CLASS="LITERAL"
+>YYYY-MM-DD HH:MM:SS</TT
+>.</P
+><P
+>В случае успеха возвращается 0, а в случае ошибки — отрицательное значение.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>dttofmtasc</CODE
+></DT
+><DD
+><P
+>Преобразует переменную типа timestamp в строку C char* по маске формата. </P><PRE
+CLASS="SYNOPSIS"
+>int dttofmtasc(timestamp *ts, char *output, int str_len, char *fmtstr);</PRE
+><P> Эта функция получает в первом аргументе (<TT
+CLASS="LITERAL"
+>ts</TT
+>) указатель на переменную типа timestamp, а в последующих указатель на буфер вывода (<TT
+CLASS="LITERAL"
+>output</TT
+>), максимальную длину строки, которую может принять буфер (<TT
+CLASS="LITERAL"
+>str_len</TT
+>), и маску формата, с которой будет выполняться преобразование (<TT
+CLASS="LITERAL"
+>fmtstr</TT
+>).</P
+><P
+>В случае успеха возвращается 0, а в случае ошибки — отрицательное значение.</P
+><P
+>Внутри эта функция использует <A
+HREF="ecpg-pgtypes.html#PGTYPESTIMESTAMPFMTASC"
+><I
+CLASS="TERM"
+><CODE
+CLASS="FUNCTION"
+>PGTYPEStimestamp_fmt_asc</CODE
+></I
+></A
+>. Примеры допустимых масок формата можно найти в её описании.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>intoasc</CODE
+></DT
+><DD
+><P
+>Преобразует переменную типа interval в строку C char*. </P><PRE
+CLASS="SYNOPSIS"
+>int intoasc(interval *i, char *str);</PRE
+><P> Эта функция получает указатель (<TT
+CLASS="LITERAL"
+>i</TT
+>) на переменную типа interval, которую нужно преобразовать, и строку (<TT
+CLASS="LITERAL"
+>str</TT
+>) для сохранения результата операции. Она преобразует <TT
+CLASS="LITERAL"
+>i</TT
+> в текстовое представление согласно стандарту SQL, то есть по маске <TT
+CLASS="LITERAL"
+>YYYY-MM-DD HH:MM:SS</TT
+>.</P
+><P
+>В случае успеха возвращается 0, а в случае ошибки — отрицательное значение.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>rfmtlong</CODE
+></DT
+><DD
+><P
+>Преобразует длинное целое в текстовое представление по маске формата. </P><PRE
+CLASS="SYNOPSIS"
+>int rfmtlong(long lng_val, char *fmt, char *outbuf);</PRE
+><P> Эта функция принимает значение типа long (<TT
+CLASS="LITERAL"
+>lng_val</TT
+>), маску формата (<TT
+CLASS="LITERAL"
+>fmt</TT
+>) и указатель на выходной буфер (<TT
+CLASS="LITERAL"
+>outbuf</TT
+>). Она преобразует длинное целое в его текстовое представление согласно заданной маске формата.</P
+><P
+>Маску формата можно составить из следующих символов, определяющих формат: <P
+></P
+></P><UL
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>*</TT
+> (звёздочка) — если в данной позиции будет пусто, заполнить её звёздочкой.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>&amp;</TT
+> (амперсанд) — если в данной позиции будет пусто, заполнить её нулём.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>#</TT
+> — заменить ведущие нули пробелами.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>&lt;</TT
+> — выровнять число в строке по левой стороне.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>,</TT
+> (запятая) — сгруппировать числа, содержащие четыре и более цифр, в группы по три цифры через запятую.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>.</TT
+> (точка) — этот символ отделяет целую часть числа от дробной.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>-</TT
+> (минус) — с отрицательным числом должен выводиться знак минус.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>+</TT
+> (плюс) — с положительным числом должен выводиться знак плюс.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>(</TT
+> — это символ заменяет знак минус перед отрицательным числом. Сам знак минус выводиться не будет.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>)</TT
+> — этот символ заменяет минус и выводится после отрицательного числа.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>$</TT
+> — символ денежной суммы.</P
+></LI
+></UL
+><P></P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>rupshift</CODE
+></DT
+><DD
+><P
+>Приводит строку к верхнему регистру. </P><PRE
+CLASS="SYNOPSIS"
+>void rupshift(char *str);</PRE
+><P> Эта функция получает указатель на строку и приводит в ней каждый символ в нижнем регистре к верхнему регистру.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>byleng</CODE
+></DT
+><DD
+><P
+>Возвращает число символов в строке, не считая завершающих пробелов. </P><PRE
+CLASS="SYNOPSIS"
+>int byleng(char *str, int len);</PRE
+><P> Эта функция принимает в первом аргументе (<TT
+CLASS="LITERAL"
+>str</TT
+>) строку фиксированной длины, а во втором (<TT
+CLASS="LITERAL"
+>len</TT
+>) её длину. Она возвращает число значимых символов, то есть длину строки без завершающих пробелов.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>ldchar</CODE
+></DT
+><DD
+><P
+>Копирует строку фиксированной длины в строку с завершающим нулём. </P><PRE
+CLASS="SYNOPSIS"
+>void ldchar(char *src, int len, char *dest);</PRE
+><P> Эта функция принимает строку фиксированной длины (<TT
+CLASS="LITERAL"
+>src</TT
+>), которую нужно скопировать, её длину (<TT
+CLASS="LITERAL"
+>len</TT
+>) и указатель на целевой буфер в памяти (<TT
+CLASS="LITERAL"
+>dest</TT
+>). Учтите, что для буфера, на который указывает <TT
+CLASS="LITERAL"
+>dest</TT
+>, необходимо выделить как минимум <TT
+CLASS="LITERAL"
+>len+1</TT
+> байт. Данная функция копирует в новую область не больше <TT
+CLASS="LITERAL"
+>len</TT
+> байт (меньше, если в исходной строке есть завершающие пробелы) и добавляет завершающий 0.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>rgetmsg</CODE
+></DT
+><DD
+><P
+></P><PRE
+CLASS="SYNOPSIS"
+>int rgetmsg(int msgnum, char *s, int maxsize);</PRE
+><P> Эта функция определена, но не реализована на данный момент!</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>rtypalign</CODE
+></DT
+><DD
+><P
+></P><PRE
+CLASS="SYNOPSIS"
+>int rtypalign(int offset, int type);</PRE
+><P> Эта функция определена, но не реализована на данный момент!</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>rtypmsize</CODE
+></DT
+><DD
+><P
+></P><PRE
+CLASS="SYNOPSIS"
+>int rtypmsize(int type, int len);</PRE
+><P> Эта функция определена, но не реализована на данный момент!</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>rtypwidth</CODE
+></DT
+><DD
+><P
+></P><PRE
+CLASS="SYNOPSIS"
+>int rtypwidth(int sqltype, int sqllen);</PRE
+><P> Эта функция определена, но не реализована на данный момент!</P
+></DD
+><DT
+><A
+NAME="RSETNULL"
+></A
+><CODE
+CLASS="FUNCTION"
+>rsetnull</CODE
+></DT
+><DD
+><P
+>Присваивает переменной NULL. </P><PRE
+CLASS="SYNOPSIS"
+>int rsetnull(int t, char *ptr);</PRE
+><P> Эта функция получает целое, определяющее тип переменной, и указатель на саму переменную, приведённый к указателю C char*.</P
+><P
+>Определены следующие типы: <P
+></P
+></P><UL
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>CCHARTYPE</TT
+> — для переменной типа <TT
+CLASS="TYPE"
+>char</TT
+> или <TT
+CLASS="TYPE"
+>char*</TT
+></P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>CSHORTTYPE</TT
+> — для переменной типа <TT
+CLASS="TYPE"
+>short int</TT
+></P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>CINTTYPE</TT
+> — для переменной типа <TT
+CLASS="TYPE"
+>int</TT
+></P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>CBOOLTYPE</TT
+> — для переменной типа <TT
+CLASS="TYPE"
+>boolean</TT
+></P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>CFLOATTYPE</TT
+> — для переменной типа <TT
+CLASS="TYPE"
+>float</TT
+></P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>CLONGTYPE</TT
+> — для переменной типа <TT
+CLASS="TYPE"
+>long</TT
+></P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>CDOUBLETYPE</TT
+> — для переменной типа <TT
+CLASS="TYPE"
+>double</TT
+></P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>CDECIMALTYPE</TT
+> — для переменной типа <TT
+CLASS="TYPE"
+>decimal</TT
+></P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>CDATETYPE</TT
+> — для переменной типа <TT
+CLASS="TYPE"
+>date</TT
+></P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>CDTIMETYPE</TT
+> — для переменной типа <TT
+CLASS="TYPE"
+>timestamp</TT
+></P
+></LI
+></UL
+><P></P
+><P
+>Примеры вызова этой функции: </P><PRE
+CLASS="PROGRAMLISTING"
+>$char c[] = "abc       ";
+$short s = 17;
+$int i = -74874;
+
+rsetnull(CCHARTYPE, (char *) c);
+rsetnull(CSHORTTYPE, (char *) &amp;s);
+rsetnull(CINTTYPE, (char *) &amp;i);</PRE
+><P></P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>risnull</CODE
+></DT
+><DD
+><P
+>Проверяет содержимое переменной на NULL. </P><PRE
+CLASS="SYNOPSIS"
+>int risnull(int t, char *ptr);</PRE
+><P> Эта функция получает тип проверяемой переменной (<TT
+CLASS="LITERAL"
+>t</TT
+>), а также указатель на неё (<TT
+CLASS="LITERAL"
+>ptr</TT
+>). Заметьте, что этот указатель нужно привести к char*. Список возможных типов переменных приведён в описании функции <A
+HREF="ecpg-informix-compat.html#RSETNULL"
+><I
+CLASS="TERM"
+><CODE
+CLASS="FUNCTION"
+>rsetnull</CODE
+></I
+></A
+>.</P
+><P
+>Примеры использования этой функции: </P><PRE
+CLASS="PROGRAMLISTING"
+>$char c[] = "abc       ";
+$short s = 17;
+$int i = -74874;
+
+risnull(CCHARTYPE, (char *) c);
+risnull(CSHORTTYPE, (char *) &amp;s);
+risnull(CINTTYPE, (char *) &amp;i);</PRE
+><P></P
+></DD
+></DL
+></DIV
+><P>
+   </P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="ECPG-INFORMIX-CONSTANTS"
+>33.15.5. Дополнительные константы</A
+></H2
+><P
+>Заметьте, что все эти константы относятся к ошибкам и все они представлены отрицательными значениями. Из описаний различных констант вы также можете узнать, какими именно числами они представлены в текущей реализации. Однако полагаться на эти числа не следует. Тем не менее, вы можете рассчитывать на то, что все эти значения будут отрицательными. <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>ECPG_INFORMIX_NUM_OVERFLOW</TT
+></DT
+><DD
+><P
+>Функции возвращают это значение, если при вычислении происходит переполнение. Внутри оно представляется числом -1200 (определение <SPAN
+CLASS="PRODUCTNAME"
+>Informix</SPAN
+>).</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>ECPG_INFORMIX_NUM_UNDERFLOW</TT
+></DT
+><DD
+><P
+>Функции возвращают это значение, если при вычислении происходит антипереполнение. Внутри оно представляется числом -1201 (определение <SPAN
+CLASS="PRODUCTNAME"
+>Informix</SPAN
+>).</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>ECPG_INFORMIX_DIVIDE_ZERO</TT
+></DT
+><DD
+><P
+>Функции возвращают это значение при попытке деления на ноль. Внутри оно представляется числом -1202 (определение <SPAN
+CLASS="PRODUCTNAME"
+>Informix</SPAN
+>).</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>ECPG_INFORMIX_BAD_YEAR</TT
+></DT
+><DD
+><P
+>Функции возвращают это значение, если при разборе даты встретилось некорректное указание года. Внутри оно представляется числом -1204 (определение <SPAN
+CLASS="PRODUCTNAME"
+>Informix</SPAN
+>).</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>ECPG_INFORMIX_BAD_MONTH</TT
+></DT
+><DD
+><P
+>Функции возвращают это значение, если при разборе даты встретилось некорректное указание месяца. Внутри оно представляется числом -1205 (определение <SPAN
+CLASS="PRODUCTNAME"
+>Informix</SPAN
+>).</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>ECPG_INFORMIX_BAD_DAY</TT
+></DT
+><DD
+><P
+>Функции возвращают это значение, если при разборе даты встретилось некорректное указание дня. Внутри оно представляется числом -1206 (определение <SPAN
+CLASS="PRODUCTNAME"
+>Informix</SPAN
+>).</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>ECPG_INFORMIX_ENOSHORTDATE</TT
+></DT
+><DD
+><P
+>Функции возвращают это значение, если процедуре разбора даты требуется короткая запись даты, но строка даты имеет неподходящую длину. Внутри оно представляется числом -1209 (определение <SPAN
+CLASS="PRODUCTNAME"
+>Informix</SPAN
+>).</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>ECPG_INFORMIX_DATE_CONVERT</TT
+></DT
+><DD
+><P
+>Функции возвращают это значение, если при форматировании даты происходит ошибка. Внутри оно представляется числом -1210 (определение <SPAN
+CLASS="PRODUCTNAME"
+>Informix</SPAN
+>).</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>ECPG_INFORMIX_OUT_OF_MEMORY</TT
+></DT
+><DD
+><P
+>Функции возвращают это значение, если им не хватает памяти для выполнения операций. Внутри оно представляется числом -1211 (определение <SPAN
+CLASS="PRODUCTNAME"
+>Informix</SPAN
+>).</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>ECPG_INFORMIX_ENOTDMY</TT
+></DT
+><DD
+><P
+>Функции возвращают это значение, если процедура разбора должна была получить маску формата (например, <TT
+CLASS="LITERAL"
+>mmddyy</TT
+>), но не все поля были записаны правильно. Внутри оно представляется числом -1212 (определение <SPAN
+CLASS="PRODUCTNAME"
+>Informix</SPAN
+>).</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>ECPG_INFORMIX_BAD_NUMERIC</TT
+></DT
+><DD
+><P
+>Функции возвращают это значение, если процедура разбора не может получить числовое значение из текстового представления, потому что оно некорректно, либо если процедура вычисления не может произвести операцию с числовыми переменными из-за недопустимого значения минимум одной из этих переменных. Внутри оно представляется числом -1213 (определение <SPAN
+CLASS="PRODUCTNAME"
+>Informix</SPAN
+>).</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>ECPG_INFORMIX_BAD_EXPONENT</TT
+></DT
+><DD
+><P
+>Функции возвращают это значение, если процедура разбора не может воспринять экспоненту в числе. Внутри оно представляется числом -1216 (определение <SPAN
+CLASS="PRODUCTNAME"
+>Informix</SPAN
+>).</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>ECPG_INFORMIX_BAD_DATE</TT
+></DT
+><DD
+><P
+>Функции возвращают это значение, если процедура разбора не может разобрать дату. Внутри оно представляется числом -1218 (определение <SPAN
+CLASS="PRODUCTNAME"
+>Informix</SPAN
+>).</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>ECPG_INFORMIX_EXTRA_CHARS</TT
+></DT
+><DD
+><P
+>Функции возвращают это значение, если процедуре разбора передаются посторонние символы, которая она не может разобрать. Внутри оно представляется числом -1264 (определение <SPAN
+CLASS="PRODUCTNAME"
+>Informix</SPAN
+>).</P
+></DD
+></DL
+></DIV
+><P></P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ecpg-sql-whenever.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ecpg-develop.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>WHENEVER</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ecpg.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Внутреннее устройство</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

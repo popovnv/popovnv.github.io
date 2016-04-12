@@ -1,0 +1,472 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>libpq — библиотека для языка C</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Клиентские интерфейсы"
+HREF="client-interfaces.html"><LINK
+REL="PREVIOUS"
+TITLE="Клиентские интерфейсы"
+HREF="client-interfaces.html"><LINK
+REL="NEXT"
+TITLE="Функции управления подключением к базе данных"
+HREF="libpq-connect.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="CHAPTER"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Клиентские интерфейсы"
+HREF="client-interfaces.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="client-interfaces.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Функции управления подключением к базе данных"
+HREF="libpq-connect.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="LIBPQ"
+></A
+>Глава 31. <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> — библиотека для языка C</H1
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Содержание</B
+></DT
+><DT
+>31.1. <A
+HREF="libpq-connect.html"
+>Функции управления подключением к базе данных</A
+></DT
+><DD
+><DL
+><DT
+>31.1.1. <A
+HREF="libpq-connect.html#LIBPQ-CONNSTRING"
+>Строки параметров подключения</A
+></DT
+><DT
+>31.1.2. <A
+HREF="libpq-connect.html#LIBPQ-PARAMKEYWORDS"
+>Ключевые слова-параметры</A
+></DT
+></DL
+></DD
+><DT
+>31.2. <A
+HREF="libpq-status.html"
+>Функции, описывающие текущее состояние подключения</A
+></DT
+><DT
+>31.3. <A
+HREF="libpq-exec.html"
+>Функции для исполнения команд</A
+></DT
+><DD
+><DL
+><DT
+>31.3.1. <A
+HREF="libpq-exec.html#LIBPQ-EXEC-MAIN"
+>Главные функции</A
+></DT
+><DT
+>31.3.2. <A
+HREF="libpq-exec.html#LIBPQ-EXEC-SELECT-INFO"
+>Извлечение информации, связанной с результатом запроса</A
+></DT
+><DT
+>31.3.3. <A
+HREF="libpq-exec.html#LIBPQ-EXEC-NONSELECT"
+>Получение другой информации о результате</A
+></DT
+><DT
+>31.3.4. <A
+HREF="libpq-exec.html#LIBPQ-EXEC-ESCAPE-STRING"
+>Экранирование строковых значений для включения в SQL-команды</A
+></DT
+></DL
+></DD
+><DT
+>31.4. <A
+HREF="libpq-async.html"
+>Асинхронная обработка команд</A
+></DT
+><DT
+>31.5. <A
+HREF="libpq-single-row-mode.html"
+>Построчное извлечение результатов запроса</A
+></DT
+><DT
+>31.6. <A
+HREF="libpq-cancel.html"
+>Отмена запросов в процессе выполнения</A
+></DT
+><DT
+>31.7. <A
+HREF="libpq-fastpath.html"
+>Интерфейс быстрого пути</A
+></DT
+><DT
+>31.8. <A
+HREF="libpq-notify.html"
+>Асинхронное уведомление</A
+></DT
+><DT
+>31.9. <A
+HREF="libpq-copy.html"
+>Функции, связанные с командой <TT
+CLASS="COMMAND"
+>COPY</TT
+></A
+></DT
+><DD
+><DL
+><DT
+>31.9.1. <A
+HREF="libpq-copy.html#LIBPQ-COPY-SEND"
+>Функции для передачи данных <TT
+CLASS="COMMAND"
+>COPY</TT
+></A
+></DT
+><DT
+>31.9.2. <A
+HREF="libpq-copy.html#LIBPQ-COPY-RECEIVE"
+>Функции для приёма данных <TT
+CLASS="COMMAND"
+>COPY</TT
+></A
+></DT
+><DT
+>31.9.3. <A
+HREF="libpq-copy.html#LIBPQ-COPY-DEPRECATED"
+>Устаревшие функции для <TT
+CLASS="COMMAND"
+>COPY</TT
+></A
+></DT
+></DL
+></DD
+><DT
+>31.10. <A
+HREF="libpq-control.html"
+>Функции управления</A
+></DT
+><DT
+>31.11. <A
+HREF="libpq-misc.html"
+>Функции разного назначения</A
+></DT
+><DT
+>31.12. <A
+HREF="libpq-notice-processing.html"
+>Обработка замечаний</A
+></DT
+><DT
+>31.13. <A
+HREF="libpq-events.html"
+>Система событий</A
+></DT
+><DD
+><DL
+><DT
+>31.13.1. <A
+HREF="libpq-events.html#LIBPQ-EVENTS-TYPES"
+>Типы событий</A
+></DT
+><DT
+>31.13.2. <A
+HREF="libpq-events.html#LIBPQ-EVENTS-PROC"
+>Процедура обработки событий</A
+></DT
+><DT
+>31.13.3. <A
+HREF="libpq-events.html#LIBPQ-EVENTS-FUNCS"
+>Функции поддержки событий</A
+></DT
+><DT
+>31.13.4. <A
+HREF="libpq-events.html#LIBPQ-EVENTS-EXAMPLE"
+>Пример обработки событий</A
+></DT
+></DL
+></DD
+><DT
+>31.14. <A
+HREF="libpq-envars.html"
+>Переменные окружения</A
+></DT
+><DT
+>31.15. <A
+HREF="libpq-pgpass.html"
+>Файл паролей</A
+></DT
+><DT
+>31.16. <A
+HREF="libpq-pgservice.html"
+>Файл соединений служб</A
+></DT
+><DT
+>31.17. <A
+HREF="libpq-ldap.html"
+>Получение параметров соединения через LDAP</A
+></DT
+><DT
+>31.18. <A
+HREF="libpq-ssl.html"
+>Поддержка SSL</A
+></DT
+><DD
+><DL
+><DT
+>31.18.1. <A
+HREF="libpq-ssl.html#LIBQ-SSL-CERTIFICATES"
+>Проверка сертификатов сервера на стороне клиента</A
+></DT
+><DT
+>31.18.2. <A
+HREF="libpq-ssl.html#LIBPQ-SSL-CLIENTCERT"
+>Клиентские сертификаты</A
+></DT
+><DT
+>31.18.3. <A
+HREF="libpq-ssl.html#LIBPQ-SSL-PROTECTION"
+>Защита, обеспечиваемая в различных режимах</A
+></DT
+><DT
+>31.18.4. <A
+HREF="libpq-ssl.html#LIBPQ-SSL-FILEUSAGE"
+>Файлы, используемые клиентом SSL</A
+></DT
+><DT
+>31.18.5. <A
+HREF="libpq-ssl.html#LIBPQ-SSL-INITIALIZE"
+>Инициализация библиотеки SSL</A
+></DT
+></DL
+></DD
+><DT
+>31.19. <A
+HREF="libpq-threading.html"
+>Поведение в многопоточных программах</A
+></DT
+><DT
+>31.20. <A
+HREF="libpq-build.html"
+>Сборка программ с <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+></A
+></DT
+><DT
+>31.21. <A
+HREF="libpq-example.html"
+>Примеры программ</A
+></DT
+></DL
+></DIV
+><P
+><SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> — это интерфейс <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> для программирования приложений на языке <ACRONYM
+CLASS="ACRONYM"
+>C</ACRONYM
+>. Библиотека <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> содержит набор функций, используя которые клиентские программы могут передавать запросы серверу <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> и принимать результаты этих запросов.</P
+><P
+><SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> также является базовым механизмом для нескольких других прикладных интерфейсов <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, включая те, что написаны для C++, Perl, Python, Tcl и <SPAN
+CLASS="APPLICATION"
+>ECPG</SPAN
+>. Поэтому некоторые аспекты поведения <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> будут важны для вас, если вы используете один из этих пакетов. В частности, <A
+HREF="libpq-envars.html"
+>Раздел 31.14</A
+>, <A
+HREF="libpq-pgpass.html"
+>Раздел 31.15</A
+> и <A
+HREF="libpq-ssl.html"
+>Раздел 31.18</A
+> описывают поведение, видимое пользователю любого приложения, использующего <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>.</P
+><P
+>В конце этой главы включены короткие программы (<A
+HREF="libpq-example.html"
+>Раздел 31.21</A
+>), показывающие, как писать программы, которые используют <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>. В каталоге <TT
+CLASS="FILENAME"
+>src/test/examples</TT
+> дистрибутивного комплекта исходных текстов приведено несколько завершённых примеров приложений <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>.</P
+><P
+>Клиентские программы, которые используют <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>, должны включать заголовочный файл <TT
+CLASS="FILENAME"
+>libpq-fe.h</TT
+> и должны компоноваться с библиотекой <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="client-interfaces.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="libpq-connect.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Клиентские интерфейсы</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="client-interfaces.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Функции управления подключением к базе данных</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

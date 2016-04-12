@@ -1,0 +1,411 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>          character_sets
+        </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Информационная схема"
+HREF="information-schema.html"><LINK
+REL="PREVIOUS"
+TITLE="          attributes
+        "
+HREF="infoschema-attributes.html"><LINK
+REL="NEXT"
+TITLE="          check_constraint_routine_usage
+        "
+HREF="infoschema-check-constraint-routine-usage.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="          attributes
+        "
+HREF="infoschema-attributes.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="information-schema.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 34. Информационная схема</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="          check_constraint_routine_usage
+        "
+HREF="infoschema-check-constraint-routine-usage.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="INFOSCHEMA-CHARACTER-SETS"
+>34.7. <TT
+CLASS="LITERAL"
+>character_sets</TT
+></A
+></H1
+><P
+>Представление <TT
+CLASS="LITERAL"
+>character_sets</TT
+> описывает наборы символов, доступные в текущей базе данных. Так как PostgreSQL не поддерживает несколько наборов символов в одной базе данных, этот набор показывает только один набор, соответствующий кодировке базы.</P
+><P
+>Примите к сведению следующие термины, принятые в стандарте SQL: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+>совокупность символов</DT
+><DD
+><P
+>Абстрактная коллекция символов, например <TT
+CLASS="LITERAL"
+>UNICODE</TT
+>, <TT
+CLASS="LITERAL"
+>UCS</TT
+> или <TT
+CLASS="LITERAL"
+>LATIN1</TT
+>. Не существует в виде SQL-объекта, но показывается в этом представлении.</P
+></DD
+><DT
+>форма кодировки символов</DT
+><DD
+><P
+>Кодировка некоторой совокупности символов. Для большинства устаревших совокупностей используется только одна кодировка, так что эта кодировка не имеет отдельного имени (например, <TT
+CLASS="LITERAL"
+>LATIN1</TT
+> — форма кодировки, применимая к совокупности <TT
+CLASS="LITERAL"
+>LATIN1</TT
+>). Но например, Unicode имеет формы кодировки <TT
+CLASS="LITERAL"
+>UTF8</TT
+>, <TT
+CLASS="LITERAL"
+>UTF16</TT
+> и т. д. (не все они поддерживаются в PostgreSQL). Формы кодировки не существуют в виде SQL-объектов, но показываются в этом представлении.</P
+></DD
+><DT
+>набор символов</DT
+><DD
+><P
+>Именованный SQL-объект, определяющий совокупность и кодировку символов, а также правило сортировки по умолчанию. Предопределённый набор символов обычно называется так же, как форма кодировки, но пользователи могут определить другие имена. Например, набору символов <TT
+CLASS="LITERAL"
+>UTF8</TT
+> обычно соответствует совокупность символов <TT
+CLASS="LITERAL"
+>UCS</TT
+>, форма кодировки <TT
+CLASS="LITERAL"
+>UTF8</TT
+> и некоторое правило сортировки по умолчанию.</P
+></DD
+></DL
+></DIV
+><P> Вы можете считать, что <SPAN
+CLASS="QUOTE"
+>"кодировка"</SPAN
+> в PostgreSQL определяет набор или форму кодировки символов. Она имеет такое же имя и может быть только одной в определённой базе.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="AEN49730"
+></A
+><P
+><B
+>Таблица 34-5. Колонки <TT
+CLASS="LITERAL"
+>character_sets</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип данных</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>character_set_catalog</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Наборы символов в настоящее время не представлены в виде объектов схемы, так что эта колонка содержит NULL.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>character_set_schema</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Наборы символов в настоящее время не представлены в виде объектов схемы, так что эта колонка содержит NULL.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>character_set_name</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Имя набора символов, в настоящее время в качестве этого имени показывается имя кодировки базы данных</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>character_repertoire</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Совокупность символов — <TT
+CLASS="LITERAL"
+>UCS</TT
+> для кодировки <TT
+CLASS="LITERAL"
+>UTF8</TT
+>, либо просто имя кодировки</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>form_of_use</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Форма кодировки символов, то же, что и кодировка базы данных</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>default_collate_catalog</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Имя базы данных, содержащей правило сортировки по умолчанию (всегда текущая база, если это правило установлено)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>default_collate_schema</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Имя схемы, содержащей правило сортировки по умолчанию</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>default_collate_name</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Имя правила сортировки по умолчанию. Правилом сортировки по умолчанию считается правило, соответствующее параметрам <TT
+CLASS="LITERAL"
+>COLLATE</TT
+> и <TT
+CLASS="LITERAL"
+>CTYPE</TT
+> текущей базы данных. Если такого правила нет, данная колонка и связанные колонки схемы и каталога содержат NULL.</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="infoschema-attributes.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="infoschema-check-constraint-routine-usage.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><TT
+CLASS="LITERAL"
+>attributes</TT
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="information-schema.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><TT
+CLASS="LITERAL"
+>check_constraint_routine_usage</TT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

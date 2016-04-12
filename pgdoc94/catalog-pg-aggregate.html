@@ -1,0 +1,660 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>          pg_aggregate
+        </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Системные каталоги"
+HREF="catalogs.html"><LINK
+REL="PREVIOUS"
+TITLE="Обзор"
+HREF="catalogs-overview.html"><LINK
+REL="NEXT"
+TITLE="          pg_am
+        "
+HREF="catalog-pg-am.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Обзор"
+HREF="catalogs-overview.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 48. Системные каталоги</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="          pg_am
+        "
+HREF="catalog-pg-am.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CATALOG-PG-AGGREGATE"
+>48.2. <TT
+CLASS="STRUCTNAME"
+>pg_aggregate</TT
+></A
+></H1
+><P
+>В каталоге <TT
+CLASS="STRUCTNAME"
+>pg_aggregate</TT
+> хранится информация об агрегатных функциях. Агрегатная функция — это такая функция, которая работает с множеством значений (обычно, с содержимым одной колонки всех строк, удовлетворяющих условию запроса) и возвращает одно значение, вычисленное по этому множеству. Типичные агрегатные функции — <CODE
+CLASS="FUNCTION"
+>sum</CODE
+>, <CODE
+CLASS="FUNCTION"
+>count</CODE
+> и <CODE
+CLASS="FUNCTION"
+>max</CODE
+>. Все записи в <TT
+CLASS="STRUCTNAME"
+>pg_aggregate</TT
+> представляют собой дополнение записей в <TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+>. Запись в <TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+> определяет имя агрегатной функции, типы входных и выходных данных, а также другие свойства, подобные имеющимся у обычных функций.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="AEN94886"
+></A
+><P
+><B
+>Таблица 48-2. Колонки <TT
+CLASS="STRUCTNAME"
+>pg_aggregate</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип</TH
+><TH
+>Ссылки</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>aggfnoid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>regproc</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-proc.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>OID агрегатной функции в <TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>aggkind</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>char</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Тип агрегатной функции: <TT
+CLASS="LITERAL"
+>n</TT
+> — обычная (<SPAN
+CLASS="QUOTE"
+>"normal"</SPAN
+>), <TT
+CLASS="LITERAL"
+>o</TT
+> — сортирующая (<SPAN
+CLASS="QUOTE"
+>"ordered-set"</SPAN
+>) или <TT
+CLASS="LITERAL"
+>h</TT
+> — гипотезирующая (<SPAN
+CLASS="QUOTE"
+>"hypothetical-set"</SPAN
+>)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>aggnumdirectargs</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int2</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Число непосредственных (не агрегируемых) аргументов для сортирующей или гипотезирующей агрегатной функции (переменный массив аргументов считается одним аргументом). Если равняется <TT
+CLASS="STRUCTFIELD"
+>pronargs</TT
+>, агрегатная функция должна принимать переменный массив и этот массив описывает как агрегатные аргументы, так и окончательные непосредственные аргументы. Всегда равно нулю для обычных агрегатных функций.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>aggtransfn</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>regproc</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-proc.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Функция перехода</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>aggfinalfn</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>regproc</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-proc.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Функция завершения (0, если её нет)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>aggmtransfn</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>regproc</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-proc.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Функция прямого перехода для режима движущегося агрегата (0, если её нет)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>aggminvtransfn</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>regproc</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-proc.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Функция обратного перехода для режима движущегося агрегата (0, если её нет)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>aggmfinalfn</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>regproc</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-proc.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Функция завершения для режима движущегося агрегата (0, если её нет)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>aggfinalextra</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Со значением True в <TT
+CLASS="STRUCTFIELD"
+>aggfinalfn</TT
+> передаются дополнительные фиктивные аргументы</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>aggmfinalextra</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Со значением True в <TT
+CLASS="STRUCTFIELD"
+>aggmfinalfn</TT
+> передаются дополнительные фиктивные аргументы</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>aggsortop</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-operator.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_operator</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Связанный оператор сортировки (0, если его нет)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>aggtranstype</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-type.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_type</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Тип данных внутреннего состояния (перехода) агрегатной функции</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>aggtransspace</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int4</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Приблизительный средний размер (в байтах) данных состояния перехода, либо 0 для выбора значения по умолчанию</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>aggmtranstype</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-type.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_type</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Тип данных внутреннего состояния (перехода) для агрегатной функции в режиме движущегося агрегата (0 в случае отсутствия)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>aggmtransspace</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int4</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Приблизительный средний размер (в байтах) данных состояния перехода для режима движущегося агрегата, либо 0 для выбора значения по умолчанию</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>agginitval</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Начальное значение для состояния перехода. Это текстовое поле, содержащее значение в виде внешнего строкового представления. Если это поле содержит NULL, начальным значением состояния перехода будет NULL.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>aggminitval</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Начальное значение для состояния перехода в режиме движущегося агрегата. Это текстовое поле, содержащее значение в виде внешнего строкового представления. Если это поле содержит NULL, начальным значением состояния перехода будет NULL.</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Новые агрегатные функции создаются командой <A
+HREF="sql-createaggregate.html"
+>CREATE AGGREGATE</A
+>. За дополнительными сведениями о разработке агрегатных функций, значении функций перехода и т. д. обратитесь к <A
+HREF="xaggr.html"
+>Разделу 35.10</A
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="catalogs-overview.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="catalog-pg-am.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Обзор</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_am</TT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

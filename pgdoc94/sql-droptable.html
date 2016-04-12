@@ -1,0 +1,315 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>DROP TABLE</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="DROP SERVER"
+HREF="sql-dropserver.html"><LINK
+REL="NEXT"
+TITLE="DROP TABLESPACE"
+HREF="sql-droptablespace.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="DROP SERVER"
+HREF="sql-dropserver.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="DROP TABLESPACE"
+HREF="sql-droptablespace.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-DROPTABLE"
+></A
+>DROP TABLE</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN80059"
+></A
+><H2
+>Название</H2
+>DROP TABLE&nbsp;--&nbsp;удалить таблицу</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN80062"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>DROP TABLE [ IF EXISTS ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> [, ...] [ CASCADE | RESTRICT ]</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN80065"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>DROP TABLE</TT
+> удаляет таблицы из базы данных. Удалить таблицу может только её владелец, владелец схемы или суперпользователь. Чтобы опустошить таблицу, не удаляя её саму, вместо этой команды следует использовать <A
+HREF="sql-delete.html"
+>DELETE</A
+> или <A
+HREF="sql-truncate.html"
+>TRUNCATE</A
+>.</P
+><P
+><TT
+CLASS="COMMAND"
+>DROP TABLE</TT
+> всегда удаляет все индексы, правила, триггеры и ограничения, существующие в целевой таблице. Однако, чтобы удалить таблицу, на которую ссылается представление или ограничение внешнего ключа в другой таблице, необходимо дополнительно указать <TT
+CLASS="LITERAL"
+>CASCADE</TT
+>. (С указанием <TT
+CLASS="LITERAL"
+>CASCADE</TT
+> зависимое представление будет удалено полностью, но в случае с первичным ключом удалено будет только само ограничение, а не таблица, к которой оно относится.)</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN80075"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>IF EXISTS</TT
+></DT
+><DD
+><P
+>Не считать ошибкой, если таблица не существует. В этом случае будет выдано замечание.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></DT
+><DD
+><P
+>Имя (возможно, дополненное схемой) таблицы, подлежащей удалению.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>CASCADE</TT
+></DT
+><DD
+><P
+>Автоматически удалять объекты, зависящие от данной таблицы (например, представления).</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>RESTRICT</TT
+></DT
+><DD
+><P
+>Отказать в удалении таблицы, если от неё зависят какие-либо объекты. Это поведение по умолчанию.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN80098"
+></A
+><H2
+>Примеры</H2
+><P
+>Удаление таблиц <TT
+CLASS="LITERAL"
+>films</TT
+> и <TT
+CLASS="LITERAL"
+>distributors</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>DROP TABLE films, distributors;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN80104"
+></A
+><H2
+>Совместимость</H2
+><P
+>Эта команда соответствует стандарту SQL, но возможность удалять в одной команде несколько таблиц и указание <TT
+CLASS="LITERAL"
+>IF EXISTS</TT
+> являются расширениями <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN80109"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-altertable.html"
+>ALTER TABLE</A
+>, <A
+HREF="sql-createtable.html"
+>CREATE TABLE</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-dropserver.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-droptablespace.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>DROP SERVER</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>DROP TABLESPACE</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,465 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>REINDEX</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="REFRESH MATERIALIZED VIEW"
+HREF="sql-refreshmaterializedview.html"><LINK
+REL="NEXT"
+TITLE="RELEASE SAVEPOINT"
+HREF="sql-release-savepoint.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="REFRESH MATERIALIZED VIEW"
+HREF="sql-refreshmaterializedview.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="RELEASE SAVEPOINT"
+HREF="sql-release-savepoint.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-REINDEX"
+></A
+>REINDEX</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN82347"
+></A
+><H2
+>Название</H2
+>REINDEX&nbsp;--&nbsp;перестроить индексы</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN82350"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>REINDEX { INDEX | TABLE | DATABASE | SYSTEM } <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> [ FORCE ]</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN82353"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>REINDEX</TT
+> перестраивает индекс, обрабатывая данные таблицы, к которой относится индекс, и в результате заменяет старую копию индекса. Команда <TT
+CLASS="COMMAND"
+>REINDEX</TT
+> применяется в следующих ситуациях: <P
+></P
+></P><UL
+><LI
+><P
+>Индекс был повреждён, его содержимое стало некорректным. Хотя в теории этого не должно случаться, на практике индексы могут испортиться из-за программных ошибок или аппаратных сбоев. В таких случаях <TT
+CLASS="COMMAND"
+>REINDEX</TT
+> служит методом восстановления индекса.</P
+></LI
+><LI
+><P
+>Индекс стал <SPAN
+CLASS="QUOTE"
+>"раздутым"</SPAN
+>, то есть в нём оказалось много пустых или почти пустых страниц. Это может происходить с B-деревьями в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> при определённых, достаточно редких сценариях использования. <TT
+CLASS="COMMAND"
+>REINDEX</TT
+> даёт возможность сократить объём, занимаемый индексом, записывая новую версию индекса без &laquo;мёртвых&raquo; страниц. За подробностями обратитесь к <A
+HREF="routine-reindex.html"
+>Разделу 23.2</A
+>.</P
+></LI
+><LI
+><P
+>Параметр хранения индекса (например, фактор заполнения) был изменён, и теперь требуется, чтобы это изменение вступило в силу в полной мере.</P
+></LI
+><LI
+><P
+>Построение индекса с параметром <TT
+CLASS="LITERAL"
+>CONCURRENTLY</TT
+> завершилось ошибкой, в результате чего индекс оказался <SPAN
+CLASS="QUOTE"
+>"нерабочим"</SPAN
+>. Такие индексы бесполезны, но команда <TT
+CLASS="COMMAND"
+>REINDEX</TT
+> предоставляет удобный способ перестроить их. Однако заметьте, что <TT
+CLASS="COMMAND"
+>REINDEX</TT
+> перестраивает индекс не в параллельном режиме. Чтобы перестроить такой индекс, минимизируя влияние на производственную среду, его следует удалить, а затем снова выполнить команду <TT
+CLASS="COMMAND"
+>CREATE INDEX CONCURRENTLY</TT
+>.</P
+></LI
+></UL
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN82377"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>INDEX</TT
+></DT
+><DD
+><P
+>Перестраивает указанный индекс.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>TABLE</TT
+></DT
+><DD
+><P
+>Перестраивает все индексы в указанной таблице. Если у таблицы имеется дополнительная таблица <SPAN
+CLASS="QUOTE"
+>"TOAST"</SPAN
+>, она так же переиндексируется.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>DATABASE</TT
+></DT
+><DD
+><P
+>Перестраивает все индексы в текущей базе данных. При этом обрабатываются также индексы в общих системных каталогах. Эту форму <TT
+CLASS="COMMAND"
+>REINDEX</TT
+> нельзя выполнить в блоке транзакции.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>SYSTEM</TT
+></DT
+><DD
+><P
+>Перестраивает все индексы в системных каталогах текущей базы данных. При этом обрабатываются также индексы в общих системных каталогах, но индексы в таблицах пользователя не затрагиваются. Эту форму <TT
+CLASS="COMMAND"
+>REINDEX</TT
+> нельзя выполнить в блоке транзакции.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></DT
+><DD
+><P
+>Имя определённого индекса, таблицы или базы данных, подлежащих переиндексации. В настоящее время <TT
+CLASS="COMMAND"
+>REINDEX DATABASE</TT
+> и <TT
+CLASS="COMMAND"
+>REINDEX SYSTEM</TT
+> могут переиндексировать только текущую базу данных, так что их параметр должен соответствовать имени текущей базы данных.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>FORCE</TT
+></DT
+><DD
+><P
+>Это устаревший параметр; он игнорируется, если указан.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN82415"
+></A
+><H2
+>Замечания</H2
+><P
+>В случае подозрений в повреждении индекса таблицы пользователя, этот индекс или все индексы таблицы можно перестроить, используя команду <TT
+CLASS="COMMAND"
+>REINDEX INDEX</TT
+> или <TT
+CLASS="COMMAND"
+>REINDEX TABLE</TT
+>.</P
+><P
+>Всё усложняется, если возникает необходимость восстановить повреждённый индекс системной таблицы. В этом случае важно, чтобы система сама не использовала этот индекс. (На самом деле в таких случаях вы, скорее всего, столкнётесь с падением процессов сервера в момент запуска, как раз вследствие испорченных индексов.) Чтобы надёжно восстановить рабочее состояние, сервер следует запускать с параметром <TT
+CLASS="OPTION"
+>-P</TT
+>, который отключает использование индексов при поиске в системных каталогах.</P
+><P
+>Один из вариантов сделать это — выключить сервер <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> и запустить его снова в однопользовательском режиме, с параметром <TT
+CLASS="OPTION"
+>-P</TT
+> в командной строке. Затем можно выполнить <TT
+CLASS="COMMAND"
+>REINDEX DATABASE</TT
+>, <TT
+CLASS="COMMAND"
+>REINDEX SYSTEM</TT
+>, <TT
+CLASS="COMMAND"
+>REINDEX TABLE</TT
+> или <TT
+CLASS="COMMAND"
+>REINDEX INDEX</TT
+>, в зависимости от того, что вы хотите восстановить. В случае сомнений выполните <TT
+CLASS="COMMAND"
+>REINDEX SYSTEM</TT
+>, чтобы перестроить все системные индексы в базе данных. Затем завершите однопользовательский сеанс сервера и перезапустите сервер в обычном режиме. Чтобы подробнее узнать, как работать с сервером в однопользовательском интерфейсе, обратитесь к справочной странице <A
+HREF="app-postgres.html"
+>            <SPAN
+CLASS="APPLICATION"
+>postgres</SPAN
+>
+          </A
+>.</P
+><P
+>Можно так же запустить обычный экземпляр сервера, но добавить в параметры командной строки <TT
+CLASS="OPTION"
+>-P</TT
+>. В разных клиентах это может делаться по-разному, но во всех клиентах на базе <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> можно установить для переменной окружения <TT
+CLASS="ENVAR"
+>PGOPTIONS</TT
+> значение <TT
+CLASS="LITERAL"
+>-P</TT
+> до запуска клиента. Учтите, что хотя этот метод не препятствует работе других клиентов, всё же имеет смысл не позволять им подключаться к повреждённой базе данных до завершения восстановления.</P
+><P
+>Действие <TT
+CLASS="COMMAND"
+>REINDEX</TT
+> подобно удалению и пересозданию индекса в том смысле, что содержимое индекса пересоздаётся с нуля, но блокировки при этом устанавливаются другие. <TT
+CLASS="COMMAND"
+>REINDEX</TT
+> блокирует запись, но не чтение родительской таблицы индекса. Эта команда также устанавливает исключительную блокировку для обрабатываемого индекса, что блокирует чтение таблицы, при котором задействуется этот индекс. <TT
+CLASS="COMMAND"
+>DROP INDEX</TT
+>, напротив, моментально устанавливает исключительную блокировку на родительскую таблицу, блокируя и запись, и чтение. Последующая команда <TT
+CLASS="COMMAND"
+>CREATE INDEX</TT
+> блокирует запись, но не чтение; так как индекс отсутствует, обращений к нему ни при каком чтении не будет, что означает, что блокироваться чтение не будет, но выполняться оно будет как дорогостоящее последовательное сканирование.</P
+><P
+>Для перестраивания одного индекса или индексов таблицы необходимо быть владельцем этого индекса или таблицы. Для переиндексирования базы данных необходимо быть владельцем базы данных (заметьте, что он может таким образом перестроить индексы таблиц, принадлежащих другим пользователям). Разумеется, суперпользователи могут переиндексировать всё без ограничений.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN82442"
+></A
+><H2
+>Примеры</H2
+><P
+>Перестроение одного индекса: </P><PRE
+CLASS="PROGRAMLISTING"
+>REINDEX INDEX my_index;</PRE
+><P></P
+><P
+>Перестроение всех индексов таблицы <TT
+CLASS="LITERAL"
+>my_table</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>REINDEX TABLE my_table;</PRE
+><P></P
+><P
+>Перестроение всех индексов в определённой базе данных, в предположении, что целостность системных индексов под сомнением: </P><PRE
+CLASS="PROGRAMLISTING"
+>$ <KBD
+CLASS="USERINPUT"
+>export PGOPTIONS="-P"</KBD
+>
+$ <KBD
+CLASS="USERINPUT"
+>psql broken_db</KBD
+>
+...
+broken_db=&gt; REINDEX DATABASE broken_db;
+broken_db=&gt; \q</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN82453"
+></A
+><H2
+>Совместимость</H2
+><P
+>Команда <TT
+CLASS="COMMAND"
+>REINDEX</TT
+> отсутствует в стандарте SQL.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-refreshmaterializedview.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-release-savepoint.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>REFRESH MATERIALIZED VIEW</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>RELEASE SAVEPOINT</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

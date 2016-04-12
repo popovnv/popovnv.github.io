@@ -1,0 +1,716 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Сравнение табличных строк и массивов</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Функции и операторы"
+HREF="functions.html"><LINK
+REL="PREVIOUS"
+TITLE="Выражения подзапросов"
+HREF="functions-subquery.html"><LINK
+REL="NEXT"
+TITLE="Функции, возвращающие множества"
+HREF="functions-srf.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Выражения подзапросов"
+HREF="functions-subquery.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 9. Функции и операторы</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Функции, возвращающие множества"
+HREF="functions-srf.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="FUNCTIONS-COMPARISONS"
+>9.23. Сравнение табличных строк и массивов</A
+></H1
+><P
+>В этом разделе описываются несколько специальных конструкций, позволяющих сравнивать группы значений. Синтаксис этих конструкций связан с формами выражений с подзапросами, описанными в предыдущем разделе, а отличаются они отсутствием подзапросов. Конструкции, в которых в качестве подвыражений используются массивы, являются расширениями <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>; все остальные формы соответствуют стандарту <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>. Все описанные здесь выражения возвращают логические значения (true/false).</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN19651"
+>9.23.1. <TT
+CLASS="LITERAL"
+>IN</TT
+></A
+></H2
+><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> IN (<TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, ...</SPAN
+>])</PRE
+><P
+>Справа в скобках записывается список скалярных выражений. Результатом будет <SPAN
+CLASS="QUOTE"
+>"true"</SPAN
+>, если значение левого выражения равняется одному из значений выражений в правой части. Эту конструкцию можно считать краткой записью условия </P><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> = <TT
+CLASS="REPLACEABLE"
+><I
+>значение1</I
+></TT
+>
+OR
+<TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> = <TT
+CLASS="REPLACEABLE"
+><I
+>значение2</I
+></TT
+>
+OR
+...</PRE
+><P></P
+><P
+>Заметьте, что если результатом выражения слева оказывается NULL или равных значений справа не находится, а хотя бы одно из значений справа равно NULL, конструкция <TT
+CLASS="TOKEN"
+>IN</TT
+> возвращает NULL, а не false. Это соответствует принятым в SQL правилам сравнения переменных со значениями NULL.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN19667"
+>9.23.2. <TT
+CLASS="LITERAL"
+>NOT IN</TT
+></A
+></H2
+><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> NOT IN (<TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, ...</SPAN
+>])</PRE
+><P
+>Справа в скобках записывается список скалярных выражений. Результатом будет <SPAN
+CLASS="QUOTE"
+>"true"</SPAN
+>, если значение левого выражения не равно ни одному из значений выражений в правой части. Эту конструкцию можно считать краткой записью условия </P><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> &lt;&gt; <TT
+CLASS="REPLACEABLE"
+><I
+>значение1</I
+></TT
+>
+AND
+<TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> &lt;&gt; <TT
+CLASS="REPLACEABLE"
+><I
+>значение2</I
+></TT
+>
+AND
+...</PRE
+><P></P
+><P
+>Заметьте, что если результатом выражения слева оказывается NULL или равных значений справа не находится, а хотя бы одно из значений справа равно NULL, конструкция <TT
+CLASS="TOKEN"
+>NOT IN</TT
+> возвращает NULL, а не true, как можно было бы наивно полагать. Это соответствует принятым в SQL правилам сравнения переменных со значениями NULL.</P
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>Выражения <TT
+CLASS="LITERAL"
+>x NOT IN y</TT
+> и <TT
+CLASS="LITERAL"
+>NOT (x IN y)</TT
+> полностью равнозначны. Учитывая, что значения NULL могут ввести в заблуждение начинающих скорее в конструкции <TT
+CLASS="TOKEN"
+>NOT IN</TT
+>, чем в <TT
+CLASS="TOKEN"
+>IN</TT
+>, лучше формулировать условия так, чтобы в них было как можно меньше отрицаний.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN19689"
+>9.23.3. <TT
+CLASS="LITERAL"
+>ANY</TT
+>/<TT
+CLASS="LITERAL"
+>SOME</TT
+> (с массивом)</A
+></H2
+><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>оператор</I
+></TT
+> ANY (<TT
+CLASS="REPLACEABLE"
+><I
+>выражение массива</I
+></TT
+>)
+<TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>оператор</I
+></TT
+> SOME (<TT
+CLASS="REPLACEABLE"
+><I
+>выражение массива</I
+></TT
+>)</PRE
+><P
+>Справа в скобках записывается выражение, результатом которого является массив. Вычисленное значение левого выражения сравнивается с каждым элементом этого массива с применением заданного <TT
+CLASS="REPLACEABLE"
+><I
+>оператора</I
+></TT
+> условия, который должен выдавать логическое значение. Результатом <TT
+CLASS="TOKEN"
+>ANY</TT
+> будет <SPAN
+CLASS="QUOTE"
+>"true"</SPAN
+>, если для какого-либо элемента условие истинно, и <SPAN
+CLASS="QUOTE"
+>"false"</SPAN
+> в противном случае (в том числе, и когда массив оказывается пустым).</P
+><P
+>Если значением массива оказывается NULL, результатом <TT
+CLASS="TOKEN"
+>ANY</TT
+> также будет NULL. Если NULL получен в левой части, результатом <TT
+CLASS="TOKEN"
+>ANY</TT
+> обычно тоже будет NULL (хотя оператор нестрогого сравнения может выдать другой результат). Кроме того, если массив в правой части содержит элементы NULL и ни c одним из элементов условие не выполняется, результатом <TT
+CLASS="TOKEN"
+>ANY</TT
+> будет NULL, а не false (опять же, если используется оператор строгого сравнения). Это соответствует принятым в SQL правилам сравнения переменных со значениями NULL.</P
+><P
+>Ключевое слово <TT
+CLASS="TOKEN"
+>SOME</TT
+> является синонимом <TT
+CLASS="TOKEN"
+>ANY</TT
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN19712"
+>9.23.4. <TT
+CLASS="LITERAL"
+>ALL</TT
+> (с массивом)</A
+></H2
+><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>оператор</I
+></TT
+> ALL (<TT
+CLASS="REPLACEABLE"
+><I
+>выражение массива</I
+></TT
+>)</PRE
+><P
+>Справа в скобках записывается выражение, результатом которого является массив. Вычисленное значение левого выражения сравнивается с каждым элементом этого массива с применением заданного <TT
+CLASS="REPLACEABLE"
+><I
+>оператора</I
+></TT
+> условия, который должен выдавать логическое значение. Результатом <TT
+CLASS="TOKEN"
+>ALL</TT
+> будет <SPAN
+CLASS="QUOTE"
+>"true"</SPAN
+>, если для всех элементов условие истинно (или массив не содержит элементов), и <SPAN
+CLASS="QUOTE"
+>"false"</SPAN
+>, если находятся строки, для которых оно ложно.</P
+><P
+>Если значением массива оказывается NULL, результатом <TT
+CLASS="TOKEN"
+>ALL</TT
+> также будет NULL. Если NULL получен в левой части, результатом <TT
+CLASS="TOKEN"
+>ALL</TT
+> обычно тоже будет NULL (хотя оператор нестрогого сравнения может выдать другой результат). Кроме того, если массив в правой части содержит элементы NULL и при этом нет элементов, с которыми условие не выполняется, результатом <TT
+CLASS="TOKEN"
+>ALL</TT
+> будет NULL, а не true (опять же, если используется оператор строгого сравнения). Это соответствует принятым в SQL правилам сравнения переменных со значениями NULL.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="ROW-WISE-COMPARISON"
+>9.23.5. Сравнение конструкторов строк</A
+></H2
+><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>конструктор_строки</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>оператор</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>конструктор_строки</I
+></TT
+></PRE
+><P
+>С обеих сторон представлены конструкторы строк (они описываются в <A
+HREF="sql-expressions.html#SQL-SYNTAX-ROW-CONSTRUCTORS"
+>Подразделе 4.2.13</A
+>). При этом данные строки должны содержать одинаковое число полей. После вычисления каждой стороны они сравниваются по строкам. Сравнения конструкторов строк возможны с <TT
+CLASS="REPLACEABLE"
+><I
+>оператором</I
+></TT
+> <TT
+CLASS="LITERAL"
+>=</TT
+>, <TT
+CLASS="LITERAL"
+>&lt;&gt;</TT
+>, <TT
+CLASS="LITERAL"
+>&lt;</TT
+>, <TT
+CLASS="LITERAL"
+>&lt;=</TT
+>, <TT
+CLASS="LITERAL"
+>&gt;</TT
+> или <TT
+CLASS="LITERAL"
+>&gt;=</TT
+>. Каждый элемент строки должен иметь тип, для которого определён класс операторов B-дерева; в противном случае при попытке сравнения может возникнуть ошибка.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Ошибок, связанных с числом или типов элементов, не должно быть, если сравнение выполняется с ранее полученными колонками.</P
+></BLOCKQUOTE
+></DIV
+><P
+>Сравнения <TT
+CLASS="LITERAL"
+>=</TT
+> и <TT
+CLASS="LITERAL"
+>&lt;&gt;</TT
+> несколько отличаются от других. С этими операторами две строки считаются равными, если все их соответствующие поля не равны NULL и равны между собой, и неравными, если какие-либо соответствующие их поля не NULL и не равны между собой. В противном случае результатом сравнения будет неопределённость (NULL).</P
+><P
+>С операторами <TT
+CLASS="LITERAL"
+>&lt;</TT
+>, <TT
+CLASS="LITERAL"
+>&lt;=</TT
+>, <TT
+CLASS="LITERAL"
+>&gt;</TT
+> и <TT
+CLASS="LITERAL"
+>&gt;=</TT
+> элементы строк сравниваются слева направо до тех пор, пока не будет найдена пара неравных элементов или значений NULL. Если любым из элементов пары оказывается NULL, результатом сравнения будет неопределённость (NULL), в противном случае результат всего выражения определяется результатом сравнения этих двух элементов. Например, результатом <TT
+CLASS="LITERAL"
+>ROW(1,2,NULL) &lt; ROW(1,3,0)</TT
+> будет true, а не NULL, так как третья пара элементов не принимается в рассмотрение.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>До версии 8.2 <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> обрабатывал условия <TT
+CLASS="LITERAL"
+>&lt;</TT
+>, <TT
+CLASS="LITERAL"
+>&lt;=</TT
+>, <TT
+CLASS="LITERAL"
+>&gt;</TT
+> и <TT
+CLASS="LITERAL"
+>&gt;=</TT
+> не так, как это описано в стандарте SQL. Сравнение <TT
+CLASS="LITERAL"
+>ROW(a,b) &lt; ROW(c,d)</TT
+> выполнялось как <TT
+CLASS="LITERAL"
+>a &lt; c AND b &lt; d</TT
+>, тогда как по стандарту должно быть <TT
+CLASS="LITERAL"
+>a &lt; c OR (a = c AND b &lt; d)</TT
+>.</P
+></BLOCKQUOTE
+></DIV
+><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>конструктор_строки</I
+></TT
+> IS DISTINCT FROM <TT
+CLASS="REPLACEABLE"
+><I
+>конструктор_строки</I
+></TT
+></PRE
+><P
+>Эта конструкция похожа на сравнение строк с оператором <TT
+CLASS="LITERAL"
+>&lt;&gt;</TT
+>, но со значениями NULL она выдаёт не NULL. Любое значение NULL для неё считается неравным (отличным от) любому значению не NULL, а два NULL считаются равными (не различными). Таким образом, результатом такого выражения будет true или false, но не NULL.</P
+><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>конструктор_строки</I
+></TT
+> IS NOT DISTINCT FROM <TT
+CLASS="REPLACEABLE"
+><I
+>конструктор_строки</I
+></TT
+></PRE
+><P
+>Эта конструкция похожа на сравнение строк с оператором <TT
+CLASS="LITERAL"
+>=</TT
+>, но со значениями NULL она выдаёт не NULL. Любое значение NULL для неё считается неравным (отличным от) любому значению не NULL, а два NULL считаются равными (не различными). Таким образом, результатом такого выражения всегда будет true или false, но не NULL.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="COMPOSITE-TYPE-COMPARISON"
+>9.23.6. Сравнение составных типов</A
+></H2
+><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>запись</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>оператор</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>запись</I
+></TT
+></PRE
+><P
+>Стандарт SQL требует, чтобы при сравнении строк возвращался NULL, если результат зависит от сравнения двух значений NULL или значения NULL и не NULL. <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> выполняет это требование только при сравнении строк, созданных конструкторами (как описано в <A
+HREF="functions-comparisons.html#ROW-WISE-COMPARISON"
+>Подразделе 9.23.5</A
+>), или строки, созданной конструктором, со строкой результата подзапроса (как было описано в <A
+HREF="functions-subquery.html"
+>Разделе 9.22</A
+>). В других контекстах при сравнении полей составных типов два значения NULL считаются равными, а любое значение не NULL полагается меньшим NULL. Это отклонение от правила необходимо для полноценной реализации сортировки и индексирования составных типов.</P
+><P
+>После вычисления каждой стороны они сравниваются по строкам. Сравнения составных типов возможны с <TT
+CLASS="REPLACEABLE"
+><I
+>оператором</I
+></TT
+> <TT
+CLASS="LITERAL"
+>=</TT
+>, <TT
+CLASS="LITERAL"
+>&lt;&gt;</TT
+>, <TT
+CLASS="LITERAL"
+>&lt;</TT
+>, <TT
+CLASS="LITERAL"
+>&lt;=</TT
+>, <TT
+CLASS="LITERAL"
+>&gt;</TT
+> или <TT
+CLASS="LITERAL"
+>&gt;=</TT
+>, либо другим подобным. (Точнее, оператором сравнения строк может быть любой оператор, входящий в класс операторов B-дерева, либо обратный к оператору <TT
+CLASS="LITERAL"
+>=</TT
+>, входящему в класс операторов B-дерева.) По умолчанию вышеперечисленные операторы действуют так же, как выражение <TT
+CLASS="LITERAL"
+>IS [ NOT ] DISTINCT FROM</TT
+> для конструкторов строк (см. <A
+HREF="functions-comparisons.html#ROW-WISE-COMPARISON"
+>Подраздел 9.23.5</A
+>).</P
+><P
+>Для поддержки сравнения строк с элементами, для которых не определён класс операторов B-дерева по умолчанию, введены следующие операторы: <TT
+CLASS="LITERAL"
+>*=</TT
+>, <TT
+CLASS="LITERAL"
+>*&lt;&gt;</TT
+>, <TT
+CLASS="LITERAL"
+>*&lt;</TT
+>, <TT
+CLASS="LITERAL"
+>*&lt;=</TT
+>, <TT
+CLASS="LITERAL"
+>*&gt;</TT
+> и <TT
+CLASS="LITERAL"
+>*&gt;=</TT
+>. Эти операторы сравнивают внутреннее двоичное представление двух строк. Учтите, что две строки могут иметь различное двоичное представление, даже когда при сравнении оператором равенства считаются равными. Порядок строк с такими операторами детерминирован, но не несёт смысловой нагрузки. Данные операторы применяются внутри системы для материализованных представлений и могут быть полезны для других специальных целей (например, репликации), но, вообще говоря, не предназначены для использования в обычных запросах.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions-subquery.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="functions-srf.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Выражения подзапросов</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Функции, возвращающие множества</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

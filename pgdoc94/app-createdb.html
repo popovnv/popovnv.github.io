@@ -1,0 +1,794 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>            createdb
+          </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Клиентские приложения PostgreSQL"
+HREF="reference-client.html"><LINK
+REL="PREVIOUS"
+TITLE="            clusterdb
+          "
+HREF="app-clusterdb.html"><LINK
+REL="NEXT"
+TITLE="            createlang
+          "
+HREF="app-createlang.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="            clusterdb
+          "
+HREF="app-clusterdb.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="reference-client.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="            createlang
+          "
+HREF="app-createlang.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="APP-CREATEDB"
+></A
+><SPAN
+CLASS="APPLICATION"
+>createdb</SPAN
+></H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN85832"
+></A
+><H2
+>Название</H2
+>createdb&nbsp;--&nbsp;создать базу данных <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN85836"
+></A
+><H2
+>Синтаксис</H2
+><P
+><TT
+CLASS="COMMAND"
+>createdb</TT
+> [              <TT
+CLASS="REPLACEABLE"
+><I
+>параметр-подключения</I
+></TT
+>
+            ...] [              <TT
+CLASS="REPLACEABLE"
+><I
+>параметр</I
+></TT
+>
+            ...] [<TT
+CLASS="REPLACEABLE"
+><I
+>база_данных</I
+></TT
+>
+    [<TT
+CLASS="REPLACEABLE"
+><I
+>описание</I
+></TT
+>]]</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="R1-APP-CREATEDB-1"
+></A
+><H2
+>Описание</H2
+><P
+><SPAN
+CLASS="APPLICATION"
+>createdb</SPAN
+> создаёт базу данных <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+><P
+>Чаще всего пользователь, выполняющий эту команду, назначается владельцем создаваемой базы данных. Однако можно указать владельца явным образом с помощью флага <TT
+CLASS="OPTION"
+>-O</TT
+>, если у текущего пользователя достаточно привилегий.</P
+><P
+><SPAN
+CLASS="APPLICATION"
+>createdb</SPAN
+> это обёртка для <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>-команды <A
+HREF="sql-createdatabase.html"
+>CREATE DATABASE</A
+>. Создание баз данных с её помощью по сути не отличается от выполнения того же действия при обращении к серверу другими способами.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN85858"
+></A
+><H2
+>Параметры</H2
+><P
+><SPAN
+CLASS="APPLICATION"
+>createdb</SPAN
+> принимает в качестве аргументов: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>база_данных</I
+></TT
+></DT
+><DD
+><P
+>Указывает имя создаваемой базы. Имя должно быть уникальным в рамках кластера <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. По умолчанию в качестве имени базы данных берётся имя текущего системного пользователя.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>описание</I
+></TT
+></DT
+><DD
+><P
+>Добавляет комментарий к создаваемой базе.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-D <TT
+CLASS="REPLACEABLE"
+><I
+>табличное пространство</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--tablespace=<TT
+CLASS="REPLACEABLE"
+><I
+>табличное пространство</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Указывает табличное пространство, используемое по умолчанию. Имя пространства обрабатывается аналогично идентификаторам, заключённым в двойные кавычки.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-e</TT
+><BR><TT
+CLASS="OPTION"
+>--echo</TT
+></DT
+><DD
+><P
+>Вывести команды к серверу, генерируемые при выполнении <SPAN
+CLASS="APPLICATION"
+>createdb</SPAN
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-E <TT
+CLASS="REPLACEABLE"
+><I
+>кодировка</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--encoding=<TT
+CLASS="REPLACEABLE"
+><I
+>кодировка</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Указывает кодировку базы данных. Поддерживаемые сервером <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> кодировки описаны в <A
+HREF="multibyte.html#MULTIBYTE-CHARSET-SUPPORTED"
+>Подразделе 22.3.1</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-l <TT
+CLASS="REPLACEABLE"
+><I
+>локаль</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--locale=<TT
+CLASS="REPLACEABLE"
+><I
+>локаль</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Указывает локаль базы данных. Имеет эффект одновременно установленных флагов <TT
+CLASS="OPTION"
+>--lc-collate</TT
+> и <TT
+CLASS="OPTION"
+>--lc-ctype</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>--lc-collate=<TT
+CLASS="REPLACEABLE"
+><I
+>локаль</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Устанавливает параметр LC_COLLATE для базы данных.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>--lc-ctype=<TT
+CLASS="REPLACEABLE"
+><I
+>локаль</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Устанавливает параметр LC_CTYPE для базы данных.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-O <TT
+CLASS="REPLACEABLE"
+><I
+>владелец</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--owner=<TT
+CLASS="REPLACEABLE"
+><I
+>владелец</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Указывает пользователя в качестве владельца создаваемой базы. Имя пользователя обрабатывается аналогично идентификаторам, заключённым в двойные кавычки.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-T <TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--template=<TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Указывает шаблон, на основе которого будет создана база данных. Имя шаблона обрабатывается аналогично идентификаторам, заключённым в двойные кавычки.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-V</TT
+><BR><TT
+CLASS="OPTION"
+>--version</TT
+></DT
+><DD
+><P
+>Вывести версию <SPAN
+CLASS="APPLICATION"
+>createdb</SPAN
+> и прервать дальнейшее исполнение.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-?</TT
+><BR><TT
+CLASS="OPTION"
+>--help</TT
+></DT
+><DD
+><P
+>Вывести помощь по команде <SPAN
+CLASS="APPLICATION"
+>createdb</SPAN
+> и прервать выполнение.</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>Флаги <TT
+CLASS="OPTION"
+>-D</TT
+>, <TT
+CLASS="OPTION"
+>-l</TT
+>, <TT
+CLASS="OPTION"
+>-E</TT
+>, <TT
+CLASS="OPTION"
+>-O</TT
+>, и <TT
+CLASS="OPTION"
+>-T</TT
+> по назначению соответствуют флагам SQL-команды <A
+HREF="sql-createdatabase.html"
+>CREATE DATABASE</A
+>.</P
+><P
+><SPAN
+CLASS="APPLICATION"
+>createdb</SPAN
+> также принимает из командной строки параметры подключения: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="OPTION"
+>-h <TT
+CLASS="REPLACEABLE"
+><I
+>host</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--host=<TT
+CLASS="REPLACEABLE"
+><I
+>host</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Указывает имя компьютера, на котором запущен сервер. Если значение начинается с косой черты, оно интерпретируется как имя каталога с доменным сокетом Unix.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-p <TT
+CLASS="REPLACEABLE"
+><I
+>порт</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--port=<TT
+CLASS="REPLACEABLE"
+><I
+>порт</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Указывает порт TCP или расширение файла Unix-сокета, на котором сервер слушает подключения.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-U <TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--username=<TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Имя пользователя, под которым производится подключение.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-w</TT
+><BR><TT
+CLASS="OPTION"
+>--no-password</TT
+></DT
+><DD
+><P
+>Не выдавать запрос на ввод пароля. Если сервер требует аутентификацию по паролю и пароль не доступен с помощью других средств, таких как файл <TT
+CLASS="FILENAME"
+>.pgpass</TT
+>, попытка соединения не удастся. Этот параметр может быть полезен в пакетных заданиях и скриптах, где нет пользователя, который вводит пароль.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-W</TT
+><BR><TT
+CLASS="OPTION"
+>--password</TT
+></DT
+><DD
+><P
+>Принудительно запрашивать пароль перед подключением к базе данных.</P
+><P
+>Это несущественный параметр, так как <SPAN
+CLASS="APPLICATION"
+>createdb</SPAN
+> запрашивает пароль автоматически, если сервер проверяет подлинность по паролю. Однако, чтобы понять это, <SPAN
+CLASS="APPLICATION"
+>createdb</SPAN
+> лишний раз подключается к серверу. Поэтому иногда имеет смысл ввести <TT
+CLASS="OPTION"
+>-W</TT
+>, чтобы исключить эту ненужную попытку подключения.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>--maintenance-db=<TT
+CLASS="REPLACEABLE"
+><I
+>база_данных</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Указывает имя опорной базы данных, к которой при создании новой будет произведено подключение. Если имя не указано, то будет использоваться <TT
+CLASS="LITERAL"
+>postgres</TT
+>. Если же <TT
+CLASS="LITERAL"
+>postgres</TT
+> не существует, то будет использоваться <TT
+CLASS="LITERAL"
+>template1</TT
+>.</P
+></DD
+></DL
+></DIV
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN86024"
+></A
+><H2
+>Переменные окружения</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="ENVAR"
+>PGDATABASE</TT
+></DT
+><DD
+><P
+>Если установлена, то используется при создании базы данных, за исключением ситуации с явным указанием флага командной строки.</P
+></DD
+><DT
+><TT
+CLASS="ENVAR"
+>PGHOST</TT
+><BR><TT
+CLASS="ENVAR"
+>PGPORT</TT
+><BR><TT
+CLASS="ENVAR"
+>PGUSER</TT
+></DT
+><DD
+><P
+>Параметры подключения по умолчанию. <TT
+CLASS="ENVAR"
+>PGUSER</TT
+> указывает имя пользователя при создании базы данных, если не указано явно в командной строке или в переменной окружения <TT
+CLASS="ENVAR"
+>PGDATABASE</TT
+>.</P
+></DD
+></DL
+></DIV
+><P
+>Эта утилита, как и большинство других утилит <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, также использует переменные среды, поддерживаемые <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> (см. <A
+HREF="libpq-envars.html"
+>Раздел 31.14</A
+>).</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN86047"
+></A
+><H2
+>Диагностика</H2
+><P
+>В случае возникновения трудностей, обратитесь к <A
+HREF="sql-createdatabase.html"
+>CREATE DATABASE</A
+> и <A
+HREF="app-psql.html"
+>            <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>
+          </A
+>. При диагностике нужно учитывать, что при запуске утилиты используются значения переменных окружения и параметров подключения по умолчанию <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN86053"
+></A
+><H2
+>Примеры</H2
+><P
+>Для создания базы данных <TT
+CLASS="LITERAL"
+>demo</TT
+> на сервере, используемом по умолчанию: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$ </SAMP
+><KBD
+CLASS="USERINPUT"
+>createdb demo</KBD
+></PRE
+><P></P
+><P
+>Для создания базы <TT
+CLASS="LITERAL"
+>demo</TT
+> на сервере <TT
+CLASS="LITERAL"
+>eden</TT
+>, порт 5000, с кодировкой <TT
+CLASS="LITERAL"
+>LATIN1</TT
+>: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$ </SAMP
+><KBD
+CLASS="USERINPUT"
+>createdb -p 5000 -h eden -E LATIN1 -e demo</KBD
+>
+<SAMP
+CLASS="COMPUTEROUTPUT"
+>CREATE DATABASE demo ENCODING 'LATIN1';</SAMP
+></PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN86068"
+></A
+><H2
+>См. также</H2
+><A
+HREF="app-dropdb.html"
+>            <SPAN
+CLASS="APPLICATION"
+>dropdb</SPAN
+>
+          </A
+>, <A
+HREF="sql-createdatabase.html"
+>CREATE DATABASE</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="app-clusterdb.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="app-createlang.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><SPAN
+CLASS="APPLICATION"
+>clusterdb</SPAN
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="reference-client.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><SPAN
+CLASS="APPLICATION"
+>createlang</SPAN
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

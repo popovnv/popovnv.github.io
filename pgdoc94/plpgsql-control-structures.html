@@ -1,0 +1,2441 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Управляющие структуры</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="PL/pgSQL — процедурный язык SQL"
+HREF="plpgsql.html"><LINK
+REL="PREVIOUS"
+TITLE="Основные операторы"
+HREF="plpgsql-statements.html"><LINK
+REL="NEXT"
+TITLE="Курсоры"
+HREF="plpgsql-cursors.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Основные операторы"
+HREF="plpgsql-statements.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="plpgsql.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 40. <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> — процедурный язык <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Курсоры"
+HREF="plpgsql-cursors.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="PLPGSQL-CONTROL-STRUCTURES"
+>40.6. Управляющие структуры</A
+></H1
+><P
+>Управляющие структуры, вероятно, наиболее полезная и важная часть <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+>. С их помощью можно очень гибко и эффективно манипулировать данными <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="PLPGSQL-STATEMENTS-RETURNING"
+>40.6.1. Команды для возврата значения из функции</A
+></H2
+><P
+>Две команды позволяют вернуть данные из функции: <TT
+CLASS="COMMAND"
+>RETURN</TT
+> и <TT
+CLASS="COMMAND"
+>RETURN NEXT</TT
+>.</P
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN60442"
+>40.6.1.1. <TT
+CLASS="COMMAND"
+>RETURN</TT
+></A
+></H3
+><PRE
+CLASS="SYNOPSIS"
+>RETURN <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+>;</PRE
+><P
+><TT
+CLASS="COMMAND"
+>RETURN</TT
+> с последующим выражением прекращает выполнение функции и возвращает значение выражения в вызывающую программу. Эта форма используется для функций <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+>, которые не возвращают набор строк.</P
+><P
+>В функции, возвращающей скалярный тип, результирующее выражение автоматически приводится к типу возвращаемого значения. Однако, чтобы вернуть составной тип (строку), возвращаемое выражение должно в точности содержать требуемый набор столбцов. При этом может потребоваться явное приведение типов.</P
+><P
+>Для функции с выходными параметрами просто используйте <TT
+CLASS="COMMAND"
+>RETURN</TT
+> без выражения. Будут возвращены текущие значения выходных параметров.</P
+><P
+>Для функции, возвращающей <TT
+CLASS="TYPE"
+>void</TT
+>, <TT
+CLASS="COMMAND"
+>RETURN</TT
+> можно использовать в любом месте, но без выражения после <TT
+CLASS="COMMAND"
+>RETURN</TT
+>.</P
+><P
+>Возвращаемое значение функции не может остаться не определённым. Если достигнут конец блока верхнего уровня, а оператор <TT
+CLASS="COMMAND"
+>RETURN</TT
+> так и не встретился, происходит ошибка времени исполнения. Это не касается функций с выходными параметрами и функций, возвращающих <TT
+CLASS="TYPE"
+>void</TT
+>. Для них оператор <TT
+CLASS="COMMAND"
+>RETURN</TT
+> выполняется автоматически по окончании блока верхнего уровня.</P
+><P
+>Несколько примеров: </P><PRE
+CLASS="PROGRAMLISTING"
+>-- Функции, возвращающие скалярный тип данных
+RETURN 1 + 2;
+RETURN scalar_var;
+
+-- Функции, возвращающие составной тип данных
+RETURN composite_type_var;
+RETURN (1, 2, 'three'::text);  -- требуется приведение типов</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN60463"
+>40.6.1.2. <TT
+CLASS="COMMAND"
+>RETURN NEXT</TT
+> и <TT
+CLASS="COMMAND"
+>RETURN QUERY</TT
+></A
+></H3
+><PRE
+CLASS="SYNOPSIS"
+>RETURN NEXT <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+>;
+RETURN QUERY <TT
+CLASS="REPLACEABLE"
+><I
+>запрос</I
+></TT
+>;
+RETURN QUERY EXECUTE <TT
+CLASS="REPLACEABLE"
+><I
+>command-string</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>USING <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, ...</SPAN
+>]</SPAN
+>];</PRE
+><P
+>Для функций на <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+>, возвращающих <TT
+CLASS="LITERAL"
+>SETOF <TT
+CLASS="REPLACEABLE"
+><I
+>sometype</I
+></TT
+></TT
+>, нужно действовать несколько по-иному. Отдельные элементы возвращаемого значения формируются командами <TT
+CLASS="COMMAND"
+>RETURN NEXT</TT
+> или <TT
+CLASS="COMMAND"
+>RETURN QUERY</TT
+>, а финальная команда <TT
+CLASS="COMMAND"
+>RETURN</TT
+> без аргументов завершает выполнение функции. <TT
+CLASS="COMMAND"
+>RETURN NEXT</TT
+> используется как со скалярными, так и с составными типами данных. Для составного типа результат функции возвращается в виде таблицы. <TT
+CLASS="COMMAND"
+>RETURN QUERY</TT
+> добавляет результат выполнения запроса к результату функции. <TT
+CLASS="COMMAND"
+>RETURN NEXT</TT
+> и <TT
+CLASS="COMMAND"
+>RETURN QUERY</TT
+> можно свободно смешивать в теле функции, в этом случае их результаты будут объединены.</P
+><P
+><TT
+CLASS="COMMAND"
+>RETURN NEXT</TT
+> и <TT
+CLASS="COMMAND"
+>RETURN QUERY</TT
+> не выполняют возврат из функции. Они просто добавляют строки в результирующее множество. Затем выполнение продолжается со следующего оператора в функции. Успешное выполнение <TT
+CLASS="COMMAND"
+>RETURN NEXT</TT
+> и <TT
+CLASS="COMMAND"
+>RETURN QUERY</TT
+> формирует множество строк результата. Для выхода из функции используется <TT
+CLASS="COMMAND"
+>RETURN</TT
+>, обязательно без аргументов (или можно просто дождаться окончания выполнения функции).</P
+><P
+><TT
+CLASS="COMMAND"
+>RETURN QUERY</TT
+> имеет разновидность <TT
+CLASS="COMMAND"
+>RETURN QUERY EXECUTE</TT
+>, предназначенную для динамического выполнения запроса. В текст запроса можно добавить параметры, используя <TT
+CLASS="LITERAL"
+>USING</TT
+>, также как и с командой <TT
+CLASS="COMMAND"
+>EXECUTE</TT
+>.</P
+><P
+>Для функции с выходными параметрами просто используйте <TT
+CLASS="COMMAND"
+>RETURN NEXT</TT
+> без аргументов. При каждом исполнении <TT
+CLASS="COMMAND"
+>RETURN NEXT</TT
+> текущие значения выходных параметров сохраняются для последующего возврата в качестве строки результата. Обратите внимание, что если функция с выходными параметрами должна возвращать множество значений, то при объявлении нужно указывать <TT
+CLASS="LITERAL"
+>RETURNS SETOF</TT
+>. При этом если выходных параметров несколько, то используется <TT
+CLASS="LITERAL"
+>RETURNS SETOF record</TT
+>, а если только один с типом <TT
+CLASS="REPLACEABLE"
+><I
+>sometype</I
+></TT
+>, то <TT
+CLASS="LITERAL"
+>RETURNS SETOF <TT
+CLASS="REPLACEABLE"
+><I
+>sometype</I
+></TT
+></TT
+>.</P
+><P
+>Пример использования <TT
+CLASS="COMMAND"
+>RETURN NEXT</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE foo (fooid INT, foosubid INT, fooname TEXT);
+INSERT INTO foo VALUES (1, 2, 'three');
+INSERT INTO foo VALUES (4, 5, 'six');
+
+CREATE OR REPLACE FUNCTION get_all_foo() RETURNS SETOF foo AS
+$BODY$
+DECLARE
+    r foo%rowtype;
+BEGIN
+    FOR r IN
+        SELECT * FROM foo WHERE fooid &gt; 0
+    LOOP
+        -- здесь возможна обработка данных
+        RETURN NEXT r; -- добавляет текущую строку запроса к возвращаемому результату
+    END LOOP;
+    RETURN;
+END
+$BODY$
+LANGUAGE plpgsql;
+
+SELECT * FROM get_all_foo();</PRE
+><P></P
+><P
+>Пример использования <TT
+CLASS="COMMAND"
+>RETURN QUERY</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION get_available_flightid(date) RETURNS SETOF integer AS
+$BODY$
+BEGIN
+    RETURN QUERY SELECT flightid
+                   FROM flight
+                  WHERE flightdate &gt;= $1
+                    AND flightdate &lt; ($1 + 1);
+
+    -- Так как выполнение ещё не закончено, можно проверить, были ли возвращены строки
+    -- Если нет, то вызываем исключение
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Нет рейсов на дату: %.', $1;
+    END IF;
+
+    RETURN;
+ END
+$BODY$
+LANGUAGE plpgsql;
+
+-- Возвращает доступные рейсы, либо вызывает исключение
+SELECT * FROM get_available_flightid(CURRENT_DATE);</PRE
+><P></P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>В текущей реализации <TT
+CLASS="COMMAND"
+>RETURN NEXT</TT
+> и <TT
+CLASS="COMMAND"
+>RETURN QUERY</TT
+> результирующее множество накапливается целиком, прежде чем будет возвращено из функции. Если множество очень большое, то это может отрицательно сказаться на производительности, так как при нехватке оперативной памяти данные записываются на диск. В следующих версиях <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> это ограничение будет снято. В настоящее время управлять количеством оперативной памяти в подобных случаях можно параметром конфигурации <A
+HREF="runtime-config-resource.html#GUC-WORK-MEM"
+>work_mem</A
+>. При наличии свободной памяти администраторы должны рассмотреть возможность увеличения значения данного параметра.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="PLPGSQL-CONDITIONALS"
+>40.6.2. Условные операторы</A
+></H2
+><P
+>Операторы <TT
+CLASS="COMMAND"
+>IF</TT
+> и <TT
+CLASS="COMMAND"
+>CASE</TT
+> позволяют выполнять команды в зависимости от определённых условий. <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> поддерживает три формы <TT
+CLASS="COMMAND"
+>IF</TT
+>: <P
+></P
+></P><UL
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>IF ... THEN</TT
+></P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>IF ... THEN ... ELSE</TT
+></P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>IF ... THEN ... ELSIF ... THEN ... ELSE</TT
+></P
+></LI
+></UL
+><P> и две формы <TT
+CLASS="COMMAND"
+>CASE</TT
+>: <P
+></P
+></P><UL
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>CASE ... WHEN ... THEN ... ELSE ... END CASE</TT
+></P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>CASE WHEN ... THEN ... ELSE ... END CASE</TT
+></P
+></LI
+></UL
+><P></P
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN60547"
+>40.6.2.1. <TT
+CLASS="LITERAL"
+>IF-THEN</TT
+></A
+></H3
+><PRE
+CLASS="SYNOPSIS"
+>IF <TT
+CLASS="REPLACEABLE"
+><I
+>boolean-expression</I
+></TT
+> THEN
+    <TT
+CLASS="REPLACEABLE"
+><I
+>statements</I
+></TT
+>
+END IF;</PRE
+><P
+><TT
+CLASS="LITERAL"
+>IF-THEN</TT
+> это простейшая форма <TT
+CLASS="LITERAL"
+>IF</TT
+>. Операторы между <TT
+CLASS="LITERAL"
+>THEN</TT
+> и <TT
+CLASS="LITERAL"
+>END IF</TT
+> выполняются, если условие (<TT
+CLASS="REPLACEABLE"
+><I
+>boolean-expression</I
+></TT
+>) истинно. В противном случае они опускаются.</P
+><P
+>Пример: </P><PRE
+CLASS="PROGRAMLISTING"
+>IF v_user_id &lt;&gt; 0 THEN
+    UPDATE users SET email = v_email WHERE user_id = v_user_id;
+END IF;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN60561"
+>40.6.2.2. <TT
+CLASS="LITERAL"
+>IF-THEN-ELSE</TT
+></A
+></H3
+><PRE
+CLASS="SYNOPSIS"
+>IF <TT
+CLASS="REPLACEABLE"
+><I
+>boolean-expression</I
+></TT
+> THEN
+    <TT
+CLASS="REPLACEABLE"
+><I
+>statements</I
+></TT
+>
+ELSE
+    <TT
+CLASS="REPLACEABLE"
+><I
+>statements</I
+></TT
+>
+END IF;</PRE
+><P
+><TT
+CLASS="LITERAL"
+>IF-THEN-ELSE</TT
+> добавляет к <TT
+CLASS="LITERAL"
+>IF-THEN</TT
+> возможность указать альтернативный набор операторов, которые будут выполнены, если условие не истинно (в том числе, если условие NULL).</P
+><P
+>Примеры: </P><PRE
+CLASS="PROGRAMLISTING"
+>IF parentid IS NULL OR parentid = ''
+THEN
+    RETURN fullname;
+ELSE
+    RETURN hp_true_filename(parentid) || '/' || fullname;
+END IF;</PRE
+><P>
+
+</P><PRE
+CLASS="PROGRAMLISTING"
+>IF v_count &gt; 0 THEN
+    INSERT INTO users_count (count) VALUES (v_count);
+    RETURN 't';
+ELSE
+    RETURN 'f';
+END IF;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN60574"
+>40.6.2.3. <TT
+CLASS="LITERAL"
+>IF-THEN-ELSIF</TT
+></A
+></H3
+><PRE
+CLASS="SYNOPSIS"
+>IF <TT
+CLASS="REPLACEABLE"
+><I
+>boolean-expression</I
+></TT
+> THEN
+    <TT
+CLASS="REPLACEABLE"
+><I
+>statements</I
+></TT
+>
+[<SPAN
+CLASS="OPTIONAL"
+>ELSIF <TT
+CLASS="REPLACEABLE"
+><I
+>boolean-expression</I
+></TT
+> THEN <TT
+CLASS="REPLACEABLE"
+><I
+>statements</I
+></TT
+>
+[<SPAN
+CLASS="OPTIONAL"
+>ELSIF <TT
+CLASS="REPLACEABLE"
+><I
+>boolean-expression</I
+></TT
+> THEN <TT
+CLASS="REPLACEABLE"
+><I
+>statements</I
+></TT
+> ...</SPAN
+>]</SPAN
+>]
+[<SPAN
+CLASS="OPTIONAL"
+>ELSE <TT
+CLASS="REPLACEABLE"
+><I
+>statements</I
+></TT
+></SPAN
+>]
+END IF;</PRE
+><P
+>В некоторых случаях двух альтернатив недостаточно. <TT
+CLASS="LITERAL"
+>IF-THEN-ELSIF</TT
+> обеспечивает удобный способ проверки нескольких вариантов по очереди. Условия в <TT
+CLASS="LITERAL"
+>IF</TT
+> последовательно проверяются до тех пор, пока не будет найдено первое истинное. После этого операторы, относящиеся к этому условию, выполняются, и управление переходит к следующей после <TT
+CLASS="LITERAL"
+>END IF</TT
+> команде. (Все последующие условия не проверяются.) Если ни одно из условий <TT
+CLASS="LITERAL"
+>IF</TT
+> не является истинным, то выполняется блок <TT
+CLASS="LITERAL"
+>ELSE</TT
+> (если присутствует).</P
+><P
+>Пример: </P><PRE
+CLASS="PROGRAMLISTING"
+>IF number = 0 THEN
+    result := 'zero';
+ELSIF number &gt; 0 THEN
+    result := 'positive';
+ELSIF number &lt; 0 THEN
+    result := 'negative';
+ELSE
+    -- раз мы здесь, значит значение number не определено (NULL)
+    result := 'NULL';
+END IF;</PRE
+><P></P
+><P
+>Вместо ключевого слова <TT
+CLASS="LITERAL"
+>ELSIF</TT
+> можно использовать <TT
+CLASS="LITERAL"
+>ELSEIF</TT
+>.</P
+><P
+>Другой вариант сделать то же самое, это использование вложенных операторов <TT
+CLASS="LITERAL"
+>IF-THEN-ELSE</TT
+>, как в следующем примере: </P><PRE
+CLASS="PROGRAMLISTING"
+>IF demo_row.sex = 'm' THEN
+    pretty_sex := 'man';
+ELSE
+    IF demo_row.sex = 'f' THEN
+        pretty_sex := 'woman';
+    END IF;
+END IF;</PRE
+><P></P
+><P
+>Однако это требует написания соответствующих <TT
+CLASS="LITERAL"
+>END IF</TT
+> для каждого <TT
+CLASS="LITERAL"
+>IF</TT
+>, что при наличии нескольких альтернатив делает код более громоздким, чем использование <TT
+CLASS="LITERAL"
+>ELSIF</TT
+>.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN60606"
+>40.6.2.4. Простой <TT
+CLASS="LITERAL"
+>CASE</TT
+></A
+></H3
+><PRE
+CLASS="SYNOPSIS"
+>CASE <TT
+CLASS="REPLACEABLE"
+><I
+>search-expression</I
+></TT
+>
+    WHEN <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>...</SPAN
+>]</SPAN
+>] THEN
+      <TT
+CLASS="REPLACEABLE"
+><I
+>statements</I
+></TT
+>
+  [<SPAN
+CLASS="OPTIONAL"
+>WHEN <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>...</SPAN
+>]</SPAN
+>] THEN <TT
+CLASS="REPLACEABLE"
+><I
+>statements</I
+></TT
+> ...</SPAN
+>]
+  [<SPAN
+CLASS="OPTIONAL"
+>ELSE <TT
+CLASS="REPLACEABLE"
+><I
+>statements</I
+></TT
+></SPAN
+>]
+END CASE;</PRE
+><P
+>Простая форма <TT
+CLASS="COMMAND"
+>CASE</TT
+> реализует условное выполнение на основе сравнения операндов. <TT
+CLASS="REPLACEABLE"
+><I
+>search-expression</I
+></TT
+> вычисляется (один раз) и последовательно сравнивается с каждым <TT
+CLASS="REPLACEABLE"
+><I
+>expression</I
+></TT
+> в условиях <TT
+CLASS="LITERAL"
+>WHEN</TT
+>. Если совпадение найдено, то выполняются соответствующие <TT
+CLASS="REPLACEABLE"
+><I
+>statements</I
+></TT
+> и управление переходит к следующей после <TT
+CLASS="LITERAL"
+>END CASE</TT
+> команде. (Все последующие выражения <TT
+CLASS="LITERAL"
+>WHEN</TT
+> не проверяются.) Если совпадение не было найдено, то выполняются <TT
+CLASS="LITERAL"
+>ELSE</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>statements</I
+></TT
+>. Но если <TT
+CLASS="LITERAL"
+>ELSE</TT
+> нет, то вызывается исключение <TT
+CLASS="LITERAL"
+>CASE_NOT_FOUND</TT
+>.</P
+><P
+>Пример: </P><PRE
+CLASS="PROGRAMLISTING"
+>CASE x
+    WHEN 1, 2 THEN
+        msg := 'один или два';
+    ELSE
+        msg := 'значение, отличное от один или два';
+END CASE;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN60638"
+>40.6.2.5. <TT
+CLASS="LITERAL"
+>CASE</TT
+> с перебором условий</A
+></H3
+><PRE
+CLASS="SYNOPSIS"
+>CASE
+    WHEN <TT
+CLASS="REPLACEABLE"
+><I
+>boolean-expression</I
+></TT
+> THEN
+      <TT
+CLASS="REPLACEABLE"
+><I
+>statements</I
+></TT
+>
+  [<SPAN
+CLASS="OPTIONAL"
+>WHEN <TT
+CLASS="REPLACEABLE"
+><I
+>boolean-expression</I
+></TT
+> THEN <TT
+CLASS="REPLACEABLE"
+><I
+>statements</I
+></TT
+> ...</SPAN
+>]
+  [<SPAN
+CLASS="OPTIONAL"
+>ELSE <TT
+CLASS="REPLACEABLE"
+><I
+>statements</I
+></TT
+></SPAN
+>]
+END CASE;</PRE
+><P
+>Эта форма <TT
+CLASS="COMMAND"
+>CASE</TT
+> реализует условное выполнение, основываясь на истинности логических условий. Каждое выражение <TT
+CLASS="REPLACEABLE"
+><I
+>boolean-expression</I
+></TT
+> в предложении <TT
+CLASS="LITERAL"
+>WHEN</TT
+> вычисляется по порядку до тех пор, пока не будет найдено истинное. Затем выполняются соответствующие <TT
+CLASS="REPLACEABLE"
+><I
+>statements</I
+></TT
+> и управление переходит к следующей после <TT
+CLASS="LITERAL"
+>END CASE</TT
+> команде. (Все последующие выражения <TT
+CLASS="LITERAL"
+>WHEN</TT
+> не проверяются.) Если ни одно из условий не окажется истинным, то выполняются <TT
+CLASS="LITERAL"
+>ELSE</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>statements</I
+></TT
+>. Но если <TT
+CLASS="LITERAL"
+>ELSE</TT
+> нет, то вызывается исключение <TT
+CLASS="LITERAL"
+>CASE_NOT_FOUND</TT
+>.</P
+><P
+>Пример: </P><PRE
+CLASS="PROGRAMLISTING"
+>CASE
+    WHEN x BETWEEN 0 AND 10 THEN
+        msg := 'значение в диапазоне между 0 и 10';
+    WHEN x BETWEEN 11 AND 20 THEN
+        msg := 'значение в диапазоне между 11 и 20';
+END CASE;</PRE
+><P></P
+><P
+>Эта форма <TT
+CLASS="COMMAND"
+>CASE</TT
+> полностью эквивалента <TT
+CLASS="LITERAL"
+>IF-THEN-ELSIF</TT
+>, за исключением того, что при невыполнении всех условий и отсутствии <TT
+CLASS="LITERAL"
+>ELSE</TT
+>, <TT
+CLASS="LITERAL"
+>IF-THEN-ELSIF</TT
+> ничего не делает, а <TT
+CLASS="COMMAND"
+>CASE</TT
+> вызывает ошибку.</P
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="PLPGSQL-CONTROL-STRUCTURES-LOOPS"
+>40.6.3. Простые циклы</A
+></H2
+><P
+>Операторы <TT
+CLASS="LITERAL"
+>LOOP</TT
+>, <TT
+CLASS="LITERAL"
+>EXIT</TT
+>, <TT
+CLASS="LITERAL"
+>CONTINUE</TT
+>, <TT
+CLASS="LITERAL"
+>WHILE</TT
+>, <TT
+CLASS="LITERAL"
+>FOR</TT
+> и <TT
+CLASS="LITERAL"
+>FOREACH</TT
+> позволяют повторить серию команд в функции на <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+>.</P
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN60681"
+>40.6.3.1. <TT
+CLASS="LITERAL"
+>LOOP</TT
+></A
+></H3
+><PRE
+CLASS="SYNOPSIS"
+>[<SPAN
+CLASS="OPTIONAL"
+>&lt;&lt;<TT
+CLASS="REPLACEABLE"
+><I
+>метка</I
+></TT
+>&gt;&gt;</SPAN
+>]
+LOOP
+    <TT
+CLASS="REPLACEABLE"
+><I
+>statements</I
+></TT
+>
+END LOOP [<SPAN
+CLASS="OPTIONAL"
+> <TT
+CLASS="REPLACEABLE"
+><I
+>метка</I
+></TT
+> </SPAN
+>];</PRE
+><P
+><TT
+CLASS="LITERAL"
+>LOOP</TT
+> организует безусловный цикл, который повторяется до бесконечности, пока не будет прекращён операторами <TT
+CLASS="LITERAL"
+>EXIT</TT
+> или <TT
+CLASS="COMMAND"
+>RETURN</TT
+>. Для вложенных циклов можно использовать <TT
+CLASS="REPLACEABLE"
+><I
+>label</I
+></TT
+> в операторах <TT
+CLASS="LITERAL"
+>EXIT</TT
+> и <TT
+CLASS="LITERAL"
+>CONTINUE</TT
+>, чтобы указать к какому циклу эти операторы относятся.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN60697"
+>40.6.3.2. <TT
+CLASS="LITERAL"
+>EXIT</TT
+></A
+></H3
+><PRE
+CLASS="SYNOPSIS"
+>EXIT [<SPAN
+CLASS="OPTIONAL"
+> <TT
+CLASS="REPLACEABLE"
+><I
+>метка</I
+></TT
+> </SPAN
+>] [<SPAN
+CLASS="OPTIONAL"
+>WHEN <TT
+CLASS="REPLACEABLE"
+><I
+>boolean-expression</I
+></TT
+></SPAN
+>];</PRE
+><P
+>Если <TT
+CLASS="REPLACEABLE"
+><I
+>label</I
+></TT
+> не указана, то завершается самый внутренний цикл, далее выполняется оператор, следующий за <TT
+CLASS="LITERAL"
+>END LOOP</TT
+>. Если <TT
+CLASS="REPLACEABLE"
+><I
+>label</I
+></TT
+> указана, то она должна относиться к текущему или внешнему циклу, или это может быть метка блока. При этом в именованном цикле/блоке выполнение прекращается, а управление переходит к следующему оператору после соответствующего <TT
+CLASS="LITERAL"
+>END</TT
+>.</P
+><P
+>При наличии <TT
+CLASS="LITERAL"
+>WHEN</TT
+> цикл прекращается, только если <TT
+CLASS="REPLACEABLE"
+><I
+>boolean-expression</I
+></TT
+> истинно. В противном случае управление переходит к оператору следующему за <TT
+CLASS="LITERAL"
+>EXIT</TT
+>.</P
+><P
+><TT
+CLASS="LITERAL"
+>EXIT</TT
+> можно использовать со всеми типами циклов, не только с безусловным.</P
+><P
+>Когда <TT
+CLASS="LITERAL"
+>EXIT</TT
+> используется для выхода из блока, управление переходит к следующему оператору после окончания блока. Обратите внимание, что для выхода из блока нужно обязательно указывать <TT
+CLASS="REPLACEABLE"
+><I
+>label</I
+></TT
+>. <TT
+CLASS="LITERAL"
+>EXIT</TT
+> без <TT
+CLASS="REPLACEABLE"
+><I
+>label</I
+></TT
+> не позволяет прекратить работу блока. (Это изменение по сравнению с версиями <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> до 8.4, в которых разрешалось использовать <TT
+CLASS="LITERAL"
+>EXIT</TT
+> без <TT
+CLASS="REPLACEABLE"
+><I
+>label</I
+></TT
+> для прекращения работы текущего блока.)</P
+><P
+>Примеры: </P><PRE
+CLASS="PROGRAMLISTING"
+>LOOP
+    -- здесь вычисления 
+    IF count &gt; 0 THEN
+        EXIT;  -- выход из цикла
+    END IF;
+END LOOP;
+
+LOOP
+    -- здесь вычисления
+    EXIT WHEN count &gt; 0;  -- аналогично предыдущему примеру
+END LOOP;
+
+&lt;&lt;ablock&gt;&gt;
+BEGIN
+    -- здесь вычисления
+    IF stocks &gt; 100000 THEN
+        EXIT ablock;  -- выход из блока ablock
+    END IF;
+    -- вычисления не будут выполнены, если stocks &gt; 100000
+END;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN60729"
+>40.6.3.3. <TT
+CLASS="LITERAL"
+>CONTINUE</TT
+></A
+></H3
+><PRE
+CLASS="SYNOPSIS"
+>CONTINUE [<SPAN
+CLASS="OPTIONAL"
+> <TT
+CLASS="REPLACEABLE"
+><I
+>метка</I
+></TT
+> </SPAN
+>] [<SPAN
+CLASS="OPTIONAL"
+>WHEN <TT
+CLASS="REPLACEABLE"
+><I
+>boolean-expression</I
+></TT
+></SPAN
+>];</PRE
+><P
+>Если <TT
+CLASS="REPLACEABLE"
+><I
+>label</I
+></TT
+> не указана, то начинается следующая итерация самого внутреннего цикла. То есть все оставшиеся в цикле операторы пропускаются, и управление переходит к управляющему выражению цикла (если есть) для определения, нужна ли ещё одна итерация цикла. Если <TT
+CLASS="REPLACEABLE"
+><I
+>label</I
+></TT
+> присутствует, то она указывает на метку цикла, выполнение которого будет продолжено.</P
+><P
+>При наличии <TT
+CLASS="LITERAL"
+>WHEN</TT
+> следующая итерация цикла начинается только тогда, когда <TT
+CLASS="REPLACEABLE"
+><I
+>boolean-expression</I
+></TT
+> истинно. В противном случае управление переходит к оператору, следующему за <TT
+CLASS="LITERAL"
+>CONTINUE</TT
+>.</P
+><P
+><TT
+CLASS="LITERAL"
+>CONTINUE</TT
+> можно использовать со всеми типами циклов, не только с безусловным.</P
+><P
+>Примеры: </P><PRE
+CLASS="PROGRAMLISTING"
+>LOOP
+    -- здесь вычисления
+    EXIT WHEN count &gt; 100;
+    CONTINUE WHEN count &lt; 50;
+    -- Вычисления для count в диапазоне 50 .. 100
+END LOOP;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN60751"
+>40.6.3.4. <TT
+CLASS="LITERAL"
+>WHILE</TT
+></A
+></H3
+><PRE
+CLASS="SYNOPSIS"
+>[<SPAN
+CLASS="OPTIONAL"
+>&lt;&lt;<TT
+CLASS="REPLACEABLE"
+><I
+>метка</I
+></TT
+>&gt;&gt;</SPAN
+>]
+WHILE <TT
+CLASS="REPLACEABLE"
+><I
+>boolean-expression</I
+></TT
+> LOOP
+    <TT
+CLASS="REPLACEABLE"
+><I
+>statements</I
+></TT
+>
+END LOOP [<SPAN
+CLASS="OPTIONAL"
+> <TT
+CLASS="REPLACEABLE"
+><I
+>метка</I
+></TT
+> </SPAN
+>];</PRE
+><P
+><TT
+CLASS="LITERAL"
+>WHILE</TT
+> выполняет серию команд до тех пор, пока истинно выражение <TT
+CLASS="REPLACEABLE"
+><I
+>boolean-expression</I
+></TT
+>. Выражение проверяется непосредственно перед каждым входом в тело цикла.</P
+><P
+>Пример: </P><PRE
+CLASS="PROGRAMLISTING"
+>WHILE amount_owed &gt; 0 AND gift_certificate_balance &gt; 0 LOOP
+    -- здесь вычисления
+END LOOP;
+
+WHILE NOT done LOOP
+    -- здесь вычисления
+END LOOP;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="PLPGSQL-INTEGER-FOR"
+>40.6.3.5. <TT
+CLASS="LITERAL"
+>FOR</TT
+> (целочисленный вариант)</A
+></H3
+><PRE
+CLASS="SYNOPSIS"
+>[<SPAN
+CLASS="OPTIONAL"
+>&lt;&lt;<TT
+CLASS="REPLACEABLE"
+><I
+>метка</I
+></TT
+>&gt;&gt;</SPAN
+>]
+FOR <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> IN [<SPAN
+CLASS="OPTIONAL"
+>REVERSE</SPAN
+>] <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> .. <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>BY <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+></SPAN
+>] LOOP
+    <TT
+CLASS="REPLACEABLE"
+><I
+>statements</I
+></TT
+>
+END LOOP [<SPAN
+CLASS="OPTIONAL"
+> <TT
+CLASS="REPLACEABLE"
+><I
+>метка</I
+></TT
+> </SPAN
+>];</PRE
+><P
+>В этой форме цикла <TT
+CLASS="LITERAL"
+>FOR</TT
+> итерации выполняются по диапазону целых чисел. Переменная <TT
+CLASS="REPLACEABLE"
+><I
+>name</I
+></TT
+> автоматически определяется с типом <TT
+CLASS="TYPE"
+>integer</TT
+> и существует только внутри цикла (если уже существует переменная с таким именем, то внутри цикла она будет игнорироваться). Выражения для нижней и верхней границы диапазона чисел вычисляются один раз при входе в цикл. Если не указано <TT
+CLASS="LITERAL"
+>BY</TT
+>, то шаг итерации 1, в противном случае используется значение в <TT
+CLASS="LITERAL"
+>BY</TT
+>, которое вычисляется, опять же, один раз при входе в цикл. Если указано <TT
+CLASS="LITERAL"
+>REVERSE</TT
+>, то после каждой итерации величина шага вычитается, а не добавляется.</P
+><P
+>Примеры целочисленного <TT
+CLASS="LITERAL"
+>FOR</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>FOR i IN 1..10 LOOP
+    -- внутри цикла переменная i будет иметь значения 1,2,3,4,5,6,7,8,9,10
+END LOOP;
+
+FOR i IN REVERSE 10..1 LOOP
+    -- внутри цикла переменная i будет иметь значения 10,9,8,7,6,5,4,3,2,1
+END LOOP;
+
+FOR i IN REVERSE 10..1 BY 2 LOOP
+    -- внутри цикла переменная i будет иметь значения 10,8,6,4,2
+END LOOP;</PRE
+><P></P
+><P
+>Если нижняя граница цикла больше верхней границы (или меньше, в случае <TT
+CLASS="LITERAL"
+>REVERSE</TT
+>), то тело цикла не выполняется вообще. При этом ошибка не возникает.</P
+><P
+>Если у цикла есть метка, то к переменной цикла можно обращаться по имени, дополненному меткой.</P
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="PLPGSQL-RECORDS-ITERATING"
+>40.6.4. Цикл по результатам запроса</A
+></H2
+><P
+>Другой вариант <TT
+CLASS="LITERAL"
+>FOR</TT
+> позволяет организовать цикл по результатам запроса. Синтаксис: </P><PRE
+CLASS="SYNOPSIS"
+>[<SPAN
+CLASS="OPTIONAL"
+> &lt;&lt;<TT
+CLASS="REPLACEABLE"
+><I
+>label</I
+></TT
+>&gt;&gt; </SPAN
+>]
+FOR <TT
+CLASS="REPLACEABLE"
+><I
+>target</I
+></TT
+> IN <TT
+CLASS="REPLACEABLE"
+><I
+>query</I
+></TT
+> LOOP
+    <TT
+CLASS="REPLACEABLE"
+><I
+>statements</I
+></TT
+>
+END LOOP [<SPAN
+CLASS="OPTIONAL"
+> <TT
+CLASS="REPLACEABLE"
+><I
+>label</I
+></TT
+> </SPAN
+>];</PRE
+><P> Переменная <TT
+CLASS="REPLACEABLE"
+><I
+>target</I
+></TT
+> может быть строковой переменной, переменной типа <TT
+CLASS="TYPE"
+>record</TT
+> или разделённым запятыми списком скалярных переменных. В переменную <TT
+CLASS="REPLACEABLE"
+><I
+>target</I
+></TT
+> последовательно присваиваются строки результата запроса, и для каждой строки выполняется тело цикла. Пример: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION cs_refresh_mviews() RETURNS integer AS $$
+DECLARE
+    mviews RECORD;
+BEGIN
+    RAISE NOTICE 'Обновление материализованных представлений...';
+
+    FOR mviews IN SELECT * FROM cs_materialized_views ORDER BY sort_key LOOP
+
+        -- Сейчас "mviews" содержит одну запись из cs_materialized_views
+
+        RAISE NOTICE 'Обновляется мат. представление %s ...', quote_ident(mviews.mv_name);
+        EXECUTE 'TRUNCATE TABLE ' || quote_ident(mviews.mv_name);
+        EXECUTE 'INSERT INTO '
+                   || quote_ident(mviews.mv_name) || ' '
+                   || mviews.mv_query;
+    END LOOP;
+
+    RAISE NOTICE 'Закончено обновление материализованных представлений.';
+    RETURN 1;
+END;
+$$ LANGUAGE plpgsql;</PRE
+><P> Если цикл завершается по команде <TT
+CLASS="LITERAL"
+>EXIT</TT
+>, то последняя присвоенная строка доступна и после цикла.</P
+><P
+>В цикле <TT
+CLASS="LITERAL"
+>FOR</TT
+> можно использовать любые <TT
+CLASS="LITERAL"
+>SQL</TT
+>-команды, возвращающие строки. Чаще всего это <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, но могут быть и <TT
+CLASS="COMMAND"
+>INSERT</TT
+>, <TT
+CLASS="COMMAND"
+>UPDATE</TT
+>, <TT
+CLASS="COMMAND"
+>DELETE</TT
+> с предложением <TT
+CLASS="LITERAL"
+>RETURNING</TT
+>. А также некоторые утилиты, например <TT
+CLASS="COMMAND"
+>EXPLAIN</TT
+>.</P
+><P
+>Для переменных <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> в тексте запроса выполняется подстановка значений, план запроса кешируется для возможного повторного использования, как подробно описано в <A
+HREF="plpgsql-implementation.html#PLPGSQL-VAR-SUBST"
+>Подразделе 40.10.1</A
+> и <A
+HREF="plpgsql-implementation.html#PLPGSQL-PLAN-CACHING"
+>Подразделе 40.10.2</A
+>.</P
+><P
+>Ещё одна разновидность этого типа цикла <TT
+CLASS="LITERAL"
+>FOR-IN-EXECUTE</TT
+>: </P><PRE
+CLASS="SYNOPSIS"
+>[<SPAN
+CLASS="OPTIONAL"
+> &lt;&lt;<TT
+CLASS="REPLACEABLE"
+><I
+>label</I
+></TT
+>&gt;&gt; </SPAN
+>]
+FOR <TT
+CLASS="REPLACEABLE"
+><I
+>target</I
+></TT
+> IN EXECUTE <TT
+CLASS="REPLACEABLE"
+><I
+>text_expression</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+> USING <TT
+CLASS="REPLACEABLE"
+><I
+>expression</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, ... </SPAN
+>] </SPAN
+>] LOOP
+    <TT
+CLASS="REPLACEABLE"
+><I
+>statements</I
+></TT
+>
+END LOOP [<SPAN
+CLASS="OPTIONAL"
+> <TT
+CLASS="REPLACEABLE"
+><I
+>label</I
+></TT
+> </SPAN
+>];</PRE
+><P> Она похожа на предыдущую форму, за исключением того, что текст запроса указывается в виде строкового выражения. Текст запроса формируется и для него строится план выполнения при каждом входе в цикл. Это даёт программисту выбор между скоростью предварительно разобранного запроса и гибкостью динамического запроса, так же, как и в случае с обычным оператором <TT
+CLASS="COMMAND"
+>EXECUTE</TT
+>. Как и в <TT
+CLASS="COMMAND"
+>EXECUTE</TT
+>, значения параметров могут быть добавлены в команду с использованием <TT
+CLASS="LITERAL"
+>USING</TT
+>.</P
+><P
+>Ещё один способ организовать цикл по результатам запроса это объявить курсор. Описание в <A
+HREF="plpgsql-cursors.html#PLPGSQL-CURSOR-FOR-LOOP"
+>Подразделе 40.7.4</A
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="PLPGSQL-FOREACH-ARRAY"
+>40.6.5. Цикл по элементам массива</A
+></H2
+><P
+>Цикл <TT
+CLASS="LITERAL"
+>FOREACH</TT
+> очень похож на <TT
+CLASS="LITERAL"
+>FOR</TT
+>. Отличие в том, что вместо перебора строк SQL-запроса происходит перебор элементов массива. (В целом, <TT
+CLASS="LITERAL"
+>FOREACH</TT
+> предназначен для перебора выражений составного типа. Варианты реализации цикла для работы с прочими составными выражениями помимо массивов могут быть добавлены в будущем.) Синтаксис цикла <TT
+CLASS="LITERAL"
+>FOREACH</TT
+>: </P><PRE
+CLASS="SYNOPSIS"
+>[<SPAN
+CLASS="OPTIONAL"
+> &lt;&lt;<TT
+CLASS="REPLACEABLE"
+><I
+>label</I
+></TT
+>&gt;&gt; </SPAN
+>]
+FOREACH <TT
+CLASS="REPLACEABLE"
+><I
+>target</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+> SLICE <TT
+CLASS="REPLACEABLE"
+><I
+>number</I
+></TT
+> </SPAN
+>] IN ARRAY <TT
+CLASS="REPLACEABLE"
+><I
+>expression</I
+></TT
+> LOOP
+    <TT
+CLASS="REPLACEABLE"
+><I
+>statements</I
+></TT
+>
+END LOOP [<SPAN
+CLASS="OPTIONAL"
+> <TT
+CLASS="REPLACEABLE"
+><I
+>label</I
+></TT
+> </SPAN
+>];</PRE
+><P></P
+><P
+>Без указания <TT
+CLASS="LITERAL"
+>SLICE</TT
+>, или если <TT
+CLASS="LITERAL"
+>SLICE</TT
+> равен 0, цикл выполняется по всем элементам массива, полученного из <TT
+CLASS="REPLACEABLE"
+><I
+>expression</I
+></TT
+>. В переменную <TT
+CLASS="REPLACEABLE"
+><I
+>target</I
+></TT
+> последовательно присваивается каждый элемент массива и для него выполняется тело цикла. Пример цикла по элементам целочисленного массива: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION sum(int[]) RETURNS int8 AS $$
+DECLARE
+  s int8 := 0;
+  x int;
+BEGIN
+  FOREACH x IN ARRAY $1
+  LOOP
+    s := s + x;
+  END LOOP;
+  RETURN s;
+END;
+$$ LANGUAGE plpgsql;</PRE
+><P> Обход элементов проводится в том порядке, в котором они сохранялись, независимо от размерности массива. Как правило, <TT
+CLASS="REPLACEABLE"
+><I
+>target</I
+></TT
+> это одиночная переменная, но может быть и списком переменных, когда элементы массива имеют составной тип (записи). В этом случае переменным присваиваются значения из последовательных столбцов составного элемента массива.</P
+><P
+>При положительном значении <TT
+CLASS="LITERAL"
+>SLICE</TT
+> <TT
+CLASS="LITERAL"
+>FOREACH</TT
+> выполняет итерации по срезам массива, а не по отдельным элементам. Значение <TT
+CLASS="LITERAL"
+>SLICE</TT
+> должно быть целым числом, не превышающим размерности массива. Переменная <TT
+CLASS="REPLACEABLE"
+><I
+>target</I
+></TT
+> должна быть массивом, который получает последовательные срезы исходного массива, где размерность каждого среза задаётся значением <TT
+CLASS="LITERAL"
+>SLICE</TT
+>. Пример цикла по одномерным срезам: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION scan_rows(int[]) RETURNS void AS $$
+DECLARE
+  x int[];
+BEGIN
+  FOREACH x SLICE 1 IN ARRAY $1
+  LOOP
+    RAISE NOTICE 'row = %', x;
+  END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT scan_rows(ARRAY[[1,2,3],[4,5,6],[7,8,9],[10,11,12]]);
+
+NOTICE:  row = {1,2,3}
+NOTICE:  row = {4,5,6}
+NOTICE:  row = {7,8,9}
+NOTICE:  row = {10,11,12}</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="PLPGSQL-ERROR-TRAPPING"
+>40.6.6. Обработка ошибок</A
+></H2
+><P
+>По умолчанию любая возникающая ошибка прерывает выполнение функции на <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+>, а также транзакцию, относящуюся к этой функции. Использование в блоке секции <TT
+CLASS="LITERAL"
+>EXCEPTION</TT
+> позволяет перехватывать и обрабатывать ошибки. Синтаксис секции <TT
+CLASS="LITERAL"
+>EXCEPTION</TT
+> дополняет синтаксис обычного блока: </P><PRE
+CLASS="SYNOPSIS"
+>[<SPAN
+CLASS="OPTIONAL"
+> &lt;&lt;<TT
+CLASS="REPLACEABLE"
+><I
+>label</I
+></TT
+>&gt;&gt; </SPAN
+>]
+[<SPAN
+CLASS="OPTIONAL"
+> DECLARE
+    <TT
+CLASS="REPLACEABLE"
+><I
+>declarations</I
+></TT
+> </SPAN
+>]
+BEGIN
+    <TT
+CLASS="REPLACEABLE"
+><I
+>statements</I
+></TT
+>
+EXCEPTION
+    WHEN <TT
+CLASS="REPLACEABLE"
+><I
+>condition</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+> OR <TT
+CLASS="REPLACEABLE"
+><I
+>condition</I
+></TT
+> ... </SPAN
+>] THEN
+        <TT
+CLASS="REPLACEABLE"
+><I
+>handler_statements</I
+></TT
+>
+    [<SPAN
+CLASS="OPTIONAL"
+> WHEN <TT
+CLASS="REPLACEABLE"
+><I
+>condition</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+> OR <TT
+CLASS="REPLACEABLE"
+><I
+>condition</I
+></TT
+> ... </SPAN
+>] THEN
+          <TT
+CLASS="REPLACEABLE"
+><I
+>handler_statements</I
+></TT
+>
+      ... </SPAN
+>]
+END;</PRE
+><P></P
+><P
+>Если ошибок не было, то выполняются все <TT
+CLASS="REPLACEABLE"
+><I
+>statements</I
+></TT
+> блока и управление переходит к следующему оператору после <TT
+CLASS="LITERAL"
+>END</TT
+>. Но если при выполнении <TT
+CLASS="REPLACEABLE"
+><I
+>statements</I
+></TT
+> происходит ошибка, то дальнейшая обработка прекращается и управление переходит к списку исключений в секции <TT
+CLASS="LITERAL"
+>EXCEPTION</TT
+>. В этом списке ищется первое исключение, условие которого соответствует ошибке. Если исключение найдено, то выполняются соответствующие <TT
+CLASS="REPLACEABLE"
+><I
+>handler_statements</I
+></TT
+> и управление переходит к следующему оператору после <TT
+CLASS="LITERAL"
+>END</TT
+>. Если исключение не найдено, то ошибка передаётся наружу, как будто секции <TT
+CLASS="LITERAL"
+>EXCEPTION</TT
+> не было. При этом ошибку можно перехватить в секции <TT
+CLASS="LITERAL"
+>EXCEPTION</TT
+> внешнего блока. Если ошибка так и не была перехвачена, то обработка функции прекращается.</P
+><P
+>Допустимые имена <TT
+CLASS="REPLACEABLE"
+><I
+>condition</I
+></TT
+> перечислены в <A
+HREF="errcodes-appendix.html"
+>Приложении A</A
+>. Специальное имя <TT
+CLASS="LITERAL"
+>OTHERS</TT
+> соответствует любой ошибке, за исключением <TT
+CLASS="LITERAL"
+>QUERY_CANCELED</TT
+>. Можно явно обработать <TT
+CLASS="LITERAL"
+>QUERY_CANCELED</TT
+>, но зачастую это неразумно. Имена исключений не чувствительны к регистру. Кроме того, <TT
+CLASS="REPLACEABLE"
+><I
+>condition</I
+></TT
+> можно указать через соответствующий <TT
+CLASS="LITERAL"
+>SQLSTATE</TT
+> код. В следующем примере обе строки эквивалентны: </P><PRE
+CLASS="PROGRAMLISTING"
+>WHEN division_by_zero THEN ...
+WHEN SQLSTATE '22012' THEN ...</PRE
+><P></P
+><P
+>Если при выполнении <TT
+CLASS="REPLACEABLE"
+><I
+>handler_statements</I
+></TT
+> возникнет новая ошибка, то она не может быть перехвачена в этой секции <TT
+CLASS="LITERAL"
+>EXCEPTION</TT
+>. Ошибка передаётся наружу и её можно перехватить в секции <TT
+CLASS="LITERAL"
+>EXCEPTION</TT
+> внешнего блока.</P
+><P
+>При выполнении команд в секции <TT
+CLASS="LITERAL"
+>EXCEPTION</TT
+> локальные переменные функции на <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> сохраняют те значения, которые были на момент возникновения ошибки. Однако, будут отменены все изменения в базе данных, выполненные в блоке. В качестве примера рассмотрим следующий фрагмент: </P><PRE
+CLASS="PROGRAMLISTING"
+>INSERT INTO mytab(firstname, lastname) VALUES('Tom', 'Jones');
+BEGIN
+    UPDATE mytab SET firstname = 'Joe' WHERE lastname = 'Jones';
+    x := x + 1;
+    y := x / 0;
+EXCEPTION
+    WHEN division_by_zero THEN
+        RAISE NOTICE 'перехватили ошибку division_by_zero';
+        RETURN x;
+END;</PRE
+><P> При присвоении значения переменной <TT
+CLASS="LITERAL"
+>y</TT
+> произойдёт ошибка <TT
+CLASS="LITERAL"
+>division_by_zero</TT
+>. Она будет перехвачена в секции <TT
+CLASS="LITERAL"
+>EXCEPTION</TT
+>. Оператор <TT
+CLASS="COMMAND"
+>RETURN</TT
+> вернёт значение <TT
+CLASS="LITERAL"
+>x</TT
+>, увеличенное на единицу, но изменения сделанные командой <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> будут отменены. Изменения, выполненные командой <TT
+CLASS="COMMAND"
+>INSERT</TT
+>, которая предшествует блоку, не будут отменены. В результате, база данных будет содержать <TT
+CLASS="LITERAL"
+>Tom Jones</TT
+>, а не <TT
+CLASS="LITERAL"
+>Joe Jones</TT
+>.</P
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>Наличие секции <TT
+CLASS="LITERAL"
+>EXCEPTION</TT
+> значительно увеличивает накладные расходы на вход/выход из блока. Поэтому не используйте <TT
+CLASS="LITERAL"
+>EXCEPTION</TT
+> без надобности.</P
+></BLOCKQUOTE
+></DIV
+><DIV
+CLASS="EXAMPLE"
+><A
+NAME="PLPGSQL-UPSERT-EXAMPLE"
+></A
+><P
+><B
+>Пример 40-2. Обработка исключений для команд <TT
+CLASS="COMMAND"
+>UPDATE</TT
+>/<TT
+CLASS="COMMAND"
+>INSERT</TT
+></B
+></P
+><P
+>В этом примере обработка исключений используется для того, чтобы определить какую команду выполнить <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> или <TT
+CLASS="COMMAND"
+>INSERT</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE db (a INT PRIMARY KEY, b TEXT);
+
+CREATE FUNCTION merge_db(key INT, data TEXT) RETURNS VOID AS
+$$
+BEGIN
+    LOOP
+        -- для начала UPDATE записи по значению ключа
+        UPDATE db SET b = data WHERE a = key;
+        IF found THEN
+            RETURN;
+        END IF;
+        -- записи с таким ключом нет, поэтому попытаемся её вставить
+        -- если параллельно с нами кто-то ещё пытается вставить запись с таким же ключом,
+        -- то мы получим ошибку уникальности
+        BEGIN
+            INSERT INTO db(a,b) VALUES (key, data);
+            RETURN;
+        EXCEPTION WHEN unique_violation THEN
+            -- Здесь ничего не делаем,
+            -- продолжаем цикл, чтобы повторить UPDATE.
+        END;
+    END LOOP;
+END;
+$$
+LANGUAGE plpgsql;
+
+SELECT merge_db(1, 'david');
+SELECT merge_db(1, 'dennis');</PRE
+><P> В примере предполагается, что ошибка <TT
+CLASS="LITERAL"
+>unique_violation</TT
+> вызвана командой <TT
+CLASS="COMMAND"
+>INSERT</TT
+> текущего блока, а не, скажем, <TT
+CLASS="COMMAND"
+>INSERT</TT
+> из триггерной функции таблицы. Здесь также не учтено, что у таблицы может быть несколько уникальных ключей, поэтому попытка повторить операцию будет предприниматься вне зависимости от того, уникальность какого ключа привела к ошибке. Далее будут рассмотрены возможности, позволяющие убедиться, что мы обрабатываем именно ту ошибку, которую хотели.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="PLPGSQL-EXCEPTION-DIAGNOSTICS"
+>40.6.6.1. Получение информации об ошибке</A
+></H3
+><P
+>При обработке исключений часто бывает необходимым получить детальную информацию о произошедшей ошибке. Для этого в <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> есть два способа: использование специальных переменных и команда <TT
+CLASS="COMMAND"
+>GET STACKED DIAGNOSTICS</TT
+>.</P
+><P
+>Внутри секции <TT
+CLASS="LITERAL"
+>EXCEPTION</TT
+> специальная переменная <TT
+CLASS="VARNAME"
+>SQLSTATE</TT
+> содержит код ошибки, для которой было вызвано исключение (список возможных кодов ошибок приведён в <A
+HREF="errcodes-appendix.html#ERRCODES-TABLE"
+>Таблице A-1</A
+>). Специальная переменная <TT
+CLASS="VARNAME"
+>SQLERRM</TT
+> содержит сообщение об ошибке, связанное с исключением. Эти переменные являются неопределёнными вне секции <TT
+CLASS="LITERAL"
+>EXCEPTION</TT
+>.</P
+><P
+>Также, при обработке исключений, дополнительную информацию можно получить командой <TT
+CLASS="COMMAND"
+>GET STACKED DIAGNOSTICS</TT
+>, которая имеет вид: </P><PRE
+CLASS="SYNOPSIS"
+>GET STACKED DIAGNOSTICS <TT
+CLASS="REPLACEABLE"
+><I
+>variable</I
+></TT
+> { = | := } <TT
+CLASS="REPLACEABLE"
+><I
+>item</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+> , ... </SPAN
+>];</PRE
+><P> Каждый <TT
+CLASS="REPLACEABLE"
+><I
+>item</I
+></TT
+> является ключевым словом, идентифицирующим значение состояния, которое будет присвоено указанной переменной. Переменная должна быть соответствующего типа данных. Идентификаторы, доступные в настоящее время, приведены в <A
+HREF="plpgsql-control-structures.html#PLPGSQL-EXCEPTION-DIAGNOSTICS-VALUES"
+>Таблице 40-1</A
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="PLPGSQL-EXCEPTION-DIAGNOSTICS-VALUES"
+></A
+><P
+><B
+>Таблица 40-1. Диагностические коды ошибок</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                      <TT
+CLASS="LITERAL"
+>RETURNED_SQLSTATE</TT
+>
+                    </TD
+><TD
+>text</TD
+><TD
+>код исключения, возвращаемый SQLSTATE</TD
+></TR
+><TR
+><TD
+>                      <TT
+CLASS="LITERAL"
+>COLUMN_NAME</TT
+>
+                    </TD
+><TD
+>text</TD
+><TD
+>имя столбца, относящегося к исключению</TD
+></TR
+><TR
+><TD
+>                      <TT
+CLASS="LITERAL"
+>CONSTRAINT_NAME</TT
+>
+                    </TD
+><TD
+>text</TD
+><TD
+>имя ограничения целостности, относящегося к исключению</TD
+></TR
+><TR
+><TD
+>                      <TT
+CLASS="LITERAL"
+>PG_DATATYPE_NAME</TT
+>
+                    </TD
+><TD
+>text</TD
+><TD
+>имя типа данных, относящегося к исключению</TD
+></TR
+><TR
+><TD
+>                      <TT
+CLASS="LITERAL"
+>MESSAGE_TEXT</TT
+>
+                    </TD
+><TD
+>text</TD
+><TD
+>текст основного сообщения исключения</TD
+></TR
+><TR
+><TD
+>                      <TT
+CLASS="LITERAL"
+>TABLE_NAME</TT
+>
+                    </TD
+><TD
+>text</TD
+><TD
+>имя таблицы, относящейся к исключению</TD
+></TR
+><TR
+><TD
+>                      <TT
+CLASS="LITERAL"
+>SCHEMA_NAME</TT
+>
+                    </TD
+><TD
+>text</TD
+><TD
+>имя схемы, относящейся к исключению</TD
+></TR
+><TR
+><TD
+>                      <TT
+CLASS="LITERAL"
+>PG_EXCEPTION_DETAIL</TT
+>
+                    </TD
+><TD
+>text</TD
+><TD
+>текст детального сообщения исключения (если есть)</TD
+></TR
+><TR
+><TD
+>                      <TT
+CLASS="LITERAL"
+>PG_EXCEPTION_HINT</TT
+>
+                    </TD
+><TD
+>text</TD
+><TD
+>текст подсказки к исключению (если есть)</TD
+></TR
+><TR
+><TD
+>                      <TT
+CLASS="LITERAL"
+>PG_EXCEPTION_CONTEXT</TT
+>
+                    </TD
+><TD
+>text</TD
+><TD
+>строка (или строки) с описанием стека вызова</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Если исключение не устанавливает значение для идентификатора, то возвращается пустая строка.</P
+><P
+>Пример: </P><PRE
+CLASS="PROGRAMLISTING"
+>DECLARE
+  text_var1 text;
+  text_var2 text;
+  text_var3 text;
+BEGIN
+  -- здесь происходит обработка, которая может вызвать исключение
+  ...
+EXCEPTION WHEN OTHERS THEN
+  GET STACKED DIAGNOSTICS text_var1 = MESSAGE_TEXT,
+                          text_var2 = PG_EXCEPTION_DETAIL,
+                          text_var3 = PG_EXCEPTION_HINT;
+END;</PRE
+><P></P
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="PLPGSQL-GET-DIAGNOSTICS-CONTEXT"
+>40.6.7. Получение информации о выполнении в текущий момент</A
+></H2
+><P
+>Команда <TT
+CLASS="COMMAND"
+>GET [<SPAN
+CLASS="OPTIONAL"
+> CURRENT </SPAN
+>] DIAGNOSTICS</TT
+> извлекает информацию о текущем состоянии выполнения (в то время как обсуждавшаяся выше команда <TT
+CLASS="COMMAND"
+>GET STACKED DIAGNOSTICS</TT
+> выдаёт информацию о состоянии выполнения на момент предыдущей ошибки). Команда имеет следующий вид:</P
+><PRE
+CLASS="SYNOPSIS"
+>GET [<SPAN
+CLASS="OPTIONAL"
+>CURRENT</SPAN
+>] DIAGNOSTICS <TT
+CLASS="REPLACEABLE"
+><I
+>variable</I
+></TT
+> { = | := } <TT
+CLASS="REPLACEABLE"
+><I
+>item</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, ...</SPAN
+>];</PRE
+><P
+>В настоящий момент поддерживается только один <TT
+CLASS="REPLACEABLE"
+><I
+>item</I
+></TT
+> <TT
+CLASS="LITERAL"
+>PG_CONTEXT</TT
+>, который возвращает значение типа <TT
+CLASS="LITERAL"
+>text</TT
+>, содержащее стек вызова. Стек вызова может состоять из нескольких строк, первая строка относится к выполняемый в текущий момент команде <TT
+CLASS="COMMAND"
+>GET DIAGNOSTICS</TT
+> в текущей функции. Вторая и последующие строки относятся к следующим функциям далее вверх по стеку вызова. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE OR REPLACE FUNCTION outer_func() RETURNS integer AS $$
+BEGIN
+  RETURN inner_func();
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION inner_func() RETURNS integer AS $$
+DECLARE
+  stack text;
+BEGIN
+  GET DIAGNOSTICS stack = PG_CONTEXT;
+  RAISE NOTICE E'--- Стек вызова ---\n%', stack;
+  RETURN 1;
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT outer_func();
+
+NOTICE:  --- Стек вызова ---
+PL/pgSQL function inner_func() line 5 at GET DIAGNOSTICS
+PL/pgSQL function outer_func() line 3 at RETURN
+CONTEXT:  PL/pgSQL function outer_func() line 3 at RETURN
+ outer_func
+ ------------
+           1
+(1 row)</PRE
+><P></P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="plpgsql-statements.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="plpgsql-cursors.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Основные операторы</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="plpgsql.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Курсоры</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

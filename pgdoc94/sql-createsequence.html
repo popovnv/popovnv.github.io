@@ -1,0 +1,706 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>CREATE SEQUENCE</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="CREATE SCHEMA"
+HREF="sql-createschema.html"><LINK
+REL="NEXT"
+TITLE="CREATE SERVER"
+HREF="sql-createserver.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="CREATE SCHEMA"
+HREF="sql-createschema.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="CREATE SERVER"
+HREF="sql-createserver.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-CREATESEQUENCE"
+></A
+>CREATE SEQUENCE</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN75351"
+></A
+><H2
+>Название</H2
+>CREATE SEQUENCE&nbsp;--&nbsp;создать генератор последовательности</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN75354"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>CREATE [ TEMPORARY | TEMP ] SEQUENCE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> [ INCREMENT [ BY ] <TT
+CLASS="REPLACEABLE"
+><I
+>шаг</I
+></TT
+> ]
+    [ MINVALUE <TT
+CLASS="REPLACEABLE"
+><I
+>мин_значение</I
+></TT
+> | NO MINVALUE ] [ MAXVALUE <TT
+CLASS="REPLACEABLE"
+><I
+>макс_значение</I
+></TT
+> | NO MAXVALUE ]
+    [ START [ WITH ] <TT
+CLASS="REPLACEABLE"
+><I
+>начало</I
+></TT
+> ] [ CACHE <TT
+CLASS="REPLACEABLE"
+><I
+>кеш</I
+></TT
+> ] [ [ NO ] CYCLE ]
+    [ OWNED BY { <TT
+CLASS="REPLACEABLE"
+><I
+>table_name</I
+></TT
+>.<TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+> | NONE } ]</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN75364"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>CREATE SEQUENCE</TT
+> создаёт генератор последовательности. Эта операция включает создание и инициализацию специальной таблицы <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+>, содержащей одну строку. Владельцем генератора будет пользователь, выполняющий эту команду.</P
+><P
+>Если указано имя схемы, последовательность создаётся в заданной схеме, в противном случае — в текущей. Временные последовательности существуют в специальной схеме, так что при создании таких последовательностей имя схемы задать нельзя. Имя последовательности должно отличаться от имён других последовательностей, таблиц, индексов, представлений или сторонних таблиц, уже существующих в этой схеме.</P
+><P
+>После создания последовательности работать с ней можно, вызывая функции <CODE
+CLASS="FUNCTION"
+>nextval</CODE
+>, <CODE
+CLASS="FUNCTION"
+>currval</CODE
+> и <CODE
+CLASS="FUNCTION"
+>setval</CODE
+>. Эти функции документированы в <A
+HREF="functions-sequence.html"
+>Разделе 9.16</A
+>.</P
+><P
+>Хотя непосредственно изменить значение последовательности нельзя, получить её параметры и текущее состояние можно таким запросом: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT * FROM <TT
+CLASS="REPLACEABLE"
+><I
+>name</I
+></TT
+>;</PRE
+><P> В частности, поле <TT
+CLASS="LITERAL"
+>last_value</TT
+> последовательности будет содержать последнее значение, выделенное для какого-либо сеанса. (Конечно, ко времени вывода это значение может стать неактуальным, если другие сеансы активно вызывают <CODE
+CLASS="FUNCTION"
+>nextval</CODE
+>.)</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN75380"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>TEMPORARY</TT
+> или <TT
+CLASS="LITERAL"
+>TEMP</TT
+></DT
+><DD
+><P
+>Если указано, объект последовательности создаётся только для данного сеанса и автоматически удаляется при завершении сеанса. Существующая постоянная последовательность с тем же именем не будут видна (в этом сеансе), пока существует временная, однако к ней можно обратиться, дополнив имя указанием схемы.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></DT
+><DD
+><P
+>Имя (возможно, дополненное схемой) создаваемой последовательности.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>шаг</I
+></TT
+></DT
+><DD
+><P
+>Необязательное предложение <TT
+CLASS="LITERAL"
+>INCREMENT BY <TT
+CLASS="REPLACEABLE"
+><I
+>шаг</I
+></TT
+></TT
+> определяет, какое число будет добавляться к текущему значению последовательности для получения нового значения. С положительным шагом последовательность будет возрастающей, а с отрицательным — убывающей. Значение по умолчанию: 1.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>мин_значение</I
+></TT
+><BR><TT
+CLASS="LITERAL"
+>NO MINVALUE</TT
+></DT
+><DD
+><P
+>Необязательное предложение <TT
+CLASS="LITERAL"
+>MINVALUE <TT
+CLASS="REPLACEABLE"
+><I
+>мин_значение</I
+></TT
+></TT
+> определяет наименьшее число, которое будет генерировать последовательность. Если это предложение опущено, либо указано <TT
+CLASS="OPTION"
+>NO MINVALUE</TT
+>, используется значение по умолчанию: 1 и -2<SUP
+>63</SUP
+>-1 для возрастающих и убывающих последовательностей, соответственно.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>макс_значение</I
+></TT
+><BR><TT
+CLASS="LITERAL"
+>NO MAXVALUE</TT
+></DT
+><DD
+><P
+>Необязательное предложение <TT
+CLASS="LITERAL"
+>MAXVALUE <TT
+CLASS="REPLACEABLE"
+><I
+>макс_значение</I
+></TT
+></TT
+> определяет наибольшее значение. Если это предложение опущено, либо указано <TT
+CLASS="OPTION"
+>NO MAXVALUE</TT
+>, используется значение по умолчанию: 2<SUP
+>63</SUP
+>-1 и -1 для возрастающих и убывающих последовательностей, соответственно.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>начало</I
+></TT
+></DT
+><DD
+><P
+>Необязательное предложение <TT
+CLASS="LITERAL"
+>START WITH <TT
+CLASS="REPLACEABLE"
+><I
+>начало</I
+></TT
+></TT
+> позволяет запустить последовательность с любого значения. По умолчанию началом считается <TT
+CLASS="REPLACEABLE"
+><I
+>мин_значение</I
+></TT
+> для возрастающих последовательностей и <TT
+CLASS="REPLACEABLE"
+><I
+>макс_значение</I
+></TT
+> для убывающих.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>кеш</I
+></TT
+></DT
+><DD
+><P
+>Необязательное предложение <TT
+CLASS="LITERAL"
+>CACHE <TT
+CLASS="REPLACEABLE"
+><I
+>кеш</I
+></TT
+></TT
+> определяет, сколько чисел последовательности будет выделяться и сохраняться в памяти для ускорения доступа к ним. Минимальное значение равно 1 (за один раз генерируется только одно значение, т. е. кеширования нет), и оно же предполагается по умолчанию.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>CYCLE</TT
+><BR><TT
+CLASS="LITERAL"
+>NO CYCLE</TT
+></DT
+><DD
+><P
+>Параметр <TT
+CLASS="LITERAL"
+>CYCLE</TT
+> позволяет зациклить последовательность при достижении <TT
+CLASS="REPLACEABLE"
+><I
+>макс_значения</I
+></TT
+> или <TT
+CLASS="REPLACEABLE"
+><I
+>мин_значения</I
+></TT
+> для возрастающей или убывающей последовательности, соответственно. Когда этот предел достигается, следующим числом этих последовательностей будет соответственно <TT
+CLASS="REPLACEABLE"
+><I
+>мин_значение</I
+></TT
+> или <TT
+CLASS="REPLACEABLE"
+><I
+>макс_значение</I
+></TT
+>.</P
+><P
+>Если указывается <TT
+CLASS="LITERAL"
+>NO CYCLE</TT
+>, при каждом вызове <CODE
+CLASS="FUNCTION"
+>nextval</CODE
+> после достижения предельного значения будет возникать ошибка. Если указания <TT
+CLASS="LITERAL"
+>CYCLE</TT
+> и <TT
+CLASS="LITERAL"
+>NO CYCLE</TT
+> отсутствуют, по умолчанию предполагается <TT
+CLASS="LITERAL"
+>NO CYCLE</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>OWNED BY</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>имя_таблицы</I
+></TT
+>.<TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+><BR><TT
+CLASS="LITERAL"
+>OWNED BY NONE</TT
+></DT
+><DD
+><P
+>Предложение <TT
+CLASS="LITERAL"
+>OWNED BY</TT
+> позволяет связать последовательность с определённой колонкой таблицы так, чтобы при удалении этой колонки (или всей таблицы) последовательность удалялась автоматически. Указанная таблица должна иметь того же владельца и находиться в той же схеме, что и последовательность. Подразумеваемое по умолчанию предложение <TT
+CLASS="LITERAL"
+>OWNED BY NONE</TT
+> указывает, что такая связь не устанавливается.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN75468"
+></A
+><H2
+>Замечания</H2
+><P
+>Для удаления последовательности применяется команда <TT
+CLASS="COMMAND"
+>DROP SEQUENCE</TT
+>.</P
+><P
+>Последовательности основаны на арифметике <TT
+CLASS="TYPE"
+>bigint</TT
+>, так что их значения не могут выходить за диапазон восьмибайтовых целых (-9223372036854775808 .. 9223372036854775807).</P
+><P
+>Если значение параметра <TT
+CLASS="REPLACEABLE"
+><I
+>кеш</I
+></TT
+> больше единицы, и объект последовательности используется параллельно в нескольких сеансах, результат может оказаться не вполне ожидаемым. Каждый сеанс будет выделять и кешировать несколько очередных значений последовательности при одном обращении к объекту последовательности и соответственно увеличивать <TT
+CLASS="LITERAL"
+>последнее_значение</TT
+> этого объекта. Затем при следующих <TT
+CLASS="REPLACEABLE"
+><I
+>кеш</I
+></TT
+>-1 вызовах <CODE
+CLASS="FUNCTION"
+>nextval</CODE
+> в этом сеансе будет просто возвращать заготовленные значения, не касаясь объекта последовательности. В результате, все числа, выделенные, но не использованные в сеансе, будут потеряны при завершении сеанса, что приведёт к образовании <SPAN
+CLASS="QUOTE"
+>"дырок"</SPAN
+> в последовательности.</P
+><P
+>Более того, хотя разным сеансам гарантированно выделяются различные значения последовательности, если рассмотреть все сеансы в целом, порядок этих значений может быть нарушен. Например, при значении <TT
+CLASS="REPLACEABLE"
+><I
+>кеш</I
+></TT
+>, равном 10, сеанс A может зарезервировать значения 1..10 и получить <CODE
+CLASS="FUNCTION"
+>nextval</CODE
+>=1, затем сеанс B может зарезервировать значения 11..20 и получить <CODE
+CLASS="FUNCTION"
+>nextval</CODE
+>=11 до того, как в сеансе A сгенерируется <TT
+CLASS="LITERAL"
+>nextval</TT
+>=2. Таким образом, при значении <TT
+CLASS="REPLACEABLE"
+><I
+>кеш</I
+></TT
+>, равном одному, можно быть уверенными в том, что <CODE
+CLASS="FUNCTION"
+>nextval</CODE
+> генерирует последовательные значения; но если <TT
+CLASS="REPLACEABLE"
+><I
+>кеш</I
+></TT
+> больше одного, рассчитывать можно только на то, что все значения <CODE
+CLASS="FUNCTION"
+>nextval</CODE
+> различны; их порядок может быть непоследовательным. Кроме того, <TT
+CLASS="LITERAL"
+>last_value</TT
+> возвращает последнее зарезервированное значение для всех сеансов, вне зависимости от того, было ли оно уже возвращено функцией <CODE
+CLASS="FUNCTION"
+>nextval</CODE
+>.</P
+><P
+>Также следует учитывать, что действие функции <CODE
+CLASS="FUNCTION"
+>setval</CODE
+>, выполненной для такой последовательности, проявится в других сеансах только после того, как в них будут использованы все предварительно закешированные значения.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN75493"
+></A
+><H2
+>Примеры</H2
+><P
+>Создание возрастающей последовательности с именем <TT
+CLASS="LITERAL"
+>serial</TT
+>, с начальным значением 101: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE SEQUENCE serial START 101;</PRE
+><P></P
+><P
+>Получение следующего номера этой последовательности: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT nextval('serial');
+
+ nextval
+---------
+     101</PRE
+><P></P
+><P
+>Получение следующего номера этой последовательности: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT nextval('serial');
+
+ nextval
+---------
+     102</PRE
+><P></P
+><P
+>Использование этой последовательности в команде <TT
+CLASS="COMMAND"
+>INSERT</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>INSERT INTO distributors VALUES (nextval('serial'), 'nothing');</PRE
+><P></P
+><P
+>Изменение значения последовательности после <TT
+CLASS="COMMAND"
+>COPY FROM</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>BEGIN;
+COPY distributors FROM 'input_file';
+SELECT setval('serial', max(id)) FROM distributors;
+END;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN75508"
+></A
+><H2
+>Совместимость</H2
+><P
+>Команда <TT
+CLASS="COMMAND"
+>CREATE SEQUENCE</TT
+> соответствует стандарту <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>, со следующими исключениями: <P
+></P
+></P><UL
+><LI
+><P
+>Описанное в стандарте выражение <TT
+CLASS="LITERAL"
+>AS &lt;тип данных&gt;</TT
+> не поддерживается.</P
+></LI
+><LI
+><P
+>Для получения следующего значения применяется функция <CODE
+CLASS="FUNCTION"
+>nextval()</CODE
+>, а не выражение <TT
+CLASS="COMMAND"
+>NEXT VALUE FOR</TT
+>, как того требует стандарт.</P
+></LI
+><LI
+><P
+>Предложение <TT
+CLASS="LITERAL"
+>OWNED BY</TT
+> является расширением <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+></LI
+></UL
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN75525"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-altersequence.html"
+>ALTER SEQUENCE</A
+>, <A
+HREF="sql-dropsequence.html"
+>DROP SEQUENCE</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-createschema.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-createserver.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>CREATE SCHEMA</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>CREATE SERVER</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

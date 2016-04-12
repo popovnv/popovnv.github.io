@@ -1,0 +1,582 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>CREATE DATABASE</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="CREATE CONVERSION"
+HREF="sql-createconversion.html"><LINK
+REL="NEXT"
+TITLE="CREATE DOMAIN"
+HREF="sql-createdomain.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="CREATE CONVERSION"
+HREF="sql-createconversion.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="CREATE DOMAIN"
+HREF="sql-createdomain.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-CREATEDATABASE"
+></A
+>CREATE DATABASE</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN72804"
+></A
+><H2
+>Название</H2
+>CREATE DATABASE&nbsp;--&nbsp;создать базу данных</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN72807"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>CREATE DATABASE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+>
+    [ [ WITH ] [ OWNER [=] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+> ]
+           [ TEMPLATE [=] <TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+> ]
+           [ ENCODING [=] <TT
+CLASS="REPLACEABLE"
+><I
+>кодировка</I
+></TT
+> ]
+           [ LC_COLLATE [=] <TT
+CLASS="REPLACEABLE"
+><I
+>категория_сортировки</I
+></TT
+> ]
+           [ LC_CTYPE [=] <TT
+CLASS="REPLACEABLE"
+><I
+>категория_типов_символов</I
+></TT
+> ]
+           [ TABLESPACE [=] <TT
+CLASS="REPLACEABLE"
+><I
+>табл_пространство</I
+></TT
+> ]
+           [ CONNECTION LIMIT [=] <TT
+CLASS="REPLACEABLE"
+><I
+>предел_подключений</I
+></TT
+> ] ]</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN72817"
+></A
+><H2
+>Описание</H2
+><P
+>Команда <TT
+CLASS="COMMAND"
+>CREATE DATABASE</TT
+> создаёт базу данных <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+><P
+>Чтобы создать базу данных, необходимо быть суперпользователем или иметь специальное право <TT
+CLASS="LITERAL"
+>CREATEDB</TT
+>. См. <A
+HREF="sql-createuser.html"
+>CREATE USER</A
+>.</P
+><P
+>По умолчанию новая база данных создаётся копированием стандартной системной базы данных <TT
+CLASS="LITERAL"
+>template1</TT
+>. Задать другой шаблон можно, добавив указание <TT
+CLASS="LITERAL"
+>TEMPLATE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></TT
+>. В частности, написав <TT
+CLASS="LITERAL"
+>TEMPLATE template0</TT
+>, можно создать девственно чистую базу данных, содержащую только стандартные объекты, предопределённые установленной версией <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Это бывает полезно, когда копировать в новую базу любые дополнительные объекты, добавленные локально в <TT
+CLASS="LITERAL"
+>template1</TT
+>, нежелательно.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN72832"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></DT
+><DD
+><P
+>Имя создаваемой базы данных.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+></DT
+><DD
+><P
+>Имя пользователя (роли), назначаемого владельцем новой базы данных, либо <TT
+CLASS="LITERAL"
+>DEFAULT</TT
+>, чтобы владельцем стал пользователь по умолчанию (а именно, пользователь, выполняющий команду). Чтобы создать базу данных и сделать её владельцем другую роль, необходимо быть непосредственным или опосредованным членом этой роли, либо суперпользователем.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+></DT
+><DD
+><P
+>Имя шаблона, из которого будет создаваться новая база данных, либо <TT
+CLASS="LITERAL"
+>DEFAULT</TT
+>, чтобы выбрать шаблон по умолчанию (<TT
+CLASS="LITERAL"
+>template1</TT
+>).</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>кодировка</I
+></TT
+></DT
+><DD
+><P
+>Кодировка символов в новой базе данных. Укажите строковую константу (например, <TT
+CLASS="LITERAL"
+>'SQL_ASCII'</TT
+>) или целочисленный номер кодировки, либо <TT
+CLASS="LITERAL"
+>DEFAULT</TT
+>, чтобы выбрать кодировку по умолчанию (а именно, кодировку шаблона). Наборы символов, которые поддерживает <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, перечислены в <A
+HREF="multibyte.html#MULTIBYTE-CHARSET-SUPPORTED"
+>Подразделе 22.3.1</A
+>. Дополнительные ограничения описаны ниже.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>категория_сортировки</I
+></TT
+></DT
+><DD
+><P
+>Порядок сортировки (<TT
+CLASS="LITERAL"
+>LC_COLLATE</TT
+>), который будет использоваться в новой базе данных. Этот параметр определяет порядок сортировки строк, например, в запросах с ORDER BY, а также порядок индексов по текстовым колонкам. По умолчанию используется порядок сортировки, установленный в шаблоне. Дополнительные ограничения описаны ниже.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>категория_типов_символов</I
+></TT
+></DT
+><DD
+><P
+>Классификация символов (<TT
+CLASS="LITERAL"
+>LC_CTYPE</TT
+>), которая будет применяться в новой базе данных. Этот параметр определяет принадлежность символов категориям, например: строчные, заглавные, цифры и т. п. По умолчанию используется классификация символов, установленная в шаблоне. Дополнительные ограничения описаны ниже.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>табл_пространство</I
+></TT
+></DT
+><DD
+><P
+>Имя табличного пространства, связываемого с новой базой данных, или <TT
+CLASS="LITERAL"
+>DEFAULT</TT
+> для использования табличного пространства шаблона. Это табличное пространство будет использоваться по умолчанию для объектов, создаваемых в этой базе. За подробностями обратитесь к <A
+HREF="sql-createtablespace.html"
+>CREATE TABLESPACE</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>предел_подключений</I
+></TT
+></DT
+><DD
+><P
+>Максимальное количество одновременных подключений к этой базе данных. Значение -1 (по умолчанию) снимает ограничение.</P
+></DD
+></DL
+></DIV
+><P
+>Дополнительные параметры могут записываться в любом порядке, не обязательно так, как показано выше.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN72887"
+></A
+><H2
+>Замечания</H2
+><P
+><TT
+CLASS="COMMAND"
+>CREATE DATABASE</TT
+> нельзя выполнять внутри блока транзакции.</P
+><P
+>Ошибки, содержащие сообщение <SPAN
+CLASS="QUOTE"
+>"не удалось инициализировать каталог базы данных"</SPAN
+>, чаще всего связаны с нехваткой прав в каталоге данных, заполнением диска или другими проблемами в файловой системе.</P
+><P
+>Для удаления базы данных применяется <A
+HREF="sql-dropdatabase.html"
+>DROP DATABASE</A
+>.</P
+><P
+>Программа <A
+HREF="app-createdb.html"
+>            <SPAN
+CLASS="APPLICATION"
+>createdb</SPAN
+>
+          </A
+> представляет собой оболочку этой команды, созданную ради удобства.</P
+><P
+>Конфигурационные параметры уровня базы данных (устанавливаемые командой <A
+HREF="sql-alterdatabase.html"
+>ALTER DATABASE</A
+>) из шаблона в новую базу данных не копируются.</P
+><P
+>Хотя с помощью этой команды можно скопировать любую базу данных, а не только <TT
+CLASS="LITERAL"
+>template1</TT
+>, указав её имя в качестве имени шаблона, она не предназначена (пока) для использования в качестве универсального средства вроде <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="COMMAND"
+>COPY DATABASE</TT
+>"</SPAN
+>. Принципиальным ограничением является невозможность копирования базы данных шаблона, если установлены другие подключения к ней. <TT
+CLASS="COMMAND"
+>CREATE DATABASE</TT
+> выдаёт ошибку, если при запуске команды есть другие подключения к этой базе; в противном случае новые подключения к базе блокируются до завершения команды <TT
+CLASS="COMMAND"
+>CREATE DATABASE</TT
+>. За дополнительными сведениями обратитесь к <A
+HREF="manage-ag-templatedbs.html"
+>Разделу 21.3</A
+>.</P
+><P
+>Кодировка символов, указанная для новой базы данных, должна быть совместима с выбранными параметрами локали (<TT
+CLASS="LITERAL"
+>LC_COLLATE</TT
+> и <TT
+CLASS="LITERAL"
+>LC_CTYPE</TT
+>). Если выбрана локаль <TT
+CLASS="LITERAL"
+>C</TT
+> (или равнозначная ей <TT
+CLASS="LITERAL"
+>POSIX</TT
+>), допускаются все кодировки, но для других локалей правильно будет работать только одна кодировка. (В Windows, однако, кодировку UTF-8 можно использовать с любой локалью.) <TT
+CLASS="COMMAND"
+>CREATE DATABASE</TT
+> позволяет суперпользователям указать кодировку <TT
+CLASS="LITERAL"
+>SQL_ASCII</TT
+> вне зависимости от локали, но этот вариант считается устаревшим и может привести к ошибочному поведению строковых функций, если в базе хранятся данные в кодировке, несовместимой с заданной локалью.</P
+><P
+>Параметры локали и кодировка должны соответствовать тем, что установлены в шаблоне, если только это не <TT
+CLASS="LITERAL"
+>template0</TT
+>. Это ограничение объясняется тем, что другие базы данных могут содержать данные в кодировке, отличной от заданной, или индексы, порядок сортировки которых определяются параметрами <TT
+CLASS="LITERAL"
+>LC_COLLATE</TT
+> и <TT
+CLASS="LITERAL"
+>LC_CTYPE</TT
+>. При копировании таких данных получится база, которая будет испорченной согласно новым параметрам локали. Однако <TT
+CLASS="LITERAL"
+>template0</TT
+> определённо не содержит какие-либо данные или индексы, зависящие от кодировки или локали.</P
+><P
+>Ограничение <TT
+CLASS="LITERAL"
+>CONNECTION LIMIT</TT
+> действует только приблизительно; если одновременно запускаются два сеанса, тогда как в базе остаётся только одно <SPAN
+CLASS="QUOTE"
+>"свободное место"</SPAN
+>, может так случиться, что будут отклонены оба подключения. Кроме того, это ограничение не распространяется на суперпользователей.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN72921"
+></A
+><H2
+>Примеры</H2
+><P
+>Создание базы данных: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE DATABASE lusiadas;</PRE
+><P></P
+><P
+>Создание базы данных <TT
+CLASS="LITERAL"
+>sales</TT
+>, принадлежащей пользователю <TT
+CLASS="LITERAL"
+>salesapp</TT
+>, с табличным пространством по умолчанию <TT
+CLASS="LITERAL"
+>salesspace</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE DATABASE sales OWNER salesapp TABLESPACE salesspace;</PRE
+><P></P
+><P
+>Создание базы данных <TT
+CLASS="LITERAL"
+>music</TT
+> с кодировкой ISO-8859-1: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE DATABASE music ENCODING 'LATIN1' TEMPLATE template0;</PRE
+><P> В этом примере предложение <TT
+CLASS="LITERAL"
+>TEMPLATE template0</TT
+> будет необходимым, только если кодировка <TT
+CLASS="LITERAL"
+>template1</TT
+> отличается от ISO-8859-1. Заметьте, что при смене кодировки может потребоваться также выбрать другие параметры <TT
+CLASS="LITERAL"
+>LC_COLLATE</TT
+> и <TT
+CLASS="LITERAL"
+>LC_CTYPE</TT
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN72937"
+></A
+><H2
+>Совместимость</H2
+><P
+>Оператор <TT
+CLASS="COMMAND"
+>CREATE DATABASE</TT
+> отсутствует в стандарте SQL. Базы данных равнозначны каталогам, а их создание в стандарте определяется реализацией.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN72941"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-alterdatabase.html"
+>ALTER DATABASE</A
+>, <A
+HREF="sql-dropdatabase.html"
+>DROP DATABASE</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-createconversion.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-createdomain.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>CREATE CONVERSION</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>CREATE DOMAIN</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

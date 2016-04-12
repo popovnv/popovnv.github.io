@@ -1,0 +1,235 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Значения по умолчанию</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Определение данных"
+HREF="ddl.html"><LINK
+REL="PREVIOUS"
+TITLE="Основы таблиц"
+HREF="ddl-basics.html"><LINK
+REL="NEXT"
+TITLE="Ограничения"
+HREF="ddl-constraints.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Основы таблиц"
+HREF="ddl-basics.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ddl.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 5. Определение данных</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Ограничения"
+HREF="ddl-constraints.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="DDL-DEFAULT"
+>5.2. Значения по умолчанию</A
+></H1
+><P
+>Колонке можно назначить значение по умолчанию. Когда добавляется новая строка и каким-то её колонкам не присваиваются значения, эти колонки принимают значения по умолчанию. Также команда управления данными может явно указать, что колонке должно быть присвоено значение по умолчанию, не зная его. (Подробнее команды управления данными описаны в <A
+HREF="dml.html"
+>Главе 6</A
+>.)</P
+><P
+> Если значение по умолчанию не объявлено явно, им считается значение NULL. Обычно это имеет смысл, так как можно считать, что NULL представляет неизвестные данные.</P
+><P
+>В определении таблицы значения по умолчанию указываются после типа данных колонки. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE products (
+    product_no integer,
+    name text,
+    price numeric <B
+CLASS="EMPHASIS"
+>DEFAULT 9.99</B
+>
+);</PRE
+><P></P
+><P
+>Значение по умолчанию может быть выражением, которое в этом случае вычисляется в момент присваивания значения по умолчанию (а <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>не</I
+></SPAN
+> когда создаётся таблица). Например, колонке <TT
+CLASS="TYPE"
+>timestamp</TT
+> в качестве значения по умолчания часто присваивается <TT
+CLASS="LITERAL"
+>CURRENT_TIMESTAMP</TT
+>, чтобы в момент добавления строки в ней оказалось текущее время. Ещё один распространённый пример &mdash; генерация <SPAN
+CLASS="QUOTE"
+>"последовательных номеров"</SPAN
+> для всех строк. В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> это обычно делается примерно так: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE products (
+    product_no integer <B
+CLASS="EMPHASIS"
+>DEFAULT nextval('products_product_no_seq')</B
+>,
+    ...
+);</PRE
+><P> здесь функция <TT
+CLASS="LITERAL"
+>nextval()</TT
+> выбирает очередное значение из <I
+CLASS="FIRSTTERM"
+>последовательности</I
+> (см. <A
+HREF="functions-sequence.html"
+>Раздел 9.16</A
+>). Это употребление настолько распространено, что для него есть специальная короткая запись: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE products (
+    product_no <B
+CLASS="EMPHASIS"
+>SERIAL</B
+>,
+    ...
+);</PRE
+><P> <TT
+CLASS="LITERAL"
+>SERIAL</TT
+> обсуждается позже в <A
+HREF="datatype-numeric.html#DATATYPE-SERIAL"
+>Подразделе 8.1.4</A
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ddl-basics.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ddl-constraints.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Основы таблиц</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ddl.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Ограничения</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,475 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Автоматическая очистка</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Настройка сервера"
+HREF="runtime-config.html"><LINK
+REL="PREVIOUS"
+TITLE="Статистика времени выполнения"
+HREF="runtime-config-statistics.html"><LINK
+REL="NEXT"
+TITLE="Параметры клиентских сеансов по умолчанию"
+HREF="runtime-config-client.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Статистика времени выполнения"
+HREF="runtime-config-statistics.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="runtime-config.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 18. Настройка сервера</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Параметры клиентских сеансов по умолчанию"
+HREF="runtime-config-client.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="RUNTIME-CONFIG-AUTOVACUUM"
+>18.10. Автоматическая очистка</A
+></H1
+><P
+>Эти параметры управляют поведением механизма <I
+CLASS="FIRSTTERM"
+>автоочистки</I
+>. За дополнительными сведениями обратитесь к <A
+HREF="routine-vacuuming.html#AUTOVACUUM"
+>Подразделу 23.1.6</A
+>.</P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="GUC-AUTOVACUUM"
+></A
+><TT
+CLASS="VARNAME"
+>autovacuum</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Управляет состоянием демона, производящего автоочистку. По умолчанию он включён, но чтобы автоочистка работала, нужно также включить <A
+HREF="runtime-config-statistics.html#GUC-TRACK-COUNTS"
+>track_counts</A
+>. Задать этот параметр можно только в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+> или в командной строке при запуске сервера.</P
+><P
+>Заметьте, что даже если этот параметр отключён, система будет запускать процессы автоочистки, когда это необходимо для предотвращения наложений идентификаторов транзакций. За дополнительными сведениями обратитесь к <A
+HREF="routine-vacuuming.html#VACUUM-FOR-WRAPAROUND"
+>Подразделу 23.1.5</A
+>.</P
+></DD
+><DT
+><A
+NAME="GUC-LOG-AUTOVACUUM-MIN-DURATION"
+></A
+><TT
+CLASS="VARNAME"
+>log_autovacuum_min_duration</TT
+> (<TT
+CLASS="TYPE"
+>integer</TT
+>) </DT
+><DD
+><P
+>Задаёт время (в миллисекундах) выполнения действия автоочистки, при превышении которого информация об этом действии записывается в протокол. При нулевом значении в протоколе фиксируются все действия автоочистки. Значение -1 (по умолчанию) отключает протоколирование действий автоочистки. Например, если задать значение <TT
+CLASS="LITERAL"
+>250ms</TT
+>, в протоколе будут фиксироваться все операции автоматической очистки и анализа, выполняемые дольше 250 мс. Кроме того, когда этот параметр имеет любое значение, отличное от <TT
+CLASS="LITERAL"
+>-1</TT
+>, в протокол будет записываться сообщение в случае пропуска действия автоочистки из-за конфликтующей блокировки. Таким образом, включение этого параметра позволяет отслеживать активность автоочистки. Задать этот параметр можно только в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+> или в командной строке при запуске сервера.</P
+></DD
+><DT
+><A
+NAME="GUC-AUTOVACUUM-MAX-WORKERS"
+></A
+><TT
+CLASS="VARNAME"
+>autovacuum_max_workers</TT
+> (<TT
+CLASS="TYPE"
+>integer</TT
+>) </DT
+><DD
+><P
+>Задаёт максимальное число процессов автоочистки (не считая процесс, запускающий автоочистку), которые могут выполняться одновременно. По умолчанию это число равно трём. Задать этот параметр можно только при запуске сервера.</P
+></DD
+><DT
+><A
+NAME="GUC-AUTOVACUUM-NAPTIME"
+></A
+><TT
+CLASS="VARNAME"
+>autovacuum_naptime</TT
+> (<TT
+CLASS="TYPE"
+>integer</TT
+>) </DT
+><DD
+><P
+>Задаёт минимальную задержку между двумя запусками автоочистки для отдельной базы данных. Демон автоочистки проверяет базу данных через заданный интервал времени и выдаёт команды <TT
+CLASS="COMMAND"
+>VACUUM</TT
+> и <TT
+CLASS="COMMAND"
+>ANALYZE</TT
+>, когда это требуется для таблиц этой базы. Задержка задаётся в секундах и по умолчанию равна одной минуте (<TT
+CLASS="LITERAL"
+>1min</TT
+>). Этот параметр можно задать только в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+> или в командной строке при запуске сервера.</P
+></DD
+><DT
+><A
+NAME="GUC-AUTOVACUUM-VACUUM-THRESHOLD"
+></A
+><TT
+CLASS="VARNAME"
+>autovacuum_vacuum_threshold</TT
+> (<TT
+CLASS="TYPE"
+>integer</TT
+>) </DT
+><DD
+><P
+>Задаёт минимальное число изменённых или удалённых кортежей, при котором будет выполняться <TT
+CLASS="COMMAND"
+>VACUUM</TT
+> для отдельно взятой таблицы. Значение по умолчанию — 50 кортежей. Задать этот параметр можно только в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+> или в командной строке при запуске сервера. Данное значение можно переопределить для избранных таблиц, изменив их параметры хранения.</P
+></DD
+><DT
+><A
+NAME="GUC-AUTOVACUUM-ANALYZE-THRESHOLD"
+></A
+><TT
+CLASS="VARNAME"
+>autovacuum_analyze_threshold</TT
+> (<TT
+CLASS="TYPE"
+>integer</TT
+>) </DT
+><DD
+><P
+>Задаёт минимальное число добавленных, изменённых или удалённых кортежей, при котором будет выполняться <TT
+CLASS="COMMAND"
+>ANALYZE</TT
+> для отдельно взятой таблицы. Значение по умолчанию — 50 кортежей. Этот параметр можно задать только в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+> или в командной строке при запуске сервера. Данное значение можно переопределить для избранных таблиц, изменив их параметры хранения.</P
+></DD
+><DT
+><A
+NAME="GUC-AUTOVACUUM-VACUUM-SCALE-FACTOR"
+></A
+><TT
+CLASS="VARNAME"
+>autovacuum_vacuum_scale_factor</TT
+> (<TT
+CLASS="TYPE"
+>floating point</TT
+>) </DT
+><DD
+><P
+>Задаёт процент от размера таблицы, который будет добавляться к <TT
+CLASS="VARNAME"
+>autovacuum_vacuum_threshold</TT
+> при выборе порога срабатывания команды <TT
+CLASS="COMMAND"
+>VACUUM</TT
+>. Значение по умолчанию — 0.2 (20% от размера таблицы). Задать этот параметр можно только в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+> или в командной строке при запуске сервера. Данное значение можно переопределить для избранных таблиц, изменив их параметры хранения.</P
+></DD
+><DT
+><A
+NAME="GUC-AUTOVACUUM-ANALYZE-SCALE-FACTOR"
+></A
+><TT
+CLASS="VARNAME"
+>autovacuum_analyze_scale_factor</TT
+> (<TT
+CLASS="TYPE"
+>floating point</TT
+>) </DT
+><DD
+><P
+>Задаёт процент от размера таблицы, который будет добавляться к <TT
+CLASS="VARNAME"
+>autovacuum_analyze_threshold</TT
+> при выборе порога срабатывания команды <TT
+CLASS="COMMAND"
+>ANALYZE</TT
+>. Значение по умолчанию — 0.1 (10% от размера таблицы). Задать этот параметр можно только в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+> или в командной строке при запуске сервера. Данное значение можно переопределить для избранных таблиц, изменив их параметры хранения.</P
+></DD
+><DT
+><A
+NAME="GUC-AUTOVACUUM-FREEZE-MAX-AGE"
+></A
+><TT
+CLASS="VARNAME"
+>autovacuum_freeze_max_age</TT
+> (<TT
+CLASS="TYPE"
+>integer</TT
+>) </DT
+><DD
+><P
+>Задаёт максимальный возраст (в транзакциях) для поля <TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+>.<TT
+CLASS="STRUCTFIELD"
+>relfrozenxid</TT
+> некоторой таблицы, при достижении которого будет запущена операция <TT
+CLASS="COMMAND"
+>VACUUM</TT
+> для предотвращения наложений идентификаторов транзакций в этой таблице. Заметьте, что система запустит процессы автоочистки для предотвращения наложений, даже если для всех других целей автоочистка отключена.</P
+><P
+>При очистке могут также удаляться старые файлы из подкаталога <TT
+CLASS="FILENAME"
+>pg_clog</TT
+>, поэтому значение по умолчанию сравнительно мало — 200 миллионов транзакций. Задать этот параметр можно только при запуске сервера, но для отдельных таблиц его можно определить по-другому, изменив их параметры хранения. За дополнительными сведениями обратитесь к <A
+HREF="routine-vacuuming.html#VACUUM-FOR-WRAPAROUND"
+>Подразделу 23.1.5</A
+>.</P
+></DD
+><DT
+><A
+NAME="GUC-AUTOVACUUM-MULTIXACT-FREEZE-MAX-AGE"
+></A
+><TT
+CLASS="VARNAME"
+>autovacuum_multixact_freeze_max_age</TT
+> (<TT
+CLASS="TYPE"
+>integer</TT
+>) </DT
+><DD
+><P
+>Задаёт максимальный возраст (в мультитранзакциях) для поля <TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+>.<TT
+CLASS="STRUCTFIELD"
+>relminmxid</TT
+> таблицы, при достижении которого будет запущена операция <TT
+CLASS="COMMAND"
+>VACUUM</TT
+> для предотвращения наложений идентификаторов мультитранзакций в этой таблице. Заметьте, что система запустит процессы автоочистки для предотвращения наложений, даже если для всех других целей автоочистка отключена.</P
+><P
+>При очистке мультитранзакций могут также удаляться старые файлы из подкаталогов <TT
+CLASS="FILENAME"
+>pg_multixact/members</TT
+> и <TT
+CLASS="FILENAME"
+>pg_multixact/offsets</TT
+>, поэтому значение по умолчанию сравнительно мало — 400 миллионов мультитранзакций. Этот параметр можно задать только при запуске сервера, но для отдельных таблиц его можно определить по-другому, изменив их параметры хранения. За дополнительными сведениями обратитесь к <A
+HREF="routine-vacuuming.html#VACUUM-FOR-MULTIXACT-WRAPAROUND"
+>Подразделу 23.1.5.1</A
+>.</P
+></DD
+><DT
+><A
+NAME="GUC-AUTOVACUUM-VACUUM-COST-DELAY"
+></A
+><TT
+CLASS="VARNAME"
+>autovacuum_vacuum_cost_delay</TT
+> (<TT
+CLASS="TYPE"
+>integer</TT
+>) </DT
+><DD
+><P
+>Задаёт задержку при превышении предела стоимости, которая будет применяться при автоматических операциях <TT
+CLASS="COMMAND"
+>VACUUM</TT
+>. При значении -1 применяется обычная задержка <A
+HREF="runtime-config-resource.html#GUC-VACUUM-COST-DELAY"
+>vacuum_cost_delay</A
+>. Значение по умолчанию — 20 миллисекунд. Задать этот параметр можно только в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+> или в командной строке при запуске сервера. Его можно переопределить для отдельных таблиц, изменив их параметры хранения.</P
+></DD
+><DT
+><A
+NAME="GUC-AUTOVACUUM-VACUUM-COST-LIMIT"
+></A
+><TT
+CLASS="VARNAME"
+>autovacuum_vacuum_cost_limit</TT
+> (<TT
+CLASS="TYPE"
+>integer</TT
+>) </DT
+><DD
+><P
+>Задаёт предел стоимости, который будет учитываться при автоматических операциях <TT
+CLASS="COMMAND"
+>VACUUM</TT
+>. При значении -1 (по умолчанию) применяется обычное значение <A
+HREF="runtime-config-resource.html#GUC-VACUUM-COST-LIMIT"
+>vacuum_cost_limit</A
+>. Заметьте, что это значение распределяется пропорционально среди всех работающих процессов автоочистки, если их больше одного, так что сумма ограничений всех процессов никогда не превосходит данный предел. Задать этот параметр можно только в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+> или в командной строке при запуске сервера. Его можно переопределить для отдельных таблиц, изменив их параметры хранения.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="runtime-config-statistics.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="runtime-config-client.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Статистика времени выполнения</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="runtime-config.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Параметры клиентских сеансов по умолчанию</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

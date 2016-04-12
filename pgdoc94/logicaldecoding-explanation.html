@@ -1,0 +1,262 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Концепции логического декодирования</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Логическое декодирование"
+HREF="logicaldecoding.html"><LINK
+REL="PREVIOUS"
+TITLE="Примеры логического декодирования"
+HREF="logicaldecoding-example.html"><LINK
+REL="NEXT"
+TITLE="Интерфейс протокола потоковой репликации"
+HREF="logicaldecoding-walsender.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Примеры логического декодирования"
+HREF="logicaldecoding-example.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="logicaldecoding.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 46. Логическое декодирование</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Интерфейс протокола потоковой репликации"
+HREF="logicaldecoding-walsender.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="LOGICALDECODING-EXPLANATION"
+>46.2. Концепции логического декодирования</A
+></H1
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN66394"
+>46.2.1. Логическое декодирование</A
+></H2
+><P
+>Логическое декодирование — это процедура извлечения всех постоянных изменений, происходящих в таблицах базы данных, в согласованном и понятном формате, который можно интерпретировать, не имея полного представления о внутреннем состоянии базы данных.</P
+><P
+>В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> логическое декодирование реализуется путём перевода содержимого <A
+HREF="wal.html"
+>журнала упреждающей записи</A
+>, описывающего изменения на уровне хранения, в специальную форму уровня приложения, например, в поток кортежей или операторов SQL.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN66402"
+>46.2.2. Слоты репликации</A
+></H2
+><P
+>В контексте логической репликации слот представляет поток изменений, которые могут быть воспроизведены клиентом в том порядке, в каком они происходили на исходном сервере. Через каждый слот передаётся последовательность изменений в одной базе данных, при этом каждое изменение передаётся только один раз (не считая предпросмотра в потоке).</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> также есть слоты потоковой репликации (см. <A
+HREF="warm-standby.html#STREAMING-REPLICATION"
+>Подраздел 25.2.5</A
+>), но они используются несколько по-другому.</P
+></BLOCKQUOTE
+></DIV
+><P
+>Слоту репликации назначается идентификатор, уникальный для всех баз данных в кластере <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Слоты сохраняются независимо от подключений, использующих их, и защищены от сбоев сервера.</P
+><P
+>Для одной базы данных могут существовать несколько независимых слотов. Каждый слот имеет собственное состояние, что позволяет различным потребителям получать изменения с разных позиций в потоке изменений базы данных. Для большинства приложений каждому потребителю требуется отдельный слот.</P
+><P
+>Слот логической репликации ничего не знает о состоянии получателя(ей). Возможно даже иметь несколько различных потребителей одного слота в разные моменты времени; они просто будут получать изменения с момента, когда их перестал получать предыдущий потребитель. Но в любой определённый момент получать изменения может только один потребитель.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Слоты репликации сохраняются при сбоях сервера и ничего не знают о состоянии их потребителя(ей). Они не дают удалять требуемые ресурсы, даже когда не используются никаким подключением. На это уходит место в хранилище, так как ни сегменты WAL, ни требуемые строки из системных каталогов нельзя будет удалить в результате <TT
+CLASS="COMMAND"
+>VACUUM</TT
+>, пока они нужны этому слоту репликации. Поэтому, если слот больше не требуется, его следует удалять.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN66419"
+>46.2.3. Модули вывода</A
+></H2
+><P
+>Модули вывода переводят данные из внутреннего представления в журнале упреждающей записи в формат, устраивающий потребителя слота репликации.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN66422"
+>46.2.4. Экспортированные снимки</A
+></H2
+><P
+>Когда новый слот репликации создаётся через интерфейс потоковой репликации, экспортируется снимок (см. <A
+HREF="functions-admin.html#FUNCTIONS-SNAPSHOT-SYNCHRONIZATION"
+>Подраздел 9.26.5</A
+>), который будет показывать ровно то состояние базы данных, изменения после которого будут включаться в поток изменений. Используя его, можно создать новую реплику, воспользовавшись командой <A
+HREF="sql-set-transaction.html"
+><TT
+CLASS="LITERAL"
+>SET TRANSACTION SNAPSHOT</TT
+></A
+>, чтобы получить состояние базы в момент создания слота. После этого данную транзакцию можно использовать для выгрузки состояния базы на момент экспорт снимка, а затем изменять это состояние, применяя содержимое слота, так что никакие изменения не будут потеряны.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="logicaldecoding-example.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="logicaldecoding-walsender.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Примеры логического декодирования</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="logicaldecoding.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Интерфейс протокола потоковой репликации</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

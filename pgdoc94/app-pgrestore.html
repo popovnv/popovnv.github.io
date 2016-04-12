@@ -1,0 +1,1499 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>pg_restore</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Клиентские приложения PostgreSQL"
+HREF="reference-client.html"><LINK
+REL="PREVIOUS"
+TITLE="            pg_recvlogical
+          "
+HREF="app-pgrecvlogical.html"><LINK
+REL="NEXT"
+TITLE="            psql
+          "
+HREF="app-psql.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="            pg_recvlogical
+          "
+HREF="app-pgrecvlogical.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="reference-client.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="            psql
+          "
+HREF="app-psql.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="APP-PGRESTORE"
+></A
+>pg_restore</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN89581"
+></A
+><H2
+>Название</H2
+>pg_restore&nbsp;--&nbsp;восстановить базу данных <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> из файла архива, созданного командой <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+></DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN89586"
+></A
+><H2
+>Синтаксис</H2
+><P
+><TT
+CLASS="COMMAND"
+>pg_restore</TT
+> [              <TT
+CLASS="REPLACEABLE"
+><I
+>параметр-подключения</I
+></TT
+>
+            ...] [              <TT
+CLASS="REPLACEABLE"
+><I
+>параметр</I
+></TT
+>
+            ...] [              <TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+>
+            ]</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="APP-PGRESTORE-DESCRIPTION"
+></A
+><H2
+>Описание</H2
+><P
+>Утилита <SPAN
+CLASS="APPLICATION"
+>pg_restore</SPAN
+> предназначена для восстановления базы данных <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> из архива, созданного командой <A
+HREF="app-pgdump.html"
+>pg_dump</A
+> в любом из не текстовых форматов. Она выполняет команды, необходимые для восстановления того состояния базы данных, в котором база была сохранена. При наличии файлов архивов, <SPAN
+CLASS="APPLICATION"
+>pg_restore</SPAN
+> может восстанавливать данные избирательно или даже переупорядочить объекты перед восстановлением. Заметьте, что разработанный для файлов архива формат не привязан к архитектуре.</P
+><P
+>Утилита <SPAN
+CLASS="APPLICATION"
+>pg_restore</SPAN
+> может работать в двух режимах. Если указывается имя базы данных, <SPAN
+CLASS="APPLICATION"
+>pg_restore</SPAN
+> подключается к этой базе данных и восстанавливает содержимое архива непосредственно в неё. В противном случае, создаётся SQL-скрипт с командами, необходимыми для пересоздания базы данных, который затем выводится в файл или в стандартное устройство вывода. Сформированный скрипт будет в точности соответствовать выводу <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+> в простом текстовом формате. Поэтому некоторые из параметров, управляющих выводом, аналогичны параметрам <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+>.</P
+><P
+>Разумеется, <SPAN
+CLASS="APPLICATION"
+>pg_restore</SPAN
+> может восстановить информацию, только если она присутствует в файле архива, и только в существующем виде. Например, если архив был создан с указанием <SPAN
+CLASS="QUOTE"
+>"выгрузить данные в виде команд <TT
+CLASS="COMMAND"
+>INSERT</TT
+>"</SPAN
+>, <SPAN
+CLASS="APPLICATION"
+>pg_restore</SPAN
+> не сможет загрузить эти данные, используя операторы <TT
+CLASS="COMMAND"
+>COPY</TT
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="APP-PGRESTORE-OPTIONS"
+></A
+><H2
+>Параметры</H2
+><P
+>Утилита <SPAN
+CLASS="APPLICATION"
+>pg_restore</SPAN
+> принимает следующие аргументы командной строки. <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+></DT
+><DD
+><P
+>Указывает расположение восстанавливаемого файла архива (или каталога, для архива в формате каталога). По умолчанию используется устройство стандартного ввода.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-a</TT
+><BR><TT
+CLASS="OPTION"
+>--data-only</TT
+></DT
+><DD
+><P
+>Восстанавливать только данные, без схемы (определений данных). При этом восстанавливаются данные таблиц, большие объекты и значения последовательностей, имеющиеся в архиве.</P
+><P
+>Флаг похож на <TT
+CLASS="OPTION"
+>--section=data</TT
+>, но по историческим причинам не равнозначен ему.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-c</TT
+><BR><TT
+CLASS="OPTION"
+>--clean</TT
+></DT
+><DD
+><P
+>Удалить (DROP) объекты базы данных, прежде чем пересоздавать их. (Без дополнительного указания <TT
+CLASS="OPTION"
+>--if-exists</TT
+> при этом могут выдаваться безвредные сообщения об ошибках, если таких объектов не окажется в целевой базе данных.)</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-C</TT
+><BR><TT
+CLASS="OPTION"
+>--create</TT
+></DT
+><DD
+><P
+>Создать базу данных, прежде чем восстанавливать данные. Если также указан параметр <TT
+CLASS="OPTION"
+>--clean</TT
+>, удалить и пересоздать целевую базу данных перед подключением к ней.</P
+><P
+>С этим параметром база, заданная параметром <TT
+CLASS="OPTION"
+>-d</TT
+>, применяется только для подключения и выполнения начальных команд <TT
+CLASS="COMMAND"
+>DROP DATABASE</TT
+> и <TT
+CLASS="COMMAND"
+>CREATE DATABASE</TT
+>. Все данные восстанавливаются в базу данных, имя которой записано в архиве.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-d <TT
+CLASS="REPLACEABLE"
+><I
+>база_данных</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--dbname=<TT
+CLASS="REPLACEABLE"
+><I
+>база_данных</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Подключиться к базе данных <TT
+CLASS="REPLACEABLE"
+><I
+>имя_базы</I
+></TT
+> и восстановить данные непосредственно в неё.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-e</TT
+><BR><TT
+CLASS="OPTION"
+>--exit-on-error</TT
+></DT
+><DD
+><P
+>Завершать работу в случае возникновения ошибки при выполнении команд SQL в базе данных. По умолчанию процесс восстановления продолжается, а по его окончании выдаётся число ошибок.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-f <TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--file=<TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Задаёт файл для вывода сгенерированного скрипта или списка объектов, полученного с параметром <TT
+CLASS="OPTION"
+>-l</TT
+>. По умолчанию используется стандартный вывод.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-F <TT
+CLASS="REPLACEABLE"
+><I
+>format</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--format=<TT
+CLASS="REPLACEABLE"
+><I
+>format</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Задаёт формат архива. Указывать формат необязательно, так как <SPAN
+CLASS="APPLICATION"
+>pg_restore</SPAN
+> определяет формат автоматически. Но если формат задаётся, допускается один из этих вариантов: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>c</TT
+><BR><TT
+CLASS="LITERAL"
+>custom</TT
+></DT
+><DD
+><P
+>Архив сохранён в настраиваемом формате <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>d</TT
+><BR><TT
+CLASS="LITERAL"
+>directory</TT
+></DT
+><DD
+><P
+>Архив сохранён в каталоге.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>t</TT
+><BR><TT
+CLASS="LITERAL"
+>tar</TT
+></DT
+><DD
+><P
+>Архив сохранён в формате <TT
+CLASS="COMMAND"
+>tar</TT
+>.</P
+></DD
+></DL
+></DIV
+><P></P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-i</TT
+><BR><TT
+CLASS="OPTION"
+>--ignore-version</TT
+></DT
+><DD
+><P
+>Устаревший флаг и сейчас игнорируется.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-I <TT
+CLASS="REPLACEABLE"
+><I
+>индекс</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--index=<TT
+CLASS="REPLACEABLE"
+><I
+>индекс</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Восстановить определение только заданного индекса. Добавив дополнительные ключи <TT
+CLASS="OPTION"
+>-I</TT
+>, можно указать несколько индексов.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-j <TT
+CLASS="REPLACEABLE"
+><I
+>число-заданий</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--jobs=<TT
+CLASS="REPLACEABLE"
+><I
+>число-заданий</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Запустить наиболее длительные операции <SPAN
+CLASS="APPLICATION"
+>pg_restore</SPAN
+> (в частности, загрузку данных, создание индексов или ограничений) в нескольких параллельных заданиях. Это позволяет кардинально сократить время восстановления большой базы данных, когда сервер работает на многопроцессорном компьютере.</P
+><P
+>Каждое задание выполняется в отдельном задании или потоке, в зависимости от операционной системы, и использует отдельное подключение к серверу.</P
+><P
+>Оптимальное значение этого параметра зависит от аппаратной конфигурации сервера, клиента и сети. В частности, имеет значение количество процессорных ядер и устройство дискового хранилища. В качестве начального значения можно выбрать число ядер на сервере, но и при увеличении этого значения во многих случаях восстановление будет быстрее. Конечно, при слишком больших значениях производительность упадёт из-за перегрузки.</P
+><P
+>Этот параметр поддерживается только с архивом в специальном формате или в каталоге. Входные данные должны поступать из обычного файла или каталога (а не, например из канала ввода). Данный параметр игнорируется, когда генерируется скрипт (нет прямого подключения к базе данных). Кроме того, несколько заданий не могут выполняться в сочетании с параметром <TT
+CLASS="OPTION"
+>--single-transaction</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-l</TT
+><BR><TT
+CLASS="OPTION"
+>--list</TT
+></DT
+><DD
+><P
+>Вывести содержимое архива. Вывод этой операции можно подать на вход этой же команде с параметром <TT
+CLASS="OPTION"
+>-L</TT
+>. Учтите, что когда вместе с <TT
+CLASS="OPTION"
+>-l</TT
+> применяются параметры фильтрации (например, <TT
+CLASS="OPTION"
+>-n</TT
+> или <TT
+CLASS="OPTION"
+>-t</TT
+>), они сокращают список выводимых объектов.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-L <TT
+CLASS="REPLACEABLE"
+><I
+>файл-список</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--use-list=<TT
+CLASS="REPLACEABLE"
+><I
+>файл-список</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Восстановить из архива только элементы, перечисленные в <TT
+CLASS="REPLACEABLE"
+><I
+>файле-списке</I
+></TT
+>, и в том порядке, в каком они идут в этом файле. Заметьте, что когда вместе с <TT
+CLASS="OPTION"
+>-L</TT
+> применяются параметры фильтрации (например, <TT
+CLASS="OPTION"
+>-n</TT
+> или <TT
+CLASS="OPTION"
+>-t</TT
+>), они дополнительно ограничивают восстанавливаемые объекты.</P
+><P
+>Данный <TT
+CLASS="REPLACEABLE"
+><I
+>файл-список</I
+></TT
+> обычно представляет собой отредактированный результат предыдущей операции <TT
+CLASS="OPTION"
+>-l</TT
+>. Строки в нём могут быть переставлены или удалены, а также могут быть закомментированы точкой с запятой (<TT
+CLASS="LITERAL"
+>;</TT
+>), добавленной в начале строки. См. примеры ниже.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-n <TT
+CLASS="REPLACEABLE"
+><I
+>пространство_имён</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--schema=<TT
+CLASS="REPLACEABLE"
+><I
+>схема</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Восстановить только объекты в указанной схеме. Добавив дополнительные ключи <TT
+CLASS="OPTION"
+>-n</TT
+>, можно указать несколько схем. Этот параметр можно сочетать с <TT
+CLASS="OPTION"
+>-t</TT
+>, чтобы восстановить только определённую таблицу.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-O</TT
+><BR><TT
+CLASS="OPTION"
+>--no-owner</TT
+></DT
+><DD
+><P
+>Не генерировать команды, устанавливающие владение объектами, как в исходной базе данных. По умолчанию, <SPAN
+CLASS="APPLICATION"
+>pg_restore</SPAN
+> генерирует команды <TT
+CLASS="COMMAND"
+>ALTER OWNER</TT
+> или <TT
+CLASS="COMMAND"
+>SET SESSION AUTHORIZATION</TT
+>, восстанавливающие исходных владельцев создаваемых элементов схемы. Однако эти команды можно будет выполнить, только если к базе данных первоначально подключается суперпользователь (или пользователь, владеющими всеми объектами в скрипте). Чтобы получить скрипт, который сможет восстановить любой подключающийся пользователь (но при этом он станет владельцем всех созданных объектов), используется <TT
+CLASS="OPTION"
+>-O</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-P <TT
+CLASS="REPLACEABLE"
+><I
+>имя-функции(тип-аргумента[, ...])</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--function=<TT
+CLASS="REPLACEABLE"
+><I
+>имя-функции(тип-аргумента[, ...])</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Восстановить только указанную функцию. При этом важно записать имя функции и аргументы в точности так, как они фигурируют в оглавлении файла архива. Добавив дополнительные ключи <TT
+CLASS="OPTION"
+>-P</TT
+>, можно указать несколько функций.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-R</TT
+><BR><TT
+CLASS="OPTION"
+>--no-reconnect</TT
+></DT
+><DD
+><P
+>Параметр является устаревшим, но в целях совместимости ещё работает.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-s</TT
+><BR><TT
+CLASS="OPTION"
+>--schema-only</TT
+></DT
+><DD
+><P
+>Восстановить только схему (определения данных), без данных, в объёме, в котором элементы схемы представлены в архиве.</P
+><P
+>Действие параметра противоположно действию <TT
+CLASS="OPTION"
+>--data-only</TT
+>. Это похоже на указание <TT
+CLASS="OPTION"
+>--section=pre-data --section=post-data</TT
+>, но по историческим причинам не равнозначно ему.</P
+><P
+>(Не путайте этот параметр с <TT
+CLASS="OPTION"
+>--schema</TT
+>, где слово <SPAN
+CLASS="QUOTE"
+>"схема"</SPAN
+> используется в другом значении.)</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-S <TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--superuser=<TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Задаёт имя суперпользователя, полномочия которого будут использоваться для отключения триггеров. Этот параметр применяется только с параметром <TT
+CLASS="OPTION"
+>--disable-triggers</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-t <TT
+CLASS="REPLACEABLE"
+><I
+>таблица</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--table=<TT
+CLASS="REPLACEABLE"
+><I
+>таблица</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Восстановить определение и/или данные только указанной таблицы. Добавив дополнительные ключи <TT
+CLASS="OPTION"
+>-t</TT
+>, можно указать несколько таблиц. Этот параметр можно сочетать с <TT
+CLASS="OPTION"
+>-n</TT
+>, указывающим схему.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-T <TT
+CLASS="REPLACEABLE"
+><I
+>триггер</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--trigger=<TT
+CLASS="REPLACEABLE"
+><I
+>триггер</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Восстановить только указанный триггер. Добавив дополнительные ключи <TT
+CLASS="OPTION"
+>-T</TT
+>, можно указать несколько триггеров.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-v</TT
+><BR><TT
+CLASS="OPTION"
+>--verbose</TT
+></DT
+><DD
+><P
+>Включает режим подробных сообщений.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-V</TT
+><BR><TT
+CLASS="OPTION"
+>--version</TT
+></DT
+><DD
+><P
+>Сообщить версию <SPAN
+CLASS="APPLICATION"
+>pg_restore</SPAN
+> и завершиться.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-x</TT
+><BR><TT
+CLASS="OPTION"
+>--no-privileges</TT
+><BR><TT
+CLASS="OPTION"
+>--no-acl</TT
+></DT
+><DD
+><P
+>Не восстанавливать права доступа (не выполнять команды GRANT/REVOKE).</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-1</TT
+><BR><TT
+CLASS="OPTION"
+>--single-transaction</TT
+></DT
+><DD
+><P
+>Произвести восстановление в одной транзакции (то есть, завернуть выполняемые команды в <TT
+CLASS="COMMAND"
+>BEGIN</TT
+>/<TT
+CLASS="COMMAND"
+>COMMIT</TT
+>). При этом гарантируется, что либо все команды будут выполнены успешно, либо не будет никаких изменений. Этот режим подразумевает <TT
+CLASS="OPTION"
+>--exit-on-error</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>--disable-triggers</TT
+></DT
+><DD
+><P
+>Этот параметр действует только при выгрузке одних данных. С ним <SPAN
+CLASS="APPLICATION"
+>pg_restore</SPAN
+> выполняет команды, отключающие триггеры в целевых таблицах на время загрузки данных. Используйте его, если в ваших таблицах определены проверки ссылочной целостности или другие триггеры, которые вы не хотели бы выполнять в процессе загрузки данных.</P
+><P
+>В настоящее время команды, генерируемые с <TT
+CLASS="OPTION"
+>--disable-triggers</TT
+>, должны выполнятся суперпользователем. Поэтому необходимо также задать имя суперпользователя в параметре <TT
+CLASS="OPTION"
+>-S</TT
+> или, что предпочтительнее, запускать <SPAN
+CLASS="APPLICATION"
+>pg_restore</SPAN
+> от имени суперпользователя <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>--if-exists</TT
+></DT
+><DD
+><P
+>При очистке целевой базы использовать условные команды (добавлять предложение <TT
+CLASS="LITERAL"
+>IF EXISTS</TT
+>). Применяется только с параметром <TT
+CLASS="OPTION"
+>--clean</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>--no-data-for-failed-tables</TT
+></DT
+><DD
+><P
+>По умолчанию данные восстанавливаются даже при ошибке команды создания таблицы (например, когда она уже существует). С этим параметром данные в таком случае не восстанавливаются. Это поведение полезно, если в целевой таблице уже содержатся нужные данные. Например, вспомогательные таблицы для расширений <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> (в частности, <SPAN
+CLASS="PRODUCTNAME"
+>PostGIS</SPAN
+>) могут быть уже заполнены; этот параметр позволяет предотвратить дублирование или загрузку устаревших данных в эти таблицы.</P
+><P
+>Этот параметр действует только при восстановлении непосредственно в базу данных (не при генерации SQL-скрипта).</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>--no-security-labels</TT
+></DT
+><DD
+><P
+>Не выводить команды, восстанавливающие метки безопасности, даже если они содержатся в архиве.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>--no-tablespaces</TT
+></DT
+><DD
+><P
+>Не формировать команды для указания табличных пространств. Все объекты будут создаваться в табличном пространстве по умолчанию.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>--section=<TT
+CLASS="REPLACEABLE"
+><I
+>имя секции</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Восстановить только указанный раздел. В качестве имени раздела можно задать <TT
+CLASS="OPTION"
+>pre-data</TT
+>, <TT
+CLASS="OPTION"
+>data</TT
+> или <TT
+CLASS="OPTION"
+>post-data</TT
+>. Указав этот параметр неоднократно, можно выбрать несколько разделов. По умолчанию восстанавливаются все разделы.</P
+><P
+>Раздел &laquo;data&raquo; содержит собственно данные таблиц и определения больших объектов. В разделе &laquo;post-data&raquo; содержатся определения индексов, триггеров, правил и ограничений (кроме отдельно проверяемых). Раздел &laquo;pre-data&raquo; содержит все остальные определения.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>--use-set-session-authorization</TT
+></DT
+><DD
+><P
+>Выводить команды <TT
+CLASS="COMMAND"
+>SET SESSION AUTHORIZATION</TT
+>, соответствующие стандарту, вместо <TT
+CLASS="COMMAND"
+>ALTER OWNER</TT
+>, для назначения владельцев объектов. В результате выгруженный скрипт будет более стандартизированным, но может не восстановиться корректно, в зависимости от истории объектов.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-?</TT
+><BR><TT
+CLASS="OPTION"
+>--help</TT
+></DT
+><DD
+><P
+>Показать справку по аргументам командной строки <SPAN
+CLASS="APPLICATION"
+>pg_restore</SPAN
+> и завершиться.</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+><SPAN
+CLASS="APPLICATION"
+>pg_restore</SPAN
+> также принимает в качестве параметров соединения следующие аргументы командной строки: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="OPTION"
+>-h <TT
+CLASS="REPLACEABLE"
+><I
+>host</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--host=<TT
+CLASS="REPLACEABLE"
+><I
+>host</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Указывает имя компьютера, на котором запущен сервер. Если значение начинается с косой черты, оно интерпретируется как имя каталога с доменным сокетом Unix. Значение по умолчанию берётся из переменной окружения <TT
+CLASS="ENVAR"
+>PGHOST</TT
+>, если она установлена. В противном случае выполняется подключение к доменному сокету.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-p <TT
+CLASS="REPLACEABLE"
+><I
+>порт</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--port=<TT
+CLASS="REPLACEABLE"
+><I
+>порт</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Указывает TCP-порт или расширение локального файла Unix-сокета, на котором сервер слушает подключения. По умолчанию берётся значение переменной окружения <TT
+CLASS="ENVAR"
+>PGPORT</TT
+>, если оно установлено, либо значение времени компиляции.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-U <TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--username=<TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Имя пользователя, под которым производится подключение.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-w</TT
+><BR><TT
+CLASS="OPTION"
+>--no-password</TT
+></DT
+><DD
+><P
+>Не выдавать запрос на ввод пароля. Если сервер требует аутентификацию по паролю и пароль не доступен с помощью других средств, таких как файл <TT
+CLASS="FILENAME"
+>.pgpass</TT
+>, попытка соединения не удастся. Этот параметр может быть полезен в пакетных заданиях и скриптах, где нет пользователя, который вводит пароль.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-W</TT
+><BR><TT
+CLASS="OPTION"
+>--password</TT
+></DT
+><DD
+><P
+>Принудительно запрашивать пароль перед подключением к базе данных.</P
+><P
+>Это несущественный параметр, так как <SPAN
+CLASS="APPLICATION"
+>pg_restore</SPAN
+> запрашивает пароль автоматически, если сервер проверяет подлинность по паролю. Однако, чтобы понять это, <SPAN
+CLASS="APPLICATION"
+>pg_restore</SPAN
+> лишний раз подключается к серверу. Поэтому иногда имеет смысл ввести <TT
+CLASS="OPTION"
+>-W</TT
+>, чтобы исключить эту ненужную попытку подключения.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>--role=<TT
+CLASS="REPLACEABLE"
+><I
+>имя роли</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Задаёт имя роли, которая будет осуществлять восстановление. Получив это имя, <SPAN
+CLASS="APPLICATION"
+>pg_restore</SPAN
+> выполнит <TT
+CLASS="COMMAND"
+>SET ROLE</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>имя_роли</I
+></TT
+> после подключения к базе данных. Это полезно, когда проходящий проверку пользователь (указанный в <TT
+CLASS="OPTION"
+>-U</TT
+>) не имеет прав, необходимых для <SPAN
+CLASS="APPLICATION"
+>pg_restore</SPAN
+>, но может переключиться на роль, наделённую этими правами. В некоторых окружениях правила запрещают подключаться к серверу непосредственно суперпользователю, и этот параметр позволяет выполнить восстановление, не нарушая их.</P
+></DD
+></DL
+></DIV
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN90012"
+></A
+><H2
+>Переменные окружения</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="ENVAR"
+>PGHOST</TT
+><BR><TT
+CLASS="ENVAR"
+>PGOPTIONS</TT
+><BR><TT
+CLASS="ENVAR"
+>PGPORT</TT
+><BR><TT
+CLASS="ENVAR"
+>PGUSER</TT
+></DT
+><DD
+><P
+>Параметры подключения по умолчанию</P
+></DD
+></DL
+></DIV
+><P
+>Как и большинство других утилит <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, эта утилита также использует переменные среды, поддерживаемые <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> (см. <A
+HREF="libpq-envars.html"
+>Раздел 31.14</A
+>). Однако она не учитывает <TT
+CLASS="ENVAR"
+>PGDATABASE</TT
+>, когда имя базы не указано.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="APP-PGRESTORE-DIAGNOSTICS"
+></A
+><H2
+>Диагностика</H2
+><P
+>Когда с параметром <TT
+CLASS="OPTION"
+>-d</TT
+> устанавливается прямое подключение к базе данных, <SPAN
+CLASS="APPLICATION"
+>pg_restore</SPAN
+> выполняет обычные операторы <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>. При этом применяются все свойства подключения по умолчанию и переменные окружения, которые использует клиентская библиотека <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>. Если вы сталкиваетесь с проблемами при запуске <SPAN
+CLASS="APPLICATION"
+>pg_restore</SPAN
+>, убедитесь в том, что вы можете получить информацию из базы данных, используя, например <A
+HREF="app-psql.html"
+>            <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>
+          </A
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="APP-PGRESTORE-NOTES"
+></A
+><H2
+>Замечания</H2
+><P
+>Если в вашей инсталляции база данных <TT
+CLASS="LITERAL"
+>template1</TT
+> содержит какие-либо дополнения, важно убедиться в том, что вывод <SPAN
+CLASS="APPLICATION"
+>pg_restore</SPAN
+> загружается в действительно пустую базу; иначе вы, скорее всего, получите ошибки из-за дублирования определений создаваемых объектов. Чтобы получить пустую базу данных без дополнительных объектов, выберите в качестве шаблона <TT
+CLASS="LITERAL"
+>template0</TT
+>, а не <TT
+CLASS="LITERAL"
+>template1</TT
+>, например так: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE DATABASE foo WITH TEMPLATE template0;</PRE
+><P></P
+><P
+>Ограничения <SPAN
+CLASS="APPLICATION"
+>pg_restore</SPAN
+> описаны ниже. <P
+></P
+></P><UL
+><LI
+><P
+>При восстановлении данных в уже существующие таблицы с параметром <TT
+CLASS="OPTION"
+>--disable-triggers</TT
+>, <SPAN
+CLASS="APPLICATION"
+>pg_restore</SPAN
+> выполняет команды, отключающие триггеры в пользовательских таблицах до добавления данных, а затем, после добавления данных, выполняет команды, снова включающие эти триггеры. Если восстановление прервётся в середине, системные каталоги могут оказаться в некорректном состоянии.</P
+></LI
+><LI
+><P
+>Утилита <SPAN
+CLASS="APPLICATION"
+>pg_restore</SPAN
+> не способна восстанавливать большие объекты избирательно; например, только для определённой таблицы. Если архив содержит большие объекты, они будут восстановлены все, либо не будут восстановлены никакие (если они были исключены параметрами <TT
+CLASS="OPTION"
+>-L</TT
+>, <TT
+CLASS="OPTION"
+>-t</TT
+> и т. п.).</P
+></LI
+></UL
+><P></P
+><P
+>Также обратитесь к документации <A
+HREF="app-pgdump.html"
+>pg_dump</A
+>, чтобы узнать о связанных ограничениях <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+>.</P
+><P
+>После восстановления имеет смысл запустить <TT
+CLASS="COMMAND"
+>ANALYZE</TT
+> для каждой восстановленной таблицы, чтобы оптимизатор получил актуальную статистику; за дополнительными сведениями обратитесь к <A
+HREF="routine-vacuuming.html#VACUUM-FOR-STATISTICS"
+>Подразделу 23.1.3</A
+> и <A
+HREF="routine-vacuuming.html#AUTOVACUUM"
+>Подразделу 23.1.6</A
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="APP-PGRESTORE-EXAMPLES"
+></A
+><H2
+>Примеры</H2
+><P
+>Предположим, что мы выгрузили базу данных <TT
+CLASS="LITERAL"
+>mydb</TT
+> в файл специального формата: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>pg_dump -Fc mydb &gt; db.dump</KBD
+></PRE
+><P></P
+><P
+>Мы можем удалить базу данных и восстановить её из копии: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>dropdb mydb</KBD
+>
+<SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>pg_restore -C -d postgres db.dump</KBD
+></PRE
+><P> В аргументе <TT
+CLASS="OPTION"
+>-d</TT
+> можно указать любую базу данных, существующую в кластере; <SPAN
+CLASS="APPLICATION"
+>pg_restore</SPAN
+> использует её, только чтобы выполнить команду <TT
+CLASS="COMMAND"
+>CREATE DATABASE</TT
+> для базы <TT
+CLASS="LITERAL"
+>mydb</TT
+>. С параметром <TT
+CLASS="OPTION"
+>-C</TT
+> данные всегда восстанавливаются в базу, имя которой записано в файле архива.</P
+><P
+>Восстановить данные в новую базу <TT
+CLASS="LITERAL"
+>newdb</TT
+> можно так: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>createdb -T template0 newdb</KBD
+>
+<SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>pg_restore -d newdb db.dump</KBD
+></PRE
+><P> Обратите внимание, мы не используем параметр <TT
+CLASS="OPTION"
+>-C</TT
+>, а вместо этого подключаемся непосредственно к базе, в которую хотим восстановить данные. Также заметьте, что мы создаём базу данных из шаблона <TT
+CLASS="LITERAL"
+>template0</TT
+>, а не <TT
+CLASS="LITERAL"
+>template1</TT
+>, чтобы изначально она была гарантированно пустой.</P
+><P
+>Чтобы переупорядочить элементы базы данных, сначала необходимо получить оглавление архива: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>pg_restore -l db.dump &gt; db.list</KBD
+></PRE
+><P> Файл оглавления содержит заголовок и по одной строке для каждого элемента, например: </P><PRE
+CLASS="PROGRAMLISTING"
+>;
+; Archive created at Mon Sep 14 13:55:39 2009
+;     dbname: DBDEMOS
+;     TOC Entries: 81
+;     Compression: 9
+;     Dump Version: 1.10-0
+;     Format: CUSTOM
+;     Integer: 4 bytes
+;     Offset: 8 bytes
+;     Dumped from database version: 8.3.5
+;     Dumped by pg_dump version: 8.3.8
+;
+;
+; Selected TOC Entries:
+;
+3; 2615 2200 SCHEMA - public pasha
+1861; 0 0 COMMENT - SCHEMA public pasha
+1862; 0 0 ACL - public pasha
+317; 1247 17715 TYPE public composite pasha
+319; 1247 25899 DOMAIN public domain0 pasha</PRE
+><P> С точки с запятой начинаются комментарии, а число в начале строки обозначает внутренний идентификатор, назначаемый каждому элементу в архиве.</P
+><P
+>Строки в этом файле можно закомментировать, удалить или переместить. Например, список: </P><PRE
+CLASS="PROGRAMLISTING"
+>10; 145433 TABLE map_resolutions postgres
+;2; 145344 TABLE species postgres
+;4; 145359 TABLE nt_header postgres
+6; 145402 TABLE species_records postgres
+;8; 145416 TABLE ss_old postgres</PRE
+><P> можно передать утилите <SPAN
+CLASS="APPLICATION"
+>pg_restore</SPAN
+>, чтобы восстановить только элементы 10 и 6 в указанном порядке: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>pg_restore -L db.list db.dump</KBD
+></PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN90106"
+></A
+><H2
+>См. также</H2
+><A
+HREF="app-pgdump.html"
+>pg_dump</A
+>, <A
+HREF="app-pg-dumpall.html"
+>            <SPAN
+CLASS="APPLICATION"
+>pg_dumpall</SPAN
+>
+          </A
+>, <A
+HREF="app-psql.html"
+>            <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>
+          </A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="app-pgrecvlogical.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="app-psql.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><SPAN
+CLASS="APPLICATION"
+>pg_recvlogical</SPAN
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="reference-client.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

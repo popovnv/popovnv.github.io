@@ -1,0 +1,320 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Синтаксис SQL</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Язык SQL"
+HREF="sql.html"><LINK
+REL="PREVIOUS"
+TITLE="Язык SQL"
+HREF="sql.html"><LINK
+REL="NEXT"
+TITLE="Лексическая структура"
+HREF="sql-syntax-lexical.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="CHAPTER"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Язык SQL"
+HREF="sql.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Лексическая структура"
+HREF="sql-syntax-lexical.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="SQL-SYNTAX"
+></A
+>Глава 4. Синтаксис SQL</H1
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Содержание</B
+></DT
+><DT
+>4.1. <A
+HREF="sql-syntax-lexical.html"
+>Лексическая структура</A
+></DT
+><DD
+><DL
+><DT
+>4.1.1. <A
+HREF="sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS"
+>Идентификаторы и ключевые слова</A
+></DT
+><DT
+>4.1.2. <A
+HREF="sql-syntax-lexical.html#SQL-SYNTAX-CONSTANTS"
+>Константы</A
+></DT
+><DT
+>4.1.3. <A
+HREF="sql-syntax-lexical.html#SQL-SYNTAX-OPERATORS"
+>Операторы</A
+></DT
+><DT
+>4.1.4. <A
+HREF="sql-syntax-lexical.html#SQL-SYNTAX-SPECIAL-CHARS"
+>Специальные знаки</A
+></DT
+><DT
+>4.1.5. <A
+HREF="sql-syntax-lexical.html#SQL-SYNTAX-COMMENTS"
+>Комментарии</A
+></DT
+><DT
+>4.1.6. <A
+HREF="sql-syntax-lexical.html#SQL-PRECEDENCE"
+>Приоритеты операторов</A
+></DT
+></DL
+></DD
+><DT
+>4.2. <A
+HREF="sql-expressions.html"
+>Выражения значения</A
+></DT
+><DD
+><DL
+><DT
+>4.2.1. <A
+HREF="sql-expressions.html#SQL-EXPRESSIONS-COLUMN-REFS"
+>Ссылки на колонки</A
+></DT
+><DT
+>4.2.2. <A
+HREF="sql-expressions.html#SQL-EXPRESSIONS-PARAMETERS-POSITIONAL"
+>Позиционные параметры</A
+></DT
+><DT
+>4.2.3. <A
+HREF="sql-expressions.html#SQL-EXPRESSIONS-SUBSCRIPTS"
+>Индексы элементов</A
+></DT
+><DT
+>4.2.4. <A
+HREF="sql-expressions.html#FIELD-SELECTION"
+>Выбор поля</A
+></DT
+><DT
+>4.2.5. <A
+HREF="sql-expressions.html#SQL-EXPRESSIONS-OPERATOR-CALLS"
+>Применение оператора</A
+></DT
+><DT
+>4.2.6. <A
+HREF="sql-expressions.html#SQL-EXPRESSIONS-FUNCTION-CALLS"
+>Вызовы функций</A
+></DT
+><DT
+>4.2.7. <A
+HREF="sql-expressions.html#SYNTAX-AGGREGATES"
+>Агрегатные выражения</A
+></DT
+><DT
+>4.2.8. <A
+HREF="sql-expressions.html#SYNTAX-WINDOW-FUNCTIONS"
+>Вызовы оконных функций</A
+></DT
+><DT
+>4.2.9. <A
+HREF="sql-expressions.html#SQL-SYNTAX-TYPE-CASTS"
+>Приведения типов</A
+></DT
+><DT
+>4.2.10. <A
+HREF="sql-expressions.html#SQL-SYNTAX-COLLATE-EXPRS"
+>Применение правил сортировки</A
+></DT
+><DT
+>4.2.11. <A
+HREF="sql-expressions.html#SQL-SYNTAX-SCALAR-SUBQUERIES"
+>Скалярные подзапросы</A
+></DT
+><DT
+>4.2.12. <A
+HREF="sql-expressions.html#SQL-SYNTAX-ARRAY-CONSTRUCTORS"
+>Конструкторы массивов</A
+></DT
+><DT
+>4.2.13. <A
+HREF="sql-expressions.html#SQL-SYNTAX-ROW-CONSTRUCTORS"
+>Конструкторы табличных строк</A
+></DT
+><DT
+>4.2.14. <A
+HREF="sql-expressions.html#SYNTAX-EXPRESS-EVAL"
+>Правила вычисления выражений</A
+></DT
+></DL
+></DD
+><DT
+>4.3. <A
+HREF="sql-syntax-calling-funcs.html"
+>Вызов функций</A
+></DT
+><DD
+><DL
+><DT
+>4.3.1. <A
+HREF="sql-syntax-calling-funcs.html#SQL-SYNTAX-CALLING-FUNCS-POSITIONAL"
+>Позиционная передача</A
+></DT
+><DT
+>4.3.2. <A
+HREF="sql-syntax-calling-funcs.html#SQL-SYNTAX-CALLING-FUNCS-NAMED"
+>Именная передача</A
+></DT
+><DT
+>4.3.3. <A
+HREF="sql-syntax-calling-funcs.html#SQL-SYNTAX-CALLING-FUNCS-MIXED"
+>Смешанная передача</A
+></DT
+></DL
+></DD
+></DL
+></DIV
+><P
+>В этой главе описывается синтаксис языка SQL. Тем самым закладывается фундамент для следующих глав, где будет подробно рассмотрено, как с помощью команд SQL описывать и изменять данные.</P
+><P
+>Мы советуем прочитать эту главу и тем, кто уже знаком SQL, так как в ней описываются несколько правил и концепций, которые реализованы в разных базах данных SQL по-разному или относятся только к <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-syntax-lexical.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Язык SQL</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Лексическая структура</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

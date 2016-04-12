@@ -1,0 +1,915 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>CREATE ROLE</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="CREATE OPERATOR FAMILY"
+HREF="sql-createopfamily.html"><LINK
+REL="NEXT"
+TITLE="CREATE RULE"
+HREF="sql-createrule.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="CREATE OPERATOR FAMILY"
+HREF="sql-createopfamily.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="CREATE RULE"
+HREF="sql-createrule.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-CREATEROLE"
+></A
+>CREATE ROLE</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN74792"
+></A
+><H2
+>Название</H2
+>CREATE ROLE&nbsp;--&nbsp;создать роль в базе данных</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN74795"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>CREATE ROLE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> [ [ WITH ] <TT
+CLASS="REPLACEABLE"
+><I
+>параметр</I
+></TT
+> [ ... ] ]
+
+<SPAN
+CLASS="phrase"
+><SPAN
+CLASS="PHRASE"
+>Здесь <TT
+CLASS="REPLACEABLE"
+><I
+>параметр</I
+></TT
+>:</SPAN
+></SPAN
+>
+
+      SUPERUSER | NOSUPERUSER
+    | CREATEDB | NOCREATEDB
+    | CREATEROLE | NOCREATEROLE
+    | CREATEUSER | NOCREATEUSER
+    | INHERIT | NOINHERIT
+    | LOGIN | NOLOGIN
+    | REPLICATION | NOREPLICATION
+    | CONNECTION LIMIT <TT
+CLASS="REPLACEABLE"
+><I
+>предел_подключений</I
+></TT
+>
+    | [ ENCRYPTED | UNENCRYPTED ] PASSWORD '<TT
+CLASS="REPLACEABLE"
+><I
+>пароль</I
+></TT
+>'
+    | VALID UNTIL '<TT
+CLASS="REPLACEABLE"
+><I
+>дата_время</I
+></TT
+>'
+    | IN ROLE <TT
+CLASS="REPLACEABLE"
+><I
+>имя_роли</I
+></TT
+> [, ...]
+    | IN GROUP <TT
+CLASS="REPLACEABLE"
+><I
+>имя_роли</I
+></TT
+> [, ...]
+    | ROLE <TT
+CLASS="REPLACEABLE"
+><I
+>имя_роли</I
+></TT
+> [, ...]
+    | ADMIN <TT
+CLASS="REPLACEABLE"
+><I
+>имя_роли</I
+></TT
+> [, ...]
+    | USER <TT
+CLASS="REPLACEABLE"
+><I
+>имя_роли</I
+></TT
+> [, ...]
+    | SYSID <TT
+CLASS="REPLACEABLE"
+><I
+>uid</I
+></TT
+></PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN74810"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>CREATE ROLE</TT
+> добавляет новую роль в кластер баз данных <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Роль — это сущность, которая может владеть объектами и иметь определённые права в базе; роль может представлять <SPAN
+CLASS="QUOTE"
+>"пользователя"</SPAN
+>, <SPAN
+CLASS="QUOTE"
+>"группу"</SPAN
+> или и то, и другое, в зависимости от варианта использования. За информацией об управлении пользователями и проверке подлинности обратитесь к <A
+HREF="user-manag.html"
+>Главе 20</A
+> и <A
+HREF="client-authentication.html"
+>Главе 19</A
+>. Чтобы выполнить эту команду, необходимо быть суперпользователем или иметь право <TT
+CLASS="LITERAL"
+>CREATEROLE</TT
+>.</P
+><P
+>Учтите, что роли определяются на уровне кластера баз данных, так что они действуют во всех базах в кластере.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN74821"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></DT
+><DD
+><P
+>Имя создаваемой роли.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>SUPERUSER</TT
+><BR><TT
+CLASS="LITERAL"
+>NOSUPERUSER</TT
+></DT
+><DD
+><P
+>Эти предложения определяют, будет ли эта роль <SPAN
+CLASS="QUOTE"
+>"суперпользователем"</SPAN
+>, который может переопределить все ограничения доступа в базе данных. Статус суперпользователя несёт опасность и назначать его следует только в случае необходимости. Создать нового суперпользователя может только суперпользователь. В отсутствие этих предложений по умолчанию подразумевается <TT
+CLASS="LITERAL"
+>NOSUPERUSER</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>CREATEDB</TT
+><BR><TT
+CLASS="LITERAL"
+>NOCREATEDB</TT
+></DT
+><DD
+><P
+>Эти предложения определяют, сможет ли роль создавать базы данных. Указание <TT
+CLASS="LITERAL"
+>CREATEDB</TT
+> даёт новой роли это право, а <TT
+CLASS="LITERAL"
+>NOCREATEDB</TT
+> запрещает роли создавать базы данных. По умолчанию подразумевается <TT
+CLASS="LITERAL"
+>NOCREATEDB</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>CREATEROLE</TT
+><BR><TT
+CLASS="LITERAL"
+>NOCREATEROLE</TT
+></DT
+><DD
+><P
+>Эти предложения определяют, сможет ли роль создавать новые роли (т. е. выполнять <TT
+CLASS="COMMAND"
+>CREATE ROLE</TT
+>). Роль с правом <TT
+CLASS="LITERAL"
+>CREATEROLE</TT
+> может также изменять и удалять другие роли. По умолчанию подразумевается <TT
+CLASS="LITERAL"
+>NOCREATEROLE</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>CREATEUSER</TT
+><BR><TT
+CLASS="LITERAL"
+>NOCREATEUSER</TT
+></DT
+><DD
+><P
+>Эти предложения являются устаревшими, но по-прежнему принимаются, как альтернативное написание <TT
+CLASS="LITERAL"
+>SUPERUSER</TT
+> и <TT
+CLASS="LITERAL"
+>NOSUPERUSER</TT
+>. Учтите, что они <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>не</I
+></SPAN
+> равнозначны паре <TT
+CLASS="LITERAL"
+>CREATEROLE</TT
+>, как можно было бы подумать!</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>INHERIT</TT
+><BR><TT
+CLASS="LITERAL"
+>NOINHERIT</TT
+></DT
+><DD
+><P
+>Эти предложения определяют, будет ли роль <SPAN
+CLASS="QUOTE"
+>"наследовать"</SPAN
+> права ролей, членом которых она является. Роль с атрибутом <TT
+CLASS="LITERAL"
+>INHERIT</TT
+> может автоматически использовать в базе данных любые права, назначенные всем ролям, в которые она включена, непосредственно или опосредованно. Без <TT
+CLASS="LITERAL"
+>INHERIT</TT
+> членство в другой роли позволяет только выполнить <TT
+CLASS="COMMAND"
+>SET ROLE</TT
+> и переключиться на эту роль; правами, назначенными другой роли, можно будет пользоваться только после этого. По умолчанию подразумевается <TT
+CLASS="LITERAL"
+>INHERIT</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>LOGIN</TT
+><BR><TT
+CLASS="LITERAL"
+>NOLOGIN</TT
+></DT
+><DD
+><P
+>Эти предложения определяют, разрешается ли новой роли вход на сервер; то есть, может ли эта роль стать начальным авторизованным именем при подключении клиента. Можно считать, что роль с атрибутом <TT
+CLASS="LITERAL"
+>LOGIN</TT
+> соответствует пользователю. Роли без этого атрибута бывают полезны для управления доступом в базе данных, но это не пользователи в обычном понимании. По умолчанию подразумевается вариант <TT
+CLASS="LITERAL"
+>NOLOGIN</TT
+>, за исключением вызова <TT
+CLASS="COMMAND"
+>CREATE ROLE</TT
+> в виде <A
+HREF="sql-createuser.html"
+>CREATE USER</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>REPLICATION</TT
+><BR><TT
+CLASS="LITERAL"
+>NOREPLICATION</TT
+></DT
+><DD
+><P
+>Эти предложения определяют, сможет ли новая роль запускать потоковую репликацию или переключать систему в режим резервного копирования и из него. Роль с атрибутом <TT
+CLASS="LITERAL"
+>REPLICATION</TT
+> получает очень широкие полномочия, поэтому его следует назначать, только если роль фактически применяется для репликации. По умолчанию подразумевается <TT
+CLASS="LITERAL"
+>NOREPLICATION</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>CONNECTION LIMIT</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>предел_подключений</I
+></TT
+></DT
+><DD
+><P
+>Если роли разрешён вход, этот параметр определяет максимальное число одновременных подключений, разрешённых для этой роли. Значение -1 (по умолчанию) отключает ограничение.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>PASSWORD</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>пароль</I
+></TT
+></DT
+><DD
+><P
+>Задаёт пароль роли. (Пароль полезен только для ролей с атрибутом <TT
+CLASS="LITERAL"
+>LOGIN</TT
+>, но задать его можно и для ролей без такого атрибута.) Если проверка подлинности по паролю не будет использоваться, этот параметр можно опустить. При указании пустого значения будет задан пароль NULL, что не позволит данному пользователю пройти проверку подлинности по паролю. При желании пароль NULL можно установить явно, указав <TT
+CLASS="LITERAL"
+>PASSWORD NULL</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>ENCRYPTED</TT
+><BR><TT
+CLASS="LITERAL"
+>UNENCRYPTED</TT
+></DT
+><DD
+><P
+>Эти ключевые слова определяют, будет ли пароль храниться в системных каталогах в зашифрованном виде. (При отсутствии явного указания поведение по умолчанию определяется конфигурационным параметром <A
+HREF="runtime-config-connection.html#GUC-PASSWORD-ENCRYPTION"
+>password_encryption</A
+>.) Если пароль представлен в виде MD5-хеша, он сохраняется как есть, вне зависимости от того, присутствует ли указание <TT
+CLASS="LITERAL"
+>ENCRYPTED</TT
+> или <TT
+CLASS="LITERAL"
+>UNENCRYPTED</TT
+> (так как система не может расшифровать зашифрованный пароль). Это позволяет выгружать/загружать зашифрованные пароли при экспорте/импорте данных.</P
+><P
+>Учтите, что старые клиенты могут не поддерживать механизм проверки подлинности с MD5, необходимый для использования паролей, хранящихся в зашифрованном виде.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>VALID UNTIL</TT
+> '<TT
+CLASS="REPLACEABLE"
+><I
+>дата_время</I
+></TT
+>'</DT
+><DD
+><P
+>Предложение <TT
+CLASS="LITERAL"
+>VALID UNTIL</TT
+> устанавливает дату и время, после которого пароль роли перестаёт действовать. Если это предложение отсутствует, срок действия пароля будет неограниченным.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>IN ROLE</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>имя_роли</I
+></TT
+></DT
+><DD
+><P
+>В предложении <TT
+CLASS="LITERAL"
+>IN ROLE</TT
+> перечисляются одна или несколько существующих ролей, в которые будет немедленно включена новая роль. (Заметьте, что добавить новую роль с правами администратора таким образом нельзя; для этого надо отдельно выполнить команду <TT
+CLASS="COMMAND"
+>GRANT</TT
+>.)</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>IN GROUP</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>имя_роли</I
+></TT
+></DT
+><DD
+><P
+><TT
+CLASS="LITERAL"
+>IN GROUP</TT
+> — устаревшее написание предложения <TT
+CLASS="LITERAL"
+>IN ROLE</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>ROLE</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>имя_роли</I
+></TT
+></DT
+><DD
+><P
+>В предложении <TT
+CLASS="LITERAL"
+>ROLE</TT
+> перечисляются одна или несколько существующих ролей, которые автоматически становятся членами создаваемой роли. (По сути таким образом новая роль становится <SPAN
+CLASS="QUOTE"
+>"группой"</SPAN
+>.)</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>ADMIN</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>имя_роли</I
+></TT
+></DT
+><DD
+><P
+>Предложение <TT
+CLASS="LITERAL"
+>ADMIN</TT
+> подобно <TT
+CLASS="LITERAL"
+>ROLE</TT
+>, но перечисленные в нём роли включаются в новую роль с атрибутом <TT
+CLASS="LITERAL"
+>WITH ADMIN OPTION</TT
+>, что даёт им право включать в эту роль другие роли.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>USER</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>имя_роли</I
+></TT
+></DT
+><DD
+><P
+>Предложение <TT
+CLASS="LITERAL"
+>USER</TT
+> является устаревшим написанием предложения <TT
+CLASS="LITERAL"
+>ROLE</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>SYSID</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>uid</I
+></TT
+></DT
+><DD
+><P
+>Предложение <TT
+CLASS="LITERAL"
+>SYSID</TT
+> игнорируется, но принимается для обратной совместимости.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN74981"
+></A
+><H2
+>Замечания</H2
+><P
+>Для изменения атрибутов роли применяется <A
+HREF="sql-alterrole.html"
+>ALTER ROLE</A
+>, а для удаления роли — <A
+HREF="sql-droprole.html"
+>DROP ROLE</A
+>. Все атрибуты, заданные в <TT
+CLASS="COMMAND"
+>CREATE ROLE</TT
+>, могут быть изменены позднее командами <TT
+CLASS="COMMAND"
+>ALTER ROLE</TT
+>.</P
+><P
+>Для добавления и удаления членов ролей, используемых в качестве групп, рекомендуется использовать <A
+HREF="sql-grant.html"
+>GRANT</A
+> и <A
+HREF="sql-revoke.html"
+>REVOKE</A
+>.</P
+><P
+>Предложение <TT
+CLASS="LITERAL"
+>VALID UNTIL</TT
+> определяет срок действия только пароля, но не роли как таковой. В частности, ограничение срока пароля не действует при входе пользователя без проверки подлинности по паролю.</P
+><P
+>Атрибут <TT
+CLASS="LITERAL"
+>INHERIT</TT
+> управляет наследованием назначаемых прав (то есть правами доступа к объектам баз данных и членством в ролях). Его действие не распространяется на специальные атрибуты, устанавливаемые командами <TT
+CLASS="COMMAND"
+>CREATE ROLE</TT
+> и <TT
+CLASS="COMMAND"
+>ALTER ROLE</TT
+>. Например, членства в роли с правом <TT
+CLASS="LITERAL"
+>CREATEDB</TT
+> недостаточно для получения права создавать базы данных, даже если установлен атрибут <TT
+CLASS="LITERAL"
+>INHERIT</TT
+>; чтобы воспользоваться правом создавать базы данных, необходимо переключиться на эту роль, выполнив <A
+HREF="sql-set-role.html"
+>SET ROLE</A
+>.</P
+><P
+>Атрибут <TT
+CLASS="LITERAL"
+>INHERIT</TT
+> устанавливается по умолчанию в целях обратной совместимости: в предыдущих выпусках <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> пользователи всегда обладали всеми правами групп, в которые они были включены. Однако <TT
+CLASS="LITERAL"
+>NOINHERIT</TT
+> по смыслу ближе к тому, что описано в стандарте SQL.</P
+><P
+>Будьте осторожны с правом <TT
+CLASS="LITERAL"
+>CREATEROLE</TT
+>. На роли, создаваемые командой <TT
+CLASS="LITERAL"
+>CREATEROLE</TT
+>, не распространяется концепция наследования. Это значит, что даже если роль не имеет определённого права, но может создавать другие роли, она вполне способна создать другую роль с отличным набором прав (за исключением создания ролей с правами суперпользователя). Например, если роль <SPAN
+CLASS="QUOTE"
+>"user"</SPAN
+> имеет право <TT
+CLASS="LITERAL"
+>CREATEROLE</TT
+>, но не <TT
+CLASS="LITERAL"
+>CREATEDB</TT
+>, она, тем не менее, может создать новую роль с правом <TT
+CLASS="LITERAL"
+>CREATEDB</TT
+>. Поэтому роль с правом <TT
+CLASS="LITERAL"
+>CREATEROLE</TT
+> следует воспринимать как роль почти суперпользователя.</P
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> включает программу <A
+HREF="app-createuser.html"
+>            <SPAN
+CLASS="APPLICATION"
+>createuser</SPAN
+>
+          </A
+>, которая предоставляет ту же функциональность, что и команда <TT
+CLASS="COMMAND"
+>CREATE ROLE</TT
+> (на самом деле она вызывает эту команду), но может запускаться в командной оболочке.</P
+><P
+>Ограничение <TT
+CLASS="LITERAL"
+>CONNECTION LIMIT</TT
+> действует только приблизительно; если одновременно запускаются два сеанса, тогда как для этой роли остаётся только одно <SPAN
+CLASS="QUOTE"
+>"свободное место"</SPAN
+>, может так случиться, что будут отклонены оба подключения. Кроме того, это ограничение не распространяется на суперпользователей.</P
+><P
+>Указывая в этой команде незашифрованный пароль, следует проявлять осторожность. Пароль будет передаваться на сервер открытым текстом и может также записываться в историю команд клиента или в протокол работы сервера. Команда <A
+HREF="app-createuser.html"
+>            <SPAN
+CLASS="APPLICATION"
+>createuser</SPAN
+>
+          </A
+>, однако, передаёт пароль зашифрованным. Кроме того, в <A
+HREF="app-psql.html"
+>            <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>
+          </A
+> есть команда <TT
+CLASS="COMMAND"
+>\password</TT
+>, с помощью которой можно безопасно сменить пароль позже.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN75023"
+></A
+><H2
+>Примеры</H2
+><P
+>Создание роли, для которой разрешён вход, но не задан пароль: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE ROLE jonathan LOGIN;</PRE
+><P></P
+><P
+>Создание роли с паролем: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE USER davide WITH PASSWORD 'jw8s0F4';</PRE
+><P> (<TT
+CLASS="COMMAND"
+>CREATE USER</TT
+> действует так же, как <TT
+CLASS="COMMAND"
+>CREATE ROLE</TT
+>, но подразумевает ещё и атрибут <TT
+CLASS="LITERAL"
+>LOGIN</TT
+>.)</P
+><P
+>Создание роли с паролем, действующим до конца 2004 г., то есть пароль перестаёт действовать в первую же секунду 2005 г. </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE ROLE miriam WITH LOGIN PASSWORD 'jw8s0F4' VALID UNTIL '2005-01-01';</PRE
+><P></P
+><P
+>Создание роли, которая может создавать базы данных и управлять ролями: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE ROLE admin WITH CREATEDB CREATEROLE;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN75036"
+></A
+><H2
+>Совместимость</H2
+><P
+>Оператор <TT
+CLASS="COMMAND"
+>CREATE ROLE</TT
+> описан в стандарте SQL, но стандарт требует поддержки только следующего синтаксиса: </P><PRE
+CLASS="SYNOPSIS"
+>CREATE ROLE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> [ WITH ADMIN <TT
+CLASS="REPLACEABLE"
+><I
+>имя_роли</I
+></TT
+> ]</PRE
+><P> Возможность создавать множество начальных администраторов и все другие параметры <TT
+CLASS="COMMAND"
+>CREATE ROLE</TT
+> относятся к расширениям <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+><P
+>В стандарте SQL определяются концепции пользователей и ролей, но в нём они рассматриваются как отдельные сущности, а все команды создания пользователей считаются внутренней спецификой СУБД. В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> мы решили объединить пользователей и роли в единую сущность, так что роли получили дополнительные атрибуты, не описанные в стандарте.</P
+><P
+>Поведение, наиболее близкое к описанному в стандарте SQL, можно получить, если создавать пользователей с атрибутом <TT
+CLASS="LITERAL"
+>NOINHERIT</TT
+>, а роли — с атрибутом <TT
+CLASS="LITERAL"
+>INHERIT</TT
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN75050"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-set-role.html"
+>SET ROLE</A
+>, <A
+HREF="sql-alterrole.html"
+>ALTER ROLE</A
+>, <A
+HREF="sql-droprole.html"
+>DROP ROLE</A
+>, <A
+HREF="sql-grant.html"
+>GRANT</A
+>, <A
+HREF="sql-revoke.html"
+>REVOKE</A
+>, <A
+HREF="app-createuser.html"
+>            <SPAN
+CLASS="APPLICATION"
+>createuser</SPAN
+>
+          </A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-createopfamily.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-createrule.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>CREATE OPERATOR FAMILY</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>CREATE RULE</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

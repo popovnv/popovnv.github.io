@@ -1,0 +1,339 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>dict_xsyn</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Дополнительно поставляемые модули"
+HREF="contrib.html"><LINK
+REL="PREVIOUS"
+TITLE="dict_int"
+HREF="dict-int.html"><LINK
+REL="NEXT"
+TITLE="dummy_seclabel"
+HREF="dummy-seclabel.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="dict_int"
+HREF="dict-int.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Приложение E. Дополнительно поставляемые модули</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="dummy_seclabel"
+HREF="dummy-seclabel.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="DICT-XSYN"
+>E.11. dict_xsyn</A
+></H1
+><P
+>Модуль <TT
+CLASS="FILENAME"
+>dict_xsyn</TT
+> (Extended Synonym Dictionary, расширенный словарь синонимов) представляет собой пример дополнительного шаблона словаря для полнотекстового поиска. Этот словарь заменяет слова группами их синонимов, что позволяет находить слово по одному из его синонимов.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN120395"
+>E.11.1. Конфигурирование</A
+></H2
+><P
+>Словарь <TT
+CLASS="LITERAL"
+>dict_xsyn</TT
+> принимает следующие параметры:</P
+><P
+></P
+><UL
+><LI
+><P
+>Параметр <TT
+CLASS="LITERAL"
+>matchorig</TT
+> определяет, будет ли словарь принимать изначальное слово. По умолчанию он включён (имеет значение <TT
+CLASS="LITERAL"
+>true</TT
+>).</P
+></LI
+><LI
+><P
+>Параметр <TT
+CLASS="LITERAL"
+>matchsynonyms</TT
+> определяет, будет ли словарь принимать синонимы. По умолчанию он отключён (имеет значение <TT
+CLASS="LITERAL"
+>false</TT
+>).</P
+></LI
+><LI
+><P
+>Параметр <TT
+CLASS="LITERAL"
+>keeporig</TT
+> определяет, будет ли исходное слово включаться в вывод словаря. По умолчанию он включён (имеет значение <TT
+CLASS="LITERAL"
+>true</TT
+>).</P
+></LI
+><LI
+><P
+>Параметр <TT
+CLASS="LITERAL"
+>keepsynonyms</TT
+> определяет, будут ли в вывод словаря включаться синонимы. По умолчанию он включён (имеет значение <TT
+CLASS="LITERAL"
+>true</TT
+>).</P
+></LI
+><LI
+><P
+>Параметр <TT
+CLASS="LITERAL"
+>rules</TT
+> задаёт базовое имя файла со списком синонимов. Этот файл должен находиться в каталоге <TT
+CLASS="FILENAME"
+>$SHAREDIR/tsearch_data/</TT
+> (где под <TT
+CLASS="LITERAL"
+>$SHAREDIR</TT
+> понимается каталог с общими данными инсталляции <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>). Имя файла должно заканчиваться расширением <TT
+CLASS="LITERAL"
+>.rules</TT
+> (которое не нужно указывать в параметре <TT
+CLASS="LITERAL"
+>rules</TT
+>).</P
+></LI
+></UL
+><P
+>Файл правил имеет следующий формат:</P
+><P
+></P
+><UL
+><LI
+><P
+>Каждая строка представляет группу синонимов для одного слова, которое задаётся первым в этой строке. Символы разделяются пробельными символами, так что строка выглядит так: </P><PRE
+CLASS="PROGRAMLISTING"
+>word syn1 syn2 syn3</PRE
+><P></P
+></LI
+><LI
+><P
+>Символ решётки (<TT
+CLASS="LITERAL"
+>#</TT
+>) обозначает начало комментария. Он может находиться в любом месте строки. Следующая за ним часть строки игнорируется.</P
+></LI
+></UL
+><P
+>Пример словаря можно найти в файле <TT
+CLASS="FILENAME"
+>xsyn_sample.rules</TT
+>, устанавливаемом в <TT
+CLASS="FILENAME"
+>$SHAREDIR/tsearch_data/</TT
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN120435"
+>E.11.2. Usage</A
+></H2
+><P
+>При установке расширения <TT
+CLASS="LITERAL"
+>dict_xsyn</TT
+> в базе создаётся шаблон текстового поиска <TT
+CLASS="LITERAL"
+>xsyn_template</TT
+> и словарь <TT
+CLASS="LITERAL"
+>xsyn</TT
+> на его базе, с параметрами по умолчанию. Вы можете изменить параметры словаря, например так: </P><PRE
+CLASS="PROGRAMLISTING"
+>mydb# ALTER TEXT SEARCH DICTIONARY xsyn (RULES='my_rules', KEEPORIG=false);
+ALTER TEXT SEARCH DICTIONARY</PRE
+><P> или создать новые словари на базе этого шаблона.</P
+><P
+>Протестировать этот словарь можно так: </P><PRE
+CLASS="PROGRAMLISTING"
+>mydb=# SELECT ts_lexize('xsyn', 'word');
+      ts_lexize
+-----------------------
+ {syn1,syn2,syn3}
+
+mydb# ALTER TEXT SEARCH DICTIONARY xsyn (RULES='my_rules', KEEPORIG=true);
+ALTER TEXT SEARCH DICTIONARY
+
+mydb=# SELECT ts_lexize('xsyn', 'word');
+      ts_lexize
+-----------------------
+ {word,syn1,syn2,syn3}
+
+mydb# ALTER TEXT SEARCH DICTIONARY xsyn (RULES='my_rules', KEEPORIG=false, MATCHSYNONYMS=true);
+ALTER TEXT SEARCH DICTIONARY
+
+mydb=# SELECT ts_lexize('xsyn', 'syn1');
+      ts_lexize
+-----------------------
+ {syn1,syn2,syn3}
+
+mydb# ALTER TEXT SEARCH DICTIONARY xsyn (RULES='my_rules', KEEPORIG=true, MATCHORIG=false, KEEPSYNONYMS=false);
+ALTER TEXT SEARCH DICTIONARY
+
+mydb=# SELECT ts_lexize('xsyn', 'syn1');
+      ts_lexize
+-----------------------
+ {word}</PRE
+><P> Но для практического применения его нужно включить в конфигурацию текстового поиска, как описано в <A
+HREF="textsearch.html"
+>Главе 12</A
+>. Это может выглядеть примерно так: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER TEXT SEARCH CONFIGURATION english
+    ALTER MAPPING FOR word, asciiword WITH xsyn, english_stem;</PRE
+><P></P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="dict-int.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="dummy-seclabel.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>dict_int</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>dummy_seclabel</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,749 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>UPDATE</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="UNLISTEN"
+HREF="sql-unlisten.html"><LINK
+REL="NEXT"
+TITLE="VACUUM"
+HREF="sql-vacuum.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="UNLISTEN"
+HREF="sql-unlisten.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="VACUUM"
+HREF="sql-vacuum.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-UPDATE"
+></A
+>UPDATE</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN85138"
+></A
+><H2
+>Название</H2
+>UPDATE&nbsp;--&nbsp;изменить строки таблицы</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN85141"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>[ WITH [ RECURSIVE ] <TT
+CLASS="REPLACEABLE"
+><I
+>запрос_WITH</I
+></TT
+> [, ...] ]
+UPDATE [ ONLY ] <TT
+CLASS="REPLACEABLE"
+><I
+>table_name</I
+></TT
+> [ * ] [ [ AS ] <TT
+CLASS="REPLACEABLE"
+><I
+>псевдоним</I
+></TT
+> ]
+    SET { <TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+> = { <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> | DEFAULT } |
+          ( <TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+> [, ...] ) = ( { <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> | DEFAULT } [, ...] ) } [, ...]
+    [ FROM <TT
+CLASS="REPLACEABLE"
+><I
+>список_FROM</I
+></TT
+> ]
+    [ WHERE <TT
+CLASS="REPLACEABLE"
+><I
+>условие</I
+></TT
+> | WHERE CURRENT OF <TT
+CLASS="REPLACEABLE"
+><I
+>имя_курсора</I
+></TT
+> ]
+    [ RETURNING * | <TT
+CLASS="REPLACEABLE"
+><I
+>выражение_результата</I
+></TT
+> [ [ AS ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_результата</I
+></TT
+> ] [, ...] ]</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN85155"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>UPDATE</TT
+> изменяет значения указанных колонок во всех строках, удовлетворяющих условию. В предложении <TT
+CLASS="LITERAL"
+>SET</TT
+> должны указываться только те колонки, которые будут изменены; колонки, не изменяемые явно, сохраняют свои предыдущие значения.</P
+><P
+>Изменить строки в таблице, используя информацию из других таблиц в базе данных, можно двумя способами: применяя вложенные запросы или указав дополнительные таблицы в предложении <TT
+CLASS="LITERAL"
+>FROM</TT
+>. Выбор предпочитаемого варианта зависит от конкретных обстоятельств.</P
+><P
+>Предложение <TT
+CLASS="LITERAL"
+>RETURNING</TT
+> указывает, что команда <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> должна вычислить и возвратить значения для каждой фактически изменённой строки. Вычислить в нём можно любое выражение с колонками целевой таблицы и/или колонками других таблиц, упомянутых во <TT
+CLASS="LITERAL"
+>FROM</TT
+>. При этом в выражении будут использоваться новые (изменённые) значения колонок таблицы. Список <TT
+CLASS="LITERAL"
+>RETURNING</TT
+> имеет тот же синтаксис, что и список результатов <TT
+CLASS="COMMAND"
+>SELECT</TT
+>.</P
+><P
+>Для выполнения этой команды необходимо иметь право <TT
+CLASS="LITERAL"
+>UPDATE</TT
+> для таблицы, или как минимум для колонок, перечисленных в списке изменяемых. Также необходимо иметь право <TT
+CLASS="LITERAL"
+>SELECT</TT
+> для всех колонок, значения которых считываются в <TT
+CLASS="REPLACEABLE"
+><I
+>выражениях</I
+></TT
+> или <TT
+CLASS="REPLACEABLE"
+><I
+>условии</I
+></TT
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN85173"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>запрос_WITH</I
+></TT
+></DT
+><DD
+><P
+>Предложение <TT
+CLASS="LITERAL"
+>WITH</TT
+> позволяет задать один или несколько подзапросов, на которые затем можно ссылаться по имени в запросе <TT
+CLASS="COMMAND"
+>UPDATE</TT
+>. Подробнее об этом см. <A
+HREF="queries-with.html"
+>Раздел 7.8</A
+> и <A
+HREF="sql-select.html"
+>SELECT</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>table_name</I
+></TT
+></DT
+><DD
+><P
+>Имя (возможно, дополненное схемой) таблицы, строки которой будут изменены. Если перед именем таблицы добавлено <TT
+CLASS="LITERAL"
+>ONLY</TT
+>, соответствующие строки изменяются только в указанной таблице. Без <TT
+CLASS="LITERAL"
+>ONLY</TT
+> строки будут также изменены во всех таблицах, унаследованных от указанной. При желании, после имени таблицы можно указать <TT
+CLASS="LITERAL"
+>*</TT
+>, чтобы явно обозначить, что операция затрагивает все дочерние таблицы.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>псевдоним</I
+></TT
+></DT
+><DD
+><P
+>Альтернативное имя целевой таблицы. Когда указывается это имя, оно полностью скрывает фактическое имя таблицы. Например, в запросе <TT
+CLASS="LITERAL"
+>UPDATE foo AS f</TT
+> дополнительные компоненты оператора <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> должны обращаться к целевой таблице по имени <TT
+CLASS="LITERAL"
+>f</TT
+>, а не <TT
+CLASS="LITERAL"
+>foo</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+></DT
+><DD
+><P
+>Имя колонки в таблице <TT
+CLASS="REPLACEABLE"
+><I
+>имя_таблицы</I
+></TT
+>. Имя колонки при необходимости может быть дополнено именем вложенного поля или индексом массива. Имя таблицы добавлять к имени целевой колонки не нужно &mdash; например, запись <TT
+CLASS="LITERAL"
+>UPDATE tab SET tab.col = 1</TT
+> ошибочна.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+></DT
+><DD
+><P
+>Выражение, результат которого присваивается колонке. В этом выражении можно использовать предыдущие значения этой и других колонок таблицы.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>DEFAULT</TT
+></DT
+><DD
+><P
+>Присвоить колонке значение по умолчанию (это может быть NULL, если для колонки не определено некоторое выражение по умолчанию).</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>список_FROM</I
+></TT
+></DT
+><DD
+><P
+>Список табличных выражений, позволяющий использовать в условии <TT
+CLASS="LITERAL"
+>WHERE</TT
+> и выражениях присваивания колонки из других таблиц. Этот список подобен тому, что задаётся в предложении <A
+HREF="sql-select.html#SQL-FROM"
+><I
+>Предложение <I
+>FROM</I
+></I
+></A
+> оператора <TT
+CLASS="COMMAND"
+>SELECT</TT
+>. Заметьте, что целевую таблицу нужно добавлять в <TT
+CLASS="REPLACEABLE"
+><I
+>список_FROM</I
+></TT
+> только при формировании замкнутого соединения (в этом случае она должна фигурировать в <TT
+CLASS="REPLACEABLE"
+><I
+>списке_FROM</I
+></TT
+> под псевдонимом).</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>условие</I
+></TT
+></DT
+><DD
+><P
+>Выражение, возвращающее значение типа <TT
+CLASS="TYPE"
+>boolean</TT
+>. Изменены будут только те стоки, для которых это выражение возвращает <TT
+CLASS="LITERAL"
+>true</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_курсора</I
+></TT
+></DT
+><DD
+><P
+>Имя курсора, который будет использоваться в условии <TT
+CLASS="LITERAL"
+>WHERE CURRENT OF</TT
+>. С таким условием будет изменена строка, выбранная из этого курсора последней. Курсор должен образовываться запросом, не применяющим группировку, к целевой таблице команды <TT
+CLASS="COMMAND"
+>UPDATE</TT
+>. Заметьте, что <TT
+CLASS="LITERAL"
+>WHERE CURRENT OF</TT
+> нельзя задать вместе с булевским условием. За дополнительными сведениями об использовании курсоров с <TT
+CLASS="LITERAL"
+>WHERE CURRENT OF</TT
+> обратитесь к <A
+HREF="sql-declare.html"
+>DECLARE</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>выражение_результата</I
+></TT
+></DT
+><DD
+><P
+>Выражение, которое будет вычисляться и возвращаться командой <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> после изменения каждой строки. В этом выражении можно использовать имена любых колонок таблицы <TT
+CLASS="REPLACEABLE"
+><I
+>имя_таблицы</I
+></TT
+> или таблиц, перечисленных в списке <TT
+CLASS="LITERAL"
+>FROM</TT
+>. Чтобы получить все колонки, достаточно написать <TT
+CLASS="LITERAL"
+>*</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_результата</I
+></TT
+></DT
+><DD
+><P
+>Имя, назначаемое возвращаемой колонке.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN85260"
+></A
+><H2
+>Выводимая информация</H2
+><P
+>В случае успешного завершения, <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> возвращает метку команды в виде </P><PRE
+CLASS="SCREEN"
+>UPDATE <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+></PRE
+><P> Здесь <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+> обозначает количество изменённых строк, включая те подлежащие изменению строки, значения в которых не были изменены. Заметьте, что это число может быть меньше количества строк, удовлетворяющих <TT
+CLASS="REPLACEABLE"
+><I
+>условию</I
+></TT
+>, когда изменения отменяются триггером <TT
+CLASS="LITERAL"
+>BEFORE UPDATE</TT
+>. Если <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+> равно 0, данный запрос не изменил ни одной строки (это не считается ошибкой).</P
+><P
+>Если команда <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> содержит предложение <TT
+CLASS="LITERAL"
+>RETURNING</TT
+>, её результат будет похож на результат оператора <TT
+CLASS="COMMAND"
+>SELECT</TT
+> (с теми же колонками и значениями, что содержатся в списке <TT
+CLASS="LITERAL"
+>RETURNING</TT
+>), полученный для строк, изменённых этой командой.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN85275"
+></A
+><H2
+>Замечания</H2
+><P
+>Когда присутствует предложение <TT
+CLASS="LITERAL"
+>FROM</TT
+>, целевая таблица по сути соединяется с таблицами, перечисленными в <TT
+CLASS="REPLACEABLE"
+><I
+>списке_FROM</I
+></TT
+>, и каждая выходная строка соединения представляет операцию изменения для целевой таблицы. Применяя предложение <TT
+CLASS="LITERAL"
+>FROM</TT
+>, необходимо обеспечить, чтобы соединение выдавало максимум одну выходную строку для каждой строки, которую нужно изменить. Другими словами, целевая строка не должна соединяться с более чем одной строкой из других таблиц. Если это условие нарушается, только одна из строк соединения будет использоваться для изменения целевой строки, но какая именно, предсказать нельзя.</P
+><P
+>Из-за этой неопределённости надёжнее ссылаться на другие таблицы только в подзапросах, хотя такие запросы часто хуже читаются и работают медленнее, чем соединение.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN85282"
+></A
+><H2
+>Примеры</H2
+><P
+>Изменение слова <TT
+CLASS="LITERAL"
+>Drama</TT
+> на <TT
+CLASS="LITERAL"
+>Dramatic</TT
+> в колонке <TT
+CLASS="STRUCTFIELD"
+>kind</TT
+> таблицы <TT
+CLASS="STRUCTNAME"
+>films</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>UPDATE films SET kind = 'Dramatic' WHERE kind = 'Drama';</PRE
+><P></P
+><P
+>Изменение значений температуры и сброс уровня осадков к значению по умолчанию в одной строке таблицы <TT
+CLASS="STRUCTNAME"
+>weather</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>UPDATE weather SET temp_lo = temp_lo+1, temp_hi = temp_lo+15, prcp = DEFAULT
+  WHERE city = 'San Francisco' AND date = '2003-07-03';</PRE
+><P></P
+><P
+>Выполнение той же операции с получением изменённых записей: </P><PRE
+CLASS="PROGRAMLISTING"
+>UPDATE weather SET temp_lo = temp_lo+1, temp_hi = temp_lo+15, prcp = DEFAULT
+  WHERE city = 'San Francisco' AND date = '2003-07-03'
+  RETURNING temp_lo, temp_hi, prcp;</PRE
+><P></P
+><P
+>Такое же изменение с применением альтернативного синтаксиса со списком колонок: </P><PRE
+CLASS="PROGRAMLISTING"
+>UPDATE weather SET (temp_lo, temp_hi, prcp) = (temp_lo+1, temp_lo+15, DEFAULT)
+  WHERE city = 'San Francisco' AND date = '2003-07-03';</PRE
+><P></P
+><P
+>Увеличение счётчика продаж для продавца, занимающегося компанией Acme Corporation, с применением предложения <TT
+CLASS="LITERAL"
+>FROM</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>UPDATE employees SET sales_count = sales_count + 1 FROM accounts
+  WHERE accounts.name = 'Acme Corporation'
+  AND employees.id = accounts.sales_person;</PRE
+><P></P
+><P
+>Выполнение той же операции, с вложенным запросом в предложении <TT
+CLASS="LITERAL"
+>WHERE</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>UPDATE employees SET sales_count = sales_count + 1 WHERE id =
+  (SELECT sales_person FROM accounts WHERE name = 'Acme Corporation');</PRE
+><P></P
+><P
+>Попытка добавить новый продукт вместе с количеством. Если такая запись уже существует, вместо этого увеличить количество данного продукта в существующей записи. Чтобы реализовать этот подход, не откатывая всю транзакцию, можно использовать точки сохранения: </P><PRE
+CLASS="PROGRAMLISTING"
+>BEGIN;
+-- другие операции
+SAVEPOINT sp1;
+INSERT INTO wines VALUES('Chateau Lafite 2003', '24');
+-- Предполагая, что здесь возникает ошибка из-за нарушения уникальности ключа,
+-- мы выполняем следующие команды:
+ROLLBACK TO sp1;
+UPDATE wines SET stock = stock + 24 WHERE winename = 'Chateau Lafite 2003';
+-- Продолжение других операций и в завершение...
+COMMIT;</PRE
+><P></P
+><P
+>Изменение колонки <TT
+CLASS="STRUCTFIELD"
+>kind</TT
+> таблицы <TT
+CLASS="STRUCTNAME"
+>films</TT
+> в строке, на которой в данный момент находится курсор <TT
+CLASS="LITERAL"
+>c_films</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>UPDATE films SET kind = 'Dramatic' WHERE CURRENT OF c_films;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN85310"
+></A
+><H2
+>Совместимость</H2
+><P
+>Эта команда соответствует стандарту <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>, за исключением предложений <TT
+CLASS="LITERAL"
+>FROM</TT
+> и <TT
+CLASS="LITERAL"
+>RETURNING</TT
+>, которые являются расширениями <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, как и возможность применять <TT
+CLASS="LITERAL"
+>WITH</TT
+> с <TT
+CLASS="COMMAND"
+>UPDATE</TT
+>.</P
+><P
+>Согласно стандарту, синтаксис со списком колонок должен допускать присвоение этому списку результата выражения, возвращающего одну строку, как например, следующий подзапрос: </P><PRE
+CLASS="PROGRAMLISTING"
+>UPDATE accounts SET (contact_last_name, contact_first_name) =
+    (SELECT last_name, first_name FROM salesmen
+     WHERE salesmen.id = accounts.sales_id);</PRE
+><P> В настоящее время это не реализовано &mdash; источником значений должен быть список независимых выражений.</P
+><P
+>В некоторых других СУБД также поддерживается дополнительное предложение <TT
+CLASS="LITERAL"
+>FROM</TT
+>, но предполагается, что целевая таблица должна ещё раз упоминаться в этом предложении. <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> воспринимает предложение <TT
+CLASS="LITERAL"
+>FROM</TT
+> не так, поэтому будьте внимательны, портируя приложения, которые используют это расширение языка.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-unlisten.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-vacuum.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>UNLISTEN</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>VACUUM</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

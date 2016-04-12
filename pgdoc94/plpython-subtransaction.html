@@ -1,0 +1,302 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Неявные подтранзакции</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="PL/Python — процедурный язык Python"
+HREF="plpython.html"><LINK
+REL="PREVIOUS"
+TITLE="Обращение к базе данных"
+HREF="plpython-database.html"><LINK
+REL="NEXT"
+TITLE="Вспомогательные функции"
+HREF="plpython-util.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Обращение к базе данных"
+HREF="plpython-database.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="plpython.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 43. PL/Python — процедурный язык Python</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Вспомогательные функции"
+HREF="plpython-util.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="PLPYTHON-SUBTRANSACTION"
+>43.8. Неявные подтранзакции</A
+></H1
+><P
+>Перехват ошибок, произошедших при обращении к базе данных, как описано в <A
+HREF="plpython-database.html#PLPYTHON-TRAPPING"
+>Подразделе 43.7.2</A
+>, может привести к нежелательной ситуации, когда часть операций будет успешно выполнена, прежде чем произойдёт сбой. Данные останутся в несогласованном состоянии после обработки такой ошибки. PL/Python предлагает решение этой проблемы в форме неявных подтранзакций.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN63695"
+>43.8.1. Менеджеры контекста подтранзакций</A
+></H2
+><P
+>Рассмотрим функцию, осуществляющую перевод средств между двумя счетами: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION transfer_funds() RETURNS void AS $$
+try:
+    plpy.execute("UPDATE accounts SET balance = balance - 100 WHERE account_name = 'joe'")
+    plpy.execute("UPDATE accounts SET balance = balance + 100 WHERE account_name = 'mary'")
+except plpy.SPIError, e:
+    result = "error transferring funds: %s" % e.args
+else:
+    result = "funds transferred correctly"
+plan = plpy.prepare("INSERT INTO operations (result) VALUES ($1)", ["text"])
+plpy.execute(plan, [result])
+$$ LANGUAGE plpythonu;</PRE
+><P> Если при выполнении второго оператора <TT
+CLASS="LITERAL"
+>UPDATE</TT
+> произойдёт исключение, эта функция сообщит об ошибке, но результат первого <TT
+CLASS="LITERAL"
+>UPDATE</TT
+> будет, тем не менее, зафиксирован. Другими словами, средства будут списаны со счёта Джо, но не зачислятся на счёт Мэри.</P
+><P
+>Во избежание таких проблем, вы можете завернуть вызовы <TT
+CLASS="LITERAL"
+>plpy.execute</TT
+> в явную подтранзакцию. Модуль <TT
+CLASS="LITERAL"
+>plpy</TT
+> предоставляет вспомогательный объект для управления явными подтранзакциями, создаваемый функцией <TT
+CLASS="LITERAL"
+>plpy.subtransaction()</TT
+>. Объекты, созданные этой функцией, реализуют <A
+HREF="http://docs.python.org/library/stdtypes.html#context-manager-types"
+TARGET="_top"
+>интерфейс менеджера контекста</A
+>. Используя явные подтранзакции, мы можем переписать нашу функцию так: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION transfer_funds2() RETURNS void AS $$
+try:
+    with plpy.subtransaction():
+        plpy.execute("UPDATE accounts SET balance = balance - 100 WHERE account_name = 'joe'")
+        plpy.execute("UPDATE accounts SET balance = balance + 100 WHERE account_name = 'mary'")
+except plpy.SPIError, e:
+    result = "error transferring funds: %s" % e.args
+else:
+    result = "funds transferred correctly"
+plan = plpy.prepare("INSERT INTO operations (result) VALUES ($1)", ["text"])
+plpy.execute(plan, [result])
+$$ LANGUAGE plpythonu;</PRE
+><P> Заметьте, что конструкция <TT
+CLASS="LITERAL"
+>try/catch</TT
+> по-прежнему нужна. Без неё исключение распространится вверх по стеку Python и приведёт к прерыванию всей функции с ошибкой <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, так что в таблицу <TT
+CLASS="LITERAL"
+>operations</TT
+> запись не добавится. Менеджер контекста подтранзакции не перехватывает ошибки, он только гарантирует, что все операции с базой данных в его области действия будут атомарно зафиксированы или отменены. Откат блока подтранзакции происходит при исключении любого вида, а не только исключения, вызванного ошибками при обращении к базе данных. Обычное исключение Python, вызванное внутри блока явной подтранзакции, также приведёт к откату этой подтранзакции.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN63710"
+>43.8.2. Старые версии Python</A
+></H2
+><P
+>Синтаксис использования менеджеров контекста с ключевым словом <TT
+CLASS="LITERAL"
+>with</TT
+> по умолчанию поддерживается в Python 2.6. В PL/Python с более старой версией Python тоже возможно использовать явные подтранзакции, хотя и не так прозрачно. При этом вы можете вызывать методы <TT
+CLASS="LITERAL"
+>__enter__</TT
+> и <TT
+CLASS="LITERAL"
+>__exit__</TT
+> менеджера контекста по удобным псевдонимам <TT
+CLASS="LITERAL"
+>enter</TT
+> и <TT
+CLASS="LITERAL"
+>exit</TT
+>. Для такого случая функцию перечисления средств можно переписать так: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION transfer_funds_old() RETURNS void AS $$
+try:
+    subxact = plpy.subtransaction()
+    subxact.enter()
+    try:
+        plpy.execute("UPDATE accounts SET balance = balance - 100 WHERE account_name = 'joe'")
+        plpy.execute("UPDATE accounts SET balance = balance + 100 WHERE account_name = 'mary'")
+    except:
+        import sys
+        subxact.exit(*sys.exc_info())
+        raise
+    else:
+        subxact.exit(None, None, None)
+except plpy.SPIError, e:
+    result = "error transferring funds: %s" % e.args
+else:
+    result = "funds transferred correctly"
+
+plan = plpy.prepare("INSERT INTO operations (result) VALUES ($1)", ["text"])
+plpy.execute(plan, [result])
+$$ LANGUAGE plpythonu;</PRE
+><P></P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Хотя менеджеры контекста были реализованы в 2.5, для использования синтаксиса <TT
+CLASS="LITERAL"
+>with</TT
+> в этой версии нужно применить <A
+HREF="http://docs.python.org/release/2.5/ref/future.html"
+TARGET="_top"
+>&laquo;будущий оператор&raquo;</A
+>. Однако по техническим причинам &laquo;будущие операторы&raquo; в функциях PL/Python использовать нельзя.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="plpython-database.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="plpython-util.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Обращение к базе данных</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="plpython.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Вспомогательные функции</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,270 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>dblink_get_notify</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="dblink"
+HREF="dblink.html"><LINK
+REL="PREVIOUS"
+TITLE="dblink_is_busy"
+HREF="contrib-dblink-is-busy.html"><LINK
+REL="NEXT"
+TITLE="dblink_get_result"
+HREF="contrib-dblink-get-result.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="dblink_is_busy"
+HREF="contrib-dblink-is-busy.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="dblink.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="dblink_get_result"
+HREF="contrib-dblink-get-result.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="CONTRIB-DBLINK-GET-NOTIFY"
+></A
+>dblink_get_notify</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN120033"
+></A
+><H2
+>Название</H2
+>dblink_get_notify&nbsp;--&nbsp;выдаёт асинхронные уведомления подключения</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN120036"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>dblink_get_notify() returns setof (notify_name text, be_pid int, extra text)
+dblink_get_notify(text connname) returns setof (notify_name text, be_pid int, extra text)</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN120038"
+></A
+><H2
+>Описание</H2
+><P
+><CODE
+CLASS="FUNCTION"
+>dblink_get_notify</CODE
+> выдаёт уведомления либо безымянного подключения, либо подключения с заданным именем. Чтобы получать уведомления через dblink, необходимо сначала выполнить <CODE
+CLASS="FUNCTION"
+>LISTEN</CODE
+>, воспользовавшись функцией <CODE
+CLASS="FUNCTION"
+>dblink_exec</CODE
+>. За подробностями обратитесь к <A
+HREF="sql-listen.html"
+>LISTEN</A
+> и <A
+HREF="sql-notify.html"
+>NOTIFY</A
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN120046"
+></A
+><H2
+>Аргументы</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="PARAMETER"
+>conname</TT
+></DT
+><DD
+><P
+>Имя именованного подключения, уведомления которого нужно получить.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN120054"
+></A
+><H2
+>Возвращаемое значение</H2
+><P
+>Возвращает <TT
+CLASS="TYPE"
+>setof (notify_name text, be_pid int, extra text)</TT
+> или пустой набор, если уведомлений нет.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN120058"
+></A
+><H2
+>Примеры</H2
+><PRE
+CLASS="SCREEN"
+>SELECT dblink_exec('LISTEN virtual');
+ dblink_exec 
+-------------
+ LISTEN
+(1 row)
+
+SELECT * FROM dblink_get_notify();
+ notify_name | be_pid | extra
+-------------+--------+-------
+(0 rows)
+
+NOTIFY virtual;
+NOTIFY
+
+SELECT * FROM dblink_get_notify();
+ notify_name | be_pid | extra
+-------------+--------+-------
+ virtual     |   1229 |
+(1 row)</PRE
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="contrib-dblink-is-busy.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="contrib-dblink-get-result.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>dblink_is_busy</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="dblink.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>dblink_get_result</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

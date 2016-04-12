@@ -1,0 +1,387 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>CREATE CONVERSION</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="CREATE COLLATION"
+HREF="sql-createcollation.html"><LINK
+REL="NEXT"
+TITLE="CREATE DATABASE"
+HREF="sql-createdatabase.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="CREATE COLLATION"
+HREF="sql-createcollation.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="CREATE DATABASE"
+HREF="sql-createdatabase.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-CREATECONVERSION"
+></A
+>CREATE CONVERSION</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN72720"
+></A
+><H2
+>Название</H2
+>CREATE CONVERSION&nbsp;--&nbsp;создать перекодировку</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN72723"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>CREATE [ DEFAULT ] CONVERSION <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+>
+    FOR <TT
+CLASS="REPLACEABLE"
+><I
+>исходная_кодировка</I
+></TT
+> TO <TT
+CLASS="REPLACEABLE"
+><I
+>целевая_кодировка</I
+></TT
+> FROM <TT
+CLASS="REPLACEABLE"
+><I
+>имя_функции</I
+></TT
+></PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="SQL-CREATECONVERSION-DESCRIPTION"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>CREATE CONVERSION</TT
+> определяет новую перекодировку наборов символов. Кроме того, перекодировки, помеченные как <TT
+CLASS="LITERAL"
+>DEFAULT</TT
+>, могут применяться для автоматического преобразования кодировки между клиентом и сервером. Для такого применения должны быть определены две перекодировки: из кодировки A в B <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>и</I
+></SPAN
+> из кодировки B в A.</P
+><P
+>Чтобы создать перекодировку, необходимо иметь право <TT
+CLASS="LITERAL"
+>EXECUTE</TT
+> для реализующей функции и право <TT
+CLASS="LITERAL"
+>CREATE</TT
+> в целевой схеме.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN72738"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>DEFAULT</TT
+></DT
+><DD
+><P
+>Предложение <TT
+CLASS="LITERAL"
+>DEFAULT</TT
+> показывает, что эта перекодировка должна использоваться по умолчанию для преобразования заданной исходной кодировки в целевую. Для каждой пары кодировок может быть только одна перекодировка по умолчанию.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></DT
+><DD
+><P
+>Имя перекодировки, возможно, дополненное схемой. Если схема не указана, перекодировка создаётся в текущей схеме. Имя перекодировки должно быть уникально в этой схеме.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>исходная_кодировка</I
+></TT
+></DT
+><DD
+><P
+>Имя исходной кодировки.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>целевая_кодировка</I
+></TT
+></DT
+><DD
+><P
+>Имя целевой кодировки.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_функции</I
+></TT
+></DT
+><DD
+><P
+>Функция, выполняющая перекодирование. Имя функции может быть дополнено схемой, в противном случае для поиска функции просматривается путь поиска.</P
+><P
+>Функция должна иметь следующую сигнатуру: </P><PRE
+CLASS="PROGRAMLISTING"
+>conv_proc(
+    integer,  -- идентификатор исходной кодировки
+    integer,  -- идентификатор целевой кодировки
+    cstring,  -- исходная строка (строка, завершающаяся 0, как в C)
+    internal, -- целевая строка (заполняется строкой, завершающейся 0, как в C)
+    integer   -- длина исходной строки
+) RETURNS void;</PRE
+><P></P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="SQL-CREATECONVERSION-NOTES"
+></A
+><H2
+>Замечания</H2
+><P
+>Для удаления перекодировок, созданных пользователем, применяется <TT
+CLASS="COMMAND"
+>DROP CONVERSION</TT
+>.</P
+><P
+>Набор прав, требуемых для создания перекодировки, может измениться в будущих версиях.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="SQL-CREATECONVERSION-EXAMPLES"
+></A
+><H2
+>Примеры</H2
+><P
+>Создание перекодировки из кодировки <TT
+CLASS="LITERAL"
+>UTF8</TT
+> в <TT
+CLASS="LITERAL"
+>LATIN1</TT
+> с использованием функции <CODE
+CLASS="FUNCTION"
+>myfunc</CODE
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE CONVERSION myconv FOR 'UTF8' TO 'LATIN1' FROM myfunc;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="SQL-CREATECONVERSION-COMPAT"
+></A
+><H2
+>Совместимость</H2
+><P
+>Оператор <TT
+CLASS="COMMAND"
+>CREATE CONVERSION</TT
+> является расширением <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. В стандарте SQL отсутствует оператор <TT
+CLASS="COMMAND"
+>CREATE CONVERSION</TT
+>, но есть очень похожий по предназначению и синтаксису оператор <TT
+CLASS="COMMAND"
+>CREATE TRANSLATION</TT
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="SQL-CREATECONVERSION-SEEALSO"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-alterconversion.html"
+>ALTER CONVERSION</A
+>, <A
+HREF="sql-createfunction.html"
+>CREATE FUNCTION</A
+>, <A
+HREF="sql-dropconversion.html"
+>DROP CONVERSION</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-createcollation.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-createdatabase.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>CREATE COLLATION</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>CREATE DATABASE</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

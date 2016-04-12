@@ -1,0 +1,278 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Регламентные задачи обслуживания базы данных</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Администрирование сервера"
+HREF="admin.html"><LINK
+REL="PREVIOUS"
+TITLE="Поддержка кодировок"
+HREF="multibyte.html"><LINK
+REL="NEXT"
+TITLE="Регламентная очистка"
+HREF="routine-vacuuming.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="CHAPTER"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Поддержка кодировок"
+HREF="multibyte.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="admin.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Регламентная очистка"
+HREF="routine-vacuuming.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="MAINTENANCE"
+></A
+>Глава 23. Регламентные задачи обслуживания базы данных</H1
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Содержание</B
+></DT
+><DT
+>23.1. <A
+HREF="routine-vacuuming.html"
+>Регламентная очистка</A
+></DT
+><DD
+><DL
+><DT
+>23.1.1. <A
+HREF="routine-vacuuming.html#VACUUM-BASICS"
+>Основные принципы очистки</A
+></DT
+><DT
+>23.1.2. <A
+HREF="routine-vacuuming.html#VACUUM-FOR-SPACE-RECOVERY"
+>Высвобождение дискового пространства</A
+></DT
+><DT
+>23.1.3. <A
+HREF="routine-vacuuming.html#VACUUM-FOR-STATISTICS"
+>Обновление статистики планировщика</A
+></DT
+><DT
+>23.1.4. <A
+HREF="routine-vacuuming.html#VACUUM-FOR-VISIBILITY-MAP"
+>Обновление карты видимости</A
+></DT
+><DT
+>23.1.5. <A
+HREF="routine-vacuuming.html#VACUUM-FOR-WRAPAROUND"
+>Предотвращение ошибок из-за зацикливания счётчика транзакций</A
+></DT
+><DT
+>23.1.6. <A
+HREF="routine-vacuuming.html#AUTOVACUUM"
+>Демон автоочистки</A
+></DT
+></DL
+></DD
+><DT
+>23.2. <A
+HREF="routine-reindex.html"
+>Регулярная переиндексация</A
+></DT
+><DT
+>23.3. <A
+HREF="logfile-maintenance.html"
+>Обслуживание журнала</A
+></DT
+></DL
+></DIV
+><P
+>Как и в любой СУБД, в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> для достижения оптимальной производительности нужно регулярно выполнять определённые процедуры. Задачи, которые рассматриваются в этой главе, являются <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>обязательными</I
+></SPAN
+>, но они по природе своей повторяющиеся и легко поддаются автоматизации с использованием стандартных средств, таких как задания <SPAN
+CLASS="APPLICATION"
+>cron</SPAN
+> или <SPAN
+CLASS="APPLICATION"
+>Планировщика задач</SPAN
+> в Windows. Создание соответствующих заданий и контроль над их успешным выполнением входят в обязанности администратора базы данных.</P
+><P
+>Одной из очевидных задач обслуживания СУБД является регулярное создание резервных копий данных. При отсутствии свежей резервной копии у вас не будет шанса восстановить систему после катастрофы (сбой диска, пожар, удаление важной таблицы по ошибке и т. д.). Механизмы резервного копирования и восстановления в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> детально рассматриваются в <A
+HREF="backup.html"
+>Главе 24</A
+>.</P
+><P
+>Другое важное направление обслуживания СУБД — периодическая <SPAN
+CLASS="QUOTE"
+>"очистка"</SPAN
+> базы данных. Эта операция рассматривается в <A
+HREF="routine-vacuuming.html"
+>Разделе 23.1</A
+>. С ней тесно связано обновление статистики, которая будет использоваться планировщиком запросов; оно рассматривается в <A
+HREF="routine-vacuuming.html#VACUUM-FOR-STATISTICS"
+>Подразделе 23.1.3</A
+>.</P
+><P
+>Ещё одной задачей, требующей периодического выполнения, является управление файлами журнала. Она рассматривается в <A
+HREF="logfile-maintenance.html"
+>Разделе 23.3</A
+>.</P
+><P
+>Для контроля состояния базы данных и для отслеживания нестандартных ситуаций можно использовать <A
+HREF="http://bucardo.org/wiki/Check_postgres"
+TARGET="_top"
+><SPAN
+CLASS="APPLICATION"
+>check_postgres</SPAN
+></A
+>. Скрипт <SPAN
+CLASS="APPLICATION"
+>check_postgres</SPAN
+> можно интегрировать с Nagios и MRTG, однако он может работать и самостоятельно.</P
+><P
+>По сравнению с некоторыми другими СУБД <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> неприхотлив в обслуживании. Тем не менее, должное внимание к вышеперечисленным задачам будет значительно способствовать комфортной и производительной работе с СУБД.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="multibyte.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="routine-vacuuming.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Поддержка кодировок</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="admin.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Регламентная очистка</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

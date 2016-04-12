@@ -1,0 +1,514 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Системные представления</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Системные каталоги"
+HREF="catalogs.html"><LINK
+REL="PREVIOUS"
+TITLE="          pg_user_mapping
+        "
+HREF="catalog-pg-user-mapping.html"><LINK
+REL="NEXT"
+TITLE="          pg_available_extensions
+        "
+HREF="view-pg-available-extensions.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="          pg_user_mapping
+        "
+HREF="catalog-pg-user-mapping.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 48. Системные каталоги</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="          pg_available_extensions
+        "
+HREF="view-pg-available-extensions.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="VIEWS-OVERVIEW"
+>48.54. Системные представления</A
+></H1
+><P
+>В дополнение к системным каталогам, в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> есть набор встроенных представлений. Некоторые системные представления содержат в себе некоторые популярные запросы к системным каталогам, а другие дают доступ к внутреннему состоянию сервера.</P
+><P
+>Информационная схема (см. <A
+HREF="information-schema.html"
+>Главу 34</A
+>) содержит другой набор представлений, пересекающихся по функциональности с системными представлениям. Так как информационная схема соответствует стандарту SQL, тогда как описанные здесь представления свойственны только для <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, обычно лучше использовать информационную схему, если через неё можно получить всю требуемую информацию.</P
+><P
+>В <A
+HREF="views-overview.html#VIEW-TABLE"
+>Таблице 48-55</A
+> кратко перечислены описываемые здесь системные представления. Более подробное описание каждого представления следует далее. Есть также дополнительные представления, дающие доступ к результатам работы сборщика статистики; они перечисляются в <A
+HREF="monitoring-stats.html#MONITORING-STATS-VIEWS-TABLE"
+>Таблице 27-1</A
+>.</P
+><P
+>Кроме явно отмеченных исключений, все описанные здесь представления доступны только для чтения.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="VIEW-TABLE"
+></A
+><P
+><B
+>Таблица 48-55. Системные представления</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+>Имя представления</TH
+><TH
+>Предназначение</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <A
+HREF="view-pg-available-extensions.html"
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_available_extensions</TT
+>
+                  </A
+>
+                </TD
+><TD
+>доступные расширения</TD
+></TR
+><TR
+><TD
+>                  <A
+HREF="view-pg-available-extension-versions.html"
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_available_extension_versions</TT
+>
+                  </A
+>
+                </TD
+><TD
+>доступные версии расширений</TD
+></TR
+><TR
+><TD
+>                  <A
+HREF="view-pg-cursors.html"
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_cursors</TT
+>
+                  </A
+>
+                </TD
+><TD
+>открытые курсоры</TD
+></TR
+><TR
+><TD
+>                  <A
+HREF="view-pg-group.html"
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_group</TT
+>
+                  </A
+>
+                </TD
+><TD
+>группы пользователей баз данных</TD
+></TR
+><TR
+><TD
+>                  <A
+HREF="view-pg-indexes.html"
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_indexes</TT
+>
+                  </A
+>
+                </TD
+><TD
+>индексы</TD
+></TR
+><TR
+><TD
+>                  <A
+HREF="view-pg-locks.html"
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_locks</TT
+>
+                  </A
+>
+                </TD
+><TD
+>установленные в данный момент блокировки</TD
+></TR
+><TR
+><TD
+>                  <A
+HREF="view-pg-matviews.html"
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_matviews</TT
+>
+                  </A
+>
+                </TD
+><TD
+>материализованные представления</TD
+></TR
+><TR
+><TD
+>                  <A
+HREF="view-pg-prepared-statements.html"
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_prepared_statements</TT
+>
+                  </A
+>
+                </TD
+><TD
+>подготовленные операторы</TD
+></TR
+><TR
+><TD
+>                  <A
+HREF="view-pg-prepared-xacts.html"
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_prepared_xacts</TT
+>
+                  </A
+>
+                </TD
+><TD
+>подготовленные транзакции</TD
+></TR
+><TR
+><TD
+>                  <A
+HREF="view-pg-roles.html"
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_roles</TT
+>
+                  </A
+>
+                </TD
+><TD
+>роли баз данных</TD
+></TR
+><TR
+><TD
+>                  <A
+HREF="view-pg-rules.html"
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_rules</TT
+>
+                  </A
+>
+                </TD
+><TD
+>правила</TD
+></TR
+><TR
+><TD
+>                  <A
+HREF="view-pg-seclabels.html"
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_seclabels</TT
+>
+                  </A
+>
+                </TD
+><TD
+>метки безопасности</TD
+></TR
+><TR
+><TD
+>                  <A
+HREF="view-pg-settings.html"
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_settings</TT
+>
+                  </A
+>
+                </TD
+><TD
+>значения параметров</TD
+></TR
+><TR
+><TD
+>                  <A
+HREF="view-pg-shadow.html"
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_shadow</TT
+>
+                  </A
+>
+                </TD
+><TD
+>пользователи базы данных</TD
+></TR
+><TR
+><TD
+>                  <A
+HREF="view-pg-stats.html"
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_stats</TT
+>
+                  </A
+>
+                </TD
+><TD
+>статистика планировщика</TD
+></TR
+><TR
+><TD
+>                  <A
+HREF="view-pg-tables.html"
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_tables</TT
+>
+                  </A
+>
+                </TD
+><TD
+>таблицы</TD
+></TR
+><TR
+><TD
+>                  <A
+HREF="view-pg-timezone-abbrevs.html"
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_timezone_abbrevs</TT
+>
+                  </A
+>
+                </TD
+><TD
+>аббревиатуры часовых поясов</TD
+></TR
+><TR
+><TD
+>                  <A
+HREF="view-pg-timezone-names.html"
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_timezone_names</TT
+>
+                  </A
+>
+                </TD
+><TD
+>имена часовых поясов</TD
+></TR
+><TR
+><TD
+>                  <A
+HREF="view-pg-user.html"
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_user</TT
+>
+                  </A
+>
+                </TD
+><TD
+>пользователи базы данных</TD
+></TR
+><TR
+><TD
+>                  <A
+HREF="view-pg-user-mappings.html"
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_user_mappings</TT
+>
+                  </A
+>
+                </TD
+><TD
+>сопоставления пользователей</TD
+></TR
+><TR
+><TD
+>                  <A
+HREF="view-pg-views.html"
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_views</TT
+>
+                  </A
+>
+                </TD
+><TD
+>представления</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="catalog-pg-user-mapping.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="view-pg-available-extensions.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_user_mapping</TT
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_available_extensions</TT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

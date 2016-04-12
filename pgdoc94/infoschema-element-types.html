@@ -1,0 +1,755 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>          element_types
+        </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Информационная схема"
+HREF="information-schema.html"><LINK
+REL="PREVIOUS"
+TITLE="          domains
+        "
+HREF="infoschema-domains.html"><LINK
+REL="NEXT"
+TITLE="          enabled_roles
+        "
+HREF="infoschema-enabled-roles.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="          domains
+        "
+HREF="infoschema-domains.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="information-schema.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 34. Информационная схема</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="          enabled_roles
+        "
+HREF="infoschema-enabled-roles.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="INFOSCHEMA-ELEMENT-TYPES"
+>34.23. <TT
+CLASS="LITERAL"
+>element_types</TT
+></A
+></H1
+><P
+>Представление <TT
+CLASS="LITERAL"
+>element_types</TT
+> показывает дескрипторы типов элементов массива. Когда колонка таблицы, атрибут составного типа, параметр или результат функции объявлены с типом массива, соответствующее представление информационной схемы будет содержать только <TT
+CLASS="LITERAL"
+>ARRAY</TT
+> в колонке <TT
+CLASS="LITERAL"
+>data_type</TT
+>. Чтобы получить информацию о типе элемента массива, можно связать соответствующее представление с данным. Например, просмотреть колонки таблицы с типами данных и типами элементов массива (если это применимо) можно так: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT c.column_name, c.data_type, e.data_type AS element_type
+FROM information_schema.columns c LEFT JOIN information_schema.element_types e
+     ON ((c.table_catalog, c.table_schema, c.table_name, 'TABLE', c.dtd_identifier)
+       = (e.object_catalog, e.object_schema, e.object_name, e.object_type, e.collection_type_identifier))
+WHERE c.table_schema = '...' AND c.table_name = '...'
+ORDER BY c.ordinal_position;</PRE
+><P> Это представление показывает только те объекты, к которым имеет доступ текущий пользователь, являясь владельцем или имея некоторые права.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="AEN51034"
+></A
+><P
+><B
+>Таблица 34-21. Колонки <TT
+CLASS="LITERAL"
+>element_types</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип данных</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>object_catalog</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Имя базы данных, содержащей объект, связанный с описываемым массивом (всегда текущая база)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>object_schema</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Имя схемы, содержащей объект, связанный с описываемым массивом</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>object_name</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Имя объекта, связанного с описываемым массивом</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>object_type</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>character_data</TT
+>
+                </TD
+><TD
+>Тип объекта, связанного с описываемым массивом: <TT
+CLASS="LITERAL"
+>TABLE</TT
+> (массив задействован в колонке этой таблицы), <TT
+CLASS="LITERAL"
+>USER-DEFINED TYPE</TT
+> (массив задействован в атрибуте составного типа), <TT
+CLASS="LITERAL"
+>DOMAIN</TT
+> (массив задействован в домене), <TT
+CLASS="LITERAL"
+>ROUTINE</TT
+> (массив задействован в типе данных параметра или результата функции).</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>collection_type_identifier</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Идентификатор дескриптора типа данных для описываемого массива. Его можно использовать для соединения с колонками <TT
+CLASS="LITERAL"
+>dtd_identifier</TT
+> других представлений информационной схемы.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>data_type</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>character_data</TT
+>
+                </TD
+><TD
+>Тип данных элементов массива, если это встроенный тип, либо <TT
+CLASS="LITERAL"
+>USER-DEFINED</TT
+> (в этом случае тип определяется в <TT
+CLASS="LITERAL"
+>udt_name</TT
+> и связанных колонках).</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>character_maximum_length</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>cardinal_number</TT
+>
+                </TD
+><TD
+>Всегда NULL, так как эта информация неприменима к типам элементов массива в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>character_octet_length</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>cardinal_number</TT
+>
+                </TD
+><TD
+>Всегда NULL, так как эта информация неприменима к типам элементов массива в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>character_set_catalog</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>character_set_schema</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>character_set_name</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>collation_catalog</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Имя базы данных, содержащей правило сортировки типа элемента (это всегда текущая база), либо NULL, если это правило по умолчанию или тип элемента несортируемый</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>collation_schema</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Имя схемы, содержащей правило сортировки типа элемента, либо NULL, если это правило по умолчанию или тип элемента несортируемый</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>collation_name</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Имя правила сортировки типа элемента, либо NULL, если это правило по умолчанию или тип элемента несортируемый</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>numeric_precision</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>cardinal_number</TT
+>
+                </TD
+><TD
+>Всегда NULL, так как эта информация неприменима к типам элементов массива в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>numeric_precision_radix</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>cardinal_number</TT
+>
+                </TD
+><TD
+>Всегда NULL, так как эта информация неприменима к типам элементов массива в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>numeric_scale</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>cardinal_number</TT
+>
+                </TD
+><TD
+>Всегда NULL, так как эта информация неприменима к типам элементов массива в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>datetime_precision</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>cardinal_number</TT
+>
+                </TD
+><TD
+>Всегда NULL, так как эта информация неприменима к типам элементов массива в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>interval_type</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>character_data</TT
+>
+                </TD
+><TD
+>Всегда NULL, так как эта информация неприменима к типам элементов массива в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>interval_precision</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>cardinal_number</TT
+>
+                </TD
+><TD
+>Всегда NULL, так как эта информация неприменима к типам элементов массива в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>domain_default</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>character_data</TT
+>
+                </TD
+><TD
+>Ещё не реализовано</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>udt_catalog</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Имя базы данных, в которой определён тип данных элемента (всегда текущая база)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>udt_schema</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Имя схемы, в которой определён тип данных элемента</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>udt_name</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Имя типа данных элемента</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>scope_catalog</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>scope_schema</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>scope_name</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>maximum_cardinality</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>cardinal_number</TT
+>
+                </TD
+><TD
+>Всегда NULL, так как массивы имеют неограниченную максимальную ёмкость в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>dtd_identifier</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Идентификатор дескриптора типа данных элемента. В настоящее время бесполезен.</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="infoschema-domains.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="infoschema-enabled-roles.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><TT
+CLASS="LITERAL"
+>domains</TT
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="information-schema.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><TT
+CLASS="LITERAL"
+>enabled_roles</TT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

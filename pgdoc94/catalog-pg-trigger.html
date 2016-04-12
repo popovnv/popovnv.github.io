@@ -1,0 +1,655 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>          pg_trigger
+        </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Системные каталоги"
+HREF="catalogs.html"><LINK
+REL="PREVIOUS"
+TITLE="          pg_tablespace
+        "
+HREF="catalog-pg-tablespace.html"><LINK
+REL="NEXT"
+TITLE="          pg_ts_config
+        "
+HREF="catalog-pg-ts-config.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="          pg_tablespace
+        "
+HREF="catalog-pg-tablespace.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 48. Системные каталоги</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="          pg_ts_config
+        "
+HREF="catalog-pg-ts-config.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CATALOG-PG-TRIGGER"
+>48.46. <TT
+CLASS="STRUCTNAME"
+>pg_trigger</TT
+></A
+></H1
+><P
+>В каталоге <TT
+CLASS="STRUCTNAME"
+>pg_trigger</TT
+> хранятся триггеры для таблиц и представлений. За дополнительными сведениями обратитесь к описанию <A
+HREF="sql-createtrigger.html"
+>CREATE TRIGGER</A
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="AEN99701"
+></A
+><P
+><B
+>Таблица 48-46. Колонки <TT
+CLASS="STRUCTNAME"
+>pg_trigger</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип</TH
+><TH
+>Ссылки</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Идентификатор строки (скрытый атрибут; должен выбираться явно)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>tgrelid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-class.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Таблица, к которой относится этот триггер</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>tgname</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>name</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Имя триггера (должно быть уникальным среди триггеров одной таблицы)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>tgfoid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-proc.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Вызываемая функция</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>tgtype</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int2</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Битовая маска, задающая условия срабатывания триггера</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>tgenabled</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>char</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Устанавливает, в каких режимах <A
+HREF="runtime-config-client.html#GUC-SESSION-REPLICATION-ROLE"
+>session_replication_role</A
+> срабатывает триггер: <TT
+CLASS="LITERAL"
+>O</TT
+> = триггер срабатывает в режимах <SPAN
+CLASS="QUOTE"
+>"origin"</SPAN
+> (источник) и <SPAN
+CLASS="QUOTE"
+>"local"</SPAN
+> (локально), <TT
+CLASS="LITERAL"
+>D</TT
+> = триггер отключён, <TT
+CLASS="LITERAL"
+>R</TT
+> = триггер срабатывает в режиме <SPAN
+CLASS="QUOTE"
+>"replica"</SPAN
+> (реплика), <TT
+CLASS="LITERAL"
+>A</TT
+> = триггер срабатывает всегда.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>tgisinternal</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>True, если триггер создан внутри системы (обычно, для реализации ограничения, заданного в <TT
+CLASS="STRUCTFIELD"
+>tgconstraint</TT
+>)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>tgconstrrelid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-class.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Таблица, задействованная в ограничении ссылочной целостности</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>tgconstrindid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-class.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Индекс, поддерживающий ограничение уникальности, первичного ключа или ссылочной целостности, либо ограничение-исключение</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>tgconstraint</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-constraint.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_constraint</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Запись в <TT
+CLASS="STRUCTNAME"
+>pg_constraint</TT
+>, связанная этим триггером, если такая имеется</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>tgdeferrable</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>True, если триггер ограничения является откладываемым</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>tginitdeferred</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>True, если триггер ограничения изначально отложенный</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>tgnargs</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int2</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Число аргументов, передаваемых функции триггера</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>tgattr</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int2vector</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-attribute.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_attribute</TT
+></A
+>.attnum</TT
+>
+                </TD
+><TD
+>Номера колонок, если триггер привязан к колонкам; в противном случае пустой массив</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>tgargs</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bytea</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Аргументы строкового типа, передаваемые триггеру, с NULL в конце каждого</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>tgqual</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>pg_node_tree</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Дерево выражения (в представлении <CODE
+CLASS="FUNCTION"
+>nodeToString()</CODE
+>) для условия триггера <TT
+CLASS="LITERAL"
+>WHEN</TT
+>, либо NULL, если оно отсутствует</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>В настоящее время триггеры, привязанные к колонкам, поддерживаются только для событий <TT
+CLASS="LITERAL"
+>UPDATE</TT
+>, так что <TT
+CLASS="STRUCTFIELD"
+>tgattr</TT
+> применимо только к событиям такого типа. Поле <TT
+CLASS="STRUCTFIELD"
+>tgtype</TT
+> может содержать биты и для других типов событий, но они распространяются только на таблицы, вне зависимости от значения <TT
+CLASS="STRUCTFIELD"
+>tgattr</TT
+>.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Когда <TT
+CLASS="STRUCTFIELD"
+>tgconstraint</TT
+> содержит не ноль, то есть ссылается на запись в <TT
+CLASS="STRUCTNAME"
+>pg_constraint</TT
+>, поля <TT
+CLASS="STRUCTFIELD"
+>tgconstrrelid</TT
+>, <TT
+CLASS="STRUCTFIELD"
+>tgconstrindid</TT
+>, <TT
+CLASS="STRUCTFIELD"
+>tgdeferrable</TT
+> и <TT
+CLASS="STRUCTFIELD"
+>tginitdeferred</TT
+> по большому счёту избыточны, они повторяют значения в этой записи. Однако, возможно связать неоткладываемый триггер с откладываемым ограничением: с ограничениями внешнего ключа могут быть связаны и откладываемые, и неоткладываемые триггеры.</P
+></BLOCKQUOTE
+></DIV
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Если для отношения есть какие-либо триггеры в этом каталоге, значением <TT
+CLASS="LITERAL"
+>pg_class.relhastriggers</TT
+> для неё должно быть true.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="catalog-pg-tablespace.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="catalog-pg-ts-config.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_tablespace</TT
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_ts_config</TT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

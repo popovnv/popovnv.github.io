@@ -1,0 +1,241 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Видимость изменений в данных</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Триггеры"
+HREF="triggers.html"><LINK
+REL="PREVIOUS"
+TITLE="Обзор механизма работы триггеров"
+HREF="trigger-definition.html"><LINK
+REL="NEXT"
+TITLE="Триггерные функции на языке C"
+HREF="trigger-interface.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Обзор механизма работы триггеров"
+HREF="trigger-definition.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="triggers.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 36. Триггеры</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Триггерные функции на языке C"
+HREF="trigger-interface.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="TRIGGER-DATACHANGES"
+>36.2. Видимость изменений в данных</A
+></H1
+><P
+>Если в триггерной функции выполняются SQL-команды и эти команды обращаются к таблице, на которую создан триггер, то необходимо знать правила видимости данных, потому что они определяют, будут ли видеть эти SQL-команды изменения в данных, для которых сработал триггер. Кратко: <P
+></P
+></P><UL
+><LI
+><P
+>Триггеры уровня оператора следуют простым правилам видимости: никакие из изменений, сделанных оператором, не видны в триггерах <TT
+CLASS="LITERAL"
+>BEFORE</TT
+>, тогда как в триггерах <TT
+CLASS="LITERAL"
+>AFTER</TT
+> видны все изменения.</P
+></LI
+><LI
+><P
+>Изменение данных (вставка, обновление или удаление), заставляющее сработать триггер, <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>не видно</I
+></SPAN
+> для команд SQL, выполняемых в триггере <TT
+CLASS="LITERAL"
+>BEFORE</TT
+> уровня строки, потому что это изменение ещё не произошло.</P
+></LI
+><LI
+><P
+>Тем не менее, команды SQL, выполняемые в триггере <TT
+CLASS="LITERAL"
+>BEFORE</TT
+> уровня строки, <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>будут</I
+></SPAN
+> видеть изменения данных в строках, которые уже были обработаны в этом операторе. Это требует осторожности, так как порядок обработки строк в целом непредсказуемый; команда SQL, обрабатывающая множество строк, может делать это в любом порядке.</P
+></LI
+><LI
+><P
+>Аналогично, триггер <TT
+CLASS="LITERAL"
+>INSTEAD OF</TT
+> уровня строки увидит изменения данных, внесённые при предыдущих вызовах триггера <TT
+CLASS="LITERAL"
+>INSTEAD OF</TT
+> для этой же внешней команды.</P
+></LI
+><LI
+><P
+>Когда срабатывает триггер <TT
+CLASS="LITERAL"
+>AFTER</TT
+> уровня строки, все изменения сделанные оператором уже выполнены и видны в вызываемой триггерной функции.</P
+></LI
+></UL
+><P></P
+><P
+>Если триггерная функция написана на одном из стандартных процедурных языков, вышеприведённые утверждения применимы, только если функция объявлена как <TT
+CLASS="LITERAL"
+>VOLATILE</TT
+>. Функции объявленные как <TT
+CLASS="LITERAL"
+>STABLE</TT
+> или <TT
+CLASS="LITERAL"
+>IMMUTABLE</TT
+> в любом случае не будут видеть изменений, сделанных вызывающим оператором.</P
+><P
+>Дополнительную информацию о правилах видимости данных можно найти в <A
+HREF="spi-visibility.html"
+>Разделе 44.4</A
+>. Пример в <A
+HREF="trigger-example.html"
+>Разделе 36.4</A
+> содержит демонстрацию этих правил.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="trigger-definition.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="trigger-interface.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Обзор механизма работы триггеров</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="triggers.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Триггерные функции на языке C</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

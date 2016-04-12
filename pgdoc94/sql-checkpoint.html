@@ -1,0 +1,231 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>CHECKPOINT</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="BEGIN"
+HREF="sql-begin.html"><LINK
+REL="NEXT"
+TITLE="CLOSE"
+HREF="sql-close.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="BEGIN"
+HREF="sql-begin.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="CLOSE"
+HREF="sql-close.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-CHECKPOINT"
+></A
+>CHECKPOINT</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN71132"
+></A
+><H2
+>Название</H2
+>CHECKPOINT&nbsp;--&nbsp;записать контрольную точку в журнал транзакций</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN71135"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>CHECKPOINT</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN71137"
+></A
+><H2
+>Описание</H2
+><P
+>Контрольная точка — это состояние в журнале транзакций, в котором все файлы данных содержат актуальные записи, в соответствии с информацией в журнале. При этом все файлы данных сохраняются на диск. Более подробно о том, что происходит во время контрольной точки, можно узнать в <A
+HREF="wal-configuration.html"
+>Разделе 29.4</A
+>.</P
+><P
+>Команда <TT
+CLASS="COMMAND"
+>CHECKPOINT</TT
+> приводит к принудительному выполнению контрольной точки в момент вызова, не дожидаясь периодической контрольной точки, производимой системой по графику (это настраивается параметрами в <A
+HREF="runtime-config-wal.html#RUNTIME-CONFIG-WAL-CHECKPOINTS"
+>Подраздел 18.5.2</A
+>). Команда <TT
+CLASS="COMMAND"
+>CHECKPOINT</TT
+> не предназначена для применения при обычном использовании базы данных.</P
+><P
+>Если <TT
+CLASS="COMMAND"
+>CHECKPOINT</TT
+> выполняется в процессе восстановления, вместо записи новой контрольной точки производится точка перезапуска (см. <A
+HREF="wal-configuration.html"
+>Раздел 29.4</A
+>).</P
+><P
+>Выполнять <TT
+CLASS="COMMAND"
+>CHECKPOINT</TT
+> могут только суперпользователи.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN71150"
+></A
+><H2
+>Совместимость</H2
+><P
+>Команда <TT
+CLASS="COMMAND"
+>CHECKPOINT</TT
+> является языковым расширением <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-begin.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-close.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>BEGIN</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>CLOSE</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

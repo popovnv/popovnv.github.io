@@ -1,0 +1,637 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>CREATE LANGUAGE</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="CREATE INDEX"
+HREF="sql-createindex.html"><LINK
+REL="NEXT"
+TITLE="CREATE MATERIALIZED VIEW"
+HREF="sql-creatematerializedview.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="CREATE INDEX"
+HREF="sql-createindex.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="CREATE MATERIALIZED VIEW"
+HREF="sql-creatematerializedview.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-CREATELANGUAGE"
+></A
+>CREATE LANGUAGE</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN74160"
+></A
+><H2
+>Название</H2
+>CREATE LANGUAGE&nbsp;--&nbsp;создать процедурный язык</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN74163"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>CREATE [ OR REPLACE ] [ PROCEDURAL ] LANGUAGE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+>
+CREATE [ OR REPLACE ] [ TRUSTED ] [ PROCEDURAL ] LANGUAGE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+>
+    HANDLER <TT
+CLASS="REPLACEABLE"
+><I
+>обработчик_вызова</I
+></TT
+> [ INLINE <TT
+CLASS="REPLACEABLE"
+><I
+>обработчик_внедрённого_кода</I
+></TT
+> ] [ VALIDATOR <TT
+CLASS="REPLACEABLE"
+><I
+>функция_проверки</I
+></TT
+> ]</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="SQL-CREATELANGUAGE-DESCRIPTION"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>CREATE LANGUAGE</TT
+> регистрирует в базе данных <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> новый процедурный язык. Впоследствии на этом языке можно будет определять новые функции и триггерные процедуры.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Начиная с <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> 9.1, большинство процедурных языков были преобразованы в <SPAN
+CLASS="QUOTE"
+>"расширения"</SPAN
+>, так что они теперь устанавливаются посредством <A
+HREF="sql-createextension.html"
+>CREATE EXTENSION</A
+>, а не <TT
+CLASS="COMMAND"
+>CREATE LANGUAGE</TT
+>. Прямое использование <TT
+CLASS="COMMAND"
+>CREATE LANGUAGE</TT
+> теперь следует ограничить скриптами установки расширений. Если в вашей базе данных есть <SPAN
+CLASS="QUOTE"
+>"чистое"</SPAN
+> определение языка, возможно, полученное в результате обновления, его можно преобразовать в расширение, выполнив <TT
+CLASS="LITERAL"
+>CREATE EXTENSION <TT
+CLASS="REPLACEABLE"
+><I
+>имя_языка</I
+></TT
+> FROM unpackaged</TT
+>.</P
+></BLOCKQUOTE
+></DIV
+><P
+><TT
+CLASS="COMMAND"
+>CREATE LANGUAGE</TT
+> по сути связывает имя языка с функциями-обработчиками, исполняющими код, написанный на этом языке. За дополнительными сведениями о языковых обработчиках обратитесь к <A
+HREF="plhandler.html"
+>Главе 52</A
+>.</P
+><P
+>Команда <TT
+CLASS="COMMAND"
+>CREATE LANGUAGE</TT
+> имеет две формы. В первой форме пользователь задаёт только имя создаваемого языка, и сервер <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> получает подходящие параметры, обращаясь к системному каталогу <A
+HREF="catalog-pg-pltemplate.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_pltemplate</TT
+></A
+>. Во второй форме пользователь указывает параметры языка вместе с его именем. Вторая форма позволяет создать язык, не определённый заранее в <TT
+CLASS="STRUCTNAME"
+>pg_pltemplate</TT
+>, но этот подход считается устаревшим.</P
+><P
+>Когда сервер находит в каталоге <TT
+CLASS="STRUCTNAME"
+>pg_pltemplate</TT
+> запись для заданного имени языка, он будет использовать данные из каталога, даже если параметры языка указаны в команде. Это поведение упрощает загрузку экспортированных ранее файлов, которые, скорее всего, будут содержать устаревшую информацию о функциях поддержки языка.</P
+><P
+>Обычно, для того чтобы зарегистрировать новый язык, необходимо иметь право суперпользователя <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Однако владелец базы данных может зарегистрировать новый язык в этой базе данных, если язык определён в каталоге <TT
+CLASS="STRUCTNAME"
+>pg_pltemplate</TT
+> и помечен как допускающий создание владельцами БД (<TT
+CLASS="STRUCTFIELD"
+>tmpldbacreate</TT
+> содержит true). По умолчанию доверенные языки могут создаваться владельцами базы данных, но это можно изменить, внеся коррективы в <TT
+CLASS="STRUCTNAME"
+>pg_pltemplate</TT
+>. Создатель языка становится его владельцем и может впоследствии удалить или переименовать его, либо назначить другого владельца.</P
+><P
+><TT
+CLASS="COMMAND"
+>CREATE OR REPLACE LANGUAGE</TT
+> создаст новый язык, либо заменит существующее определение. Если язык уже существует, его параметры изменяются в соответствии со значениями, указанными в команде или полученными из <TT
+CLASS="STRUCTNAME"
+>pg_pltemplate</TT
+>, при этом владелец языка и права доступа к нему не меняются, и все существующие функции, написанные на этом языке, по-прежнему считаются рабочими. Помимо обладания обычными правами, требующимися для создания языка, пользователь должен быть суперпользователем или владельцем существующего языка. Вариант с <TT
+CLASS="LITERAL"
+>REPLACE</TT
+> в основном предназначен для случаев, когда язык уже существует. Если для языка есть запись в <TT
+CLASS="STRUCTNAME"
+>pg_pltemplate</TT
+>, то <TT
+CLASS="LITERAL"
+>REPLACE</TT
+> фактически ничего не меняет в существующем определении, кроме исключительного случая, когда запись в <TT
+CLASS="STRUCTNAME"
+>pg_pltemplate</TT
+> была изменена после создания языка.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="SQL-CREATELANGUAGE-PARAMETERS"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>TRUSTED</TT
+></DT
+><DD
+><P
+>Указание <TT
+CLASS="LITERAL"
+>TRUSTED</TT
+> (доверенный) означает, что язык не даёт пользователю доступ к данным, к которым он не имел бы доступа без него. Если при регистрации языка это ключевое слово опущено, использовать этот язык для создания новых функций смогут только суперпользователи <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>PROCEDURAL</TT
+></DT
+><DD
+><P
+>Это слово не несёт смысловой нагрузки.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></DT
+><DD
+><P
+>Имя процедурного языка. Оно должно быть уникальным среди всех языков в базе данных.</P
+><P
+>В целях обратной совместимости имя можно заключить в апострофы.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>HANDLER</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>обработчик_вызова</I
+></TT
+></DT
+><DD
+><P
+>Здесь <TT
+CLASS="REPLACEABLE"
+><I
+>обработчик_вызова</I
+></TT
+> — имя ранее зарегистрированной функции, которая будет вызываться для исполнения процедур (функций) на этом языке. Обработчик вызова для процедурного языка должен быть написан на компилируемом языке, например, на C, с соглашениями о вызовах версии 1 и зарегистрирован в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> как функция без аргументов, возвращающая фиктивный тип <TT
+CLASS="TYPE"
+>language_handler</TT
+>, который просто показывает, что эта функция — обработчик вызова.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>INLINE</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>обработчик_внедрённого_кода</I
+></TT
+></DT
+><DD
+><P
+>Здесь <TT
+CLASS="REPLACEABLE"
+><I
+>обработчик_внедрённого_кода</I
+></TT
+> — имя ранее зарегистрированной функции, которая будет вызываться для выполнения анонимного блока кода (команды <A
+HREF="sql-do.html"
+>DO</A
+>) на этом языке. Если <TT
+CLASS="REPLACEABLE"
+><I
+>обработчик_внедрённого_кода</I
+></TT
+> не определён, данный язык не будет поддерживать анонимные блоки кода. Этот обработчик должен принимать один аргумент типа <TT
+CLASS="TYPE"
+>internal</TT
+>, содержащий внутреннее представление команды <TT
+CLASS="COMMAND"
+>DO</TT
+>, и обычно возвращает тип <TT
+CLASS="TYPE"
+>void</TT
+>. Значение, возвращаемое этим обработчиком, игнорируется.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>VALIDATOR</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>функция_проверки</I
+></TT
+></DT
+><DD
+><P
+>Здесь <TT
+CLASS="REPLACEABLE"
+><I
+>функция_проверки</I
+></TT
+> — имя ранее зарегистрированной функции, которая будет вызываться при создании новой функции на этом языке и проверять её. Если функция проверки не задана, функции на этом языке при создании проверяться не будут. Функция проверки должна принимать один аргумент типа <TT
+CLASS="TYPE"
+>oid</TT
+> с идентификатором создаваемой функции и обычно возвращает <TT
+CLASS="TYPE"
+>void</TT
+>.</P
+><P
+>Функция проверки обычно проверяет тело создаваемой функции на синтаксические ошибки, но может также проанализировать и другие характеристики функции, например, поддержку определённых типов аргументов этим языком. Значение, возвращаемое этой функцией, игнорируется, об ошибках она должна сигнализировать, вызывая <CODE
+CLASS="FUNCTION"
+>ereport()</CODE
+>.</P
+></DD
+></DL
+></DIV
+><P
+>Параметр <TT
+CLASS="LITERAL"
+>TRUSTED</TT
+> и имена вспомогательных функций игнорируются, если на сервере для указанного языка имеется запись в <TT
+CLASS="STRUCTNAME"
+>pg_pltemplate</TT
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="SQL-CREATELANGUAGE-NOTES"
+></A
+><H2
+>Замечания</H2
+><P
+>Программа <A
+HREF="app-createlang.html"
+>            <SPAN
+CLASS="APPLICATION"
+>createlang</SPAN
+>
+          </A
+> представляет собой простую обёртку команды <TT
+CLASS="COMMAND"
+>CREATE LANGUAGE</TT
+>. Она упрощает установку процедурных языков из командной строки оболочки.</P
+><P
+>Для удаления процедурных языков следует использовать <A
+HREF="sql-droplanguage.html"
+>DROP LANGUAGE</A
+> или, что предпочтительнее, программу <A
+HREF="app-droplang.html"
+>            <SPAN
+CLASS="APPLICATION"
+>droplang</SPAN
+>
+          </A
+>.</P
+><P
+>В системном каталоге <CODE
+CLASS="CLASSNAME"
+>pg_language</CODE
+> (см. <A
+HREF="catalog-pg-language.html"
+>Раздел 48.28</A
+>) записывается информация о языках, установленных в данный момент. Кроме того, у <TT
+CLASS="COMMAND"
+>createlang</TT
+> есть параметр, позволяющий просмотреть список установленных языков.</P
+><P
+>Чтобы создавать функции на процедурном языке, пользователь должен иметь право <TT
+CLASS="LITERAL"
+>USAGE</TT
+> для этого языка. По умолчанию для доверенных языков право <TT
+CLASS="LITERAL"
+>USAGE</TT
+> даётся роли <TT
+CLASS="LITERAL"
+>PUBLIC</TT
+> (т. е. всем), однако при желании его можно отозвать.</P
+><P
+>Процедурные языки являются локальными по отношению к базам данных. Тем не менее, язык можно установить в базу данных <TT
+CLASS="LITERAL"
+>template1</TT
+>, в результате чего он будет автоматически доступен во всех базах данных, создаваемых из неё впоследствии.</P
+><P
+>Обработчик вызова, обработчик встроенного кода (при наличии) и функция проверки (при наличии) должны уже существовать, если на сервере нет записи для этого языка в <TT
+CLASS="STRUCTNAME"
+>pg_pltemplate</TT
+>. Но если такая запись уже есть, функции могут не существовать — в случае отсутствия в базе данных они будут определены автоматически. (Это может привести к сбою в <TT
+CLASS="COMMAND"
+>CREATE LANGUAGE</TT
+>, если в установленной системе не найдётся разделяемая библиотека, реализующая этот язык.)</P
+><P
+>В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> до версии 7.3 обязательно требовалось объявить функции-обработчики, как возвращающие фиктивный тип <TT
+CLASS="TYPE"
+>opaque</TT
+>, а не <TT
+CLASS="TYPE"
+>language_handler</TT
+>. Для поддержки загрузки старых файлов экспорта БД, команда <TT
+CLASS="COMMAND"
+>CREATE LANGUAGE</TT
+> принимает функции с объявленным типом результата <TT
+CLASS="TYPE"
+>opaque</TT
+>, но при этом выдаётся предупреждение и тип результата меняется на <TT
+CLASS="TYPE"
+>language_handler</TT
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="SQL-CREATELANGUAGE-EXAMPLES"
+></A
+><H2
+>Примеры</H2
+><P
+>Предпочитаемый способ создания любых процедурных языков довольно прост: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE LANGUAGE plperl;</PRE
+><P></P
+><P
+>Для языка, не представленного в каталоге <TT
+CLASS="STRUCTNAME"
+>pg_pltemplate</TT
+>, требуется выполнить следующие действия: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION plsample_call_handler() RETURNS language_handler
+    AS '$libdir/plsample'
+    LANGUAGE C;
+CREATE LANGUAGE plsample
+    HANDLER plsample_call_handler;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="SQL-CREATELANGUAGE-COMPAT"
+></A
+><H2
+>Совместимость</H2
+><P
+><TT
+CLASS="COMMAND"
+>CREATE LANGUAGE</TT
+> является расширением <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN74304"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-alterlanguage.html"
+>ALTER LANGUAGE</A
+>, <A
+HREF="sql-createfunction.html"
+>CREATE FUNCTION</A
+>, <A
+HREF="sql-droplanguage.html"
+>DROP LANGUAGE</A
+>, <A
+HREF="sql-grant.html"
+>GRANT</A
+>, <A
+HREF="sql-revoke.html"
+>REVOKE</A
+>, <A
+HREF="app-createlang.html"
+>            <SPAN
+CLASS="APPLICATION"
+>createlang</SPAN
+>
+          </A
+>, <A
+HREF="app-droplang.html"
+>            <SPAN
+CLASS="APPLICATION"
+>droplang</SPAN
+>
+          </A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-createindex.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-creatematerializedview.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>CREATE INDEX</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>CREATE MATERIALIZED VIEW</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

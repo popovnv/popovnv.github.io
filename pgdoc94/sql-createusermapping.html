@@ -1,0 +1,335 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>CREATE USER MAPPING</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="CREATE USER"
+HREF="sql-createuser.html"><LINK
+REL="NEXT"
+TITLE="CREATE VIEW"
+HREF="sql-createview.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="CREATE USER"
+HREF="sql-createuser.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="CREATE VIEW"
+HREF="sql-createview.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-CREATEUSERMAPPING"
+></A
+>CREATE USER MAPPING</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN77736"
+></A
+><H2
+>Название</H2
+>CREATE USER MAPPING&nbsp;--&nbsp;создать сопоставление пользователя для стороннего сервера</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN77739"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>CREATE USER MAPPING FOR { <TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+> | USER | CURRENT_USER | PUBLIC }
+    SERVER <TT
+CLASS="REPLACEABLE"
+><I
+>имя_сервера</I
+></TT
+>
+    [ OPTIONS ( <TT
+CLASS="REPLACEABLE"
+><I
+>параметр</I
+></TT
+> '<TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+>' [ , ... ] ) ]</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN77745"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>CREATE USER MAPPING</TT
+> создаёт сопоставление пользователя на внешнем сервере. Сопоставление пользователя обычно содержит информацию о подключении, которую будет использовать обёртка сторонних данных вместе с информацией о стороннем сервере для получения доступа к внешнему ресурсу.</P
+><P
+>Владелец стороннего сервера может создать сопоставление для любых пользователей на этом сервере. Кроме того, пользователь может создать сопоставление для своего собственного имени пользователя, если он наделён правом <TT
+CLASS="LITERAL"
+>USAGE</TT
+> на данном сервере.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN77751"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+></DT
+><DD
+><P
+>Имя существующего пользователя, для которого создаётся сопоставление на стороннем сервере. Ключевые слова <TT
+CLASS="LITERAL"
+>CURRENT_USER</TT
+> и <TT
+CLASS="LITERAL"
+>USER</TT
+> обозначают имя текущего пользователя. Если указывается <TT
+CLASS="LITERAL"
+>PUBLIC</TT
+>, создаётся так называемое общее сопоставление, которое будет использоваться при отсутствии сопоставления для конкретного пользователя.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_сервера</I
+></TT
+></DT
+><DD
+><P
+>Имя существующего сервера, для которого создаётся сопоставление пользователя.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>OPTIONS ( <TT
+CLASS="REPLACEABLE"
+><I
+>параметр</I
+></TT
+> '<TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+>' [, ... ] )</TT
+></DT
+><DD
+><P
+>В этом предложении задаются параметры сопоставления. Эти параметры обычно определяют фактическое имя и пароль пользователя на целевом сервере. Имена параметров должны быть уникальными. Набор допустимых имён и значений параметров определяется обёрткой сторонних данных внешнего сервера.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN77774"
+></A
+><H2
+>Примеры</H2
+><P
+>Создание сопоставления для пользователя <TT
+CLASS="LITERAL"
+>bob</TT
+> на сервере <TT
+CLASS="LITERAL"
+>foo</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE USER MAPPING FOR bob SERVER foo OPTIONS (user 'bob', password 'secret');</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN77780"
+></A
+><H2
+>Совместимость</H2
+><P
+><TT
+CLASS="COMMAND"
+>CREATE USER MAPPING</TT
+> соответствует стандарту ISO/IEC 9075-9 (SQL/MED).</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN77784"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-alterusermapping.html"
+>ALTER USER MAPPING</A
+>, <A
+HREF="sql-dropusermapping.html"
+>DROP USER MAPPING</A
+>, <A
+HREF="sql-createforeigndatawrapper.html"
+>CREATE FOREIGN DATA WRAPPER</A
+>, <A
+HREF="sql-createserver.html"
+>CREATE SERVER</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-createuser.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-createview.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>CREATE USER</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>CREATE VIEW</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

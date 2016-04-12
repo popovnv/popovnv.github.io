@@ -1,0 +1,234 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Перегрузка функций</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Расширение SQL"
+HREF="extend.html"><LINK
+REL="PREVIOUS"
+TITLE="Функции на языке запросов (SQL)"
+HREF="xfunc-sql.html"><LINK
+REL="NEXT"
+TITLE="Категории изменчивости функций"
+HREF="xfunc-volatility.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Функции на языке запросов (SQL)"
+HREF="xfunc-sql.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="extend.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 35. Расширение <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Категории изменчивости функций"
+HREF="xfunc-volatility.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="XFUNC-OVERLOAD"
+>35.5. Перегрузка функций</A
+></H1
+><P
+>Вы можете определить несколько функций с одним именем SQL, если эти функции будут принимать разные аргументы. Другими словами, имена функций можно <I
+CLASS="FIRSTTERM"
+>перегружать</I
+>. Когда выполняется запрос, сервер определяет, какую именно функцию вызывать, по количеству и типам представленных аргументов. Перегрузка может быть полезна для имитации функций с переменным количеством аргументов, до какого-то конечного числа.</P
+><P
+>Создавая семейство перегруженных функций, необходимо не допускать неоднозначности. Например, если созданы функции: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION test(int, real) RETURNS ...
+CREATE FUNCTION test(smallint, double precision) RETURNS ...</PRE
+><P> не вполне понятно, какая функция будет вызвана с довольно простыми аргументами вроде <TT
+CLASS="LITERAL"
+>test(1, 1.5)</TT
+>. Реализованные в данный момент правила разрешения типов описаны в <A
+HREF="typeconv.html"
+>Главе 10</A
+>, но разрабатывать систему, которая будет незаметно полагаться на такие особенности, неразумно.</P
+><P
+>Функции, принимающей один аргумент составного типа, обычно не следует давать имя, совпадающее с именем какого-либо атрибута (поля) этого типа. Вспомните, что запись <TT
+CLASS="LITERAL"
+>атрибут(таблица)</TT
+> считается равнозначной <TT
+CLASS="LITERAL"
+>таблица.атрибут</TT
+>. В случае, когда возникает неоднозначность между функцией, принимающей составной тип, и атрибутом составного типа, всегда будет выбираться атрибут. Этот выбор можно переопределить, дополнив имя функции схемой (то есть, записав <TT
+CLASS="LITERAL"
+>схема.функция(таблица)</TT
+>), но лучше избежать этой проблемы, подобрав разные имена.</P
+><P
+>Другой тип конфликта возможен между обычными функциями и функциями с переменными параметрами. Например, можно создать функции <TT
+CLASS="LITERAL"
+>foo(numeric)</TT
+> и <TT
+CLASS="LITERAL"
+>foo(VARIADIC numeric[])</TT
+>. В этом случае будет непонятно, какая функция должна выбираться при передаче одного числового аргумента, например <TT
+CLASS="LITERAL"
+>foo(10.1)</TT
+>. При разрешении этого конфликта предпочтение отдаётся функции, найденной первой по пути поиска, либо, если две функции находятся в одной схеме, выбирается функция с постоянными аргументами.</P
+><P
+>При перегрузке функций на языке C есть дополнительное ограничение: имя уровня C каждой функции в семействе перегруженных функций должно отличаться от имён уровня C всех других функций, как внутренних, так и загружаемых динамически. Если это правило нарушается, поведение зависит от среды. Вы можете получить ошибку компоновщика во время выполнения, либо будет вызвана не та функция (обычно внутренняя). Альтернативная форма предложения <TT
+CLASS="LITERAL"
+>AS</TT
+> для SQL-команды <TT
+CLASS="COMMAND"
+>CREATE FUNCTION</TT
+> позволяет отвязать имя SQL-функции от имени, определённого в исходном коде на C. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION test(int) RETURNS int
+    AS '<TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+>', 'test_1arg'
+    LANGUAGE C;
+CREATE FUNCTION test(int, int) RETURNS int
+    AS '<TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+>', 'test_2arg'
+    LANGUAGE C;</PRE
+><P> Имена функций на C здесь следуют одному из множества возможных соглашений.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="xfunc-sql.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="xfunc-volatility.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Функции на языке запросов (<ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>)</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="extend.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Категории изменчивости функций</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

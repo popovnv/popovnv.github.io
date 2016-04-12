@@ -1,0 +1,279 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Списки VALUES</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Запросы"
+HREF="queries.html"><LINK
+REL="PREVIOUS"
+TITLE="LIMIT и OFFSET"
+HREF="queries-limit.html"><LINK
+REL="NEXT"
+TITLE="Запросы WITH (Общие табличные выражения)"
+HREF="queries-with.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="LIMIT и OFFSET"
+HREF="queries-limit.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="queries.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 7. Запросы</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Запросы WITH (Общие табличные выражения)"
+HREF="queries-with.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="QUERIES-VALUES"
+>7.7. Списки <TT
+CLASS="LITERAL"
+>VALUES</TT
+></A
+></H1
+><P
+>Предложение <TT
+CLASS="LITERAL"
+>VALUES</TT
+> позволяет создать <SPAN
+CLASS="QUOTE"
+>"постоянную таблицу"</SPAN
+>, которую можно использовать в запросе, не создавая и не наполняя таблицу в БД. Синтаксис предложения: </P><PRE
+CLASS="SYNOPSIS"
+>VALUES ( <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> [, ...] ) [, ...]</PRE
+><P> Для каждого списка выражений в скобках создаётся строка таблицы. Все списки должны иметь одинаковое число элементов (т. е. число колонок в таблице) и соответствующие элементы во всех списках должны иметь совместимые типы данных. Фактический тип данных колонок результата определяется по тем же правилам, что и для <TT
+CLASS="LITERAL"
+>UNION</TT
+> (см. <A
+HREF="typeconv-union-case.html"
+>Раздел 10.5</A
+>).</P
+><P
+>Как пример: </P><PRE
+CLASS="PROGRAMLISTING"
+>VALUES (1, 'one'), (2, 'two'), (3, 'three');</PRE
+><P> вернёт таблицу из двух колонок и трёх строк. Это равносильно такому запросу: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT 1 AS column1, 'one' AS column2
+UNION ALL
+SELECT 2, 'two'
+UNION ALL
+SELECT 3, 'three';</PRE
+><P> По умолчанию <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> назначает колонкам таблицы <TT
+CLASS="LITERAL"
+>VALUES</TT
+> имена <TT
+CLASS="LITERAL"
+>column1</TT
+>, <TT
+CLASS="LITERAL"
+>column2</TT
+> и т. д. Имена колонок не определены в стандарте SQL и в другой СУБД они могут быть другими, поэтому обычно лучше переопределить имена списком псевдонимов, например так: </P><PRE
+CLASS="PROGRAMLISTING"
+>=&gt; SELECT * FROM (VALUES (1, 'one'), (2, 'two'), (3, 'three')) AS t (num,letter);
+ num | letter
+-----+--------
+   1 | one
+   2 | two
+   3 | three
+(3 rows)</PRE
+><P></P
+><P
+>Синтаксически список <TT
+CLASS="LITERAL"
+>VALUES</TT
+> с набором выражений равнозначен: </P><PRE
+CLASS="SYNOPSIS"
+>SELECT <TT
+CLASS="REPLACEABLE"
+><I
+>список_выборки</I
+></TT
+> FROM <TT
+CLASS="REPLACEABLE"
+><I
+>табличное_выражение</I
+></TT
+></PRE
+><P> и допускается везде, где допустим <TT
+CLASS="LITERAL"
+>SELECT</TT
+>. Например, вы можете использовать его в составе <TT
+CLASS="LITERAL"
+>UNION</TT
+> или добавить к нему <TT
+CLASS="REPLACEABLE"
+><I
+>определение_сортировки</I
+></TT
+> (<TT
+CLASS="LITERAL"
+>ORDER BY</TT
+>, <TT
+CLASS="LITERAL"
+>LIMIT</TT
+> и/или <TT
+CLASS="LITERAL"
+>OFFSET</TT
+>). <TT
+CLASS="LITERAL"
+>VALUES</TT
+> чаще всего используется как источник данных для команды <TT
+CLASS="COMMAND"
+>INSERT</TT
+>, а также как подзапрос.</P
+><P
+>За дополнительными сведениями обратитесь к справке <A
+HREF="sql-values.html"
+>VALUES</A
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="queries-limit.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="queries-with.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><TT
+CLASS="LITERAL"
+>LIMIT</TT
+> и <TT
+CLASS="LITERAL"
+>OFFSET</TT
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="queries.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Запросы <TT
+CLASS="LITERAL"
+>WITH</TT
+> (Общие табличные выражения)</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

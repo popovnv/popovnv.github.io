@@ -1,0 +1,318 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Библиотечные функции</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="ECPG — встраиваемый SQL в C"
+HREF="ecpg.html"><LINK
+REL="PREVIOUS"
+TITLE="Компиляция программ со встраиваемым SQL"
+HREF="ecpg-process.html"><LINK
+REL="NEXT"
+TITLE="Большие объекты"
+HREF="ecpg-lo.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Компиляция программ со встраиваемым SQL"
+HREF="ecpg-process.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ecpg.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 33. <SPAN
+CLASS="APPLICATION"
+>ECPG</SPAN
+> — встраиваемый <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> в C</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Большие объекты"
+HREF="ecpg-lo.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="ECPG-LIBRARY"
+>33.11. Библиотечные функции</A
+></H1
+><P
+>Библиотека <TT
+CLASS="FILENAME"
+>libecpg</TT
+> в основном содержит <SPAN
+CLASS="QUOTE"
+>"скрытые"</SPAN
+> функции, применяемые для реализации функциональности, выражаемой встраиваемыми командами SQL. Но есть также некоторые функции, которые можно вызывать напрямую. Заметьте, что код, задействующий эти функции, будет непереносимым.</P
+><P
+></P
+><UL
+><LI
+><P
+><CODE
+CLASS="FUNCTION"
+>ECPGdebug(int <TT
+CLASS="REPLACEABLE"
+><I
+>вкл</I
+></TT
+>, FILE *<TT
+CLASS="REPLACEABLE"
+><I
+>поток</I
+></TT
+>)</CODE
+> с первым аргументом, отличным от нуля, включает вывод отладочных сообщений в заданный <TT
+CLASS="REPLACEABLE"
+><I
+>поток</I
+></TT
+>. Журнал сообщений, полученный таким образом, будет содержать все операторы <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> с заданными входными переменными и результаты, выданные сервером <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Это может быть очень полезно для поиска ошибок в командах <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>В Windows, если библиотека <SPAN
+CLASS="APPLICATION"
+>ecpg</SPAN
+> и приложение скомпилированы с разными флагами, эта функция может вызвать крах приложения из-за различий внутреннего представления указателей <TT
+CLASS="LITERAL"
+>FILE</TT
+>. В частности, флаги многопоточной/однопоточной, выпускаемой/отладочной или статической/динамической сборки должны быть одинаковыми для библиотеки и всех использующих её приложений.</P
+></BLOCKQUOTE
+></DIV
+></LI
+><LI
+><P
+><CODE
+CLASS="FUNCTION"
+>ECPGget_PGconn(const char *<TT
+CLASS="REPLACEABLE"
+><I
+>имя_подключения</I
+></TT
+>) </CODE
+> возвращает указатель на подключение к базе данных, имеющее заданное имя. Если аргумент <TT
+CLASS="REPLACEABLE"
+><I
+>имя_подключения</I
+></TT
+> равен <TT
+CLASS="LITERAL"
+>NULL</TT
+>, возвращается указатель на текущее подключение. Если определить подключение не удаётся, возвращается <TT
+CLASS="LITERAL"
+>NULL</TT
+>. Полученный указатель на подключение, если требуется, можно использовать при вызове любых других функций <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Манипулировать подключениями, открытыми средствами <SPAN
+CLASS="APPLICATION"
+>ecpg</SPAN
+>, напрямую через <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> не следует.</P
+></BLOCKQUOTE
+></DIV
+></LI
+><LI
+><P
+><CODE
+CLASS="FUNCTION"
+>ECPGtransactionStatus(const char *<TT
+CLASS="REPLACEABLE"
+><I
+>имя_подключения</I
+></TT
+>)</CODE
+> возвращает состояние текущей транзакции для подключения, на которое указывает <TT
+CLASS="REPLACEABLE"
+><I
+>имя_подключения</I
+></TT
+>. Возвращаемые коды состояния перечислены в описании входящей в libpq функции <CODE
+CLASS="FUNCTION"
+>PQtransactionStatus()</CODE
+> в <A
+HREF="libpq-status.html"
+>Разделе 31.2</A
+>.</P
+></LI
+><LI
+><P
+><CODE
+CLASS="FUNCTION"
+>ECPGstatus(int <TT
+CLASS="REPLACEABLE"
+><I
+>номер_строки</I
+></TT
+>, const char* <TT
+CLASS="REPLACEABLE"
+><I
+>имя_подключения</I
+></TT
+>)</CODE
+> возвращает true при наличии подключения к базе данных и false в противном случае. В аргументе <TT
+CLASS="REPLACEABLE"
+><I
+>имя_подключения</I
+></TT
+> можно передать <TT
+CLASS="LITERAL"
+>NULL</TT
+>, если применяется одно подключение.</P
+></LI
+></UL
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ecpg-process.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ecpg-lo.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Компиляция программ со встраиваемым SQL</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ecpg.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Большие объекты</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

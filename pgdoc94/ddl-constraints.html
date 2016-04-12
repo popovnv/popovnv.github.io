@@ -1,0 +1,697 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Ограничения</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Определение данных"
+HREF="ddl.html"><LINK
+REL="PREVIOUS"
+TITLE="Значения по умолчанию"
+HREF="ddl-default.html"><LINK
+REL="NEXT"
+TITLE="Системные колонки"
+HREF="ddl-system-columns.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Значения по умолчанию"
+HREF="ddl-default.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ddl.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 5. Определение данных</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Системные колонки"
+HREF="ddl-system-columns.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="DDL-CONSTRAINTS"
+>5.3. Ограничения</A
+></H1
+><P
+>Типы данных сами по себе ограничивают множество данных, которые можно сохранить в таблице. Однако для многих приложений такие ограничения слишком грубые. Например, колонка, содержащая цену продукта, должна, вероятно, принимать только положительные значения. Но такого стандартного типа данных нет. Возможно, вы также захотите ограничить данные колонки по отношению к другим колонкам или строкам. Например, в таблице с информацией о товаре должна быть только одна строка с определённым кодом товара.</P
+><P
+>Для решения подобных задач SQL позволяет вам определять ограничения для колонок и таблиц. Ограничения дают вам возможность управлять данными в таблицах так, как вы захотите. Если пользователь попытается сохранить в колонке значение, нарушающее ограничения, возникнет ошибка. Ограничения будут действовать, даже если это значение по умолчанию.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="DDL-CONSTRAINTS-CHECK-CONSTRAINTS"
+>5.3.1. Ограничения-проверки</A
+></H2
+><P
+>Ограничение-проверка &mdash; наиболее общий тип ограничений. В его определении вы можете указать, что значение данной колонки должно удовлетворять логическому выражению (проверке истинности). Например, цену товара можно ограничить положительными значениями так: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE products (
+    product_no integer,
+    name text,
+    price numeric <B
+CLASS="EMPHASIS"
+>CHECK (price &gt; 0)</B
+>
+);</PRE
+><P></P
+><P
+>Как вы видите, ограничение определяется после типа данных, как и значение по умолчанию. Значения по умолчанию и ограничения могут указываться в любом порядке. Ограничение-проверка состоит из ключевого слова <TT
+CLASS="LITERAL"
+>CHECK</TT
+>, за которым идёт выражение в скобках. Это выражение должно включать колонку, для которой задаётся ограничение, иначе оно не имеет большого смысла.</P
+><P
+>Вы можете также присвоить ограничению отдельное имя. Это улучшит сообщения об ошибках и позволит вам ссылаться на это ограничение, когда вам понадобится изменить его. Сделать это можно так: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE products (
+    product_no integer,
+    name text,
+    price numeric <B
+CLASS="EMPHASIS"
+>CONSTRAINT positive_price</B
+> CHECK (price &gt; 0)
+);</PRE
+><P> То есть, чтобы создать именованное ограничение, напишите ключевое слово <TT
+CLASS="LITERAL"
+>CONSTRAINT</TT
+>, а за ним идентификатор и собственно определение ограничения. (Если вы не определите имя ограничения таким образом, система выберет для него имя за вас.)</P
+><P
+>Ограничение-проверка может также ссылаться на несколько колонок. Например, если вы храните обычную цену и цену со скидкой, так вы можете гарантировать, что цена со скидкой будет всегда меньше обычной: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE products (
+    product_no integer,
+    name text,
+    price numeric CHECK (price &gt; 0),
+    discounted_price numeric CHECK (discounted_price &gt; 0),
+    <B
+CLASS="EMPHASIS"
+>CHECK (price &gt; discounted_price)</B
+>
+);</PRE
+><P></P
+><P
+>Первые два ограничения определяются похожим образом, но для третьего используется новый синтаксис. Оно не связано с определённой колонкой, а представлено отдельным элементом в списке. Определения колонок и такие определения ограничений можно переставлять в произвольном порядке.</P
+><P
+>Про первые два ограничения можно сказать, что это ограничения колонок, тогда как третье является ограничением таблицы, так как оно написано отдельно от определений колонок. Ограничения колонок также можно записать в виде ограничений таблицы, тогда как обратное не всегда возможно, так как подразумевается, что ограничение колонки ссылается только на связанную колонку. (Хотя <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> этого не требует, но для совместимости с другими СУБД лучше следовать это правилу.) Ранее приведённый пример можно переписать и так: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE products (
+    product_no integer,
+    name text,
+    price numeric,
+    CHECK (price &gt; 0),
+    discounted_price numeric,
+    CHECK (discounted_price &gt; 0),
+    CHECK (price &gt; discounted_price)
+);</PRE
+><P> Или даже так: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE products (
+    product_no integer,
+    name text,
+    price numeric CHECK (price &gt; 0),
+    discounted_price numeric,
+    CHECK (discounted_price &gt; 0 AND price &gt; discounted_price)
+);</PRE
+><P> Это дело вкуса.</P
+><P
+>Ограничениям таблицы можно присваивать имена так же, как и ограничениям колонок: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE products (
+    product_no integer,
+    name text,
+    price numeric,
+    CHECK (price &gt; 0),
+    discounted_price numeric,
+    CHECK (discounted_price &gt; 0),
+    <B
+CLASS="EMPHASIS"
+>CONSTRAINT valid_discount</B
+> CHECK (price &gt; discounted_price)
+);</PRE
+><P></P
+><P
+>Следует заметить, что ограничение-проверка удовлетворяется, если выражение принимает значение true или NULL. Так как результатом многих выражений с операндами NULL будет значение NULL, такие ограничения не будут препятствовать записи NULL в связанные колонки. Чтобы гарантировать, что колонка не содержит значения NULL, можно использовать ограничение NOT NULL, описанное в следующем разделе.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN2537"
+>5.3.2. Ограничения NOT NULL</A
+></H2
+><P
+>Ограничение NOT NULL просто указывает, что колонке нельзя присваивать значение NULL. Пример синтаксиса: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE products (
+    product_no integer <B
+CLASS="EMPHASIS"
+>NOT NULL</B
+>,
+    name text <B
+CLASS="EMPHASIS"
+>NOT NULL</B
+>,
+    price numeric
+);</PRE
+><P></P
+><P
+>Ограничение NOT NULL всегда записывается как ограничение колонки и функционально эквивалентно ограничению <TT
+CLASS="LITERAL"
+>CHECK (<TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+> IS NOT NULL)</TT
+>, но в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> явное ограничение NOT NULL работает более эффективно. Хотя у такой записи есть недостаток &mdash; назначить имя таким ограничениям нельзя.</P
+><P
+>Естественно, для колонки можно определить больше одного ограничения. Для этого их нужно просто указать одно за другим: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE products (
+    product_no integer NOT NULL,
+    name text NOT NULL,
+    price numeric NOT NULL CHECK (price &gt; 0)
+);</PRE
+><P> Порядок здесь не имеет значения, он не обязательно соответствует порядку проверки ограничений.</P
+><P
+>Для ограничения <TT
+CLASS="LITERAL"
+>NOT NULL</TT
+> есть и обратное: ограничение <TT
+CLASS="LITERAL"
+>NULL</TT
+>. Это не означает, что колонка должна иметь только значение NULL, что конечно было бы бессмысленно. Суть же его в простом указании, что колонка может иметь значение NULL (это поведение по умолчанию). Ограничение <TT
+CLASS="LITERAL"
+>NULL</TT
+> отсутствует в стандарте SQL и использовать его в переносимых приложениях не следует. (Оно было добавлено в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> только для совместимости с некоторыми другими СУБД.) Однако некоторые пользователи любят его использовать, так как оно позволяет легко переключать ограничения в скрипте. Например, вы можете начать с: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE products (
+    product_no integer NULL,
+    name text NULL,
+    price numeric NULL
+);</PRE
+><P> и затем вставить ключевое слово <TT
+CLASS="LITERAL"
+>NOT</TT
+>, где потребуется.</P
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>При проектировании баз данных чаще всего большинство колонок должны быть помечены как NOT NULL.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="DDL-CONSTRAINTS-UNIQUE-CONSTRAINTS"
+>5.3.3. Ограничения уникальности</A
+></H2
+><P
+>Ограничения уникальности гарантируют, что данные в определённой колонке или группе колонок уникальны для всех строк таблицы. Ограничение записывается так: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE products (
+    product_no integer <B
+CLASS="EMPHASIS"
+>UNIQUE</B
+>,
+    name text,
+    price numeric
+);</PRE
+><P> в виде ограничения колонки и так: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE products (
+    product_no integer,
+    name text,
+    price numeric,
+    <B
+CLASS="EMPHASIS"
+>UNIQUE (product_no)</B
+>
+);</PRE
+><P> в виде ограничения таблицы.</P
+><P
+>Если ограничение уникальности определяется для группы колонок, колонки перечисляются через запятую: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE example (
+    a integer,
+    b integer,
+    c integer,
+    <B
+CLASS="EMPHASIS"
+>UNIQUE (a, c)</B
+>
+);</PRE
+><P> Такое ограничение указывает, что сочетание значений перечисленных колонок должно быть уникально во всей таблице, тогда как значения каждой колонки по отдельности не должны быть (и обычно не будут) уникальными.</P
+><P
+>Вы можете назначить уникальному ограничению имя обычным образом: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE products (
+    product_no integer <B
+CLASS="EMPHASIS"
+>CONSTRAINT must_be_different</B
+> UNIQUE,
+    name text,
+    price numeric
+);</PRE
+><P></P
+><P
+>При добавлении ограничения уникальности будет автоматически создан уникальный индекс-B-дерево для колонки или группы колонок, задействованных в ограничении. Ограничение уникальности для только некоторых строк можно ввести, создав <A
+HREF="indexes-partial.html"
+>частичный индекс</A
+>.</P
+><P
+>Вообще говоря, ограничение уникальности нарушается, когда в таблице оказывается несколько строк, у которых совпадают значения всех колонок, включённых в ограничение. Однако два значения NULL при сравнении не считаются равными. Это означает, что даже при наличии ограничения уникальности в таблице можно сохранить строки с дублирующимися значениями, если они содержат NULL в одной или нескольких колонках ограничения. Это поведение соответствует стандарту SQL, но мы слышали о СУБД, которые ведут себя по-другому. Имейте в виду эту особенность, разрабатывая переносимые приложения.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="DDL-CONSTRAINTS-PRIMARY-KEYS"
+>5.3.4. Первичные ключи</A
+></H2
+><P
+>Технически ограничение первичного ключа представляет собой просто объединение ограничения уникальности c ограничением NOT NULL. Таким образом, следующие два определения создадут таблицу одинаково: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE products (
+    product_no integer UNIQUE NOT NULL,
+    name text,
+    price numeric
+);</PRE
+><P>
+
+</P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE products (
+    product_no integer <B
+CLASS="EMPHASIS"
+>PRIMARY KEY</B
+>,
+    name text,
+    price numeric
+);</PRE
+><P></P
+><P
+>Первичные ключи, как и ограничения уникальности, могут включать несколько колонок и записывается это так же: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE example (
+    a integer,
+    b integer,
+    c integer,
+    <B
+CLASS="EMPHASIS"
+>PRIMARY KEY (a, c)</B
+>
+);</PRE
+><P></P
+><P
+>Первичный ключ выбирает колонку или группу колонок, которую можно использовать как уникальный идентификатор строк таблицы. (Это прямое следствие определения первичного ключа. Заметьте, что ограничение уникальности само по себе не является таким уникальным идентификатором, так как оно не исключает значения NULL.) Это полезно и для документирования, и для клиентских приложений. Например, графическому приложению с возможностями редактирования содержимого таблицы, вероятно, потребуется знать первичный ключ таблицы, чтобы однозначно идентифицировать её строки.</P
+><P
+>При добавлении первичного ключа автоматически создаётся уникальный индекс-B-дерево для связанной колонки или группы колонок.</P
+><P
+>Таблица может иметь максимум один первичный ключ. (Ограничений уникальности и ограничений NOT NULL может быть сколько угодно, но назначить ограничением первичного ключа можно только одно.) Теория реляционных баз данных говорит, что в каждой таблице должен быть первичный ключ. В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> такого жёсткого требования нет, но обычно лучше ему следовать.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="DDL-CONSTRAINTS-FK"
+>5.3.5. Внешние ключи</A
+></H2
+><P
+>Ограничение внешнего ключа указывает, что значения колонки (или группы колонок) должны соответствовать значениям в некоторой строке другой таблицы. Это называется <I
+CLASS="FIRSTTERM"
+>ссылочной целостностью</I
+> двух связанных таблиц.</P
+><P
+>Пусть у вас уже есть таблица продуктов, которую мы неоднократно использовали ранее: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE products (
+    product_no integer PRIMARY KEY,
+    name text,
+    price numeric
+);</PRE
+><P> Давайте предположим, что у вас есть таблица с заказами этих продуктов. Мы хотим, чтобы в таблице заказов содержались только заказы действительно существующих продуктов. Поэтому мы определим в ней ограничение внешнего ключа, ссылающееся на таблицу продуктов: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE orders (
+    order_id integer PRIMARY KEY,
+    product_no integer <B
+CLASS="EMPHASIS"
+>REFERENCES products (product_no)</B
+>,
+    quantity integer
+);</PRE
+><P> С таким ограничением создать заказ со значением <TT
+CLASS="STRUCTFIELD"
+>product_no</TT
+>, отсутствующим в таблице products (и не равным NULL), будет невозможно.</P
+><P
+>В такой схеме таблицу orders называют <I
+CLASS="FIRSTTERM"
+>подчинённой</I
+> таблицей, а products &mdash; <I
+CLASS="FIRSTTERM"
+>главной</I
+>. Соответственно, колонки называют так же подчинённой и главной (или ссылающейся и целевой).</P
+><P
+>Предыдущую команду можно сократить так: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE orders (
+    order_id integer PRIMARY KEY,
+    product_no integer <B
+CLASS="EMPHASIS"
+>REFERENCES products</B
+>,
+    quantity integer
+);</PRE
+><P> то есть, если опустить список колонок, внешний ключ будет неявно связан с первичным ключом главной таблицы.</P
+><P
+>Внешний ключ также может ссылаться на группу колонок. В этом случае его нужно записать в виде обычного ограничения таблицы. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE t1 (
+  a integer PRIMARY KEY,
+  b integer,
+  c integer,
+  <B
+CLASS="EMPHASIS"
+>FOREIGN KEY (b, c) REFERENCES other_table (c1, c2)</B
+>
+);</PRE
+><P> Естественно, число и типы колонок в ограничении должны соответствовать числу и типам целевых колонок.</P
+><P
+>Ограничению внешнего ключа можно назначить имя стандартным способом.</P
+><P
+>Таблица может содержать несколько ограничений внешнего ключа. Это полезно для связи таблиц в отношении многие-ко-многим. Скажем, у вас есть таблицы продуктов и заказов, но вы хотите, чтобы один заказ мог содержать несколько продуктов (что невозможно в предыдущей схеме). Для этого вы можете использовать такую схему: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE products (
+    product_no integer PRIMARY KEY,
+    name text,
+    price numeric
+);
+
+CREATE TABLE orders (
+    order_id integer PRIMARY KEY,
+    shipping_address text,
+    ...
+);
+
+CREATE TABLE order_items (
+    product_no integer REFERENCES products,
+    order_id integer REFERENCES orders,
+    quantity integer,
+    PRIMARY KEY (product_no, order_id)
+);</PRE
+><P> Заметьте, что в последней таблице первичный ключ покрывает внешние ключи.</P
+><P
+>Мы знаем, что внешние ключи запрещают создание заказов, не относящихся ни к одному продукту. Но что делать, если после создания заказов с определённым продуктом мы захотим удалить его? SQL справится с этой ситуацией. Интуиция подсказывает следующие варианты поведения: <P
+></P
+></P><UL
+COMPACT="COMPACT"
+><LI
+><P
+>Запретить удаление продукта</P
+></LI
+><LI
+><P
+>Удалить также связанные заказы</P
+></LI
+><LI
+><P
+>Что-то ещё?</P
+></LI
+></UL
+><P></P
+><P
+>Для иллюстрации давайте реализуем следующее поведение в вышеприведённом примере: при попытке удаления продукта, на который ссылаются заказы (через таблицу <TT
+CLASS="LITERAL"
+>order_items</TT
+>), мы запрещаем эту операцию. Если же кто-то попытается удалить заказ, то удалится и его содержимое: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE products (
+    product_no integer PRIMARY KEY,
+    name text,
+    price numeric
+);
+
+CREATE TABLE orders (
+    order_id integer PRIMARY KEY,
+    shipping_address text,
+    ...
+);
+
+CREATE TABLE order_items (
+    product_no integer REFERENCES products <B
+CLASS="EMPHASIS"
+>ON DELETE RESTRICT</B
+>,
+    order_id integer REFERENCES orders <B
+CLASS="EMPHASIS"
+>ON DELETE CASCADE</B
+>,
+    quantity integer,
+    PRIMARY KEY (product_no, order_id)
+);</PRE
+><P></P
+><P
+>Ограничивающие и каскадные удаления &mdash; два наиболее распространённых варианта. <TT
+CLASS="LITERAL"
+>RESTRICT</TT
+> предотвращает удаление связанной строки. <TT
+CLASS="LITERAL"
+>NO ACTION</TT
+> означает, что если зависимые строки продолжают существовать при проверке ограничения, возникает ошибка (это поведение по умолчанию). (Главным отличием этих двух вариантов является то, что <TT
+CLASS="LITERAL"
+>NO ACTION</TT
+> позволяет отложить проверку в процессе транзакции, а <TT
+CLASS="LITERAL"
+>RESTRICT</TT
+> &mdash; нет.) <TT
+CLASS="LITERAL"
+>CASCADE</TT
+> указывает, что при удалении связанных строк зависимые от них будут так же автоматически удалены. Есть ещё два варианта: <TT
+CLASS="LITERAL"
+>SET NULL</TT
+> и <TT
+CLASS="LITERAL"
+>SET DEFAULT</TT
+>. При удалении связанных строк они назначают зависимым колонкам в подчинённой таблице значения NULL или значения по умолчанию, соответственно. Заметьте, что это не будет основанием для нарушения ограничений. Например, если в качестве действия задано <TT
+CLASS="LITERAL"
+>SET DEFAULT</TT
+>, но значение по умолчанию не удовлетворяет ограничению внешнего ключа, операция закончится ошибкой.</P
+><P
+>Аналогично указанию <TT
+CLASS="LITERAL"
+>ON DELETE</TT
+> существует <TT
+CLASS="LITERAL"
+>ON UPDATE</TT
+>, которое срабатывает при изменении заданной колонки. При этом возможные действия те же, а <TT
+CLASS="LITERAL"
+>CASCADE</TT
+> в данном случае означает, что изменённые значения связанных колонок будут скопированы в зависимые строки.</P
+><P
+>Обычно зависимая строка не должна удовлетворять ограничению внешнего ключа, если одна из связанных колонок содержит NULL. Если в объявление внешнего ключа добавлено <TT
+CLASS="LITERAL"
+>MATCH FULL</TT
+>, строка будет удовлетворять ограничению, только если все связанные колонки равны NULL (то есть при разных значениях (NULL и не NULL) гарантируется невыполнение ограничения <TT
+CLASS="LITERAL"
+>MATCH FULL</TT
+>). Если вы хотите, чтобы зависимые строки не могли избежать и этого ограничения, объявите связанные колонки как <TT
+CLASS="LITERAL"
+>NOT NULL</TT
+>.</P
+><P
+>Внешний ключ должен ссылаться на колонки, образующие первичный ключ или ограничение уникальности. Таким образом, для связанных колонок всегда будет существовать индекс (определённый соответствующим первичным ключом или ограничением), а значит проверки соответствия связанной строки будут выполняться эффективно. Так как команды <TT
+CLASS="COMMAND"
+>DELETE</TT
+> для строк главной таблицы или <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> для зависимых колонок потребуют просканировать подчинённую таблицу и найти строки, ссылающиеся на старые значения, полезно будет иметь индекс и для подчинённых колонок. Но это нужно не всегда, и создать соответствующий индекс можно по-разному, поэтому объявление внешнего ключа не создаёт автоматически индекс по связанным колонкам.</P
+><P
+>Подробнее об изменении и удалении данных рассказывается в <A
+HREF="dml.html"
+>Главе 6</A
+>. Вы также можете подробнее узнать о синтаксисе ограничений внешнего ключа в справке <A
+HREF="sql-createtable.html"
+>CREATE TABLE</A
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="DDL-CONSTRAINTS-EXCLUSION"
+>5.3.6. Ограничения-исключения</A
+></H2
+><P
+>Ограничения-исключения гарантируют, что при сравнении любых двух строк по указанным колонкам или выражениям с помощью заданных операторов, минимум одно из этих сравнений возвратит false или NULL. Записывается это так: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE circles (
+    c circle,
+    EXCLUDE USING gist (c WITH &amp;&amp;)
+);</PRE
+><P></P
+><P
+>Подробнее об этом см. <A
+HREF="sql-createtable.html#SQL-CREATETABLE-EXCLUDE"
+><TT
+CLASS="COMMAND"
+>CREATE TABLE ... CONSTRAINT ... EXCLUDE</TT
+></A
+>.</P
+><P
+>При добавлении ограничения-исключения будет автоматически создан индекс того типа, который указан в объявлении ограничения.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ddl-default.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ddl-system-columns.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Значения по умолчанию</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ddl.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Системные колонки</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

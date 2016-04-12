@@ -1,0 +1,582 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>VALUES</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="VACUUM"
+HREF="sql-vacuum.html"><LINK
+REL="NEXT"
+TITLE="Клиентские приложения PostgreSQL"
+HREF="reference-client.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="VACUUM"
+HREF="sql-vacuum.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Клиентские приложения PostgreSQL"
+HREF="reference-client.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-VALUES"
+></A
+>VALUES</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN85460"
+></A
+><H2
+>Название</H2
+>VALUES&nbsp;--&nbsp;вычислить набор строк</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN85463"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>VALUES ( <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> [, ...] ) [, ...]
+    [ ORDER BY <TT
+CLASS="REPLACEABLE"
+><I
+>выражение_сортировки</I
+></TT
+> [ ASC | DESC | USING <TT
+CLASS="REPLACEABLE"
+><I
+>оператор</I
+></TT
+> ] [, ...] ]
+    [ LIMIT { <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+> | ALL } ]
+    [ OFFSET <TT
+CLASS="REPLACEABLE"
+><I
+>начало</I
+></TT
+> [ ROW | ROWS ] ]
+    [ FETCH { FIRST | NEXT } [ <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+> ] { ROW | ROWS } ONLY ]</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN85471"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>VALUES</TT
+> вычисляет значение строки или множество значений строк, заданное выражениями. Чаще всего эта команда используется для формирования <SPAN
+CLASS="QUOTE"
+>"таблицы констант"</SPAN
+> в большой команде, но её можно использовать и отдельно.</P
+><P
+>Когда указывается больше, чем одна строка, все строки должны иметь одинаковое количество элементов. Типы данных результирующих колонок таблицы определяются в результате совмещения явных и неявных типов выражений, заданных для этих колонок, по тем же правилам, что и в <TT
+CLASS="LITERAL"
+>UNION</TT
+> (см. <A
+HREF="typeconv-union-case.html"
+>Раздел 10.5</A
+>).</P
+><P
+>В составе других команд синтаксис допускает использование <TT
+CLASS="COMMAND"
+>VALUES</TT
+> везде, где допускается <TT
+CLASS="COMMAND"
+>SELECT</TT
+>. Так как грамматически она воспринимается как <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, с командой <TT
+CLASS="COMMAND"
+>VALUES</TT
+> можно использовать предложения <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+>, <TT
+CLASS="LITERAL"
+>LIMIT</TT
+> (или равнозначное <TT
+CLASS="LITERAL"
+>FETCH FIRST</TT
+>) и <TT
+CLASS="LITERAL"
+>OFFSET</TT
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN85488"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+></DT
+><DD
+><P
+>Константа или выражение, которое вычисляется и вставляется в указанное место результирующей таблицы (множества строк). В списке <TT
+CLASS="COMMAND"
+>VALUES</TT
+>, находящемся на верхнем уровне оператора <TT
+CLASS="COMMAND"
+>INSERT</TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> может быть заменено словом <TT
+CLASS="LITERAL"
+>DEFAULT</TT
+>, указывающим, что в целевую колонку должно быть вставлено значение этой колонки по умолчанию. Когда <TT
+CLASS="COMMAND"
+>VALUES</TT
+> употребляется в других контекстах, указание <TT
+CLASS="LITERAL"
+>DEFAULT</TT
+> использовать нельзя.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>выражение_сортировки</I
+></TT
+></DT
+><DD
+><P
+>Выражение или целочисленная константа, указывающая, как должны сортироваться строки результата. Это выражение может обращаться к колонкам результата <TT
+CLASS="COMMAND"
+>VALUES</TT
+> по именам <TT
+CLASS="LITERAL"
+>column1</TT
+>, <TT
+CLASS="LITERAL"
+>column2</TT
+> и т. д. За дополнительными подробностями обратитесь к <A
+HREF="sql-select.html#SQL-ORDERBY"
+><I
+>Предложение <I
+>ORDER BY</I
+></I
+></A
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>оператор</I
+></TT
+></DT
+><DD
+><P
+>Оператор сортировки. За подробностями обратитесь к <A
+HREF="sql-select.html#SQL-ORDERBY"
+><I
+>Предложение <I
+>ORDER BY</I
+></I
+></A
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+></DT
+><DD
+><P
+>Максимальное число строк, которое должно быть возвращено. За подробностями обратитесь к <A
+HREF="sql-select.html#SQL-LIMIT"
+><I
+>Предложение <I
+>LIMIT</I
+></I
+></A
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>начало</I
+></TT
+></DT
+><DD
+><P
+>Число строк, которые должны быть пропущены, прежде чем начнётся выдача строк. За подробностями обратитесь к <A
+HREF="sql-select.html#SQL-LIMIT"
+><I
+>Предложение <I
+>LIMIT</I
+></I
+></A
+>.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN85529"
+></A
+><H2
+>Замечания</H2
+><P
+>Следует избегать составления списков <TT
+CLASS="COMMAND"
+>VALUES</TT
+> с очень большим количеством строк, так как при этом можно столкнуться с нехваткой памяти или снижением производительности. Применение <TT
+CLASS="COMMAND"
+>VALUES</TT
+> в команде <TT
+CLASS="COMMAND"
+>INSERT</TT
+> — особый случай (так как ожидаемые типы колонок становятся известны из целевой таблицы команды <TT
+CLASS="COMMAND"
+>INSERT</TT
+> и их не надо вычислять, сканируя весь список <TT
+CLASS="COMMAND"
+>VALUES</TT
+>), так что в этом контексте можно работать с гораздо более объёмными списками, чем в других.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN85537"
+></A
+><H2
+>Примеры</H2
+><P
+>Простейшая команда <TT
+CLASS="COMMAND"
+>VALUES</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>VALUES (1, 'one'), (2, 'two'), (3, 'three');</PRE
+><P> Эта команда выдаст таблицу из двух колонок и трёх строк. По сути она равнозначна запросу: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT 1 AS column1, 'one' AS column2
+UNION ALL
+SELECT 2, 'two'
+UNION ALL
+SELECT 3, 'three';</PRE
+><P></P
+><P
+>Более типично использование <TT
+CLASS="COMMAND"
+>VALUES</TT
+> в составе большей команды SQL. Чаще всего она применяется в <TT
+CLASS="COMMAND"
+>INSERT</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>INSERT INTO films (code, title, did, date_prod, kind)
+    VALUES ('T_601', 'Yojimbo', 106, '1961-06-16', 'Drama');</PRE
+><P></P
+><P
+>В контексте <TT
+CLASS="COMMAND"
+>INSERT</TT
+> список <TT
+CLASS="COMMAND"
+>VALUES</TT
+> может содержать слово <TT
+CLASS="LITERAL"
+>DEFAULT</TT
+>, указывающее, что в данном месте вместо некоторого значения должно использоваться значение колонки по умолчанию: </P><PRE
+CLASS="PROGRAMLISTING"
+>INSERT INTO films VALUES
+    ('UA502', 'Bananas', 105, DEFAULT, 'Comedy', '82 minutes'),
+    ('T_601', 'Yojimbo', 106, DEFAULT, 'Drama', DEFAULT);</PRE
+><P></P
+><P
+><TT
+CLASS="COMMAND"
+>VALUES</TT
+> также может применяться там, где можно написать вложенный <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, например в предложении <TT
+CLASS="LITERAL"
+>FROM</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT f.*
+  FROM films f, (VALUES('MGM', 'Horror'), ('UA', 'Sci-Fi')) AS t (studio, kind)
+  WHERE f.studio = t.studio AND f.kind = t.kind;
+
+UPDATE employees SET salary = salary * v.increase
+  FROM (VALUES(1, 200000, 1.2), (2, 400000, 1.4)) AS v (depno, target, increase)
+  WHERE employees.depno = v.depno AND employees.sales &gt;= v.target;</PRE
+><P> Заметьте, что когда <TT
+CLASS="COMMAND"
+>VALUES</TT
+> используется в предложении <TT
+CLASS="LITERAL"
+>FROM</TT
+>, предложение <TT
+CLASS="LITERAL"
+>AS</TT
+> становится обязательным, так же, как и для <TT
+CLASS="COMMAND"
+>SELECT</TT
+>. При этом не требуется указывать в <TT
+CLASS="LITERAL"
+>AS</TT
+> имена всех колонок, но это рекомендуется делать. (По умолчанию <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> даёт колонкам <TT
+CLASS="COMMAND"
+>VALUES</TT
+> имена <TT
+CLASS="LITERAL"
+>column1</TT
+>, <TT
+CLASS="LITERAL"
+>column2</TT
+> и т. д., но в других СУБД имена могут быть другими.)</P
+><P
+>Когда <TT
+CLASS="COMMAND"
+>VALUES</TT
+> используется в команде <TT
+CLASS="COMMAND"
+>INSERT</TT
+>, значения автоматически приводятся к типу данных соответствующей целевой колонки. Когда она используется в других контекстах, может потребоваться указать нужный тип данных. Если все записи представлены строковыми константами в кавычках, достаточно привести к нужному типу значения в первой строке, чтобы задать тип для всех: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT * FROM machines
+WHERE ip_address IN (VALUES('192.168.0.1'::inet), ('192.168.0.10'), ('192.168.1.43'));</PRE
+><P></P
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>Для простых тестов на включение (<TT
+CLASS="LITERAL"
+>IN</TT
+>) лучше полагаться на форму <TT
+CLASS="LITERAL"
+>IN</TT
+> со списком скаляров, чем записывать запрос <TT
+CLASS="COMMAND"
+>VALUES</TT
+>, как показано выше. Список скаляров проще записать и часто он обрабатывается более эффективно.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN85575"
+></A
+><H2
+>Совместимость</H2
+><P
+><TT
+CLASS="COMMAND"
+>VALUES</TT
+> соответствует стандарту SQL. Указания <TT
+CLASS="LITERAL"
+>LIMIT</TT
+> и <TT
+CLASS="LITERAL"
+>OFFSET</TT
+> являются расширениями <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>; см. также <A
+HREF="sql-select.html"
+>SELECT</A
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN85583"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-insert.html"
+>INSERT</A
+>, <A
+HREF="sql-select.html"
+>SELECT</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-vacuum.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="reference-client.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>VACUUM</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Клиентские приложения PostgreSQL</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

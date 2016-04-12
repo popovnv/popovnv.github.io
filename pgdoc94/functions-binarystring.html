@@ -1,0 +1,935 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Функции и операторы двоичных строк</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Функции и операторы"
+HREF="functions.html"><LINK
+REL="PREVIOUS"
+TITLE="Строковые функции и операторы"
+HREF="functions-string.html"><LINK
+REL="NEXT"
+TITLE="Функции и операторы для работы с битовыми строками"
+HREF="functions-bitstring.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Строковые функции и операторы"
+HREF="functions-string.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 9. Функции и операторы</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Функции и операторы для работы с битовыми строками"
+HREF="functions-bitstring.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="FUNCTIONS-BINARYSTRING"
+>9.5. Функции и операторы двоичных строк</A
+></H1
+><P
+>В этом разделе описываются функции и операторы для работы с данными типа <TT
+CLASS="TYPE"
+>bytea</TT
+>.</P
+><P
+>В <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> определены несколько строковых функций, в которых аргументы разделяются не запятыми, а ключевыми словами. Подробнее это описано в <A
+HREF="functions-binarystring.html#FUNCTIONS-BINARYSTRING-SQL"
+>Таблице 9-9</A
+>. <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> также предоставляет варианты этих функций с синтаксисом, обычным для функций (см. <A
+HREF="functions-binarystring.html#FUNCTIONS-BINARYSTRING-OTHER"
+>Таблицу 9-10</A
+>).</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>В примерах, приведённых на этой странице, подразумевается, что параметр сервера <A
+HREF="runtime-config-client.html#GUC-BYTEA-OUTPUT"
+><TT
+CLASS="VARNAME"
+>bytea_output</TT
+></A
+> равен <TT
+CLASS="LITERAL"
+>escape</TT
+> (выбран традиционный формат PostgreSQL).</P
+></BLOCKQUOTE
+></DIV
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-BINARYSTRING-SQL"
+></A
+><P
+><B
+>Таблица 9-9. <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>-функции и операторы для работы с двоичными строками</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Функция</TH
+><TH
+>Тип результата</TH
+><TH
+>Описание</TH
+><TH
+>Пример</TH
+><TH
+>Результат</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+><TT
+CLASS="PARAMETER"
+>string</TT
+> <TT
+CLASS="LITERAL"
+>||</TT
+>
+        <TT
+CLASS="PARAMETER"
+>string</TT
+></TT
+>
+                </TD
+><TD
+> <TT
+CLASS="TYPE"
+>bytea</TT
+> </TD
+><TD
+>Конкатенация строк </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>E'\\\\Post'​::bytea || E'\\047gres​\\000'​::bytea</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>\\Post'gres​\000</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>octet_length(​<TT
+CLASS="PARAMETER"
+>string</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int</TT
+>
+                </TD
+><TD
+>Число байт в двоичной строке</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>octet_length(​E'jo\\000se'​::bytea)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>5</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>overlay(<TT
+CLASS="PARAMETER"
+>string</TT
+> placing <TT
+CLASS="PARAMETER"
+>string</TT
+> from <TT
+CLASS="TYPE"
+>int</TT
+> [<SPAN
+CLASS="OPTIONAL"
+>for <TT
+CLASS="TYPE"
+>int</TT
+></SPAN
+>])</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bytea</TT
+>
+                </TD
+><TD
+>Заменяет подстроку</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>overlay(​E'Th\\000​omas'​::bytea placing E'\\002\\003'​::bytea from 2 for 3)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>T\\002​\\003​mas</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>position(​<TT
+CLASS="PARAMETER"
+>substring</TT
+> in <TT
+CLASS="PARAMETER"
+>string</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int</TT
+>
+                </TD
+><TD
+>Положение указанной подстроки</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>position(​E'\\000om'::​bytea in E'Th\\000​omas'::​bytea)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>3</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>substring(​<TT
+CLASS="PARAMETER"
+>string</TT
+> [<SPAN
+CLASS="OPTIONAL"
+>from <TT
+CLASS="TYPE"
+>int</TT
+></SPAN
+>] [<SPAN
+CLASS="OPTIONAL"
+>for <TT
+CLASS="TYPE"
+>int</TT
+></SPAN
+>])</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bytea</TT
+>
+                </TD
+><TD
+>Извлекает подстроку</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>substring(​E'Th\\000​omas'::​bytea from 2 for 3)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>h\000o</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>trim(​[<SPAN
+CLASS="OPTIONAL"
+>both</SPAN
+>]
+        <TT
+CLASS="PARAMETER"
+>bytes</TT
+> from <TT
+CLASS="PARAMETER"
+>string</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bytea</TT
+>
+                </TD
+><TD
+>Удаляет наибольшую подстроку, содержащую только байты <TT
+CLASS="PARAMETER"
+>bytes</TT
+>, с начала и с конца строки <TT
+CLASS="PARAMETER"
+>string</TT
+></TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>trim(​E'\\000'::​bytea from E'\\000Tom​\\000'::​bytea)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>Tom</TT
+>
+                </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> есть и другие функции для работы с двоичными строками, перечисленные в <A
+HREF="functions-binarystring.html#FUNCTIONS-BINARYSTRING-OTHER"
+>Таблице 9-10</A
+>. Некоторые из них используются в качестве внутренней реализации стандартных функций <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>, приведённых в <A
+HREF="functions-binarystring.html#FUNCTIONS-BINARYSTRING-SQL"
+>Таблице 9-9</A
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-BINARYSTRING-OTHER"
+></A
+><P
+><B
+>Таблица 9-10. Другие функции для работы с двоичными строками</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Функция</TH
+><TH
+>Тип результата</TH
+><TH
+>Описание</TH
+><TH
+>Пример</TH
+><TH
+>Результат</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>btrim(​<TT
+CLASS="PARAMETER"
+>string</TT
+>
+        <TT
+CLASS="TYPE"
+>bytea</TT
+>, <TT
+CLASS="PARAMETER"
+>bytes</TT
+> <TT
+CLASS="TYPE"
+>bytea</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bytea</TT
+>
+                </TD
+><TD
+>Удаляет наибольшую подстроку, состоящую только из байт <TT
+CLASS="PARAMETER"
+>bytes</TT
+>, с начала и с конца строки <TT
+CLASS="PARAMETER"
+>string</TT
+></TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>btrim(​E'\\000trim​\\000'::​bytea, E'\\000'::​bytea)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>trim</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>decode(​<TT
+CLASS="PARAMETER"
+>string</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>, <TT
+CLASS="PARAMETER"
+>format</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>)</CODE
+></TT
+>
+      </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bytea</TT
+>
+                </TD
+><TD
+>Получает двоичные данные из текстового представления в <TT
+CLASS="PARAMETER"
+>string</TT
+>. Значения параметра <TT
+CLASS="PARAMETER"
+>format</TT
+> те же, что и для функции <CODE
+CLASS="FUNCTION"
+>encode</CODE
+>.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>decode(​E'123​\\000456', 'escape')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>123\000456</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>encode(​<TT
+CLASS="PARAMETER"
+>data</TT
+> <TT
+CLASS="TYPE"
+>bytea</TT
+>, <TT
+CLASS="PARAMETER"
+>format</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>)</CODE
+></TT
+>
+      </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Переводит двоичные данные в текстовое представление в одном из форматов: <TT
+CLASS="LITERAL"
+>base64</TT
+>, <TT
+CLASS="LITERAL"
+>hex</TT
+>, <TT
+CLASS="LITERAL"
+>escape</TT
+>. Формат <TT
+CLASS="LITERAL"
+>escape</TT
+> преобразует нулевые байты и байты с 1 в старшем бите в восьмеричные последовательности <TT
+CLASS="LITERAL"
+>\nnn</TT
+> и дублирует обратную косую черту.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>encode(​E'123​\\000456'::​bytea, 'escape')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>123\000456</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>get_bit(​<TT
+CLASS="PARAMETER"
+>string</TT
+>, <TT
+CLASS="PARAMETER"
+>offset</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int</TT
+>
+                </TD
+><TD
+>Извлекает бит из строки</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>get_bit(​E'Th\\000​omas'::​bytea, 45)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>1</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>get_byte(​<TT
+CLASS="PARAMETER"
+>string</TT
+>, <TT
+CLASS="PARAMETER"
+>offset</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int</TT
+>
+                </TD
+><TD
+>Извлекает байт из строки</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>get_byte(​E'Th\\000​omas'::bytea, 4)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>109</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>length(​<TT
+CLASS="PARAMETER"
+>string</TT
+>)</CODE
+></TT
+>
+      </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int</TT
+>
+                </TD
+><TD
+>Длина двоичной строки </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>length(​E'jo\\000se'​::bytea)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>5</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>md5(<TT
+CLASS="PARAMETER"
+>string</TT
+>)</CODE
+></TT
+>
+      </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Вычисляет MD5-хеш строки <TT
+CLASS="PARAMETER"
+>string</TT
+> и возвращает результат в 16-ричном виде</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>md5(​E'Th\\000​omas'::​bytea)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>8ab2d3c9​689aaf18 b4958c33​4c82d8b1</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>set_bit(<TT
+CLASS="PARAMETER"
+>string</TT
+>, <TT
+CLASS="PARAMETER"
+>offset</TT
+>, <TT
+CLASS="PARAMETER"
+>newvalue</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bytea</TT
+>
+                </TD
+><TD
+>Устанавливает значение бита в строке</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>set_bit(​E'Th\\000​omas'::​bytea, 45, 0)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>Th\000omAs</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>set_byte(​<TT
+CLASS="PARAMETER"
+>string</TT
+>, <TT
+CLASS="PARAMETER"
+>offset</TT
+>, <TT
+CLASS="PARAMETER"
+>newvalue</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bytea</TT
+>
+                </TD
+><TD
+>Устанавливает значение байта в строке</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>set_byte(​E'Th\\000​omas'::​bytea, 4, 64)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>Th\000o@as</TT
+>
+                </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Для функций <CODE
+CLASS="FUNCTION"
+>get_byte</CODE
+> и <CODE
+CLASS="FUNCTION"
+>set_byte</CODE
+> байты нумеруется с 0. Функции <CODE
+CLASS="FUNCTION"
+>get_bit</CODE
+> и <CODE
+CLASS="FUNCTION"
+>set_bit</CODE
+> нумеруют биты справа налево; например, бит 0 будет меньшим значащим битом первого байта, а бит 15 &mdash; большим значащим битом второго байта.</P
+><P
+>См. также агрегатную функцию <CODE
+CLASS="FUNCTION"
+>string_agg</CODE
+> в <A
+HREF="functions-aggregate.html"
+>Разделе 9.20</A
+> и функции для работы с большими объектами в <A
+HREF="lo-funcs.html"
+>Разделе 32.4</A
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions-string.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="functions-bitstring.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Строковые функции и операторы</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Функции и операторы для работы с битовыми строками</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

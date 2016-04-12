@@ -1,0 +1,230 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Глобальные значения в PL/Perl</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="PL/Perl — процедурный язык Perl"
+HREF="plperl.html"><LINK
+REL="PREVIOUS"
+TITLE="Встроенные функции"
+HREF="plperl-builtins.html"><LINK
+REL="NEXT"
+TITLE="Доверенный и недоверенный PL/Perl"
+HREF="plperl-trusted.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Встроенные функции"
+HREF="plperl-builtins.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="plperl.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 42. PL/Perl — процедурный язык Perl</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Доверенный и недоверенный PL/Perl"
+HREF="plperl-trusted.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="PLPERL-GLOBAL"
+>42.4. Глобальные значения в PL/Perl</A
+></H1
+><P
+>Вы можете использовать для хранения данных, включая ссылки на код, глобальный хеш <TT
+CLASS="VARNAME"
+>%_SHARED</TT
+>. Эти данные будут сохраняться между вызовами функции на протяжении всего текущего сеанса.</P
+><P
+>Простой пример работы с разделяемыми данными: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE OR REPLACE FUNCTION set_var(name text, val text) RETURNS text AS $$
+    if ($_SHARED{$_[0]} = $_[1]) {
+        return 'ok';
+    } else {
+        return "cannot set shared variable $_[0] to $_[1]";
+    }
+$$ LANGUAGE plperl;
+
+CREATE OR REPLACE FUNCTION get_var(name text) RETURNS text AS $$
+    return $_SHARED{$_[0]};
+$$ LANGUAGE plperl;
+
+SELECT set_var('sample', 'Hello, PL/Perl!  How''s tricks?');
+SELECT get_var('sample');</PRE
+><P></P
+><P
+>Это чуть более сложный пример, в котором используется ссылка на код: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE OR REPLACE FUNCTION myfuncs() RETURNS void AS $$
+    $_SHARED{myquote} = sub {
+        my $arg = shift;
+        $arg =~ s/(['\\])/\\$1/g;
+        return "'$arg'";
+    };
+$$ LANGUAGE plperl;
+
+SELECT myfuncs(); /* инициализация функции */
+
+/* Определение функции, использующей функцию заключения в кавычки */
+
+CREATE OR REPLACE FUNCTION use_quote(TEXT) RETURNS text AS $$
+    my $text_to_quote = shift;
+    my $qfunc = $_SHARED{myquote};
+    return &amp;$qfunc($text_to_quote);
+$$ LANGUAGE plperl;</PRE
+><P> (Код выше можно было бы упростить до однострочной команды <TT
+CLASS="LITERAL"
+>return $_SHARED{myquote}-&gt;($_[0]);</TT
+> в ущерб читаемости.)</P
+><P
+>По соображениям безопасности, PL/Perl выполняет функции, вызываемые некоторой ролью SQL, в отдельном интерпретаторе Perl, выделенном для этой роли. Это предотвращает случайное или злонамеренное влияние одного пользователя на поведение функций PL/Perl другого пользователя. В каждом интерпретаторе будет своё значение переменной <TT
+CLASS="VARNAME"
+>%_SHARED</TT
+> и собственное глобальное состояние. Таким образом, две функции PL/Perl будут разделять одно значение <TT
+CLASS="VARNAME"
+>%_SHARED</TT
+>, только если они выполняются одной ролью SQL. В приложении, выполняющем код в одном сеансе с разными ролями SQL (вызывающем функции <TT
+CLASS="LITERAL"
+>SECURITY DEFINER</TT
+>, использующем команду <TT
+CLASS="COMMAND"
+>SET ROLE</TT
+> и т. д.) может понадобиться явно предпринять дополнительные меры, чтобы функции на PL/Perl могли разделять данные через <TT
+CLASS="VARNAME"
+>%_SHARED</TT
+>. Для этого сначала установите для функций, которые должны взаимодействовать, одного владельца, а затем задайте для них свойство <TT
+CLASS="LITERAL"
+>SECURITY DEFINER</TT
+>. Разумеется, при этом нужно позаботиться о том, чтобы эти функции не могли сделать ничего непредусмотренного.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="plperl-builtins.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="plperl-trusted.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Встроенные функции</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="plperl.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Доверенный и недоверенный PL/Perl</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

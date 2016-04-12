@@ -1,0 +1,373 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Таблицы и индексы</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Полнотекстовый поиск"
+HREF="textsearch.html"><LINK
+REL="PREVIOUS"
+TITLE="Введение"
+HREF="textsearch-intro.html"><LINK
+REL="NEXT"
+TITLE="Управление текстовым поиском"
+HREF="textsearch-controls.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Введение"
+HREF="textsearch-intro.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="textsearch.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 12. Полнотекстовый поиск</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Управление текстовым поиском"
+HREF="textsearch-controls.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="TEXTSEARCH-TABLES"
+>12.2. Таблицы и индексы</A
+></H1
+><P
+>В предыдущем разделе приводились примеры, которые показывали, как можно выполнить сопоставление с простыми текстовыми константами. В этом разделе показывается, как находить текст в таблице, возможно с применением индексов.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="TEXTSEARCH-TABLES-SEARCH"
+>12.2.1. Поиск в таблице</A
+></H2
+><P
+>Полнотекстовый поиск можно выполнить, не применяя индекс. Следующий простой запрос выводит заголовок (<TT
+CLASS="STRUCTNAME"
+>title</TT
+>) каждой строки, содержащей слово <TT
+CLASS="LITERAL"
+>friend</TT
+> в поле <TT
+CLASS="STRUCTFIELD"
+>body</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT title
+FROM pgweb
+WHERE to_tsvector('english', body) @@ to_tsquery('english', 'friend');</PRE
+><P> При этом также будут найдены связанные слова, такие как <TT
+CLASS="LITERAL"
+>friends</TT
+> и <TT
+CLASS="LITERAL"
+>friendly</TT
+>, так как все они сводятся к одной нормализованной лексеме.</P
+><P
+>В показанном выше примере для разбора и нормализации строки явно выбирается конфигурация <TT
+CLASS="LITERAL"
+>english</TT
+>. Хотя параметры, задающие конфигурацию, можно опустить: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT title
+FROM pgweb
+WHERE to_tsvector(body) @@ to_tsquery('friend');</PRE
+><P> Такой запрос будет использовать конфигурацию, заданную в параметре <A
+HREF="runtime-config-client.html#GUC-DEFAULT-TEXT-SEARCH-CONFIG"
+>default_text_search_config</A
+>.</P
+><P
+>В следующем более сложном примере выбираются десять документов, изменённых последними, со словами <TT
+CLASS="LITERAL"
+>create</TT
+> и <TT
+CLASS="LITERAL"
+>table</TT
+> в полях <TT
+CLASS="STRUCTNAME"
+>title</TT
+> или <TT
+CLASS="STRUCTNAME"
+>body</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT title
+FROM pgweb
+WHERE to_tsvector(title || ' ' || body) @@ to_tsquery('create &amp; table')
+ORDER BY last_mod_date DESC
+LIMIT 10;</PRE
+><P> Чтобы найти строки, содержащие <TT
+CLASS="LITERAL"
+>NULL</TT
+> в одном из полей, нужно воспользоваться функцией <CODE
+CLASS="FUNCTION"
+>coalesce</CODE
+>, но здесь мы опустили её вызовы для краткости.</P
+><P
+>Хотя такие запросы будут работать и без индекса, для большинства приложений скорость будет неприемлемой; этот подход рекомендуется только для нерегулярного поиска и динамического содержимого. Для практического применения полнотекстового поиска обычно создаются индексы.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="TEXTSEARCH-TABLES-INDEX"
+>12.2.2. Создание индексов</A
+></H2
+><P
+>Для ускорения текстового поиска мы можем создать индекс <ACRONYM
+CLASS="ACRONYM"
+>GIN</ACRONYM
+> (см. <A
+HREF="textsearch-indexes.html"
+>Раздел 12.9</A
+>): </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE INDEX pgweb_idx ON pgweb USING gin(to_tsvector('english', body));</PRE
+><P> Заметьте, что здесь используется функция <CODE
+CLASS="FUNCTION"
+>to_tsvector</CODE
+> с двумя аргументами. В выражениях, определяющих индексы, можно использовать только функции, в которых явно задаётся имя конфигурации текстового поиска (см. <A
+HREF="indexes-expressional.html"
+>Раздел 11.7</A
+>). Это объясняется тем, что содержимое индекса не должно зависеть от значения параметра <A
+HREF="runtime-config-client.html#GUC-DEFAULT-TEXT-SEARCH-CONFIG"
+>default_text_search_config</A
+>. В противном случае содержимое индекса может быть неактуальным, если разные его элементы <TT
+CLASS="TYPE"
+>tsvector</TT
+> будут создаваться с разными конфигурациями текстового поиска и нельзя будет понять, какую именно использовать. Выгрузить и восстановить такой индекс будет невозможно.</P
+><P
+>Так как при создании индекса использовалась версия <CODE
+CLASS="FUNCTION"
+>to_tsvector</CODE
+> с двумя аргументами, этот индекс будет использоваться только в запросах, где <CODE
+CLASS="FUNCTION"
+>to_tsvector</CODE
+> вызывается с двумя аргументами и во втором передаётся имя той же конфигурации. То есть, <TT
+CLASS="LITERAL"
+>WHERE to_tsvector('english', body) @@ 'a &amp; b'</TT
+> сможет использовать этот индекс, а <TT
+CLASS="LITERAL"
+>WHERE to_tsvector(body) @@ 'a &amp; b'</TT
+> &mdash; нет. Это гарантирует, что индекс будет использоваться только с той конфигурацией, с которой создавались его элементы.</P
+><P
+>Индекс можно создать более сложным образом, определив для него имя конфигурации в другой колонке таблицы, например: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE INDEX pgweb_idx ON pgweb USING gin(to_tsvector(config_name, body));</PRE
+><P> где <TT
+CLASS="LITERAL"
+>config_name</TT
+> &mdash; имя колонки в таблице <TT
+CLASS="LITERAL"
+>pgweb</TT
+>. Так можно сохранить имя конфигурации, связанной с элементом индекса, и, таким образом, иметь в одном индексе элементы с разными конфигурациями. Это может быть полезно, например, когда в коллекции документов хранятся документы на разных языках. И в этом случае в запросах должен использоваться тот же индекс (с таким же образом задаваемой конфигурацией), например, так: <TT
+CLASS="LITERAL"
+>WHERE to_tsvector(config_name, body) @@ 'a &amp; b'</TT
+>.</P
+><P
+>Индексы могут создаваться даже по объединению колонок: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE INDEX pgweb_idx ON pgweb
+  USING gin(to_tsvector('english', title || ' ' || body));</PRE
+><P></P
+><P
+>Ещё один вариант &mdash; создать отдельную колонку <TT
+CLASS="TYPE"
+>tsvector</TT
+>, в которой сохранить результат <CODE
+CLASS="FUNCTION"
+>to_tsvector</CODE
+>. Следующий пример показывает, как можно подготовить для индексации объединённое содержимое колонок <TT
+CLASS="LITERAL"
+>title</TT
+> и <TT
+CLASS="LITERAL"
+>body</TT
+>, применив функцию <CODE
+CLASS="FUNCTION"
+>coalesce</CODE
+> для получения желаемого результата, даже когда одна из колонок <TT
+CLASS="LITERAL"
+>NULL</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER TABLE pgweb ADD COLUMN textsearchable_index_col tsvector;
+UPDATE pgweb SET textsearchable_index_col =
+     to_tsvector('english', coalesce(title,'') || ' ' || coalesce(body,''));</PRE
+><P> Затем мы создаём индекс <ACRONYM
+CLASS="ACRONYM"
+>GIN</ACRONYM
+> для ускорения поиска: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE INDEX textsearch_idx ON pgweb USING gin(textsearchable_index_col);</PRE
+><P> Теперь мы можем быстро выполнять полнотекстовый поиск: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT title
+FROM pgweb
+WHERE textsearchable_index_col @@ to_tsquery('create &amp; table')
+ORDER BY last_mod_date DESC
+LIMIT 10;</PRE
+><P></P
+><P
+>Когда представление <TT
+CLASS="TYPE"
+>tsvector</TT
+> хранится в отдельной колонке, необходимо создать триггер, который будет поддерживать колонку с <TT
+CLASS="TYPE"
+>tsvector</TT
+> в актуальном состоянии при любых изменениях <TT
+CLASS="LITERAL"
+>title</TT
+> или <TT
+CLASS="LITERAL"
+>body</TT
+>. Как это сделать, рассказывается в <A
+HREF="textsearch-features.html#TEXTSEARCH-UPDATE-TRIGGERS"
+>Подразделе 12.4.3</A
+>.</P
+><P
+>Хранение вычисленного выражения индекса в отдельной колонке даёт ряд преимуществ. Во-первых, для использования индекса в запросах не нужно явно указывать имя конфигурации текстового поиска. Как показано в вышеприведённом примере, в этом случае запрос может зависеть от <TT
+CLASS="VARNAME"
+>default_text_search_config</TT
+>. Во-вторых, поиск выполняется быстрее, так как для проверки соответствия данных индексу не нужно повторно выполнять <CODE
+CLASS="FUNCTION"
+>to_tsvector</CODE
+>. (Это актуально больше для индексов GiST, чем для GIN; см. <A
+HREF="textsearch-indexes.html"
+>Раздел 12.9</A
+>.) С другой стороны, схему с индексом по выражению проще реализовать и она позволяет сэкономить место на диске, так как представление <TT
+CLASS="TYPE"
+>tsvector</TT
+> не хранится явно.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="textsearch-intro.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="textsearch-controls.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Введение</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="textsearch.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Управление текстовым поиском</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

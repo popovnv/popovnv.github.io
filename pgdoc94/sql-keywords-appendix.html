@@ -1,0 +1,12214 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Ключевые слова SQL</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Приложения"
+HREF="appendixes.html"><LINK
+REL="PREVIOUS"
+TITLE="История единиц измерения времени"
+HREF="datetime-units-history.html"><LINK
+REL="NEXT"
+TITLE="Соответствие стандарту SQL"
+HREF="features.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="APPENDIX"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="История единиц измерения времени"
+HREF="datetime-units-history.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="appendixes.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Соответствие стандарту SQL"
+HREF="features.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="APPENDIX"
+><H1
+><A
+NAME="SQL-KEYWORDS-APPENDIX"
+></A
+>Приложение C. Ключевые слова <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+></H1
+><P
+>В <A
+HREF="sql-keywords-appendix.html#KEYWORDS-TABLE"
+>Таблице C-1</A
+> перечислены все слова, которые являются ключевыми в стандарте SQL и в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> 9.4.1. Общее описание ключевых слов можно найти в <A
+HREF="sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS"
+>Подразделе 4.1.1</A
+>. (Для экономии места в таблицу включены только две последние две версии стандарта SQL и SQL-92 для исторического сравнения. Отличия между ними и другими промежуточными версиями стандарта невелики.)</P
+><P
+>В SQL есть различие между <I
+CLASS="FIRSTTERM"
+>зарезервированными</I
+> и <I
+CLASS="FIRSTTERM"
+>незарезервированными</I
+> ключевыми словами. Согласно стандарту, действительно ключевыми словами являются только зарезервированные слова; они не могут быть идентификаторами. Незарезервированные ключевые слова имеют особое значение только в определённых контекстах и могут быть идентификаторами в других. Большинство незарезервированных ключевых слов на самом деле представляют имена встроенных таблиц и функций, определённых в SQL. Концепция незарезервированных ключевых слов собственно введена только для того, чтобы показать, что эти слова имеют некоторое предопределённое значение в отдельных контекстах.</P
+><P
+>В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> анализатор SQL сталкивается с дополнительными сложностями. Ему приходится иметь дело с несколькими различными классами элементов языка, начиная с тех, что никогда не могут использоваться как идентификаторы, и заканчивая теми, что не имеют никаких особых отличий от обычных идентификаторов. (Последнее обычно относится к функциям, описанным в SQL.) Даже зарезервированные ключевые слова не полностью зарезервированы в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, а могут использоваться в качестве меток колонок (например, можно написать <TT
+CLASS="LITERAL"
+>SELECT 55 AS CHECK</TT
+>, хотя <TT
+CLASS="TOKEN"
+>CHECK</TT
+> и является зарезервированным ключевым словом).</P
+><P
+>В <A
+HREF="sql-keywords-appendix.html#KEYWORDS-TABLE"
+>Таблице C-1</A
+>, в колонке <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> мы даём пометку <SPAN
+CLASS="QUOTE"
+>"не зарезервировано"</SPAN
+> тем ключевым словам, которые явно известны анализатору запросов, но их можно использовать в качестве имени колонки или таблицы. Некоторые ключевые слова, которые недопустимы в качестве имени функции или типа данных, но в остальном не отличаются от незарезервированных слов, помечены соответственно. (Большинство из этих слов представляют встроенные функции или типы данных со специальным синтаксисом. Функции или типы с таким именем существуют, но пользователь не может их переопределить.) Метка <SPAN
+CLASS="QUOTE"
+>"зарезервировано"</SPAN
+> даётся тем словам, которые не могут быть именами колонок или таблиц. Некоторые зарезервированные ключевые слова могут быть именами функций или типов данных; это также отмечается в таблице. Если такой пометки нет, зарезервированное слово допускается только в качестве метки колонки <SPAN
+CLASS="QUOTE"
+>"AS"</SPAN
+>.</P
+><P
+>Вообще, если вы сталкиваетесь с разнообразными ошибками разбора команд, содержащих в качестве идентификаторов какие-либо из перечисленных ключевых слов, попробуйте для решения проблемы заключить идентификатор в кавычки.</P
+><P
+>Изучая <A
+HREF="sql-keywords-appendix.html#KEYWORDS-TABLE"
+>Таблицу C-1</A
+>, важно понимать, что отсутствие какого-либо ключевого слова в списке зарезервированных в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> не означает, что функциональность, связанная с этим словом, не реализована. И наоборот, присутствие ключевого слова не обязательно говорит о наличии соответствующей функциональности.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="KEYWORDS-TABLE"
+></A
+><P
+><B
+>Таблица C-1. Ключевые слова <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Ключевое слово</TH
+><TH
+>                <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>
+              </TH
+><TH
+>SQL:2011</TH
+><TH
+>SQL:2008</TH
+><TH
+>SQL-92</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>A</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ABORT</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ABS</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ABSENT</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ABSOLUTE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ACCESS</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ACCORDING</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ACTION</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ADA</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ADD</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ADMIN</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>AFTER</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>AGGREGATE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ALL</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ALLOCATE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ALSO</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ALTER</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ALWAYS</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ANALYSE</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ANALYZE</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>AND</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ANY</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ARE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ARRAY</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ARRAY_AGG</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ARRAY_MAX_CARDINALITY</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>AS</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ASC</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ASENSITIVE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ASSERTION</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ASSIGNMENT</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ASYMMETRIC</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>AT</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ATOMIC</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ATTRIBUTE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ATTRIBUTES</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>AUTHORIZATION</TT
+>
+              </TD
+><TD
+>зарезервировано (допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>AVG</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>BACKWARD</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>BASE64</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>BEFORE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>BEGIN</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>BEGIN_FRAME</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>BEGIN_PARTITION</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>BERNOULLI</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>BETWEEN</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>BIGINT</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>BINARY</TT
+>
+              </TD
+><TD
+>зарезервировано (допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>BIT</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>BIT_LENGTH</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>BLOB</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>BLOCKED</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>BOM</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>BOOLEAN</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>BOTH</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>BREADTH</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>BY</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>C</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CACHE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CALL</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CALLED</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CARDINALITY</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CASCADE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CASCADED</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CASE</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CAST</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CATALOG</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CATALOG_NAME</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CEIL</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CEILING</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CHAIN</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CHAR</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CHARACTER</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CHARACTERISTICS</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CHARACTERS</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CHARACTER_LENGTH</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CHARACTER_SET_CATALOG</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CHARACTER_SET_NAME</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CHARACTER_SET_SCHEMA</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CHAR_LENGTH</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CHECK</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CHECKPOINT</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CLASS</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CLASS_ORIGIN</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CLOB</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CLOSE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CLUSTER</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>COALESCE</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>COBOL</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>COLLATE</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>COLLATION</TT
+>
+              </TD
+><TD
+>зарезервировано (допускается функция или тип)</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>COLLATION_CATALOG</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>COLLATION_NAME</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>COLLATION_SCHEMA</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>COLLECT</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>COLUMN</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>COLUMNS</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>COLUMN_NAME</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>COMMAND_FUNCTION</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>COMMAND_FUNCTION_CODE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>COMMENT</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>COMMENTS</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>COMMIT</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>COMMITTED</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CONCURRENTLY</TT
+>
+              </TD
+><TD
+>зарезервировано (допускается функция или тип)</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CONDITION</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CONDITION_NUMBER</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CONFIGURATION</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CONNECT</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CONNECTION</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CONNECTION_NAME</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CONSTRAINT</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CONSTRAINTS</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CONSTRAINT_CATALOG</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CONSTRAINT_NAME</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CONSTRAINT_SCHEMA</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CONSTRUCTOR</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CONTAINS</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CONTENT</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CONTINUE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CONTROL</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CONVERSION</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CONVERT</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>COPY</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CORR</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CORRESPONDING</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>COST</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>COUNT</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>COVAR_POP</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>COVAR_SAMP</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CREATE</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CROSS</TT
+>
+              </TD
+><TD
+>зарезервировано (допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CSV</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CUBE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CUME_DIST</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CURRENT</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CURRENT_CATALOG</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CURRENT_DATE</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CURRENT_DEFAULT_TRANSFORM_GROUP</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CURRENT_PATH</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CURRENT_ROLE</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CURRENT_ROW</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CURRENT_SCHEMA</TT
+>
+              </TD
+><TD
+>зарезервировано (допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CURRENT_TIME</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CURRENT_TIMESTAMP</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CURRENT_TRANSFORM_GROUP_FOR_TYPE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CURRENT_USER</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CURSOR</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CURSOR_NAME</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>CYCLE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DATA</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DATABASE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DATALINK</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DATE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DATETIME_INTERVAL_CODE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DATETIME_INTERVAL_PRECISION</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DAY</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DB</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DEALLOCATE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DEC</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DECIMAL</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DECLARE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DEFAULT</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DEFAULTS</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DEFERRABLE</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DEFERRED</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DEFINED</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DEFINER</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DEGREE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DELETE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DELIMITER</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DELIMITERS</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DENSE_RANK</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DEPTH</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DEREF</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DERIVED</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DESC</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DESCRIBE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DESCRIPTOR</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DETERMINISTIC</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DIAGNOSTICS</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DICTIONARY</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DISABLE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DISCARD</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DISCONNECT</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DISPATCH</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DISTINCT</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DLNEWCOPY</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DLPREVIOUSCOPY</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DLURLCOMPLETE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DLURLCOMPLETEONLY</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DLURLCOMPLETEWRITE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DLURLPATH</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DLURLPATHONLY</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DLURLPATHWRITE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DLURLSCHEME</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DLURLSERVER</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DLVALUE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DO</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DOCUMENT</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DOMAIN</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DOUBLE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DROP</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DYNAMIC</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DYNAMIC_FUNCTION</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>DYNAMIC_FUNCTION_CODE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>EACH</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ELEMENT</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ELSE</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>EMPTY</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ENABLE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ENCODING</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ENCRYPTED</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>END</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>END-EXEC</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>END_FRAME</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>END_PARTITION</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ENFORCED</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ENUM</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>EQUALS</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ESCAPE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>EVENT</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>EVERY</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>EXCEPT</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>EXCEPTION</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>EXCLUDE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>EXCLUDING</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>EXCLUSIVE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>EXEC</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>EXECUTE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>EXISTS</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>EXP</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>EXPLAIN</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>EXPRESSION</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>EXTENSION</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>EXTERNAL</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>EXTRACT</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>FALSE</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>FAMILY</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>FETCH</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>FILE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>FILTER</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>FINAL</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>FIRST</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>FIRST_VALUE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>FLAG</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>FLOAT</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>FLOOR</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>FOLLOWING</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>FOR</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>FORCE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>FOREIGN</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>FORTRAN</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>FORWARD</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>FOUND</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>FRAME_ROW</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>FREE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>FREEZE</TT
+>
+              </TD
+><TD
+>зарезервировано (допускается функция или тип)</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>FROM</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>FS</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>FULL</TT
+>
+              </TD
+><TD
+>зарезервировано (допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>FUNCTION</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>FUNCTIONS</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>FUSION</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>G</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>GENERAL</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>GENERATED</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>GET</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>GLOBAL</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>GO</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>GOTO</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>GRANT</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>GRANTED</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>GREATEST</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>GROUP</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>GROUPING</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>GROUPS</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>HANDLER</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>HAVING</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>HEADER</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>HEX</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>HIERARCHY</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>HOLD</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>HOUR</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ID</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>IDENTITY</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>IF</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>IGNORE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ILIKE</TT
+>
+              </TD
+><TD
+>зарезервировано (допускается функция или тип)</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>IMMEDIATE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>IMMEDIATELY</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>IMMUTABLE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>IMPLEMENTATION</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>IMPLICIT</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>IMPORT</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>IN</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>INCLUDING</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>INCREMENT</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>INDENT</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>INDEX</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>INDEXES</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>INDICATOR</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>INHERIT</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>INHERITS</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>INITIALLY</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>INLINE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>INNER</TT
+>
+              </TD
+><TD
+>зарезервировано (допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>INOUT</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>INPUT</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>INSENSITIVE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>INSERT</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>INSTANCE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>INSTANTIABLE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>INSTEAD</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>INT</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>INTEGER</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>INTEGRITY</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>INTERSECT</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>INTERSECTION</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>INTERVAL</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>INTO</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>INVOKER</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>IS</TT
+>
+              </TD
+><TD
+>зарезервировано (допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ISNULL</TT
+>
+              </TD
+><TD
+>зарезервировано (допускается функция или тип)</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ISOLATION</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>JOIN</TT
+>
+              </TD
+><TD
+>зарезервировано (допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>K</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>KEY</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>KEY_MEMBER</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>KEY_TYPE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>LABEL</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>LAG</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>LANGUAGE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>LARGE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>LAST</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>LAST_VALUE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>LATERAL</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>LC_COLLATE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>LC_CTYPE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>LEAD</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>LEADING</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>LEAKPROOF</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>LEAST</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>LEFT</TT
+>
+              </TD
+><TD
+>зарезервировано (допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>LENGTH</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>LEVEL</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>LIBRARY</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>LIKE</TT
+>
+              </TD
+><TD
+>зарезервировано (допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>LIKE_REGEX</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>LIMIT</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>LINK</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>LISTEN</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>LN</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>LOAD</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>LOCAL</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>LOCALTIME</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>LOCALTIMESTAMP</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>LOCATION</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>LOCATOR</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>LOCK</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>LOWER</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>M</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>MAP</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>MAPPING</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>MATCH</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>MATCHED</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>MATERIALIZED</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>MAX</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>MAXVALUE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>MAX_CARDINALITY</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>MEMBER</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>MERGE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>MESSAGE_LENGTH</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>MESSAGE_OCTET_LENGTH</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>MESSAGE_TEXT</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>METHOD</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>MIN</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>MINUTE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>MINVALUE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>MOD</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>MODE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>MODIFIES</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>MODULE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>MONTH</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>MORE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>MOVE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>MULTISET</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>MUMPS</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>NAME</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>NAMES</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>NAMESPACE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>NATIONAL</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>NATURAL</TT
+>
+              </TD
+><TD
+>зарезервировано (допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>NCHAR</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>NCLOB</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>NESTING</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>NEW</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>NEXT</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>NFC</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>NFD</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>NFKC</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>NFKD</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>NIL</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>NO</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>NONE</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>NORMALIZE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>NORMALIZED</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>NOT</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>NOTHING</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>NOTIFY</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>NOTNULL</TT
+>
+              </TD
+><TD
+>зарезервировано (допускается функция или тип)</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>NOWAIT</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>NTH_VALUE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>NTILE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>NULL</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>NULLABLE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>NULLIF</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>NULLS</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>NUMBER</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>NUMERIC</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>OBJECT</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>OCCURRENCES_REGEX</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>OCTETS</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>OCTET_LENGTH</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>OF</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>OFF</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>OFFSET</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>OIDS</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>OLD</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ON</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ONLY</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>OPEN</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>OPERATOR</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>OPTION</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>OPTIONS</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>OR</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ORDER</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ORDERING</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ORDINALITY</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>OTHERS</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>OUT</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>OUTER</TT
+>
+              </TD
+><TD
+>зарезервировано (допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>OUTPUT</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>OVER</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>OVERLAPS</TT
+>
+              </TD
+><TD
+>зарезервировано (допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>OVERLAY</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>OVERRIDING</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>OWNED</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>OWNER</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>P</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>PAD</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>PARAMETER</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>PARAMETER_MODE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>PARAMETER_NAME</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>PARAMETER_ORDINAL_POSITION</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>PARAMETER_SPECIFIC_CATALOG</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>PARAMETER_SPECIFIC_NAME</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>PARAMETER_SPECIFIC_SCHEMA</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>PARSER</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>PARTIAL</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>PARTITION</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>PASCAL</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>PASSING</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>PASSTHROUGH</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>PASSWORD</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>PATH</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>PERCENT</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>PERCENTILE_CONT</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>PERCENTILE_DISC</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>PERCENT_RANK</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>PERIOD</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>PERMISSION</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>PLACING</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>PLANS</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>PLI</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>PORTION</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>POSITION</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>POSITION_REGEX</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>POWER</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>PRECEDES</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>PRECEDING</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>PRECISION</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>PREPARE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>PREPARED</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>PRESERVE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>PRIMARY</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>PRIOR</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>PRIVILEGES</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>PROCEDURAL</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>PROCEDURE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>PROGRAM</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>PUBLIC</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>QUOTE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>RANGE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>RANK</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>READ</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>READS</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>REAL</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>REASSIGN</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>RECHECK</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>RECOVERY</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>RECURSIVE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>REF</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>REFERENCES</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>REFERENCING</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>REFRESH</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>REGR_AVGX</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>REGR_AVGY</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>REGR_COUNT</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>REGR_INTERCEPT</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>REGR_R2</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>REGR_SLOPE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>REGR_SXX</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>REGR_SXY</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>REGR_SYY</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>REINDEX</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>RELATIVE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>RELEASE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>RENAME</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>REPEATABLE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>REPLACE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>REPLICA</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>REQUIRING</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>RESET</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>RESPECT</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>RESTART</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>RESTORE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>RESTRICT</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>RESULT</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>RETURN</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>RETURNED_CARDINALITY</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>RETURNED_LENGTH</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>RETURNED_OCTET_LENGTH</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>RETURNED_SQLSTATE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>RETURNING</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>RETURNS</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>REVOKE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>RIGHT</TT
+>
+              </TD
+><TD
+>зарезервировано (допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ROLE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ROLLBACK</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ROLLUP</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ROUTINE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ROUTINE_CATALOG</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ROUTINE_NAME</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ROUTINE_SCHEMA</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ROW</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ROWS</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ROW_COUNT</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ROW_NUMBER</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>RULE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SAVEPOINT</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SCALE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SCHEMA</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SCHEMA_NAME</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SCOPE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SCOPE_CATALOG</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SCOPE_NAME</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SCOPE_SCHEMA</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SCROLL</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SEARCH</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SECOND</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SECTION</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SECURITY</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SELECT</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SELECTIVE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SELF</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SENSITIVE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SEQUENCE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SEQUENCES</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SERIALIZABLE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SERVER</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SERVER_NAME</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SESSION</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SESSION_USER</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SET</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SETOF</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SETS</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SHARE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SHOW</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SIMILAR</TT
+>
+              </TD
+><TD
+>зарезервировано (допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SIMPLE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SIZE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SMALLINT</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SNAPSHOT</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SOME</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SOURCE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SPACE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SPECIFIC</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SPECIFICTYPE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SPECIFIC_NAME</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SQL</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SQLCODE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SQLERROR</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SQLEXCEPTION</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SQLSTATE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SQLWARNING</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SQRT</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>STABLE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>STANDALONE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>START</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>STATE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>STATEMENT</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>STATIC</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>STATISTICS</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>STDDEV_POP</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>STDDEV_SAMP</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>STDIN</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>STDOUT</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>STORAGE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>STRICT</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>STRIP</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>STRUCTURE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>STYLE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SUBCLASS_ORIGIN</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SUBMULTISET</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SUBSTRING</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SUBSTRING_REGEX</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SUCCEEDS</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SUM</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SYMMETRIC</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SYSID</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SYSTEM</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SYSTEM_TIME</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>SYSTEM_USER</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>T</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>TABLE</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>TABLES</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>TABLESAMPLE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>TABLESPACE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>TABLE_NAME</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>TEMP</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>TEMPLATE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>TEMPORARY</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>TEXT</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>THEN</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>TIES</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>TIME</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>TIMESTAMP</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>TIMEZONE_HOUR</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>TIMEZONE_MINUTE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>TO</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>TOKEN</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>TOP_LEVEL_COUNT</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>TRAILING</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>TRANSACTION</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>TRANSACTIONS_COMMITTED</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>TRANSACTIONS_ROLLED_BACK</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>TRANSACTION_ACTIVE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>TRANSFORM</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>TRANSFORMS</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>TRANSLATE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>TRANSLATE_REGEX</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>TRANSLATION</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>TREAT</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>TRIGGER</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>TRIGGER_CATALOG</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>TRIGGER_NAME</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>TRIGGER_SCHEMA</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>TRIM</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>TRIM_ARRAY</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>TRUE</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>TRUNCATE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>TRUSTED</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>TYPE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>TYPES</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>UESCAPE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>UNBOUNDED</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>UNCOMMITTED</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>UNDER</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>UNENCRYPTED</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>UNION</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>UNIQUE</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>UNKNOWN</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>UNLINK</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>UNLISTEN</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>UNLOGGED</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>UNNAMED</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>UNNEST</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>UNTIL</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>UNTYPED</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>UPDATE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>UPPER</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>URI</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>USAGE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>USER</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>USER_DEFINED_TYPE_CATALOG</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>USER_DEFINED_TYPE_CODE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>USER_DEFINED_TYPE_NAME</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>USER_DEFINED_TYPE_SCHEMA</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>USING</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>VACUUM</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>VALID</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>VALIDATE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>VALIDATOR</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>VALUE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>VALUES</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>VALUE_OF</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>VARBINARY</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>VARCHAR</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>VARIADIC</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>VARYING</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>VAR_POP</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>VAR_SAMP</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>VERBOSE</TT
+>
+              </TD
+><TD
+>зарезервировано (допускается функция или тип)</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>VERSION</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>VERSIONING</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>VIEW</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>VIEWS</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>VOLATILE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>WHEN</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>WHENEVER</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>WHERE</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>WHITESPACE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>WIDTH_BUCKET</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>WINDOW</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>WITH</TT
+>
+              </TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>WITHIN</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>WITHOUT</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>WORK</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>WRAPPER</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>WRITE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>XML</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>XMLAGG</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>XMLATTRIBUTES</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>XMLBINARY</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>XMLCAST</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>XMLCOMMENT</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>XMLCONCAT</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>XMLDECLARATION</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>XMLDOCUMENT</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>XMLELEMENT</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>XMLEXISTS</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>XMLFOREST</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>XMLITERATE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>XMLNAMESPACES</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>XMLPARSE</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>XMLPI</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>XMLQUERY</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>XMLROOT</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>XMLSCHEMA</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>XMLSERIALIZE</TT
+>
+              </TD
+><TD
+>не зарезервировано (не допускается функция или тип)</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>XMLTABLE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>XMLTEXT</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>XMLVALIDATE</TT
+>
+              </TD
+><TD
+>&nbsp;</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>YEAR</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>YES</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>                <TT
+CLASS="TOKEN"
+>ZONE</TT
+>
+              </TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>не зарезервировано</TD
+><TD
+>зарезервировано</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="datetime-units-history.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="features.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>История единиц измерения времени</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="appendixes.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Соответствие стандарту SQL</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

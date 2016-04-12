@@ -1,0 +1,886 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>          pg_constraint
+        </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Системные каталоги"
+HREF="catalogs.html"><LINK
+REL="PREVIOUS"
+TITLE="          pg_collation
+        "
+HREF="catalog-pg-collation.html"><LINK
+REL="NEXT"
+TITLE="          pg_conversion
+        "
+HREF="catalog-pg-conversion.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="          pg_collation
+        "
+HREF="catalog-pg-collation.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 48. Системные каталоги</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="          pg_conversion
+        "
+HREF="catalog-pg-conversion.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CATALOG-PG-CONSTRAINT"
+>48.13. <TT
+CLASS="STRUCTNAME"
+>pg_constraint</TT
+></A
+></H1
+><P
+>В каталоге <TT
+CLASS="STRUCTNAME"
+>pg_constraint</TT
+> хранятся ограничения-проверки, ограничения-исключения, а также ограничения первичного ключа, уникальности и внешних ключей, определённые для таблиц. (Ограничения колонок описываются как и все остальные. Любое ограничение колонки равнозначно некоторому ограничению таблицы.) Ограничения на NULL представляются не здесь, а в каталоге <TT
+CLASS="STRUCTNAME"
+>pg_attribute</TT
+>.</P
+><P
+>Для пользовательских триггеров ограничений (создаваемых командой <TT
+CLASS="COMMAND"
+>CREATE CONSTRAINT TRIGGER</TT
+>) в этой таблице также создаётся запись.</P
+><P
+>Здесь также хранятся ограничения доменов.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="AEN96505"
+></A
+><P
+><B
+>Таблица 48-13. Колонки <TT
+CLASS="STRUCTNAME"
+>pg_constraint</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип</TH
+><TH
+>Ссылки</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Идентификатор строки (скрытый атрибут; должен выбираться явно)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>conname</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>name</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Имя ограничения (не обязательно уникальное!)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>connamespace</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-namespace.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_namespace</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>OID пространства имён, содержащего это ограничение</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>contype</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>char</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+><TT
+CLASS="LITERAL"
+>c</TT
+> = ограничение-проверка (check), <TT
+CLASS="LITERAL"
+>f</TT
+> = внешний ключ (foreign key), <TT
+CLASS="LITERAL"
+>p</TT
+> = первичный ключ (primary key), <TT
+CLASS="LITERAL"
+>u</TT
+> = ограничение уникальности (unique), <TT
+CLASS="LITERAL"
+>t</TT
+> = триггер ограничения (trigger), <TT
+CLASS="LITERAL"
+>x</TT
+> = ограничение-исключение (exclusion)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>condeferrable</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Является ли ограничение откладываемым?</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>condeferred</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Является ли ограничение отложенным по умолчанию?</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>convalidated</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Было ли ограничение проверено? В настоящее время значение false возможно только для внешних ключей и ограничений CHECK</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>conrelid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-class.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Таблица, для которой установлено это ограничение; 0, если это не ограничение таблицы</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>contypid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-type.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_type</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Домен, к которому относится это ограничение; 0, если это не ограничение домена</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>conindid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-class.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Индекс, поддерживающий это ограничение, если это ограничение уникальности, первичного или внешнего ключа, либо ограничение-исключение; в противном случае — 0</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>confrelid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-class.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Если это внешний ключ, таблица, на которую он ссылается; иначе 0</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>confupdtype</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>char</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Код действия при изменении внешнего ключа: <TT
+CLASS="LITERAL"
+>a</TT
+> = нет действия, <TT
+CLASS="LITERAL"
+>r</TT
+> = ограничить (restrict), <TT
+CLASS="LITERAL"
+>c</TT
+> = каскадное действие (cascade), <TT
+CLASS="LITERAL"
+>n</TT
+> = присвоить NULL, <TT
+CLASS="LITERAL"
+>d</TT
+> = поведение по умолчанию</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>confdeltype</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>char</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Код действия при удалении внешнего ключа: <TT
+CLASS="LITERAL"
+>a</TT
+> = нет действия, <TT
+CLASS="LITERAL"
+>r</TT
+> = ограничить (restrict), <TT
+CLASS="LITERAL"
+>c</TT
+> = каскадное действие (cascade), <TT
+CLASS="LITERAL"
+>n</TT
+> = присвоить NULL, <TT
+CLASS="LITERAL"
+>d</TT
+> = поведение по умолчанию</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>confmatchtype</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>char</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Тип сопоставления внешнего ключа: <TT
+CLASS="LITERAL"
+>f</TT
+> = полное (full), <TT
+CLASS="LITERAL"
+>p</TT
+> = частичное (partial), <TT
+CLASS="LITERAL"
+>s</TT
+> = простое (simple)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>conislocal</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Ограничение определено локально в данном отношении. Заметьте, что ограничение может быть определено локально и при этом наследоваться.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>coninhcount</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int4</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Число прямых потомков этого ограничения. Ограничение с ненулевым числом потомков нельзя удалить или переименовать.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>connoinherit</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Ограничение определено локально для данного отношения и является ненаследуемым.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>conkey</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int2[]</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-attribute.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_attribute</TT
+></A
+>.attnum</TT
+>
+                </TD
+><TD
+>Для ограничений таблицы (включая внешние ключи, но не триггеры ограничений), определяет список колонок, образующих ограничение</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>confkey</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int2[]</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-attribute.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_attribute</TT
+></A
+>.attnum</TT
+>
+                </TD
+><TD
+>Для внешнего ключа определяет список колонок, на которые он ссылается</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>conpfeqop</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid[]</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-operator.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_operator</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Для внешнего ключа список операторов равенства для сравнений PK = FK</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>conppeqop</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid[]</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-operator.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_operator</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Для внешнего ключа список операторов равенства для сравнений PK = PK</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>conffeqop</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid[]</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-operator.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_operator</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Для внешнего ключа список операторов равенства для сравнений FK = FK</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>conexclop</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid[]</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-operator.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_operator</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Для ограничения-исключения список операторов исключения по колонкам</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>conbin</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>pg_node_tree</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Для ограничения-проверки внутреннее представление выражения</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>consrc</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Для ограничения-проверки понятное человеку представление выражения</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>В случае с ограничением-исключением значение <TT
+CLASS="STRUCTFIELD"
+>conkey</TT
+> полезно только для элементов ограничений, представляющих простые ссылки на колонки. Для других случаев в <TT
+CLASS="STRUCTFIELD"
+>conkey</TT
+> задаётся ноль, и чтобы получить выражение, определяющее ограничение, надо обратиться к соответствующему индексу. (Таким образом, поле <TT
+CLASS="STRUCTFIELD"
+>conkey</TT
+> имеет то же содержимое, что и <TT
+CLASS="STRUCTNAME"
+>pg_index</TT
+>.<TT
+CLASS="STRUCTFIELD"
+>indkey</TT
+> для индекса.)</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Поле <TT
+CLASS="STRUCTFIELD"
+>consrc</TT
+> не меняется при изменении задействованных в выражении объектов; например, в нём не отслеживается переименование колонок. Поэтому лучше не полагаться на него, а воспользоваться функцией <CODE
+CLASS="FUNCTION"
+>pg_get_constraintdef()</CODE
+>, чтобы получить определение ограничения-проверки.</P
+></BLOCKQUOTE
+></DIV
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Поле <TT
+CLASS="LITERAL"
+>pg_class.relchecks</TT
+> должно согласовываться с числом ограничений-проверок, описанных в данной таблице для каждого отношения.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="catalog-pg-collation.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="catalog-pg-conversion.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_collation</TT
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_conversion</TT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

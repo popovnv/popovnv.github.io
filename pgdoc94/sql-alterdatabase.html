@@ -1,0 +1,503 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>ALTER DATABASE</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="ALTER CONVERSION"
+HREF="sql-alterconversion.html"><LINK
+REL="NEXT"
+TITLE="ALTER DEFAULT PRIVILEGES"
+HREF="sql-alterdefaultprivileges.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="ALTER CONVERSION"
+HREF="sql-alterconversion.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="ALTER DEFAULT PRIVILEGES"
+HREF="sql-alterdefaultprivileges.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-ALTERDATABASE"
+></A
+>ALTER DATABASE</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN66920"
+></A
+><H2
+>Название</H2
+>ALTER DATABASE&nbsp;--&nbsp;изменить атрибуты базы данных</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN66923"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>ALTER DATABASE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> [ [ WITH ] <TT
+CLASS="REPLACEABLE"
+><I
+>параметр</I
+></TT
+> [ ... ] ]
+
+<SPAN
+CLASS="phrase"
+><SPAN
+CLASS="PHRASE"
+>Здесь <TT
+CLASS="REPLACEABLE"
+><I
+>параметр</I
+></TT
+>:</SPAN
+></SPAN
+>
+
+    CONNECTION LIMIT <TT
+CLASS="REPLACEABLE"
+><I
+>предел_подключений</I
+></TT
+>
+
+ALTER DATABASE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> RENAME TO <TT
+CLASS="REPLACEABLE"
+><I
+>новое_имя</I
+></TT
+>
+
+ALTER DATABASE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> OWNER TO <TT
+CLASS="REPLACEABLE"
+><I
+>новый_владелец</I
+></TT
+>
+
+ALTER DATABASE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> SET TABLESPACE <TT
+CLASS="REPLACEABLE"
+><I
+>новое_табл_пространство</I
+></TT
+>
+
+ALTER DATABASE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> SET <TT
+CLASS="REPLACEABLE"
+><I
+>параметр_конфигурации</I
+></TT
+> { TO | = } { <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> | DEFAULT }
+ALTER DATABASE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> SET <TT
+CLASS="REPLACEABLE"
+><I
+>параметр_конфигурации</I
+></TT
+> FROM CURRENT
+ALTER DATABASE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> RESET <TT
+CLASS="REPLACEABLE"
+><I
+>параметр_конфигурации</I
+></TT
+>
+ALTER DATABASE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> RESET ALL</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN66944"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>ALTER DATABASE</TT
+> изменяет атрибуты базы данных.</P
+><P
+>Первая форма оператора меняет параметры на уровне базы данных. (Подробнее описано ниже.) Изменять эти параметры может только владелец базы данных или суперпользователь.</P
+><P
+>Вторая форма меняет имя базы данных. Переименовать базу данных может только владелец БД или суперпользователь (не суперпользователю требуется также право <TT
+CLASS="LITERAL"
+>CREATEDB</TT
+>). Переименовать текущую базу данных нельзя. (Если вам нужно сделать это, сначала подключитесь к другой базе.)</P
+><P
+>Третья форма меняет владельца базы данных. Чтобы сменить владельца базы, необходимо быть её владельцем и также непосредственным или опосредованным членом новой роли-владельца, и кроме того, иметь право <TT
+CLASS="LITERAL"
+>CREATEDB</TT
+>. (Заметьте, что суперпользователи наделяются всеми этими правами автоматически.)</P
+><P
+>Четвёртая форма меняет основное табличное пространство базы данных (табличное пространство по умолчанию). Произвести это изменение может только её владелец или суперпользователь; кроме того, необходимо иметь право для создания нового табличного пространства. Эта команда физически переносит все таблицы или индексы из прежнего основного табличного пространства БД в новое. Заметьте, что таблицы и индексы, находящиеся не в основном табличном пространстве, при этом не затрагиваются.</P
+><P
+>Остальные формы меняют значение по умолчанию конфигурационных переменных времени выполнения для базы данных <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Когда устанавливается следующий сеанс работы с указанной базой данных, заданное этой командой значение становится значением по умолчанию. Значения переменных, заданные для базы данных, переопределяют значения, определённые в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+> или полученные через командную строку <TT
+CLASS="COMMAND"
+>postgres</TT
+>. Менять сеансовые значения переменных для базы данных может только её владелец или суперпользователь. Некоторые параметры изменить таким образом нельзя, а некоторые может изменить только суперпользователь.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN66958"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></DT
+><DD
+><P
+>Имя базы данных, атрибуты которой изменяются.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>предел_подключений</I
+></TT
+></DT
+><DD
+><P
+>Число разрешённых одновременно подключений к этой базе данных (-1 снимает ограничение).</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>новое_имя</I
+></TT
+></DT
+><DD
+><P
+>Новое имя базы данных.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>новый_владелец</I
+></TT
+></DT
+><DD
+><P
+>Новый владелец базы данных.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>новое_табл_пространство</I
+></TT
+></DT
+><DD
+><P
+>Новое основное табличное пространство базы данных.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>параметр_конфигурации</I
+></TT
+><BR><TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+></DT
+><DD
+><P
+>Устанавливает сеансовое значение по умолчанию для указанного параметра конфигурации. Если указывается <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> <TT
+CLASS="LITERAL"
+>DEFAULT</TT
+> или равнозначный вариант, <TT
+CLASS="LITERAL"
+>RESET</TT
+>, определение параметра на уровне базы данных удаляется, так что в новых сеансах будет действовать значение по умолчанию, определённое на уровне системы. Для очистки всех значений параметров на уровне базы данных выполните <TT
+CLASS="LITERAL"
+>RESET ALL</TT
+>. <TT
+CLASS="LITERAL"
+>SET FROM CURRENT</TT
+> устанавливает значение параметра на уровне базы данных из текущего значения в активном сеансе.</P
+><P
+>За подробными сведениями об именах и значениях параметров обратитесь к <A
+HREF="sql-set.html"
+>SET</A
+> и <A
+HREF="runtime-config.html"
+>Главе 18</A
+>.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN67001"
+></A
+><H2
+>Замечания</H2
+><P
+>Также возможно связать параметры сеанса не с базой данных, а с определённой ролью; см. <A
+HREF="sql-alterrole.html"
+>ALTER ROLE</A
+>. В случае конфликта параметры на уровне роли переопределяют параметры на уровне базы данных.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN67005"
+></A
+><H2
+>Примеры</H2
+><P
+>Отключение сканирования индекса по умолчанию в базе данных <TT
+CLASS="LITERAL"
+>test</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER DATABASE test SET enable_indexscan TO off;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN67010"
+></A
+><H2
+>Совместимость</H2
+><P
+>Оператор <TT
+CLASS="COMMAND"
+>ALTER DATABASE</TT
+> является расширением <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN67015"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-createdatabase.html"
+>CREATE DATABASE</A
+>, <A
+HREF="sql-dropdatabase.html"
+>DROP DATABASE</A
+>, <A
+HREF="sql-set.html"
+>SET</A
+>, <A
+HREF="sql-createtablespace.html"
+>CREATE TABLESPACE</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-alterconversion.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-alterdefaultprivileges.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>ALTER CONVERSION</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>ALTER DEFAULT PRIVILEGES</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

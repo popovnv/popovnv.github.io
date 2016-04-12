@@ -1,0 +1,647 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Функции для метода доступа индекса</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Определение интерфейса для методов доступа индекса"
+HREF="indexam.html"><LINK
+REL="PREVIOUS"
+TITLE="Записи каталога для индексов"
+HREF="index-catalog.html"><LINK
+REL="NEXT"
+TITLE="Сканирование индекса"
+HREF="index-scanning.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Записи каталога для индексов"
+HREF="index-catalog.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="indexam.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 55. Определение интерфейса для методов доступа индекса</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Сканирование индекса"
+HREF="index-scanning.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="INDEX-FUNCTIONS"
+>55.2. Функции для метода доступа индекса</A
+></H1
+><P
+>Метод доступа индекса должен реализовывать следующие функции построения и обслуживания индексов:</P
+><P
+></P><PRE
+CLASS="PROGRAMLISTING"
+>IndexBuildResult *
+ambuild (Relation heapRelation,
+         Relation indexRelation,
+         IndexInfo *indexInfo);</PRE
+><P> Строит новый индекс. Отношение индекса уже физически создано, но пока пусто. Оно должно быть наполнено фиксированными данными, которые требуются методу доступа, и записями для всех кортежей, уже существующих в таблице. Обычно функция <CODE
+CLASS="FUNCTION"
+>ambuild</CODE
+> вызывает <CODE
+CLASS="FUNCTION"
+>IndexBuildHeapScan()</CODE
+> для поиска в таблице существующих кортежей и для вычисления ключей, которые должны вставляться в этот индекс. Эта функция должна возвращать структуру, выделенную вызовом palloc и содержащую статистику нового индекса.</P
+><P
+></P><PRE
+CLASS="PROGRAMLISTING"
+>void
+ambuildempty (Relation indexRelation);</PRE
+><P> Создаёт пустой индекс и записывает его в слой инициализации (<TT
+CLASS="SYMBOL"
+>INIT_FORKNUM</TT
+>) данного отношения. Этот метод вызывается только для нежурналируемых таблиц; пустой индекс, записанный в слой инициализации, будет копироваться в основной слой отношения при каждом перезапуске сервера.</P
+><P
+></P><PRE
+CLASS="PROGRAMLISTING"
+>bool
+aminsert (Relation indexRelation,
+          Datum *values,
+          bool *isnull,
+          ItemPointer heap_tid,
+          Relation heapRelation,
+          IndexUniqueCheck checkUnique);</PRE
+><P> Вставляет новый кортеж в существующий индекс. В массивах <TT
+CLASS="LITERAL"
+>values</TT
+> и <TT
+CLASS="LITERAL"
+>isnull</TT
+> передаются значения ключа, которые должны быть проиндексированы, а в <TT
+CLASS="LITERAL"
+>heap_tid</TT
+> — идентификатор (TID) индексируемого кортежа. Если метод доступ поддерживает уникальные индексы (его флаг <TT
+CLASS="STRUCTNAME"
+>pg_am</TT
+>.<TT
+CLASS="STRUCTFIELD"
+>amcanunique</TT
+> установлен), параметр <TT
+CLASS="LITERAL"
+>checkUnique</TT
+> указывает, какая проверка уникальности должна выполняться. Это зависит от того, является ли ограничение уникальности откладываемым; за подробностями обратитесь к <A
+HREF="index-unique-checks.html"
+>Разделу 55.5</A
+>. Обычно параметр <TT
+CLASS="LITERAL"
+>heapRelation</TT
+> нужен методу доступа только для проверки уникальности (так как он должен обратиться к основным данным, чтобы убедиться в актуальности кортежа).</P
+><P
+>Возвращаемый функцией булевский результат имеет значение, только когда параметр <TT
+CLASS="LITERAL"
+>checkUnique</TT
+> равен <TT
+CLASS="LITERAL"
+>UNIQUE_CHECK_PARTIAL</TT
+>. В этом случае результат TRUE означает, что новая запись признана уникальной, тогда как FALSE означает, что она может быть неуникальной (и требуется назначить отложенную проверку уникальности). В других случаях рекомендуется возвращать постоянный результат FALSE.</P
+><P
+>Некоторые индексы могут индексировать не все кортежи. Если кортеж не будет индексирован, <CODE
+CLASS="FUNCTION"
+>aminsert</CODE
+> должна просто завершиться, не делая ничего.</P
+><P
+></P><PRE
+CLASS="PROGRAMLISTING"
+>IndexBulkDeleteResult *
+ambulkdelete (IndexVacuumInfo *info,
+              IndexBulkDeleteResult *stats,
+              IndexBulkDeleteCallback callback,
+              void *callback_state);</PRE
+><P> Удаляет кортеж(и) из индекса. Это операция <SPAN
+CLASS="QUOTE"
+>"массового удаления"</SPAN
+>, которая предположительно будет реализована путём сканирования всего индекса и проверки для каждой записи, должна ли она удаляться. Переданная функция <TT
+CLASS="LITERAL"
+>callback</TT
+> должна вызываться в стиле <TT
+CLASS="LITERAL"
+>callback(<TT
+CLASS="REPLACEABLE"
+><I
+>TID</I
+></TT
+>, callback_state)</TT
+> с результатом bool, который говорит, должна ли удаляться запись индекса, на которую указывает передаваемый TID. Возвращать эта функция должна NULL или структуру, выделенную вызовом palloc и содержащую статистику результата удаления. NULL можно вернуть, если никакая информация не должна передаваться в <CODE
+CLASS="FUNCTION"
+>amvacuumcleanup</CODE
+>.</P
+><P
+>Из-за ограничения <TT
+CLASS="VARNAME"
+>maintenance_work_mem</TT
+> процедура <CODE
+CLASS="FUNCTION"
+>ambulkdelete</CODE
+> может вызываться несколько раз, когда удалению подлежит большое количество кортежей. В аргументе <TT
+CLASS="LITERAL"
+>stats</TT
+> передаётся результат предыдущего вызова для данного индекса (при первом вызове в ходе операции <TT
+CLASS="COMMAND"
+>VACUUM</TT
+> он содержит NULL). Это позволяет методу доступа накапливать статистику в процессе всей операции. Обычно <CODE
+CLASS="FUNCTION"
+>ambulkdelete</CODE
+> модифицирует и возвращает одну и ту же структуру, если в <TT
+CLASS="LITERAL"
+>stats</TT
+> передаётся не NULL.</P
+><P
+></P><PRE
+CLASS="PROGRAMLISTING"
+>IndexBulkDeleteResult *
+amvacuumcleanup (IndexVacuumInfo *info,
+                 IndexBulkDeleteResult *stats);</PRE
+><P> Провести очистку после операции <TT
+CLASS="COMMAND"
+>VACUUM</TT
+> (до этого <CODE
+CLASS="FUNCTION"
+>ambulkdelete</CODE
+> могла вызываться несколько или ноль раз). От этой функции не требуется ничего, кроме как выдать статистику по индексу, но она может произвести массовую очистку, например, высвободить пустые страницы индекса. В <TT
+CLASS="LITERAL"
+>stats</TT
+> ей передаётся структура, возвращённая при последнем вызове <CODE
+CLASS="FUNCTION"
+>ambulkdelete</CODE
+>, либо NULL, если <CODE
+CLASS="FUNCTION"
+>ambulkdelete</CODE
+> не вызывалась, так как никакие кортежи удалять не требовалось. Эта функция должна возвращать NULL или структуру, выделенную вызовом palloc. Содержащаяся в этой структуре статистика будет отражена в записи в <TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+> и попадёт в вывод команды <TT
+CLASS="COMMAND"
+>VACUUM</TT
+>, если она выполнялась с указанием <TT
+CLASS="LITERAL"
+>VERBOSE</TT
+>. NULL может возвращаться, если индекс вовсе не изменился в процессе операции <TT
+CLASS="COMMAND"
+>VACUUM</TT
+>, но в противном случае должна возвращаться корректная статистика.</P
+><P
+>Начиная с <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> версии 8.4, <CODE
+CLASS="FUNCTION"
+>amvacuumcleanup</CODE
+> также вызывается в конце операции <TT
+CLASS="COMMAND"
+>ANALYZE</TT
+>. В этом случае <TT
+CLASS="LITERAL"
+>stats</TT
+> всегда NULL и любое возвращаемое значение игнорируется. Этот вариант вызова можно распознать, проверив поле <TT
+CLASS="LITERAL"
+>info-&gt;analyze_only</TT
+>. При таком вызове методу доступа рекомендуется ничего не делать, кроме как провести очистку после добавления данных, и только в рабочем процессе автоочистки.</P
+><P
+></P><PRE
+CLASS="PROGRAMLISTING"
+>bool
+amcanreturn (Relation indexRelation);</PRE
+><P> Проверяет, поддерживается ли <I
+CLASS="FIRSTTERM"
+>сканирование только индекса</I
+>, когда для записи индекса возвращаются значения индексируемых колонок в виде <TT
+CLASS="STRUCTNAME"
+>IndexTuple</TT
+>. Должна вернуть TRUE, если такое сканирование поддерживается, и FALSE в противном случае. Если метод доступа индекса принципиально не поддерживает сканирование только индекса (как например, индексы по хешу, в которых хранятся только хешированные значения, а не исходные данные), достаточно обнулить флаг <TT
+CLASS="STRUCTFIELD"
+>amcanreturn</TT
+> в <TT
+CLASS="STRUCTNAME"
+>pg_am</TT
+>.</P
+><P
+></P><PRE
+CLASS="PROGRAMLISTING"
+>void
+amcostestimate (PlannerInfo *root,
+                IndexPath *path,
+                double loop_count,
+                Cost *indexStartupCost,
+                Cost *indexTotalCost,
+                Selectivity *indexSelectivity,
+                double *indexCorrelation);</PRE
+><P> Рассчитывает примерную стоимость сканирования индекса. Эта функция полностью описывается ниже в <A
+HREF="index-cost-estimation.html"
+>Разделе 55.6</A
+>.</P
+><P
+></P><PRE
+CLASS="PROGRAMLISTING"
+>bytea *
+amoptions (ArrayType *reloptions,
+           bool validate);</PRE
+><P> Разбирает и проверяет массив параметров для индекса. Эта функция вызывается, только когда для индекса задан отличный от NULL массив reloptions. Массив <TT
+CLASS="PARAMETER"
+>reloptions</TT
+> состоит из элементов типа <TT
+CLASS="TYPE"
+>text</TT
+>, содержащих записи вида <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+><TT
+CLASS="LITERAL"
+>=</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+>. Данная функция должна получить значение типа <TT
+CLASS="TYPE"
+>bytea</TT
+>, которое будет скопировано в поле <TT
+CLASS="STRUCTFIELD"
+>rd_options</TT
+> записи индекса в relcache. Содержимое этого значения <TT
+CLASS="TYPE"
+>bytea</TT
+> определяется самим методом доступа; большинство стандартных методов доступа помещают в него структуру <TT
+CLASS="STRUCTNAME"
+>StdRdOptions</TT
+>. Когда параметр <TT
+CLASS="PARAMETER"
+>validate</TT
+> равен true, эта функция должна выдать подходящее сообщение об ошибке, если какие-либо параметры нераспознаны или имеют недопустимые значения; если же <TT
+CLASS="PARAMETER"
+>validate</TT
+> равен false, некорректные записи должны просто игнорироваться. (В <TT
+CLASS="PARAMETER"
+>validate</TT
+> передаётся false, когда параметры уже загружены в <TT
+CLASS="STRUCTNAME"
+>pg_catalog</TT
+>; при этом неверная запись может быть обнаружена, только если в методе доступа поменялись правила обработки параметров, и в этом случае стоит просто игнорировать такие записи.) NULL можно вернуть, когда нужно получить поведение по умолчанию.</P
+><P
+>Цель индекса, конечно, в том, чтобы поддерживать поиск кортежей, соответствующих индексируемому условию <TT
+CLASS="LITERAL"
+>WHERE</TT
+>, по <I
+CLASS="FIRSTTERM"
+>ограничению</I
+> или <I
+CLASS="FIRSTTERM"
+>ключу поиска</I
+>. Сканирование индекса описывается более полно ниже, в <A
+HREF="index-scanning.html"
+>Разделе 55.3</A
+>. Метод доступа индекса может поддерживать <SPAN
+CLASS="QUOTE"
+>"простое"</SPAN
+> сканирование, сканирование по <SPAN
+CLASS="QUOTE"
+>"битовой карте"</SPAN
+> или и то, и другое. Метод доступа должен или может реализовывать следующие функции, связанные со сканированием:</P
+><P
+></P><PRE
+CLASS="PROGRAMLISTING"
+>IndexScanDesc
+ambeginscan (Relation indexRelation,
+             int nkeys,
+             int norderbys);</PRE
+><P> Подготавливает метод к сканированию индекса. В параметрах <TT
+CLASS="LITERAL"
+>nkeys</TT
+> и <TT
+CLASS="LITERAL"
+>norderbys</TT
+> задаётся количество операторов условия и сортировки, которые будут задействованы при сканировании; это может быть полезно для выделения памяти. Заметьте, что фактические значения ключей сканирования в этот момент ещё не предоставляются. В результате функция должна выдать структуру, выделенную средствами palloc. В связи с особенностями реализации, метод доступа <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>должен</I
+></SPAN
+> создать эту структуру, вызвав <CODE
+CLASS="FUNCTION"
+>RelationGetIndexScan()</CODE
+>. В большинстве случаев все действия <CODE
+CLASS="FUNCTION"
+>ambeginscan</CODE
+> сводятся только к выполнению этого вызова и, возможно, получению блокировок; всё самое интересное при запуске сканирования индекса происходит в <CODE
+CLASS="FUNCTION"
+>amrescan</CODE
+>.</P
+><P
+></P><PRE
+CLASS="PROGRAMLISTING"
+>void
+amrescan (IndexScanDesc scan,
+          ScanKey keys,
+          int nkeys,
+          ScanKey orderbys,
+          int norderbys);</PRE
+><P> Запускает или перезапускает сканирование индекса, возможно, с новыми ключами сканирования. (Для перезапуска сканирования с ранее переданными ключами в <TT
+CLASS="LITERAL"
+>keys</TT
+> и/или <TT
+CLASS="LITERAL"
+>orderbys</TT
+> передаётся NULL.) Заметьте, что количество ключей или операторов сортировки не может превышать значения, поступившие в <CODE
+CLASS="FUNCTION"
+>ambeginscan</CODE
+>. На практике возможность перезапуска используется, когда в соединении со вложенным циклом выбирается новый внешний кортеж, так что требуется сравнение с новым ключом, но структура ключей сканирования не меняется.</P
+><P
+></P><PRE
+CLASS="PROGRAMLISTING"
+>boolean
+amgettuple (IndexScanDesc scan,
+            ScanDirection direction);</PRE
+><P> Выбирает следующий кортеж в ходе данного сканирования, с передвижением по индексу в заданном направлении (вперёд или назад). Возвращает TRUE, если кортеж был получен, или FALSE, если подходящих кортежей не осталось. В случае успеха в структуре <TT
+CLASS="LITERAL"
+>scan</TT
+> сохраняется TID кортежа. Заметьте, что под <SPAN
+CLASS="QUOTE"
+>"успехом"</SPAN
+> здесь подразумевается только, что индекс содержит запись, соответствующую ключам сканирования, а не то, что данный кортеж обязательно существует в данных или оказывается видимым в снимке вызывающего субъекта. При положительном результате <CODE
+CLASS="FUNCTION"
+>amgettuple</CODE
+> должна также установить для свойства <TT
+CLASS="LITERAL"
+>scan-&gt;xs_recheck</TT
+> значение TRUE или FALSE. FALSE будет означать, что запись индекса точно соответствует ключам сканирования, а TRUE, что есть сомнение в этом, так что условия, представленные ключами сканирования, необходимо ещё раз перепроверить для фактического кортежа, когда он будет получен. Это свойство введено для поддержки <SPAN
+CLASS="QUOTE"
+>"неточных"</SPAN
+> операторов индексов. Заметьте, что такая перепроверка касается только условий сканирования; предикат частичного индекса (если он имеется) никогда не перепроверяется кодом, вызывающим <CODE
+CLASS="FUNCTION"
+>amgettuple</CODE
+>.</P
+><P
+>Если индекс поддерживает сканирование только индекса (то есть, <CODE
+CLASS="FUNCTION"
+>amcanreturn</CODE
+> выдаёт для него TRUE), то в случае успеха метод доступа должен также проверить флаг <TT
+CLASS="LITERAL"
+>scan-&gt;xs_want_itup</TT
+> и, если он установлен, должен вернуть исходные индексированные данные для этой записи индекса, в виде указателя на <TT
+CLASS="STRUCTNAME"
+>IndexTuple</TT
+>, сохранённого в <TT
+CLASS="LITERAL"
+>scan-&gt;xs_itup</TT
+>, и дескриптор кортежа <TT
+CLASS="LITERAL"
+>scan-&gt;xs_itupdesc</TT
+>. (Контролировать структуру данных, на которую указывает этот указатель, должен сам метод доступа. Она должна сохраняться в рабочем состоянии как минимум до следующего вызова <CODE
+CLASS="FUNCTION"
+>amgettuple</CODE
+>, <CODE
+CLASS="FUNCTION"
+>amrescan</CODE
+> или <CODE
+CLASS="FUNCTION"
+>amendscan</CODE
+> в процессе текущего сканирования.)</P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>amgettuple</CODE
+> должна реализовываться, только если метод доступа поддерживает <SPAN
+CLASS="QUOTE"
+>"простое"</SPAN
+> сканирование индекса. В противном случае поле <TT
+CLASS="STRUCTFIELD"
+>amgettuple</TT
+> в соответствующей строке <TT
+CLASS="STRUCTNAME"
+>pg_am</TT
+> должно содержать ноль.</P
+><P
+></P><PRE
+CLASS="PROGRAMLISTING"
+>int64
+amgetbitmap (IndexScanDesc scan,
+             TIDBitmap *tbm);</PRE
+><P> Выбирает все кортежи для данного сканирования и добавляет их в передаваемую вызывающим кодом структуру <TT
+CLASS="TYPE"
+>TIDBitmap</TT
+> (то есть, получает логическое объединение множества TID выбранных кортежей с множеством, уже записанным в битовой карте). Возвращает эта функция число полученных кортежей (это может быть только приблизительная оценка; например, некоторые методы доступа не учитывают повторяющиеся значения). Добавляя идентификаторы кортежей в битовую карту, <CODE
+CLASS="FUNCTION"
+>amgetbitmap</CODE
+> может обозначить, что для этих кортежей нужно перепроверить условия сканирования. Для этого так же, как и в <CODE
+CLASS="FUNCTION"
+>amgettuple</CODE
+>, устанавливается выходной параметр <TT
+CLASS="LITERAL"
+>xs_recheck</TT
+>. Замечание: в текущей реализации эта возможность увязывается с возможностью неточного хранения самих битовых карт, таким образом вызывающий код перепроверяет для отмеченных кортежей и условия сканирования, и предикат частичного индекса (если он имеется). Однако так может быть не всегда. Функции <CODE
+CLASS="FUNCTION"
+>amgetbitmap</CODE
+> и <CODE
+CLASS="FUNCTION"
+>amgettuple</CODE
+> не могут использоваться в одном сканировании индекса; есть и другие ограничения в применении <CODE
+CLASS="FUNCTION"
+>amgetbitmap</CODE
+>, описанные в <A
+HREF="index-scanning.html"
+>Разделе 55.3</A
+>.</P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>amgetbitmap</CODE
+> должна реализовываться, только если метод доступа поддерживает сканирование индекса <SPAN
+CLASS="QUOTE"
+>"по битовой карте"</SPAN
+>. В противном случае поле <TT
+CLASS="STRUCTFIELD"
+>amgetbitmap</TT
+> в соответствующей строке <TT
+CLASS="STRUCTNAME"
+>pg_am</TT
+> должно содержать ноль.</P
+><P
+></P><PRE
+CLASS="PROGRAMLISTING"
+>void
+amendscan (IndexScanDesc scan);</PRE
+><P> Завершает сканирование и освобождает ресурсы. Саму структуру <TT
+CLASS="LITERAL"
+>scan</TT
+> освобождать не следует, но любые блокировки или закрепления объектов, установленные внутри метода доступа, должны быть сняты.</P
+><P
+></P><PRE
+CLASS="PROGRAMLISTING"
+>void
+ammarkpos (IndexScanDesc scan);</PRE
+><P> Помечает текущую позицию сканирования. Метод доступа должен поддерживать сохранение только одной позиции в процессе сканирования.</P
+><P
+></P><PRE
+CLASS="PROGRAMLISTING"
+>void
+amrestrpos (IndexScanDesc scan);</PRE
+><P> Восстанавливает позицию сканирования, отмеченную последней.</P
+><P
+>По соглашению запись в <TT
+CLASS="LITERAL"
+>pg_proc</TT
+> для реализующей функции метода доступа должна описывать корректное число аргументов, но все они должны быть объявлены с типом <TT
+CLASS="TYPE"
+>internal</TT
+> (так как типы большинства аргументов неизвестны SQL, и нам всё равно не нужно, чтобы пользователи вызывали эти функции). В качестве возвращаемого типа выбирается <TT
+CLASS="TYPE"
+>void</TT
+>, <TT
+CLASS="TYPE"
+>internal</TT
+> или <TT
+CLASS="TYPE"
+>boolean</TT
+>, в соответствии с реальным типом. Единственным исключением является функция <CODE
+CLASS="FUNCTION"
+>amoptions</CODE
+>, которая должна корректно объявляться как принимающая параметры <TT
+CLASS="TYPE"
+>text[]</TT
+> и <TT
+CLASS="TYPE"
+>bool</TT
+> и возвращающая <TT
+CLASS="TYPE"
+>bytea</TT
+>. Благодаря этому, клиентский код сможет вызывать <CODE
+CLASS="FUNCTION"
+>amoptions</CODE
+>, чтобы проверить правильность параметров.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="index-catalog.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="index-scanning.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Записи каталога для индексов</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="indexam.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Сканирование индекса</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

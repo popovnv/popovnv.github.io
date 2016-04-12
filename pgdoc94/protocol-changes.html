@@ -1,0 +1,251 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Сводка изменений по сравнению с протоколом версии 2.0</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Клиент-серверный протокол"
+HREF="protocol.html"><LINK
+REL="PREVIOUS"
+TITLE="Поля сообщений с ошибками и замечаниями"
+HREF="protocol-error-fields.html"><LINK
+REL="NEXT"
+TITLE="Соглашения по оформлению кода PostgreSQL"
+HREF="source.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Поля сообщений с ошибками и замечаниями"
+HREF="protocol-error-fields.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="protocol.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 49. Клиент-серверный протокол</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Соглашения по оформлению кода PostgreSQL"
+HREF="source.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="PROTOCOL-CHANGES"
+>49.7. Сводка изменений по сравнению с протоколом версии 2.0</A
+></H1
+><P
+>В этом разделе представлен краткий список изменений к сведению разработчиков, желающих модернизировать существующие клиентские библиотеки до протокола 3.0.</P
+><P
+>В начальном стартовом пакете вместо фиксированного формата применяется гибкий формат списка строк. Заметьте, что теперь сеансовые значения по умолчанию для параметров времени выполнения можно задать непосредственно в стартовом пакете. (Вообще, это можно было делать и раньше, используя поле <TT
+CLASS="LITERAL"
+>options</TT
+>, но из-за ограниченного размера <TT
+CLASS="LITERAL"
+>options</TT
+> и невозможности задавать значения с пробелами, это вариант был не очень безопасным.)</P
+><P
+>Во всех сообщениях непосредственно за байтом типа сообщения следует счётчик длины (за исключением стартовых пакетов, в которых нет байта типа). Также заметьте, что байт типа теперь есть в сообщении PasswordMessage.</P
+><P
+>Сообщения ErrorResponse и NoticeResponse ('<TT
+CLASS="LITERAL"
+>E</TT
+>' и '<TT
+CLASS="LITERAL"
+>N</TT
+>') могут содержать несколько полей, из которых клиентский код может собрать сообщение об ошибке желаемого уровня детализации. Заметьте, что текст отдельных полей обычно не завершается новой строкой, тогда как в старом протоколе одиночная строка всегда завершалась так.</P
+><P
+>Сообщение ReadyForQuery ('<TT
+CLASS="LITERAL"
+>Z</TT
+>') включает индикатор статуса транзакции.</P
+><P
+>Различие между типами данных BinaryRow и DataRow ушло; один тип сообщений DataRow позволяет возвращать данные во всех форматах. Заметьте, что формат DataRow был изменён для упрощения его разбора. Также изменилось представление двоичных значений: оно больше не привязано к внутреннему представлению сервера.</P
+><P
+>В протоколе появился новый подраздел <SPAN
+CLASS="QUOTE"
+>"расширенный запрос"</SPAN
+>, в котором добавлены типы сообщений для команд Parse, Bind, Execute, Describe, Close, Flush и Sync, а также типы серверных сообщений ParseComplete, BindComplete, PortalSuspended, ParameterDescription, NoData и CloseComplete. Существующие клиенты могут не подстраиваться под этот раздел протокола, но если они задействует его, это позволит улучшить производительность или функциональность.</P
+><P
+>Данные <TT
+CLASS="COMMAND"
+>COPY</TT
+> теперь внедряются в сообщения CopyData и CopyDone. Есть чётко определённый способ восстановить работу в случае ошибок в процессе <TT
+CLASS="COMMAND"
+>COPY</TT
+>. Специальная последняя строка <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>\.</TT
+>"</SPAN
+> больше не нужна, она не передаётся при выполнении <TT
+CLASS="COMMAND"
+>COPY OUT</TT
+>. (Она по-прежнему воспринимается как завершающая последовательность в потоке <TT
+CLASS="COMMAND"
+>COPY IN</TT
+>, но это считается устаревшим способом завершения, и в конце концов он будет исключён.) Поддерживается <TT
+CLASS="COMMAND"
+>COPY</TT
+> в двоичном режиме. Сообщения CopyInResponse и CopyOutResponse включают поля, определяющие число колонок и формат каждой колонки.</P
+><P
+>Изменилась структура сообщений FunctionCall и FunctionCallResponse. Сообщение FunctionCall теперь позволяет передавать функциям аргументы NULL. Ещё в нём могут передаваться параметры и получаться результаты в текстовом или двоичном формате. Не осталось повода считать сообщение FunctionCall потенциально небезопасным, так как оно не даёт прямого доступа к внутренней презентации данных на сервере.</P
+><P
+>Сервер отправляет сообщения ParameterStatus ('<TT
+CLASS="LITERAL"
+>S</TT
+>') при попытке подключения для всех параметров, которые он считает интересными для клиентской библиотеки. Как следствие, при любом изменении активного значения одного из этих параметров также выдаётся сообщение ParameterStatus.</P
+><P
+>Сообщение RowDescription ('<TT
+CLASS="LITERAL"
+>T</TT
+>') содержит поля с OID таблицы и номером колонки для каждой колонки описываемой строки. В нём также передаётся код формата для каждой колонки.</P
+><P
+>Сервер более не выдаёт сообщение CursorResponse ('<TT
+CLASS="LITERAL"
+>P</TT
+>').</P
+><P
+>В сообщении NotificationResponse ('<TT
+CLASS="LITERAL"
+>A</TT
+>') добавилось ещё одно строковое поле, в котором может передаваться строка <SPAN
+CLASS="QUOTE"
+>"сообщения"</SPAN
+> от отправителя события <TT
+CLASS="COMMAND"
+>NOTIFY</TT
+>.</P
+><P
+>Раньше сообщение EmptyQueryResponse ('<TT
+CLASS="LITERAL"
+>I</TT
+>') включало пустой строковый параметр; теперь он ликвидирован.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="protocol-error-fields.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="source.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Поля сообщений с ошибками и замечаниями</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="protocol.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Соглашения по оформлению кода PostgreSQL</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

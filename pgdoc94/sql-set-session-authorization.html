@@ -1,0 +1,320 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>SET SESSION AUTHORIZATION</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="SET ROLE"
+HREF="sql-set-role.html"><LINK
+REL="NEXT"
+TITLE="SET TRANSACTION"
+HREF="sql-set-transaction.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="SET ROLE"
+HREF="sql-set-role.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="SET TRANSACTION"
+HREF="sql-set-transaction.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-SET-SESSION-AUTHORIZATION"
+></A
+>SET SESSION AUTHORIZATION</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN84623"
+></A
+><H2
+>Название</H2
+>SET SESSION AUTHORIZATION&nbsp;--&nbsp;установить идентификатор пользователя сеанса и идентификатор текущего пользователя в рамках сеанса</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN84626"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>SET [ SESSION | LOCAL ] SESSION AUTHORIZATION <TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+>
+SET [ SESSION | LOCAL ] SESSION AUTHORIZATION DEFAULT
+RESET SESSION AUTHORIZATION</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN84629"
+></A
+><H2
+>Описание</H2
+><P
+>Эта команда меняет идентификатор пользователя сеанса и идентификатор текущего пользователя в рамках активного сеанса SQL на <TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+>. Имя пользователя может быть записано в виде идентификатора или строковой константы. С помощью этой команды, можно, например, временно переключиться на непривилегированного пользователя, сохранив возможность затем стать суперпользователем.</P
+><P
+>Идентификатором пользователя сеанса изначально принимается имя пользователя, введённое клиентом (возможно, прошедшее проверку подлинности). Идентификатор текущего пользователя обычно совпадает с идентификатором пользователя сеанса, но может временно меняться в функциях с характеристикой <TT
+CLASS="LITERAL"
+>SECURITY DEFINER</TT
+> и подобными механизмами; также его можно изменить командой <A
+HREF="sql-set-role.html"
+>SET ROLE</A
+>. Идентификатор текущего пользователя принимается во внимание при проверке разрешений.</P
+><P
+>Идентификатор пользователя сеанса можно изменить, только если начальный пользователь сеанса (<I
+CLASS="FIRSTTERM"
+>аутентифицированный пользователь</I
+>) имеет права суперпользователя. В противном случае эта команда разрешается, только если в ней указывается имя аутентифицированного пользователя.</P
+><P
+>Указания <TT
+CLASS="LITERAL"
+>SESSION</TT
+> и <TT
+CLASS="LITERAL"
+>LOCAL</TT
+> действуют на эту команду так же, как и на обычную команду <A
+HREF="sql-set.html"
+>SET</A
+>.</P
+><P
+>Формы <TT
+CLASS="LITERAL"
+>DEFAULT</TT
+> и <TT
+CLASS="LITERAL"
+>RESET</TT
+> сбрасывают идентификаторы текущего пользователя и пользователя сеанса, так что текущим становится пользователь, изначально проходивший проверку подлинности. Эти формы могут выполняться любым пользователем.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN84645"
+></A
+><H2
+>Замечания</H2
+><P
+><TT
+CLASS="COMMAND"
+>SET SESSION AUTHORIZATION</TT
+> нельзя использовать в функции с характеристикой <TT
+CLASS="LITERAL"
+>SECURITY DEFINER</TT
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN84650"
+></A
+><H2
+>Примеры</H2
+><PRE
+CLASS="PROGRAMLISTING"
+>SELECT SESSION_USER, CURRENT_USER;
+
+ session_user | current_user 
+--------------+--------------
+ peter        | peter
+
+SET SESSION AUTHORIZATION 'paul';
+
+SELECT SESSION_USER, CURRENT_USER;
+
+ session_user | current_user 
+--------------+--------------
+ paul         | paul</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN84653"
+></A
+><H2
+>Совместимость</H2
+><P
+>Стандарт SQL позволяет вместо строковой константы <TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+> указывать некоторые другие выражения, но на практике это не очень полезно. <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> допускает синтаксис идентификаторов (<TT
+CLASS="LITERAL"
+>"имя_пользователя"</TT
+>), а стандарт SQL — нет. Стандарт не позволяет выполнять эту команду в транзакции; в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> такого ограничения нет, так как для него нет причины. Указания <TT
+CLASS="LITERAL"
+>SESSION</TT
+> и <TT
+CLASS="LITERAL"
+>LOCAL</TT
+> относятся к расширениям <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, так же, как и синтаксис <TT
+CLASS="LITERAL"
+>RESET</TT
+>.</P
+><P
+>Набор прав, требуемых для выполнения этой команды, согласно стандарту, определяется реализацией.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN84665"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-set-role.html"
+>SET ROLE</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-set-role.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-set-transaction.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>SET ROLE</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>SET TRANSACTION</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

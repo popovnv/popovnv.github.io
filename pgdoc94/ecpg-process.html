@@ -1,0 +1,273 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Компиляция программ со встраиваемым SQL</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="ECPG — встраиваемый SQL в C"
+HREF="ecpg.html"><LINK
+REL="PREVIOUS"
+TITLE="Директивы препроцессора"
+HREF="ecpg-preproc.html"><LINK
+REL="NEXT"
+TITLE="Библиотечные функции"
+HREF="ecpg-library.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Директивы препроцессора"
+HREF="ecpg-preproc.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ecpg.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 33. <SPAN
+CLASS="APPLICATION"
+>ECPG</SPAN
+> — встраиваемый <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> в C</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Библиотечные функции"
+HREF="ecpg-library.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="ECPG-PROCESS"
+>33.10. Компиляция программ со встраиваемым SQL</A
+></H1
+><P
+>Теперь, когда вы получили представление, как писать программы на C со встраиваемым SQL, вы наверное хотите узнать, как их компилировать. Прежде чем компилировать код C, необходимо пропустить исходный файл через препроцессор встраиваемого <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> в <ACRONYM
+CLASS="ACRONYM"
+>C</ACRONYM
+>, который преобразует записанные вами операторы <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> в вызовы специальных функций. После компиляции полученный объектный код нужно скомпоновать со специальной библиотекой, содержащей необходимые функции. Эти функции получают информацию из аргументов, выполняют команды <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> через интерфейс <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>, и помещают результат в аргументы, заданные для вывода.</P
+><P
+>Программа препроцессора называется <TT
+CLASS="FILENAME"
+>ecpg</TT
+> и входит в состав обычной инсталляции <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Программам со встраиваемым SQL, как правило, даются имена с расширением <TT
+CLASS="FILENAME"
+>.pgc</TT
+>. Если вы создали код программы в файле <TT
+CLASS="FILENAME"
+>prog1.pgc</TT
+>, вы можете обработать его, просто выполнив: </P><PRE
+CLASS="PROGRAMLISTING"
+>ecpg prog1.pgc</PRE
+><P> При этом будет создан файл <TT
+CLASS="FILENAME"
+>prog1.c</TT
+>. Если имена входных файлов не следуют этому соглашению, имя выходного файла можно задать явно в аргументе <TT
+CLASS="OPTION"
+>-o</TT
+>.</P
+><P
+>Обработанный препроцессором файл можно скомпилировать обычным образом, например, так: </P><PRE
+CLASS="PROGRAMLISTING"
+>cc -c prog1.c</PRE
+><P> В сгенерированные исходные файлы C включаются заголовочные файлы из инсталляции <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, поэтому если вы установили <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> так, что соответствующий каталог не просматривается по умолчанию, вам придётся добавить указание вида <TT
+CLASS="LITERAL"
+>-I/usr/local/pgsql/include</TT
+> в командную строку компиляции.</P
+><P
+>Чтобы скомпоновать программу со встраиваемым SQL, необходимо подключить библиотеку <TT
+CLASS="FILENAME"
+>libecpg</TT
+> примерно так: </P><PRE
+CLASS="PROGRAMLISTING"
+>cc -o myprog prog1.o prog2.o ... -lecpg</PRE
+><P> Возможно, и для этого понадобится добавить в командную строку указание вида <TT
+CLASS="LITERAL"
+>-L/usr/local/pgsql/lib</TT
+>.</P
+><P
+>Чтобы узнать пути вашей инсталляции, можно воспользоваться командой <TT
+CLASS="COMMAND"
+>pg_config</TT
+> или <TT
+CLASS="COMMAND"
+>pkg-config</TT
+> (в качестве имени пакета нужно указать <TT
+CLASS="LITERAL"
+>libecpg</TT
+>).</P
+><P
+>Если вы организуете процесс сборки большого проекта с применением <SPAN
+CLASS="APPLICATION"
+>make</SPAN
+>, может быть удобно включить в ваши сборочные файлы следующее неявное правило: </P><PRE
+CLASS="PROGRAMLISTING"
+>ECPG = ecpg
+
+%.c: %.pgc
+        $(ECPG) $&lt;</PRE
+><P></P
+><P
+>Полный синтаксис вызова команды <TT
+CLASS="COMMAND"
+>ecpg</TT
+> приведён в описании <A
+HREF="app-ecpg.html"
+>            <SPAN
+CLASS="APPLICATION"
+>ecpg</SPAN
+>
+          </A
+>.</P
+><P
+>Библиотека <SPAN
+CLASS="APPLICATION"
+>ecpg</SPAN
+> по умолчанию потокобезопасна. Однако для компиляции клиентского кода могут потребоваться параметры командной строки для настройки многопоточности.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ecpg-preproc.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ecpg-library.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Директивы препроцессора</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ecpg.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Библиотечные функции</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

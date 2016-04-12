@@ -1,0 +1,384 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Определение данных</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Язык SQL"
+HREF="sql.html"><LINK
+REL="PREVIOUS"
+TITLE="Вызов функций"
+HREF="sql-syntax-calling-funcs.html"><LINK
+REL="NEXT"
+TITLE="Основы таблиц"
+HREF="ddl-basics.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="CHAPTER"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Вызов функций"
+HREF="sql-syntax-calling-funcs.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Основы таблиц"
+HREF="ddl-basics.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="DDL"
+></A
+>Глава 5. Определение данных</H1
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Содержание</B
+></DT
+><DT
+>5.1. <A
+HREF="ddl-basics.html"
+>Основы таблиц</A
+></DT
+><DT
+>5.2. <A
+HREF="ddl-default.html"
+>Значения по умолчанию</A
+></DT
+><DT
+>5.3. <A
+HREF="ddl-constraints.html"
+>Ограничения</A
+></DT
+><DD
+><DL
+><DT
+>5.3.1. <A
+HREF="ddl-constraints.html#DDL-CONSTRAINTS-CHECK-CONSTRAINTS"
+>Ограничения-проверки</A
+></DT
+><DT
+>5.3.2. <A
+HREF="ddl-constraints.html#AEN2537"
+>Ограничения NOT NULL</A
+></DT
+><DT
+>5.3.3. <A
+HREF="ddl-constraints.html#DDL-CONSTRAINTS-UNIQUE-CONSTRAINTS"
+>Ограничения уникальности</A
+></DT
+><DT
+>5.3.4. <A
+HREF="ddl-constraints.html#DDL-CONSTRAINTS-PRIMARY-KEYS"
+>Первичные ключи</A
+></DT
+><DT
+>5.3.5. <A
+HREF="ddl-constraints.html#DDL-CONSTRAINTS-FK"
+>Внешние ключи</A
+></DT
+><DT
+>5.3.6. <A
+HREF="ddl-constraints.html#DDL-CONSTRAINTS-EXCLUSION"
+>Ограничения-исключения</A
+></DT
+></DL
+></DD
+><DT
+>5.4. <A
+HREF="ddl-system-columns.html"
+>Системные колонки</A
+></DT
+><DT
+>5.5. <A
+HREF="ddl-alter.html"
+>Изменение таблиц</A
+></DT
+><DD
+><DL
+><DT
+>5.5.1. <A
+HREF="ddl-alter.html#DDL-ALTER-ADDING-A-COLUMN"
+>Добавление колонки</A
+></DT
+><DT
+>5.5.2. <A
+HREF="ddl-alter.html#DDL-ALTER-REMOVING-A-COLUMN"
+>Удаление колонки</A
+></DT
+><DT
+>5.5.3. <A
+HREF="ddl-alter.html#DDL-ALTER-ADDING-A-CONSTRAINT"
+>Добавление ограничения</A
+></DT
+><DT
+>5.5.4. <A
+HREF="ddl-alter.html#DDL-ALTER-REMOVING-A-CONSTRAINT"
+>Удаление ограничения</A
+></DT
+><DT
+>5.5.5. <A
+HREF="ddl-alter.html#AEN2854"
+>Изменение значения по умолчанию</A
+></DT
+><DT
+>5.5.6. <A
+HREF="ddl-alter.html#AEN2864"
+>Изменение типа данных колонки</A
+></DT
+><DT
+>5.5.7. <A
+HREF="ddl-alter.html#AEN2874"
+>Переименование колонки</A
+></DT
+><DT
+>5.5.8. <A
+HREF="ddl-alter.html#AEN2881"
+>Переименование таблицы</A
+></DT
+></DL
+></DD
+><DT
+>5.6. <A
+HREF="ddl-priv.html"
+>Права</A
+></DT
+><DT
+>5.7. <A
+HREF="ddl-schemas.html"
+>Схемы</A
+></DT
+><DD
+><DL
+><DT
+>5.7.1. <A
+HREF="ddl-schemas.html#DDL-SCHEMAS-CREATE"
+>Создание схемы</A
+></DT
+><DT
+>5.7.2. <A
+HREF="ddl-schemas.html#DDL-SCHEMAS-PUBLIC"
+>Схема public</A
+></DT
+><DT
+>5.7.3. <A
+HREF="ddl-schemas.html#DDL-SCHEMAS-PATH"
+>Путь поиска схемы</A
+></DT
+><DT
+>5.7.4. <A
+HREF="ddl-schemas.html#DDL-SCHEMAS-PRIV"
+>Схемы и права</A
+></DT
+><DT
+>5.7.5. <A
+HREF="ddl-schemas.html#DDL-SCHEMAS-CATALOG"
+>Схема системного каталога</A
+></DT
+><DT
+>5.7.6. <A
+HREF="ddl-schemas.html#DDL-SCHEMAS-PATTERNS"
+>Шаблоны использования</A
+></DT
+><DT
+>5.7.7. <A
+HREF="ddl-schemas.html#DDL-SCHEMAS-PORTABILITY"
+>Переносимость</A
+></DT
+></DL
+></DD
+><DT
+>5.8. <A
+HREF="ddl-inherit.html"
+>Наследование</A
+></DT
+><DT
+>5.9. <A
+HREF="ddl-partitioning.html"
+>Секционирование</A
+></DT
+><DD
+><DL
+><DT
+>5.9.1. <A
+HREF="ddl-partitioning.html#DDL-PARTITIONING-OVERVIEW"
+>Обзор</A
+></DT
+><DT
+>5.9.2. <A
+HREF="ddl-partitioning.html#DDL-PARTITIONING-IMPLEMENTATION"
+>Реализация секционирования</A
+></DT
+><DT
+>5.9.3. <A
+HREF="ddl-partitioning.html#DDL-PARTITIONING-MANAGING-PARTITIONS"
+>Управление секциями</A
+></DT
+><DT
+>5.9.4. <A
+HREF="ddl-partitioning.html#DDL-PARTITIONING-CONSTRAINT-EXCLUSION"
+>Секционирование и исключение по ограничению</A
+></DT
+><DT
+>5.9.5. <A
+HREF="ddl-partitioning.html#DDL-PARTITIONING-ALTERNATIVES"
+>Альтернативные варианты секционирования</A
+></DT
+><DT
+>5.9.6. <A
+HREF="ddl-partitioning.html#DDL-PARTITIONING-CAVEATS"
+>Ограничения</A
+></DT
+></DL
+></DD
+><DT
+>5.10. <A
+HREF="ddl-foreign-data.html"
+>Сторонние данные</A
+></DT
+><DT
+>5.11. <A
+HREF="ddl-others.html"
+>Другие объекты баз данных</A
+></DT
+><DT
+>5.12. <A
+HREF="ddl-depend.html"
+>Отслеживание зависимостей</A
+></DT
+></DL
+></DIV
+><P
+>Эта глава рассказывает, как создавать структуры базы данных, в которых будут храниться данные. В реляционной базе данных данные хранятся в таблицах, так что большая часть этой главы будет посвящена созданию и изменению таблиц, а также средствам управления данными в них. Затем мы обсудим, как таблицы можно объединять в схемы и как ограничивать доступ к ним. Наконец, мы кратко рассмотрим другие возможности, связанные с хранением данных, в частности наследование, представления, функции и триггеры.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-syntax-calling-funcs.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ddl-basics.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Вызов функций</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Основы таблиц</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,214 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Индексы по выражениям</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Индексы"
+HREF="indexes.html"><LINK
+REL="PREVIOUS"
+TITLE="Уникальные индексы"
+HREF="indexes-unique.html"><LINK
+REL="NEXT"
+TITLE="Частичные индексы"
+HREF="indexes-partial.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Уникальные индексы"
+HREF="indexes-unique.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="indexes.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 11. Индексы</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Частичные индексы"
+HREF="indexes-partial.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="INDEXES-EXPRESSIONAL"
+>11.7. Индексы по выражениям</A
+></H1
+><P
+>Индекс можно создать не только по колонке нижележащей таблицы, но и по функции или скалярному выражению с одним или несколькими колонками таблицы. Это позволяет быстро находить данные в таблице по результатам вычислений.</P
+><P
+>Например, для сравнений без учёта регистра символов часто используется функция <CODE
+CLASS="FUNCTION"
+>lower</CODE
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT * FROM test1 WHERE lower(col1) = 'value';</PRE
+><P> Этот запрос сможет использовать индекс, определённый для результата функции <TT
+CLASS="LITERAL"
+>lower(col1)</TT
+> так: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE INDEX test1_lower_col1_idx ON test1 (lower(col1));</PRE
+><P></P
+><P
+>Если мы объявим этот индекс уникальным (<TT
+CLASS="LITERAL"
+>UNIQUE</TT
+>), он не даст добавить строки, в которых значения <TT
+CLASS="LITERAL"
+>col1</TT
+> различаются только регистром, как и те, в которых значения <TT
+CLASS="LITERAL"
+>col1</TT
+> действительно одинаковые. Таким образом, индексы по выражениям можно использовать ещё и для обеспечения ограничений, которые нельзя записать как простые ограничения уникальности.</P
+><P
+>Если же часто выполняются запросы вида: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT * FROM people WHERE (first_name || ' ' || last_name) = 'John Smith';</PRE
+><P> тогда, возможно, стоит создать такой индекс: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE INDEX people_names ON people ((first_name || ' ' || last_name));</PRE
+><P></P
+><P
+>Синтаксис команды <TT
+CLASS="COMMAND"
+>CREATE INDEX</TT
+> обычно требует заключать индексные выражения в скобки, как показано во втором примере. Если же выражение представляет собой просто вызов функции, как в первом примере, дополнительные скобки можно опустить.</P
+><P
+>Поддержка индексируемых выражений обходится довольно дорого, так как эти выражения должны вычисляться при добавлении каждой строки и при каждом последующем изменении. Однако при поиске по индексу индексируемое выражение <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>не</I
+></SPAN
+> вычисляется повторно, так как его результат уже сохранён в индексе. В рассмотренных выше случаях система видит запрос как <TT
+CLASS="LITERAL"
+>WHERE колонка_индекса = 'константа'</TT
+> и поэтому поиск выполняется так же быстро, как и с простым индексом. Таким образом, индексы по выражениям могут быть полезны, когда скорость извлечения данных гораздо важнее скорости добавления и изменения.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="indexes-unique.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="indexes-partial.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Уникальные индексы</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="indexes.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Частичные индексы</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

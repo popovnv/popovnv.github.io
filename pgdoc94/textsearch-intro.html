@@ -1,0 +1,684 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Введение</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Полнотекстовый поиск"
+HREF="textsearch.html"><LINK
+REL="PREVIOUS"
+TITLE="Полнотекстовый поиск"
+HREF="textsearch.html"><LINK
+REL="NEXT"
+TITLE="Таблицы и индексы"
+HREF="textsearch-tables.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Полнотекстовый поиск"
+HREF="textsearch.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="textsearch.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 12. Полнотекстовый поиск</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Таблицы и индексы"
+HREF="textsearch-tables.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="TEXTSEARCH-INTRO"
+>12.1. Введение</A
+></H1
+><P
+>Полнотекстовый поиск (или просто <I
+CLASS="FIRSTTERM"
+>поиск текста</I
+>) &mdash; это возможность находить <I
+CLASS="FIRSTTERM"
+>документы</I
+> на естественном языке, соответствующие <I
+CLASS="FIRSTTERM"
+>запросу</I
+>, и, возможно, дополнительно сортировать их по релевантности для этого запроса. Наиболее распространённая задача &mdash; найти все документы, содержащие <I
+CLASS="FIRSTTERM"
+>слова запроса</I
+>, и выдать их отсортированными по степени <I
+CLASS="FIRSTTERM"
+>соответствия</I
+> запросу. Понятия <TT
+CLASS="VARNAME"
+>запроса</TT
+> и <TT
+CLASS="VARNAME"
+>соответствия</TT
+> довольно расплывчаты и зависят от конкретного приложения. В самом простом случае <TT
+CLASS="VARNAME"
+>запросом</TT
+> считается набор слов, а <TT
+CLASS="VARNAME"
+>соответствие</TT
+> определяется частотой слов в документе.</P
+><P
+>Операторы текстового поиска существуют в СУБД уже многие годы. В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> для текстовых типов данных есть операторы <TT
+CLASS="LITERAL"
+>~</TT
+>, <TT
+CLASS="LITERAL"
+>~*</TT
+>, <TT
+CLASS="LITERAL"
+>LIKE</TT
+> и <TT
+CLASS="LITERAL"
+>ILIKE</TT
+>, но им не хватает очень важных вещей, которые требуются сегодня от информационных систем:</P
+><P
+></P
+><UL
+COMPACT="COMPACT"
+><LI
+STYLE="list-style-type: disc"
+><P
+>Нет поддержки лингвистического функционала, даже для английского языка. Возможности регулярных выражений ограничены &mdash; они не рассчитаны на работу со словоформами, например, <TT
+CLASS="LITERAL"
+>подходят</TT
+> и <TT
+CLASS="LITERAL"
+>подходить</TT
+>. С ними вы можете пропустить документы, которые содержат <TT
+CLASS="LITERAL"
+>подходят</TT
+>, но, вероятно, и они представляют интерес при поиске по ключевому слову <TT
+CLASS="LITERAL"
+>подходить</TT
+>. Конечно, можно попытаться перечислить в регулярном выражении все варианты слова, но это будет очень трудоёмко и чревато ошибками (некоторые слова могут иметь десятки словоформ).</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Они не позволяют упорядочивать результаты поиска (по релевантности), а без этого поиск неэффективен, когда находятся сотни подходящих документов.</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Они обычно выполняются медленно из-за отсутствия индексов, так как при каждом поиске приходится просматривать все документы.</P
+></LI
+></UL
+><P
+>Полнотекстовая индексация заключается в <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>предварительной обработке</I
+></SPAN
+> документов и сохранении индекса для последующего быстрого поиска. Предварительная обработка включает следующие операции:</P
+><P
+></P
+><UL
+><LI
+STYLE="list-style-type: none"
+><P
+><SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>Разбор документов на <I
+CLASS="FIRSTTERM"
+>фрагменты</I
+></I
+></SPAN
+>. При этом полезно выделить различные классы фрагментов, например, числа, слова, словосочетания, почтовые адреса и т. д., которые будут обрабатываться по-разному. В принципе классы фрагментов могут зависеть от приложения, но для большинства применений вполне подойдёт предопределённый набор классов. Эту операцию в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> выполняет <I
+CLASS="FIRSTTERM"
+>анализатор</I
+> (parser). Вы можете использовать как стандартный анализатор, так и создавать свои, узкоспециализированные.</P
+></LI
+><LI
+STYLE="list-style-type: none"
+><P
+><SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>Преобразование фрагментов в <I
+CLASS="FIRSTTERM"
+>лексемы</I
+></I
+></SPAN
+>. Лексема &mdash; это <I
+CLASS="FIRSTTERM"
+>нормализованный</I
+> фрагмент, в котором разные словоформы приведены к одной. Например, при нормализации буквы верхнего регистра приводятся к нижнему, а из слов обычно убираются окончания (в частности, <TT
+CLASS="LITERAL"
+>s</TT
+> или <TT
+CLASS="LITERAL"
+>es</TT
+> в английском). Благодаря этому можно находить разные формы одного слова, не вводя вручную все возможные варианты. Кроме того, на данном шаге обычно исключаются <I
+CLASS="FIRSTTERM"
+>стоп-слова</I
+>, то есть слова, настолько распространённые, что искать их нет смысла. (Другими словами, фрагменты представляют собой просто подстроки текста документа, а лексемы &mdash; это слова, имеющие ценность для индексации и поиска.) Для выполнения этого шага в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> используются <I
+CLASS="FIRSTTERM"
+>словари</I
+>. Набор существующих стандартных словарей при необходимости можно расширять, создавая свои собственные.</P
+></LI
+><LI
+STYLE="list-style-type: none"
+><P
+><SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>Хранение документов в форме, подготовленной для поиска</I
+></SPAN
+>. Например, каждый документ может быть представлен в виде сортированного массива нормализованных лексем. Помимо лексем часто желательно хранить информацию об их положении для <I
+CLASS="FIRSTTERM"
+>ранжирования по близости</I
+>, чтобы документ, в котором слова запроса расположены <SPAN
+CLASS="QUOTE"
+>"плотнее"</SPAN
+>, получал более высокий ранг, чем документ с разбросанными словами.</P
+></LI
+></UL
+><P
+>Словари позволяют управлять нормализацией фрагментов с большой гибкостью. Создавая словари, можно:</P
+><P
+></P
+><UL
+COMPACT="COMPACT"
+><LI
+STYLE="list-style-type: disc"
+><P
+>Определять стоп-слова, которые не будут индексироваться.</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Сопоставлять синонимы с одним словом, используя <SPAN
+CLASS="APPLICATION"
+>Ispell</SPAN
+>.</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Сопоставлять словосочетания с одним словом, используя тезаурус.</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Сопоставлять различные склонения слова с канонической формой, используя словарь <SPAN
+CLASS="APPLICATION"
+>Ispell</SPAN
+>.</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Сопоставлять различные склонения слова с канонической формой, используя стеммер <SPAN
+CLASS="APPLICATION"
+>Snowball</SPAN
+>.</P
+></LI
+></UL
+><P
+>Для хранения подготовленных документов в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> предназначен тип данных <TT
+CLASS="TYPE"
+>tsvector</TT
+>, а для представления обработанных запросов &mdash; тип <TT
+CLASS="TYPE"
+>tsquery</TT
+> (<A
+HREF="datatype-textsearch.html"
+>Раздел 8.11</A
+>). С этими типами данных работают целый ряд функций и операторов (<A
+HREF="functions-textsearch.html"
+>Раздел 9.13</A
+>), и наиболее важный из них &mdash; оператор соответствия <TT
+CLASS="LITERAL"
+>@@</TT
+>, с которым мы познакомимся в <A
+HREF="textsearch-intro.html#TEXTSEARCH-MATCHING"
+>Подразделе 12.1.2</A
+>. Для ускорения полнотекстового поиска могут применяться индексы (<A
+HREF="textsearch-indexes.html"
+>Раздел 12.9</A
+>).</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="TEXTSEARCH-DOCUMENT"
+>12.1.1. Что такое документ?</A
+></H2
+><P
+><I
+CLASS="FIRSTTERM"
+>Документ</I
+> &mdash; это единица обработки в системе полнотекстового поиска; например, журнальная статья или почтовое сообщение. Система поиска текста должна уметь разбирать документы и сохранять связи лексем (ключевых слов) с содержащим их документом. Впоследствии эти связи могут использоваться для поиска документов с заданными ключевыми словами.</P
+><P
+>В контексте поиска в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> документ &mdash; это обычно содержимое текстового поля в строке таблицы или, возможно, сочетание (объединение) таких полей, которые могут храниться в разных таблицах или формироваться динамически. Другими словами, документ для индексации может создаваться из нескольких частей и не храниться где-либо как единое целое. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT title || ' ' ||  author || ' ' ||  abstract || ' ' || body
+  AS document
+FROM messages
+WHERE mid = 12;
+
+SELECT m.title || ' ' || m.author || ' ' || m.abstract || ' ' || d.body
+  AS document
+FROM messages m, docs d
+WHERE mid = did AND mid = 12;</PRE
+><P></P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>На самом деле в этих примерах запросов следует использовать функцию <CODE
+CLASS="FUNCTION"
+>coalesce</CODE
+>, чтобы значение <TT
+CLASS="LITERAL"
+>NULL</TT
+> в каком-либо одном атрибуте не привело к тому, что результирующим документом окажется <TT
+CLASS="LITERAL"
+>NULL</TT
+>.</P
+></BLOCKQUOTE
+></DIV
+><P
+>Документы также можно хранить в обычных текстовых файлах в файловой системе. В этом случае база данных может быть просто хранилищем полнотекстового индекса и исполнителем запросов, а найденные документы будут загружаться из файловой системы по некоторым уникальным идентификаторам. Однако для загрузки внешних файлов требуются права суперпользователя или поддержка специальных функций, так что это обычно менее удобно, чем хранить все данные внутри БД <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Кроме того, когда всё хранится в базе данных, это упрощает доступ к метаданным документов при индексации и выводе результатов.</P
+><P
+>Для нужд текстового поиска каждый документ должен быть сведён к специальному формату <TT
+CLASS="TYPE"
+>tsvector</TT
+>. Поиск и ранжирование выполняется исключительно с этим представлением документа &mdash; исходный текст потребуется извлечь, только когда документ будет отобран для вывода пользователю. Поэтому мы часто подразумеваем под <TT
+CLASS="TYPE"
+>tsvector</TT
+> документ, тогда как этот тип, конечно, содержит только компактное представление всего документа.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="TEXTSEARCH-MATCHING"
+>12.1.2. Простое соответствие текста</A
+></H2
+><P
+>Полнотекстовый поиск в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> реализован на базе оператора соответствия <TT
+CLASS="LITERAL"
+>@@</TT
+>, который возвращает <TT
+CLASS="LITERAL"
+>true</TT
+>, если <TT
+CLASS="TYPE"
+>tsvector</TT
+> (документ) соответствует <TT
+CLASS="TYPE"
+>tsquery</TT
+> (запросу). Для этого оператора не важно, какой тип записан первым: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT 'a fat cat sat on a mat and ate a fat rat'::tsvector @@
+  'cat &amp; rat'::tsquery;
+ ?column?
+----------
+ t
+
+SELECT 'fat &amp; cow'::tsquery @@
+  'a fat cat sat on a mat and ate a fat rat'::tsvector;
+ ?column?
+----------
+ f</PRE
+><P></P
+><P
+>Как можно догадаться из этого примера, <TT
+CLASS="TYPE"
+>tsquery</TT
+> &mdash; это не просто текст, как и <TT
+CLASS="TYPE"
+>tsvector</TT
+>. Значение типа <TT
+CLASS="TYPE"
+>tsquery</TT
+> содержит искомые слова, это должны быть уже нормализованные лексемы, возможно объединённые в выражение операторами AND, OR и NOT. (Подробнее об этом см. <A
+HREF="datatype-textsearch.html"
+>Раздел 8.11</A
+>.) Вы можете воспользоваться функциями <CODE
+CLASS="FUNCTION"
+>to_tsquery</CODE
+> и <CODE
+CLASS="FUNCTION"
+>plainto_tsquery</CODE
+>, которые могут преобразовать заданный пользователем текст в значение <TT
+CLASS="TYPE"
+>tsquery</TT
+>, например, нормализуя слова в этом тексте. Функция <CODE
+CLASS="FUNCTION"
+>to_tsvector</CODE
+> подобным образом может разобрать и нормализовать текстовое содержимое документа. Так что запрос с поиском соответствия на практике выглядит скорее так: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT to_tsvector('fat cats ate fat rats') @@ to_tsquery('fat &amp; rat');
+ ?column? 
+----------
+ t</PRE
+><P> Заметьте, что соответствие не будет обнаружено, если запрос записан как </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT 'fat cats ate fat rats'::tsvector @@ to_tsquery('fat &amp; rat');
+ ?column? 
+----------
+ f</PRE
+><P>так как слово <TT
+CLASS="LITERAL"
+>rats</TT
+> не нормализовано. Элементами <TT
+CLASS="TYPE"
+>tsvector</TT
+> должны быть лексемы, предположительно уже нормализованные, так что <TT
+CLASS="LITERAL"
+>rats</TT
+> считается не соответствующим <TT
+CLASS="LITERAL"
+>rat</TT
+>.</P
+><P
+>Оператор <TT
+CLASS="LITERAL"
+>@@</TT
+> также может принимать типы <TT
+CLASS="TYPE"
+>text</TT
+>, позволяя опустить явные преобразования текстовых строк в типы <TT
+CLASS="TYPE"
+>tsvector</TT
+> и <TT
+CLASS="TYPE"
+>tsquery</TT
+> в простых случаях. Всего есть четыре варианта этого оператора: </P><PRE
+CLASS="PROGRAMLISTING"
+>tsvector @@ tsquery
+tsquery  @@ tsvector
+text @@ tsquery
+text @@ text</PRE
+><P></P
+><P
+>Первые два мы уже видели раньше. Форма <TT
+CLASS="TYPE"
+>text</TT
+><TT
+CLASS="LITERAL"
+>@@</TT
+><TT
+CLASS="TYPE"
+>tsquery</TT
+> равнозначна выражению <TT
+CLASS="LITERAL"
+>to_tsvector(x) @@ y</TT
+>, а форма <TT
+CLASS="TYPE"
+>text</TT
+><TT
+CLASS="LITERAL"
+>@@</TT
+><TT
+CLASS="TYPE"
+>text</TT
+> &mdash; выражению <TT
+CLASS="LITERAL"
+>to_tsvector(x) @@ plainto_tsquery(y)</TT
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="TEXTSEARCH-INTRO-CONFIGURATIONS"
+>12.1.3. Конфигурации</A
+></H2
+><P
+>До этого мы рассматривали очень простые примеры поиска текста. Как было упомянуто выше, весь функционал текстового поиска позволяет делать гораздо больше: пропускать определённые слова (стоп-слова), обрабатывать синонимы и выполнять сложный анализ слов, например, выделять фрагменты не только по пробелам. Все эти функции управляются <I
+CLASS="FIRSTTERM"
+>конфигурациями текстового поиска</I
+>. В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> есть набор предопределённых конфигураций для многих языков, но вы также можете создавать собственные конфигурации. (Все доступные конфигурации можно просмотреть с помощью команды <TT
+CLASS="COMMAND"
+>\dF</TT
+> в <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>.)</P
+><P
+>Подходящая конфигурация для данной среды выбирается во время установки и записывается в параметре <A
+HREF="runtime-config-client.html#GUC-DEFAULT-TEXT-SEARCH-CONFIG"
+>default_text_search_config</A
+> в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+>. Если вы используете для всего кластера одну конфигурацию текстового поиска, вам будет достаточно этого параметра в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+>. Если же требуется использовать в кластере разные конфигурации, но для каждой базы данных одну определённую, её можно задать командой <TT
+CLASS="COMMAND"
+>ALTER DATABASE ... SET</TT
+>. В противном случае конфигурацию можно выбрать в рамках сеанса, определив параметр <TT
+CLASS="VARNAME"
+>default_text_search_config</TT
+>.</P
+><P
+>У каждой функции текстового поиска, зависящей от конфигурации, есть необязательный аргумент <TT
+CLASS="TYPE"
+>regconfig</TT
+>, в котором можно явно указать конфигурацию для данной функции. Значение <TT
+CLASS="VARNAME"
+>default_text_search_config</TT
+> используется, только когда этот аргумент опущен.</P
+><P
+>Для упрощения создания конфигураций текстового поиска они строятся из более простых объектов. В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> есть четыре типа таких объектов:</P
+><P
+></P
+><UL
+COMPACT="COMPACT"
+><LI
+STYLE="list-style-type: disc"
+><P
+><I
+CLASS="FIRSTTERM"
+>Анализаторы текстового поиска</I
+> разделяют документ на фрагменты и классифицируют их (например, как слова или числа).</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+><I
+CLASS="FIRSTTERM"
+>Словари текстового поиска</I
+> приводят фрагменты к нормализованной форме и отбрасывают стоп-слова.</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+><I
+CLASS="FIRSTTERM"
+>Шаблоны текстового поиска</I
+> предоставляют функции, образующие реализацию словарей. (При создании словаря просто задаётся шаблон и набор параметров для него.)</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+><I
+CLASS="FIRSTTERM"
+>Конфигурации текстового поиска</I
+> выбирают анализатор и набор словарей, который будет использоваться для нормализации фрагментов, выданных анализатором.</P
+></LI
+></UL
+><P
+>Анализаторы и шаблоны текстового поиска строятся из низкоуровневых функций на языке C; чтобы создать их, нужно программировать на C, а подключить их к базе данных может только суперпользователь. (В подкаталоге <TT
+CLASS="FILENAME"
+>contrib/</TT
+> инсталляции <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> можно найти примеры дополнительных анализаторов и шаблонов.) Так как словари и конфигурации представляют собой просто наборы параметров, связывающие анализаторы и шаблоны, их можно создавать, не имея административных прав. Далее в этой главе будут приведены примеры их создания.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="textsearch.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="textsearch-tables.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Полнотекстовый поиск</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="textsearch.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Таблицы и индексы</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

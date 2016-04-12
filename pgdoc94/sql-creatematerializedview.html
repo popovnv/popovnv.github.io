@@ -1,0 +1,406 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>CREATE MATERIALIZED VIEW</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="CREATE LANGUAGE"
+HREF="sql-createlanguage.html"><LINK
+REL="NEXT"
+TITLE="CREATE OPERATOR"
+HREF="sql-createoperator.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="CREATE LANGUAGE"
+HREF="sql-createlanguage.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="CREATE OPERATOR"
+HREF="sql-createoperator.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-CREATEMATERIALIZEDVIEW"
+></A
+>CREATE MATERIALIZED VIEW</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN74328"
+></A
+><H2
+>Название</H2
+>CREATE MATERIALIZED VIEW&nbsp;--&nbsp;создать материализованное представление</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN74331"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>CREATE MATERIALIZED VIEW <TT
+CLASS="REPLACEABLE"
+><I
+>table_name</I
+></TT
+>
+    [ (<TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+> [, ...] ) ]
+    [ WITH ( <TT
+CLASS="REPLACEABLE"
+><I
+>параметр_хранения</I
+></TT
+> [= <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+>] [, ... ] ) ]
+    [ TABLESPACE <TT
+CLASS="REPLACEABLE"
+><I
+>табл_пространство</I
+></TT
+> ]
+    AS <TT
+CLASS="REPLACEABLE"
+><I
+>запрос</I
+></TT
+>
+    [ WITH [ NO ] DATA ]</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN74339"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>CREATE MATERIALIZED VIEW</TT
+> определяет материализованное представление запроса. Заданный запрос выполняется и наполняет представление в момент вызова команды (если только не указано <TT
+CLASS="COMMAND"
+>WITH NO DATA</TT
+>). Обновить представление позже можно, выполнив <TT
+CLASS="COMMAND"
+>REFRESH MATERIALIZED VIEW</TT
+>.</P
+><P
+>Команда <TT
+CLASS="COMMAND"
+>CREATE MATERIALIZED VIEW</TT
+> подобна <TT
+CLASS="COMMAND"
+>CREATE TABLE AS</TT
+>, за исключением того, что она запоминает запрос, порождающий представление, так что это представление можно позже обновить по требованию. Материализованные представления сходны с таблицами во многом, но не во всём; например, не поддерживаются временные материализованные представления и автоматическая генерация OID.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN74348"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>table_name</I
+></TT
+></DT
+><DD
+><P
+>Имя (возможно, дополненное схемой) создаваемого материализованного представления.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+></DT
+><DD
+><P
+>Имя колонки в создаваемом материализованном представлении. Если имена колонок не заданы явно, они определяются по именам колонок результата запроса.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>WITH ( <TT
+CLASS="REPLACEABLE"
+><I
+>параметр_хранения</I
+></TT
+> [= <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+>] [, ... ] )</TT
+></DT
+><DD
+><P
+>Это предложение задаёт дополнительные параметры хранения для создаваемого материализованного представления; подробнее о них можно узнать в <A
+HREF="sql-createtable.html#SQL-CREATETABLE-STORAGE-PARAMETERS"
+><I
+>Параметры хранения</I
+></A
+>. Все параметры, которые поддерживает <TT
+CLASS="LITERAL"
+>CREATE TABLE</TT
+>, поддерживает так же и <TT
+CLASS="LITERAL"
+>CREATE MATERIALIZED VIEW</TT
+>, за исключением <TT
+CLASS="LITERAL"
+>OIDS</TT
+>. За дополнительной информацией обратитесь к <A
+HREF="sql-createtable.html"
+>CREATE TABLE</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>TABLESPACE <TT
+CLASS="REPLACEABLE"
+><I
+>табл_пространство</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Здесь <TT
+CLASS="REPLACEABLE"
+><I
+>табл_пространство</I
+></TT
+> — имя табличного пространства, в котором будет создано материализованное представление. Если оно не задано, выбирается <A
+HREF="runtime-config-client.html#GUC-DEFAULT-TABLESPACE"
+>default_tablespace</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>запрос</I
+></TT
+></DT
+><DD
+><P
+>Команда <A
+HREF="sql-select.html"
+>SELECT</A
+>, <A
+HREF="sql-select.html#SQL-TABLE"
+>TABLE</A
+> или <A
+HREF="sql-values.html"
+>VALUES</A
+>. Эта команда будет выполняться в контексте с ограничениями по безопасности; в частности, будут запрещены вызовы функций, которые сами создают временные таблицы.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>WITH [ NO ] DATA</TT
+></DT
+><DD
+><P
+>Это предложение указывает, будет ли материализованное представление наполняться в момент создания. Если материализованное представление не наполняется, оно помечается как нечитаемое, так что к нему нельзя будет обращаться до выполнения <TT
+CLASS="COMMAND"
+>REFRESH MATERIALIZED VIEW</TT
+>.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN74395"
+></A
+><H2
+>Совместимость</H2
+><P
+><TT
+CLASS="COMMAND"
+>CREATE MATERIALIZED VIEW</TT
+> является расширением <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN74400"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-altermaterializedview.html"
+>ALTER MATERIALIZED VIEW</A
+>, <A
+HREF="sql-createtableas.html"
+>CREATE TABLE AS</A
+>, <A
+HREF="sql-createview.html"
+>CREATE VIEW</A
+>, <A
+HREF="sql-dropmaterializedview.html"
+>DROP MATERIALIZED VIEW</A
+>, <A
+HREF="sql-refreshmaterializedview.html"
+>REFRESH MATERIALIZED VIEW</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-createlanguage.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-createoperator.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>CREATE LANGUAGE</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>CREATE OPERATOR</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,682 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>pg_trgm</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Дополнительно поставляемые модули"
+HREF="contrib.html"><LINK
+REL="PREVIOUS"
+TITLE="pgstattuple"
+HREF="pgstattuple.html"><LINK
+REL="NEXT"
+TITLE="postgres_fdw"
+HREF="postgres-fdw.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="pgstattuple"
+HREF="pgstattuple.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Приложение E. Дополнительно поставляемые модули</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="postgres_fdw"
+HREF="postgres-fdw.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="PGTRGM"
+>E.31. pg_trgm</A
+></H1
+><P
+>Модуль <TT
+CLASS="FILENAME"
+>pg_trgm</TT
+> предоставляет функции и операторы для определения схожести алфавитно-цифровых строк на основе триграмм, а также классы операторов индексов, поддерживающие быстрый поиск схожих строк.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN124183"
+>E.31.1. Понятия, связанные с триграммами (или триграфами)</A
+></H2
+><P
+>Триграмма — это группа трёх последовательных символов, взятых из строки. Мы можем измерить схожесть двух строк, подсчитав число триграмм, которые есть в обеих. Эта простая идея оказывается очень эффективной для измерения схожести слов на многих естественных языках.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+><TT
+CLASS="FILENAME"
+>pg_trgm</TT
+>, извлекая триграммы из строк, игнорирует символы, не относящиеся к словам (не алфавитно-цифровые). При выделении триграмм, содержащихся в строке, считается, что перед каждым словом находятся два пробела, а после — один пробел. Например, из строки <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>cat</TT
+>"</SPAN
+> выделяется набор триграмм: <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+> c</TT
+>"</SPAN
+>, <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+> ca</TT
+>"</SPAN
+>, <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>cat</TT
+>"</SPAN
+> и <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>at </TT
+>"</SPAN
+>. Из строки <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>foo|bar</TT
+>"</SPAN
+> выделяются триграммы: <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+> f</TT
+>"</SPAN
+>, <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+> fo</TT
+>"</SPAN
+>, <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>foo</TT
+>"</SPAN
+>, <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>oo </TT
+>"</SPAN
+>, <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+> b</TT
+>"</SPAN
+>, <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+> ba</TT
+>"</SPAN
+>, <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>bar</TT
+>"</SPAN
+> и <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>ar </TT
+>"</SPAN
+>.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN124217"
+>E.31.2. Функции и операторы</A
+></H2
+><P
+>Реализованные в модуле <TT
+CLASS="FILENAME"
+>pg_trgm</TT
+> функции перечислены в <A
+HREF="pgtrgm.html#PGTRGM-FUNC-TABLE"
+>Таблице E-22</A
+>, а операторы — в <A
+HREF="pgtrgm.html#PGTRGM-OP-TABLE"
+>Таблице E-23</A
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="PGTRGM-FUNC-TABLE"
+></A
+><P
+><B
+>Таблица E-22. Функции <TT
+CLASS="FILENAME"
+>pg_trgm</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Функция</TH
+><TH
+>Возвращает</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                    <CODE
+CLASS="FUNCTION"
+>similarity(text, text)</CODE
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>real</TT
+>
+                  </TD
+><TD
+>Возвращает число, показывающее, насколько близки два аргумента. Диапазон результатов — от нуля (это значение указывает, что две строки полностью различны) до одного (это значение указывает, что две строки идентичны).</TD
+></TR
+><TR
+><TD
+>                    <CODE
+CLASS="FUNCTION"
+>show_trgm(text)</CODE
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>text[]</TT
+>
+                  </TD
+><TD
+>Возвращает массив всех триграмм в заданной строке. (На практике это редко бывает полезно, кроме как для отладки.)</TD
+></TR
+><TR
+><TD
+>                    <CODE
+CLASS="FUNCTION"
+>show_limit()</CODE
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>real</TT
+>
+                  </TD
+><TD
+>Возвращает текущий порог схожести, который использует оператор <TT
+CLASS="LITERAL"
+>%</TT
+>. Это значение задаёт минимальную схожесть между двумя словами, при которой они считаются настолько близкими, что одно может быть, например, ошибочным написанием другого.</TD
+></TR
+><TR
+><TD
+>                    <CODE
+CLASS="FUNCTION"
+>set_limit(real)</CODE
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>real</TT
+>
+                  </TD
+><TD
+>Задаёт текущий порог схожести, который использует оператор <TT
+CLASS="LITERAL"
+>%</TT
+>. Это значение должно быть в диапазоне от 0 до 1 (по умолчанию 0.3). Возвращает то же значение, что было передано на вход.</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><DIV
+CLASS="TABLE"
+><A
+NAME="PGTRGM-OP-TABLE"
+></A
+><P
+><B
+>Таблица E-23. Операторы <TT
+CLASS="FILENAME"
+>pg_trgm</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Оператор</TH
+><TH
+>Возвращает</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+><TT
+CLASS="TYPE"
+>text</TT
+> <TT
+CLASS="LITERAL"
+>%</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>Возвращает <TT
+CLASS="LITERAL"
+>true</TT
+>, если схожесть аргументов выше текущего порога, заданного функцией <CODE
+CLASS="FUNCTION"
+>set_limit</CODE
+>.</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="TYPE"
+>text</TT
+> <TT
+CLASS="LITERAL"
+>&lt;-&gt;</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>real</TT
+>
+                  </TD
+><TD
+>Возвращает <SPAN
+CLASS="QUOTE"
+>"расстояние"</SPAN
+> между аргументами, то есть один минус значение <CODE
+CLASS="FUNCTION"
+>similarity()</CODE
+>.</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN124297"
+>E.31.3. Поддержка индексов</A
+></H2
+><P
+>Модуль <TT
+CLASS="FILENAME"
+>pg_trgm</TT
+> предоставляет классы операторов индексов GiST и GIN, позволяющие создавать индекс по текстовым колонкам для очень быстрого поиска по критерию схожести. Эти типы индексов поддерживают вышеописанные операторы схожести и дополнительно поддерживают поиск на основе триграмм для запросов с <TT
+CLASS="LITERAL"
+>LIKE</TT
+>, <TT
+CLASS="LITERAL"
+>ILIKE</TT
+>, <TT
+CLASS="LITERAL"
+>~</TT
+> и <TT
+CLASS="LITERAL"
+>~*</TT
+>. (Эти индексы не поддерживают простые операторы сравнения и равенства, так что вам может понадобиться и обычный индекс-B-дерево.)</P
+><P
+>Пример: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE test_trgm (t text);
+CREATE INDEX trgm_idx ON test_trgm USING gist (t gist_trgm_ops);</PRE
+><P> или </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE INDEX trgm_idx ON test_trgm USING gin (t gin_trgm_ops);</PRE
+><P></P
+><P
+>На этот момент у вас будет индекс по колонке <TT
+CLASS="STRUCTFIELD"
+>t</TT
+>, используя который можно осуществлять поиск по схожести. Пример типичного запроса: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT t, similarity(t, '<TT
+CLASS="REPLACEABLE"
+><I
+>word</I
+></TT
+>') AS sml
+  FROM test_trgm
+  WHERE t % '<TT
+CLASS="REPLACEABLE"
+><I
+>word</I
+></TT
+>'
+  ORDER BY sml DESC, t;</PRE
+><P> Он выдаст все значения в текстовой колонке, которые достаточно схожи со словом <TT
+CLASS="REPLACEABLE"
+><I
+>word</I
+></TT
+>, в порядке сортировки от наиболее к наименее схожим. Благодаря использованию индекса, эта операция будет быстрой даже с очень большими наборами данных.</P
+><P
+>Другой вариант предыдущего запроса: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT t, t &lt;-&gt; '<TT
+CLASS="REPLACEABLE"
+><I
+>word</I
+></TT
+>' AS dist
+  FROM test_trgm
+  ORDER BY dist LIMIT 10;</PRE
+><P> Он может быть довольно эффективно выполнен с применением индексов GiST, а не GIN. Обычно он выигрышнее первого варианта только когда требуется получить небольшое количество близких совпадений.</P
+><P
+>Начиная с <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> 9.1, эти типы индексов также поддерживают поиск с операторами <TT
+CLASS="LITERAL"
+>LIKE</TT
+> и <TT
+CLASS="LITERAL"
+>ILIKE</TT
+>, например: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT * FROM test_trgm WHERE t LIKE '%foo%bar';</PRE
+><P> При таком поиске по индексу сначала из искомой строки извлекаются триграммы, а затем они ищутся в индексе. Чем больше триграмм оказывается в искомой строке, тем более эффективным будет поиск по индексу. В отличие от поиска по B-дереву, искомая строка не должна привязываться к левому краю.</P
+><P
+>Начиная с <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> 9.3, индексы этих типов также поддерживают поиск по регулярным выражениям (операторы <TT
+CLASS="LITERAL"
+>~</TT
+> и <TT
+CLASS="LITERAL"
+>~*</TT
+>), например: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT * FROM test_trgm WHERE t ~ '(foo|bar)';</PRE
+><P> При таком поиске из регулярного выражения извлекаются триграммы, а затем они ищутся в индексе. Чем больше триграмм удаётся извлечь из регулярного выражения, тем более эффективным будет поиск по индексу. В отличие от поиска по B-дереву, искомая строка не должна привязываться к левому краю.</P
+><P
+>Относительно поиска по регулярному выражению или с <TT
+CLASS="LITERAL"
+>LIKE</TT
+>, имейте в виду, что при отсутствии триграмм в искомом шаблоне поиск сводится к полному сканирования индекса.</P
+><P
+>Выбор между индексами GiST и GIN зависит от относительных характеристик производительности GiST и GIN, которые здесь не рассматриваются. Как правило, индекс GIN быстрее индекса GiST при поиске, но строится или обновляется он медленнее; поэтому GIN лучше подходит для статических, а GiST для часто изменяемых данных.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN124330"
+>E.31.4. Интеграция с текстовым поиском</A
+></H2
+><P
+>Сопоставление триграмм — очень полезный приём в сочетании с применением полнотекстового индекса. В частности это может помочь найти слова, написанные неправильно, которые не будут находиться непосредственно механизмом полнотекстового поиска.</P
+><P
+>В первую очередь нужно построить дополнительную таблицу, содержащую все уникальные слова в документе: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE words AS SELECT word FROM
+        ts_stat('SELECT to_tsvector(''simple'', bodytext) FROM documents');</PRE
+><P> Здесь <TT
+CLASS="STRUCTNAME"
+>documents</TT
+> — это таблица с текстовым полем <TT
+CLASS="STRUCTFIELD"
+>bodytext</TT
+>, по которому мы будем выполнять поиск. Конфигурация <TT
+CLASS="LITERAL"
+>simple</TT
+> используется с функцией <CODE
+CLASS="FUNCTION"
+>to_tsvector</CODE
+> вместо конфигурации для определённого языка по той причине, что нам нужен список исходных (необработанных стеммером) слов.</P
+><P
+>Затем нужно создать индекс триграмм по колонке со словами: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE INDEX words_idx ON words USING gin(word gin_trgm_ops);</PRE
+><P> Теперь мы можем использовать запрос <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, подобный показанному в предыдущем примере, и предлагать варианты исправлений слов, введённых пользователем с ошибками. Кроме того, может быть полезно дополнительно проверить, что выбранные слова также имеют длину, примерно равную длине ошибочных слов.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Так как таблица <TT
+CLASS="STRUCTNAME"
+>words</TT
+> была сформирована как отдельная статическая таблица, её нужно периодически обновлять, чтобы она достаточно хорошо соответствовала набору документов. Постоянно поддерживать её в полностью актуальном состоянии обычно не требуется.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN124345"
+>E.31.5. Ссылки</A
+></H2
+><P
+>Сайт разработки GiST <A
+HREF="http://www.sai.msu.su/~megera/postgres/gist/"
+TARGET="_top"
+>http://www.sai.msu.su/~megera/postgres/gist/</A
+></P
+><P
+>Сайт разработки Tsearch2 <A
+HREF="http://www.sai.msu.su/~megera/postgres/gist/tsearch/V2/"
+TARGET="_top"
+>http://www.sai.msu.su/~megera/postgres/gist/tsearch/V2/</A
+></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN124351"
+>E.31.6. Авторы</A
+></H2
+><P
+>Олег Бартунов <CODE
+CLASS="EMAIL"
+>&#60;<A
+HREF="mailto:oleg@sai.msu.su"
+>oleg@sai.msu.su</A
+>&#62;</CODE
+>, Москва, Московский Государственный Университет, Россия</P
+><P
+>Фёдор Сигаев <CODE
+CLASS="EMAIL"
+>&#60;<A
+HREF="mailto:teodor@sigaev.ru"
+>teodor@sigaev.ru</A
+>&#62;</CODE
+>, Москва, ООО &laquo;Дельта-Софт&raquo;, Россия</P
+><P
+>Документация: Кристофер Кингс-Линн</P
+><P
+>Разработку этого модуля спонсировало ООО &laquo;Дельта-Софт&raquo;, г. Москва, Россия.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="pgstattuple.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="postgres-fdw.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>pgstattuple</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>postgres_fdw</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

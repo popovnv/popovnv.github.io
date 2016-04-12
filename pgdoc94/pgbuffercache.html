@@ -1,0 +1,475 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>pg_buffercache</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Дополнительно поставляемые модули"
+HREF="contrib.html"><LINK
+REL="PREVIOUS"
+TITLE="passwordcheck"
+HREF="passwordcheck.html"><LINK
+REL="NEXT"
+TITLE="pgcrypto"
+HREF="pgcrypto.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="passwordcheck"
+HREF="passwordcheck.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Приложение E. Дополнительно поставляемые модули</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="pgcrypto"
+HREF="pgcrypto.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="PGBUFFERCACHE"
+>E.24. pg_buffercache</A
+></H1
+><P
+>Модуль <TT
+CLASS="FILENAME"
+>pg_buffercache</TT
+> даёт возможность понять, что происходит в общем кеше буферов в реальном времени.</P
+><P
+>Этот модуль предоставляет функцию на C <CODE
+CLASS="FUNCTION"
+>pg_buffercache_pages</CODE
+>, возвращающую набор записей, плюс представление <TT
+CLASS="STRUCTNAME"
+>pg_buffercache</TT
+>, которое является удобной обёрткой этой функции.</P
+><P
+>По умолчанию, роли public на всякий случай, во избежание угрозы безопасности, запрещён любой доступ к этим объектам.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN122660"
+>E.24.1. Представление <TT
+CLASS="STRUCTNAME"
+>pg_buffercache</TT
+></A
+></H2
+><P
+>Определения колонок, содержащихся в представлении, показаны в <A
+HREF="pgbuffercache.html#PGBUFFERCACHE-COLUMNS"
+>Таблице E-14</A
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="PGBUFFERCACHE-COLUMNS"
+></A
+><P
+><B
+>Таблица E-14. Колонки <TT
+CLASS="STRUCTNAME"
+>pg_buffercache</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип</TH
+><TH
+>Ссылки</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>bufferid</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>integer</TT
+>
+                  </TD
+><TD
+>&nbsp;</TD
+><TD
+>ID, в диапазоне 1..<TT
+CLASS="VARNAME"
+>shared_buffers</TT
+></TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>relfilenode</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>oid</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>pg_class.relfilenode</TT
+>
+                  </TD
+><TD
+>Номер файлового узла для отношения</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>reltablespace</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>oid</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>pg_tablespace.oid</TT
+>
+                  </TD
+><TD
+>OID табличного пространства, содержащего отношение</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>reldatabase</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>oid</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>pg_database.oid</TT
+>
+                  </TD
+><TD
+>OID базы данных, содержащей отношение</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>relforknumber</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>smallint</TT
+>
+                  </TD
+><TD
+>&nbsp;</TD
+><TD
+>Номер слоя в отношении; см. <TT
+CLASS="FILENAME"
+>src/include/common/relpath.h</TT
+></TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>relblocknumber</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>&nbsp;</TD
+><TD
+>Номер страницы в отношении</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>isdirty</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>&nbsp;</TD
+><TD
+>Страница загрязнена?</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>usagecount</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>smallint</TT
+>
+                  </TD
+><TD
+>&nbsp;</TD
+><TD
+>Счётчик обращений по часовой стрелке</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Для каждого буфера в общем кеше выдаётся одна строка. Для неиспользуемых буферов все поля равны NULL, за исключением <TT
+CLASS="STRUCTFIELD"
+>bufferid</TT
+>. Общие системные каталоги показываются как относящиеся к базе данных под номером 0.</P
+><P
+>Так как кеш используется совместно всеми базами данных, обычно в нём находятся и страницы из отношений, не принадлежащих текущей базе данных. Это означает, что для некоторых строк при соединении с <TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+> не найдутся соответствующие строки, либо соединение будет некорректным. Если вы хотите выполнить соединение с <TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+>, будет правильным ограничить соединение строками, в которых <TT
+CLASS="STRUCTFIELD"
+>reldatabase</TT
+> содержит OID текущей базы данных или ноль.</P
+><P
+>При обращении к представлению <TT
+CLASS="STRUCTNAME"
+>pg_buffercache</TT
+> устанавливаются блокировки менеджера внутренних буферов на время, достаточное для копирования всех данных состояния буферов, которые будут выводиться в представлении. Благодаря этому представление выдаёт согласованный набор результатов, не блокируя при этом обычные операции с буфером дольше, чем необходимо. Тем не менее, это может повлиять на производительность базы данных, если обращаться к этому представлению часто.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN122745"
+>E.24.2. Пример вывода</A
+></H2
+><PRE
+CLASS="SCREEN"
+>regression=# SELECT c.relname, count(*) AS buffers
+             FROM pg_buffercache b INNER JOIN pg_class c
+             ON b.relfilenode = pg_relation_filenode(c.oid) AND
+                b.reldatabase IN (0, (SELECT oid FROM pg_database
+                                      WHERE datname = current_database()))
+             GROUP BY c.relname
+             ORDER BY 2 DESC
+             LIMIT 10;
+
+             relname             | buffers
+---------------------------------+---------
+ tenk2                           |     345
+ tenk1                           |     141
+ pg_proc                         |      46
+ pg_class                        |      45
+ pg_attribute                    |      43
+ pg_class_relname_nsp_index      |      30
+ pg_proc_proname_args_nsp_index  |      28
+ pg_attribute_relid_attnam_index |      26
+ pg_depend                       |      22
+ pg_depend_reference_index       |      20
+(10 rows)</PRE
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN122748"
+>E.24.3. Авторы</A
+></H2
+><P
+>Марк Кирквуд <CODE
+CLASS="EMAIL"
+>&#60;<A
+HREF="mailto:markir@paradise.net.nz"
+>markir@paradise.net.nz</A
+>&#62;</CODE
+></P
+><P
+>Предложения по конструкции: Нейл Конвей <CODE
+CLASS="EMAIL"
+>&#60;<A
+HREF="mailto:neilc@samurai.com"
+>neilc@samurai.com</A
+>&#62;</CODE
+></P
+><P
+>Советы по отладке: Том Лейн <CODE
+CLASS="EMAIL"
+>&#60;<A
+HREF="mailto:tgl@sss.pgh.pa.us"
+>tgl@sss.pgh.pa.us</A
+>&#62;</CODE
+></P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="passwordcheck.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="pgcrypto.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>passwordcheck</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>pgcrypto</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

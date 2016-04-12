@@ -1,0 +1,633 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Совместимость с разными версиями и платформами</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Настройка сервера"
+HREF="runtime-config.html"><LINK
+REL="PREVIOUS"
+TITLE="Управление блокировками"
+HREF="runtime-config-locks.html"><LINK
+REL="NEXT"
+TITLE="Обработка ошибок"
+HREF="runtime-config-error-handling.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Управление блокировками"
+HREF="runtime-config-locks.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="runtime-config.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 18. Настройка сервера</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Обработка ошибок"
+HREF="runtime-config-error-handling.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="RUNTIME-CONFIG-COMPATIBLE"
+>18.13. Совместимость с разными версиями и платформами</A
+></H1
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="RUNTIME-CONFIG-COMPATIBLE-VERSION"
+>18.13.1. Предыдущие версии PostgreSQL</A
+></H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="GUC-ARRAY-NULLS"
+></A
+><TT
+CLASS="VARNAME"
+>array_nulls</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Этот параметр определяет, будет ли при разборе вводимого массива распознаваться строка <TT
+CLASS="LITERAL"
+>NULL</TT
+> без кавычек как элемент массива, равный NULL. Значение по умолчанию, <TT
+CLASS="LITERAL"
+>on</TT
+>, позволяет задавать NULL в качестве элементов вводимого массива. Однако до версии 8.2 <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> не поддерживал ввод элементов NULL в массивах, а воспринимал <TT
+CLASS="LITERAL"
+>NULL</TT
+> как обычный элемент массива со строковым значением <SPAN
+CLASS="QUOTE"
+>"NULL"</SPAN
+>. Для обратной совместимости с приложениями, зависящими от старого поведения, эту переменную можно отключить (присвоив ей <TT
+CLASS="LITERAL"
+>off</TT
+>).</P
+><P
+>Заметьте, что массивы, содержащие NULL, можно создать, даже когда эта переменная имеет значение <TT
+CLASS="LITERAL"
+>off</TT
+>.</P
+></DD
+><DT
+><A
+NAME="GUC-BACKSLASH-QUOTE"
+></A
+><TT
+CLASS="VARNAME"
+>backslash_quote</TT
+> (<TT
+CLASS="TYPE"
+>enum</TT
+>) </DT
+><DD
+><P
+>Этот параметр определяет, можно ли будет представить знак апострофа в строковой константе в виде <TT
+CLASS="LITERAL"
+>\'</TT
+>. В стандарте SQL определён другой, предпочитаемый вариант передачи апострофа, удвоением (<TT
+CLASS="LITERAL"
+>''</TT
+>), но <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> исторически также принимал вариант <TT
+CLASS="LITERAL"
+>\'</TT
+>. Однако применение варианта <TT
+CLASS="LITERAL"
+>\'</TT
+> сопряжено с угрозами безопасности, так как в некоторых клиентских кодировках существуют многобайтные символы, последний байт которых численно равен ASCII-коду <TT
+CLASS="LITERAL"
+>\</TT
+>. Если код на стороне клиента выполнит экранирование некорректно, это может открыть возможности для SQL-инъекции. Предотвратить этот риск можно, запретив серверу принимать запросы, в которых апостроф экранируется обратной косой. Допустимые значения параметра <TT
+CLASS="VARNAME"
+>backslash_quote</TT
+>: <TT
+CLASS="LITERAL"
+>on</TT
+> (принимать <TT
+CLASS="LITERAL"
+>\'</TT
+> всегда), <TT
+CLASS="LITERAL"
+>off</TT
+> (не принимать никогда) и <TT
+CLASS="LITERAL"
+>safe_encoding</TT
+> (принимать, только если клиентская кодировка не допускает присутствия ASCII-кода <TT
+CLASS="LITERAL"
+>\</TT
+> в многобайтных символах). Значение по умолчанию — <TT
+CLASS="LITERAL"
+>safe_encoding</TT
+>.</P
+><P
+>Заметьте, что в строковой константе, записанной согласно стандарту, знаки <TT
+CLASS="LITERAL"
+>\</TT
+> обозначают просто <TT
+CLASS="LITERAL"
+>\</TT
+>. Этот параметр влияет только на восприятие строк, не соответствующих стандарту, в том числе с синтаксисом спецпоследовательностей (<TT
+CLASS="LITERAL"
+>E'...'</TT
+>).</P
+></DD
+><DT
+><A
+NAME="GUC-DEFAULT-WITH-OIDS"
+></A
+><TT
+CLASS="VARNAME"
+>default_with_oids</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Этот параметр определяет, будут ли команды <TT
+CLASS="COMMAND"
+>CREATE TABLE</TT
+> и <TT
+CLASS="COMMAND"
+>CREATE TABLE AS</TT
+> без явных указаний <TT
+CLASS="LITERAL"
+>WITH OIDS</TT
+> и <TT
+CLASS="LITERAL"
+>WITHOUT OIDS</TT
+> добавлять колонку OID в создаваемые таблицы. Он также устанавливает, будут ли колонки OID добавляться в таблицы, создаваемые командой <TT
+CLASS="COMMAND"
+>SELECT INTO</TT
+>. По умолчанию значение этого параметра — <TT
+CLASS="LITERAL"
+>off</TT
+> (колонки OID не добавляются); в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> версии 8.0 и до этого поведение по умолчанию было противоположным.</P
+><P
+>Практика использования OID в пользовательских таблицах считается устаревшей, так что в большинстве инсталляций не следует включать этот параметр. Приложения, которым требуется колонка OID в определённой таблице, могут явно указать <TT
+CLASS="LITERAL"
+>WITH OIDS</TT
+> при создании таблицы. Этот параметр следует включать только для совместимости со старыми приложениями, которые не делают этого.</P
+></DD
+><DT
+><A
+NAME="GUC-ESCAPE-STRING-WARNING"
+></A
+><TT
+CLASS="VARNAME"
+>escape_string_warning</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Когда этот параметр включён, сервер выдаёт предупреждение, если обратная косая черта (<TT
+CLASS="LITERAL"
+>\</TT
+>) встречается в обычной строковой константе (с синтаксисом <TT
+CLASS="LITERAL"
+>'...'</TT
+>) и параметр <TT
+CLASS="VARNAME"
+>standard_conforming_strings</TT
+> отключён. Значение по умолчанию — <TT
+CLASS="LITERAL"
+>on</TT
+> (вкл.).</P
+><P
+>Приложения, которые предпочитают использовать обратную косую в виде спецсимвола, должны перейти к применению синтаксиса спецстрок (<TT
+CLASS="LITERAL"
+>E'...'</TT
+>), так как по умолчанию теперь в обычных строках обратная косая воспринимается как обычный символ, в соответствии со стандартом SQL. Включение данного параметра помогает найти код, нуждающийся в модификации.</P
+></DD
+><DT
+><A
+NAME="GUC-LO-COMPAT-PRIVILEGES"
+></A
+><TT
+CLASS="VARNAME"
+>lo_compat_privileges</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> до версии 9.0 для больших объектов не назначались права доступа, и поэтому они были всегда доступны на чтение и запись для всех пользователей. Если установить для этого параметра значение <TT
+CLASS="LITERAL"
+>on</TT
+>, существующие теперь проверки прав отключаются для совместимости с предыдущими версиями. Значение по умолчанию — <TT
+CLASS="LITERAL"
+>off</TT
+>. Изменить этот параметр могут только суперпользователи.</P
+><P
+>Установка данного параметра не приводит к отключению всех проверок безопасности, связанных с большими объектами &mdash; затрагиваются только те проверки, которые изменились в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> 9.0. Например, функции <TT
+CLASS="LITERAL"
+>lo_import()</TT
+> и <TT
+CLASS="LITERAL"
+>lo_export()</TT
+> будут требовать прав суперпользователя вне зависимости от данного значения.</P
+></DD
+><DT
+><A
+NAME="GUC-QUOTE-ALL-IDENTIFIERS"
+></A
+><TT
+CLASS="VARNAME"
+>quote_all_identifiers</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Принудительно заключать в кавычки все идентификаторы, даже если это не ключевые слова (сегодня), при получении SQL из базы данных. Это касается вывода <TT
+CLASS="COMMAND"
+>EXPLAIN</TT
+>, а также результатов функций типа <CODE
+CLASS="FUNCTION"
+>pg_get_viewdef</CODE
+>. См. также описание аргумента <TT
+CLASS="OPTION"
+>--quote-all-identifiers</TT
+> команд <A
+HREF="app-pgdump.html"
+>pg_dump</A
+> и <A
+HREF="app-pg-dumpall.html"
+>            <SPAN
+CLASS="APPLICATION"
+>pg_dumpall</SPAN
+>
+          </A
+>.</P
+></DD
+><DT
+><A
+NAME="GUC-SQL-INHERITANCE"
+></A
+><TT
+CLASS="VARNAME"
+>sql_inheritance</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Этот параметр определяет, будет ли использование таблиц без уточнений подразумевать включение дочерних таблиц в иерархии наследования. Значение по умолчанию — <TT
+CLASS="LITERAL"
+>on</TT
+>, что означает, что дочерние таблицы включаются (то есть по умолчанию подразумевается суффикс <TT
+CLASS="LITERAL"
+>*</TT
+>). При значении <TT
+CLASS="LITERAL"
+>off</TT
+> дочерние таблицы не включаются (то есть подразумевается префикс <TT
+CLASS="LITERAL"
+>ONLY</TT
+>). Стандарт SQL требует, чтобы дочерние таблицы включались, так что вариант <TT
+CLASS="LITERAL"
+>off</TT
+> не соответствует стандарту, но предлагается для совместимости с <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> до версии 7.1. За дополнительными сведениями обратитесь к <A
+HREF="ddl-inherit.html"
+>Разделу 5.8</A
+>.</P
+><P
+>Поведение с выключенным <TT
+CLASS="VARNAME"
+>sql_inheritance</TT
+> считается устаревшим, так как оно не только противоречит стандарту SQL, но и провоцирует ошибки. При обсуждении наследования в этом руководстве обычно предполагается, что данный параметр имеет значение <TT
+CLASS="LITERAL"
+>on</TT
+>.</P
+></DD
+><DT
+><A
+NAME="GUC-STANDARD-CONFORMING-STRINGS"
+></A
+><TT
+CLASS="VARNAME"
+>standard_conforming_strings</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Этот параметр определяет, будет ли обратная косая черта в обычных строковых константах (<TT
+CLASS="LITERAL"
+>'...'</TT
+>) восприниматься буквально, как того требует стандарт SQL. Начиная с версии <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> 9.1, он имеет значение <TT
+CLASS="LITERAL"
+>on</TT
+> (в предыдущих версиях значение по умолчанию было <TT
+CLASS="LITERAL"
+>off</TT
+>). Приложения могут выяснить, как обрабатываются строковые константы, проверив этот параметр. Наличие этого параметра может также быть признаком того, что поддерживается синтаксис спецпоследовательностей (<TT
+CLASS="LITERAL"
+>E'...'</TT
+>). Этот синтаксис (<A
+HREF="sql-syntax-lexical.html#SQL-SYNTAX-STRINGS-ESCAPE"
+>Подраздел 4.1.2.2</A
+>) следует использовать, если приложению нужно, чтобы обратная косая воспринималась как спецсимвол.</P
+></DD
+><DT
+><A
+NAME="GUC-SYNCHRONIZE-SEQSCANS"
+></A
+><TT
+CLASS="VARNAME"
+>synchronize_seqscans</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Этот параметр включает синхронизацию обращений при последовательном сканировании больших таблиц, чтобы эти операции читали один блок примерно в одно и то же время, и, таким образом, нагрузка разделялась между ними. Когда он включён, сканирование может начаться в середине таблицы, чтобы синхронизироваться со сканированием, которое уже выполняется. По достижении конца таблицы сканирование <SPAN
+CLASS="QUOTE"
+>"заворачивается"</SPAN
+> к началу и завершает обработку пропущенных строк. Это может привести к непредсказуемому изменению порядка строк, возвращаемых запросами, в которых отсутствует предложение <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+>. Когда этот параметр выключен (имеет значение <TT
+CLASS="LITERAL"
+>off</TT
+>), реализуется поведение, принятое до версии 8.3, когда последовательное сканирование всегда начиналось с начала таблицы. Значение по умолчанию — <TT
+CLASS="LITERAL"
+>on</TT
+>.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="RUNTIME-CONFIG-COMPATIBLE-CLIENTS"
+>18.13.2. Совместимость с разными платформами и клиентами</A
+></H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="GUC-TRANSFORM-NULL-EQUALS"
+></A
+><TT
+CLASS="VARNAME"
+>transform_null_equals</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Когда этот параметр включён, проверки вида <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> = NULL</TT
+> (или <TT
+CLASS="LITERAL"
+>NULL = <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+></TT
+>) воспринимаются как <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> IS NULL</TT
+>, то есть они истинны, если <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> даёт значение NULL, и ложны в противном случае. Согласно спецификации SQL, сравнение <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> = NULL</TT
+> должно всегда возвращать NULL (неизвестное значение). Поэтому по умолчанию этот параметр выключен (равен <TT
+CLASS="LITERAL"
+>off</TT
+>).</P
+><P
+>Однако формы фильтров в <SPAN
+CLASS="PRODUCTNAME"
+>Microsoft Access</SPAN
+> генерируют запросы, в которых проверка на значение NULL записывается как <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> = NULL</TT
+>, так что если вы используете этот интерфейс для обращения к базе данных, имеет смысл включить данный параметр. Так как проверки вида <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> = NULL</TT
+> всегда возвращают значение NULL (следуя правилам стандарта SQL), они не очень полезны и не должны встречаться в обычных приложениях, так что на практике от включения этого параметра не будет большого вреда. Однако начинающие пользователи часто путаются в семантике выражений со значениями NULL, поэтому по умолчанию этот параметр выключен.</P
+><P
+>Заметьте, что этот параметр влияет только на точную форму сравнения <TT
+CLASS="LITERAL"
+>= NULL</TT
+>, но не на другие операторы сравнения или выражения, результат которых может быть равнозначен сравнению с применением оператора равенства (например, конструкцию <TT
+CLASS="LITERAL"
+>IN</TT
+>). Поэтому данный параметр не может быть универсальной защитой от плохих приёмов программирования.</P
+><P
+>За сопутствующей информацией обратитесь к <A
+HREF="functions-comparison.html"
+>Разделу 9.2</A
+>.</P
+></DD
+></DL
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="runtime-config-locks.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="runtime-config-error-handling.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Управление блокировками</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="runtime-config.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Обработка ошибок</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

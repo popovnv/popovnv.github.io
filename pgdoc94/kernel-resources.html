@@ -1,0 +1,1412 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Управление ресурсами ядра</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Подготовка к работе и сопровождение сервера"
+HREF="runtime.html"><LINK
+REL="PREVIOUS"
+TITLE="Запуск сервера баз данных"
+HREF="server-start.html"><LINK
+REL="NEXT"
+TITLE="Выключение сервера"
+HREF="server-shutdown.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Запуск сервера баз данных"
+HREF="server-start.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="runtime.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 17. Подготовка к работе и сопровождение сервера</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Выключение сервера"
+HREF="server-shutdown.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="KERNEL-RESOURCES"
+>17.4. Управление ресурсами ядра</A
+></H1
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> иногда может исчерпывать некоторые ресурсы операционной системы до предела, особенно при запуске нескольких копий сервера в одной системе или при работе с очень большими базами. В этом разделе описываются ресурсы ядра, которые использует <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, и подходы к решению проблем, связанных с ограниченностью этих ресурсов.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="SYSVIPC"
+>17.4.1. Разделяемая память и семафоры</A
+></H2
+><P
+>Разделяемая память и семафоры в совокупности называются средствами межпроцессного взаимодействия (<ACRONYM
+CLASS="ACRONYM"
+>IPC</ACRONYM
+>) в стиле <SPAN
+CLASS="SYSTEMITEM"
+>System V</SPAN
+> (к этим средствам также относятся очереди сообщений, но они не имеют отношения к <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>). За исключением <SPAN
+CLASS="SYSTEMITEM"
+>Windows</SPAN
+>, где <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> использует собственную замену этих средств, эти средства необходимы для работы <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+><P
+>Если эти механизмы полностью отсутствуют в системе, при запуске сервера обычно выдаётся ошибка <SPAN
+CLASS="ERRORNAME"
+>Illegal system call</SPAN
+> (Неверный системный вызов). В этом случае единственный способ решить проблему — переконфигурировать ядро системы. Без них <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> просто не будет работать. Это довольно редкая ситуация, особенно с современными операционными системами.</P
+><P
+>Когда <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> превышает один из различных жёстких пределов <ACRONYM
+CLASS="ACRONYM"
+>IPC</ACRONYM
+>, сервер отказывается запускаться, но выдаёт полезное сообщение, говорящее об ошибке и о том, что с ней делать. (См. также <A
+HREF="server-start.html#SERVER-START-FAILURES"
+>Подраздел 17.3.1</A
+>.) Соответствующие параметры ядра в разных системах называются аналогично (они перечислены в <A
+HREF="kernel-resources.html#SYSVIPC-PARAMETERS"
+>Таблице 17-1</A
+>), но устанавливаются они по-разному. Ниже предлагаются способы их изменения для некоторых систем.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> до версии 9.3 требовал для запуска сервера гораздо больший объём разделяемой памяти System V. Если вы используете более раннюю версию сервера, обратитесь к документации по вашей версии.</P
+></BLOCKQUOTE
+></DIV
+><DIV
+CLASS="TABLE"
+><A
+NAME="SYSVIPC-PARAMETERS"
+></A
+><P
+><B
+>Таблица 17-1. Параметры <ACRONYM
+CLASS="ACRONYM"
+>IPC</ACRONYM
+> в стиле <SPAN
+CLASS="SYSTEMITEM"
+>System V</SPAN
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Описание</TH
+><TH
+>Разумные значения</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                    <TT
+CLASS="VARNAME"
+>SHMMAX</TT
+>
+                  </TD
+><TD
+>Максимальный размер сегмента разделяемой памяти (в байтах)</TD
+><TD
+>не меньше 1 КБ (больше, если запускается много копий сервера)</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="VARNAME"
+>SHMMIN</TT
+>
+                  </TD
+><TD
+>Минимальный размер сегмента разделяемой памяти (в байтах)</TD
+><TD
+>1</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="VARNAME"
+>SHMALL</TT
+>
+                  </TD
+><TD
+>Общий объём доступной разделяемой памяти (в байтах или страницах)</TD
+><TD
+>если в байтах, то же, что и <TT
+CLASS="VARNAME"
+>SHMMAX</TT
+>; если в страницах, то <TT
+CLASS="LITERAL"
+>ceil(SHMMAX/PAGE_SIZE)</TT
+></TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="VARNAME"
+>SHMSEG</TT
+>
+                  </TD
+><TD
+>Максимальное число сегментов разделяемой памяти для процесса</TD
+><TD
+>требуется только 1 сегмент, но значение по умолчанию гораздо больше</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="VARNAME"
+>SHMMNI</TT
+>
+                  </TD
+><TD
+>Максимальное число сегментов разделяемой памяти для всей системы</TD
+><TD
+>как <TT
+CLASS="VARNAME"
+>SHMSEG</TT
+> плюс потребность других приложений</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="VARNAME"
+>SEMMNI</TT
+>
+                  </TD
+><TD
+>Максимальное число идентификаторов семафоров (т. е., их наборов)</TD
+><TD
+>как минимум <TT
+CLASS="LITERAL"
+>ceil((max_connections + autovacuum_max_workers + 4) / 16)</TT
+></TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="VARNAME"
+>SEMMNS</TT
+>
+                  </TD
+><TD
+>Максимальное число семафоров для всей системы</TD
+><TD
+><TT
+CLASS="LITERAL"
+>ceil((max_connections + autovacuum_max_workers + 4) / 16) * 17</TT
+> плюс потребность для других приложений</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="VARNAME"
+>SEMMSL</TT
+>
+                  </TD
+><TD
+>Максимальное число семафоров в наборе</TD
+><TD
+>не меньше 17</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="VARNAME"
+>SEMMAP</TT
+>
+                  </TD
+><TD
+>Число записей в карте семафоров</TD
+><TD
+>см. текст</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="VARNAME"
+>SEMVMX</TT
+>
+                  </TD
+><TD
+>Максимальное значение семафора</TD
+><TD
+>не меньше 1000 (по умолчанию оно обычно равно 32767; без необходимости менять его не следует)</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> запрашивает небольшой блок разделяемой памяти System V (обычно 48 байт на 64-битной платформе) для каждой копии сервера. В большинстве современных операционных систем такой объём выделяется без проблем. Однако, если запускать много копий сервера, или разделяемую память System V занимают и другие приложения, может понадобиться увеличить значение <TT
+CLASS="VARNAME"
+>SHMMAX</TT
+>, максимальный размер сегмента разделяемой памяти (в байтах), либо <TT
+CLASS="VARNAME"
+>SHMALL</TT
+>, общий объём разделяемой памяти System V, доступный для всей системы. Заметьте, что <TT
+CLASS="VARNAME"
+>SHMALL</TT
+> во многих системах задаётся в страницах, а не в байтах.</P
+><P
+>Менее вероятны проблемы с минимальным размером сегментов разделяемой памяти (<TT
+CLASS="VARNAME"
+>SHMMIN</TT
+>), который для <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> не должен превышать примерно 32 байт (обычно это всего 1 байт). Максимальное число сегментов для всей системы (<TT
+CLASS="VARNAME"
+>SHMMNI</TT
+>) или для одного процесса (<TT
+CLASS="VARNAME"
+>SHMSEG</TT
+>) тоже обычно не влияет на работоспособность сервера, если только это число не равно нулю.</P
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> использует по одному семафору на одно разрешённое подключение (<A
+HREF="runtime-config-connection.html#GUC-MAX-CONNECTIONS"
+>max_connections</A
+>) и на рабочий процесс автоочистки (<A
+HREF="runtime-config-autovacuum.html#GUC-AUTOVACUUM-MAX-WORKERS"
+>autovacuum_max_workers</A
+>), в наборах по 16. В каждом таком наборе есть также 17-ый семафор, содержащий <SPAN
+CLASS="QUOTE"
+>"магическое число"</SPAN
+>, позволяющий обнаруживать коллизии с наборами семафоров других приложений. Максимальное число семафоров в системе задаётся параметром <TT
+CLASS="VARNAME"
+>SEMMNS</TT
+>, который, следовательно, должен быть равен как минимум сумме <TT
+CLASS="VARNAME"
+>max_connections</TT
+> и <TT
+CLASS="VARNAME"
+>autovacuum_max_workers</TT
+>, плюс один дополнительный на каждые 16 семафоров подключений и рабочих процессов (см. формулу в <A
+HREF="kernel-resources.html#SYSVIPC-PARAMETERS"
+>Таблице 17-1</A
+>). Параметр <TT
+CLASS="VARNAME"
+>SEMMNI</TT
+> определяет максимальное число наборов семафоров, которые могут существовать в системе в один момент времени. Таким образом, этот параметр должен быть не меньше <TT
+CLASS="LITERAL"
+>ceil((max_connections + autovacuum_max_workers + 4) / 16)</TT
+>. В качестве временного решения проблем, которые вызваны этими ограничениями, но обычно сопровождаются некорректными сообщениями, например, <SPAN
+CLASS="QUOTE"
+>"No space left on device"</SPAN
+> (На устройстве не осталось места) от функции <CODE
+CLASS="FUNCTION"
+>semget</CODE
+>, можно уменьшить число разрешённых соединений.</P
+><P
+>В некоторых случаях может потребоваться увеличить <TT
+CLASS="VARNAME"
+>SEMMAP</TT
+> как минимум до уровня <TT
+CLASS="VARNAME"
+>SEMMNS</TT
+>. Этот параметр определяет размер карты ресурсов семафоров, в которой выделяется запись для каждого непрерывного блока семафоров. Когда набор семафоров освобождается, эта запись либо добавляется к существующей соседней записи, либо регистрируется как новая запись в карте. Если карта переполняется, освобождаемые семафоры теряются (до перезагрузки). Таким образом, фрагментация пространства семафоров может со времени привести к уменьшению числа доступных семафоров.</P
+><P
+>Параметр <TT
+CLASS="VARNAME"
+>SEMMSL</TT
+>, определяющий, сколько семафоров может быть в одном наборе, для <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> должен равняться как минимум 17.</P
+><P
+>Другие параметры, связанные с <SPAN
+CLASS="QUOTE"
+>"аннулированием операций"</SPAN
+> с семафорами, например, <TT
+CLASS="VARNAME"
+>SEMMNU</TT
+> и <TT
+CLASS="VARNAME"
+>SEMUME</TT
+>, на работу <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> не влияют.</P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><SPAN
+CLASS="SYSTEMITEM"
+>AIX</SPAN
+></DT
+><DD
+><P
+>Как минимум с версии 5.1, для таких параметров, как <TT
+CLASS="VARNAME"
+>SHMMAX</TT
+>, никакая дополнительная настройка не должна требоваться, так как система, похоже, позволяет использовать всю память в качестве разделяемой. Подобная конфигурация требуется обычно и для других баз данных, например, для <SPAN
+CLASS="APPLICATION"
+>DB/2</SPAN
+>.</P
+><P
+>Однако может понадобиться изменить глобальные параметры <TT
+CLASS="COMMAND"
+>ulimit</TT
+> в <TT
+CLASS="FILENAME"
+>/etc/security/limits</TT
+>, так как стандартные жёсткие ограничения на размер (<TT
+CLASS="VARNAME"
+>fsize</TT
+>) и количество файлов (<TT
+CLASS="VARNAME"
+>nofiles</TT
+>) могут быть недостаточно большими.</P
+></DD
+><DT
+><SPAN
+CLASS="SYSTEMITEM"
+>FreeBSD</SPAN
+></DT
+><DD
+><P
+>Значения по умолчанию можно изменить, используя возможности <TT
+CLASS="COMMAND"
+>sysctl</TT
+> или <TT
+CLASS="COMMAND"
+>loader</TT
+>. С помощью <TT
+CLASS="COMMAND"
+>sysctl</TT
+> можно задать следующие параметры: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>#</SAMP
+> <KBD
+CLASS="USERINPUT"
+>sysctl kern.ipc.shmall=32768</KBD
+>
+<SAMP
+CLASS="PROMPT"
+>#</SAMP
+> <KBD
+CLASS="USERINPUT"
+>sysctl kern.ipc.shmmax=134217728</KBD
+></PRE
+><P> Чтобы эти изменения сохранялись после перезагрузки, измените <TT
+CLASS="FILENAME"
+>/etc/sysctl.conf</TT
+>.</P
+><P
+>Эти параметры, связанные с семафорами, <TT
+CLASS="COMMAND"
+>sysctl</TT
+> менять не позволяет, но их можно задать в <TT
+CLASS="FILENAME"
+>/boot/loader.conf</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>kern.ipc.semmni=256
+kern.ipc.semmns=512
+kern.ipc.semmnu=256</PRE
+><P> Чтобы изменённые таким образом параметры вступили в силу, требуется перезагрузить систему. (Заметьте, что во FreeBSD нет параметра <TT
+CLASS="VARNAME"
+>SEMMAP</TT
+>. В старых версиях значение для <TT
+CLASS="LITERAL"
+>kern.ipc.semmap</TT
+> принималось, но игнорировалось; новые версии его не принимают.)</P
+><P
+>Возможно, вы захотите настроить ядро так, чтобы разделяемая память всегда находилась в ОЗУ и никогда не выгружалась в пространство подкачки. Это можно сделать, установив с помощью <TT
+CLASS="COMMAND"
+>sysctl</TT
+> параметр <TT
+CLASS="LITERAL"
+>kern.ipc.shm_use_phys</TT
+>.</P
+><P
+>Если вы используете &laquo;камеры&raquo; FreeBSD, включив в <SPAN
+CLASS="APPLICATION"
+>sysctl</SPAN
+> параметр <TT
+CLASS="LITERAL"
+>security.jail.sysvipc_allowed</TT
+>, главные процессы <SPAN
+CLASS="APPLICATION"
+>postmaster</SPAN
+>, работающие в разных камерах, должны запускаться разными пользователями операционной системы. Это усиливает защиту, так как не позволяет обычным пользователям обращаться к разделяемой памяти или семафорам в разных камерах, и при этом способствует корректной работе кода очистки IPC в PostgreSQL. (Во FreeBSD 6.0 и более поздних версиях код очистки IPC не может корректно выявить процессы в других камерах, что не позволяет запускать процессы postmaster на одном порту в разных камерах.)</P
+><P
+>До версии 4.0 система <SPAN
+CLASS="SYSTEMITEM"
+>FreeBSD</SPAN
+> работала так же, как сейчас <SPAN
+CLASS="SYSTEMITEM"
+>OpenBSD</SPAN
+> (см. ниже).</P
+></DD
+><DT
+><SPAN
+CLASS="SYSTEMITEM"
+>NetBSD</SPAN
+></DT
+><DD
+><P
+>В <SPAN
+CLASS="SYSTEMITEM"
+>NetBSD</SPAN
+>, начиная с версии 5.0, параметры IPC можно изменить, воспользовавшись командой <TT
+CLASS="COMMAND"
+>sysctl</TT
+>, например: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>sysctl -w kern.ipc.shmmax=16777216</KBD
+></PRE
+><P> Чтобы эти параметры сохранялись после перезагрузки, измените <TT
+CLASS="FILENAME"
+>/etc/sysctl.conf</TT
+>.</P
+><P
+>Возможно, вы захотите настроить ядро так, чтобы разделяемая память всегда находилась в ОЗУ и никогда не выгружалась в пространство подкачки. Это можно сделать, установив с помощью <TT
+CLASS="COMMAND"
+>sysctl</TT
+> параметр <TT
+CLASS="LITERAL"
+>kern.ipc.shm_use_phys</TT
+>.</P
+><P
+>До версии 5.0 система <SPAN
+CLASS="SYSTEMITEM"
+>NetBSD</SPAN
+> работала так же, как сейчас <SPAN
+CLASS="SYSTEMITEM"
+>OpenBSD</SPAN
+> (см. ниже), за исключением того, что параметры устанавливаются с указанием <TT
+CLASS="LITERAL"
+>options</TT
+>, а не <TT
+CLASS="LITERAL"
+>option</TT
+>.</P
+></DD
+><DT
+><SPAN
+CLASS="SYSTEMITEM"
+>OpenBSD</SPAN
+></DT
+><DD
+><P
+>При компиляции ядра должны быть включены механизмы <TT
+CLASS="VARNAME"
+>SYSVSHM</TT
+> и <TT
+CLASS="VARNAME"
+>SYSVSEM</TT
+>. (По умолчанию они включены.) Максимальный размер разделяемой памяти определяется параметром <TT
+CLASS="VARNAME"
+>SHMMAXPGS</TT
+> (в страницах). Ниже показан пример, как установить следующие параметры: </P><PRE
+CLASS="PROGRAMLISTING"
+>option        SYSVSHM
+option        SHMMAXPGS=4096
+option        SHMSEG=256
+
+option        SYSVSEM
+option        SEMMNI=256
+option        SEMMNS=512
+option        SEMMNU=256
+option        SEMMAP=256</PRE
+><P></P
+><P
+>Возможно, вы захотите настроить ядро так, чтобы разделяемая память всегда находилась в ОЗУ и никогда не выгружалась в пространство подкачки. Это можно сделать, установив с помощью <TT
+CLASS="COMMAND"
+>sysctl</TT
+> параметр <TT
+CLASS="LITERAL"
+>kern.ipc.shm_use_phys</TT
+>.</P
+></DD
+><DT
+><SPAN
+CLASS="SYSTEMITEM"
+>HP-UX</SPAN
+></DT
+><DD
+><P
+>Значения по умолчанию обычно вполне удовлетворяют средним потребностям. В <SPAN
+CLASS="PRODUCTNAME"
+>HP-UX</SPAN
+> 10 параметр <TT
+CLASS="VARNAME"
+>SEMMNS</TT
+> по умолчанию имеет значение 128, что может быть недостаточно для больших баз данных.</P
+><P
+>Параметры <ACRONYM
+CLASS="ACRONYM"
+>IPC</ACRONYM
+> можно установить в менеджере системного администрирования (<SPAN
+CLASS="APPLICATION"
+>System Administration Manager</SPAN
+>, <ACRONYM
+CLASS="ACRONYM"
+>SAM</ACRONYM
+>) в разделе <SPAN
+CLASS="GUIMENU"
+>Kernel Configuration (Настройка ядра)</SPAN
+>-&gt;<SPAN
+CLASS="GUIMENUITEM"
+>Configurable Parameters (Настраиваемые параметры)</SPAN
+>. Установив нужные параметры, выполните операцию <SPAN
+CLASS="GUIBUTTON"
+>Create A New Kernel</SPAN
+> (Создать ядро).</P
+></DD
+><DT
+><SPAN
+CLASS="SYSTEMITEM"
+>Linux</SPAN
+></DT
+><DD
+><P
+>По умолчанию максимальный размер сегмента равен 32 МБ, а максимальный общий размер составляет 2097152 страниц. Страница почти всегда содержит 4096 байт, за исключением нестандартных конфигураций ядра с поддержкой <SPAN
+CLASS="QUOTE"
+>"огромных страниц"</SPAN
+> (точно узнать размер страницы можно, выполнив <TT
+CLASS="LITERAL"
+>getconf PAGE_SIZE</TT
+>).</P
+><P
+>Параметры размера разделяемой памяти можно изменить, воспользовавшись командой <TT
+CLASS="COMMAND"
+>sysctl</TT
+>. Например, так можно выделить 16 ГБ для разделяемой памяти: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>sysctl -w kernel.shmmax=17179869184</KBD
+>
+<SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>sysctl -w kernel.shmall=4194304</KBD
+></PRE
+><P> Чтобы сохранить эти изменения после перезагрузки, их также можно записать в файл <TT
+CLASS="FILENAME"
+>/etc/sysctl.conf</TT
+> (это настоятельно рекомендуется).</P
+><P
+>В некоторых старых дистрибутивах может не оказаться программы <TT
+CLASS="COMMAND"
+>sysctl</TT
+>, но те же изменения можно произвести, обратившись к файловой системе <TT
+CLASS="FILENAME"
+>/proc</TT
+>: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>echo 17179869184 &gt;/proc/sys/kernel/shmmax</KBD
+>
+<SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>echo 4194304 &gt;/proc/sys/kernel/shmall</KBD
+></PRE
+><P></P
+><P
+>Остальные параметры имеют вполне подходящие значения, так что их обычно менять не нужно.</P
+></DD
+><DT
+><SPAN
+CLASS="SYSTEMITEM"
+>OS X</SPAN
+></DT
+><DD
+><P
+>Для настройки разделяемой памяти в OS X рекомендуется создать файл <TT
+CLASS="FILENAME"
+>/etc/sysctl.conf</TT
+> и записать в него присвоения переменных следующим образом: </P><PRE
+CLASS="PROGRAMLISTING"
+>kern.sysv.shmmax=4194304
+kern.sysv.shmmin=1
+kern.sysv.shmmni=32
+kern.sysv.shmseg=8
+kern.sysv.shmall=1024</PRE
+><P> Заметьте, что в некоторых версиях OS X, <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>все пять</I
+></SPAN
+> параметров разделяемой памяти должны быть установлены в <TT
+CLASS="FILENAME"
+>/etc/sysctl.conf</TT
+>, иначе их значения будут проигнорированы.</P
+><P
+>Имейте в виду, что последние версии OS X игнорируют попытки задать для <TT
+CLASS="VARNAME"
+>SHMMAX</TT
+> значение, не кратное 4096.</P
+><P
+><TT
+CLASS="VARNAME"
+>SHMALL</TT
+> на этой платформе измеряется в страницах (по 4 КБ).</P
+><P
+>В старых версиях OS X, чтобы изменения параметров разделяемой памяти вступили в силу, требовалась перезагрузка. Начиная с версии 10.5, все параметры, кроме <TT
+CLASS="VARNAME"
+>SHMMNI</TT
+> можно изменить &laquo;на лету&raquo;, воспользовавшись командой <SPAN
+CLASS="APPLICATION"
+>sysctl</SPAN
+>. Но, тем не менее, лучше задавать выбранные вами значения в <TT
+CLASS="FILENAME"
+>/etc/sysctl.conf</TT
+>, чтобы они сохранялись после перезагрузки.</P
+><P
+>Файл <TT
+CLASS="FILENAME"
+>/etc/sysctl.conf</TT
+> обрабатывается, только начиная с OS X версии 10.3.9. Если вы используете предыдущий выпуск 10.3.x, необходимо отредактировать файл <TT
+CLASS="FILENAME"
+>/etc/rc</TT
+> и задать значения следующими командами: </P><PRE
+CLASS="PROGRAMLISTING"
+>sysctl -w kern.sysv.shmmax
+sysctl -w kern.sysv.shmmin
+sysctl -w kern.sysv.shmmni
+sysctl -w kern.sysv.shmseg
+sysctl -w kern.sysv.shmall</PRE
+><P> Заметьте, что <TT
+CLASS="FILENAME"
+>/etc/rc</TT
+> обычно заменяется при обновлении системы OS X, так что следует ожидать, что вам придётся повторять эти изменения после каждого обновления.</P
+><P
+>В OS X 10.2 и более ранних версиях вместо этого надо записать эти команды в файле <TT
+CLASS="FILENAME"
+>/System/Library/StartupItems/SystemTuning/SystemTuning</TT
+>.</P
+></DD
+><DT
+><SPAN
+CLASS="SYSTEMITEM"
+>SCO OpenServer</SPAN
+></DT
+><DD
+><P
+>В стандартной конфигурации размер одного сегмента разделяемой памяти имеет предел в 512 КБ. Чтобы увеличить этот предел, сначала перейдите в каталог <TT
+CLASS="FILENAME"
+>/etc/conf/cf.d</TT
+>. Затем просмотрите текущее значение <TT
+CLASS="VARNAME"
+>SHMMAX</TT
+>, выполнив: </P><PRE
+CLASS="PROGRAMLISTING"
+>./configure -y SHMMAX</PRE
+><P> Задайте новое значение <TT
+CLASS="VARNAME"
+>SHMMAX</TT
+>, выполнив: </P><PRE
+CLASS="PROGRAMLISTING"
+>./configure SHMMAX=<TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+></PRE
+><P> Здесь <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> — новый предел, который вы хотите установить (в байтах). Установив <TT
+CLASS="VARNAME"
+>SHMMAX</TT
+>, пересоберите ядро: </P><PRE
+CLASS="PROGRAMLISTING"
+>./link_unix</PRE
+><P> и перезагрузите систему.</P
+></DD
+><DT
+><SPAN
+CLASS="SYSTEMITEM"
+>Solaris</SPAN
+> версии с 2.6 по 2.9 (Solaris 6 .. Solaris 9) </DT
+><DD
+><P
+>Соответствующие параметры можно изменить в <TT
+CLASS="FILENAME"
+>/etc/system</TT
+>, например так: </P><PRE
+CLASS="PROGRAMLISTING"
+>set shmsys:shminfo_shmmax=0x2000000
+set shmsys:shminfo_shmmin=1
+set shmsys:shminfo_shmmni=256
+set shmsys:shminfo_shmseg=256
+
+set semsys:seminfo_semmap=256
+set semsys:seminfo_semmni=512
+set semsys:seminfo_semmns=512
+set semsys:seminfo_semmsl=32</PRE
+><P> Чтобы изменения вступили в силу, потребуется перегрузить систему. Информацию о разделяемой памяти в более старых версиях Solaris можно найти по ссылке <A
+HREF="http://sunsite.uakom.sk/sunworldonline/swol-09-1997/swol-09-insidesolaris.html"
+TARGET="_top"
+>http://sunsite.uakom.sk/sunworldonline/swol-09-1997/swol-09-insidesolaris.html</A
+>.</P
+></DD
+><DT
+><SPAN
+CLASS="SYSTEMITEM"
+>Solaris</SPAN
+> 2.10 (Solaris 10) и более поздние версии<BR><SPAN
+CLASS="SYSTEMITEM"
+>OpenSolaris</SPAN
+></DT
+><DD
+><P
+>В Solaris 10 и новее, а также в OpenSolaris, стандартные параметры разделяемой памяти и семафоров достаточно хороши для большинства применений <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. По умолчанию Solaris теперь устанавливает в <TT
+CLASS="VARNAME"
+>SHMMAX</TT
+> четверть объёма <ACRONYM
+CLASS="ACRONYM"
+>ОЗУ</ACRONYM
+>. Чтобы изменить этот параметр, воспользуйтесь возможностью задать параметр проекта, связанного с пользователем <TT
+CLASS="LITERAL"
+>postgres</TT
+>. Например, выполните от имени <TT
+CLASS="LITERAL"
+>root</TT
+> такую команду: </P><PRE
+CLASS="PROGRAMLISTING"
+>projadd -c "PostgreSQL DB User" -K "project.max-shm-memory=(privileged,8GB,deny)" -U postgres -G postgres user.postgres</PRE
+><P></P
+><P
+>Эта команда создаёт проект <TT
+CLASS="LITERAL"
+>user.postgres</TT
+> и устанавливает максимальный объём разделяемой памяти для пользователя <TT
+CLASS="LITERAL"
+>postgres</TT
+> равным 8 ГБ. Это изменение вступает в силу при следующем входе этого пользователя или при перезапуске <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> (не перезагрузке конфигурации). При этом подразумевается, что <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> выполняется пользователем <TT
+CLASS="LITERAL"
+>postgres</TT
+> в группе <TT
+CLASS="LITERAL"
+>postgres</TT
+>. Перезагружать систему после этой команды не нужно.</P
+><P
+>Для серверов баз данных, рассчитанных на большое количество подключений, рекомендуется также изменить следующие параметры: </P><PRE
+CLASS="PROGRAMLISTING"
+>project.max-shm-ids=(priv,32768,deny)
+project.max-sem-ids=(priv,4096,deny)
+project.max-msg-ids=(priv,4096,deny)</PRE
+><P></P
+><P
+>Кроме того, если <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> у вас выполняется внутри зоны, может понадобиться также увеличить лимиты на использование ресурсов зоны. Получить дополнительную информацию о <TT
+CLASS="LITERAL"
+>проектах</TT
+> и команде <TT
+CLASS="COMMAND"
+>prctl</TT
+> можно в <I
+CLASS="CITETITLE"
+>Руководстве системного администратора</I
+> (System Administrator's Guide), &laquo;Главе 2: Проекты и задачи&raquo; (Chapter2: Projects and Tasks).</P
+></DD
+><DT
+><SPAN
+CLASS="SYSTEMITEM"
+>UnixWare</SPAN
+></DT
+><DD
+><P
+>В <SPAN
+CLASS="PRODUCTNAME"
+>UnixWare</SPAN
+> 7 максимальный размер сегментов разделяемой памяти равен 512 КБ в стандартной конфигурации. Чтобы просмотреть текущее значение <TT
+CLASS="VARNAME"
+>SHMMAX</TT
+>, выполните: </P><PRE
+CLASS="PROGRAMLISTING"
+>/etc/conf/bin/idtune -g SHMMAX</PRE
+><P> В результате вы увидите текущее значение, значение по умолчанию, а также минимальные и максимальные значения. Чтобы задать новое значение <TT
+CLASS="VARNAME"
+>SHMMAX</TT
+>, выполните: </P><PRE
+CLASS="PROGRAMLISTING"
+>/etc/conf/bin/idtune SHMMAX <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+></PRE
+><P> Здесь <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> — новый предел, который вы хотите установить (в байтах). Изменив значение <TT
+CLASS="VARNAME"
+>SHMMAX</TT
+>, пересоберите ядро: </P><PRE
+CLASS="PROGRAMLISTING"
+>/etc/conf/bin/idbuild -B</PRE
+><P> и перегрузите систему.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN28735"
+>17.4.2. Ограничения ресурсов</A
+></H2
+><P
+>В Unix-подобных операционных системах существуют различные типы ограничений ресурсов, которые могут влиять на работу сервера <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Особенно важны ограничения на число процессов для пользователя, число открытых файлов и объём памяти для каждого процесса. Каждое из этих ограничений имеет <SPAN
+CLASS="QUOTE"
+>"жёсткий"</SPAN
+> и <SPAN
+CLASS="QUOTE"
+>"мягкий"</SPAN
+> предел. Мягкий предел действительно ограничивает использование ресурса, но пользователь может увеличить его значение до жёсткого предела. Изменить жёсткий предел может только пользователь root. За изменение этих параметров отвечает системный вызов <CODE
+CLASS="FUNCTION"
+>setrlimit</CODE
+>. Управлять этими ресурсами в командной строке позволяет встроенная команда <TT
+CLASS="COMMAND"
+>ulimit</TT
+> (в оболочках Bourne) и <TT
+CLASS="COMMAND"
+>limit</TT
+> (<SPAN
+CLASS="APPLICATION"
+>csh</SPAN
+>). В системах семейства BSD различными ограничениями ресурсов, устанавливаемыми при входе пользователя, управляет файл <TT
+CLASS="FILENAME"
+>/etc/login.conf</TT
+>. За подробностями обратитесь к документации операционной системы. Для <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> интерес представляют параметры <TT
+CLASS="VARNAME"
+>maxproc</TT
+>, <TT
+CLASS="VARNAME"
+>openfiles</TT
+> и <TT
+CLASS="VARNAME"
+>datasize</TT
+>. Они могут задаваться, например так: </P><PRE
+CLASS="PROGRAMLISTING"
+>default:\
+...
+        :datasize-cur=256M:\
+        :maxproc-cur=256:\
+        :openfiles-cur=256:\
+...</PRE
+><P> (Здесь <TT
+CLASS="LITERAL"
+>-cur</TT
+> обозначает мягкий предел. Чтобы задать жёсткий предел, нужно заменить это окончание на <TT
+CLASS="LITERAL"
+>-max</TT
+>.)</P
+><P
+>Ядро также может устанавливать общесистемные ограничения на использование некоторых ресурсов. <P
+></P
+></P><UL
+><LI
+><P
+>В <SPAN
+CLASS="PRODUCTNAME"
+>Linux</SPAN
+> максимальное число открытых файлов, которое поддерживает ядро, определяется в спецфайле <TT
+CLASS="FILENAME"
+>/proc/sys/fs/file-max</TT
+>. Изменить этот предел можно, записав другое число в этот файл, либо добавив присваивание в файл <TT
+CLASS="FILENAME"
+>/etc/sysctl.conf</TT
+>. Максимальное число файлов для одного процесса задаётся при компиляции ядра; за дополнительными сведения обратитесь к <TT
+CLASS="FILENAME"
+>/usr/src/linux/Documentation/proc.txt</TT
+>.</P
+></LI
+></UL
+><P></P
+><P
+>Сервер <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> использует для обслуживания каждого подключения отдельный процесс, так что возможное число процессов должно быть не меньше числа разрешённых соединений плюс число процессов, требуемых для остальной системы. Это обычно не проблема, но когда в одной системе работает множество серверов, предел может быть достигнут.</P
+><P
+>В качестве максимального числа открытых файлов по умолчанию обычно выбираются <SPAN
+CLASS="QUOTE"
+>"социально-ориентированные"</SPAN
+> значения, позволяющие использовать одну систему нескольким пользователям так, чтобы ни один из них не потреблял слишком много системных ресурсов. Если вы запускаете в системе несколько серверов, это должно вполне устраивать, но на выделенных машинах может возникнуть желание увеличить этот предел.</P
+><P
+>С другой стороны, некоторые системы позволяют отдельным процессам открывать очень много файлов и если это делают сразу несколько процессов, они могут легко исчерпать общесистемный предел. Если вы столкнётесь с такой ситуацией, но не захотите менять общесистемное ограничение, вы можете ограничить использование открытых файлов сервером <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, установив параметр конфигурации <A
+HREF="runtime-config-resource.html#GUC-MAX-FILES-PER-PROCESS"
+>max_files_per_process</A
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="LINUX-MEMORY-OVERCOMMIT"
+>17.4.3. Чрезмерное выделение памяти в Linux</A
+></H2
+><P
+>В Linux 2.4 и новее механизм виртуальной памяти по умолчанию работает не оптимально для <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Вследствие того, что ядро выделяет память в чрезмерном объёме, оно может уничтожить главный управляющий процесс <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> (postmaster), если при выделении памяти процессу <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> или другому процессу виртуальная память будет исчерпана.</P
+><P
+>Когда это происходит, вы можете получить примерно такое сообщение ядра (где именно искать это сообщение, можно узнать в документации вашей системы): </P><PRE
+CLASS="PROGRAMLISTING"
+>Out of Memory: Killed process 12345 (postgres).</PRE
+><P> Это сообщение говорит о том, что процесс <TT
+CLASS="FILENAME"
+>postgres</TT
+> был уничтожен из-за нехватки памяти. Хотя существующие подключения к базе данных будут работать по-прежнему, новые подключения приниматься не будут. Чтобы восстановить работу сервера, <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> придётся перезапустить.</P
+><P
+>Один из способов обойти эту проблему — запускать <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> на компьютере, где никакие другие процессы не займут всю память. Если физической памяти недостаточно, решить проблему также можно, увеличив объём пространства подкачки, так как уничтожение процессов при нехватке памяти происходит только когда заканчивается и физическая память, и место в пространстве подкачки.</P
+><P
+>Если памяти не хватает по вине самого <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, эту проблему можно решить, изменив конфигурацию сервера. В некоторых случаях может помочь уменьшение конфигурационных параметров, связанных с памятью, а именно <A
+HREF="runtime-config-resource.html#GUC-SHARED-BUFFERS"
+><TT
+CLASS="VARNAME"
+>shared_buffers</TT
+></A
+> и <A
+HREF="runtime-config-resource.html#GUC-WORK-MEM"
+><TT
+CLASS="VARNAME"
+>work_mem</TT
+></A
+>. В других случаях проблема может возникать, потому что разрешено слишком много подключений к самому серверу баз данных. Чаще всего в такой ситуации стоит уменьшить число подключений <A
+HREF="runtime-config-connection.html#GUC-MAX-CONNECTIONS"
+><TT
+CLASS="VARNAME"
+>max_connections</TT
+></A
+> и организовать внешний пул соединений.</P
+><P
+>В Linux 2.6 и новее <SPAN
+CLASS="QUOTE"
+>"чрезмерное выделение"</SPAN
+> памяти можно предотвратить, изменив поведение ядра. Хотя при этом <A
+HREF="http://lwn.net/Articles/104179/"
+TARGET="_top"
+>OOM killer</A
+> (уничтожение процессов при нехватке памяти) всё равно может вызываться, вероятность такого уничтожения значительно уменьшается, а значит поведение системы становится более стабильным. Для этого нужно включить режим строгого выделения памяти, воспользовавшись <TT
+CLASS="COMMAND"
+>sysctl</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>sysctl -w vm.overcommit_memory=2</PRE
+><P> либо поместив соответствующую запись в <TT
+CLASS="FILENAME"
+>/etc/sysctl.conf</TT
+>. Возможно, вы также захотите изменить связанный параметр <TT
+CLASS="VARNAME"
+>vm.overcommit_ratio</TT
+>. За подробностями обратитесь к документации ядра <TT
+CLASS="FILENAME"
+>Documentation/vm/overcommit-accounting</TT
+>.</P
+><P
+>Другой подход, который можно применить (возможно, вместе с изменением <TT
+CLASS="VARNAME"
+>vm.overcommit_memory</TT
+>), заключается в исключении процесса postmaster из числа возможных жертв при нехватке памяти. Для этого нужно задать для переменной <TT
+CLASS="VARNAME"
+>oom_score_adj</TT
+> этого процесса значение <TT
+CLASS="LITERAL"
+>-1000</TT
+>. Проще всего это можно сделать, выполнив </P><PRE
+CLASS="PROGRAMLISTING"
+>echo -1000 &gt; /proc/self/oom_score_adj</PRE
+><P> в скрипте запуска управляющего процесса непосредственно перед тем, как запускать postmaster. Заметьте, что делать это надо под именем root, иначе ничего не изменится; поэтому проще всего вставить эту команду в скрипт, принадлежащий пользователю root. Применяя такой подход, также имеет смысл собрать <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> с ключом <TT
+CLASS="LITERAL"
+>-DLINUX_OOM_SCORE_ADJ=0</TT
+> в параметрах <TT
+CLASS="VARNAME"
+>CPPFLAGS</TT
+>. При этом дочерние процессы postgres будут работать с обычным значением <TT
+CLASS="VARNAME"
+>oom_score_adj</TT
+>, равным нулю, так что при необходимости система сможет уничтожать их.</P
+><P
+>В старых ядрах Linux <TT
+CLASS="FILENAME"
+>/proc/self/oom_score_adj</TT
+> отсутствует, но та же функциональность может быть доступна через <TT
+CLASS="FILENAME"
+>/proc/self/oom_adj</TT
+>. Эта переменная процесса работает так же, только значение, исключающее уничтожение процесса, равно <TT
+CLASS="LITERAL"
+>-17</TT
+>, а не <TT
+CLASS="LITERAL"
+>-1000</TT
+>. Соответствующий флаг сборки <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> устанавливается так: <TT
+CLASS="LITERAL"
+>-DLINUX_OOM_ADJ=0</TT
+>.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Некоторые дистрибутивы с ядрами Linux 2.4 содержат предварительную реализацию механизма <TT
+CLASS="COMMAND"
+>sysctl</TT
+> overcommit, появившегося официально в 2.6. Однако, если установить для <TT
+CLASS="LITERAL"
+>vm.overcommit_memory</TT
+> значение 2 в ядре 2.4, ситуация не улучшится, а только ухудшится. Прежде чем модифицировать этот параметр в ядре 2.4, рекомендуется проанализировать исходный код вашего ядра (см. функцию <CODE
+CLASS="FUNCTION"
+>vm_enough_memory</CODE
+> в файле <TT
+CLASS="FILENAME"
+>mm/mmap.c</TT
+>) и убедиться, что ядро поддерживает именно нужный вам режим. Наличие файла документации <TT
+CLASS="FILENAME"
+>overcommit-accounting</TT
+> <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>не</I
+></SPAN
+> следует считать признаком того, что он действительно поддерживается. В случае сомнений, обратитесь к эксперту по ядру или поставщику вашей системы.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="LINUX-HUGE-PAGES"
+>17.4.4. Огромные страницы в Linux</A
+></H2
+><P
+>Использование огромных страниц снижает накладные расходы при работе с большими непрерывными блоками памяти, что характерно для <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Чтобы использовать эту возможность в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, ядро должно быть собрано с параметрами <TT
+CLASS="VARNAME"
+>CONFIG_HUGETLBFS=y</TT
+> и <TT
+CLASS="VARNAME"
+>CONFIG_HUGETLB_PAGE=y</TT
+>. Также вам нужно будет настроить системный параметр <TT
+CLASS="VARNAME"
+>vm.nr_hugepages</TT
+>. Чтобы оценить, сколько огромных страниц потребуется для <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, нужно запустить сервер без поддержки огромных страниц и посмотреть на значение <TT
+CLASS="VARNAME"
+>VmPeak</TT
+> в файловой системе proc: </P><PRE
+CLASS="PROGRAMLISTING"
+>$ <KBD
+CLASS="USERINPUT"
+>head -1 /path/to/data/directory/postmaster.pid</KBD
+>
+4170
+$ <KBD
+CLASS="USERINPUT"
+>grep ^VmPeak /proc/4170/status</KBD
+>
+VmPeak:  6490428 kB</PRE
+><P>
+     <TT
+CLASS="LITERAL"
+>6490428</TT
+> / <TT
+CLASS="LITERAL"
+>2048</TT
+> (размер страницы (<TT
+CLASS="VARNAME"
+>PAGE_SIZE</TT
+>) в данном случае равен <TT
+CLASS="LITERAL"
+>2 МБ</TT
+>) — это приблизительно <TT
+CLASS="LITERAL"
+>3169.154</TT
+> огромных страниц, так что потребуется не меньше <TT
+CLASS="LITERAL"
+>3170</TT
+> огромных страниц: </P><PRE
+CLASS="PROGRAMLISTING"
+>$ <KBD
+CLASS="USERINPUT"
+>sysctl -w vm.nr_hugepages=3170</KBD
+></PRE
+><P> Иногда ядро не может выделить запрошенное количество огромных страниц сразу, поэтому может потребоваться повторить эту команду или перезагрузить систему. Чтобы изменённый параметр сохранился после перезагрузки, не забудьте записать его в <TT
+CLASS="FILENAME"
+>/etc/sysctl.conf</TT
+>.</P
+><P
+>По умолчанию <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> использует огромные страницы, когда считает это возможным, а в противном случае, переходит к обычным страницам. Чтобы задействовать огромные страницы принудительно, можно установить для <A
+HREF="runtime-config-resource.html#GUC-HUGE-PAGES"
+><TT
+CLASS="VARNAME"
+>huge_pages</TT
+></A
+> значение <TT
+CLASS="LITERAL"
+>on</TT
+>. Заметьте, что в этом случае <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> не сможет запуститься, если не получит достаточного количества огромных страниц.</P
+><P
+>Более подробно о механизме огромных страниц в <SPAN
+CLASS="PRODUCTNAME"
+>Linux</SPAN
+> можно узнать в документации ядра: <A
+HREF="https://www.kernel.org/doc/Documentation/vm/hugetlbpage.txt"
+TARGET="_top"
+>https://www.kernel.org/doc/Documentation/vm/hugetlbpage.txt</A
+>.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="server-start.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="server-shutdown.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Запуск сервера баз данных</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="runtime.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Выключение сервера</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

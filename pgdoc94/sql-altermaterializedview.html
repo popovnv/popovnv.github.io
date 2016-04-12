@@ -1,0 +1,509 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>ALTER MATERIALIZED VIEW</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="ALTER LARGE OBJECT"
+HREF="sql-alterlargeobject.html"><LINK
+REL="NEXT"
+TITLE="ALTER OPERATOR"
+HREF="sql-alteroperator.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="ALTER LARGE OBJECT"
+HREF="sql-alterlargeobject.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="ALTER OPERATOR"
+HREF="sql-alteroperator.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-ALTERMATERIALIZEDVIEW"
+></A
+>ALTER MATERIALIZED VIEW</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN68405"
+></A
+><H2
+>Название</H2
+>ALTER MATERIALIZED VIEW&nbsp;--&nbsp;изменить определение материализованного представления</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN68408"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>ALTER MATERIALIZED VIEW [ IF EXISTS ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+>
+    <TT
+CLASS="REPLACEABLE"
+><I
+>действие</I
+></TT
+> [, ... ]
+ALTER MATERIALIZED VIEW [ IF EXISTS ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+>
+    RENAME [ COLUMN ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+> TO <TT
+CLASS="REPLACEABLE"
+><I
+>новое_имя_колонки</I
+></TT
+>
+ALTER MATERIALIZED VIEW [ IF EXISTS ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+>
+    RENAME TO <TT
+CLASS="REPLACEABLE"
+><I
+>новое_имя</I
+></TT
+>
+ALTER MATERIALIZED VIEW [ IF EXISTS ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+>
+    SET SCHEMA <TT
+CLASS="REPLACEABLE"
+><I
+>новая_схема</I
+></TT
+>
+ALTER MATERIALIZED VIEW ALL IN TABLESPACE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> [ OWNED BY <TT
+CLASS="REPLACEABLE"
+><I
+>имя_роли</I
+></TT
+> [, ... ] ]
+    SET TABLESPACE <TT
+CLASS="REPLACEABLE"
+><I
+>новое_табл_пространство</I
+></TT
+> [ NOWAIT ]
+
+<SPAN
+CLASS="phrase"
+><SPAN
+CLASS="PHRASE"
+>Где возможные варианты <TT
+CLASS="REPLACEABLE"
+><I
+>действие</I
+></TT
+>:</SPAN
+></SPAN
+>
+
+    ALTER [ COLUMN ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+> SET STATISTICS <TT
+CLASS="REPLACEABLE"
+><I
+>integer</I
+></TT
+>
+    ALTER [ COLUMN ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+> SET ( <TT
+CLASS="REPLACEABLE"
+><I
+>атрибут</I
+></TT
+> = <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> [, ... ] )
+    ALTER [ COLUMN ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+> RESET ( <TT
+CLASS="REPLACEABLE"
+><I
+>атрибут</I
+></TT
+> [, ... ] )
+    ALTER [ COLUMN ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+> SET STORAGE { PLAIN | EXTERNAL | EXTENDED | MAIN }
+    CLUSTER ON <TT
+CLASS="REPLACEABLE"
+><I
+>имя_индекса</I
+></TT
+>
+    SET WITHOUT CLUSTER
+    SET ( <TT
+CLASS="REPLACEABLE"
+><I
+>параметр_хранения</I
+></TT
+> = <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> [, ... ] )
+    RESET ( <TT
+CLASS="REPLACEABLE"
+><I
+>параметр_хранения</I
+></TT
+> [, ... ] )
+    OWNER TO <TT
+CLASS="REPLACEABLE"
+><I
+>новый_владелец</I
+></TT
+>
+    SET TABLESPACE <TT
+CLASS="REPLACEABLE"
+><I
+>новое_табл_пространство</I
+></TT
+></PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN68438"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>ALTER MATERIALIZED VIEW</TT
+> изменяет различные расширенные свойства существующего материализованного представления.</P
+><P
+>Выполнить <TT
+CLASS="COMMAND"
+>ALTER MATERIALIZED VIEW</TT
+> может только владелец материализованного представления. Чтобы сменить схему материализованного представления, необходимо также иметь право <TT
+CLASS="LITERAL"
+>CREATE</TT
+> в новой схеме. Чтобы сменить владельца, требуется также быть непосредственным или опосредованным членом новой роли, а эта роль должна иметь право <TT
+CLASS="LITERAL"
+>CREATE</TT
+> в схеме материализованного представления. (С такими ограничениями при смене владельца не происходит ничего такого, что нельзя было бы сделать, имея право удалить и вновь создать материализованное представление. Однако суперпользователь может сменить владельца материализованного представления в любом случае.)</P
+><P
+>Подвиды и действия оператора <TT
+CLASS="COMMAND"
+>ALTER MATERIALIZED VIEW</TT
+> являются подмножеством тех, что относятся к команде <TT
+CLASS="COMMAND"
+>ALTER TABLE</TT
+>, и имеют то же значение применительно к материализованным представлениям. За подробностями обратитесь к описанию <A
+HREF="sql-altertable.html"
+>ALTER TABLE</A
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN68450"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></DT
+><DD
+><P
+>Имя (возможно, дополненное схемой) существующего материализованного представления.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+></DT
+><DD
+><P
+>Имя новой или существующей колонки.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>новое_имя_колонки</I
+></TT
+></DT
+><DD
+><P
+>Новое имя существующей колонки.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>новый_владелец</I
+></TT
+></DT
+><DD
+><P
+>Имя пользователя, назначаемого новым владельцем материализованного представления.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>новое_имя</I
+></TT
+></DT
+><DD
+><P
+>Новое имя материализованного представления.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>новая_схема</I
+></TT
+></DT
+><DD
+><P
+>Новая схема материализованного представления.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN68483"
+></A
+><H2
+>Примеры</H2
+><P
+>Переименование материализованного представления <TT
+CLASS="LITERAL"
+>foo</TT
+> в <TT
+CLASS="LITERAL"
+>bar</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER MATERIALIZED VIEW foo RENAME TO bar;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN68489"
+></A
+><H2
+>Совместимость</H2
+><P
+><TT
+CLASS="COMMAND"
+>ALTER MATERIALIZED VIEW</TT
+> является расширением <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN68494"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-creatematerializedview.html"
+>CREATE MATERIALIZED VIEW</A
+>, <A
+HREF="sql-dropmaterializedview.html"
+>DROP MATERIALIZED VIEW</A
+>, <A
+HREF="sql-refreshmaterializedview.html"
+>REFRESH MATERIALIZED VIEW</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-alterlargeobject.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-alteroperator.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>ALTER LARGE OBJECT</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>ALTER OPERATOR</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

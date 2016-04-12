@@ -1,0 +1,521 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>ALTER VIEW</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="ALTER USER MAPPING"
+HREF="sql-alterusermapping.html"><LINK
+REL="NEXT"
+TITLE="ANALYZE"
+HREF="sql-analyze.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="ALTER USER MAPPING"
+HREF="sql-alterusermapping.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="ANALYZE"
+HREF="sql-analyze.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-ALTERVIEW"
+></A
+>ALTER VIEW</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN70823"
+></A
+><H2
+>Название</H2
+>ALTER VIEW&nbsp;--&nbsp;изменить определение представления</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN70826"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>ALTER VIEW [ IF EXISTS ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> ALTER [ COLUMN ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+> SET DEFAULT <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+>
+ALTER VIEW [ IF EXISTS ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> ALTER [ COLUMN ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+> DROP DEFAULT
+ALTER VIEW [ IF EXISTS ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> OWNER TO <TT
+CLASS="REPLACEABLE"
+><I
+>новый_владелец</I
+></TT
+>
+ALTER VIEW [ IF EXISTS ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> RENAME TO <TT
+CLASS="REPLACEABLE"
+><I
+>новое_имя</I
+></TT
+>
+ALTER VIEW [ IF EXISTS ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> SET SCHEMA <TT
+CLASS="REPLACEABLE"
+><I
+>новая_схема</I
+></TT
+>
+ALTER VIEW [ IF EXISTS ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> SET ( <TT
+CLASS="REPLACEABLE"
+><I
+>имя_параметра_представления</I
+></TT
+> [= <TT
+CLASS="REPLACEABLE"
+><I
+>значение_параметра_представления</I
+></TT
+>] [, ... ] )
+ALTER VIEW [ IF EXISTS ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> RESET ( <TT
+CLASS="REPLACEABLE"
+><I
+>имя_параметра_представления</I
+></TT
+> [, ... ] )</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN70844"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>ALTER VIEW</TT
+> изменяет различные дополнительные свойства представления. (Для изменения запроса, определяющего представление, используйте команду <TT
+CLASS="COMMAND"
+>CREATE OR REPLACE VIEW</TT
+>.)</P
+><P
+>Выполнить <TT
+CLASS="COMMAND"
+>ALTER VIEW</TT
+> может только владелец представления. Чтобы сменить схему представления, необходимо также иметь право <TT
+CLASS="LITERAL"
+>CREATE</TT
+> в новой схеме. Чтобы сменить владельца, требуется также быть непосредственным или опосредованным членом новой роли, а эта роль должна иметь право <TT
+CLASS="LITERAL"
+>CREATE</TT
+> в схеме представления. (С такими ограничениями при смене владельца не происходит ничего такого, что нельзя было бы сделать, имея право удалить и вновь создать представление. Однако суперпользователь может сменить владельца представления в любом случае.)</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN70853"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></DT
+><DD
+><P
+>Имя (возможно, дополненное схемой) существующего представления.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>IF EXISTS</TT
+></DT
+><DD
+><P
+>Не считать ошибкой, если представление не существует. В этом случае будет выдано замечание.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>SET</TT
+>/<TT
+CLASS="LITERAL"
+>DROP DEFAULT</TT
+></DT
+><DD
+><P
+>Эти формы устанавливают или удаляют значение по умолчанию в заданной колонке. Значение по умолчанию подставляется в команды <TT
+CLASS="COMMAND"
+>INSERT</TT
+> и <TT
+CLASS="COMMAND"
+>UPDATE</TT
+>, вносящие данные в представление, до применения каких-либо правил или триггеров в этом представлении. Таким образом, значения по умолчанию в представлении имеют приоритет перед значениями по умолчанию в нижележащих отношениях.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>новый_владелец</I
+></TT
+></DT
+><DD
+><P
+>Имя пользователя, назначаемого новым владельцем представления.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>новое_имя</I
+></TT
+></DT
+><DD
+><P
+>Новое имя представления.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>новая_схема</I
+></TT
+></DT
+><DD
+><P
+>Новая схема представления.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>SET ( <TT
+CLASS="REPLACEABLE"
+><I
+>имя_параметра_представления</I
+></TT
+> [= <TT
+CLASS="REPLACEABLE"
+><I
+>значение_параметра_представления</I
+></TT
+>] [, ... ] )</TT
+><BR><TT
+CLASS="LITERAL"
+>RESET ( <TT
+CLASS="REPLACEABLE"
+><I
+>имя_параметра_представления</I
+></TT
+> [, ... ] )</TT
+></DT
+><DD
+><P
+>Устанавливает или сбрасывает параметры представления. В настоящее время поддерживаются параметры: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>check_option</TT
+> (<TT
+CLASS="TYPE"
+>string</TT
+>)</DT
+><DD
+><P
+>Изменяет параметр проверки представления. Допустимые значения: <TT
+CLASS="LITERAL"
+>local</TT
+> (локальная) или <TT
+CLASS="LITERAL"
+>cascaded</TT
+> (каскадная).</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>security_barrier</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>)</DT
+><DD
+><P
+>Изменяет свойство представления, включающее барьер безопасности. Значение должно быть логическим: <TT
+CLASS="LITERAL"
+>true</TT
+> или <TT
+CLASS="LITERAL"
+>false</TT
+>.</P
+></DD
+></DL
+></DIV
+><P></P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN70916"
+></A
+><H2
+>Замечания</H2
+><P
+>По историческим причинам команду <TT
+CLASS="COMMAND"
+>ALTER TABLE</TT
+> можно использовать и с представлениями; но единственно допустимые для работы с представлениями вариации <TT
+CLASS="COMMAND"
+>ALTER TABLE</TT
+> равносильны вышеперечисленным командам.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN70921"
+></A
+><H2
+>Примеры</H2
+><P
+>Переименование представления <TT
+CLASS="LITERAL"
+>foo</TT
+> в <TT
+CLASS="LITERAL"
+>bar</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER VIEW foo RENAME TO bar;</PRE
+><P></P
+><P
+>Добавление значения колонки по умолчанию в изменяемое представление: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE base_table (id int, ts timestamptz);
+CREATE VIEW a_view AS SELECT * FROM base_table;
+ALTER VIEW a_view ALTER COLUMN ts SET DEFAULT now();
+INSERT INTO base_table(id) VALUES(1);  -- в ts окажется значение NULL
+INSERT INTO a_view(id) VALUES(2);  -- в ts окажется текущее время</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN70929"
+></A
+><H2
+>Совместимость</H2
+><P
+><TT
+CLASS="COMMAND"
+>ALTER VIEW</TT
+> — реализованное в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> расширение стандарта SQL.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN70934"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-createview.html"
+>CREATE VIEW</A
+>, <A
+HREF="sql-dropview.html"
+>DROP VIEW</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-alterusermapping.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-analyze.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>ALTER USER MAPPING</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>ANALYZE</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

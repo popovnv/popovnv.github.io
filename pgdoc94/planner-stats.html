@@ -1,0 +1,346 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Статистика, используемая планировщиком</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Оптимизация производительности"
+HREF="performance-tips.html"><LINK
+REL="PREVIOUS"
+TITLE="Использование EXPLAIN"
+HREF="using-explain.html"><LINK
+REL="NEXT"
+TITLE="Управление планировщиком с помощью явных предложений JOIN"
+HREF="explicit-joins.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Использование EXPLAIN"
+HREF="using-explain.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="performance-tips.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 14. Оптимизация производительности</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Управление планировщиком с помощью явных предложений JOIN"
+HREF="explicit-joins.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="PLANNER-STATS"
+>14.2. Статистика, используемая планировщиком</A
+></H1
+><P
+>Как было показано в предыдущем разделе, планировщик запросов должен оценить число строк, возвращаемых запросов, чтобы сделать правильный выбор в отношении плана запроса. В этом разделе кратко описывается статистика, которую использует система для этих оценок.</P
+><P
+>В частности, статистика включает общее число записей в каждой таблице и индексе, а также число дисковых блоков, которые они занимают. Эта информация содержится в таблице <A
+HREF="catalog-pg-class.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+></A
+>, в колонках <TT
+CLASS="STRUCTFIELD"
+>reltuples</TT
+> и <TT
+CLASS="STRUCTFIELD"
+>relpages</TT
+>. Получить её можно, например так: </P><PRE
+CLASS="SCREEN"
+>SELECT relname, relkind, reltuples, relpages
+FROM pg_class
+WHERE relname LIKE 'tenk1%';
+
+       relname        | relkind | reltuples | relpages
+----------------------+---------+-----------+----------
+ tenk1                | r       |     10000 |      358
+ tenk1_hundred        | i       |     10000 |       30
+ tenk1_thous_tenthous | i       |     10000 |       30
+ tenk1_unique1        | i       |     10000 |       30
+ tenk1_unique2        | i       |     10000 |       30
+(5 rows)</PRE
+><P> Здесь мы видим, что <TT
+CLASS="STRUCTNAME"
+>tenk1</TT
+> содержит 10000 строк данных и столько же строк в индексах (что неудивительно), но объём индексов гораздо меньше таблицы.</P
+><P
+>Для большей эффективности <TT
+CLASS="STRUCTFIELD"
+>reltuples</TT
+> и <TT
+CLASS="STRUCTFIELD"
+>relpages</TT
+> не пересчитываются &laquo;на лету&raquo;, так что они обычно содержат несколько устаревшие значения. Их обновляют команды <TT
+CLASS="COMMAND"
+>VACUUM</TT
+>, <TT
+CLASS="COMMAND"
+>ANALYZE</TT
+> и несколько команд DDL, такие как <TT
+CLASS="COMMAND"
+>CREATE INDEX</TT
+>. <TT
+CLASS="COMMAND"
+>VACUUM</TT
+> и <TT
+CLASS="COMMAND"
+>ANALYZE</TT
+> могут не сканировать всю таблицу (и обычно так и делают), а только вычислить приращение <TT
+CLASS="STRUCTFIELD"
+>reltuples</TT
+> по части таблицы, так что результат остаётся приблизительным. В любом случае планировщик пересчитывает значения, полученные из <TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+>, в пропорции к текущему физическому размеру таблицы и таким образом уточняет приближение.</P
+><P
+>Большинство запросов возвращают не все строки таблицы, а только немногие из них, ограниченные условиями <TT
+CLASS="LITERAL"
+>WHERE</TT
+>. Поэтому планировщику нужно оценить <I
+CLASS="FIRSTTERM"
+>избирательность</I
+> условий <TT
+CLASS="LITERAL"
+>WHERE</TT
+>, то есть определить, какой процент строк будет соответствовать каждому условию в предложении <TT
+CLASS="LITERAL"
+>WHERE</TT
+>. Нужная для этого информация хранится в системном каталоге <A
+HREF="catalog-pg-statistic.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_statistic</TT
+></A
+>. Значения в <TT
+CLASS="STRUCTNAME"
+>pg_statistic</TT
+> обновляются командами <TT
+CLASS="COMMAND"
+>ANALYZE</TT
+> и <TT
+CLASS="COMMAND"
+>VACUUM ANALYZE</TT
+> и никогда не бывают точными, даже сразу после обновления.</P
+><P
+>Для исследования статистики лучше обращаться не непосредственно к таблице <TT
+CLASS="STRUCTNAME"
+>pg_statistic</TT
+>, а к представлению <A
+HREF="view-pg-stats.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_stats</TT
+></A
+>, предназначенному для облегчения восприятия этой информации. Кроме того, представление <TT
+CLASS="STRUCTNAME"
+>pg_stats</TT
+> доступно для чтения всем, тогда как <TT
+CLASS="STRUCTNAME"
+>pg_statistic</TT
+> &mdash; только суперпользователям. (Это сделано для того, чтобы непривилегированные пользователи не могли ничего узнать о содержимом таблиц других людей из статистики. Представление <TT
+CLASS="STRUCTNAME"
+>pg_stats</TT
+> устроено так, что оно показывает строки только для тех таблиц, которые может читать данный пользователь.) Например, мы можем выполнить: </P><PRE
+CLASS="SCREEN"
+>SELECT attname, inherited, n_distinct,
+       array_to_string(most_common_vals, E'\n') as most_common_vals
+FROM pg_stats
+WHERE tablename = 'road';
+
+ attname | inherited | n_distinct |          most_common_vals
+---------+-----------+------------+------------------------------------
+ name    | f         |  -0.363388 | I- 580                        Ramp+
+         |           |            | I- 880                        Ramp+
+         |           |            | Sp Railroad                       +
+         |           |            | I- 580                            +
+         |           |            | I- 680                        Ramp
+ name    | t         |  -0.284859 | I- 880                        Ramp+
+         |           |            | I- 580                        Ramp+
+         |           |            | I- 680                        Ramp+
+         |           |            | I- 580                            +
+         |           |            | State Hwy 13                  Ramp
+(2 rows)</PRE
+><P> Заметьте, что для одной колонки показываются две строки: одна соответствует полной иерархии наследования, построенной для таблицы <TT
+CLASS="LITERAL"
+>road</TT
+> (<TT
+CLASS="LITERAL"
+>inherited</TT
+>=<TT
+CLASS="LITERAL"
+>t</TT
+>), и другая относится непосредственно к таблице <TT
+CLASS="LITERAL"
+>road</TT
+> (<TT
+CLASS="LITERAL"
+>inherited</TT
+>=<TT
+CLASS="LITERAL"
+>f</TT
+>).</P
+><P
+>Объём информации, сохраняемой в <TT
+CLASS="STRUCTNAME"
+>pg_statistic</TT
+> командой <TT
+CLASS="COMMAND"
+>ANALYZE</TT
+>, в частности максимальное число записей в массивах <TT
+CLASS="STRUCTFIELD"
+>most_common_vals</TT
+> (самые популярные значения) и <TT
+CLASS="STRUCTFIELD"
+>histogram_bounds</TT
+> (границы гистограмм) для каждой колонки, можно ограничить на уровне колонок с помощью команды <TT
+CLASS="COMMAND"
+>ALTER TABLE SET STATISTICS</TT
+> или глобально, установив параметр конфигурации <A
+HREF="runtime-config-query.html#GUC-DEFAULT-STATISTICS-TARGET"
+>default_statistics_target</A
+>. В настоящее время ограничение по умолчанию равно 100 записям. Увеличивая этот предел, можно увеличить точность оценок планировщика, особенно для колонок с нерегулярным распределением данных, ценой большего объёма <TT
+CLASS="STRUCTNAME"
+>pg_statistic</TT
+> и, возможно, увеличения времени расчёта этой статистики. И напротив, для колонок с простым распределением данных может быть достаточно меньшего предела.</P
+><P
+>Подробнее использование статистики планировщиком описывается в <A
+HREF="planner-stats-details.html"
+>Главе 61</A
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="using-explain.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="explicit-joins.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Использование <TT
+CLASS="COMMAND"
+>EXPLAIN</TT
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="performance-tips.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Управление планировщиком с помощью явных предложений <TT
+CLASS="LITERAL"
+>JOIN</TT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

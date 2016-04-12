@@ -1,0 +1,1572 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Использование областей дескрипторов</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="ECPG — встраиваемый SQL в C"
+HREF="ecpg.html"><LINK
+REL="PREVIOUS"
+TITLE="Библиотека pgtypes"
+HREF="ecpg-pgtypes.html"><LINK
+REL="NEXT"
+TITLE="Обработка ошибок"
+HREF="ecpg-errors.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Библиотека pgtypes"
+HREF="ecpg-pgtypes.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ecpg.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 33. <SPAN
+CLASS="APPLICATION"
+>ECPG</SPAN
+> — встраиваемый <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> в C</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Обработка ошибок"
+HREF="ecpg-errors.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="ECPG-DESCRIPTORS"
+>33.7. Использование областей дескрипторов</A
+></H1
+><P
+>Области дескрипторов SQL дают возможности для более сложной обработки результатов операторов <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, <TT
+CLASS="COMMAND"
+>FETCH</TT
+> и <TT
+CLASS="COMMAND"
+>DESCRIBE</TT
+>. Область дескриптора SQL объединяет в одной структуре данные одной строки и элементы метаданных. Эти метаданные особенно полезны при выполнении динамических SQL-операторов, когда характер результирующих колонок может быть неизвестен заранее. PostgreSQL предлагает два подхода к использованию областей дескрипторов: именованные области SQL-дескрипторов и области SQLDA в структурах C.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="ECPG-NAMED-DESCRIPTORS"
+>33.7.1. Именованные области SQL-дескрипторов</A
+></H2
+><P
+>Именованная область SQL-дескриптора состоит из заголовка, содержащего сведения обо всём дескрипторе, и одного или нескольких дескрипторов элементов, которые по сути описывают отдельные колонки в строке результата.</P
+><P
+>Прежде чем вы сможете использовать область SQL-дескриптора, её нужно выделить: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL ALLOCATE DESCRIPTOR <TT
+CLASS="REPLACEABLE"
+><I
+>идентификатор</I
+></TT
+>;</PRE
+><P> Заданный идентификатор играет роль <SPAN
+CLASS="QUOTE"
+>"имени переменной"</SPAN
+> области дескриптора.  Когда дескриптор оказывается ненужным, его следует освободить: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL DEALLOCATE DESCRIPTOR <TT
+CLASS="REPLACEABLE"
+><I
+>идентификатор</I
+></TT
+>;</PRE
+><P></P
+><P
+>Чтобы воспользоваться областью дескриптора, её нужно указать в качестве целевого объекта в предложении <TT
+CLASS="LITERAL"
+>INTO</TT
+>, вместо перечисления переменных среды: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL FETCH NEXT FROM mycursor INTO SQL DESCRIPTOR mydesc;</PRE
+><P> Если набор результатов пуст, в области дескриптора будут, тем не менее, содержаться метаданные из запроса, то есть имена полей.</P
+><P
+>Получить метаданные набора результатов для ещё не выполненных подготовленных запросов можно, воспользовавшись оператором <TT
+CLASS="COMMAND"
+>DESCRIBE</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL BEGIN DECLARE SECTION;
+char *sql_stmt = "SELECT * FROM table1";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL PREPARE stmt1 FROM :sql_stmt;
+EXEC SQL DESCRIBE stmt1 INTO SQL DESCRIPTOR mydesc;</PRE
+><P></P
+><P
+>До PostgreSQL версии 9.0 ключевое слово <TT
+CLASS="LITERAL"
+>SQL</TT
+> было необязательным, так что предложения <TT
+CLASS="LITERAL"
+>DESCRIPTOR</TT
+> и <TT
+CLASS="LITERAL"
+>SQL DESCRIPTOR</TT
+> создавали именованные области SQL-дескрипторов. Теперь она стало обязательным; без слова <TT
+CLASS="LITERAL"
+>SQL</TT
+> создаются области SQLDA, см. <A
+HREF="ecpg-descriptors.html#ECPG-SQLDA-DESCRIPTORS"
+>Подраздел 33.7.2</A
+>.</P
+><P
+>В операторах <TT
+CLASS="COMMAND"
+>DESCRIBE</TT
+> и <TT
+CLASS="COMMAND"
+>FETCH</TT
+> ключевые слова <TT
+CLASS="LITERAL"
+>INTO</TT
+> и <TT
+CLASS="LITERAL"
+>USING</TT
+> действуют примерно одинаково: они указывают вывести набор результатов и метаданные в область дескриптора.</P
+><P
+>Возникает вопрос: а как же получить данные из области дескриптора? Область дескриптора можно представить как структуру с именованными полями. Чтобы получить значение поля из заголовка и сохранить его в переменной среды, нужно выполнить команду: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL GET DESCRIPTOR <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> :<TT
+CLASS="REPLACEABLE"
+><I
+>переменная_среды</I
+></TT
+> = <TT
+CLASS="REPLACEABLE"
+><I
+>поле</I
+></TT
+>;</PRE
+><P> В настоящее время определено только одно поле заголовка: <TT
+CLASS="REPLACEABLE"
+><I
+>COUNT</I
+></TT
+>, которое говорит, сколько областей дескрипторов элементов существует (то есть, сколько колонок содержится в результате). Переменная среды должна иметь целочисленный тип. Чтобы получить поле из области дескриптора элемента, нужно выполнить команду: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL GET DESCRIPTOR <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> VALUE <TT
+CLASS="REPLACEABLE"
+><I
+>номер</I
+></TT
+> :<TT
+CLASS="REPLACEABLE"
+><I
+>переменная_среды</I
+></TT
+> = <TT
+CLASS="REPLACEABLE"
+><I
+>поле</I
+></TT
+>;</PRE
+><P>
+    В качестве <TT
+CLASS="REPLACEABLE"
+><I
+>num</I
+></TT
+> можно задать обычное целое или переменную среды, содержащую целое число. Допустимые поля: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>CARDINALITY</TT
+> (integer)</DT
+><DD
+><P
+>число строк в наборе результатов</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>DATA</TT
+></DT
+><DD
+><P
+>собственно элемент данных (тип данных поля зависит от запроса)</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>DATETIME_INTERVAL_CODE</TT
+> (целое)</DT
+><DD
+><P
+>Когда <TT
+CLASS="LITERAL"
+>TYPE</TT
+> равно <TT
+CLASS="LITERAL"
+>9</TT
+>, <TT
+CLASS="LITERAL"
+>DATETIME_INTERVAL_CODE</TT
+> содержит значение <TT
+CLASS="LITERAL"
+>1</TT
+> для <TT
+CLASS="LITERAL"
+>DATE</TT
+>, <TT
+CLASS="LITERAL"
+>2</TT
+> для <TT
+CLASS="LITERAL"
+>TIME</TT
+>, <TT
+CLASS="LITERAL"
+>3</TT
+> для <TT
+CLASS="LITERAL"
+>TIMESTAMP</TT
+>, <TT
+CLASS="LITERAL"
+>4</TT
+> для <TT
+CLASS="LITERAL"
+>TIME WITH TIME ZONE</TT
+>, либо <TT
+CLASS="LITERAL"
+>5</TT
+> для <TT
+CLASS="LITERAL"
+>TIMESTAMP WITH TIME ZONE</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>DATETIME_INTERVAL_PRECISION</TT
+> (целое)</DT
+><DD
+><P
+>не реализовано</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>INDICATOR</TT
+> (целое)</DT
+><DD
+><P
+>индикатор (отмечающий значение NULL или усечение значения)</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>KEY_MEMBER</TT
+> (целое)</DT
+><DD
+><P
+>не реализовано</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>LENGTH</TT
+> (целое)</DT
+><DD
+><P
+>длина данных в символах</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>NAME</TT
+> (строка)</DT
+><DD
+><P
+>имя колонки</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>NULLABLE</TT
+> (целое)</DT
+><DD
+><P
+>не реализовано</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>OCTET_LENGTH</TT
+> (целое)</DT
+><DD
+><P
+>длина символьного представления данных в байтах</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>PRECISION</TT
+> (целое)</DT
+><DD
+><P
+>точность (для типа <TT
+CLASS="TYPE"
+>numeric</TT
+>)</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>RETURNED_LENGTH</TT
+> (целое)</DT
+><DD
+><P
+>длина данных в символах</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>RETURNED_OCTET_LENGTH</TT
+> (целое)</DT
+><DD
+><P
+>длина символьного представления данных в байтах</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>SCALE</TT
+> (целое)</DT
+><DD
+><P
+>масштаб (для типа <TT
+CLASS="TYPE"
+>numeric</TT
+>)</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>TYPE</TT
+> (целое)</DT
+><DD
+><P
+>числовой код типа данных колонки</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>В операторах <TT
+CLASS="COMMAND"
+>EXECUTE</TT
+>, <TT
+CLASS="COMMAND"
+>DECLARE</TT
+> и <TT
+CLASS="COMMAND"
+>OPEN</TT
+> ключевые слова <TT
+CLASS="LITERAL"
+>INTO</TT
+> и <TT
+CLASS="LITERAL"
+>USING</TT
+> действуют по-разному. Область дескриптора также можно сформировать вручную, чтобы передать входные параметры запросу или курсору, а команда <TT
+CLASS="LITERAL"
+>USING SQL DESCRIPTOR <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></TT
+> даёт возможность передать входные аргументы параметризованному запросу. Оператор, формирующий именованную область SQL-дескриптора, выглядит так: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL SET DESCRIPTOR <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> VALUE <TT
+CLASS="REPLACEABLE"
+><I
+>номер</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>поле</I
+></TT
+> = :<TT
+CLASS="REPLACEABLE"
+><I
+>переменная_среды</I
+></TT
+>;</PRE
+><P></P
+><P
+>PostgreSQL поддерживает выборку сразу нескольких записей в одном операторе <TT
+CLASS="COMMAND"
+>FETCH</TT
+> и может сохранить их данные в переменной среды, если эта переменная — массив. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL BEGIN DECLARE SECTION;
+int id[5];
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL FETCH 5 FROM mycursor INTO SQL DESCRIPTOR mydesc;
+
+EXEC SQL GET DESCRIPTOR mydesc VALUE 1 :id = DATA;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="ECPG-SQLDA-DESCRIPTORS"
+>33.7.2. Области дескрипторов SQLDA</A
+></H2
+><P
+>Область дескриптора SQLDA представляет собой структуру языка C, в которую можно получить набор результатов и метаданные запроса. Одна такая структура содержит одну запись из набора данных. </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL include sqlda.h;
+sqlda_t         *mysqlda;
+
+EXEC SQL FETCH 3 FROM mycursor INTO DESCRIPTOR mysqlda;</PRE
+><P> Заметьте, что ключевое слово <TT
+CLASS="LITERAL"
+>SQL</TT
+> в этом случае опускается. Замечания относительно применения ключевых слов <TT
+CLASS="LITERAL"
+>INTO</TT
+> и <TT
+CLASS="LITERAL"
+>USING</TT
+> в <A
+HREF="ecpg-descriptors.html#ECPG-NAMED-DESCRIPTORS"
+>Подразделе 33.7.1</A
+> применимы и здесь, с дополнением. В операторе <TT
+CLASS="COMMAND"
+>DESCRIBE</TT
+> можно полностью опустить ключевое слово <TT
+CLASS="LITERAL"
+>DESCRIPTOR</TT
+>, если присутствует ключевое слово <TT
+CLASS="LITERAL"
+>INTO</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL DESCRIBE prepared_statement INTO mysqlda;</PRE
+><P></P
+><DIV
+CLASS="PROCEDURE"
+><P
+>Общая схема использования SQLDA выглядит так:</P
+><OL
+TYPE="1"
+><LI
+CLASS="STEP"
+><P
+>Подготовить запрос и объявить курсор для него.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Объявить SQLDA для строк результата.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Объявить SQLDA для входных параметров и инициализировать их (выделить память, задать параметры).</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Открыть курсор с входной SQLDA.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Выбрать строки из курсора и сохранить их в выходной SQLDA.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Прочитать значения из выходной SQLDA в переменные среды (и преобразовать при необходимости).</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Закрыть курсор.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Освободить область памяти, выделенную для входной SQLDA.</P
+></LI
+></OL
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN46744"
+>33.7.2.1. Структура данных SQLDA</A
+></H3
+><P
+>Для SQLDA используются три типа данных: <TT
+CLASS="TYPE"
+>sqlda_t</TT
+>, <TT
+CLASS="TYPE"
+>sqlvar_t</TT
+> и <TT
+CLASS="TYPE"
+>struct sqlname</TT
+>.</P
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>Структура данных SQLDA в PostgreSQL подобна той, что используется в IBM DB2 Universal Database, так что часть технической информации по SQLDA в DB2 может быть полезна и для понимания устройства SQLDA в PostgreSQL.</P
+></BLOCKQUOTE
+></DIV
+><DIV
+CLASS="SECT4"
+><H4
+CLASS="SECT4"
+><A
+NAME="ECPG-SQLDA-SQLDA"
+>33.7.2.1.1. Структура sqlda_t</A
+></H4
+><P
+>Тип структуры <TT
+CLASS="TYPE"
+>sqlda_t</TT
+> представляет тип собственно SQLDA. Эта структура описывает одну запись. Две или более структур <TT
+CLASS="TYPE"
+>sqlda_t</TT
+> могут объединяться в связанный список по указателям в поле <TT
+CLASS="STRUCTFIELD"
+>desc_next</TT
+>, и таким образом образовывать упорядоченный набор строк. Поэтому когда выбираются две или более строк, приложение может прочитать их, проследуя по указателям <TT
+CLASS="STRUCTFIELD"
+>desc_next</TT
+> во всех узлах <TT
+CLASS="TYPE"
+>sqlda_t</TT
+>.</P
+><P
+>Тип <TT
+CLASS="TYPE"
+>sqlda_t</TT
+> определяется так: </P><PRE
+CLASS="PROGRAMLISTING"
+>struct sqlda_struct
+{
+    char            sqldaid[8];
+    long            sqldabc;
+    short           sqln;
+    short           sqld;
+    struct sqlda_struct *desc_next;
+    struct sqlvar_struct sqlvar[1];
+};
+
+typedef struct sqlda_struct sqlda_t;</PRE
+><P> Его поля имеют следующее назначение: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>sqldaid</TT
+></DT
+><DD
+><P
+>Содержит строковую константу <TT
+CLASS="LITERAL"
+>"SQLDA "</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>sqldabc</TT
+></DT
+><DD
+><P
+>Содержит размер выделенного пространства в байтах.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>sqln</TT
+></DT
+><DD
+><P
+>Содержит число входных параметров для параметризованного запроса, когда передаётся в операторы <TT
+CLASS="COMMAND"
+>OPEN</TT
+>, <TT
+CLASS="COMMAND"
+>DECLARE</TT
+> или <TT
+CLASS="COMMAND"
+>EXECUTE</TT
+> с ключевым словом <TT
+CLASS="LITERAL"
+>USING</TT
+>. В структуре, выводимой операторами <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, <TT
+CLASS="COMMAND"
+>EXECUTE</TT
+> или <TT
+CLASS="COMMAND"
+>FETCH</TT
+>, данное значение совпадает с <TT
+CLASS="LITERAL"
+>sqld</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>sqld</TT
+></DT
+><DD
+><P
+>Содержит число полей в наборе результатов.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>desc_next</TT
+></DT
+><DD
+><P
+>Если запрос выдаёт несколько записей, возвращается несколько связанных структур SQLDA, а <TT
+CLASS="LITERAL"
+>desc_next</TT
+> содержит указатель на следующую запись в списке.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>sqlvar</TT
+></DT
+><DD
+><P
+>Это массив колонок в наборе результатов.</P
+></DD
+></DL
+></DIV
+><P></P
+></DIV
+><DIV
+CLASS="SECT4"
+><H4
+CLASS="SECT4"
+><A
+NAME="ECPG-SQLDA-SQLVAR"
+>33.7.2.1.2. Структура sqlvar_t</A
+></H4
+><P
+>Тип структуры <TT
+CLASS="TYPE"
+>sqlvar_t</TT
+> содержит значение колонки и метаданные, в частности, тип и длину. Эта структура определяется так: </P><PRE
+CLASS="PROGRAMLISTING"
+>struct sqlvar_struct
+{
+    short          sqltype;
+    short          sqllen;
+    char          *sqldata;
+    short         *sqlind;
+    struct sqlname sqlname;
+};
+
+typedef struct sqlvar_struct sqlvar_t;</PRE
+><P> Её поля имеют следующее назначение: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>sqltype</TT
+></DT
+><DD
+><P
+>Содержит идентификатор типа данного поля. Возможные значения перечислены в <TT
+CLASS="LITERAL"
+>enum ECPGttype</TT
+> в <TT
+CLASS="LITERAL"
+>ecpgtype.h</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>sqllen</TT
+></DT
+><DD
+><P
+>Содержит двоичную длину поля, например, 4 байта для <TT
+CLASS="TYPE"
+>ECPGt_int</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>sqldata</TT
+></DT
+><DD
+><P
+>Указывает на данные. Формат данных описан в <A
+HREF="ecpg-variables.html#ECPG-VARIABLES-TYPE-MAPPING"
+>Подразделе 33.4.4</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>sqlind</TT
+></DT
+><DD
+><P
+>Указывает на индикатор NULL. 0 соответствует значению не NULL, -1 — NULL.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>sqlname</TT
+></DT
+><DD
+><P
+>Имя поля.</P
+></DD
+></DL
+></DIV
+><P></P
+></DIV
+><DIV
+CLASS="SECT4"
+><H4
+CLASS="SECT4"
+><A
+NAME="ECPG-SQLDA-SQLNAME"
+>33.7.2.1.3. Структура struct sqlname</A
+></H4
+><P
+>Структура <TT
+CLASS="TYPE"
+>struct sqlname</TT
+> содержит имя колонки. Она включена в <TT
+CLASS="TYPE"
+>sqlvar_t</TT
+> в качестве члена. Эта структура определена так: </P><PRE
+CLASS="PROGRAMLISTING"
+>#define NAMEDATALEN 64
+
+struct sqlname
+{
+        short           length;
+        char            data[NAMEDATALEN];
+};</PRE
+><P> Её поля имеют следующее назначение: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>length</TT
+></DT
+><DD
+><P
+>Содержит длину имени поля.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>data</TT
+></DT
+><DD
+><P
+>Содержит собственно имя поля.</P
+></DD
+></DL
+></DIV
+><P></P
+></DIV
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="ECPG-SQLDA-OUTPUT"
+>33.7.2.2. Получение набора результатов с применением SQLDA</A
+></H3
+><DIV
+CLASS="PROCEDURE"
+><P
+>Чтобы получить набор результатов запроса через SQLDA, нужно проделать примерно следующее:</P
+><OL
+TYPE="1"
+><LI
+CLASS="STEP"
+><P
+>Объявить структуру <TT
+CLASS="TYPE"
+>sqlda_t</TT
+> для получения набора результатов.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Выполнить команды <TT
+CLASS="COMMAND"
+>FETCH</TT
+>/<TT
+CLASS="COMMAND"
+>EXECUTE</TT
+>/<TT
+CLASS="COMMAND"
+>DESCRIBE</TT
+> для обработки запроса с указанной SQLDA.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Определить число записей в наборе результатов, прочитав <TT
+CLASS="STRUCTFIELD"
+>sqln</TT
+>, член структуры <TT
+CLASS="TYPE"
+>sqlda_t</TT
+>.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Получить значения каждой колонки из элементов <TT
+CLASS="LITERAL"
+>sqlvar[0]</TT
+>, <TT
+CLASS="LITERAL"
+>sqlvar[1]</TT
+> и т. д., составляющих массив, включённый в структуру <TT
+CLASS="TYPE"
+>sqlda_t</TT
+>.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Перейти к следующей строке (структуре <TT
+CLASS="TYPE"
+>sqlda_t</TT
+>) по указателю <TT
+CLASS="STRUCTFIELD"
+>desc_next</TT
+>, члену структуры <TT
+CLASS="TYPE"
+>sqlda_t</TT
+>.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>При необходимости повторить эти действия.</P
+></LI
+></OL
+></DIV
+><P
+>Далее показывается, как получить набор результатов через SQLDA.</P
+><P
+>Сначала объявите структуру <TT
+CLASS="TYPE"
+>sqlda_t</TT
+>, в которую будет помещён набор результатов. </P><PRE
+CLASS="PROGRAMLISTING"
+>sqlda_t *sqlda1;</PRE
+><P></P
+><P
+>Затем укажите эту SQLDA в команде. В данном примере это команда <TT
+CLASS="COMMAND"
+>FETCH</TT
+>. </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL FETCH NEXT FROM cur1 INTO DESCRIPTOR sqlda1;</PRE
+><P></P
+><P
+>Обработайте все строки в цикле с переходом по связанному списку. </P><PRE
+CLASS="PROGRAMLISTING"
+>sqlda_t *cur_sqlda;
+
+for (cur_sqlda = sqlda1;
+     cur_sqlda != NULL;
+     cur_sqlda = cur_sqlda-&gt;desc_next)
+{
+    ...
+}</PRE
+><P></P
+><P
+>Внутри этого цикла реализуйте ещё один цикл чтения данных каждой колонки (структуры <TT
+CLASS="TYPE"
+>sqlvar_t</TT
+>) в строке. </P><PRE
+CLASS="PROGRAMLISTING"
+>for (i = 0; i &lt; cur_sqlda-&gt;sqld; i++)
+{
+    sqlvar_t v = cur_sqlda-&gt;sqlvar[i];
+    char *sqldata = v.sqldata;
+    short sqllen  = v.sqllen;
+    ...
+}</PRE
+><P></P
+><P
+>Чтобы получить значение колонки, прочитайте значение поля <TT
+CLASS="STRUCTFIELD"
+>sqltype</TT
+>, члена структуры <TT
+CLASS="TYPE"
+>sqlvar_t</TT
+>. Затем выберите подходящий способ, в зависимости от типа колонки, копирования данных из поля <TT
+CLASS="STRUCTFIELD"
+>sqlvar</TT
+> в переменную среды. </P><PRE
+CLASS="PROGRAMLISTING"
+>char var_buf[1024];
+
+switch (v.sqltype)
+{
+    case ECPGt_char:
+        memset(&amp;var_buf, 0, sizeof(var_buf));
+        memcpy(&amp;var_buf, sqldata, (sizeof(var_buf) &lt;= sqllen ? sizeof(var_buf) - 1 : sqllen));
+        break;
+
+    case ECPGt_int: /* integer */
+        memcpy(&amp;intval, sqldata, sqllen);
+        snprintf(var_buf, sizeof(var_buf), "%d", intval);
+        break;
+
+    ...
+}</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="ECPG-SQLDA-INPUT"
+>33.7.2.3. Передача значений параметров через SQLDA</A
+></H3
+><DIV
+CLASS="PROCEDURE"
+><P
+>Чтобы передать параметры подготовленному запросу через SQLDA, нужно проделать примерно следующее:</P
+><OL
+TYPE="1"
+><LI
+CLASS="STEP"
+><P
+>Создать подготовленный запрос (подготовленный оператор)</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Объявить структуру sqlda_t в качестве входной SQLDA.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Выделить область памяти (структуру sqlda_t) для входной SQLDA.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Установить (скопировать) входные значения в выделенной памяти.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Открыть курсор, указав входную SQLDA.</P
+></LI
+></OL
+></DIV
+><P
+>Рассмотрим это на примере.</P
+><P
+>Сначала создайте подготовленный оператор. </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL BEGIN DECLARE SECTION;
+char query[1024] = "SELECT d.oid, * FROM pg_database d, pg_stat_database s WHERE d.oid = s.datid AND (d.datname = ? OR d.oid = ?)";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL PREPARE stmt1 FROM :query;</PRE
+><P></P
+><P
+>Затем выделите память для SQLDA и установите число входных параметров в поле <TT
+CLASS="STRUCTFIELD"
+>sqln</TT
+>, члене структуры <TT
+CLASS="TYPE"
+>sqlda_t</TT
+>. Когда для подготовленного запроса требуются два или более входных параметров, приложение должно выделить дополнительное место в памяти, размер которого вычисляется как (число параметров - 1) * sizeof(sqlvar_t). В показанном здесь примере выделяется место для двух параметров. </P><PRE
+CLASS="PROGRAMLISTING"
+>sqlda_t *sqlda2;
+
+sqlda2 = (sqlda_t *) malloc(sizeof(sqlda_t) + sizeof(sqlvar_t));
+memset(sqlda2, 0, sizeof(sqlda_t) + sizeof(sqlvar_t));
+
+sqlda2-&gt;sqln = 2; /* число входных переменных */</PRE
+><P></P
+><P
+>Выделив память, сохраните значения параметров в массиве <TT
+CLASS="LITERAL"
+>sqlvar[]</TT
+>. (Этот же массив используется для значений колонок, когда SQLDA получает набор результатов.) В данном примере передаются два параметра: <TT
+CLASS="LITERAL"
+>"postgres"</TT
+> (строкового типа) и <TT
+CLASS="LITERAL"
+>1</TT
+> (целочисленного типа). </P><PRE
+CLASS="PROGRAMLISTING"
+>sqlda2-&gt;sqlvar[0].sqltype = ECPGt_char;
+sqlda2-&gt;sqlvar[0].sqldata = "postgres";
+sqlda2-&gt;sqlvar[0].sqllen  = 8;
+
+int intval = 1;
+sqlda2-&gt;sqlvar[1].sqltype = ECPGt_int;
+sqlda2-&gt;sqlvar[1].sqldata = (char *) &amp;intval;
+sqlda2-&gt;sqlvar[1].sqllen  = sizeof(intval);</PRE
+><P></P
+><P
+>Откройте курсор с указанием ранее созданной SQLDA, чтобы входные параметры были переданы подготовленному оператору. </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL OPEN cur1 USING DESCRIPTOR sqlda2;</PRE
+><P></P
+><P
+>Наконец, закончив использование входных SQLDA, необходимо явно освободить выделенную для них память, в отличие от SQLDA, получающих результаты запросов. </P><PRE
+CLASS="PROGRAMLISTING"
+>free(sqlda2);</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="ECPG-SQLDA-EXAMPLE"
+>33.7.2.4. Пример приложения, использующего SQLDA</A
+></H3
+><P
+>Представленный здесь пример программы показывает, как выбрать из системных каталогов статистику доступа к базам данных, определённых входными параметрами.</P
+><P
+>Это приложение соединяет записи двух системных таблиц, pg_database и pg_stat_database по OID базы данных, и также выбирает и показывает статистику, принимая два входных параметра (база данных <TT
+CLASS="LITERAL"
+>postgres</TT
+> и OID <TT
+CLASS="LITERAL"
+>1</TT
+>).</P
+><P
+>Сначала создайте SQLDA для ввода параметров и SQLDA для вывода результатов. </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL include sqlda.h;
+
+sqlda_t *sqlda1; /* выходной дескриптор */
+sqlda_t *sqlda2; /* входной дескриптор */</PRE
+><P></P
+><P
+>Затем подключитесь к базе данных, подготовьте оператор и объявите курсор для подготовленного оператора. </P><PRE
+CLASS="PROGRAMLISTING"
+>int
+main(void)
+{
+    EXEC SQL BEGIN DECLARE SECTION;
+    char query[1024] = "SELECT d.oid,* FROM pg_database d, pg_stat_database s WHERE d.oid=s.datid AND ( d.datname=? OR d.oid=? )";
+    EXEC SQL END DECLARE SECTION;
+
+    EXEC SQL CONNECT TO testdb AS con1 USER testuser;
+
+    EXEC SQL PREPARE stmt1 FROM :query;
+    EXEC SQL DECLARE cur1 CURSOR FOR stmt1;</PRE
+><P></P
+><P
+>Затем запишите некоторые значения параметров во входную SQLDA. Выделите память для входной SQLDA и установите количество параметров в <TT
+CLASS="LITERAL"
+>sqln</TT
+>. Запишите тип, значение и длину значения в поля <TT
+CLASS="LITERAL"
+>sqltype</TT
+>, <TT
+CLASS="LITERAL"
+>sqldata</TT
+> и <TT
+CLASS="LITERAL"
+>sqllen</TT
+> структуры <TT
+CLASS="LITERAL"
+>sqlvar</TT
+>. </P><PRE
+CLASS="PROGRAMLISTING"
+>    /* Создать структуру SQLDA для входных параметров. */
+    sqlda2 = (sqlda_t *) malloc(sizeof(sqlda_t) + sizeof(sqlvar_t));
+    memset(sqlda2, 0, sizeof(sqlda_t) + sizeof(sqlvar_t));
+    sqlda2-&gt;sqln = 2; /* number of input variables */
+
+    sqlda2-&gt;sqlvar[0].sqltype = ECPGt_char;
+    sqlda2-&gt;sqlvar[0].sqldata = "postgres";
+    sqlda2-&gt;sqlvar[0].sqllen  = 8;
+
+    intval = 1;
+    sqlda2-&gt;sqlvar[1].sqltype = ECPGt_int;
+    sqlda2-&gt;sqlvar[1].sqldata = (char *)&amp;intval;
+    sqlda2-&gt;sqlvar[1].sqllen  = sizeof(intval);</PRE
+><P></P
+><P
+>Подготовив входную SQLDA, откройте курсор с ней. </P><PRE
+CLASS="PROGRAMLISTING"
+>    /* Открыть курсор с входными параметрами. */
+    EXEC SQL OPEN cur1 USING DESCRIPTOR sqlda2;</PRE
+><P></P
+><P
+>Выберите строки из открытого курсора в выходную SQLDA. (Обычно, чтобы выбрать все строки в наборе результатов, нужно повторять <TT
+CLASS="COMMAND"
+>FETCH</TT
+> в цикле.) </P><PRE
+CLASS="PROGRAMLISTING"
+>    while (1)
+    {
+        sqlda_t *cur_sqlda;
+
+        /* Назначить дескриптор курсору */
+        EXEC SQL FETCH NEXT FROM cur1 INTO DESCRIPTOR sqlda1;</PRE
+><P></P
+><P
+>Затем прочитайте выбранные записи из SQLDA, следуя по связанному списку структуры <TT
+CLASS="TYPE"
+>sqlda_t</TT
+>. </P><PRE
+CLASS="PROGRAMLISTING"
+>    for (cur_sqlda = sqlda1 ;
+         cur_sqlda != NULL ;
+         cur_sqlda = cur_sqlda-&gt;desc_next)
+    {
+        ...</PRE
+><P></P
+><P
+>Прочитайте все колонки первой записи. Количество колонок хранится в поле <TT
+CLASS="STRUCTFIELD"
+>sqld</TT
+>, а данные первой колонки в <TT
+CLASS="LITERAL"
+>sqlvar[0]</TT
+>, оба эти поля — члены структуры <TT
+CLASS="TYPE"
+>sqlda_t</TT
+>. </P><PRE
+CLASS="PROGRAMLISTING"
+>        /* Вывести каждую колонку в строке. */
+        for (i = 0; i &lt; sqlda1-&gt;sqld; i++)
+        {
+            sqlvar_t v = sqlda1-&gt;sqlvar[i];
+            char *sqldata = v.sqldata;
+            short sqllen  = v.sqllen;
+
+            strncpy(name_buf, v.sqlname.data, v.sqlname.length);
+            name_buf[v.sqlname.length] = '\0';</PRE
+><P></P
+><P
+>Теперь данные колонки сохранены в переменной <TT
+CLASS="VARNAME"
+>v</TT
+>. Скопируйте все элементы данных в переменные среды, определив тип колонки по полю <TT
+CLASS="LITERAL"
+>v.sqltype</TT
+>. </P><PRE
+CLASS="PROGRAMLISTING"
+>            switch (v.sqltype) {
+                int intval;
+                double doubleval;
+                unsigned long long int longlongval;
+
+                case ECPGt_char:
+                    memset(&amp;var_buf, 0, sizeof(var_buf));
+                    memcpy(&amp;var_buf, sqldata, (sizeof(var_buf) &lt;= sqllen ? sizeof(var_buf)-1 : sqllen));
+                    break;
+
+                case ECPGt_int: /* integer */
+                    memcpy(&amp;intval, sqldata, sqllen);
+                    snprintf(var_buf, sizeof(var_buf), "%d", intval);
+                    break;
+
+                ...
+
+                default:
+                    ...
+            }
+
+            printf("%s = %s (type: %d)\n", name_buf, var_buf, v.sqltype);
+        }</PRE
+><P></P
+><P
+>Закончив обработку всех записей, закройте курсор и отключитесь от базы данных. </P><PRE
+CLASS="PROGRAMLISTING"
+>    EXEC SQL CLOSE cur1;
+    EXEC SQL COMMIT;
+
+    EXEC SQL DISCONNECT ALL;</PRE
+><P></P
+><P
+>Всё программа показана в <A
+HREF="ecpg-descriptors.html#ECPG-SQLDA-EXAMPLE-EXAMPLE"
+>Примере 33-1</A
+>.</P
+><DIV
+CLASS="EXAMPLE"
+><A
+NAME="ECPG-SQLDA-EXAMPLE-EXAMPLE"
+></A
+><P
+><B
+>Пример 33-1. Пример программы на базе SQLDA</B
+></P
+><PRE
+CLASS="PROGRAMLISTING"
+>#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;unistd.h&gt;
+
+EXEC SQL include sqlda.h;
+
+sqlda_t *sqlda1; /* дескриптор для выходных данных */
+sqlda_t *sqlda2; /* дескриптор для входных данных */
+
+EXEC SQL WHENEVER NOT FOUND DO BREAK;
+EXEC SQL WHENEVER SQLERROR STOP;
+
+int
+main(void)
+{
+    EXEC SQL BEGIN DECLARE SECTION;
+    char query[1024] = "SELECT d.oid,* FROM pg_database d, pg_stat_database s WHERE d.oid=s.datid AND ( d.datname=? OR d.oid=? )";
+
+    int intval;
+    unsigned long long int longlongval;
+    EXEC SQL END DECLARE SECTION;
+
+    EXEC SQL CONNECT TO uptimedb AS con1 USER uptime;
+
+    EXEC SQL PREPARE stmt1 FROM :query;
+    EXEC SQL DECLARE cur1 CURSOR FOR stmt1;
+
+    /* Создать структуру SQLDA для входных параметров */
+    sqlda2 = (sqlda_t *)malloc(sizeof(sqlda_t) + sizeof(sqlvar_t));
+    memset(sqlda2, 0, sizeof(sqlda_t) + sizeof(sqlvar_t));
+    sqlda2-&gt;sqln = 2; /* число входных переменных */
+
+    sqlda2-&gt;sqlvar[0].sqltype = ECPGt_char;
+    sqlda2-&gt;sqlvar[0].sqldata = "postgres";
+    sqlda2-&gt;sqlvar[0].sqllen  = 8;
+
+    intval = 1;
+    sqlda2-&gt;sqlvar[1].sqltype = ECPGt_int;
+    sqlda2-&gt;sqlvar[1].sqldata = (char *) &amp;intval;
+    sqlda2-&gt;sqlvar[1].sqllen  = sizeof(intval);
+
+    /* Открыть курсор с входными параметрами. */
+    EXEC SQL OPEN cur1 USING DESCRIPTOR sqlda2;
+
+    while (1)
+    {
+        sqlda_t *cur_sqlda;
+
+        /* Присвоить дескриптор курсору */
+        EXEC SQL FETCH NEXT FROM cur1 INTO DESCRIPTOR sqlda1;
+
+        for (cur_sqlda = sqlda1 ;
+             cur_sqlda != NULL ;
+             cur_sqlda = cur_sqlda-&gt;desc_next)
+        {
+            int i;
+            char name_buf[1024];
+            char var_buf[1024];
+
+            /* Напечатать каждую колонку в строке. */
+            for (i=0 ; i&lt;cur_sqlda-&gt;sqld ; i++)
+            {
+                sqlvar_t v = cur_sqlda-&gt;sqlvar[i];
+                char *sqldata = v.sqldata;
+                short sqllen  = v.sqllen;
+
+                strncpy(name_buf, v.sqlname.data, v.sqlname.length);
+                name_buf[v.sqlname.length] = '\0';
+
+                switch (v.sqltype)
+                {
+                    case ECPGt_char:
+                        memset(&amp;var_buf, 0, sizeof(var_buf));
+                        memcpy(&amp;var_buf, sqldata, (sizeof(var_buf)&lt;=sqllen ? sizeof(var_buf)-1 : sqllen) );
+                        break;
+
+                    case ECPGt_int: /* integer */
+                        memcpy(&amp;intval, sqldata, sqllen);
+                        snprintf(var_buf, sizeof(var_buf), "%d", intval);
+                        break;
+
+                    case ECPGt_long_long: /* bigint */
+                        memcpy(&amp;longlongval, sqldata, sqllen);
+                        snprintf(var_buf, sizeof(var_buf), "%lld", longlongval);
+                        break;
+
+                    default:
+                    {
+                        int i;
+                        memset(var_buf, 0, sizeof(var_buf));
+                        for (i = 0; i &lt; sqllen; i++)
+                        {
+                            char tmpbuf[16];
+                            snprintf(tmpbuf, sizeof(tmpbuf), "%02x ", (unsigned char) sqldata[i]);
+                            strncat(var_buf, tmpbuf, sizeof(var_buf));
+                        }
+                    }
+                        break;
+                }
+
+                printf("%s = %s (type: %d)\n", name_buf, var_buf, v.sqltype);
+            }
+
+            printf("\n");
+        }
+    }
+
+    EXEC SQL CLOSE cur1;
+    EXEC SQL COMMIT;
+
+    EXEC SQL DISCONNECT ALL;
+
+    return 0;
+}</PRE
+><P
+>Вывод этой программы должен быть примерно таким (некоторые числа будут меняться).</P
+><PRE
+CLASS="SCREEN"
+>oid = 1 (type: 1)
+datname = template1 (type: 1)
+datdba = 10 (type: 1)
+encoding = 0 (type: 5)
+datistemplate = t (type: 1)
+datallowconn = t (type: 1)
+datconnlimit = -1 (type: 5)
+datlastsysoid = 11510 (type: 1)
+datfrozenxid = 379 (type: 1)
+dattablespace = 1663 (type: 1)
+datconfig =  (type: 1)
+datacl = {=c/uptime,uptime=CTc/uptime} (type: 1)
+datid = 1 (type: 1)
+datname = template1 (type: 1)
+numbackends = 0 (type: 5)
+xact_commit = 113606 (type: 9)
+xact_rollback = 0 (type: 9)
+blks_read = 130 (type: 9)
+blks_hit = 7341714 (type: 9)
+tup_returned = 38262679 (type: 9)
+tup_fetched = 1836281 (type: 9)
+tup_inserted = 0 (type: 9)
+tup_updated = 0 (type: 9)
+tup_deleted = 0 (type: 9)
+
+oid = 11511 (type: 1)
+datname = postgres (type: 1)
+datdba = 10 (type: 1)
+encoding = 0 (type: 5)
+datistemplate = f (type: 1)
+datallowconn = t (type: 1)
+datconnlimit = -1 (type: 5)
+datlastsysoid = 11510 (type: 1)
+datfrozenxid = 379 (type: 1)
+dattablespace = 1663 (type: 1)
+datconfig =  (type: 1)
+datacl =  (type: 1)
+datid = 11511 (type: 1)
+datname = postgres (type: 1)
+numbackends = 0 (type: 5)
+xact_commit = 221069 (type: 9)
+xact_rollback = 18 (type: 9)
+blks_read = 1176 (type: 9)
+blks_hit = 13943750 (type: 9)
+tup_returned = 77410091 (type: 9)
+tup_fetched = 3253694 (type: 9)
+tup_inserted = 0 (type: 9)
+tup_updated = 0 (type: 9)
+tup_deleted = 0 (type: 9)</PRE
+></DIV
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ecpg-pgtypes.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ecpg-errors.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Библиотека pgtypes</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ecpg.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Обработка ошибок</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

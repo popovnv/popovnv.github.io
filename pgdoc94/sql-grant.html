@@ -1,0 +1,1066 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>GRANT</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="FETCH"
+HREF="sql-fetch.html"><LINK
+REL="NEXT"
+TITLE="INSERT"
+HREF="sql-insert.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="FETCH"
+HREF="sql-fetch.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="INSERT"
+HREF="sql-insert.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-GRANT"
+></A
+>GRANT</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN81196"
+></A
+><H2
+>Название</H2
+>GRANT&nbsp;--&nbsp;определить права доступа</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN81199"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>GRANT { { SELECT | INSERT | UPDATE | DELETE | TRUNCATE | REFERENCES | TRIGGER }
+    [, ...] | ALL [ PRIVILEGES ] }
+    ON { [ TABLE ] <TT
+CLASS="REPLACEABLE"
+><I
+>table_name</I
+></TT
+> [, ...]
+         | ALL TABLES IN SCHEMA <TT
+CLASS="REPLACEABLE"
+><I
+>имя_схемы</I
+></TT
+> [, ...] }
+    TO { [ GROUP ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_роли</I
+></TT
+> | PUBLIC } [, ...] [ WITH GRANT OPTION ]
+
+GRANT { { SELECT | INSERT | UPDATE | REFERENCES } ( <TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+> [, ...] )
+    [, ...] | ALL [ PRIVILEGES ] ( <TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+> [, ...] ) }
+    ON [ TABLE ] <TT
+CLASS="REPLACEABLE"
+><I
+>table_name</I
+></TT
+> [, ...]
+    TO { [ GROUP ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_роли</I
+></TT
+> | PUBLIC } [, ...] [ WITH GRANT OPTION ]
+
+GRANT { { USAGE | SELECT | UPDATE }
+    [, ...] | ALL [ PRIVILEGES ] }
+    ON { SEQUENCE <TT
+CLASS="REPLACEABLE"
+><I
+>имя_последовательности</I
+></TT
+> [, ...]
+         | ALL SEQUENCES IN SCHEMA <TT
+CLASS="REPLACEABLE"
+><I
+>имя_схемы</I
+></TT
+> [, ...] }
+    TO { [ GROUP ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_роли</I
+></TT
+> | PUBLIC } [, ...] [ WITH GRANT OPTION ]
+
+GRANT { { CREATE | CONNECT | TEMPORARY | TEMP } [, ...] | ALL [ PRIVILEGES ] }
+    ON DATABASE <TT
+CLASS="REPLACEABLE"
+><I
+>имя_бд</I
+></TT
+> [, ...]
+    TO { [ GROUP ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_роли</I
+></TT
+> | PUBLIC } [, ...] [ WITH GRANT OPTION ]
+
+GRANT { USAGE | ALL [ PRIVILEGES ] }
+    ON DOMAIN <TT
+CLASS="REPLACEABLE"
+><I
+>имя_домена</I
+></TT
+> [, ...]
+    TO { [ GROUP ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_роли</I
+></TT
+> | PUBLIC } [, ...] [ WITH GRANT OPTION ]
+
+GRANT { USAGE | ALL [ PRIVILEGES ] }
+    ON FOREIGN DATA WRAPPER <TT
+CLASS="REPLACEABLE"
+><I
+>имя_обёртки_сторонних_данных</I
+></TT
+> [, ...]
+    TO { [ GROUP ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_роли</I
+></TT
+> | PUBLIC } [, ...] [ WITH GRANT OPTION ]
+
+GRANT { USAGE | ALL [ PRIVILEGES ] }
+    ON FOREIGN SERVER <TT
+CLASS="REPLACEABLE"
+><I
+>имя_сервера</I
+></TT
+> [, ...]
+    TO { [ GROUP ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_роли</I
+></TT
+> | PUBLIC } [, ...] [ WITH GRANT OPTION ]
+
+GRANT { EXECUTE | ALL [ PRIVILEGES ] }
+    ON { FUNCTION <TT
+CLASS="REPLACEABLE"
+><I
+>имя_функции</I
+></TT
+> ( [ [ <TT
+CLASS="REPLACEABLE"
+><I
+>режим_аргумента</I
+></TT
+> ] [ <TT
+CLASS="REPLACEABLE"
+><I
+>имя_аргумента</I
+></TT
+> ] <TT
+CLASS="REPLACEABLE"
+><I
+>тип_аргумента</I
+></TT
+> [, ...] ] ) [, ...]
+         | ALL FUNCTIONS IN SCHEMA <TT
+CLASS="REPLACEABLE"
+><I
+>имя_схемы</I
+></TT
+> [, ...] }
+    TO { [ GROUP ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_роли</I
+></TT
+> | PUBLIC } [, ...] [ WITH GRANT OPTION ]
+
+GRANT { USAGE | ALL [ PRIVILEGES ] }
+    ON LANGUAGE <TT
+CLASS="REPLACEABLE"
+><I
+>имя_языка</I
+></TT
+> [, ...]
+    TO { [ GROUP ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_роли</I
+></TT
+> | PUBLIC } [, ...] [ WITH GRANT OPTION ]
+
+GRANT { { SELECT | UPDATE } [, ...] | ALL [ PRIVILEGES ] }
+    ON LARGE OBJECT <TT
+CLASS="REPLACEABLE"
+><I
+>oid_БО</I
+></TT
+> [, ...]
+    TO { [ GROUP ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_роли</I
+></TT
+> | PUBLIC } [, ...] [ WITH GRANT OPTION ]
+
+GRANT { { CREATE | USAGE } [, ...] | ALL [ PRIVILEGES ] }
+    ON SCHEMA <TT
+CLASS="REPLACEABLE"
+><I
+>имя_схемы</I
+></TT
+> [, ...]
+    TO { [ GROUP ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_роли</I
+></TT
+> | PUBLIC } [, ...] [ WITH GRANT OPTION ]
+
+GRANT { CREATE | ALL [ PRIVILEGES ] }
+    ON TABLESPACE <TT
+CLASS="REPLACEABLE"
+><I
+>табл_пространство</I
+></TT
+> [, ...]
+    TO { [ GROUP ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_роли</I
+></TT
+> | PUBLIC } [, ...] [ WITH GRANT OPTION ]
+
+GRANT { USAGE | ALL [ PRIVILEGES ] }
+    ON TYPE <TT
+CLASS="REPLACEABLE"
+><I
+>имя_типа</I
+></TT
+> [, ...]
+    TO { [ GROUP ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_роли</I
+></TT
+> | PUBLIC } [, ...] [ WITH GRANT OPTION ]
+
+GRANT <TT
+CLASS="REPLACEABLE"
+><I
+>имя_роли</I
+></TT
+> [, ...] TO <TT
+CLASS="REPLACEABLE"
+><I
+>имя_роли</I
+></TT
+> [, ...] [ WITH ADMIN OPTION ]</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="SQL-GRANT-DESCRIPTION"
+></A
+><H2
+>Описание</H2
+><P
+>Команда <TT
+CLASS="COMMAND"
+>GRANT</TT
+> имеет две основные разновидности: первая назначает права для доступа к объектам баз данных (таблицам, колонкам, представлениям, сторонним таблицам, последовательностям, базам данных, обёрткам сторонних данных, сторонним серверам, функциям, процедурным языкам, схемам или табличным пространствам), а вторая назначает одни роли членами других. Эти разновидности во многом похожи, но имеют достаточно отличий, чтобы рассматривать их отдельно.</P
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="SQL-GRANT-DESCRIPTION-OBJECTS"
+></A
+><H3
+>GRANT для объектов баз данных</H3
+><P
+>Эта разновидность команды <TT
+CLASS="COMMAND"
+>GRANT</TT
+> даёт одной или нескольким ролям определённые права для доступа к объекту базы данных. Эти права добавляются к списку имеющихся, если роль уже наделена какими-то правами.</P
+><P
+>Также можно дать роли некоторое право для всех объектов одного типа в одной или нескольких схемах. Эта функциональность в настоящее время поддерживается только для таблиц, последовательностей и функций (но заметьте, что указание <TT
+CLASS="LITERAL"
+>ALL TABLES</TT
+> распространяется также на представления и сторонние таблицы).</P
+><P
+>Ключевое слово <TT
+CLASS="LITERAL"
+>PUBLIC</TT
+> означает, что права даются всем ролям, включая те, что могут быть созданы позже. <TT
+CLASS="LITERAL"
+>PUBLIC</TT
+> можно воспринимать как неявно определённую группу, в которую входят все роли. Любая конкретная роль получит в сумме все права, данные непосредственно ей и ролям, членом которых она является, а также права, данные роли <TT
+CLASS="LITERAL"
+>PUBLIC</TT
+>.</P
+><P
+>Если указано <TT
+CLASS="LITERAL"
+>WITH GRANT OPTION</TT
+>, получатель права, в свою очередь, может давать его другим. Без этого указания распоряжаться своим правом он не сможет. Группе <TT
+CLASS="LITERAL"
+>PUBLIC</TT
+> право передачи права дать нельзя.</P
+><P
+>Нет необходимости явно давать права для доступа к объекту его владельцу (обычно это пользователь, создавший объект), так как по умолчанию он имеет все права. (Однако владелец может лишить себя прав в целях безопасности.)</P
+><P
+>Право удалять объект или изменять его определение произвольным образом не считается назначаемым; оно неотъемлемо связано с владельцем, так что отозвать это право или дать его кому-то другому нельзя. (Однако похожий эффект можно получить, управляя членством в роли, владеющей объектом; см. ниже.) Владелец также неявно получает право распоряжения всеми правами для своего объекта.</P
+><P
+>PostgreSQL по умолчанию назначает группе <TT
+CLASS="LITERAL"
+>PUBLIC</TT
+> определённые права для некоторых типов объектов. Для таблиц, колонок, схем и табличных пространств <TT
+CLASS="LITERAL"
+>PUBLIC</TT
+> по умолчанию никаких прав не имеет. Для других типов объектов <TT
+CLASS="LITERAL"
+>PUBLIC</TT
+> имеет следующие права: <TT
+CLASS="LITERAL"
+>CONNECT</TT
+> и <TT
+CLASS="LITERAL"
+>CREATE TEMP TABLE</TT
+> — для баз данных; <TT
+CLASS="LITERAL"
+>EXECUTE</TT
+> — для функций; <TT
+CLASS="LITERAL"
+>USAGE</TT
+> — для языков. Владелец объекта, конечно же, может отозвать (с помощью <TT
+CLASS="COMMAND"
+>REVOKE</TT
+>) как явно назначенные права, так и права, назначаемые по умолчанию. (Для максимальной безопасности команду <TT
+CLASS="COMMAND"
+>REVOKE</TT
+> нужно выполнять в транзакции, создающей объект; тогда не образуется окно, в котором другой пользователь смог бы обратиться к объекту.) Кроме того, эти изначально назначаемые права по умолчанию можно изменить, воспользовавшись командой <A
+HREF="sql-alterdefaultprivileges.html"
+>ALTER DEFAULT PRIVILEGES</A
+>.</P
+><P
+>Все возможные права перечислены ниже: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+>SELECT</DT
+><DD
+><P
+>Позволяет выполнять <A
+HREF="sql-select.html"
+>SELECT</A
+> для любой колонки или перечисленных колонок в заданной таблице, представлении или последовательности. Также позволяет выполнять <A
+HREF="sql-copy.html"
+>COPY</A
+> TO. Помимо того, это право требуется для обращения к существующим значениям колонок в <A
+HREF="sql-update.html"
+>UPDATE</A
+> или <A
+HREF="sql-delete.html"
+>DELETE</A
+>. Для последовательностей это право позволяет пользоваться функцией <CODE
+CLASS="FUNCTION"
+>currval</CODE
+>. Для больших объектов это право позволяет читать содержимое объекта.</P
+></DD
+><DT
+>INSERT</DT
+><DD
+><P
+>Позволяет вставлять строки в заданную таблицу с помощью <A
+HREF="sql-insert.html"
+>INSERT</A
+>. Если право ограничивается несколькими колонками, только их значение можно будет задать в команде <TT
+CLASS="COMMAND"
+>INSERT</TT
+> (другие колонки получат значения по умолчанию). Также позволяет выполнять <A
+HREF="sql-copy.html"
+>COPY</A
+> FROM.</P
+></DD
+><DT
+>UPDATE</DT
+><DD
+><P
+>Позволяет изменять (с помощью <A
+HREF="sql-update.html"
+>UPDATE</A
+>) данные во всех, либо только перечисленных, колонках в заданной таблице. (На практике для любой нетривиальной команды <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> потребуется и право <TT
+CLASS="LITERAL"
+>SELECT</TT
+>, так как она должна обратиться к колонкам таблицы, чтобы определить, какие строки подлежат изменению, и/или вычислить новые значения колонок.) Для <TT
+CLASS="LITERAL"
+>SELECT ... FOR UPDATE</TT
+> и <TT
+CLASS="LITERAL"
+>SELECT ... FOR SHARE</TT
+> также необходимо это право как минимум для одной колонки, помимо права <TT
+CLASS="LITERAL"
+>SELECT</TT
+>. Для последовательностей это право позволяет пользоваться функциями <CODE
+CLASS="FUNCTION"
+>nextval</CODE
+> и <CODE
+CLASS="FUNCTION"
+>setval</CODE
+>. Для больших объектов это правило позволяет записывать данные в объект или обрезать его.</P
+></DD
+><DT
+>DELETE</DT
+><DD
+><P
+>Позволяет удалять строки из заданной таблицы с помощью <A
+HREF="sql-delete.html"
+>DELETE</A
+>. (На практике для любой нетривиальной команды <TT
+CLASS="COMMAND"
+>DELETE</TT
+> потребуется также право <TT
+CLASS="LITERAL"
+>SELECT</TT
+>, так как она должна обратиться к колонкам таблицы, чтобы определить, какие строки подлежат удалению.)</P
+></DD
+><DT
+>TRUNCATE</DT
+><DD
+><P
+>Позволяет опустошить заданную таблицу с помощью <A
+HREF="sql-truncate.html"
+>TRUNCATE</A
+>.</P
+></DD
+><DT
+>REFERENCES</DT
+><DD
+><P
+>Это право требуется для создания ограничений внешнего ключа, как для ссылающихся, так и для целевых колонок. Дать это право можно для всех, либо только для некоторых колонок таблицы.</P
+></DD
+><DT
+>TRIGGER</DT
+><DD
+><P
+>Позволяет создавать триггеры в заданной таблице. (См. описание оператора <A
+HREF="sql-createtrigger.html"
+>CREATE TRIGGER</A
+>.)</P
+></DD
+><DT
+>CREATE</DT
+><DD
+><P
+>Для баз данных это право позволяет создавать схемы в заданной базе.</P
+><P
+>Для схем это право позволяет создавать новые объекты в заданной схеме. Чтобы переименовать существующий объект, необходимо быть владельцем этого объекта <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>и</I
+></SPAN
+> иметь это право для схемы, содержащей его.</P
+><P
+>Для табличных пространств это право позволяет создавать таблицы, индексы и временные файлы в заданном табличном пространстве, а также создавать базы данных, для которых это пространство будет основным. (Учтите, что когда это право отзывается, существующие объекты остаются в прежнем расположении.)</P
+></DD
+><DT
+>CONNECT</DT
+><DD
+><P
+>Позволяет пользователю подключаться к указанной базе данных. Это право проверяется при установлении соединения (в дополнение к условиям, определённым в конфигурации <TT
+CLASS="FILENAME"
+>pg_hba.conf</TT
+>).</P
+></DD
+><DT
+>TEMPORARY<BR>TEMP</DT
+><DD
+><P
+>Позволяет создавать временные таблицы в заданной базе данных.</P
+></DD
+><DT
+>EXECUTE</DT
+><DD
+><P
+>Позволяет выполнять заданную функцию и применять любые определённые поверх неё операторы. Это единственный тип прав, применимый к функциям. (Этот синтаксис распространяется и на агрегатные функции.)</P
+></DD
+><DT
+>USAGE</DT
+><DD
+><P
+>Для процедурных языков это право позволяет создавать функции на заданном языке. Это единственный тип прав, применимый к процедурным языкам.</P
+><P
+>Для схем это право даёт доступ к объектам, содержащимся в заданной схеме (предполагается, что при этом имеются права, необходимые для доступа к самим объектам). По сути это право позволяет субъекту <SPAN
+CLASS="QUOTE"
+>"просматривать"</SPAN
+> объекты внутри схемы. Без этого разрешения имена объектов всё же можно будет узнать, например, обратившись к системным таблицам. Кроме того, если отозвать это право, в существующих сеансах могут оказаться операторы, для которых просмотр имён объектов был выполнен ранее, так что это право не позволяет абсолютно надёжно перекрыть доступ к объектам.</P
+><P
+>Для последовательностей это право позволяет использовать функции <CODE
+CLASS="FUNCTION"
+>currval</CODE
+> и <CODE
+CLASS="FUNCTION"
+>nextval</CODE
+>.</P
+><P
+>Для типов и доменов это право позволяет использовать заданный тип или домен при создании таблиц, функций или других объектов схемы. (Заметьте, что это право не ограничивает общее <SPAN
+CLASS="QUOTE"
+>"использование"</SPAN
+> типа, например, обращение к значениям типа в запросах. Не имея этого права, субъект лишается только возможности создавать объекты, зависящие от заданного типа. Основное предназначение этого права в том, чтобы ограничить круг пользователей, способных создавать зависимости от типа, которые могут впоследствии помешать владельцу типа изменить его.)</P
+><P
+>Для обёрток сторонних данных это право позволяет субъекту создавать определения сторонних серверов, использующих заданную обёртку сторонних данных.</P
+><P
+>Для серверов это право позволяет субъекту создавать определения сторонних таблиц на заданном сервере, а также создавать, изменять и удалять сопоставление для собственного имени пользователя, связанное с этим сервером.</P
+></DD
+><DT
+>ALL PRIVILEGES</DT
+><DD
+><P
+>Даёт целевой роли все права сразу. Ключевое слово <TT
+CLASS="LITERAL"
+>PRIVILEGES</TT
+> является необязательным в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, хотя в строгом SQL оно требуется.</P
+></DD
+></DL
+></DIV
+><P> Права, требующиеся для других команд, указаны на страницах справки этих команд.</P
+></DIV
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="SQL-GRANT-DESCRIPTION-ROLES"
+></A
+><H3
+>GRANT для ролей</H3
+><P
+>Эта разновидность команды <TT
+CLASS="COMMAND"
+>GRANT</TT
+> включает роль в члены одной или нескольких других ролей. Членство в ролях играет важную роль, так как права, данные роли, распространяются и на всех её членов.</P
+><P
+>С указанием <TT
+CLASS="LITERAL"
+>WITH ADMIN OPTION</TT
+> новоиспечённый член роли сможет, в свою очередь, включать в члены этой роли, а также исключать из неё другие роли. Без этого указания обычные пользователи не могут это делать. Считается, что роль не имеет права <TT
+CLASS="LITERAL"
+>WITH ADMIN OPTION</TT
+> для самой себя, но ей позволено управлять своими членами из сеанса, в котором пользователь сеанса соответствует данной роли. Суперпользователи баз данных могут включать или исключать любые роли из любых ролей. Роли с правом <TT
+CLASS="LITERAL"
+>CREATEROLE</TT
+> могут управлять членством в любых ролях, кроме ролей суперпользователей.</P
+><P
+>В отличие от прав, членство в ролях нельзя назначить группе <TT
+CLASS="LITERAL"
+>PUBLIC</TT
+>. Заметьте также, что эта форма команды не принимает избыточное слово <TT
+CLASS="LITERAL"
+>GROUP</TT
+>.</P
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="SQL-GRANT-NOTES"
+></A
+><H2
+>Замечания</H2
+><P
+>Для лишения субъектов прав доступа применяется команда <A
+HREF="sql-revoke.html"
+>REVOKE</A
+>.</P
+><P
+>Начиная с <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> версии 8.1, концепции пользователей и групп объединены в единую сущность, названную ролью. Таким образом, теперь нет необходимости добавлять ключевое слово <TT
+CLASS="LITERAL"
+>GROUP</TT
+>, чтобы показать, что субъект является группой, а не пользователем. Слово <TT
+CLASS="LITERAL"
+>GROUP</TT
+> всё ещё принимается этой командой, но оно лишено смысловой нагрузки.</P
+><P
+>Пользователь может выполнять <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, <TT
+CLASS="COMMAND"
+>INSERT</TT
+> и подобные команды с колонкой таблицы, если он имеет такое право для данной колонки или для всей таблицы. Если назначить пользователю требуемое право на уровне таблицы, а затем отозвать его для одной из колонок, это не даст эффекта, которого можно было бы ожидать: операция с правами на уровне колонок не затронет право на уровне таблицы.</P
+><P
+>Если назначить право доступа к объекту (с помощью <TT
+CLASS="COMMAND"
+>GRANT</TT
+>) попытается не владелец объекта, команда завершится ошибкой, если пользователь не имеет никаких прав для этого объекта. Если же пользователь имеет какие-то права, команда будет выполняться, но пользователь сможет давать другим только те права, которые даны ему с правом передачи. Формы <TT
+CLASS="COMMAND"
+>GRANT ALL PRIVILEGES</TT
+> будут выдавать предупреждение, если у него вовсе нет таких прав, тогда как другие формы будут выдавать предупреждения, если пользователь не имеет прав распоряжаться именно правами, указанными в команде. (В принципе, эти утверждения применимы и к владельцу объекта, но ему разрешено распоряжаться всеми правами, поэтому такие ситуации невозможны.)</P
+><P
+>Следует отметить, что суперпользователи баз данных могут обращаться к любым объектам, вне зависимости от наличия каких-либо прав. Это сравнимо с привилегиями пользователя <TT
+CLASS="LITERAL"
+>root</TT
+> в системе Unix. И так же, как <TT
+CLASS="LITERAL"
+>root</TT
+>, роль суперпользователя следует использовать только когда это абсолютно необходимо.</P
+><P
+>Если суперпользователь решит выполнить команду <TT
+CLASS="COMMAND"
+>GRANT</TT
+> или <TT
+CLASS="COMMAND"
+>REVOKE</TT
+>, она будет выполнена, как если бы её выполнял владелец заданного объекта. В частности, права, назначенные такой командой, будут представлены как права, назначенные владельцем объекта. (Если так же установить членство в роли, оно будет представлено как назначенное самой ролью.)</P
+><P
+><TT
+CLASS="COMMAND"
+>GRANT</TT
+> и <TT
+CLASS="COMMAND"
+>REVOKE</TT
+> также могут быть выполнены ролью, которая не является владельцем заданного объекта, но является членом роли-владельца, либо членом роли, имеющей права <TT
+CLASS="LITERAL"
+>WITH GRANT OPTION</TT
+> для этого объекта. В этом случае, права будут записаны как назначенные ролью, которая действительно владеет объектом, либо имеет право <TT
+CLASS="LITERAL"
+>WITH GRANT OPTION</TT
+>. Например, если таблица <TT
+CLASS="LITERAL"
+>t1</TT
+> принадлежит роли <TT
+CLASS="LITERAL"
+>g1</TT
+>, членом которой является <TT
+CLASS="LITERAL"
+>u1</TT
+>, то <TT
+CLASS="LITERAL"
+>u1</TT
+> может дать права на использование <TT
+CLASS="LITERAL"
+>t1</TT
+> роли <TT
+CLASS="LITERAL"
+>u2</TT
+>, но эти права будут представлены, как назначенные непосредственно ролью <TT
+CLASS="LITERAL"
+>g1</TT
+>. Отозвать эти права позже сможет любой член роли <TT
+CLASS="LITERAL"
+>g1</TT
+>.</P
+><P
+>Если роль, выполняющая команду <TT
+CLASS="COMMAND"
+>GRANT</TT
+>, получает требуемое право по нескольким путям членства, какая именно роль будет выбрана в качестве назначающей право, не определено. Если это важно, в таких случах рекомендуется воспользоваться командой <TT
+CLASS="COMMAND"
+>SET ROLE</TT
+> и переключиться на роль, которую хочется видеть в качестве выполняющей <TT
+CLASS="COMMAND"
+>GRANT</TT
+>.</P
+><P
+>При назначении прав для доступа к таблице они автоматически не распространяются на последовательности, используемые этой таблицей, в том числе, на последовательности, связанные с колонками <TT
+CLASS="TYPE"
+>SERIAL</TT
+>. Права доступа к последовательностям нужно назначать отдельно.</P
+><P
+>Чтобы получить информацию о существующих правах, назначенных для таблиц и колонок, воспользуйтесь командой <TT
+CLASS="COMMAND"
+>\dp</TT
+> в <A
+HREF="app-psql.html"
+>            <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>
+          </A
+>. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>=&gt; \dp mytable
+                              Access privileges
+ Schema |  Name   | Type  |   Access privileges   | Column access privileges 
+--------+---------+-------+-----------------------+--------------------------
+ public | mytable | table | miriam=arwdDxt/miriam | col1:
+                          : =r/miriam             :   miriam_rw=rw/miriam
+                          : admin=arw/miriam        
+(1 row)</PRE
+><P> Записи, выводимые командой <TT
+CLASS="COMMAND"
+>\dp</TT
+>, интерпретируются так: </P><PRE
+CLASS="LITERALLAYOUT"
+>имя_роли=xxxx -- права, назначенные роли
+        =xxxx -- права, назначенные PUBLIC
+
+            r -- SELECT ("read", чтение)
+            w -- UPDATE ("write", запись)
+            a -- INSERT ("append", добавление)
+            d -- DELETE
+            D -- TRUNCATE
+            x -- REFERENCES
+            t -- TRIGGER
+            X -- EXECUTE
+            U -- USAGE
+            C -- CREATE
+            c -- CONNECT
+            T -- TEMPORARY
+      arwdDxt -- ALL PRIVILEGES (все права для таблиц; для других объектов другие)
+            * -- право передачи заданного права
+
+        /yyyy -- роль, назначившая это право</PRE
+><P> В примере выше показано, что увидит пользователь <TT
+CLASS="LITERAL"
+>miriam</TT
+>, если создаст таблицу <TT
+CLASS="LITERAL"
+>mytable</TT
+> и выполнит: </P><PRE
+CLASS="PROGRAMLISTING"
+>GRANT SELECT ON mytable TO PUBLIC;
+GRANT SELECT, UPDATE, INSERT ON mytable TO admin;
+GRANT SELECT (col1), UPDATE (col1) ON mytable TO miriam_rw;</PRE
+><P></P
+><P
+>Для других объектов есть другие команды <TT
+CLASS="COMMAND"
+>\d</TT
+>, которые также позволяют просмотреть назначенные права.</P
+><P
+>Если колонка <SPAN
+CLASS="QUOTE"
+>"Права доступа"</SPAN
+> для данного объекта пуста, это значит, что для объекта действуют стандартные права (то есть колонка прав содержит NULL). Права по умолчанию всегда включают все права для владельца и могут также включать некоторые права для <TT
+CLASS="LITERAL"
+>PUBLIC</TT
+> в зависимости от типа объекта, как разъяснялось выше. Первая команда <TT
+CLASS="COMMAND"
+>GRANT</TT
+> или <TT
+CLASS="COMMAND"
+>REVOKE</TT
+> для объекта приводит к проявлению записи прав по умолчанию (например, <TT
+CLASS="LITERAL"
+>{miriam=arwdDxt/miriam}</TT
+>), а затем изменяет эту запись в соответствии с заданным запросом. Подобным образом, строки, показанные в колонке <SPAN
+CLASS="QUOTE"
+>"Права доступа к колонкам"</SPAN
+>, выводятся только для колонок с нестандартными правами доступа. (Заметьте, что в данном контексте под <SPAN
+CLASS="QUOTE"
+>"стандартными правами"</SPAN
+> всегда подразумевается встроенный набор прав, предопределённый для типа объекта. Если с объектом связан набор прав по умолчанию, полученный после изменения в результате <TT
+CLASS="COMMAND"
+>ALTER DEFAULT PRIVILEGES</TT
+>, изменённые права будут всегда выводиться явно, показывая эффект команды <TT
+CLASS="COMMAND"
+>ALTER</TT
+>.)</P
+><P
+>Заметьте, что право распоряжения правами, которое имеет владелец, не отмечается в выводимой сводке. Знаком <TT
+CLASS="LITERAL"
+>*</TT
+> отмечаются только те права с правом передачи, которые были явно назначены кому-либо.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="SQL-GRANT-EXAMPLES"
+></A
+><H2
+>Примеры</H2
+><P
+>Следующая команда разрешает всем добавлять записи в таблицу <TT
+CLASS="LITERAL"
+>films</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>GRANT INSERT ON films TO PUBLIC;</PRE
+><P></P
+><P
+>Эта команда даёт пользователю <TT
+CLASS="LITERAL"
+>manuel</TT
+> все права для представления <TT
+CLASS="LITERAL"
+>kinds</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>GRANT ALL PRIVILEGES ON kinds TO manuel;</PRE
+><P> Учтите, что если её выполнит суперпользователь или владелец представления <TT
+CLASS="LITERAL"
+>kinds</TT
+>, эта команда действительно даст субъекту все права, но если её выполнит обычный пользователь, субъект получит только те права, которые даны этому пользователю с правом передачи.</P
+><P
+>Включение в роль <TT
+CLASS="LITERAL"
+>admins</TT
+> пользователя <TT
+CLASS="LITERAL"
+>joe</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>GRANT admins TO joe;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="SQL-GRANT-COMPATIBILITY"
+></A
+><H2
+>Совместимость</H2
+><P
+>Согласно стандарту SQL, слово <TT
+CLASS="LITERAL"
+>PRIVILEGES</TT
+> в указании <TT
+CLASS="LITERAL"
+>ALL PRIVILEGES</TT
+> является обязательным. Стандарт SQL не позволяет назначать права сразу для нескольких объектов одной командой.</P
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> позволяет владельцу объекта лишить себя своих обычных прав: например, владелец таблицы может разрешить себе только чтение таблицы, отозвав собственные права <TT
+CLASS="LITERAL"
+>INSERT</TT
+>, <TT
+CLASS="LITERAL"
+>UPDATE</TT
+>, <TT
+CLASS="LITERAL"
+>DELETE</TT
+> и <TT
+CLASS="LITERAL"
+>TRUNCATE</TT
+>. В стандарте SQL это невозможно. Это объясняется тем, что <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> воспринимает права владельца как назначенные им же себе; поэтому их можно и отозвать. В стандарте SQL права владельца даются ему предполагаемой сущностью <SPAN
+CLASS="QUOTE"
+>"_SYSTEM"</SPAN
+>. Так как владелец объекта отличается от <SPAN
+CLASS="QUOTE"
+>"_SYSTEM"</SPAN
+>, лишить себя этих прав он не может.</P
+><P
+>Согласно стандарту SQL, право с правом передачи можно дать субъекту <TT
+CLASS="LITERAL"
+>PUBLIC</TT
+>; однако PostgreSQL может давать право с правом передачи только ролям.</P
+><P
+>В стандарте SQL право <TT
+CLASS="LITERAL"
+>USAGE</TT
+> распространяется и на другие типы объектов: наборы символов, правила сортировки и преобразования.</P
+><P
+>В стандарте SQL право <TT
+CLASS="LITERAL"
+>USAGE</TT
+> для последовательностей управляет использованием выражения <TT
+CLASS="LITERAL"
+>NEXT VALUE FOR</TT
+>, которое равнозначно функции <CODE
+CLASS="FUNCTION"
+>nextval</CODE
+> в PostgreSQL. Права <TT
+CLASS="LITERAL"
+>SELECT</TT
+> и <TT
+CLASS="LITERAL"
+>UPDATE</TT
+> для последовательностей являются расширениями PostgreSQL. То, что право <TT
+CLASS="LITERAL"
+>USAGE</TT
+> для последовательностей управляет использованием функции <TT
+CLASS="LITERAL"
+>currval</TT
+>, так же относится к расширениям PostgreSQL (как и сама функция).</P
+><P
+>Права для баз данных, табличных пространств, схем и языков относятся к расширениям <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN81473"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-revoke.html"
+>REVOKE</A
+>, <A
+HREF="sql-alterdefaultprivileges.html"
+>ALTER DEFAULT PRIVILEGES</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-fetch.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-insert.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>FETCH</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>INSERT</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,309 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Создание базы данных</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Управление базами данных"
+HREF="managing-databases.html"><LINK
+REL="PREVIOUS"
+TITLE="Обзор"
+HREF="manage-ag-overview.html"><LINK
+REL="NEXT"
+TITLE="Шаблоны баз данных"
+HREF="manage-ag-templatedbs.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Обзор"
+HREF="manage-ag-overview.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="managing-databases.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 21. Управление базами данных</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Шаблоны баз данных"
+HREF="manage-ag-templatedbs.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="MANAGE-AG-CREATEDB"
+>21.2. Создание базы данных</A
+></H1
+><P
+>Для создания базы данных сервер <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> должен быть развёрнут и запущен (см. <A
+HREF="server-start.html"
+>Раздел 17.3</A
+>).</P
+><P
+>База данных создаётся SQL-командой <A
+HREF="sql-createdatabase.html"
+>CREATE DATABASE</A
+>: </P><PRE
+CLASS="SYNOPSIS"
+>CREATE DATABASE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+>;</PRE
+><P> где <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> подчиняется правилам именования идентификаторов <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>. Текущий пользователь автоматически назначается владельцем. Владелец может удалить свою базу, что также приведёт к удалению всех её объектов, в том числе, имеющих других владельцев.</P
+><P
+>Создание баз данных это привилегированная операция. Как предоставить права доступа, описано в <A
+HREF="role-attributes.html"
+>Разделе 20.2</A
+>.</P
+><P
+>Поскольку для выполнения команды <TT
+CLASS="COMMAND"
+>CREATE DATABASE</TT
+> необходимо подключение к серверу базы данных, возникает вопрос как создать самую первую базу данных. Первая база данных всегда создаётся командой <TT
+CLASS="COMMAND"
+>initdb</TT
+> при инициализации пространства хранения данных (см. <A
+HREF="creating-cluster.html"
+>Раздел 17.2</A
+>.) Эта база данных называется <TT
+CLASS="LITERAL"
+>postgres</TT
+>. Далее для создания первой <SPAN
+CLASS="QUOTE"
+>"обычной"</SPAN
+> базы данных можно подключиться к <TT
+CLASS="LITERAL"
+>postgres</TT
+>.</P
+><P
+>Вторая база данных <TT
+CLASS="LITERAL"
+>template1</TT
+>, также создаётся во время инициализации кластера. При каждом создании новой базы данных в рамках кластера по факту производится клонирование шаблона <TT
+CLASS="LITERAL"
+>template1</TT
+>. При этом любые изменения сделанные в <TT
+CLASS="LITERAL"
+>template1</TT
+> распространяются на все созданные впоследствии базы данных. Следует избегать создания объектов в <TT
+CLASS="LITERAL"
+>template1</TT
+>, за исключением ситуации, когда их необходимо автоматически добавлять в новые базы. Более подробно в <A
+HREF="manage-ag-templatedbs.html"
+>Разделе 21.3</A
+>.</P
+><P
+>Для удобства, есть утилита командной строки для создания баз данных, <TT
+CLASS="COMMAND"
+>createdb</TT
+>.</P><PRE
+CLASS="SYNOPSIS"
+>createdb <TT
+CLASS="REPLACEABLE"
+><I
+>dbname</I
+></TT
+></PRE
+><P>
+
+   Утилита <TT
+CLASS="COMMAND"
+>createdb</TT
+> не делает ничего волшебного, она просто подключается к базе данных <TT
+CLASS="LITERAL"
+>postgres</TT
+> и выполняет ранее описанную SQL-команду <TT
+CLASS="COMMAND"
+>CREATE DATABASE</TT
+>. Подробнее о её вызове можно узнать в <A
+HREF="app-createdb.html"
+>            <SPAN
+CLASS="APPLICATION"
+>createdb</SPAN
+>
+          </A
+>. Обратите внимание, что команда <TT
+CLASS="COMMAND"
+>createdb</TT
+> без параметров создаст базу данных с именем текущего пользователя.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+><A
+HREF="client-authentication.html"
+>Глава 19</A
+> содержит информацию о том, как ограничить права на подключение к заданной базе данных.</P
+></BLOCKQUOTE
+></DIV
+><P
+>Иногда необходимо создать базу данных для другого пользователя и назначить его владельцем, чтобы он мог конфигурировать и управлять ею. Для этого используйте одну из следующих команд: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE DATABASE <TT
+CLASS="REPLACEABLE"
+><I
+>dbname</I
+></TT
+> OWNER <TT
+CLASS="REPLACEABLE"
+><I
+>rolename</I
+></TT
+>;</PRE
+><P> из среды SQL, или: </P><PRE
+CLASS="PROGRAMLISTING"
+>createdb -O <TT
+CLASS="REPLACEABLE"
+><I
+>rolename</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>dbname</I
+></TT
+></PRE
+><P> из командной строки ОС. Лишь суперпользователь может создавать базы данных для других (для ролей, членом которых он не является).</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="manage-ag-overview.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="manage-ag-templatedbs.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Обзор</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="managing-databases.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Шаблоны баз данных</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

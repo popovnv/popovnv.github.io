@@ -1,0 +1,405 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Логический тип</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Типы данных"
+HREF="datatype.html"><LINK
+REL="PREVIOUS"
+TITLE="Типы даты/времени"
+HREF="datatype-datetime.html"><LINK
+REL="NEXT"
+TITLE="Типы перечислений"
+HREF="datatype-enum.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Типы даты/времени"
+HREF="datatype-datetime.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="datatype.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 8. Типы данных</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Типы перечислений"
+HREF="datatype-enum.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="DATATYPE-BOOLEAN"
+>8.6. Логический тип</A
+></H1
+><P
+>В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> есть стандартный <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>-тип <TT
+CLASS="TYPE"
+>boolean</TT
+>; см. <A
+HREF="datatype-boolean.html#DATATYPE-BOOLEAN-TABLE"
+>Таблицу 8-19</A
+>. Тип <TT
+CLASS="TYPE"
+>boolean</TT
+> может иметь следующие состояния: <SPAN
+CLASS="QUOTE"
+>"true"</SPAN
+>, <SPAN
+CLASS="QUOTE"
+>"false"</SPAN
+> и третье состояние, <SPAN
+CLASS="QUOTE"
+>"unknown"</SPAN
+>, которое представляется <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>-значением NULL.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="DATATYPE-BOOLEAN-TABLE"
+></A
+><P
+><B
+>Таблица 8-19. Логический тип данных</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Размер</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>1 байт</TD
+><TD
+>состояние: истина или ложь</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Состояние <SPAN
+CLASS="QUOTE"
+>"true"</SPAN
+> может задаваться следующими значениями: <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>TRUE</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>'t'</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>'true'</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>'y'</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>'yes'</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>'on'</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>'1'</TT
+></TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+> Для состояния <SPAN
+CLASS="QUOTE"
+>"false"</SPAN
+> можно использовать следующие варианты: <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>FALSE</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>'f'</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>'false'</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>'n'</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>'no'</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>'off'</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>'0'</TT
+></TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+> При этом пробелы в начале и конце строки игнорируются, и регистр так же не имеет значения. Предпочтительными (совместимыми с <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>) являются варианты <TT
+CLASS="LITERAL"
+>TRUE</TT
+> и <TT
+CLASS="LITERAL"
+>FALSE</TT
+>.</P
+><P
+><A
+HREF="datatype-boolean.html#DATATYPE-BOOLEAN-EXAMPLE"
+>Пример 8-2</A
+> показывает, что значения типа <TT
+CLASS="TYPE"
+>boolean</TT
+> при выводе представляются буквами <TT
+CLASS="LITERAL"
+>t</TT
+> и <TT
+CLASS="LITERAL"
+>f</TT
+>.</P
+><DIV
+CLASS="EXAMPLE"
+><A
+NAME="DATATYPE-BOOLEAN-EXAMPLE"
+></A
+><P
+><B
+>Пример 8-2. Использование типа <TT
+CLASS="TYPE"
+>boolean</TT
+></B
+></P
+><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE test1 (a boolean, b text);
+INSERT INTO test1 VALUES (TRUE, 'sic est');
+INSERT INTO test1 VALUES (FALSE, 'non est');
+SELECT * FROM test1;
+ a |    b
+---+---------
+ t | sic est
+ f | non est
+
+SELECT * FROM test1 WHERE a;
+ a |    b
+---+---------
+ t | sic est</PRE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="datatype-datetime.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="datatype-enum.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Типы даты/времени</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="datatype.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Типы перечислений</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

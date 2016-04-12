@@ -1,0 +1,2802 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Библиотека pgtypes</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="ECPG — встраиваемый SQL в C"
+HREF="ecpg.html"><LINK
+REL="PREVIOUS"
+TITLE="Динамический SQL"
+HREF="ecpg-dynamic.html"><LINK
+REL="NEXT"
+TITLE="Использование областей дескрипторов"
+HREF="ecpg-descriptors.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Динамический SQL"
+HREF="ecpg-dynamic.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ecpg.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 33. <SPAN
+CLASS="APPLICATION"
+>ECPG</SPAN
+> — встраиваемый <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> в C</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Использование областей дескрипторов"
+HREF="ecpg-descriptors.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="ECPG-PGTYPES"
+>33.6. Библиотека pgtypes</A
+></H1
+><P
+>Библиотека pgtypes сопоставляет типы базы данных <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> с их эквивалентами в C, которые можно использовать в программах на C. Она также предлагает функции для выполнения простых вычислений с этими типами в C, то есть без помощи сервера <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Рассмотрите следующий пример: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL BEGIN DECLARE SECTION;
+   date date1;
+   timestamp ts1, tsout;
+   interval iv1;
+   char *out;
+EXEC SQL END DECLARE SECTION;
+
+PGTYPESdate_today(&amp;date1);
+EXEC SQL SELECT started, duration INTO :ts1, :iv1 FROM datetbl WHERE d=:date1;
+PGTYPEStimestamp_add_interval(&amp;ts1, &amp;iv1, &amp;tsout);
+out = PGTYPEStimestamp_to_asc(&amp;tsout);
+printf("Started + duration: %s\n", out);
+free(out);</PRE
+><P></P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="ECPG-PGTYPES-NUMERIC"
+>33.6.1. Тип numeric</A
+></H2
+><P
+>Тип numeric позволяет производить вычисления с фиксированной точностью. Эквивалентный ему тип на сервере <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> описан в <A
+HREF="datatype-numeric.html"
+>Разделе 8.1</A
+>. Ввиду того, что переменная имеет фиксированную точность, она должна расширяться и сжиматься динамически. Поэтому такие переменные можно создавать только в области кучи, используя функции <CODE
+CLASS="FUNCTION"
+>PGTYPESnumeric_new</CODE
+> и <CODE
+CLASS="FUNCTION"
+>PGTYPESnumeric_free</CODE
+>. Тип decimal подобен numeric, но имеет ограниченную точность, и поэтому может размещаться и в области кучи, и в стеке.</P
+><P
+>Для работы с типом numeric можно использовать следующие функции: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><CODE
+CLASS="FUNCTION"
+>PGTYPESnumeric_new</CODE
+></DT
+><DD
+><P
+>Запрашивает указатель на новую переменную, размещённую в памяти. </P><PRE
+CLASS="SYNOPSIS"
+>numeric *PGTYPESnumeric_new(void);</PRE
+><P></P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>PGTYPESnumeric_free</CODE
+></DT
+><DD
+><P
+>Освобождает переменную типа numeric, высвобождая всю её память. </P><PRE
+CLASS="SYNOPSIS"
+>void PGTYPESnumeric_free(numeric *var);</PRE
+><P></P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>PGTYPESnumeric_from_asc</CODE
+></DT
+><DD
+><P
+>Разбирает числовой тип из строковой записи. </P><PRE
+CLASS="SYNOPSIS"
+>numeric *PGTYPESnumeric_from_asc(char *str, char **endptr);</PRE
+><P> Допускаются в частности следующие форматы: <TT
+CLASS="LITERAL"
+>-2</TT
+>, <TT
+CLASS="LITERAL"
+>.794</TT
+>, <TT
+CLASS="LITERAL"
+>+3.44</TT
+>, <TT
+CLASS="LITERAL"
+>592.49E07</TT
+> и <TT
+CLASS="LITERAL"
+>-32.84e-4</TT
+>. Если значение удаётся разобрать успешно, возвращается действительный указатель, в противном случае указатель NULL. На данный момент ECPG всегда разбирает строку до конца, так что эта функция не может вернуть адрес первого недопустимого символа в <TT
+CLASS="LITERAL"
+>*endptr</TT
+>. Поэтому в <TT
+CLASS="LITERAL"
+>endptr</TT
+> свободно можно передать NULL.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>PGTYPESnumeric_to_asc</CODE
+></DT
+><DD
+><P
+>Возвращает указатель на строку, выделенную функцией <CODE
+CLASS="FUNCTION"
+>malloc</CODE
+> и содержащую строковое представление значения <TT
+CLASS="LITERAL"
+>num</TT
+> числового типа. </P><PRE
+CLASS="SYNOPSIS"
+>char *PGTYPESnumeric_to_asc(numeric *num, int dscale);</PRE
+><P> Числовое значение будет выводиться с заданным в <TT
+CLASS="LITERAL"
+>dscale</TT
+> количеством цифр после запятой, округлённое при необходимости.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>PGTYPESnumeric_add</CODE
+></DT
+><DD
+><P
+>Суммирует две числовые переменные и возвращает результат в третьей. </P><PRE
+CLASS="SYNOPSIS"
+>int PGTYPESnumeric_add(numeric *var1, numeric *var2, numeric *result);</PRE
+><P> Эта функция суммирует переменные <TT
+CLASS="LITERAL"
+>var1</TT
+> и <TT
+CLASS="LITERAL"
+>var2</TT
+> в результирующую переменную <TT
+CLASS="LITERAL"
+>result</TT
+>. Функция возвращает 0 в случае успеха и -1 при ошибке.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>PGTYPESnumeric_sub</CODE
+></DT
+><DD
+><P
+>Вычисляет разность двух числовых переменных и возвращает результат в третьей. </P><PRE
+CLASS="SYNOPSIS"
+>int PGTYPESnumeric_sub(numeric *var1, numeric *var2, numeric *result);</PRE
+><P> Эта функция вычитает переменную <TT
+CLASS="LITERAL"
+>var2</TT
+> из <TT
+CLASS="LITERAL"
+>var1</TT
+>. Результат операции помещается в переменную <TT
+CLASS="LITERAL"
+>result</TT
+>. Функция возвращает 0 в случае успеха и -1 при ошибке.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>PGTYPESnumeric_mul</CODE
+></DT
+><DD
+><P
+>Перемножает две числовые переменные и возвращает результат в третьей. </P><PRE
+CLASS="SYNOPSIS"
+>int PGTYPESnumeric_mul(numeric *var1, numeric *var2, numeric *result);</PRE
+><P> Эта функция перемножает переменные <TT
+CLASS="LITERAL"
+>var1</TT
+> и <TT
+CLASS="LITERAL"
+>var2</TT
+>. Результат операции сохраняется в переменной <TT
+CLASS="LITERAL"
+>result</TT
+>. Функция возвращает 0 в случае успеха и -1 при ошибке.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>PGTYPESnumeric_div</CODE
+></DT
+><DD
+><P
+>Вычисляет частное двух числовых переменных и возвращает результат в третьей. </P><PRE
+CLASS="SYNOPSIS"
+>int PGTYPESnumeric_div(numeric *var1, numeric *var2, numeric *result);</PRE
+><P> Эта функция делит переменную <TT
+CLASS="LITERAL"
+>var1</TT
+> на <TT
+CLASS="LITERAL"
+>var2</TT
+>. Результат операции сохраняется в переменной <TT
+CLASS="LITERAL"
+>result</TT
+>. Функция возвращает 0 в случае успеха и -1 при ошибке.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>PGTYPESnumeric_cmp</CODE
+></DT
+><DD
+><P
+>Сравнивает две числовые переменные. </P><PRE
+CLASS="SYNOPSIS"
+>int PGTYPESnumeric_cmp(numeric *var1, numeric *var2)</PRE
+><P> Эта функция производит сравнение двух числовых переменных. При ошибке возвращается <TT
+CLASS="LITERAL"
+>INT_MAX</TT
+>. В случае успеха функция возвращает одно из трёх возможных значений: <P
+></P
+></P><UL
+><LI
+><P
+>1, если <TT
+CLASS="LITERAL"
+>var1</TT
+> больше <TT
+CLASS="LITERAL"
+>var2</TT
+></P
+></LI
+><LI
+><P
+>-1, если <TT
+CLASS="LITERAL"
+>var1</TT
+> меньше <TT
+CLASS="LITERAL"
+>var2</TT
+></P
+></LI
+><LI
+><P
+>0, если <TT
+CLASS="LITERAL"
+>var1</TT
+> и <TT
+CLASS="LITERAL"
+>var2</TT
+> равны</P
+></LI
+></UL
+><P></P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>PGTYPESnumeric_from_int</CODE
+></DT
+><DD
+><P
+>Преобразует переменную int в переменную numeric. </P><PRE
+CLASS="SYNOPSIS"
+>int PGTYPESnumeric_from_int(signed int int_val, numeric *var);</PRE
+><P> Эта функция принимает целочисленную переменную со знаком типа signed int и сохраняет её значение в переменной <TT
+CLASS="LITERAL"
+>var</TT
+> типа numeric. Функция возвращает 0 в случае успеха и -1 при ошибке.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>PGTYPESnumeric_from_long</CODE
+></DT
+><DD
+><P
+>Преобразует переменную long int в переменную numeric. </P><PRE
+CLASS="SYNOPSIS"
+>int PGTYPESnumeric_from_long(signed long int long_val, numeric *var);</PRE
+><P> Эта функция принимает целочисленную переменную со знаком типа signed long int и сохраняет её значение в переменной <TT
+CLASS="LITERAL"
+>var</TT
+> типа numeric. Функция возвращает 0 в случае успеха и -1 при ошибке.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>PGTYPESnumeric_copy</CODE
+></DT
+><DD
+><P
+>Копирует одну числовую переменную в другую. </P><PRE
+CLASS="SYNOPSIS"
+>int PGTYPESnumeric_copy(numeric *src, numeric *dst);</PRE
+><P> Эта функция копирует значение переменной, на которую указывает <TT
+CLASS="LITERAL"
+>src</TT
+>, в переменную, на которую указывает <TT
+CLASS="LITERAL"
+>dst</TT
+>. Она возвращает 0 в случае успеха и -1 при ошибке.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>PGTYPESnumeric_from_double</CODE
+></DT
+><DD
+><P
+>Преобразует переменную типа double в переменную numeric. </P><PRE
+CLASS="SYNOPSIS"
+>int  PGTYPESnumeric_from_double(double d, numeric *dst);</PRE
+><P> Эта функция принимает переменную типа double и сохраняет преобразованное значение в переменной, на которую указывает <TT
+CLASS="LITERAL"
+>dst</TT
+>. Она возвращает 0 в случае успеха и -1 при ошибке.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>PGTYPESnumeric_to_double</CODE
+></DT
+><DD
+><P
+>Преобразует переменную типа numeric в переменную double. </P><PRE
+CLASS="SYNOPSIS"
+>int PGTYPESnumeric_to_double(numeric *nv, double *dp)</PRE
+><P> Эта функция преобразует значение типа numeric переменной, на которую указывает <TT
+CLASS="LITERAL"
+>nv</TT
+>, в переменную типа double, на которую указывает <TT
+CLASS="LITERAL"
+>dp</TT
+>. Она возвращает 0 в случае успеха и -1 при ошибке, в том числе при переполнении. Если происходит переполнение, в глобальной переменной <TT
+CLASS="LITERAL"
+>errno</TT
+> дополнительно устанавливается значение <TT
+CLASS="LITERAL"
+>PGTYPES_NUM_OVERFLOW</TT
+>.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>PGTYPESnumeric_to_int</CODE
+></DT
+><DD
+><P
+>Преобразует переменную типа numeric в переменную int. </P><PRE
+CLASS="SYNOPSIS"
+>int PGTYPESnumeric_to_int(numeric *nv, int *ip);</PRE
+><P> Эта функция преобразует значение типа numeric переменной, на которую указывает <TT
+CLASS="LITERAL"
+>nv</TT
+>, в целочисленную переменную, на которую указывает <TT
+CLASS="LITERAL"
+>ip</TT
+>. Она возвращает 0 в случае успеха и -1 при ошибке, в том числе при переполнении. Если происходит переполнение, в глобальной переменной <TT
+CLASS="LITERAL"
+>errno</TT
+> дополнительно устанавливается значение <TT
+CLASS="LITERAL"
+>PGTYPES_NUM_OVERFLOW</TT
+>.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>PGTYPESnumeric_to_long</CODE
+></DT
+><DD
+><P
+>Преобразует переменную типа numeric в переменную long. </P><PRE
+CLASS="SYNOPSIS"
+>int PGTYPESnumeric_to_long(numeric *nv, long *lp);</PRE
+><P> Эта функция преобразует значение типа numeric переменной, на которую указывает <TT
+CLASS="LITERAL"
+>nv</TT
+>, в целочисленную переменную типа long, на которую указывает <TT
+CLASS="LITERAL"
+>lp</TT
+>. Она возвращает 0 в случае успеха и -1 при ошибке, в том числе при переполнении. Если происходит переполнение, в глобальной переменной <TT
+CLASS="LITERAL"
+>errno</TT
+> дополнительно устанавливается значение <TT
+CLASS="LITERAL"
+>PGTYPES_NUM_OVERFLOW</TT
+>.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>PGTYPESnumeric_to_decimal</CODE
+></DT
+><DD
+><P
+>Преобразует переменную типа numeric в переменную decimal. </P><PRE
+CLASS="SYNOPSIS"
+>int PGTYPESnumeric_to_decimal(numeric *src, decimal *dst);</PRE
+><P> Эта функция преобразует значение типа numeric переменной, на которую указывает <TT
+CLASS="LITERAL"
+>src</TT
+>, в переменную типа decimal, на которую указывает <TT
+CLASS="LITERAL"
+>dst</TT
+>. Она возвращает 0 в случае успеха и -1 при ошибке, в том числе при переполнении. Если происходит переполнение, в глобальной переменной <TT
+CLASS="LITERAL"
+>errno</TT
+> дополнительно устанавливается значение <TT
+CLASS="LITERAL"
+>PGTYPES_NUM_OVERFLOW</TT
+>.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>PGTYPESnumeric_from_decimal</CODE
+></DT
+><DD
+><P
+>Преобразует переменную типа decimal в переменную numeric. </P><PRE
+CLASS="SYNOPSIS"
+>int PGTYPESnumeric_from_decimal(decimal *src, numeric *dst);</PRE
+><P> Эта функция преобразует значение типа decimal переменной, на которую указывает <TT
+CLASS="LITERAL"
+>src</TT
+>, в переменную типа numeric, на которую указывает <TT
+CLASS="LITERAL"
+>dst</TT
+>. Она возвращает 0 в случае успеха и -1 при ошибке. Так как тип decimal реализован как ограниченная версия типа numeric, при таком преобразовании переполнение невозможно.</P
+></DD
+></DL
+></DIV
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="ECPG-PGTYPES-DATE"
+>33.6.2. Тип date</A
+></H2
+><P
+>Тип date, реализованный в C, позволяет программам работать с данными типа date в SQL. Соответствующий тип сервера <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> описан в <A
+HREF="datatype-datetime.html"
+>Разделе 8.5</A
+>.</P
+><P
+>Для работы с типом date можно использовать следующие функции: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="PGTYPESDATEFROMTIMESTAMP"
+></A
+><CODE
+CLASS="FUNCTION"
+>PGTYPESdate_from_timestamp</CODE
+></DT
+><DD
+><P
+>Извлекает часть даты из значения типа timestamp. </P><PRE
+CLASS="SYNOPSIS"
+>date PGTYPESdate_from_timestamp(timestamp dt);</PRE
+><P> Эта функция получает в единственном аргументе значение времени типа timestamp и возвращает извлечённую из него дату.</P
+></DD
+><DT
+><A
+NAME="PGTYPESDATEFROMASC"
+></A
+><CODE
+CLASS="FUNCTION"
+>PGTYPESdate_from_asc</CODE
+></DT
+><DD
+><P
+>Разбирает дату из её текстового представления. </P><PRE
+CLASS="SYNOPSIS"
+>date PGTYPESdate_from_asc(char *str, char **endptr);</PRE
+><P> Эта функция получает строку C char* <TT
+CLASS="LITERAL"
+>str</TT
+> и указатель на строку C char* <TT
+CLASS="LITERAL"
+>endptr</TT
+>. На данный момент ECPG всегда разбирает строку до конца, так что эта функция не может вернуть адрес первого недопустимого символа в <TT
+CLASS="LITERAL"
+>*endptr</TT
+>. Поэтому в <TT
+CLASS="LITERAL"
+>endptr</TT
+> свободно можно передать NULL.</P
+><P
+>Заметьте, что эта функция всегда подразумевает формат дат MDY (месяц-день-год) и никакой переменной для изменения этого формата в ECPG нет.</P
+><P
+>Все допустимые форматы ввода перечислены в <A
+HREF="ecpg-pgtypes.html#ECPG-PGTYPESDATE-FROM-ASC-TABLE"
+>Таблице 33-2</A
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="ECPG-PGTYPESDATE-FROM-ASC-TABLE"
+></A
+><P
+><B
+>Таблица 33-2. Допустимые форматы ввода для <CODE
+CLASS="FUNCTION"
+>PGTYPESdate_from_asc</CODE
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+>Ввод</TH
+><TH
+>Результат</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>January 8, 1999</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>January 8, 1999</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>1999-01-08</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>January 8, 1999</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>1/8/1999</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>January 8, 1999</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>1/18/1999</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>January 18, 1999</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>01/02/03</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>February 1, 2003</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>1999-Jan-08</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>January 8, 1999</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>Jan-08-1999</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>January 8, 1999</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>08-Jan-1999</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>January 8, 1999</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>99-Jan-08</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>January 8, 1999</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>08-Jan-99</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>January 8, 1999</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>08-Jan-06</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>January 8, 2006</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>Jan-08-99</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>January 8, 1999</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>19990108</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>ISO 8601; January 8, 1999</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>990108</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>ISO 8601; January 8, 1999</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>1999.008</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>год и день года</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>J2451187</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>День по юлианскому календарю</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>January 8, 99 BC</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>99 год до нашей эры</TT
+></TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DD
+><DT
+><A
+NAME="PGTYPESDATETOASC"
+></A
+><CODE
+CLASS="FUNCTION"
+>PGTYPESdate_to_asc</CODE
+></DT
+><DD
+><P
+>Возвращает текстовое представление переменной типа date. </P><PRE
+CLASS="SYNOPSIS"
+>char *PGTYPESdate_to_asc(date dDate);</PRE
+><P> Эта функция получает в качестве единственного параметра дату <TT
+CLASS="LITERAL"
+>dDate</TT
+> и выводит её в виде <TT
+CLASS="LITERAL"
+>1999-01-18</TT
+>, то есть в формате <TT
+CLASS="LITERAL"
+>YYYY-MM-DD</TT
+>.</P
+></DD
+><DT
+><A
+NAME="PGTYPESDATEJULMDY"
+></A
+><CODE
+CLASS="FUNCTION"
+>PGTYPESdate_julmdy</CODE
+></DT
+><DD
+><P
+>Извлекает значения дня, месяца и года из переменной типа date. </P><PRE
+CLASS="SYNOPSIS"
+>void PGTYPESdate_julmdy(date d, int *mdy);</PRE
+><P> Эта функция получает дату <TT
+CLASS="LITERAL"
+>d</TT
+> и указатель на 3 целочисленных значения <TT
+CLASS="LITERAL"
+>mdy</TT
+>. Имя переменной указывает на порядок значений: в <TT
+CLASS="LITERAL"
+>mdy[0]</TT
+> записывается номер месяца, в <TT
+CLASS="LITERAL"
+>mdy[1]</TT
+> — номер дня, а в <TT
+CLASS="LITERAL"
+>mdy[2]</TT
+> — год.</P
+></DD
+><DT
+><A
+NAME="PGTYPESDATEMDYJUL"
+></A
+><CODE
+CLASS="FUNCTION"
+>PGTYPESdate_mdyjul</CODE
+></DT
+><DD
+><P
+>Образует значение даты из массива 3 целых чисел, задающих день, месяц и год даты. </P><PRE
+CLASS="SYNOPSIS"
+>void PGTYPESdate_mdyjul(int *mdy, date *jdate);</PRE
+><P> Эта функция получает в первом аргументе массив из 3 целых чисел (<TT
+CLASS="LITERAL"
+>mdy</TT
+>), а во втором указатель на переменную типа date, в которую будет помещён результат операции.</P
+></DD
+><DT
+><A
+NAME="PGTYPESDATEDAYOFWEEK"
+></A
+><CODE
+CLASS="FUNCTION"
+>PGTYPESdate_dayofweek</CODE
+></DT
+><DD
+><P
+>Возвращает число, представляющее день недели для заданной даты. </P><PRE
+CLASS="SYNOPSIS"
+>int PGTYPESdate_dayofweek(date d);</PRE
+><P> Эта функция принимает в единственном аргументе переменную <TT
+CLASS="LITERAL"
+>d</TT
+> типа date и возвращает целое число, выражающее день недели для этой даты. <P
+></P
+></P><UL
+><LI
+><P
+>0 — Воскресенье</P
+></LI
+><LI
+><P
+>1 — Понедельник</P
+></LI
+><LI
+><P
+>2 — Вторник</P
+></LI
+><LI
+><P
+>3 — Среда</P
+></LI
+><LI
+><P
+>4 — Четверг</P
+></LI
+><LI
+><P
+>5 — Пятница</P
+></LI
+><LI
+><P
+>6 — Суббота</P
+></LI
+></UL
+><P></P
+></DD
+><DT
+><A
+NAME="PGTYPESDATETODAY"
+></A
+><CODE
+CLASS="FUNCTION"
+>PGTYPESdate_today</CODE
+></DT
+><DD
+><P
+>Выдаёт текущую дату. </P><PRE
+CLASS="SYNOPSIS"
+>void PGTYPESdate_today(date *d);</PRE
+><P> Эта функция получает указатель на переменную (<TT
+CLASS="LITERAL"
+>d</TT
+>) типа date, в которую будет записана текущая дата.</P
+></DD
+><DT
+><A
+NAME="PGTYPESDATEFMTASC"
+></A
+><CODE
+CLASS="FUNCTION"
+>PGTYPESdate_fmt_asc</CODE
+></DT
+><DD
+><P
+>Преобразует переменную типа date в текстовое представление по маске формата. </P><PRE
+CLASS="SYNOPSIS"
+>int PGTYPESdate_fmt_asc(date dDate, char *fmtstring, char *outbuf);</PRE
+><P> Эта функция принимает дату для преобразования (<TT
+CLASS="LITERAL"
+>dDate</TT
+>), маску формата (<TT
+CLASS="LITERAL"
+>fmtstring</TT
+>) и строку, в которую будет помещено текстовое представление даты (<TT
+CLASS="LITERAL"
+>outbuf</TT
+>).</P
+><P
+>В случае успеха возвращается 0, а в случае ошибки — отрицательное значение.</P
+><P
+>В строке формата можно использовать следующие коды полей: <P
+></P
+></P><UL
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>dd</TT
+> — Номер дня в месяце.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>mm</TT
+> — Номер месяца в году.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>yy</TT
+> — Номер года в виде двух цифр.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>yyyy</TT
+> — Номер года в виде четырёх цифр.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>ddd</TT
+> — Название дня недели (сокращённое).</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>mmm</TT
+> — Название месяца (сокращённое).</P
+></LI
+></UL
+><P> Все другие символы копируются в выводимую строку 1:1.</P
+><P
+>В <A
+HREF="ecpg-pgtypes.html#ECPG-PGTYPESDATE-FMT-ASC-EXAMPLE-TABLE"
+>Таблице 33-3</A
+> перечислены несколько возможных форматов. Это даёт представление, как можно использовать эту функцию. Все строки вывода даны для одной даты: 23 ноября 1959 г.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="ECPG-PGTYPESDATE-FMT-ASC-EXAMPLE-TABLE"
+></A
+><P
+><B
+>Таблица 33-3. Допустимые форматы ввода для <CODE
+CLASS="FUNCTION"
+>PGTYPESdate_fmt_asc</CODE
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+>Формат</TH
+><TH
+>Результат</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>mmddyy</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>112359</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>ddmmyy</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>231159</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>yymmdd</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>591123</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>yy/mm/dd</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>59/11/23</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>yy mm dd</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>59 11 23</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>yy.mm.dd</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>59.11.23</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>.mm.yyyy.dd.</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>.11.1959.23.</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>mmm. dd, yyyy</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>Nov. 23, 1959</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>mmm dd yyyy</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>Nov 23 1959</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>yyyy dd mm</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>1959 23 11</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>ddd, mmm. dd, yyyy</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>Mon, Nov. 23, 1959</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>(ddd) mmm. dd, yyyy</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>(Mon) Nov. 23, 1959</TT
+></TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DD
+><DT
+><A
+NAME="PGTYPESDATEDEFMTASC"
+></A
+><CODE
+CLASS="FUNCTION"
+>PGTYPESdate_defmt_asc</CODE
+></DT
+><DD
+><P
+>Преобразует строку C <TT
+CLASS="TYPE"
+>char*</TT
+> в значение типа date по маске формата. </P><PRE
+CLASS="SYNOPSIS"
+>int PGTYPESdate_defmt_asc(date *d, char *fmt, char *str);</PRE
+><P> Эта функция принимает указатель на переменную типа date (<TT
+CLASS="LITERAL"
+>d</TT
+>), в которую будет помещён результат операции, маску формата для разбора даты (<TT
+CLASS="LITERAL"
+>fmt</TT
+>) и строку C char*, содержащую текстовое представление даты (<TT
+CLASS="LITERAL"
+>str</TT
+>). Ожидается, что текстовое представление будет соответствовать маске формата. Однако это соответствие не обязательно должно быть точным. Данная функция анализирует только порядок элементов и ищет в нём подстроки <TT
+CLASS="LITERAL"
+>yy</TT
+> или <TT
+CLASS="LITERAL"
+>yyyy</TT
+>, обозначающие позицию года, подстроку <TT
+CLASS="LITERAL"
+>mm</TT
+>, обозначающую позицию месяца, и <TT
+CLASS="LITERAL"
+>dd</TT
+>, обозначающую позицию дня.</P
+><P
+>В <A
+HREF="ecpg-pgtypes.html#ECPG-RDEFMTDATE-EXAMPLE-TABLE"
+>Таблица 33-4</A
+> перечислены несколько возможных форматов. Это даёт представление, как можно использовать эту функцию.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="ECPG-RDEFMTDATE-EXAMPLE-TABLE"
+></A
+><P
+><B
+>Таблица 33-4. Допустимые форматы ввода для <CODE
+CLASS="FUNCTION"
+>rdefmtdate</CODE
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Формат</TH
+><TH
+>Строка</TH
+><TH
+>Результат</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>ddmmyy</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>21-2-54</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>1954-02-21</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>ddmmyy</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>2-12-54</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>1954-12-02</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>ddmmyy</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>20111954</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>1954-11-20</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>ddmmyy</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>130464</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>1964-04-13</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>mmm.dd.yyyy</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>MAR-12-1967</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>1967-03-12</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>yy/mm/dd</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>1954, February 3rd</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>1954-02-03</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>mmm.dd.yyyy</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>041269</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>1969-04-12</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>yy/mm/dd</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>In the year 2525, in the month of July, mankind will be alive on the 28th day</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>2525-07-28</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>dd-mm-yy</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>I said on the 28th of July in the year 2525</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>2525-07-28</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>mmm.dd.yyyy</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>9/14/58</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>1958-09-14</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>yy/mm/dd</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>47/03/29</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>1947-03-29</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>mmm.dd.yyyy</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>oct 28 1975</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>1975-10-28</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>mmddyy</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>Nov 14th, 1985</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>1985-11-14</TT
+></TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DD
+></DL
+></DIV
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="ECPG-PGTYPES-TIMESTAMP"
+>33.6.3. Тип timestamp</A
+></H2
+><P
+>Тип timestamp, реализованный в C, позволяет программам работать с данными типа timestamp в SQL. Соответствующий тип сервера <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> описан в <A
+HREF="datatype-datetime.html"
+>Разделе 8.5</A
+>.</P
+><P
+>Для работы с типом timestamp можно использовать следующие функции: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="PGTYPESTIMESTAMPFROMASC"
+></A
+><CODE
+CLASS="FUNCTION"
+>PGTYPEStimestamp_from_asc</CODE
+></DT
+><DD
+><P
+>Разбирает значение даты/времени из текстового представления в переменную типа timestamp. </P><PRE
+CLASS="SYNOPSIS"
+>timestamp PGTYPEStimestamp_from_asc(char *str, char **endptr);</PRE
+><P> Эта функция получает строку (<TT
+CLASS="LITERAL"
+>str</TT
+>), которую нужно разобрать, и указатель на строку C char* (<TT
+CLASS="LITERAL"
+>endptr</TT
+>). На данный момент ECPG всегда разбирает строку до конца, так что эта функция не может вернуть адрес первого недопустимого символа в <TT
+CLASS="LITERAL"
+>*endptr</TT
+>. Поэтому в <TT
+CLASS="LITERAL"
+>endptr</TT
+> свободно можно передать NULL.</P
+><P
+>В случае успеха эта функция возвращает разобранное время, а в случае ошибки возвращается <TT
+CLASS="LITERAL"
+>PGTYPESInvalidTimestamp</TT
+> и в <TT
+CLASS="VARNAME"
+>errno</TT
+> устанавливается значение <TT
+CLASS="LITERAL"
+>PGTYPES_TS_BAD_TIMESTAMP</TT
+>. См. замечание относительно <A
+HREF="ecpg-pgtypes.html#PGTYPESINVALIDTIMESTAMP"
+><I
+CLASS="TERM"
+><TT
+CLASS="LITERAL"
+>PGTYPESInvalidTimestamp</TT
+></I
+></A
+>.</P
+><P
+>Вообще вводимая строка может содержать допустимое указание даты, пробельные символы и допустимое указание времени в любом сочетании. Заметьте, что часовые пояса ECPG не поддерживает. Эта функция может разобрать их, но не задействует их в вычислениях как это делает, например, сервер <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Указания часового пояса во вводимой строке просто игнорируются.</P
+><P
+>В <A
+HREF="ecpg-pgtypes.html#ECPG-PGTYPESTIMESTAMP-FROM-ASC-EXAMPLE-TABLE"
+>Таблица 33-5</A
+> приведены несколько примеров вводимых строк.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="ECPG-PGTYPESTIMESTAMP-FROM-ASC-EXAMPLE-TABLE"
+></A
+><P
+><B
+>Таблица 33-5. Допустимые форматы ввода для <CODE
+CLASS="FUNCTION"
+>PGTYPEStimestamp_from_asc</CODE
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+>Ввод</TH
+><TH
+>Результат</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>1999-01-08 04:05:06</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>1999-01-08 04:05:06</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>January 8 04:05:06 1999 PST</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>1999-01-08 04:05:06</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>1999-Jan-08 04:05:06.789-8</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>1999-01-08 04:05:06.789 (указание часового пояса игнорируется)</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>J2451187 04:05-08:00</TT
+></TD
+><TD
+><TT
+CLASS="LITERAL"
+>1999-01-08 04:05:00 (указание часового пояса игнорируется)</TT
+></TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DD
+><DT
+><A
+NAME="PGTYPESTIMESTAMPTOASC"
+></A
+><CODE
+CLASS="FUNCTION"
+>PGTYPEStimestamp_to_asc</CODE
+></DT
+><DD
+><P
+>Преобразует значение даты в строку C char*. </P><PRE
+CLASS="SYNOPSIS"
+>char *PGTYPEStimestamp_to_asc(timestamp tstamp);</PRE
+><P> Эта функция принимает в качестве единственного аргумента <TT
+CLASS="LITERAL"
+>tstamp</TT
+> значение типа timestamp и возвращает размещённую в памяти строку, содержащую текстовое представление даты/времени.</P
+></DD
+><DT
+><A
+NAME="PGTYPESTIMESTAMPCURRENT"
+></A
+><CODE
+CLASS="FUNCTION"
+>PGTYPEStimestamp_current</CODE
+></DT
+><DD
+><P
+>Получает текущее время. </P><PRE
+CLASS="SYNOPSIS"
+>void PGTYPEStimestamp_current(timestamp *ts);</PRE
+><P> Эта функция получает текущее время и сохраняет его в переменной типа timestamp, на которую указывает <TT
+CLASS="LITERAL"
+>ts</TT
+>.</P
+></DD
+><DT
+><A
+NAME="PGTYPESTIMESTAMPFMTASC"
+></A
+><CODE
+CLASS="FUNCTION"
+>PGTYPEStimestamp_fmt_asc</CODE
+></DT
+><DD
+><P
+>Преобразует переменную типа timestamp в строку C char* по маске формата. </P><PRE
+CLASS="SYNOPSIS"
+>int PGTYPEStimestamp_fmt_asc(timestamp *ts, char *output, int str_len, char *fmtstr);</PRE
+><P> Эта функция получает в первом аргументе (<TT
+CLASS="LITERAL"
+>ts</TT
+>) указатель на переменную типа timestamp, а в последующих указатель на буфер вывода (<TT
+CLASS="LITERAL"
+>output</TT
+>), максимальную длину строки, которую может принять буфер (<TT
+CLASS="LITERAL"
+>str_len</TT
+>), и маску формата, с которой будет выполняться преобразование (<TT
+CLASS="LITERAL"
+>fmtstr</TT
+>).</P
+><P
+>В случае успеха возвращается 0, а в случае ошибки — отрицательное значение.</P
+><P
+>В маске формата можно использовать коды формата, перечисленные ниже. Эти же коды принимает функция <CODE
+CLASS="FUNCTION"
+>strftime</CODE
+> из библиотеки <SPAN
+CLASS="PRODUCTNAME"
+>libc</SPAN
+>. Любые символы, не относящиеся к кодам формата, будут просто скопированы в буфер вывода. <P
+></P
+></P><UL
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%A</TT
+> — заменяется локализованным представлением полного названия дня недели.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%a</TT
+> — заменяется локализованным представлением сокращённого названия дня недели.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%B</TT
+> — заменяется локализованным представлением полного названия месяца.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%b</TT
+> — заменяется локализованным представлением сокращённого названия месяца.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%C</TT
+> — заменяется столетием (год / 100) в виде десятичного числа; одиночная цифра предваряется нулём.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%c</TT
+> — заменяется локализованным представлением даты и времени.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%D</TT
+> — равнозначно <TT
+CLASS="LITERAL"
+>%m/%d/%y</TT
+>.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%d</TT
+> — заменяется днём месяца в виде десятичного числа (01-31).</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%E*</TT
+> <TT
+CLASS="LITERAL"
+>%O*</TT
+> — расширения локали POSIX. Последовательности <TT
+CLASS="LITERAL"
+>%Ec</TT
+>
+           <TT
+CLASS="LITERAL"
+>%EC</TT
+>
+           <TT
+CLASS="LITERAL"
+>%Ex</TT
+>
+           <TT
+CLASS="LITERAL"
+>%EX</TT
+>
+           <TT
+CLASS="LITERAL"
+>%Ey</TT
+>
+           <TT
+CLASS="LITERAL"
+>%EY</TT
+>
+           <TT
+CLASS="LITERAL"
+>%Od</TT
+>
+           <TT
+CLASS="LITERAL"
+>%Oe</TT
+>
+           <TT
+CLASS="LITERAL"
+>%OH</TT
+>
+           <TT
+CLASS="LITERAL"
+>%OI</TT
+>
+           <TT
+CLASS="LITERAL"
+>%Om</TT
+>
+           <TT
+CLASS="LITERAL"
+>%OM</TT
+>
+           <TT
+CLASS="LITERAL"
+>%OS</TT
+>
+           <TT
+CLASS="LITERAL"
+>%Ou</TT
+>
+           <TT
+CLASS="LITERAL"
+>%OU</TT
+>
+           <TT
+CLASS="LITERAL"
+>%OV</TT
+>
+           <TT
+CLASS="LITERAL"
+>%Ow</TT
+>
+           <TT
+CLASS="LITERAL"
+>%OW</TT
+>
+           <TT
+CLASS="LITERAL"
+>%Oy</TT
+> должны выводить альтернативные представления.</P
+><P
+>Кроме того, альтернативные названия месяцев представляет код формата <TT
+CLASS="LITERAL"
+>%OB</TT
+> (используется отдельно, без упоминания дня).</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%e</TT
+> — заменяется днём в виде десятичного числа (1-31); одиночная цифра предваряется пробелом.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%F</TT
+> — равнозначно <TT
+CLASS="LITERAL"
+>%Y-%m-%d</TT
+>.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%G</TT
+> — заменяется годом в виде десятичного числа (со столетием). При этом годом считается тот, что содержит наибольшую часть недели (дни недели начинаются с понедельника).</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%g</TT
+> — заменяется тем же годом, что и <TT
+CLASS="LITERAL"
+>%G</TT
+>, но в виде десятичного числа без столетия (00-99).</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%H</TT
+> — заменяется часами (в 24-часовом формате) в виде десятичного числа (00-23).</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%h</TT
+> — равнозначно <TT
+CLASS="LITERAL"
+>%b</TT
+>.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%I</TT
+> — заменяется часами (в 12-часовом формате) в виде десятичного числа (01-12).</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%j</TT
+> — заменяется днём года в виде десятичного числа (001-366).</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%k</TT
+> — заменяется часами (в 24-часовом формате) в виде десятичного числа (0-23); одиночная цифра предваряется пробелом.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%l</TT
+> — заменяется часами (в 12-часовом формате) в виде десятичного числа (1-12); одиночная цифра предваряется пробелом.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%M</TT
+> — заменяется минутами в виде десятичного числа (00-59).</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%m</TT
+> — заменяется номером месяца в виде десятичного числа (01-12).</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%n</TT
+> — заменяется символом новой строки.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%O*</TT
+> — равнозначно <TT
+CLASS="LITERAL"
+>%E*</TT
+>.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%p</TT
+> — заменяется локализованным представлением <SPAN
+CLASS="QUOTE"
+>"до полудня"</SPAN
+> или <SPAN
+CLASS="QUOTE"
+>"после полудня"</SPAN
+> в зависимости от времени.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%R</TT
+> — равнозначно <TT
+CLASS="LITERAL"
+>%H:%M</TT
+>.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%r</TT
+> — равнозначно <TT
+CLASS="LITERAL"
+>%I:%M:%S %p</TT
+>.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%S</TT
+> — заменяется секундами в виде десятичного числа (00-60).</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%s</TT
+> — заменяется числом секунд с начала эпохи, по мировому времени (UTC).</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%T</TT
+> — равнозначно <TT
+CLASS="LITERAL"
+>%H:%M:%S</TT
+></P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%t</TT
+> — заменяется символом табуляции.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%U</TT
+> — заменяется номером недели в году (первым днём недели считается воскресенье) в виде десятичного числа (00-53).</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%u</TT
+> — заменяется номером дня недели (первым днём недели считается понедельник) в виде десятичного числа (1-7).</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%V</TT
+> — заменяется номером недели в году (первым днём недели считается понедельник) в виде десятичного числа (01-53). Если к недели, включающей 1 января, относятся 4 или больше дней нового года, она считается неделей с номером 1; в противном случае это последняя неделя предыдущего года, а неделей под номером 1 будет следующая.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%v</TT
+> — равнозначно <TT
+CLASS="LITERAL"
+>%e-%b-%Y</TT
+>.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%W</TT
+> — заменяется номером недели в году (первым днём недели считается понедельник) в виде десятичного числа (00-53).</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%w</TT
+> — заменяется номером дня недели (первым днём недели считается воскресенье) в виде десятичного числа (0-6).</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%X</TT
+> — заменяется локализованным представлением времени.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%x</TT
+> — заменяется локализованным представлением даты.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%Y</TT
+> — заменяется годом со столетием в виде десятичного числа.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%y</TT
+> — заменяется годом без столетия в виде десятичного числа (00-99).</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%Z</TT
+> — заменяется названием часового пояса.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%z</TT
+> — заменяется смещением часового пояса от UTC; ведущий знак плюс обозначает смещение к востоку от UTC, а знак минус — к западу, часы и минуты задаются парами цифр без разделителя между ними (эта форма установлена для даты в RFC 822).</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%+</TT
+> — заменяется локализованным представлением даты и времени.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%-*</TT
+> — расширение GNU libc. Отключает дополнение чисел по ширине при выводе.</P
+></LI
+><LI
+><P
+>$_* — расширение GNU libc. Явно включает дополнение пробелами.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%0*</TT
+> — расширение GNU libc. Явно включает дополнение нулями.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>%%</TT
+> — заменяется символом <TT
+CLASS="LITERAL"
+>%</TT
+>.</P
+></LI
+></UL
+><P></P
+></DD
+><DT
+><A
+NAME="PGTYPESTIMESTAMPSUB"
+></A
+><CODE
+CLASS="FUNCTION"
+>PGTYPEStimestamp_sub</CODE
+></DT
+><DD
+><P
+>Вычитает одно значение времени из другого и сохраняет результат в переменной типа interval. </P><PRE
+CLASS="SYNOPSIS"
+>int PGTYPEStimestamp_sub(timestamp *ts1, timestamp *ts2, interval *iv);</PRE
+><P> Эта функция вычитает значение типа timestamp, на которое указывает <TT
+CLASS="LITERAL"
+>ts2</TT
+>, из значения timestamp, на которое указывает <TT
+CLASS="LITERAL"
+>ts1</TT
+>, и сохраняет результат в переменной типа interval, на которую указывает <TT
+CLASS="LITERAL"
+>iv</TT
+>.</P
+><P
+>В случае успеха возвращается 0, а в случае ошибки — отрицательное значение.</P
+></DD
+><DT
+><A
+NAME="PGTYPESTIMESTAMPDEFMTASC"
+></A
+><CODE
+CLASS="FUNCTION"
+>PGTYPEStimestamp_defmt_asc</CODE
+></DT
+><DD
+><P
+>Разбирает значение типа timestamp из текстового представления с заданной маской формата. </P><PRE
+CLASS="SYNOPSIS"
+>int PGTYPEStimestamp_defmt_asc(char *str, char *fmt, timestamp *d);</PRE
+><P> Эта функция получает текстовое представление даты/времени в переменной <TT
+CLASS="LITERAL"
+>str</TT
+>, а также маску формата для разбора в переменной <TT
+CLASS="LITERAL"
+>fmt</TT
+>. Результат будет сохранён в переменой, на которую указывает <TT
+CLASS="LITERAL"
+>d</TT
+>.</P
+><P
+>Если вместо маски формата <TT
+CLASS="LITERAL"
+>fmt</TT
+> передаётся NULL, эта функция переходит к стандартной маске форматирования, а именно: <TT
+CLASS="LITERAL"
+>%Y-%m-%d %H:%M:%S</TT
+>.</P
+><P
+>Данная функция является обратной к функции <A
+HREF="ecpg-pgtypes.html#PGTYPESTIMESTAMPFMTASC"
+><I
+CLASS="TERM"
+><CODE
+CLASS="FUNCTION"
+>PGTYPEStimestamp_fmt_asc</CODE
+></I
+></A
+>. Обратитесь к её документации, чтобы узнать о возможных вариантах маски формата.</P
+></DD
+><DT
+><A
+NAME="PGTYPESTIMESTAMPADDINTERVAL"
+></A
+><CODE
+CLASS="FUNCTION"
+>PGTYPEStimestamp_add_interval</CODE
+></DT
+><DD
+><P
+>Добавляет переменную типа interval к переменной типа timestamp. </P><PRE
+CLASS="SYNOPSIS"
+>int PGTYPEStimestamp_add_interval(timestamp *tin, interval *span, timestamp *tout);</PRE
+><P> Эта функция получает указатель на переменную <TT
+CLASS="LITERAL"
+>tin</TT
+> типа timestamp и указатель на переменную <TT
+CLASS="LITERAL"
+>span</TT
+> типа interval. Она добавляет временной интервал к значению даты/времени и сохраняет полученную дату/время в переменной типа timestamp, на которую указывает <TT
+CLASS="LITERAL"
+>tout</TT
+>.</P
+><P
+>В случае успеха возвращается 0, а в случае ошибки — отрицательное значение.</P
+></DD
+><DT
+><A
+NAME="PGTYPESTIMESTAMPSUBINTERVAL"
+></A
+><CODE
+CLASS="FUNCTION"
+>PGTYPEStimestamp_sub_interval</CODE
+></DT
+><DD
+><P
+>Вычитает переменную типа interval из переменной типа timestamp. </P><PRE
+CLASS="SYNOPSIS"
+>int PGTYPEStimestamp_sub_interval(timestamp *tin, interval *span, timestamp *tout);</PRE
+><P> Эта функция вычитает значение типа interval, на которое указывает <TT
+CLASS="LITERAL"
+>span</TT
+>, из значения типа timestamp, на которое указывает <TT
+CLASS="LITERAL"
+>tin</TT
+>, и сохраняет результат в переменной, на которую указывает <TT
+CLASS="LITERAL"
+>tout</TT
+>.</P
+><P
+>В случае успеха возвращается 0, а в случае ошибки — отрицательное значение.</P
+></DD
+></DL
+></DIV
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="ECPG-PGTYPES-INTERVAL"
+>33.6.4. Тип interval</A
+></H2
+><P
+>Тип interval, реализованный в C, позволяет программам работать с данными типа interval в SQL. Соответствующий тип сервера <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> описан в <A
+HREF="datatype-datetime.html"
+>Разделе 8.5</A
+>.</P
+><P
+>Для работы с типом interval можно использовать следующие функции: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="PGTYPESINTERVALNEW"
+></A
+><CODE
+CLASS="FUNCTION"
+>PGTYPESinterval_new</CODE
+></DT
+><DD
+><P
+>Возвращает указатель на новую переменную interval, размещённую в памяти. </P><PRE
+CLASS="SYNOPSIS"
+>interval *PGTYPESinterval_new(void);</PRE
+><P></P
+></DD
+><DT
+><A
+NAME="PGTYPESINTERVALFREE"
+></A
+><CODE
+CLASS="FUNCTION"
+>PGTYPESinterval_free</CODE
+></DT
+><DD
+><P
+>Освобождает место, занимаемое ранее размещённой в памяти переменной типа interval. </P><PRE
+CLASS="SYNOPSIS"
+>void PGTYPESinterval_new(interval *intvl);</PRE
+><P></P
+></DD
+><DT
+><A
+NAME="PGTYPESINTERVALFROMASC"
+></A
+><CODE
+CLASS="FUNCTION"
+>PGTYPESinterval_from_asc</CODE
+></DT
+><DD
+><P
+>Разбирает значение типа interval из его текстового представления. </P><PRE
+CLASS="SYNOPSIS"
+>interval *PGTYPESinterval_from_asc(char *str, char **endptr);</PRE
+><P> Эта функция разбирает входную строку <TT
+CLASS="LITERAL"
+>str</TT
+> и возвращает указатель на размещённую в памяти переменную типа interval. На данный момент ECPG всегда разбирает строку до конца, так что эта функция не может вернуть адрес первого недопустимого символа в <TT
+CLASS="LITERAL"
+>*endptr</TT
+>. Поэтому в <TT
+CLASS="LITERAL"
+>endptr</TT
+> свободно можно передать NULL.</P
+></DD
+><DT
+><A
+NAME="PGTYPESINTERVALTOASC"
+></A
+><CODE
+CLASS="FUNCTION"
+>PGTYPESinterval_to_asc</CODE
+></DT
+><DD
+><P
+>Преобразует переменную типа interval в текстовое представление. </P><PRE
+CLASS="SYNOPSIS"
+>char *PGTYPESinterval_to_asc(interval *span);</PRE
+><P> Эта функция преобразует переменную типа interval, на которую указывает <TT
+CLASS="LITERAL"
+>span</TT
+>, в строку C char*. Её вывод выглядит примерно так: <TT
+CLASS="LITERAL"
+>@ 1 day 12 hours 59 mins 10 secs</TT
+>.</P
+></DD
+><DT
+><A
+NAME="PGTYPESINTERVALCOPY"
+></A
+><CODE
+CLASS="FUNCTION"
+>PGTYPESinterval_copy</CODE
+></DT
+><DD
+><P
+>Копирует переменную типа interval. </P><PRE
+CLASS="SYNOPSIS"
+>int PGTYPESinterval_copy(interval *intvlsrc, interval *intvldest);</PRE
+><P> Эта функция копирует переменную типа interval, на которую указывает <TT
+CLASS="LITERAL"
+>intvlsrc</TT
+>, в переменную, на которую указывает <TT
+CLASS="LITERAL"
+>intvldest</TT
+>. Заметьте, что для целевой переменной необходимо предварительно выделить память.</P
+></DD
+></DL
+></DIV
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="ECPG-PGTYPES-DECIMAL"
+>33.6.5. Тип decimal</A
+></H2
+><P
+>Тип decimal похож на тип numeric, однако его максимальная точность ограничена 30 значащими цифрами. В отличие от типа numeric, который можно создать только в области кучи, тип decimal можно создать и в стеке, и в области кучи (посредством функций <CODE
+CLASS="FUNCTION"
+>PGTYPESdecimal_new</CODE
+> и <CODE
+CLASS="FUNCTION"
+>PGTYPESdecimal_free</CODE
+>). Для работы с типом decimal есть много других функций, подключаемых в режиме совместимости с <SPAN
+CLASS="PRODUCTNAME"
+>Informix</SPAN
+>, описанном в <A
+HREF="ecpg-informix-compat.html"
+>Разделе 33.15</A
+>.</P
+><P
+>Для работы с типом decimal можно использовать следующие функции (содержащиеся не в библиотеке <TT
+CLASS="LITERAL"
+>libcompat</TT
+>). <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><CODE
+CLASS="FUNCTION"
+>PGTYPESdecimal_new</CODE
+></DT
+><DD
+><P
+>Запрашивает указатель на новую переменную decimal, размещённую в памяти. </P><PRE
+CLASS="SYNOPSIS"
+>decimal *PGTYPESdecimal_new(void);</PRE
+><P></P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>PGTYPESdecimal_free</CODE
+></DT
+><DD
+><P
+>Освобождает переменную типа decimal, высвобождая всю её память. </P><PRE
+CLASS="SYNOPSIS"
+>void PGTYPESdecimal_free(decimal *var);</PRE
+><P></P
+></DD
+></DL
+></DIV
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="ECPG-PGTYPES-ERRNO"
+>33.6.6. Значения errno, которые устанавливает pgtypeslib</A
+></H2
+><P
+>    <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>PGTYPES_NUM_BAD_NUMERIC</TT
+></DT
+><DD
+><P
+>Аргумент должен содержать переменную типа numeric (либо указывать на переменную типа numeric), но представление этого типа в памяти оказалось некорректным.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>PGTYPES_NUM_OVERFLOW</TT
+></DT
+><DD
+><P
+>Произошло переполнение. Так как тип numeric может принимать значения практически любой точности, при преобразовании этого типа в другие типы возможно переполнение.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>PGTYPES_NUM_UNDERFLOW</TT
+></DT
+><DD
+><P
+>Произошло антипереполнение. Так как тип numeric может принимать значения практически любой точности, при преобразовании переменной этого типа в другие типы возможно антипереполнение.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>PGTYPES_NUM_DIVIDE_ZERO</TT
+></DT
+><DD
+><P
+>Имела место попытка деления на ноль.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>PGTYPES_DATE_BAD_DATE</TT
+></DT
+><DD
+><P
+>Функции <CODE
+CLASS="FUNCTION"
+>PGTYPESdate_from_asc</CODE
+> передана некорректная строка даты.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>PGTYPES_DATE_ERR_EARGS</TT
+></DT
+><DD
+><P
+>Функции <CODE
+CLASS="FUNCTION"
+>PGTYPESdate_defmt_asc</CODE
+> переданы некорректные аргументы.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>PGTYPES_DATE_ERR_ENOSHORTDATE</TT
+></DT
+><DD
+><P
+>В строке, переданной функции <CODE
+CLASS="FUNCTION"
+>PGTYPESdate_defmt_asc</CODE
+>, оказался неправильный компонент даты.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>PGTYPES_INTVL_BAD_INTERVAL</TT
+></DT
+><DD
+><P
+>Функции <CODE
+CLASS="FUNCTION"
+>PGTYPESinterval_from_asc</CODE
+> передана некорректная строка, задающая интервал, либо функции <CODE
+CLASS="FUNCTION"
+>PGTYPESinterval_to_asc</CODE
+> передано некорректное значение интервала.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>PGTYPES_DATE_ERR_ENOTDMY</TT
+></DT
+><DD
+><P
+>Обнаружено несоответствие при выводе компонентов день/месяц/год в функции <CODE
+CLASS="FUNCTION"
+>PGTYPESdate_defmt_asc</CODE
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>PGTYPES_DATE_BAD_DAY</TT
+></DT
+><DD
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>PGTYPESdate_defmt_asc</CODE
+> обнаружила некорректное значение дня месяца.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>PGTYPES_DATE_BAD_MONTH</TT
+></DT
+><DD
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>PGTYPESdate_defmt_asc</CODE
+> обнаружила некорректное значение месяца.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>PGTYPES_TS_BAD_TIMESTAMP</TT
+></DT
+><DD
+><P
+>Функции <CODE
+CLASS="FUNCTION"
+>PGTYPEStimestamp_from_asc</CODE
+> передана некорректная строка даты/времени, либо функции <CODE
+CLASS="FUNCTION"
+>PGTYPEStimestamp_to_asc</CODE
+> передано некорректное значение типа timestamp.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>PGTYPES_TS_ERR_EINFTIME</TT
+></DT
+><DD
+><P
+>Значение типа timestamp, представляющее бесконечность, получено в недопустимом контексте.</P
+></DD
+></DL
+></DIV
+><P>
+   </P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="ECPG-PGTYPES-CONSTANTS"
+>33.6.7. Специальные константы pgtypeslib</A
+></H2
+><P
+>    <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="PGTYPESINVALIDTIMESTAMP"
+></A
+><TT
+CLASS="LITERAL"
+>PGTYPESInvalidTimestamp</TT
+></DT
+><DD
+><P
+>Значение типа timestamp, представляющее недопустимое время. Это значение возвращает функция <CODE
+CLASS="FUNCTION"
+>PGTYPEStimestamp_from_asc</CODE
+> при ошибке разбора. Заметьте, что вследствие особенности внутреннего представления типа <TT
+CLASS="TYPE"
+>timestamp</TT
+>, значение <TT
+CLASS="LITERAL"
+>PGTYPESInvalidTimestamp</TT
+> в то же время представляет корректное время (<TT
+CLASS="LITERAL"
+>1899-12-31 23:59:59</TT
+>). Поэтому для выявления ошибок необходимо, чтобы приложение не только сравнивало результат функции с <TT
+CLASS="LITERAL"
+>PGTYPESInvalidTimestamp</TT
+>, но и проверяло условие <TT
+CLASS="LITERAL"
+>errno != 0</TT
+> после каждого вызова <CODE
+CLASS="FUNCTION"
+>PGTYPEStimestamp_from_asc</CODE
+>.</P
+></DD
+></DL
+></DIV
+><P>
+   </P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ecpg-dynamic.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ecpg-descriptors.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Динамический SQL</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ecpg.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Использование областей дескрипторов</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

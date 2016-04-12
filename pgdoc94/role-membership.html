@@ -1,0 +1,384 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Членство в роли</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Роли базы данных"
+HREF="user-manag.html"><LINK
+REL="PREVIOUS"
+TITLE="Атрибуты ролей"
+HREF="role-attributes.html"><LINK
+REL="NEXT"
+TITLE="Безопасность функций и триггеров"
+HREF="perm-functions.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Атрибуты ролей"
+HREF="role-attributes.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="user-manag.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 20. Роли базы данных</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Безопасность функций и триггеров"
+HREF="perm-functions.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="ROLE-MEMBERSHIP"
+>20.3. Членство в роли</A
+></H1
+><P
+>Часто бывает удобным сгруппировать пользователей для упрощения администрирования привилегий: привилегии выдаются или отзываются на всю группу. В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> для этого создаётся роль, которая представляет группу, а затем членство (<I
+CLASS="FIRSTTERM"
+>membership</I
+>) в этой группе выдаётся ролям индивидуальных пользователей.</P
+><P
+>Для настройки групповой роли, сначала нужно создать саму роль:</P><PRE
+CLASS="SYNOPSIS"
+>CREATE ROLE <TT
+CLASS="REPLACEABLE"
+><I
+>name</I
+></TT
+>;</PRE
+><P> Обычно групповая роль не имеет атрибута <TT
+CLASS="LITERAL"
+>LOGIN</TT
+>, хотя при желании его можно установить.</P
+><P
+>После того как групповая роль создана, в неё можно добавлять или удалять членов, используя команды <A
+HREF="sql-grant.html"
+>GRANT</A
+> и <A
+HREF="sql-revoke.html"
+>REVOKE</A
+>:</P><PRE
+CLASS="SYNOPSIS"
+>GRANT <TT
+CLASS="REPLACEABLE"
+><I
+>group_role</I
+></TT
+> TO <TT
+CLASS="REPLACEABLE"
+><I
+>role1</I
+></TT
+>, ... ;
+REVOKE <TT
+CLASS="REPLACEABLE"
+><I
+>group_role</I
+></TT
+> FROM <TT
+CLASS="REPLACEABLE"
+><I
+>role1</I
+></TT
+>, ... ;</PRE
+><P> Можно выдавать членство в групповой роли другим групповым ролям (потому что в действительности нет никаких различий между групповыми и не групповыми ролями). База данных не позволит замкнуть предоставление членства по кругу. Также, не допускается выдача членства в роли для <TT
+CLASS="LITERAL"
+>PUBLIC</TT
+>.</P
+><P
+>Члены групповой роли могут использовать её привилегии двумя способами. Во-первых, каждый член группы может явно выполнить <A
+HREF="sql-set-role.html"
+>SET ROLE</A
+>, чтобы временно <SPAN
+CLASS="QUOTE"
+>"стать"</SPAN
+> групповой ролью. В этом состоянии, сессия базы данных использует полномочия групповой роли, вместо оригинальной роли, под которой был выполнен вход в систему. При этом для всех создаваемых объектов базы данных владельцем считается групповая, а не оригинальная роль. Во-вторых, роли, имеющие атрибут <TT
+CLASS="LITERAL"
+>INHERIT</TT
+>, автоматически используют привилегии всех ролей, членами которых они являются, в том числе и унаследованными этими ролями привилегиями. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE ROLE joe LOGIN INHERIT;
+CREATE ROLE admin NOINHERIT;
+CREATE ROLE wheel NOINHERIT;
+GRANT admin TO joe;
+GRANT wheel TO admin;</PRE
+><P> После подключения с ролью <TT
+CLASS="LITERAL"
+>joe</TT
+>, сессия базы данных будет использовать полномочия выданные напрямую <TT
+CLASS="LITERAL"
+>joe</TT
+> и привилегии выданные <TT
+CLASS="LITERAL"
+>admin</TT
+>, так как <TT
+CLASS="LITERAL"
+>joe</TT
+> "наследует" привилегии <TT
+CLASS="LITERAL"
+>admin</TT
+>. Однако привилегии выданные <TT
+CLASS="LITERAL"
+>wheel</TT
+> не будут доступны, потому что, хотя <TT
+CLASS="LITERAL"
+>joe</TT
+> неявно и является членом <TT
+CLASS="LITERAL"
+>wheel</TT
+>, это членство получено через роль <TT
+CLASS="LITERAL"
+>admin</TT
+>, которая имеет атрибут <TT
+CLASS="LITERAL"
+>NOINHERIT</TT
+>. После выполнения команды: </P><PRE
+CLASS="PROGRAMLISTING"
+>SET ROLE admin;</PRE
+><P> сессия будет использовать только привилегии выданные <TT
+CLASS="LITERAL"
+>admin</TT
+>, привилегии выданные <TT
+CLASS="LITERAL"
+>joe</TT
+> не будут доступны. После выполнения команды: </P><PRE
+CLASS="PROGRAMLISTING"
+>SET ROLE wheel;</PRE
+><P> сессия будет использовать только привилегии выданные <TT
+CLASS="LITERAL"
+>wheel</TT
+>, привилегии <TT
+CLASS="LITERAL"
+>joe</TT
+> и <TT
+CLASS="LITERAL"
+>admin</TT
+> не будут доступны. Начальный набор привилегий можно вернуть любой из команд: </P><PRE
+CLASS="PROGRAMLISTING"
+>SET ROLE joe;
+SET ROLE NONE;
+RESET ROLE;</PRE
+><P></P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Команда <TT
+CLASS="COMMAND"
+>SET ROLE</TT
+> в любой момент разрешает выбрать любую роль, прямым или косвенным членом которой является оригинальная роль, под которой был выполнен вход в систему. Поэтому, в примере выше, не обязательно сначала становиться <TT
+CLASS="LITERAL"
+>admin</TT
+>, перед тем как стать <TT
+CLASS="LITERAL"
+>wheel</TT
+>.</P
+></BLOCKQUOTE
+></DIV
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>В стандарте SQL есть чёткое различие между пользователями и ролями. При этом пользователи не наследуют автоматически привилегии, а роли наследуют автоматически. Такое поведение может быть получено в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, если для ролей, используемых как роли в стандарте SQL, устанавливать атрибут <TT
+CLASS="LITERAL"
+>INHERIT</TT
+>, а для ролей, используемых как пользователи в стандарте SQL, устанавливать атрибут <TT
+CLASS="LITERAL"
+>NOINHERIT</TT
+>. Однако, в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> все роли по умолчанию имеют атрибут <TT
+CLASS="LITERAL"
+>INHERIT</TT
+>. Это сделано для обратной совместимости с версиями предшествующими 8.1, в которых пользователи всегда могли использовать привилегии групп, членами которых они являются.</P
+></BLOCKQUOTE
+></DIV
+><P
+>Атрибуты роли <TT
+CLASS="LITERAL"
+>LOGIN</TT
+>, <TT
+CLASS="LITERAL"
+>SUPERUSER</TT
+>, <TT
+CLASS="LITERAL"
+>CREATEDB</TT
+> и <TT
+CLASS="LITERAL"
+>CREATEROLE</TT
+> можно рассматривать как особые привилегии, но они никогда не наследуются, как обычные привилегии на объекты базы данных. Необходимо через <TT
+CLASS="COMMAND"
+>SET ROLE</TT
+> установить роль, имеющую один из этих атрибутов, чтобы им воспользоваться. Продолжая предыдущий пример, можно установить атрибуты <TT
+CLASS="LITERAL"
+>CREATEDB</TT
+> и <TT
+CLASS="LITERAL"
+>CREATEROLE</TT
+> для роли <TT
+CLASS="LITERAL"
+>admin</TT
+>. Затем при входе с ролью <TT
+CLASS="LITERAL"
+>joe</TT
+>, получить доступ к этим привилегиям будет возможно только после выполнения <TT
+CLASS="COMMAND"
+>SET ROLE admin</TT
+>.</P
+><P
+>  </P
+><P
+>Для удаления групповой роли используется <A
+HREF="sql-droprole.html"
+>DROP ROLE</A
+>: </P><PRE
+CLASS="SYNOPSIS"
+>DROP ROLE <TT
+CLASS="REPLACEABLE"
+><I
+>name</I
+></TT
+>;</PRE
+><P> Любое членство в групповой роли будет автоматически отозвано (в остальном на членов групповой роли это никак не повлияет). Однако, обратите внимание, что любые объекты, владельцем которых является групповая роль, предварительно должны быть удалены или переданы другим владельцам. Также любые привилегии выданные групповой роли должны быть отозваны.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="role-attributes.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="perm-functions.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Атрибуты ролей</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="user-manag.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Безопасность функций и триггеров</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

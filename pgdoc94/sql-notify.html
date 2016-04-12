@@ -1,0 +1,414 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>NOTIFY</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="MOVE"
+HREF="sql-move.html"><LINK
+REL="NEXT"
+TITLE="PREPARE"
+HREF="sql-prepare.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="MOVE"
+HREF="sql-move.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="PREPARE"
+HREF="sql-prepare.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-NOTIFY"
+></A
+>NOTIFY</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN81944"
+></A
+><H2
+>Название</H2
+>NOTIFY&nbsp;--&nbsp;сгенерировать уведомление</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN81947"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>NOTIFY <TT
+CLASS="REPLACEABLE"
+><I
+>канал</I
+></TT
+> [ , <TT
+CLASS="REPLACEABLE"
+><I
+>сообщение</I
+></TT
+> ]</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN81951"
+></A
+><H2
+>Описание</H2
+><P
+>Команда <TT
+CLASS="COMMAND"
+>NOTIFY</TT
+> отправляет событие уведомления вместе с дополнительной строкой <SPAN
+CLASS="QUOTE"
+>"сообщения"</SPAN
+> всем клиентским приложениям, которые до этого выполнили в текущей базе данных <TT
+CLASS="COMMAND"
+>LISTEN <TT
+CLASS="REPLACEABLE"
+><I
+>канал</I
+></TT
+></TT
+> с указанным именем канала. Уведомления видны всем пользователям.</P
+><P
+><TT
+CLASS="COMMAND"
+>NOTIFY</TT
+> предоставляет простой механизм межпроцессного взаимодействия для множества процессов, работающих с одной базой данных <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Вместе с уведомлением может быть передана строка сообщения, а передавая дополнительные данные через таблицы базы данных, можно создать более высокоуровневые механизмы обмена структурированными данными.</P
+><P
+>Информация, передаваемая клиенту с уведомлением, включает имя канала уведомлений, <ACRONYM
+CLASS="ACRONYM"
+>PID</ACRONYM
+> серверного процесса, управляющего сеансом, который выдал уведомление, и строку сообщения (она будет пустой, если сообщение не задано).</P
+><P
+>Выбор подходящих имён каналов и их назначения — дело проектировщика базы данных. Обычно имя канала совпадает с именем какой-либо таблицы в базе, а событие уведомления по сути означает <SPAN
+CLASS="QUOTE"
+>"я изменила эту таблицу, посмотрите, что она содержит теперь"</SPAN
+>. Однако команды <TT
+CLASS="COMMAND"
+>NOTIFY</TT
+> и <TT
+CLASS="COMMAND"
+>LISTEN</TT
+> не навязывают именно такой подход. Например, проектировщик базы данных может выбрать разные имена каналов, чтобы сигнализировать о разных типах изменений в одной таблице. Кроме того, строку сообщения тоже можно использовать для выделения различных событий.</P
+><P
+>Если требуется сигнализировать о факте изменений в определённой таблице, используя <TT
+CLASS="COMMAND"
+>NOTIFY</TT
+>, можно применить полезный программный приём — поместить <TT
+CLASS="COMMAND"
+>NOTIFY</TT
+> в правило, которое будет срабатывать при изменениях в таблице. При таком подходе уведомление будет выдаваться автоматически, так что прикладной программист не рискует случайно оставить какое-либо изменение без уведомления.</P
+><P
+>Транзакции оказывают значительное влияние на работу <TT
+CLASS="COMMAND"
+>NOTIFY</TT
+>. Во-первых, если <TT
+CLASS="COMMAND"
+>NOTIFY</TT
+> выполняется внутри транзакции, уведомления доставляются получателям после фиксирования транзакции и только в этом случае. Это разумно, так как в случае прерывания транзакции действие всех команд в ней аннулируется, включая <TT
+CLASS="COMMAND"
+>NOTIFY</TT
+>. Однако это может обескуражить тех, кто ожидает, что уведомления будут приходить немедленно. Во-вторых, если ожидающий сеанс получает уведомление внутри транзакции, это событие не будет доставлено подключённому клиенту до завершения (фиксации или отката) транзакции. Это опять же объясняется тем, что если уведомление будет доставлено в рамках транзакции, которая затем будет прервана, может возникнуть желание как-то отменить его &mdash; но сервер не может <SPAN
+CLASS="QUOTE"
+>"забрать назад"</SPAN
+> уведомление после того, как оно было отправлено клиенту. Поэтому уведомления доставляются только между транзакциями. Учитывая вышесказанное, в приложениях, применяющих <TT
+CLASS="COMMAND"
+>NOTIFY</TT
+> для сигнализации в реальном времени, следует минимизировать размер транзакций.</P
+><P
+>Если в рамках одной транзакции в один канал поступило несколько уведомлений с одинаковым сообщением, сервер может решить доставить только одно уведомление. Если же сообщения различаются, уведомления будут всегда доставлены по отдельности. Так же уведомления, поступающие от разных транзакций, никогда не будут объединены в одно. Не считая фильтрации последующих экземпляров дублирующихся уведомлений, <TT
+CLASS="COMMAND"
+>NOTIFY</TT
+> гарантирует, что уведомления от одной транзакции всегда поступают в том же порядке, в каком были отправлены. Также гарантируется, что сообщения от разных транзакций поступают в порядке фиксации этих транзакций.</P
+><P
+>Часто бывает, что клиент, выполнивший <TT
+CLASS="COMMAND"
+>NOTIFY</TT
+>, ожидает уведомления на этом же канале. В этом случае он получит своё же уведомление, как и любой другой сеанс, ожидающий уведомления. В зависимости от логики приложения, это может привести к бессмысленным операциям, например, поиску изменений в таблице, которые и были внесены этим же сеансом. Этой дополнительной работы можно избежать, если проверить, не совпадает ли <ACRONYM
+CLASS="ACRONYM"
+>PID</ACRONYM
+> сигнализирующего процесса (указанный в данных события) с собственным <ACRONYM
+CLASS="ACRONYM"
+>PID</ACRONYM
+> сеанса (его можно узнать, обратившись к <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>). Если они совпадают, значит сеанс получил уведомление о собственных действиях, так что его можно игнорировать.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN81983"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>канал</I
+></TT
+></DT
+><DD
+><P
+>Имя канала для передачи уведомления (любой идентификатор).</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>сообщение</I
+></TT
+></DT
+><DD
+><P
+>Строка <SPAN
+CLASS="QUOTE"
+>"сообщения"</SPAN
+>, которая будет передана вместе с уведомлением. Она должна задаваться простой текстовой константой. В стандартной конфигурации её длина должна быть меньше 8000 байт. (Если требуется передать двоичные данные или большой объём информации, лучше поместить их в таблицу базы данных и передать ключ этой записи.)</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN81997"
+></A
+><H2
+>Замечания</H2
+><P
+>Уведомления, которые были отправлены, но ещё не обработаны всеми ожидающими сеансами, содержатся в очереди. Если эта очередь переполняется, транзакции, в которых вызывается <TT
+CLASS="COMMAND"
+>NOTIFY</TT
+>, будут завершены ошибкой при попытке фиксации. Очередь довольно велика (8 ГБ в стандартной конфигурации), так что её размера должно хватать практически во всех случаях, но если в сеансе выполняется <TT
+CLASS="COMMAND"
+>LISTEN</TT
+>, а затем продолжается очень длительная транзакция, очередь не очищается. Как только эта очередь заполняется наполовину, в журнал записываются предупреждения, в которых указывается, какой сеанс препятствует очистке очереди. В этом случае следует добиться завершения текущей транзакции в указанном сеансе, чтобы очередь была очищена.</P
+><P
+>Транзакция, в которой выполняется <TT
+CLASS="COMMAND"
+>NOTIFY</TT
+>, не может быть подготовлена для двухфазной фиксации.</P
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN82004"
+></A
+><H3
+>pg_notify</H3
+><P
+>Также отправить уведомление можно, используя функцию <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_notify</CODE
+>(<TT
+CLASS="TYPE"
+>text</TT
+>, <TT
+CLASS="TYPE"
+>text</TT
+>)</TT
+>. Эта функция принимает в первом аргументе имя канала, а во втором текст сообщения. Гораздо удобнее использовать её, когда требуется работать с динамическими именами каналов и сообщениями.</P
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN82013"
+></A
+><H2
+>Примеры</H2
+><P
+>Демонстрация процедуры ожидания/получения уведомления в <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>LISTEN virtual;
+NOTIFY virtual;
+Asynchronous notification "virtual" received from server process with PID 8448.
+NOTIFY virtual, 'This is the payload';
+Asynchronous notification "virtual" with payload "This is the payload" received from server process with PID 8448.
+
+LISTEN foo;
+SELECT pg_notify('fo' || 'o', 'pay' || 'load');
+Asynchronous notification "foo" with payload "payload" received from server process with PID 14728.</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN82018"
+></A
+><H2
+>Совместимость</H2
+><P
+>Оператор <TT
+CLASS="COMMAND"
+>NOTIFY</TT
+> отсутствует в стандарте SQL.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN82022"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-listen.html"
+>LISTEN</A
+>, <A
+HREF="sql-unlisten.html"
+>UNLISTEN</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-move.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-prepare.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>MOVE</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>PREPARE</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

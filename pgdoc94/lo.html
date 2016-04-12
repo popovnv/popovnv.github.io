@@ -1,0 +1,319 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>lo</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Дополнительно поставляемые модули"
+HREF="contrib.html"><LINK
+REL="PREVIOUS"
+TITLE="isn"
+HREF="isn.html"><LINK
+REL="NEXT"
+TITLE="ltree"
+HREF="ltree.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="isn"
+HREF="isn.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Приложение E. Дополнительно поставляемые модули</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="ltree"
+HREF="ltree.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="LO"
+>E.20. lo</A
+></H1
+><P
+>Модуль <TT
+CLASS="FILENAME"
+>lo</TT
+> поддерживает управление большими объектами (БО или LO, Large Objects, иногда BLOB, Binary Large OBjects). Он реализует тип данных <TT
+CLASS="TYPE"
+>lo</TT
+> и триггер <CODE
+CLASS="FUNCTION"
+>lo_manage</CODE
+>.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN121889"
+>E.20.1. Обоснование</A
+></H2
+><P
+>Одна из проблема драйвера JDBC (она распространяется и на драйвер ODBC) в том, что спецификация типа предполагает, что ссылки на BLOB хранятся в таблице, и если запись меняется, связанный BLOB удаляется из базы.</P
+><P
+>Но с <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> этого не происходит. Большие объекты обрабатываются как самостоятельные объекты; запись в таблице может ссылаться на большой объект по OID, но при этом на один и тот же объект могут ссылаться несколько записей таблицы, так что система не удаляет большой объект, только потому что вы меняете или удаляете такую запись.</P
+><P
+>Это не проблема для приложений, ориентированных на <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, но стандартный код, использующий JDBC или ODBC, не будет удалять эти объекты, в результате чего они окажутся потерянными &mdash; объектами, которые никак не задействованы, а просто занимают место на диске.</P
+><P
+>Модуль <TT
+CLASS="FILENAME"
+>lo</TT
+> позволяет решить эту проблему, добавляя триггер к таблицам, которые содержат колонки, ссылающиеся на БО. Этот триггер по сути просто вызывает <CODE
+CLASS="FUNCTION"
+>lo_unlink</CODE
+>, когда вы удаляете или изменяете значение, ссылающееся на большой объект. Данный триггер предполагает, что на любой большой объект, на который ссылается контролируемая им колонка, указывает только одна ссылка!</P
+><P
+>Этот модуль также предоставляет тип данных <TT
+CLASS="TYPE"
+>lo</TT
+>, который просто является доменом на базе <TT
+CLASS="TYPE"
+>oid</TT
+>. Он может быть полезен для выделения колонок, содержащих ссылки на большие объекты, среди колонок, содержащих другие OID. Для использования триггера применять тип <TT
+CLASS="TYPE"
+>lo</TT
+> необязательно, но этот тип может быть полезен для отслеживания колонок в вашей базе, представляющих большие объекты, с которыми работает триггер. Кроме того, поступали сообщения, что драйвер ODBC не работает корректно, если для колонок BLOB используется не тип <TT
+CLASS="TYPE"
+>lo</TT
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN121904"
+>E.20.2. Как его использовать</A
+></H2
+><P
+>Пример его использования:</P
+><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE image (title TEXT, raster lo);
+
+CREATE TRIGGER t_raster BEFORE UPDATE OR DELETE ON image
+    FOR EACH ROW EXECUTE PROCEDURE lo_manage(raster);</PRE
+><P
+>Для каждой колонки, которая будет содержать уникальные ссылки на большие объекты, создайте триггер <TT
+CLASS="LITERAL"
+>BEFORE UPDATE OR DELETE</TT
+> и передайте имя колонки в качестве единственного аргумента триггера. Вы также можете сделать, чтобы триггер срабатывал только при изменениях в колонке, указав <TT
+CLASS="LITERAL"
+>BEFORE UPDATE OF</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+>. Если вам нужно иметь в одной таблице несколько колонок <TT
+CLASS="TYPE"
+>lo</TT
+>, создайте отдельный триггер для каждой (при этом обязательно нужно дать всем триггерам в одной таблице разные имена).</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN121913"
+>E.20.3. Ограничения</A
+></H2
+><P
+></P
+><UL
+><LI
+><P
+>При удалении таблицы, однако, всё равно будут потеряны относящиеся к ней объекты, так как триггер не будет выполняться. Этого можно избежать, выполнив перед <TT
+CLASS="COMMAND"
+>DROP TABLE</TT
+> команду <TT
+CLASS="COMMAND"
+>DELETE FROM <TT
+CLASS="REPLACEABLE"
+><I
+>таблица</I
+></TT
+></TT
+>.</P
+><P
+>То же касается и команды <TT
+CLASS="COMMAND"
+>TRUNCATE</TT
+>.</P
+><P
+>Если у вас уже есть, или вы подозреваете, что есть потерянные большие объекты, обратите внимание на модуль <A
+HREF="vacuumlo.html"
+>              <SPAN
+CLASS="APPLICATION"
+>vacuumlo</SPAN
+>
+            </A
+>, который может помочь вычистить их. Имеет смысл периодически запускать <SPAN
+CLASS="APPLICATION"
+>vacuumlo</SPAN
+> в качестве меры, дополняющей действие триггера <CODE
+CLASS="FUNCTION"
+>lo_manage</CODE
+>.</P
+></LI
+><LI
+><P
+>Некоторые клиентские программы могут создавать собственные таблицы, но не создавать для них соответствующие триггеры. Кроме того, и пользователи могут не создавать такие триггеры (забывая о них, либо не зная, как это сделать).</P
+></LI
+></UL
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN121929"
+>E.20.4. Автор</A
+></H2
+><P
+>Питер Маунт <CODE
+CLASS="EMAIL"
+>&#60;<A
+HREF="mailto:peter@retep.org.uk"
+>peter@retep.org.uk</A
+>&#62;</CODE
+></P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="isn.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ltree.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>isn</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>ltree</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

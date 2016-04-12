@@ -1,0 +1,743 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Выгрузка в SQL</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Резервное копирование и восстановление"
+HREF="backup.html"><LINK
+REL="PREVIOUS"
+TITLE="Резервное копирование и восстановление"
+HREF="backup.html"><LINK
+REL="NEXT"
+TITLE="Резервное копирование на уровне файлов"
+HREF="backup-file.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Резервное копирование и восстановление"
+HREF="backup.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="backup.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 24. Резервное копирование и восстановление</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Резервное копирование на уровне файлов"
+HREF="backup-file.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="BACKUP-DUMP"
+>24.1. Выгрузка в <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+></A
+></H1
+><P
+>Идея, стоящая за этим методом, заключается в генерации текстового файла с командами SQL, которые при выполнении на сервере пересоздадут базу данных в том же самом состоянии, в котором она была на момент выгрузки. <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> предоставляет для этой цели вспомогательную программу <A
+HREF="app-pgdump.html"
+>pg_dump</A
+>. Простейшее применение этой программы выглядит так: </P><PRE
+CLASS="SYNOPSIS"
+>pg_dump <TT
+CLASS="REPLACEABLE"
+><I
+>имя_базы</I
+></TT
+> &gt; <TT
+CLASS="REPLACEABLE"
+><I
+>выходной_файл</I
+></TT
+></PRE
+><P> Как видите, <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+> записывает результаты своей работы в устройство стандартного вывода. Далее будет рассмотрено, чем это может быть полезно. В то время как вышеупомянутая команда создаёт текстовый файл, <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+> может создать файлы и в других форматах, которые допускают параллельную обработку и более гибкое управление восстановлением объектов.</P
+><P
+>Программа <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+> является для <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> обычным клиентским приложением (хотя и весьма умным). Это означает, что вы можете выполнять процедуру резервного копирования с любого удалённого компьютера, если имеете доступ к нужной базе данных. Но помните, что <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+> не использует для своей работы какие-то специальные привилегии. В частности, ей обычно требуется доступ на чтение всех таблиц, которые вы хотите выгрузить, так что для копирования всей базы данных практически всегда её нужно запускать с правами суперпользователя СУБД. (Если у вас нет достаточных прав для резервного копирования всей базы данных, вы, тем не менее, можете сделать резервную копию той части базы, доступ к которой у вас есть, используя такие параметры, как <TT
+CLASS="OPTION"
+>-n <TT
+CLASS="REPLACEABLE"
+><I
+>схема</I
+></TT
+></TT
+> или <TT
+CLASS="OPTION"
+>-t <TT
+CLASS="REPLACEABLE"
+><I
+>таблица</I
+></TT
+></TT
+>.)</P
+><P
+>Указать, к какому серверу должна подключаться программа <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+>, можно с помощью аргументов командной строки <TT
+CLASS="OPTION"
+>-h <TT
+CLASS="REPLACEABLE"
+><I
+>сервер</I
+></TT
+></TT
+> и <TT
+CLASS="OPTION"
+>-p <TT
+CLASS="REPLACEABLE"
+><I
+>порт</I
+></TT
+></TT
+>. По умолчанию в качестве сервера выбирается localhost или значение, указанное в переменной окружения <TT
+CLASS="ENVAR"
+>PGHOST</TT
+>. Подобным образом, по умолчанию используется порт, заданный в переменной окружения <TT
+CLASS="ENVAR"
+>PGPORT</TT
+>, а если она не задана, то порт, указанный по умолчанию при компиляции. (Для удобства при компиляции сервера обычно устанавливается то же значение по умолчанию.)</P
+><P
+>Как и любое другое клиентское приложение <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+> по умолчанию будет подключаться к базе данных с именем пользователя, совпадающим с именем текущего пользователя операционной системы. Чтобы переопределить имя, либо добавьте параметр <TT
+CLASS="OPTION"
+>-U</TT
+>, либо установите переменную окружения <TT
+CLASS="ENVAR"
+>PGUSER</TT
+>. Помните, что <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+> подключается к серверу через обычные механизмы проверки подлинности клиента (которые описываются в <A
+HREF="client-authentication.html"
+>Главе 19</A
+>).</P
+><P
+>Важное преимущество <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+> в сравнении с другими методами резервного копирования, описанными далее, состоит в том, что вывод <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+> обычно можно загрузить в более новые версии <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, в то время как резервная копия на уровне файловой системы и непрерывное архивирование жёстко зависят от версии сервера. Также, только метод с применением <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+> будет работать при переносе базы данных на другую машинную архитектуру, например, при переносе с 32-битной на 64-битную версию сервера.</P
+><P
+>Дампы, создаваемые <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+>, являются внутренне согласованными, то есть, дамп представляет собой снимок базы данных на момент начала запуска <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+>. <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+> не блокирует другие операции с базой данных во время своей работы. (Исключение составляют операции, которым нужна исключительная блокировка, как например, большинство форм команды <TT
+CLASS="COMMAND"
+>ALTER TABLE</TT
+>.)</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="BACKUP-DUMP-RESTORE"
+>24.1.1. Восстановление дампа</A
+></H2
+><P
+>Текстовые файлы, созданные <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+> предназначаются для последующего чтения программой <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>. Общий вид команды для восстановления дампа: </P><PRE
+CLASS="SYNOPSIS"
+>psql <TT
+CLASS="REPLACEABLE"
+><I
+>имя_базы</I
+></TT
+> &lt; <TT
+CLASS="REPLACEABLE"
+><I
+>входной_файл</I
+></TT
+></PRE
+><P> где <TT
+CLASS="REPLACEABLE"
+><I
+>входной_файл</I
+></TT
+> &mdash; это файл, содержащий вывод команды <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+>. База данных, заданная параметром <TT
+CLASS="REPLACEABLE"
+><I
+>имя_базы</I
+></TT
+>, не будет создана данной командой, так что вы должны создать её сами из базы <TT
+CLASS="LITERAL"
+>template0</TT
+> перед запуском <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> (например, с помощью команды <TT
+CLASS="LITERAL"
+>createdb -T template0 <TT
+CLASS="REPLACEABLE"
+><I
+>имя_базы</I
+></TT
+></TT
+>). Программа <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> принимает параметры, указывающие сервер, к которому осуществляется подключение, и имя пользователя, подобно <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+>. За дополнительными сведениями обратитесь к справке по <A
+HREF="app-pgrestore.html"
+>pg_restore</A
+>. Копии не текстовые восстанавливаются утилитой <A
+HREF="app-pgrestore.html"
+>pg_restore</A
+>.</P
+><P
+>Перед восстановлением SQL-дампа все пользователи, которые владели объектами или имели права на объекты в выгруженной базе данных, должны уже существовать. Если их нет, при восстановлении будут ошибки пересоздания объектов с изначальными владельцами и/или правами. (Иногда это желаемый результат, но обычно нет).</P
+><P
+>По умолчанию, если происходит ошибка SQL, программа <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> продолжает выполнение. Если же запустить <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> с установленной переменной <TT
+CLASS="LITERAL"
+>ON_ERROR_STOP</TT
+>, это поведение поменяется и <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> завершится с кодом 3 в случае возникновения ошибки SQL: </P><PRE
+CLASS="PROGRAMLISTING"
+>psql --set ON_ERROR_STOP=on имя_базы &lt; входной_файл</PRE
+><P> В любом случае, вы получите только частично восстановленную базу данных. В качестве альтернативы можно указать, что весь дамп должен быть восстановлен в одной транзакции, так что восстановление либо полностью выполнится, либо полностью отменится. Включить данный режим можно, передав <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> аргумент <TT
+CLASS="OPTION"
+>-1</TT
+> или <TT
+CLASS="OPTION"
+>--single-transaction</TT
+>. Выбирая этот режим, учтите, что даже незначительная ошибка может привести к откату восстановления, которое могло продолжаться несколько часов. Однако, это всё же может быть предпочтительней, чем вручную вычищать сложную базу данных после частично восстановленного дампа.</P
+><P
+>Благодаря способности <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+> и <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> писать и читать каналы ввода/вывода, можно скопировать базу данных непосредственно с одного сервера на другой, например: </P><PRE
+CLASS="PROGRAMLISTING"
+>pg_dump -h <TT
+CLASS="REPLACEABLE"
+><I
+>host1</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>имя_базы</I
+></TT
+> | psql -h <TT
+CLASS="REPLACEABLE"
+><I
+>host2</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>имя_базы</I
+></TT
+></PRE
+><P></P
+><DIV
+CLASS="IMPORTANT"
+><BLOCKQUOTE
+CLASS="IMPORTANT"
+><P
+><B
+>Важно: </B
+>Дампы, которые выдаёт <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+>, содержат определения относительно <TT
+CLASS="LITERAL"
+>template0</TT
+>. Это означает, что любые языки, процедуры и т. п., добавленные в базу через <TT
+CLASS="LITERAL"
+>template1</TT
+>, <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+> также выгрузит в дамп. Как следствие, если при восстановлении вы используете модифицированный <TT
+CLASS="LITERAL"
+>template1</TT
+>, вы должны создать пустую базу данных из <TT
+CLASS="LITERAL"
+>template0</TT
+>, как показано в примере выше.</P
+></BLOCKQUOTE
+></DIV
+><P
+>После восстановления резервной копии имеет смысл запустить <A
+HREF="sql-analyze.html"
+>ANALYZE</A
+> для каждой базы данных, чтобы оптимизатор запросов получил полезную статистику; за подробностями обратитесь к <A
+HREF="routine-vacuuming.html#VACUUM-FOR-STATISTICS"
+>Подразделу 23.1.3</A
+> и <A
+HREF="routine-vacuuming.html#AUTOVACUUM"
+>Подразделу 23.1.6</A
+>. Другие советы по эффективной загрузке больших объёмов данных в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> вы можете найти в <A
+HREF="populate.html"
+>Разделе 14.4</A
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="BACKUP-DUMP-ALL"
+>24.1.2. Использование <SPAN
+CLASS="APPLICATION"
+>pg_dumpall</SPAN
+></A
+></H2
+><P
+>Программа <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+> выгружает только одну базу данных в один момент времени и не включает в дамп информацию о ролях и табличных пространствах (так как это информация уровня кластера, а не самой базы данных). Для удобства создания дампа всего содержимого кластера баз данных предоставляется программа <A
+HREF="app-pg-dumpall.html"
+>            <SPAN
+CLASS="APPLICATION"
+>pg_dumpall</SPAN
+>
+          </A
+>, которая делает резервную копию всех баз данных кластера, а также сохраняет данные уровня кластера, такие как роли и определения табличных пространств. Простое использование этой команды: </P><PRE
+CLASS="SYNOPSIS"
+>pg_dumpall &gt; <TT
+CLASS="REPLACEABLE"
+><I
+>выходной_файл</I
+></TT
+></PRE
+><P> Полученную копию можно восстановить с помощью <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>: </P><PRE
+CLASS="SYNOPSIS"
+>psql -f <TT
+CLASS="REPLACEABLE"
+><I
+>входной_файл</I
+></TT
+> postgres</PRE
+><P> (В принципе, здесь в качестве начальной базы данных можно указать имя любой существующей базы, но если вы загружаете копию в пустой кластер, обычно нужно использовать <TT
+CLASS="LITERAL"
+>postgres</TT
+>). Восстанавливать дамп, который выдала <SPAN
+CLASS="APPLICATION"
+>pg_dumpall</SPAN
+>, всегда необходимо с правами суперпользователя, так как они требуются для восстановления информации о ролях и табличных пространствах. Если вы используете табличные пространства, убедитесь, что пути к табличным пространствам в дампе соответствуют новой среде.</P
+><P
+><SPAN
+CLASS="APPLICATION"
+>pg_dumpall</SPAN
+> выдаёт команды, которые заново создают роли, табличные пространства и пустые базы данных, а затем вызывает для каждой базы <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+>. Таким образом, хотя каждая база данных будет внутренне согласованной, состояние разных баз не будет синхронным.</P
+><P
+>Только глобальные данные кластера можно выгрузить, передав <SPAN
+CLASS="APPLICATION"
+>pg_dumpall</SPAN
+> ключ <TT
+CLASS="OPTION"
+>--globals-only</TT
+>. Это необходимо, чтобы полностью скопировать кластер, когда <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+> выполняется для отдельных баз данных.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="BACKUP-DUMP-LARGE"
+>24.1.3. Управление большими базами данных</A
+></H2
+><P
+>Некоторые операционные системы накладывают ограничение на максимальный размер файла, что приводит к проблемам при создании больших файлов с помощью <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+>. К счастью, <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+> может писать в стандартный вывод, так что вы можете использовать стандартные инструменты Unix для того, чтобы избежать потенциальных проблем. Вот несколько возможных методов:</P
+><DIV
+CLASS="FORMALPARA"
+><P
+><B
+>Используйте сжатые дампы. </B
+>Вы можете использовать предпочитаемую программу сжатия, например <SPAN
+CLASS="APPLICATION"
+>gzip</SPAN
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>pg_dump <TT
+CLASS="REPLACEABLE"
+><I
+>имя_базы</I
+></TT
+> | gzip &gt; <TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+>.gz</PRE
+><P> Затем загрузить сжатый дамп можно командой: </P><PRE
+CLASS="PROGRAMLISTING"
+>gunzip -c <TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+>.gz | psql <TT
+CLASS="REPLACEABLE"
+><I
+>имя_базы</I
+></TT
+></PRE
+><P> или: </P><PRE
+CLASS="PROGRAMLISTING"
+>cat <TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+>.gz | gunzip | psql <TT
+CLASS="REPLACEABLE"
+><I
+>имя_базы</I
+></TT
+></PRE
+><P></P
+></DIV
+><DIV
+CLASS="FORMALPARA"
+><P
+><B
+>Используйте <TT
+CLASS="COMMAND"
+>split</TT
+>. </B
+>Команда <TT
+CLASS="COMMAND"
+>split</TT
+> может разбивать выводимые данные на небольшие файлы, размер которых удовлетворяет ограничению нижележащей файловой системы. Например, чтобы получить части по 1 мегабайту: </P><PRE
+CLASS="PROGRAMLISTING"
+>pg_dump <TT
+CLASS="REPLACEABLE"
+><I
+>имя_базы</I
+></TT
+> | split -b 1m - <TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+></PRE
+><P> Восстановить их можно так: </P><PRE
+CLASS="PROGRAMLISTING"
+>cat <TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+>* | psql <TT
+CLASS="REPLACEABLE"
+><I
+>имя_базы</I
+></TT
+></PRE
+><P></P
+></DIV
+><DIV
+CLASS="FORMALPARA"
+><P
+><B
+>Используйте специальный формат дампа <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+>. </B
+>Если при сборке <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> была подключена библиотека <SPAN
+CLASS="APPLICATION"
+>zlib</SPAN
+>, дамп в специальном формате будет записываться в файл в сжатом виде. В таком формате размер файла дампа будет близок к размеру, полученному с применением <TT
+CLASS="COMMAND"
+>gzip</TT
+>, но он лучше тем, что позволяет восстанавливать таблицы выборочно. Следующая команда выгружает базу данных в специальном формате: </P><PRE
+CLASS="PROGRAMLISTING"
+>pg_dump -Fc <TT
+CLASS="REPLACEABLE"
+><I
+>имя_базы</I
+></TT
+> &gt; <TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+></PRE
+><P> Дамп в специальном формате не является скриптом для <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> и должен восстанавливаться с помощью команды <SPAN
+CLASS="APPLICATION"
+>pg_restore</SPAN
+>, например: </P><PRE
+CLASS="PROGRAMLISTING"
+>pg_restore -d <TT
+CLASS="REPLACEABLE"
+><I
+>имя_базы</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+></PRE
+><P> За подробностями обратитесь к справке по командам <A
+HREF="app-pgdump.html"
+>pg_dump</A
+> и <A
+HREF="app-pgrestore.html"
+>pg_restore</A
+>.</P
+></DIV
+><P
+>Для очень больших баз данных может понадобиться сочетать <TT
+CLASS="COMMAND"
+>split</TT
+> с одним из двух других методов.</P
+><DIV
+CLASS="FORMALPARA"
+><P
+><B
+>Используйте возможность параллельной выгрузки в <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+>. </B
+>Чтобы ускорить выгрузку большой БД, вы можете использовать режим параллельной выгрузки в <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+>. При этом одновременно будут выгружаться несколько таблиц. Управлять числом параллельных заданий позволяет параметр <TT
+CLASS="COMMAND"
+>-j</TT
+>. Параллельная выгрузка поддерживается только для формата архива в каталоге. </P><PRE
+CLASS="PROGRAMLISTING"
+>pg_dump -j <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+> -F d -f <TT
+CLASS="REPLACEABLE"
+><I
+>выходной_каталог</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>имя_базы</I
+></TT
+></PRE
+><P> Вы также можете восстановить копию в параллельном режиме с помощью <TT
+CLASS="COMMAND"
+>pg_restore -j</TT
+>. Это поддерживается для любого архива в формате каталога или специальном формате, даже если архив создавался не командой <TT
+CLASS="COMMAND"
+>pg_dump -j</TT
+>.</P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="backup.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="backup-file.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Резервное копирование и восстановление</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="backup.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Резервное копирование на уровне файлов</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

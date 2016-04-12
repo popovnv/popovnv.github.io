@@ -1,0 +1,254 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Исполнитель</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Обзор внутреннего устройства PostgreSQL"
+HREF="overview.html"><LINK
+REL="PREVIOUS"
+TITLE="Планировщик/оптимизатор"
+HREF="planner-optimizer.html"><LINK
+REL="NEXT"
+TITLE="Системные каталоги"
+HREF="catalogs.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Планировщик/оптимизатор"
+HREF="planner-optimizer.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="overview.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 47. Обзор внутреннего устройства PostgreSQL</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Системные каталоги"
+HREF="catalogs.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="EXECUTOR"
+>47.6. Исполнитель</A
+></H1
+><P
+><I
+CLASS="FIRSTTERM"
+>Исполнитель</I
+> принимает план, созданный планировщиком/исполнителем и обрабатывает его рекурсивно, чтобы получить требуемый набор строк. Обработка выполняется по конвейеру, с получением данных по требованию. При вызове любого узла плана он должен выдать очередную строку, либо сообщить, что выдача строк завершена.</P
+><P
+>В качестве более конкретного примера, давайте предположим, что верхним узлом плана оказался узел <TT
+CLASS="LITERAL"
+>MergeJoin</TT
+>. Для того чтобы выполнить какое-либо соединение, необходимо выбрать две строки (одну из каждого вложенного плана). Поэтому исполнитель рекурсивно вызывает себя для обработки вложенных планов (он начинает с плана <TT
+CLASS="LITERAL"
+>левого дерева</TT
+>). Новый верхний узел (верхний узел левого вложенного плана) может быть, например, узлом <TT
+CLASS="LITERAL"
+>Sort</TT
+>, и тогда для получения входной строки снова требуется рекурсия. Дочерним узлом <TT
+CLASS="LITERAL"
+>Sort</TT
+> может быть узел <TT
+CLASS="LITERAL"
+>SeqScan</TT
+>, представляющий собственно чтение таблицы. В результате выполнения этого узла исполнитель выбирает одну строку из таблицы и возвращает её вызывающему узлу. Узел <TT
+CLASS="LITERAL"
+>Sort</TT
+>, в свою очередь, будет продолжать вызывать дочерний узел, пока не получит все строки для сортировки. Когда строки закончатся (дочерний узел сообщит об этом, возвратив NULL вместо строки), узел <TT
+CLASS="LITERAL"
+>Sort</TT
+> выполнит сортировку, и наконец сможет выдать свою первую строку, а именно строку первую по порядку сортировки. Остальные строки будут сохраняться в нём, чтобы он мог выдавать их по порядку при последующих вызовах.</P
+><P
+>Узел <TT
+CLASS="LITERAL"
+>MergeJoin</TT
+> подобным образом затребует первую строку и у вложенного плана справа. Затем он сравнивает две строки и определяет, можно ли их соединить; если да, он возвращает соединённую строки вызывающему узлу. При следующем вызове, или немедленно, если он не может соединить текущую пару поступивших строк, он переходит к следующей строке в одном отношении или в другом (в зависимости от результата сравнения) и снова проверяет соответствие. В конце концов, данные в одном или другом вложенном плане заканчиваются и узел <TT
+CLASS="LITERAL"
+>MergeJoin</TT
+> возвращает NULL, показывая тем самым, что другие строки соединения получить нельзя.</P
+><P
+>Сложные запросы могут содержать много уровней вложенности узлов плана, но общий подход тот же: каждый узел вычисляет и возвращает следующую полученную строку при очередном вызове. Каждый узел также должен производить отбор и расчёты, которые были назначены ему планировщиком.</P
+><P
+>Механизм исполнителя применяется для обработки всех четырёх основных типов SQL-запросов: <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, <TT
+CLASS="COMMAND"
+>INSERT</TT
+>, <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> и <TT
+CLASS="COMMAND"
+>DELETE</TT
+>. С <TT
+CLASS="COMMAND"
+>SELECT</TT
+> код исполнителя верхнего уровня должен только выдать клиенту все строки, полученные от дерева плана запроса. С <TT
+CLASS="COMMAND"
+>INSERT</TT
+> все полученные строки вставляются в целевую таблицу <TT
+CLASS="COMMAND"
+>INSERT</TT
+>. Эта операция выполняется в специальном узле на верхнем уровне плана запроса, называемом <TT
+CLASS="LITERAL"
+>ModifyTable</TT
+>. (Простая команда <TT
+CLASS="COMMAND"
+>INSERT ... VALUES</TT
+> создаёт простейшее дерево плана, состоящее из одного узла <TT
+CLASS="LITERAL"
+>Result</TT
+>, который вычисляет одну строку результата, и узла <TT
+CLASS="LITERAL"
+>ModifyTable</TT
+> над ним, который осуществляет добавление. Но с <TT
+CLASS="COMMAND"
+>INSERT ... SELECT</TT
+> могут быть востребованы все возможности механизма исполнителя.) С <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> планировщик делает так, чтобы каждая вычисленная строка включала значения всех изменённых колонок плюс <I
+CLASS="FIRSTTERM"
+>TID</I
+> (Tuple ID, идентификатор кортежа) исходной целевой строки; эти данные подаются в узел <TT
+CLASS="LITERAL"
+>ModifyTable</TT
+>, который использует эту информацию, чтобы создать новую изменённую строку и пометить старую строку как удалённую. С <TT
+CLASS="COMMAND"
+>DELETE</TT
+> план фактически возвращает только одну колонку, TID, а узел <TT
+CLASS="LITERAL"
+>ModifyTable</TT
+> использует значение TID, чтобы найти каждую целевую строку и пометить её как удалённую.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="planner-optimizer.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Планировщик/оптимизатор</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="overview.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Системные каталоги</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

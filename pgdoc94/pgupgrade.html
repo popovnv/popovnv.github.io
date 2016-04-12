@@ -1,0 +1,1232 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>              pg_upgrade
+            </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Серверные приложения"
+HREF="contrib-prog-server.html"><LINK
+REL="PREVIOUS"
+TITLE="              pg_test_timing
+            "
+HREF="pgtesttiming.html"><LINK
+REL="NEXT"
+TITLE="              pg_xlogdump
+            "
+HREF="pgxlogdump.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="              pg_test_timing
+            "
+HREF="pgtesttiming.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="contrib-prog-server.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="              pg_xlogdump
+            "
+HREF="pgxlogdump.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="PGUPGRADE"
+></A
+><SPAN
+CLASS="APPLICATION"
+>pg_upgrade</SPAN
+></H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN127582"
+></A
+><H2
+>Название</H2
+>pg_upgrade&nbsp;--&nbsp;обновить экземпляр сервера <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN127586"
+></A
+><H2
+>Синтаксис</H2
+><P
+><TT
+CLASS="COMMAND"
+>pg_upgrade</TT
+>                  <TT
+CLASS="OPTION"
+>-b</TT
+>
+                                 <TT
+CLASS="REPLACEABLE"
+><I
+>старый_каталог_bin</I
+></TT
+>
+                                 <TT
+CLASS="OPTION"
+>-B</TT
+>
+                                 <TT
+CLASS="REPLACEABLE"
+><I
+>новый_каталог_bin</I
+></TT
+>
+                                 <TT
+CLASS="OPTION"
+>-d</TT
+>
+                                 <TT
+CLASS="REPLACEABLE"
+><I
+>старый_каталог_данных</I
+></TT
+>
+                                 <TT
+CLASS="OPTION"
+>-D</TT
+>
+                                 <TT
+CLASS="REPLACEABLE"
+><I
+>новый_каталог_данных</I
+></TT
+>
+                [                <TT
+CLASS="REPLACEABLE"
+><I
+>параметр</I
+></TT
+>
+              ...]</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN127607"
+></A
+><H2
+>Описание</H2
+><P
+>Программа <SPAN
+CLASS="APPLICATION"
+>pg_upgrade</SPAN
+> (ранее называвшаяся <SPAN
+CLASS="APPLICATION"
+>pg_migrator</SPAN
+>) позволяет обновить данные в каталоге базы данных <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> до последней основной версии <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> без операции выгрузки/перезагрузки данных, обычно необходимой при обновлениях основной версии, например, при переходе от 8.4.7 к текущей основной версии <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Эти действия не требуются при установке корректирующей версии, например, при переходе от 9.0.1 к 9.0.4.</P
+><P
+>С выходом новых основных версий в PostgreSQL регулярно добавляются новые возможности, которые часто меняют структуру системных таблицы, но внутренний формат хранения меняется редко. Учитывая этот факт, <SPAN
+CLASS="APPLICATION"
+>pg_upgrade</SPAN
+> позволяет выполнить быстрое обновление, создавая системные таблицы заново, но сохраняя старые файлы данных. Если при обновлении основной версии формат хранения данных изменится так, что данные в старом формате окажутся нечитаемыми, <SPAN
+CLASS="APPLICATION"
+>pg_upgrade</SPAN
+> не сможет произвести такое обновление. (Сообщество разработчиков постарается не допустить подобных ситуаций.)</P
+><P
+>Программа <SPAN
+CLASS="APPLICATION"
+>pg_upgrade</SPAN
+> делает всё возможное, чтобы убедиться в том, что старый и новый кластеры двоично-совместимы, в частности проверяя параметры времени компиляции и разрядность (32/64 бита) исполняемых файлов. Важно, чтобы и все внешние модули тоже были двоично-совместимыми, хотя это <SPAN
+CLASS="APPLICATION"
+>pg_upgrade</SPAN
+> проверить не может.</P
+><P
+>pg_upgrade поддерживает обновление с версии 8.3.X и новее до текущей основной версии <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, включая альфа-выпуски и сборки снимков кода.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN127623"
+></A
+><H2
+>Параметры</H2
+><P
+><SPAN
+CLASS="APPLICATION"
+>pg_upgrade</SPAN
+> принимает следующие аргументы командной строки: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="OPTION"
+>-b</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>каталог_bin</I
+></TT
+><BR><TT
+CLASS="OPTION"
+>--old-bindir=</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>каталог_bin</I
+></TT
+></DT
+><DD
+><P
+>каталог с исполняемыми файлами старой версии PostgreSQL; переменная окружения <TT
+CLASS="ENVAR"
+>PGBINOLD</TT
+></P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-B</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>каталог_bin</I
+></TT
+><BR><TT
+CLASS="OPTION"
+>--new-bindir=</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>каталог_bin</I
+></TT
+></DT
+><DD
+><P
+>каталог с исполняемыми файлами новой версии PostgreSQL; переменная окружения <TT
+CLASS="ENVAR"
+>PGBINNEW</TT
+></P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-c</TT
+><BR><TT
+CLASS="OPTION"
+>--check</TT
+></DT
+><DD
+><P
+>только проверить кластеры, не изменять никакие данные</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-d</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>datadir</I
+></TT
+><BR><TT
+CLASS="OPTION"
+>--old-datadir=</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>datadir</I
+></TT
+></DT
+><DD
+><P
+>каталог данных старого кластера; переменная окружения <TT
+CLASS="ENVAR"
+>PGDATAOLD</TT
+></P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-D</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>datadir</I
+></TT
+><BR><TT
+CLASS="OPTION"
+>--new-datadir=</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>datadir</I
+></TT
+></DT
+><DD
+><P
+>каталог данных нового кластера; переменная окружения <TT
+CLASS="ENVAR"
+>PGDATANEW</TT
+></P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-j</TT
+><BR><TT
+CLASS="OPTION"
+>--jobs</TT
+></DT
+><DD
+><P
+>число одновременно задействуемых процессов или потоков</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-k</TT
+><BR><TT
+CLASS="OPTION"
+>--link</TT
+></DT
+><DD
+><P
+>использовать жёсткие ссылки вместо копирования файлов в новый кластер (в Windows использовать точки соединения)</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-o</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>параметры</I
+></TT
+><BR><TT
+CLASS="OPTION"
+>--old-options</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>параметры</I
+></TT
+></DT
+><DD
+><P
+>параметры, передаваемые непосредственно старой программе <TT
+CLASS="COMMAND"
+>postgres</TT
+></P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-O</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>параметры</I
+></TT
+><BR><TT
+CLASS="OPTION"
+>--new-options</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>параметры</I
+></TT
+></DT
+><DD
+><P
+>параметры, передаваемые непосредственно новой программе <TT
+CLASS="COMMAND"
+>postgres</TT
+></P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-p</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>порт</I
+></TT
+><BR><TT
+CLASS="OPTION"
+>--old-port=</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>порт</I
+></TT
+></DT
+><DD
+><P
+>номер порта старого кластера; переменная окружения <TT
+CLASS="ENVAR"
+>PGPORTOLD</TT
+></P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-P</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>порт</I
+></TT
+><BR><TT
+CLASS="OPTION"
+>--new-port=</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>порт</I
+></TT
+></DT
+><DD
+><P
+>номер порта нового кластера; переменная окружения <TT
+CLASS="ENVAR"
+>PGPORTNEW</TT
+></P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-r</TT
+><BR><TT
+CLASS="OPTION"
+>--retain</TT
+></DT
+><DD
+><P
+>сохранить SQL и журналы сообщений даже при успешном завершении</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-U</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+><BR><TT
+CLASS="OPTION"
+>--username=</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+></DT
+><DD
+><P
+>имя суперпользователя кластера; переменная окружения <TT
+CLASS="ENVAR"
+>PGUSER</TT
+></P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-v</TT
+><BR><TT
+CLASS="OPTION"
+>--verbose</TT
+></DT
+><DD
+><P
+>включить подробные внутренние сообщения</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-V</TT
+><BR><TT
+CLASS="OPTION"
+>--version</TT
+></DT
+><DD
+><P
+>показать версию, а затем завершиться</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-?</TT
+><BR><TT
+CLASS="OPTION"
+>--help</TT
+></DT
+><DD
+><P
+>показать справку, а затем завершиться</P
+></DD
+></DL
+></DIV
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN127767"
+></A
+><H2
+>Usage</H2
+><P
+>Далее описан план обновления с использованием <SPAN
+CLASS="APPLICATION"
+>pg_upgrade</SPAN
+>:</P
+><DIV
+CLASS="PROCEDURE"
+><OL
+TYPE="1"
+><LI
+CLASS="STEP"
+><P
+><B
+>Переместить старый кластер (необязательно)</B
+></P
+><P
+>Если ваш каталог инсталляции привязан к версии, например, <TT
+CLASS="FILENAME"
+>/opt/PostgreSQL/9.1</TT
+>, перемещать его не требуется. Все графические инсталляторы выбирают при установке каталоги, привязанные к версии.</P
+><P
+>Если ваш каталог инсталляции не привязан к версии, например <TT
+CLASS="FILENAME"
+>/usr/local/pgsql</TT
+>, необходимо переместить каталог текущей инсталляции PostgreSQL, чтобы он не конфликтовал с новой инсталляцией <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Когда текущий сервер <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> отключён, каталог этой инсталляции PostgreSQL можно безопасно переместить; если старый каталог <TT
+CLASS="FILENAME"
+>/usr/local/pgsql</TT
+>, его можно переименовать, выполнив: </P><PRE
+CLASS="PROGRAMLISTING"
+>mv /usr/local/pgsql /usr/local/pgsql.old</PRE
+><P></P
+></LI
+><LI
+CLASS="STEP"
+><P
+><B
+>Собрать новую версию при установке из исходного кода</B
+></P
+><P
+>Соберите из исходного кода новую версию PostgreSQL с флагами <TT
+CLASS="COMMAND"
+>configure</TT
+>, совместимыми с флагами старого кластера. Программа <SPAN
+CLASS="APPLICATION"
+>pg_upgrade</SPAN
+> проверит результаты <TT
+CLASS="COMMAND"
+>pg_controldata</TT
+>, чтобы убедиться, что все параметры совместимы, прежде чем начинать обновление.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+><B
+>Установить новые исполняемые файлы PostgreSQL</B
+></P
+><P
+>Установите новые исполняемые файлы сервера и вспомогательные файлы.</P
+><P
+>При установке из исходного кода, если вы хотите разместить сервер в нестандартном каталоге, воспользуйтесь переменной <TT
+CLASS="LITERAL"
+>prefix</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>make prefix=/usr/local/pgsql.new install</PRE
+><P></P
+></LI
+><LI
+CLASS="STEP"
+><P
+><B
+>Установить pg_upgrade и pg_upgrade_support</B
+></P
+><P
+>Установите программу <SPAN
+CLASS="APPLICATION"
+>pg_upgrade</SPAN
+> и библиотеку <SPAN
+CLASS="APPLICATION"
+>pg_upgrade_support</SPAN
+> в новую инсталляцию PostgreSQL.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+><B
+>Инициализировать новый кластер PostgreSQL</B
+></P
+><P
+>Инициализируйте новый кластер, используя <TT
+CLASS="COMMAND"
+>initdb</TT
+>. При этом так же необходимо указать флаги <TT
+CLASS="COMMAND"
+>initdb</TT
+>, совместимые с флагами в старом кластере. Многие готовые инсталляторы выполняют это действие автоматически. Запускать новый кластер не требуется.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+><B
+>Установить дополнительные разделяемые объектные файлы</B
+></P
+><P
+>Установите в новый кластер все нестандартные разделяемые объектные файлы (или DLL), которые использовались в старом кластере, например, <TT
+CLASS="FILENAME"
+>pgcrypto.so</TT
+>, где бы они ни находились — в <TT
+CLASS="FILENAME"
+>contrib</TT
+> или в другом месте. Устанавливать определения схемы, например <TT
+CLASS="FILENAME"
+>pgcrypto.sql</TT
+>, не требуется, так как они будут перенесены из старого кластера.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+><B
+>Настроить аутентификацию</B
+></P
+><P
+>Программа <TT
+CLASS="COMMAND"
+>pg_upgrade</TT
+> будет подключаться к новому и старому серверу несколько раз, так что имеет смысл установить режим аутентификации <TT
+CLASS="LITERAL"
+>peer</TT
+> в <TT
+CLASS="FILENAME"
+>pg_hba.conf</TT
+> или использовать файл <TT
+CLASS="FILENAME"
+>~/.pgpass</TT
+> (см. <A
+HREF="libpq-pgpass.html"
+>Раздел 31.15</A
+>).</P
+></LI
+><LI
+CLASS="STEP"
+><P
+><B
+>Остановить оба сервера</B
+></P
+><P
+>Убедитесь в том, что оба сервера баз данных остановлены. Для этого в Unix можно выполнить: </P><PRE
+CLASS="PROGRAMLISTING"
+>pg_ctl -D /opt/PostgreSQL/8.4 stop
+pg_ctl -D /opt/PostgreSQL/9.0 stop</PRE
+><P> А в Windows, в зависимости от имени службы: </P><PRE
+CLASS="PROGRAMLISTING"
+>NET STOP postgresql-8.4
+NET STOP postgresql-9.0</PRE
+><P> или </P><PRE
+CLASS="PROGRAMLISTING"
+>NET STOP pgsql-8.3  (В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> версии 8.3 и старее имя службы было другим)</PRE
+><P></P
+></LI
+><LI
+CLASS="STEP"
+><P
+><B
+>Запустите <SPAN
+CLASS="APPLICATION"
+>pg_upgrade</SPAN
+></B
+></P
+><P
+>Всегда запускайте программу <SPAN
+CLASS="APPLICATION"
+>pg_upgrade</SPAN
+> от нового сервера, а не от старого. <SPAN
+CLASS="APPLICATION"
+>pg_upgrade</SPAN
+> требует указания каталогов данных старого и нового кластера, а также каталогов исполняемых файлов (<TT
+CLASS="FILENAME"
+>bin</TT
+>). Вы можете также определить имя пользователя и номера портов, и следует ли ограничиться ссылкой на данные, а не копировать их (по умолчанию).</P
+><P
+>Если выбрать вариант со ссылкой на данные, обновление выполнится гораздо быстрее (так как файлы не копируются) и потребует меньше места на диске, но вы лишитесь возможности обращаться к вашему старому кластеру, запустив новый после обновления. Этот вариант также требует, чтобы каталоги данных старого и нового кластера располагались в одной файловой системе. (Табличные пространства и <TT
+CLASS="FILENAME"
+>pg_xlog</TT
+> могут находиться в других файловых системах.) Полный список параметров вы можете получить, выполнив <TT
+CLASS="LITERAL"
+>pg_upgrade --help</TT
+>.</P
+><P
+>Параметр <TT
+CLASS="OPTION"
+>--jobs</TT
+> позволяет задействовать для копирования/связывания файлов и для выгрузки/перезагрузки схем баз данных несколько процессорных ядер. В качестве начального значения параметра стоит выбрать максимум из числа процессорных ядер и числа табличных пространств. Этот параметр может радикально сократить время обновления сервера со множеством баз данных, работающего в многопроцессорной системе.</P
+><P
+>В Windows вы должны войти в систему с административными полномочиями, затем запустить командную строку от имени пользователя <TT
+CLASS="LITERAL"
+>postgres</TT
+>, задать подходящий путь: </P><PRE
+CLASS="PROGRAMLISTING"
+>RUNAS /USER:postgres "CMD.EXE"
+SET PATH=%PATH%;C:\Program Files\PostgreSQL\9.0\bin;</PRE
+><P> Наконец, запустить <SPAN
+CLASS="APPLICATION"
+>pg_upgrade</SPAN
+> с путями каталогов в кавычках, например, так: </P><PRE
+CLASS="PROGRAMLISTING"
+>pg_upgrade.exe
+        --old-datadir "C:/Program Files/PostgreSQL/8.4/data"
+        --new-datadir "C:/Program Files/PostgreSQL/9.0/data"
+        --old-bindir "C:/Program Files/PostgreSQL/8.4/bin"
+        --new-bindir "C:/Program Files/PostgreSQL/9.0/bin"</PRE
+><P> При запуске <TT
+CLASS="COMMAND"
+>pg_upgrade</TT
+> проверит два кластера на совместимость и, если всё в порядке, выполнит обновление. Также возможно запустить <TT
+CLASS="COMMAND"
+>pg_upgrade --check</TT
+>, чтобы ограничиться только проверками (при этом старый сервер может продолжать работать). Команда <TT
+CLASS="COMMAND"
+>pg_upgrade --check</TT
+> также сообщит, какие коррективы вам нужно будет внести вручную после обновления. Если вы планируете использовать режим ссылок на данные, укажите вместе с <TT
+CLASS="OPTION"
+>--check</TT
+> параметр <TT
+CLASS="OPTION"
+>--link</TT
+>, чтобы были проведены специальные проверки для этого режима. Программе <TT
+CLASS="COMMAND"
+>pg_upgrade</TT
+> требуются права на запись в текущий каталог.</P
+><P
+>Очевидно, никто не должен обращаться к кластерам в процессе обновления. Программа <SPAN
+CLASS="APPLICATION"
+>pg_upgrade</SPAN
+> по умолчанию запускает серверы с портом 50432, чтобы не допустить нежелательных клиентских подключений. В процессе обновления оба кластера могут использовать один номер порта, так как они не будут работать одновременно. Однако для проверки старого работающего сервера новый порт должен отличаться от старого.</P
+><P
+>Если при восстановлении схемы базы данных происходит ошибка, <TT
+CLASS="COMMAND"
+>pg_upgrade</TT
+> завершает свою работу и вы должны вернуться к старому кластеру, как описывается ниже в <A
+HREF="pgupgrade.html#PGUPGRADE-STEP-REVERT"
+>Шаге 14</A
+>. Прежде чем попробовать <TT
+CLASS="COMMAND"
+>pg_upgrade</TT
+> ещё раз, вы должны внести коррективы в старом кластере, чтобы pg_upgrade могла успешно восстановить схему. Если проблема возникла в дополнительном модуле, может потребоваться удалить этот модуль в старом кластере, а затем установить его в новом после обновления (предполагается, что этот модуль не хранит пользовательские данные).</P
+></LI
+><LI
+CLASS="STEP"
+><P
+><B
+>Восстановить <TT
+CLASS="FILENAME"
+>pg_hba.conf</TT
+></B
+></P
+><P
+>Если вы изменяли <TT
+CLASS="FILENAME"
+>pg_hba.conf</TT
+>, восстановите его исходное состояние. Также может потребоваться скорректировать другие файлы конфигурации в новом кластере, чтобы они соответствовали старому, например <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+>.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+><B
+>Действия после обновления</B
+></P
+><P
+>Если после обновления требуются какие-то дополнительные действия, программа pg_upgrade выдаст предупреждения об этом по завершении работы. Она также сгенерирует файлы скриптов, которые должны запускаться администратором. Эти скрипты будут подключаться к каждой базе данных, требующей дополнительных операций. Каждый такой скрипт следует выполнять командой: </P><PRE
+CLASS="PROGRAMLISTING"
+>psql --username postgres --file script.sql postgres</PRE
+><P> Эти скрипты могут выполняться в любом порядке, а после выполнения их можно удалить.</P
+><DIV
+CLASS="CAUTION"
+><P
+></P
+><TABLE
+CLASS="CAUTION"
+BORDER="1"
+WIDTH="100%"
+><TR
+><TD
+ALIGN="CENTER"
+><B
+>Предостережение</B
+></TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+><P
+>Обычно к таблицам, задействованным в перестраивающих базу скриптах, опасно обращаться, пока эти скрипты не сделают свою работу; при этом можно получить некорректный результат или плохую производительность. К таблицам, не задействованным в таких скриптах, можно обращаться немедленно.</P
+></TD
+></TR
+></TABLE
+></DIV
+></LI
+><LI
+CLASS="STEP"
+><P
+><B
+>Статистика</B
+></P
+><P
+>Так как статистика оптимизатора не передаётся в процессе работы <TT
+CLASS="COMMAND"
+>pg_upgrade</TT
+>, вы получите указание запустить соответствующую команду для воссоздания этой информации после обновления. Возможно, для этого вам понадобится установить параметры подключения к новому кластеру.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+><B
+>Удалить старый кластер</B
+></P
+><P
+>Если вы удовлетворены результатами обновления, вы можете удалить каталоги данных старого кластера, запустив скрипт, упомянутый в выводе <TT
+CLASS="COMMAND"
+>pg_upgrade</TT
+> после обновления. (Автоматическое удаление невозможно, если в старом каталоге данных находятся дополнительные табличные пространства.) Также вы можете удалить каталоги старой инсталляции (например, <TT
+CLASS="FILENAME"
+>bin</TT
+>, <TT
+CLASS="FILENAME"
+>share</TT
+>).</P
+></LI
+><LI
+CLASS="STEP"
+><A
+NAME="PGUPGRADE-STEP-REVERT"
+></A
+><P
+><B
+>Возврат к старому кластеру</B
+></P
+><P
+>Если выполнив команду <TT
+CLASS="COMMAND"
+>pg_upgrade</TT
+>, вы захотите вернуться к старому кластеру, возможны следующие варианты: <P
+></P
+></P><UL
+><LI
+><P
+>Если <TT
+CLASS="COMMAND"
+>pg_upgrade</TT
+> запускалась с ключом <TT
+CLASS="OPTION"
+>--check</TT
+>, никакие изменения в старом кластере не производились и его использование можно продолжить в любой момент.</P
+></LI
+><LI
+><P
+>Если <TT
+CLASS="COMMAND"
+>pg_upgrade</TT
+> запускалась с параметром <TT
+CLASS="OPTION"
+>--link</TT
+>, файлы данных будут разделяться старым и новым кластером. Если новый кластер уже запускался, он произвёл запись в эти файлы, так что использовать старый кластер небезопасно.</P
+></LI
+><LI
+><P
+>Если <TT
+CLASS="COMMAND"
+>pg_upgrade</TT
+> запускалась <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>без</I
+></SPAN
+>
+        ключа <TT
+CLASS="OPTION"
+>--link</TT
+> или новый сервер не запускался, старый кластер не претерпел никаких изменений, за исключением того, что в режиме ссылки на данные к имени <TT
+CLASS="FILENAME"
+>$PGDATA/global/pg_control</TT
+> было добавлено окончание <TT
+CLASS="LITERAL"
+>.old</TT
+>. Чтобы продолжить использование старого кластера, можно просто убрать окончание <TT
+CLASS="FILENAME"
+>.old</TT
+> из имени файла <TT
+CLASS="FILENAME"
+>$PGDATA/global/pg_control</TT
+>; после этого старый кластер можно будет перезапустить.</P
+></LI
+></UL
+><P></P
+></LI
+></OL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN127898"
+></A
+><H2
+>Замечания</H2
+><P
+><SPAN
+CLASS="APPLICATION"
+>pg_upgrade</SPAN
+> не поддерживает обновление баз данных, содержащих следующие ссылающиеся на OID системные типы данных <TT
+CLASS="TYPE"
+>reg*</TT
+>: <TT
+CLASS="TYPE"
+>regproc</TT
+>, <TT
+CLASS="TYPE"
+>regprocedure</TT
+>, <TT
+CLASS="TYPE"
+>regoper</TT
+>, <TT
+CLASS="TYPE"
+>regoperator</TT
+>, <TT
+CLASS="TYPE"
+>regconfig</TT
+> и <TT
+CLASS="TYPE"
+>regdictionary</TT
+>. (Обновление <TT
+CLASS="TYPE"
+>regtype</TT
+> возможно.)</P
+><P
+>Программа <SPAN
+CLASS="APPLICATION"
+>pg_upgrade</SPAN
+> сообщит обо всех актуальных для вашей инсталляции ошибках и потребностях перестроения или переиндексации базы; при этом будут созданы завершающие обновление скрипты, перестраивающие таблицы или индексы. Если вы попытаетесь автоматизировать обновление множества серверов, вы обнаружите, что для кластеров с одинаковыми схемами баз данных потребуются одинаковые действия после обновления; это объясняется тем, что эти действия диктуются схемой базы данных, а не данными пользователей.</P
+><P
+>Для проверки развёртывания новой версии создайте копию только схемы старого кластера, наполните этот кластер фиктивными данными, и попробуйте обновить его.</P
+><P
+>Если вы производите обновление кластера <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> версии до 9.2, в которой используется каталог только с файлами конфигурации, вы должны передать расположение собственно каталога с данными программе <SPAN
+CLASS="APPLICATION"
+>pg_upgrade</SPAN
+>, а расположение каталога конфигурации передать серверу, например <TT
+CLASS="LITERAL"
+>-d /каталог-данных -o '-D /каталог-конфигурации'</TT
+>.</P
+><P
+>Если вы используете старый сервер версии до 9.1, работающий с нестандартным каталогом доменных сокетов Unix, либо его стандартное расположение отличается от принятого в новой версии, задайте в <TT
+CLASS="ENVAR"
+>PGHOST</TT
+> расположение сокета старого сервера. (К Windows это не относится.)</P
+><P
+>Резервные серверы, принимающие журналы (см. <A
+HREF="warm-standby.html"
+>Раздел 25.2</A
+>), обновить таким способом нельзя, так как они должны допускать запись. Поэтому проще всего будет обновить ведущий сервер, а затем перестроить резервные, применив <TT
+CLASS="COMMAND"
+>rsync</TT
+>. Вы можете запустить <TT
+CLASS="COMMAND"
+>rsync</TT
+>, когда ведущий будет отключён, либо в ходе восстановления базовой копии (см. <A
+HREF="continuous-archiving.html#BACKUP-BASE-BACKUP"
+>Подраздел 24.3.2</A
+>), что приведёт к перезаписи старого резервного кластера.</P
+><P
+>Если вы хотите использовать режим ссылок на данные, но не хотите каких-либо изменений в старом кластере при запуске нового, сделайте копию старого кластера и обновите его в этом режиме. Чтобы получить рабочую копию старого кластера, воспользуйтесь командой <TT
+CLASS="COMMAND"
+>rsync</TT
+> и создайте предварительную копию кластера при работающем сервере, а затем отключите старый сервер и ещё раз запустите <TT
+CLASS="COMMAND"
+>rsync</TT
+>, чтобы привести эту копию в согласованное состояние. При этом вы можете исключить некоторые файлы, например <TT
+CLASS="FILENAME"
+>postmaster.pid</TT
+>, как описано в <A
+HREF="continuous-archiving.html#BACKUP-LOWLEVEL-BASE-BACKUP"
+>Подразделе 24.3.3</A
+>. Если ваша файловая система поддерживает снимки файловой системы или копирование при записи, вы можете воспользоваться этим для создания копии старого кластера и табличных пространств; при этом важно, чтобы такие снимки и копии файлов создавались одномоментно или когда сервер баз данных отключён.</P
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN127929"
+></A
+><H3
+>Ограничения при обновлении с PostgreSQL 8.3</H3
+><P
+>При обновлении PostgreSQL <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>с версии</I
+></SPAN
+> 8.3 накладываются ограничения, отсутствующие при обновлении с более новых выпусков PostgreSQL. Например, pg_upgrade не сможет выполнить обновление с версии 8.3, если пользовательская колонка: <P
+></P
+></P><UL
+><LI
+><P
+>имеет тип данных <TT
+CLASS="TYPE"
+>tsquery</TT
+></P
+></LI
+><LI
+><P
+>имеет тип данных <TT
+CLASS="TYPE"
+>name</TT
+> и это не первая колонка</P
+></LI
+></UL
+><P></P
+><P
+>Вы должны удалить все такие колонки и обновить (воссоздать) их вручную.</P
+><P
+>pg_upgrade не будет работать, если в базе данных установлен дополнительный модуль <TT
+CLASS="FILENAME"
+>ltree</TT
+>.</P
+><P
+>pg_upgrade потребует перестроить таблицу, если: <P
+></P
+></P><UL
+><LI
+><P
+>пользовательская колонка имеет тип данных <TT
+CLASS="TYPE"
+>tsvector</TT
+></P
+></LI
+></UL
+><P></P
+><P
+>pg_upgrade потребует произвести переиндексацию, если: <P
+></P
+></P><UL
+><LI
+><P
+>тип индекса — хеш или GIN</P
+></LI
+><LI
+><P
+>индекс использует <CODE
+CLASS="FUNCTION"
+>bpchar_pattern_ops</CODE
+></P
+></LI
+></UL
+><P></P
+><P
+>Кроме того, после <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> 8.3 у типа даты/времени формат хранения поменялся на целочисленный. Программа pg_upgrade перед обновлением проверит, совпадает ли формат хранения в старом и новом кластере. Поэтому убедитесь в том, что новый кластер был собран с флагом configure <TT
+CLASS="OPTION"
+>--disable-integer-datetimes</TT
+>.</P
+><P
+>Пользователям Windows следует заметить, что графический инсталлятор и инсталлятор MSI определяют целочисленный формат дат/времени по-разному. Поэтому только поставленную графическим инсталлятором версию 8.3 можно обновить до версии 8.4 или более поздней. Версию, поставленную инсталлятором MSI, обновить до новой версии, устанавливаемой графическим инсталлятором, нельзя.</P
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN127959"
+></A
+><H2
+>См. также</H2
+><A
+HREF="app-initdb.html"
+>initdb</A
+>, <A
+HREF="app-pg-ctl.html"
+>            <SPAN
+CLASS="APPLICATION"
+>pg_ctl</SPAN
+>
+          </A
+>, <A
+HREF="app-pgdump.html"
+>pg_dump</A
+>, <A
+HREF="app-postgres.html"
+>            <SPAN
+CLASS="APPLICATION"
+>postgres</SPAN
+>
+          </A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="pgtesttiming.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="pgxlogdump.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><SPAN
+CLASS="APPLICATION"
+>pg_test_timing</SPAN
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="contrib-prog-server.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><SPAN
+CLASS="APPLICATION"
+>pg_xlogdump</SPAN
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

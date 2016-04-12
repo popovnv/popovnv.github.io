@@ -1,0 +1,279 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>intagg</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Дополнительно поставляемые модули"
+HREF="contrib.html"><LINK
+REL="PREVIOUS"
+TITLE="hstore"
+HREF="hstore.html"><LINK
+REL="NEXT"
+TITLE="intarray"
+HREF="intarray.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="hstore"
+HREF="hstore.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Приложение E. Дополнительно поставляемые модули</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="intarray"
+HREF="intarray.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="INTAGG"
+>E.17. intagg</A
+></H1
+><P
+>Модуль <TT
+CLASS="FILENAME"
+>intagg</TT
+> предоставляет агрегатор и нумератор целых чисел. На данный момент имеются встроенные функции, предлагающие более широкие возможности, поэтому <TT
+CLASS="FILENAME"
+>intagg</TT
+> считается устаревшим. Однако этот модуль продолжает существовать для обратной совместимости, теперь как набор обёрток встроенных функций.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN121341"
+>E.17.1. Функции</A
+></H2
+><P
+>Агрегатор реализуется функцией <CODE
+CLASS="FUNCTION"
+>int_array_aggregate(integer)</CODE
+>, которая выдаёт массив целых чисел, содержащий в точности те числа, что переданы ей. Это обёртка встроенной функции <CODE
+CLASS="FUNCTION"
+>array_agg</CODE
+>, которая делает то же самое для массива любого типа.</P
+><P
+>Нумератор реализуется функцией <CODE
+CLASS="FUNCTION"
+>int_array_enum(integer[])</CODE
+>, которая возвращает набор целых (<TT
+CLASS="TYPE"
+>setof integer</TT
+>). По сути его действие обратно действие агрегатора: получив массив целых, он разворачивает его в набор строк. Это оболочка функции <CODE
+CLASS="FUNCTION"
+>unnest</CODE
+>, которая делает то же самое для массива любого типа.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN121356"
+>E.17.2. Примеры использования</A
+></H2
+><P
+>Во многих СУБД есть понятие таблицы соотношений &laquo;один ко многим&raquo;. Такая таблица обычно находится между двумя индексированными таблицами, например: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE left (id INT PRIMARY KEY, ...);
+CREATE TABLE right (id INT PRIMARY KEY, ...);
+CREATE TABLE one_to_many(left INT REFERENCES left, right INT REFERENCES right);</PRE
+><P> Как правило, она используется так: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT right.* from right JOIN one_to_many ON (right.id = one_to_many.right)
+  WHERE one_to_many.left = <TT
+CLASS="REPLACEABLE"
+><I
+>item</I
+></TT
+>;</PRE
+><P> Этот запрос вернёт все элементы из таблицы справа для записи в таблице слева. Это очень распространённая конструкция в SQL.</P
+><P
+>Однако этот подход может вызывать затруднения с очень большим количеством записей в таблице <TT
+CLASS="STRUCTNAME"
+>one_to_many</TT
+>. Часто такое соединение влечёт сканирование индекса и выборку каждой записи в таблице справа для конкретного элемента слева. Если у вас динамическая система, с этим ничего не поделать. Но если какое-то множество данных довольно статическое, вы можете создать сводную таблицу, применив агрегатор. </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE summary AS
+  SELECT left, int_array_aggregate(right) AS right
+  FROM one_to_many
+  GROUP BY left;</PRE
+><P> Эта команда создаст таблицу, содержащую одну строку для каждого элемента слева с массивом элементов справа. Она малополезна, пока не найден подходящий способ использования этого массива; именно для этого и нужен нумератор массива. Вы можете выполнить: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT left, int_array_enum(right) FROM summary WHERE left = <TT
+CLASS="REPLACEABLE"
+><I
+>элемент</I
+></TT
+>;</PRE
+><P> Приведённый выше запрос с вызовом <CODE
+CLASS="FUNCTION"
+>int_array_enum</CODE
+> выдаёт те же результаты, что и </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT left, right FROM one_to_many WHERE left = <TT
+CLASS="REPLACEABLE"
+><I
+>элемент</I
+></TT
+>;</PRE
+><P> Отличие состоит в том, что запрос к сводной таблице должен выдать только одну строку таблицы, тогда как непосредственный запрос к <TT
+CLASS="STRUCTNAME"
+>one_to_many</TT
+> потребует сканирования индекса и выборки строки для каждой записи.</P
+><P
+>На тестовом компьютере команда <TT
+CLASS="COMMAND"
+>EXPLAIN</TT
+> показала, что стоимость запроса снизилась с 8488 до 329. Исходный запрос выполнял соединение с таблицей <TT
+CLASS="STRUCTNAME"
+>one_to_many</TT
+> и был заменён на: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT right, count(right) FROM
+  ( SELECT left, int_array_enum(right) AS right
+    FROM summary JOIN (SELECT left FROM left_table WHERE left = <TT
+CLASS="REPLACEABLE"
+><I
+>элемент</I
+></TT
+>) AS lefts
+         ON (summary.left = lefts.left)
+  ) AS list
+  GROUP BY right
+  ORDER BY count DESC;</PRE
+><P></P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="hstore.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="intarray.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>hstore</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>intarray</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

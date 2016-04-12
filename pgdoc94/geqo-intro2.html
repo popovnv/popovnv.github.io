@@ -1,0 +1,278 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Генетические алгоритмы</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Генетический оптимизатор запросов"
+HREF="geqo.html"><LINK
+REL="PREVIOUS"
+TITLE="Обработка запроса как сложная задача оптимизации"
+HREF="geqo-intro.html"><LINK
+REL="NEXT"
+TITLE="Генетическая оптимизация запросов (GEQO) в PostgreSQL"
+HREF="geqo-pg-intro.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Обработка запроса как сложная задача оптимизации"
+HREF="geqo-intro.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="geqo.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 54. Генетический оптимизатор запросов</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Генетическая оптимизация запросов (GEQO) в PostgreSQL"
+HREF="geqo-pg-intro.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="GEQO-INTRO2"
+>54.2. Генетические алгоритмы</A
+></H1
+><P
+>Генетический алгоритм (<ACRONYM
+CLASS="ACRONYM"
+>ГА</ACRONYM
+>) реализует метод эвристической оптимизации, построенный на случайном поиске. В данном контексте множество возможных решений проблемы оптимизации называется <I
+CLASS="FIRSTTERM"
+>популяцией</I
+> <I
+CLASS="FIRSTTERM"
+>особей</I
+>. Степень адаптации особи к среде определяет функция <I
+CLASS="FIRSTTERM"
+>приспособленности</I
+>.</P
+><P
+>Координаты особи в пространстве поиска представляются <I
+CLASS="FIRSTTERM"
+>хромосомами</I
+>, которые по сути являются символьными строками. Фрагмент хромосомы, кодирующий значение одного оптимизируемого параметра, называется <I
+CLASS="FIRSTTERM"
+>геном</I
+>. Обычно ген кодируется в виде <I
+CLASS="FIRSTTERM"
+>двоичного</I
+> или <I
+CLASS="FIRSTTERM"
+>целочисленного</I
+> значения.</P
+><P
+>В результате симуляции эволюционных операций (<I
+CLASS="FIRSTTERM"
+>скрещивания</I
+>, <I
+CLASS="FIRSTTERM"
+>мутации</I
+> и <I
+CLASS="FIRSTTERM"
+>селекции</I
+>) данный алгоритм формирует новые поколения особей, у которых приспособленность в среднем будет выше, чем у их предшественников.</P
+><P
+>Как сказано в ответах на вопросы в группе <SPAN
+CLASS="SYSTEMITEM"
+>comp.ai.genetic</SPAN
+>, нельзя не отметить, что <ACRONYM
+CLASS="ACRONYM"
+>ГА</ACRONYM
+> реализует не чисто случайный поиск решения проблемы. В <ACRONYM
+CLASS="ACRONYM"
+>ГА</ACRONYM
+> происходят вероятностные процессы, но результат явно оказывается не случайным (лучше случайного).</P
+><DIV
+CLASS="FIGURE"
+><A
+NAME="GEQO-DIAGRAM"
+></A
+><P
+><B
+>Рисунок 54-1. Диаграмма структуры генетического алгоритма</B
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><P
+></P
+><A
+NAME="AEN105681"
+></A
+><TABLE
+BORDER="0"
+FRAME="void"
+CLASS="CALSTABLE"
+><COL><COL><TBODY
+><TR
+><TD
+>P(t)</TD
+><TD
+>поколение предков на момент t</TD
+></TR
+><TR
+><TD
+>P''(t)</TD
+><TD
+>поколение потомков на момент t</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+><PRE
+CLASS="LITERALLAYOUT"
+>+=========================================+
+|&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;  Algorithm GA  &lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;|
++=========================================+
+| ИНИЦИАЛИЗАЦИЯ t := 0                    |
++=========================================+
+| ИНИЦИАЛИЗАЦИЯ P(t)                      |
++=========================================+
+| вычислить ПРИСПОСОБЛЕННОСТЬ P(t)        |
++=========================================+
+| пока не выполняется УСЛОВИЕ ОСТАНОВКИ   |
+|   +-------------------------------------+
+|   | P'(t)  := СКРЕЩИВАНИЕ{P(t)}         |
+|   +-------------------------------------+
+|   | P''(t) := МУТАЦИЯ{P'(t)}            |
+|   +-------------------------------------+
+|   | P(t+1) := СЕЛЕКЦИЯ{P''(t) + P(t)}   |
+|   +-------------------------------------+
+|   | вычислить ПРИСПОСОБЛЕННОСТЬ P''(t)  |
+|   +-------------------------------------+
+|   | t := t + 1                          |
++===+=====================================+</PRE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="geqo-intro.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="geqo-pg-intro.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Обработка запроса как сложная задача оптимизации</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="geqo.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Генетическая оптимизация запросов (<ACRONYM
+CLASS="ACRONYM"
+>GEQO</ACRONYM
+>) в PostgreSQL</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

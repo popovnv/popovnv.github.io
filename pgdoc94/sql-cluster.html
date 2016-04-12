@@ -1,0 +1,439 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>CLUSTER</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="CLOSE"
+HREF="sql-close.html"><LINK
+REL="NEXT"
+TITLE="COMMENT"
+HREF="sql-comment.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="CLOSE"
+HREF="sql-close.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="COMMENT"
+HREF="sql-comment.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-CLUSTER"
+></A
+>CLUSTER</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN71231"
+></A
+><H2
+>Название</H2
+>CLUSTER&nbsp;--&nbsp;кластеризовать таблицу согласно индексу</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN71234"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>CLUSTER [VERBOSE] <TT
+CLASS="REPLACEABLE"
+><I
+>table_name</I
+></TT
+> [ USING <TT
+CLASS="REPLACEABLE"
+><I
+>имя_индекса</I
+></TT
+> ]
+CLUSTER [VERBOSE]</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN71238"
+></A
+><H2
+>Описание</H2
+><P
+>Оператор <TT
+CLASS="COMMAND"
+>CLUSTER</TT
+> указывает <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> кластеризовать таблицу, заданную параметром <TT
+CLASS="REPLACEABLE"
+><I
+>имя_таблицы</I
+></TT
+>, согласно индексу, заданному параметром <TT
+CLASS="REPLACEABLE"
+><I
+>имя_индекса</I
+></TT
+>. Указанный индекс уже должен быть определён в таблице <TT
+CLASS="REPLACEABLE"
+><I
+>имя_таблицы</I
+></TT
+>.</P
+><P
+>В результате кластеризации таблицы её содержимое физически переупорядочивается в зависимости от индекса. Кластеризация является одноразовой операцией: последующие изменения в таблице нарушают порядок кластеризации. Другими словами, система не пытается автоматически сохранять порядок новых или изменённых строк в соответствии с индексом. (Если такое желание возникает, можно периодически повторять кластеризацию, выполняя команду снова. Кроме того, если для заданной таблицы установить параметр <TT
+CLASS="LITERAL"
+>FILLFACTOR</TT
+> меньше 100%, это может помочь сохранить порядок кластеризации при изменениях, так как изменяемые строки будут помещаться в ту же страницу, если в ней достаточно места.)</P
+><P
+>Когда таблица кластеризована, <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> запоминает, по какому именно индексу. Форма <TT
+CLASS="COMMAND"
+>CLUSTER <TT
+CLASS="REPLACEABLE"
+><I
+>имя_таблицы</I
+></TT
+></TT
+> повторно кластеризует таблицу по тому же индексу. Для установки индекса, который будет использоваться для будущих операций кластеризации, или очистки предыдущего значения можно также применить команду <TT
+CLASS="LITERAL"
+>CLUSTER</TT
+> или формы <TT
+CLASS="LITERAL"
+>SET WITHOUT CLUSTER</TT
+> команды <A
+HREF="sql-altertable.html"
+>ALTER TABLE</A
+>.</P
+><P
+><TT
+CLASS="COMMAND"
+>CLUSTER</TT
+> без параметров повторно кластеризует все ранее кластеризованные таблицы в текущей базе данных, принадлежащие пользователю, вызывающему команду, или все такие таблицы, если её вызывает суперпользователь. Эту форму <TT
+CLASS="COMMAND"
+>CLUSTER</TT
+> нельзя выполнять внутри блока транзакции.</P
+><P
+>В процессе кластеризации таблицы для неё запрашивается блокировка <TT
+CLASS="LITERAL"
+>ACCESS EXCLUSIVE</TT
+>. Это препятствует выполнению всех других операций (чтению и записи) с таблицей до завершения <TT
+CLASS="COMMAND"
+>CLUSTER</TT
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN71261"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>table_name</I
+></TT
+></DT
+><DD
+><P
+>Имя (возможно, дополненное схемой) таблицы.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_индекса</I
+></TT
+></DT
+><DD
+><P
+>Имя индекса.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>VERBOSE</TT
+></DT
+><DD
+><P
+>Выводит отчёт о процессе кластеризации по мере обработки таблиц.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN71279"
+></A
+><H2
+>Замечания</H2
+><P
+>В случаях, когда происходит обращение к случайным единичным строкам таблицы, фактический порядок данных в этой таблице не важен. Но если обращения к одним данным происходят чаще, чем к другим, и есть индекс, которые собирает их вместе, применение команды <TT
+CLASS="COMMAND"
+>CLUSTER</TT
+> может быть полезным. Например, когда из таблицы запрашивается диапазон индексированных значений, либо одно индексированное значение, которому соответствуют несколько строк, <TT
+CLASS="COMMAND"
+>CLUSTER</TT
+> может помочь, так как страница таблицы, найденная по индексу для первой искомой строки, скорее всего, будет содержать и все остальные искомые строки. Таким образом, кластеризация помогает соптимизировать обращения к диску и ускорить запросы.</P
+><P
+><TT
+CLASS="COMMAND"
+>CLUSTER</TT
+> может переупорядочить таблицу, выполнив либо сканирование указанного индекса, либо (для индексов-B-деревьев) последовательное сканирование, а затем сортировку. Наилучший по скорости вариант будет выбран, исходя из имеющейся статистической информации и параметров планировщика.</P
+><P
+>Когда выбирается сканирование индекса, создаётся временная таблица, содержащая данные целевой таблицы по порядку индекса. Также создаются копии всех индексов таблицы. Таким образом, для этой операции требуется объём дискового пространства не меньше, чем размер таблицы и индексов в сумме.</P
+><P
+>В случае выбора последовательного сканирования и сортировки создаётся ещё и временный файл для сортировки, так что пиковым требованием будет удвоенный размер таблицы плюс размер индексов. Этот метод часто быстрее, чем сканирование по индексу, но если требование к дисковому пространству неприемлемо, можно отключить его выбор, временно установив <A
+HREF="runtime-config-query.html#GUC-ENABLE-SORT"
+>enable_sort</A
+> в <TT
+CLASS="LITERAL"
+>off</TT
+>.</P
+><P
+>Перед кластеризацией рекомендуется установить в <A
+HREF="runtime-config-resource.html#GUC-MAINTENANCE-WORK-MEM"
+>maintenance_work_mem</A
+> достаточно большое значение (но не больше, чем объём ОЗУ, который вы хотите выделить для операции <TT
+CLASS="COMMAND"
+>CLUSTER</TT
+>).</P
+><P
+>Так как планировщик записывает статистику, связанную с порядком таблиц, для вновь кластеризуемых таблиц рекомендуется запускать <A
+HREF="sql-analyze.html"
+>ANALYZE</A
+>. В противном случае планировщик может ошибиться с выбором плана запроса.</P
+><P
+>Так как <TT
+CLASS="COMMAND"
+>CLUSTER</TT
+> запоминает, по каким индексам кластеризованы таблицы, достаточно лишь один раз вручную кластеризовать нужные таблицы, а затем настроить периодический скрипт обслуживания, который будет выполнять <TT
+CLASS="COMMAND"
+>CLUSTER</TT
+> без параметров, с тем чтобы эти таблицы регулярно кластеризовались.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN71298"
+></A
+><H2
+>Примеры</H2
+><P
+>Кластеризация таблицы <TT
+CLASS="LITERAL"
+>employees</TT
+> согласно её индексу <TT
+CLASS="LITERAL"
+>employees_ind</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>CLUSTER employees USING employees_ind;</PRE
+><P></P
+><P
+>Кластеризация таблицы <TT
+CLASS="LITERAL"
+>employees</TT
+> согласно тому же индексу, что был использован ранее: </P><PRE
+CLASS="PROGRAMLISTING"
+>CLUSTER employees;</PRE
+><P></P
+><P
+>Кластеризация всех таблиц в базе данных, что были кластеризованы ранее: </P><PRE
+CLASS="PROGRAMLISTING"
+>CLUSTER;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN71309"
+></A
+><H2
+>Совместимость</H2
+><P
+>Оператор <TT
+CLASS="COMMAND"
+>CLUSTER</TT
+> отсутствует в стандарте SQL.</P
+><P
+>Синтаксис </P><PRE
+CLASS="SYNOPSIS"
+>CLUSTER <TT
+CLASS="REPLACEABLE"
+><I
+>имя_индекса</I
+></TT
+> ON <TT
+CLASS="REPLACEABLE"
+><I
+>имя_таблицы</I
+></TT
+></PRE
+><P> так же является допустимым для совместимости с <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> до версии 8.3.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN71318"
+></A
+><H2
+>См. также</H2
+><A
+HREF="app-clusterdb.html"
+>            <SPAN
+CLASS="APPLICATION"
+>clusterdb</SPAN
+>
+          </A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-close.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-comment.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>CLOSE</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>COMMENT</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

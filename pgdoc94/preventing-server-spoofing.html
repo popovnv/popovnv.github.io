@@ -1,0 +1,208 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Защита от подмены сервера</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Подготовка к работе и сопровождение сервера"
+HREF="runtime.html"><LINK
+REL="PREVIOUS"
+TITLE="Обновление кластера PostgreSQL"
+HREF="upgrading.html"><LINK
+REL="NEXT"
+TITLE="Возможности шифрования"
+HREF="encryption-options.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Обновление кластера PostgreSQL"
+HREF="upgrading.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="runtime.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 17. Подготовка к работе и сопровождение сервера</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Возможности шифрования"
+HREF="encryption-options.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="PREVENTING-SERVER-SPOOFING"
+>17.7. Защита от подмены сервера</A
+></H1
+><P
+>Когда сервер работает, злонамеренный пользователь не может подставить свой сервер вместо него. Однако, если сервер отключён, локальный пользователь может подменить нормальный сервер, запустив свой собственный. Поддельный сервер сможет читать пароли и запросы клиентов, хотя не сможет вернуть никакие данные, так как каталог <TT
+CLASS="VARNAME"
+>PGDATA</TT
+> будет защищён от чтения посторонними пользователями. Такая подмена возможна потому, что любой пользователь может запустить сервер баз данных; клиент, со своей стороны, не может обнаружить подмену, если его не настроить дополнительно.</P
+><P
+>Самый простой способ предотвратить подмену для <TT
+CLASS="LITERAL"
+>локальных</TT
+> подключений — использовать каталог доменных сокетов Unix (<A
+HREF="runtime-config-connection.html#GUC-UNIX-SOCKET-DIRECTORIES"
+>unix_socket_directories</A
+>), в который сможет писать только проверенный локальный пользователь. Это не позволит злонамеренному пользователю создать в этом каталоге свой файл сокета. Если вас беспокоит, что некоторые приложения при этом могут обращаться к файлу сокета в <TT
+CLASS="FILENAME"
+>/tmp</TT
+> и, таким образом, всё же будут уязвимыми, создайте при загрузке операционной системы символическую ссылку <TT
+CLASS="FILENAME"
+>/tmp/.s.PGSQL.5432</TT
+>, указывающую на перемещённый файл сокета. Возможно, вам также придётся изменить скрипт очистки <TT
+CLASS="FILENAME"
+>/tmp</TT
+>, чтобы он не удалял эту ссылку.</P
+><P
+>Лучший способ защиты от подмены для соединений TCP — использовать сертификаты SSL и добиться, чтобы клиенты проверяли сертификат сервера. Для этого надо настроить сервер, чтобы он принимал только подключения <TT
+CLASS="LITERAL"
+>hostssl</TT
+> (см. <A
+HREF="auth-pg-hba-conf.html"
+>Раздел 19.1</A
+>) и имел ключ и сертификаты SSL (см. <A
+HREF="ssl-tcp.html"
+>Раздел 17.9</A
+>). Тогда TCP-клиент должен будет подключаться к серверу с параметром <TT
+CLASS="LITERAL"
+>sslmode=verify-ca</TT
+> или <TT
+CLASS="LITERAL"
+>verify-full</TT
+> и у него должен быть установлен соответствующий корневой сертификат (см. <A
+HREF="libpq-ssl.html#LIBQ-SSL-CERTIFICATES"
+>Подраздел 31.18.1</A
+>).</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="upgrading.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="encryption-options.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Обновление кластера <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="runtime.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Возможности шифрования</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

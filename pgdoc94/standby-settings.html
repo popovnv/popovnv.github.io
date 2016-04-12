@@ -1,0 +1,317 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Параметры резервного сервера</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Конфигурация восстановления"
+HREF="recovery-config.html"><LINK
+REL="PREVIOUS"
+TITLE="Параметры управления восстановлением"
+HREF="recovery-target-settings.html"><LINK
+REL="NEXT"
+TITLE="Мониторинг работы СУБД"
+HREF="monitoring.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Параметры управления восстановлением"
+HREF="recovery-target-settings.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="recovery-config.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 26. Конфигурация восстановления</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Мониторинг работы СУБД"
+HREF="monitoring.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="STANDBY-SETTINGS"
+>26.3. Параметры резервного сервера</A
+></H1
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="STANDBY-MODE"
+></A
+><TT
+CLASS="VARNAME"
+>standby_mode</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Указывает, является ли сервер <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> резервным или нет. Если параметр установлен в <TT
+CLASS="LITERAL"
+>on</TT
+>, то сервер не прекратит восстановление по окончании последнего архивного файла WAL, а продолжит попытки извлечения новых сегментов WAL посредством команды <TT
+CLASS="VARNAME"
+>restore_command</TT
+> и/или через подключение к ведущему, как указано в параметре <TT
+CLASS="VARNAME"
+>primary_conninfo</TT
+>.</P
+></DD
+><DT
+><A
+NAME="PRIMARY-CONNINFO"
+></A
+><TT
+CLASS="VARNAME"
+>primary_conninfo</TT
+> (<TT
+CLASS="TYPE"
+>string</TT
+>) </DT
+><DD
+><P
+>Указывает строку подключения резервного сервера к ведущему. Строка описана в формате согласно <A
+HREF="libpq-connect.html#LIBPQ-CONNSTRING"
+>Подраздел 31.1.1</A
+>. Вместо опущенных параметров подключения используются соответствующие переменные окружения (см. <A
+HREF="libpq-envars.html"
+>Раздел 31.14</A
+>). Если же какие-то переменные не установлены, то используются значения по умолчанию.</P
+><P
+>Строка может содержать имя (или адрес) основного сервера и порт подключения. Также можно указать необходимого пользователя на ведущем сервере с требуемыми привилегиями (см. <A
+HREF="warm-standby.html#STREAMING-REPLICATION-AUTHENTICATION"
+>Подраздел 25.2.5.1</A
+>). Если настроена аутентификация по паролю, то его также необходимо указать. Пароль можно указать как в строке подключения <TT
+CLASS="VARNAME"
+>primary_conninfo</TT
+>, так и в файле <TT
+CLASS="FILENAME"
+>~/.pgpass</TT
+> резервного сервера (в качестве имени базы данных используйте <TT
+CLASS="LITERAL"
+>replication</TT
+>). Не указывайте имя базы данных среди параметров подключения <TT
+CLASS="VARNAME"
+>primary_conninfo</TT
+>.</P
+><P
+>Этот параметр не действует, если <TT
+CLASS="VARNAME"
+>standby_mode</TT
+> имеет значение <TT
+CLASS="LITERAL"
+>off</TT
+>.</P
+></DD
+><DT
+><A
+NAME="PRIMARY-SLOT-NAME"
+></A
+><TT
+CLASS="VARNAME"
+>primary_slot_name</TT
+> (<TT
+CLASS="TYPE"
+>string</TT
+>) </DT
+><DD
+><P
+>Дополнительно указывает заранее созданный слот при потоковой репликации для контроля очистки ресурсов подключённого узла (см. <A
+HREF="warm-standby.html#STREAMING-REPLICATION-SLOTS"
+>Подраздел 25.2.6</A
+>). Этот параметр не действует, если не указана строка подключения <TT
+CLASS="VARNAME"
+>primary_conninfo</TT
+>.</P
+></DD
+><DT
+><A
+NAME="TRIGGER-FILE"
+></A
+><TT
+CLASS="VARNAME"
+>trigger_file</TT
+> (<TT
+CLASS="TYPE"
+>string</TT
+>) </DT
+><DD
+><P
+>Указывает триггерный файл, наличие которого завершает работу в режиме резервирования. Даже если это значение не установлено, существует возможность назначить резервный сервер основным с помощью команды <TT
+CLASS="COMMAND"
+>pg_ctl promote</TT
+>. Этот параметр не действует, если параметр <TT
+CLASS="VARNAME"
+>standby_mode</TT
+> имеет значение <TT
+CLASS="LITERAL"
+>off</TT
+>.</P
+></DD
+><DT
+><A
+NAME="RECOVERY-MIN-APPLY-DELAY"
+></A
+><TT
+CLASS="VARNAME"
+>recovery_min_apply_delay</TT
+> (<TT
+CLASS="TYPE"
+>integer</TT
+>) </DT
+><DD
+><P
+>По умолчанию резервный сервер восстанавливает записи WAL ведущего настолько быстро, насколько это возможно. Иногда полезно иметь возможность задать задержку при копировании данных, например, для устранения ошибок, связанных с потерей данных. Параметр позволяет задать эту задержку, указав период времени в миллисекундах (по умолчанию) или иных единицах измерения. Например, если установить значение <TT
+CLASS="LITERAL"
+>5min</TT
+>, резервный сервер будет воспроизводить фиксацию транзакции не раньше, чем через 5 минут (судя по его системным часам) после времени фиксации, сообщённого главным.</P
+><P
+>Возможна ситуация, когда задержка репликации между серверами превышает значение этого параметра. В этом случае дополнительная задержка не добавляется. Заметьте, что задержка вычисляется как разница между меткой времени, записанной в WAL на ведущем сервере, и текущим временем на резервном. Запаздывание передачи, связанное с задержками в сети или каскадной репликацией, может существенно сократить реальное время ожидания. Если время на главном и резервном сервере не синхронизировано, это может приводить к применению записей ранее ожидаемого, однако это не очень важно, потому что полезные значения этого параметра намного превышают типичное расхождение во времени между двумя серверами.</P
+><P
+>Задержка применяется лишь для записей WAL, относящимся к зафиксированным транзакциям. Остальные записи проигрываются незамедлительно, так как их эффект не будет заметен до применения соответствующей записи о фиксации транзакции, благодаря правилам видимости MVCC.</P
+><P
+>Задержка производится до тех пор, пока резервный сервер не переключен в режим основного. После переключения бывший резервный сервер завершает восстановление незамедлительно.</P
+><P
+>Данный параметр предназначен для применения в конфигурациях с потоковой репликацией; однако, если он задан, он будет учитываться в любых случаях. На синхронную репликацию этот параметр не влияет, пока нет никакого параметра для запроса синхронного применения фиксирования транзакций. Задержка, устанавливаемая этим параметром, распространяется и на сообщения <TT
+CLASS="VARNAME"
+>hot_standby_feedback</TT
+>, что может привести к раздуванию базы на главном сервере; сочетание этих параметров требует осторожности.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="recovery-target-settings.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="monitoring.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Параметры управления восстановлением</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="recovery-config.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Мониторинг работы СУБД</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

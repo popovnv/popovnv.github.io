@@ -1,0 +1,299 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Оптимизация производительности</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Язык SQL"
+HREF="sql.html"><LINK
+REL="PREVIOUS"
+TITLE="Блокировки и индексы"
+HREF="locking-indexes.html"><LINK
+REL="NEXT"
+TITLE="Использование EXPLAIN"
+HREF="using-explain.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="CHAPTER"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Блокировки и индексы"
+HREF="locking-indexes.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Использование EXPLAIN"
+HREF="using-explain.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="PERFORMANCE-TIPS"
+></A
+>Глава 14. Оптимизация производительности</H1
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Содержание</B
+></DT
+><DT
+>14.1. <A
+HREF="using-explain.html"
+>Использование <TT
+CLASS="COMMAND"
+>EXPLAIN</TT
+></A
+></DT
+><DD
+><DL
+><DT
+>14.1.1. <A
+HREF="using-explain.html#USING-EXPLAIN-BASICS"
+>Азы <TT
+CLASS="COMMAND"
+>EXPLAIN</TT
+></A
+></DT
+><DT
+>14.1.2. <A
+HREF="using-explain.html#USING-EXPLAIN-ANALYZE"
+><TT
+CLASS="COMMAND"
+>EXPLAIN ANALYZE</TT
+></A
+></DT
+><DT
+>14.1.3. <A
+HREF="using-explain.html#USING-EXPLAIN-CAVEATS"
+>Ограничения</A
+></DT
+></DL
+></DD
+><DT
+>14.2. <A
+HREF="planner-stats.html"
+>Статистика, используемая планировщиком</A
+></DT
+><DT
+>14.3. <A
+HREF="explicit-joins.html"
+>Управление планировщиком с помощью явных предложений <TT
+CLASS="LITERAL"
+>JOIN</TT
+></A
+></DT
+><DT
+>14.4. <A
+HREF="populate.html"
+>Наполнение базы данных</A
+></DT
+><DD
+><DL
+><DT
+>14.4.1. <A
+HREF="populate.html#DISABLE-AUTOCOMMIT"
+>Отключите автофиксацию транзакций</A
+></DT
+><DT
+>14.4.2. <A
+HREF="populate.html#POPULATE-COPY-FROM"
+>Используйте <TT
+CLASS="COMMAND"
+>COPY</TT
+></A
+></DT
+><DT
+>14.4.3. <A
+HREF="populate.html#POPULATE-RM-INDEXES"
+>Удалите индексы</A
+></DT
+><DT
+>14.4.4. <A
+HREF="populate.html#POPULATE-RM-FKEYS"
+>Удалите ограничения внешних ключей</A
+></DT
+><DT
+>14.4.5. <A
+HREF="populate.html#POPULATE-WORK-MEM"
+>Увеличьте <TT
+CLASS="VARNAME"
+>maintenance_work_mem</TT
+></A
+></DT
+><DT
+>14.4.6. <A
+HREF="populate.html#POPULATE-CHECKPOINT-SEGMENTS"
+>Увеличьте <TT
+CLASS="VARNAME"
+>checkpoint_segments</TT
+></A
+></DT
+><DT
+>14.4.7. <A
+HREF="populate.html#POPULATE-PITR"
+>Отключите архивацию WAL и потоковую репликацию</A
+></DT
+><DT
+>14.4.8. <A
+HREF="populate.html#POPULATE-ANALYZE"
+>Выполните в конце <TT
+CLASS="COMMAND"
+>ANALYZE</TT
+></A
+></DT
+><DT
+>14.4.9. <A
+HREF="populate.html#POPULATE-PG-DUMP"
+>Несколько замечаний относительно <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+></A
+></DT
+></DL
+></DD
+><DT
+>14.5. <A
+HREF="non-durability.html"
+>Оптимизация, угрожающая стабильности</A
+></DT
+></DL
+></DIV
+><P
+>Быстродействие запросов зависит от многих факторов. На некоторые из них могут воздействовать пользователи, а другие являются фундаментальными особенностями системы. В этой главе приводятся полезные советы, которые помогут понять их и оптимизировать производительность <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="locking-indexes.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="using-explain.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Блокировки и индексы</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Использование <TT
+CLASS="COMMAND"
+>EXPLAIN</TT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

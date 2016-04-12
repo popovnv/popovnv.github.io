@@ -1,0 +1,346 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>sslinfo</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Дополнительно поставляемые модули"
+HREF="contrib.html"><LINK
+REL="PREVIOUS"
+TITLE="spi"
+HREF="contrib-spi.html"><LINK
+REL="NEXT"
+TITLE="tablefunc"
+HREF="tablefunc.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="spi"
+HREF="contrib-spi.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Приложение E. Дополнительно поставляемые модули</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="tablefunc"
+HREF="tablefunc.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="SSLINFO"
+>E.36. sslinfo</A
+></H1
+><P
+>Модуль <TT
+CLASS="FILENAME"
+>sslinfo</TT
+> выдаёт информацию о SSL-сертификате, который был представлен текущим клиентом при подключении к <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Это модуль бесполезен (большинство функцию возвратят NULL), если для текущего подключения не задействуется SSL.</P
+><P
+>Это расширение не будет собираться, если конфигурация была произведена без ключа <TT
+CLASS="LITERAL"
+>--with-openssl</TT
+>.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN125206"
+>E.36.1. Предоставляемые функции</A
+></H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><CODE
+CLASS="FUNCTION"
+>ssl_is_used() returns boolean</CODE
+></DT
+><DD
+><P
+>Возвращает TRUE, если текущее подключение использует SSL, и FALSE в противном случае.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>ssl_version() returns text</CODE
+></DT
+><DD
+><P
+>Возвращает имя протокола, по которому организовано SSL-подключение (например, SSLv2, SSLv3 или TLSv1).</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>ssl_cipher() returns text</CODE
+></DT
+><DD
+><P
+>Возвращает имя шифра, используемого для SSL-подключения (например, DHE-RSA-AES256-SHA).</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>ssl_client_cert_present() returns boolean</CODE
+></DT
+><DD
+><P
+>Возвращает TRUE, если текущий клиент предоставил серверу годный клиентский SSL-сертификат, и FALSE в противном случае. (Сервер может быть требовать, а может и не требовать предоставления клиентского сертификата.)</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>ssl_client_serial() returns numeric</CODE
+></DT
+><DD
+><P
+>Возвращает серийный номер текущего клиентского сертификата. Сочетание серийного номера сертификата с выдавшим его центром сертификации гарантирует однозначную идентификацию сертификата (но не его владелец &mdash; владелец должен регулярно менять свои ключи и получать сертификаты в центре сертификации).</P
+><P
+>Поэтому, если вы используете собственный ЦС и настроили сервер, чтобы он принимал сертификаты только от этого ЦС, серийный номер будет наиболее надёжным (хотя не очень запоминающимся) ключом идентификации пользователя.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>ssl_client_dn() returns text</CODE
+></DT
+><DD
+><P
+>Возвращает полное имя субъекта из текущего клиентского сертификата, преобразуя символьные данные в кодировку текущей базы данных. Предполагается, что если в именах в сертификатах используются символы вне таблицы ASCII, то ваша база данных может представить эти символы. Если в вашей базе используется кодировка SQL_ASCII, символы вне ASCII в имени будут представлены последовательностями UTF-8.</P
+><P
+>Результат выглядит примерно так: <TT
+CLASS="LITERAL"
+>/CN=Somebody /C=Some country/O=Some organization</TT
+>.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>ssl_issuer_dn() returns text</CODE
+></DT
+><DD
+><P
+>Возвращает полное имя издателя текущего клиентского сертификата, преобразуя символьные данные в кодировку текущей базы данных. Преобразования кодировки осуществляются так же, как и в <CODE
+CLASS="FUNCTION"
+>ssl_client_dn</CODE
+>.</P
+><P
+>Сочетание возвращаемого значения этой функции с серийным номером сертификата однозначно идентифицирует сертификат.</P
+><P
+>Эта функция полезна, только если в файле <TT
+CLASS="FILENAME"
+>root.crt</TT
+> вашего сервера содержатся сертификаты нескольких ЦС, или если один ЦС выдаёт сертификаты для промежуточных центров сертификации.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>ssl_client_dn_field(fieldname text) returns text</CODE
+></DT
+><DD
+><P
+>Эта функция возвращает значение указанного поля данных субъекта сертификата, либо NULL, если это поле отсутствует. Имена полей задаются строковыми константами, которые затем преобразуются в идентификаторы объектов ASN1, используя базу данных объектов OpenSSL. Принимаются следующие значения:</P
+><PRE
+CLASS="LITERALLAYOUT"
+>commonName (или CN)
+surname (или SN)
+name
+givenName (или GN)
+countryName (или C)
+localityName (или L)
+stateOrProvinceName (или ST)
+organizationName (или O)
+organizationUnitName (или OU)
+title
+description
+initials
+postalCode
+streetAddress
+generationQualifier
+description
+dnQualifier
+x500UniqueIdentifier
+pseudonym
+role
+emailAddress</PRE
+><P
+>Все эти поля являются необязательными, за исключением <TT
+CLASS="STRUCTFIELD"
+>commonName</TT
+>. Какие из них будут включены в сертификат, а какие нет, зависит полностью от политики вашего ЦС. Значение этих полей, однако, строго определено стандартами X.500 и X.509, так что их нельзя интерпретировать произвольным образом.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>ssl_issuer_field(fieldname text) returns text</CODE
+></DT
+><DD
+><P
+>То же, что <CODE
+CLASS="FUNCTION"
+>ssl_client_dn_field</CODE
+>, но для издателя, а не для субъекта сертификата.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN125283"
+>E.36.2. Автор</A
+></H2
+><P
+>Виктор Вагнер <CODE
+CLASS="EMAIL"
+>&#60;<A
+HREF="mailto:vitus@cryptocom.ru"
+>vitus@cryptocom.ru</A
+>&#62;</CODE
+>, ООО &laquo;Криптоком&raquo;</P
+><P
+>Электронный адрес группы разработчиков OpenSSL в Криптокоме: <CODE
+CLASS="EMAIL"
+>&#60;<A
+HREF="mailto:openssl@cryptocom.ru"
+>openssl@cryptocom.ru</A
+>&#62;</CODE
+></P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="contrib-spi.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="tablefunc.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>spi</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>tablefunc</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

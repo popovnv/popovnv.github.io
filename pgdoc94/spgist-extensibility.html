@@ -1,0 +1,894 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Расширяемость</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Индексы SP-GiST"
+HREF="spgist.html"><LINK
+REL="PREVIOUS"
+TITLE="Встроенные классы операторов"
+HREF="spgist-builtin-opclasses.html"><LINK
+REL="NEXT"
+TITLE="Реализация"
+HREF="spgist-implementation.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Встроенные классы операторов"
+HREF="spgist-builtin-opclasses.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="spgist.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 57. Индексы SP-GiST</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Реализация"
+HREF="spgist-implementation.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="SPGIST-EXTENSIBILITY"
+>57.3. Расширяемость</A
+></H1
+><P
+><ACRONYM
+CLASS="ACRONYM"
+>SP-GiST</ACRONYM
+> предлагает интерфейс с высоким уровнем абстракции и таким образом требует от разработчика метода доступа реализовать только методы, специфичные для конкретного типа данных. Ядро <ACRONYM
+CLASS="ACRONYM"
+>SP-GiST</ACRONYM
+> отвечает за эффективную схему обращений к диску и поиск в структуре дерева, а также берёт на себя заботу о параллельном доступе и поддержке журнала.</P
+><P
+>Кортежи в листьях дерева <ACRONYM
+CLASS="ACRONYM"
+>SP-GiST</ACRONYM
+> содержат значения того же типа данных, что и индексируемая колонка. На верхнем уровне эти кортежи содержат всегда исходное индексируемое значение данных, но на более нижних могут содержать только сокращённое представление, например, суффикс. В этом случае опорные функции класса операторов должны уметь восстанавливать исходное значение, собирая его из внутренних кортежей, которые нужно пройти для достижения уровня конкретного листа.</P
+><P
+>Внутренние кортежи устроены сложнее, так как они представляют собой точки разветвления в дереве поиска. Каждый внутренний кортеж содержит набор из одного или нескольких <I
+CLASS="FIRSTTERM"
+>узлов</I
+>, представляющих группы сходных значений листьев. Узел содержит ответвление, приводящее либо к другому, внутреннему кортежу нижнего уровня, либо к короткому списку кортежей в листьях, лежащих в одной странице индекса. Для каждого узла задаётся <I
+CLASS="FIRSTTERM"
+>метка</I
+>, описывающая его; например, в цифровом дереве меткой может быть очередной символ в строковом значении. Дополнительно внутренний кортеж может хранить <I
+CLASS="FIRSTTERM"
+>префикс</I
+>, описывающий все его члены. В цифровом дереве это может быть общий префикс всех представленных ниже строк. Значением префикса не обязательно должен быть префикс, а могут быть любые данные, требующиеся классу операторов; например, в дереве квадрантов это может быть центральная точка, от которой отмеряются четыре квадранта. В этом случае внутренний кортеж дерева квадрантов будет также содержать четыре узла, соответствующие квадрантам вокруг этой центральной точки.</P
+><P
+>Некоторые алгоритмы деревьев требует знания уровня (или глубины) текущего кортежа, так что ядро <ACRONYM
+CLASS="ACRONYM"
+>SP-GiST</ACRONYM
+> даёт возможность классам операторов контролировать число уровней при спуске по дереву. Также имеется поддержка пошагового восстановления представленного значения, когда это требуется.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Ядро <ACRONYM
+CLASS="ACRONYM"
+>SP-GiST</ACRONYM
+> берёт на себя заботу о значениях NULL. Хотя в индексах <ACRONYM
+CLASS="ACRONYM"
+>SP-GiST</ACRONYM
+> не хранятся записи для NULL в индексируемых колонках, это скрыто от кода класса операторов; записи индексов или условия поиска с NULL никогда не передаются методам класса операторов. (Предполагается, что операторы <ACRONYM
+CLASS="ACRONYM"
+>SP-GiST</ACRONYM
+> строгие и не могут возвращать положительный результат для значений NULL.) Поэтому значения NULL здесь больше обсуждаться не будут.</P
+></BLOCKQUOTE
+></DIV
+><P
+>Класс операторов индекса для <ACRONYM
+CLASS="ACRONYM"
+>SP-GiST</ACRONYM
+> должен предоставить реализации пяти методов. Все пять методов должны по единому соглашению принимать два аргумента <TT
+CLASS="TYPE"
+>internal</TT
+>, первым из которых будет указатель на структуру C, содержащую входные значения для опорного метода, а вторым — указатель на структуру C, в которую должны помещаться выходные значения. Четыре из этих методов должны возвращать просто <TT
+CLASS="TYPE"
+>void</TT
+>, так как их результаты помещаются в выходную структуру; однако <CODE
+CLASS="FUNCTION"
+>leaf_consistent</CODE
+> дополнительно возвращает результат <TT
+CLASS="TYPE"
+>boolean</TT
+>. Эти методы не должны менять никакие поля в их входных структурах. Выходная структура всегда обнуляется перед вызовом пользовательского метода.</P
+><P
+>Пользователь должен определить следующие пять методов:</P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><CODE
+CLASS="FUNCTION"
+>config</CODE
+></DT
+><DD
+><P
+>Возвращает статическую информацию о реализации индекса, включая OID типов данных префикса и метки узла.</P
+><P
+>В <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> эта функция должна объявляться так: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION my_config(internal, internal) RETURNS void ...</PRE
+><P> В первом аргументе передаётся указатель на структуру <TT
+CLASS="STRUCTNAME"
+>spgConfigIn</TT
+> языка C, содержащие входные данные для функции. Во втором аргументе передаётся указатель на структуру <TT
+CLASS="STRUCTNAME"
+>spgConfigOut</TT
+> языка C, в которую функция должна поместить результат. </P><PRE
+CLASS="PROGRAMLISTING"
+>typedef struct spgConfigIn
+{
+    Oid         attType;        /* Индексируемый тип данных */
+} spgConfigIn;
+
+typedef struct spgConfigOut
+{
+    Oid         prefixType;     /* Тип данных префикса во внутренних кортежах */
+    Oid         labelType;      /* Тип данных метки узла во внутренних кортежах */
+    bool        canReturnData;  /* Класс операторов может восстановить исходные данные */
+    bool        longValuesOK;   /* Класс может принимать значения, не умещающиеся на 1 странице */
+} spgConfigOut;</PRE
+><P>
+
+      Поле <TT
+CLASS="STRUCTFIELD"
+>attType</TT
+> передаётся для поддержки полиморфных классов операторов; для обычных классов операторов с фиксированным типом оно будет всегда содержать одно значение и поэтому его можно просто игнорировать.</P
+><P
+>Для классов операторов, не использующих префиксы, в <TT
+CLASS="STRUCTFIELD"
+>prefixType</TT
+> можно установить <TT
+CLASS="LITERAL"
+>VOIDOID</TT
+>. Подобным образом, для классов операторов, не использующих метки узлов, в <TT
+CLASS="STRUCTFIELD"
+>labelType</TT
+> тоже можно установить <TT
+CLASS="LITERAL"
+>VOIDOID</TT
+>. Признак <TT
+CLASS="STRUCTFIELD"
+>canReturnData</TT
+> следует установить, если класс операторов может восстановить изначально переданное в индекс значение. Признак <TT
+CLASS="STRUCTFIELD"
+>longValuesOK</TT
+> должен устанавливаться, только если <TT
+CLASS="STRUCTFIELD"
+>attType</TT
+> переменной длины и класс операторов может фрагментировать длинные значения, повторяя суффиксы (см. <A
+HREF="spgist-implementation.html#SPGIST-LIMITS"
+>Подраздел 57.4.1</A
+>).</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>choose</CODE
+></DT
+><DD
+><P
+>Выбирает метод для добавления нового значения во внутренний кортеж.</P
+><P
+>В <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> эта функция должна объявляться так: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION my_choose(internal, internal) RETURNS void ...</PRE
+><P> В первом аргументе передаётся указатель на структуру <TT
+CLASS="STRUCTNAME"
+>spgChooseIn</TT
+> языка C, содержащую входные данные для функции. Во втором аргументе передаётся указатель на структуру <TT
+CLASS="STRUCTNAME"
+>spgChooseOut</TT
+>, в которую функция должна поместить результат. </P><PRE
+CLASS="PROGRAMLISTING"
+>typedef struct spgChooseIn
+{
+    Datum       datum;          /* исходное значение, которое должно индексироваться */
+    Datum       leafDatum;      /* текущее значение, которое должно сохраниться в листе */
+    int         level;          /* текущий уровень (начиная с нуля) */
+
+    /* Данные из текущего внутреннего кортежа */
+    bool        allTheSame;     /* кортеж с признаком все-равны? */
+    bool        hasPrefix;      /* у кортежа есть префикс? */
+    Datum       prefixDatum;    /* если да, то это значение префикса */
+    int         nNodes;         /* число узлов во внутреннем кортеже */
+    Datum      *nodeLabels;     /* значения меток узлов (NULL, если их нет) */
+} spgChooseIn;
+
+typedef enum spgChooseResultType
+{
+    spgMatchNode = 1,           /* спуститься в существующий узел */
+    spgAddNode,                 /* добавить узел во внутренний кортеж */
+    spgSplitTuple               /* разделить внутренний кортеж (изменить его префикс) */
+} spgChooseResultType;
+
+typedef struct spgChooseOut
+{
+    spgChooseResultType resultType;     /* код действия, см. выше */
+    union
+    {
+        struct                  /* результаты для spgMatchNode */
+        {
+            int         nodeN;      /* спуститься к этому узлу (нумерация с 0) */
+            int         levelAdd;   /* шаг увеличения уровня */
+            Datum       restDatum;  /* новое значение листа */
+        }           matchNode;
+        struct                  /* результаты для spgAddNode */
+        {
+            Datum       nodeLabel;  /* метка нового узла */
+            int         nodeN;      /* куда вставлять её (нумерация с 0) */
+        }           addNode;
+        struct                  /* результаты для spgSplitTuple */
+        {
+            /* Информация для формирования нового внутреннего кортежа с одним узлом */
+            bool        prefixHasPrefix;    /* кортеж должен иметь префикс? */
+            Datum       prefixPrefixDatum;  /* если да, его значение */
+            Datum       nodeLabel;          /* метка узла */
+
+            /* Информация для формирования нового внутреннего кортежа нижнего уровня со всеми старыми узлами */
+            bool        postfixHasPrefix;   /* кортеж должен иметь префикс? */
+            Datum       postfixPrefixDatum; /* если да, его значение */
+        }           splitTuple;
+    }           result;
+} spgChooseOut;</PRE
+><P>
+
+       В <TT
+CLASS="STRUCTFIELD"
+>datum</TT
+> задаётся исходное значение, которое должно быть вставлено в индекс. Значение <TT
+CLASS="STRUCTFIELD"
+>leafDatum</TT
+> изначально совпадает с <TT
+CLASS="STRUCTFIELD"
+>datum</TT
+>, но может быть другим на низких уровнях дерева, если его изменят методы <CODE
+CLASS="FUNCTION"
+>choose</CODE
+> или <CODE
+CLASS="FUNCTION"
+>picksplit</CODE
+>. Когда поиск места добавления достигает страницы уровня листа, в создаваемом кортеже листа будет сохранено текущее значение <TT
+CLASS="STRUCTFIELD"
+>leafDatum</TT
+>. В <TT
+CLASS="STRUCTFIELD"
+>level</TT
+> задаётся текущий уровень внутреннего кортежа, начиная с нуля для уровня корня. Признак <TT
+CLASS="STRUCTFIELD"
+>allTheSame</TT
+> устанавливается, если текущий внутренний кортеж содержит несколько равнозначных узлов (см. <A
+HREF="spgist-implementation.html#SPGIST-ALL-THE-SAME"
+>Подраздел 57.4.3</A
+>). Признак <TT
+CLASS="STRUCTFIELD"
+>hasPrefix</TT
+> устанавливается, если текущий внутренний кортеж содержит префикс; в этом случае в <TT
+CLASS="STRUCTFIELD"
+>prefixDatum</TT
+> задаётся его значение. Поле <TT
+CLASS="STRUCTFIELD"
+>nNodes</TT
+> задаёт число дочерних узлов, содержащихся во внутреннем кортеже, а <TT
+CLASS="STRUCTFIELD"
+>nodeLabels</TT
+> представляет массив их меток, или NULL, если меток у них нет.</P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>choose</CODE
+> может определить, соответствует ли новое значение одному из существующих дочерних узлов, или что нужно добавить новый дочерний узел, или что новое значение не согласуется с префиксом кортежа и внутренний кортеж нужно разделить, чтобы получить менее ограничивающий префикс.</P
+><P
+>Если новое значение соответствует одному из существующих дочерних узлов, установите в <TT
+CLASS="STRUCTFIELD"
+>resultType</TT
+> значение <TT
+CLASS="LITERAL"
+>spgMatchNode</TT
+>. Установите в <TT
+CLASS="STRUCTFIELD"
+>nodeN</TT
+> номер этого узла в массиве узлов (нумерация начинается с нуля). Установите в <TT
+CLASS="STRUCTFIELD"
+>levelAdd</TT
+> значение, на которое должен увеличиваться уровень (<TT
+CLASS="STRUCTFIELD"
+>level</TT
+>) при спуске через этот узел, либо оставьте его нулевым, если класс операторов не отслеживает уровни. Установите <TT
+CLASS="STRUCTFIELD"
+>restDatum</TT
+>, равным <TT
+CLASS="STRUCTFIELD"
+>datum</TT
+>, если класс операторов не меняет значения данных от уровня к следующему, а в противном случае запишите в него изменённое значение, которое должно использоваться в качестве <TT
+CLASS="STRUCTFIELD"
+>leafDatum</TT
+> на следующем уровне.</P
+><P
+>Если нужно добавить новый дочерний узел, установите в <TT
+CLASS="STRUCTFIELD"
+>resultType</TT
+> значение <TT
+CLASS="LITERAL"
+>spgAddNode</TT
+>. В <TT
+CLASS="STRUCTFIELD"
+>nodeLabel</TT
+> задайте метку для нового узла, а в <TT
+CLASS="STRUCTFIELD"
+>nodeN</TT
+> позицию (отсчитываемую от нуля), в которую должен вставляться узел в массиве узлов. После того, как узел будет добавлен, функция <CODE
+CLASS="FUNCTION"
+>choose</CODE
+> вызывается снова с изменённым внутренним кортежем; в результате этого вызова должен быть получен результат <TT
+CLASS="LITERAL"
+>spgMatchNode</TT
+>.</P
+><P
+>Если новое значение не согласуется с префиксом кортежа, установите в <TT
+CLASS="STRUCTFIELD"
+>resultType</TT
+> значение <TT
+CLASS="LITERAL"
+>spgSplitTuple</TT
+>. Это действие приводит к перемещению всех существующих узлов в новый внутренний кортеж нижнего уровня и замене существующего внутреннего кортежа кортежем с одним узлом, указывающим на добавленный кортеж под ним. Установите признак <TT
+CLASS="STRUCTFIELD"
+>prefixHasPrefix</TT
+>, чтобы указать, должен ли новый верхний кортеж иметь префикс, и если да, задайте в <TT
+CLASS="STRUCTFIELD"
+>prefixPrefixDatum</TT
+> значение префикса. Это новое значение префикса должно быть в достаточной степени менее ограничивающим, чем исходное, чтобы было принято новое значение, и оно должно быть не длиннее исходного префикса. Установите в <TT
+CLASS="STRUCTFIELD"
+>nodeLabel</TT
+> метку, которая будет назначена узлу, указывающему на новый внутренний кортеж нижнего уровня. Установите признак <TT
+CLASS="STRUCTFIELD"
+>postfixHasPrefix</TT
+>, чтобы указать, должен ли новый нижний кортеж иметь префикс, и если да, задайте в <TT
+CLASS="STRUCTFIELD"
+>postfixPrefixDatum</TT
+> значение префикса. Сочетание этих двух префиксов и дополнительной метки должно иметь то же значение, что и исходный префикс, так как нет возможности ни изменить метку узлов, перемещённых в новый кортеж нижнего уровня, ни изменить записи дочерних узлов. После того, как узел разделён, функция <CODE
+CLASS="FUNCTION"
+>choose</CODE
+> будет вызвана снова с заменяемым внутренним кортежем. Этот вызов обычно должен возвратить результат <TT
+CLASS="LITERAL"
+>spgAddNode</TT
+>, так как метка узла, добавленная на этапе разделения, предположительно не будет соответствовать новому значению; так что за этим последует третий вызов, который наконец вернёт <TT
+CLASS="LITERAL"
+>spgMatchNode</TT
+> и позволит операции добавления перейти к уровню листьев.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>picksplit</CODE
+></DT
+><DD
+><P
+>Выбирает, как создать новый внутренний кортеж по набору кортежей в листьях.</P
+><P
+>В <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> эта функция должна объявляться так: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION my_picksplit(internal, internal) RETURNS void ...</PRE
+><P> В первом аргументе передаётся указатель на структуру <TT
+CLASS="STRUCTNAME"
+>spgPickSplitIn</TT
+> языка C, содержащую входные данные для функции. Во втором аргументе передаётся указатель на структуру <TT
+CLASS="STRUCTNAME"
+>spgPickSplitOut</TT
+> языка C, в которую функция должна поместить результат. </P><PRE
+CLASS="PROGRAMLISTING"
+>typedef struct spgPickSplitIn
+{
+    int         nTuples;        /* число кортежей в листьях */
+    Datum      *datums;         /* их значения (массив длины nTuples) */
+    int         level;          /* текущий уровень (отсчитывая от 0) */
+} spgPickSplitIn;
+
+typedef struct spgPickSplitOut
+{
+    bool        hasPrefix;      /* новый внутренний кортеж должен иметь префикс? */
+    Datum       prefixDatum;    /* если да, его значение */
+
+    int         nNodes;         /* число узлов для нового внутреннего кортежа */
+    Datum      *nodeLabels;     /* их метки (или NULL, если их нет) */
+
+    int        *mapTuplesToNodes;   /* номер узла для каждого кортежа в листе */
+    Datum      *leafTupleDatums;    /* значения, помещаемые в каждый новый кортеж */
+} spgPickSplitOut;</PRE
+><P>
+
+       В <TT
+CLASS="STRUCTFIELD"
+>nTuples</TT
+> задаётся число предоставленных кортежей уровня листьев, а <TT
+CLASS="STRUCTFIELD"
+>datums</TT
+> — массив их значений данных. В <TT
+CLASS="STRUCTFIELD"
+>level</TT
+> указывается текущий уровень, который должны разделять все кортежи листьев, и который станет уровнем нового внутреннего кортежа.</P
+><P
+>Установите признак <TT
+CLASS="STRUCTFIELD"
+>hasPrefix</TT
+>, чтобы указать, должен ли новый внутренний кортеж иметь префикс, и если да, задайте в <TT
+CLASS="STRUCTFIELD"
+>prefixDatum</TT
+> значение префикса. Установите в <TT
+CLASS="STRUCTFIELD"
+>nNodes</TT
+> количество узлов, которые будут содержаться во внутреннем кортеже, а в <TT
+CLASS="STRUCTFIELD"
+>nodeLabels</TT
+> указатель на их метки. (Если узлам не нужны метки, установите в <TT
+CLASS="STRUCTFIELD"
+>nodeLabels</TT
+> NULL; за подробностями обратитесь к <A
+HREF="spgist-implementation.html#SPGIST-NULL-LABELS"
+>Подразделу 57.4.2</A
+>.) Поместите в <TT
+CLASS="STRUCTFIELD"
+>mapTuplesToNodes</TT
+> указатель на массив, назначающий номера узлов (начиная с нуля) каждому кортежу листа. В <TT
+CLASS="STRUCTFIELD"
+>leafTupleDatums</TT
+> передайте массив значений, которые должны быть сохранены в новых кортежах листьев (они будут совпадать со входными значениями (<TT
+CLASS="STRUCTFIELD"
+>datums</TT
+>), если класс операторов не изменяет значения от уровня к следующему). Заметьте, что функция <CODE
+CLASS="FUNCTION"
+>picksplit</CODE
+> сама должна выделить память, используя palloc, для массивов <TT
+CLASS="STRUCTFIELD"
+>nodeLabels</TT
+>, <TT
+CLASS="STRUCTFIELD"
+>mapTuplesToNodes</TT
+> и <TT
+CLASS="STRUCTFIELD"
+>leafTupleDatums</TT
+>.</P
+><P
+>Если передаётся несколько кортежей листьев, ожидается, что функция <CODE
+CLASS="FUNCTION"
+>picksplit</CODE
+> классифицирует их и разделит на несколько узлов; иначе нельзя будет разнести кортежи листьев по разным страницам, что является конечной целью этой операции. Таким образом, если <CODE
+CLASS="FUNCTION"
+>picksplit</CODE
+> в итоге помещает все кортежи листьев в один узел, ядро SP-GiST меняет это решение и создаёт внутренний кортеж, в котором кортежи листьев связываются случайным образом с несколькими узлами с одинаковыми метками. Такой кортеж помечается флагом <TT
+CLASS="LITERAL"
+>allTheSame</TT
+>, показывающим, что все узлы равны. Функции <CODE
+CLASS="FUNCTION"
+>choose</CODE
+> и <CODE
+CLASS="FUNCTION"
+>inner_consistent</CODE
+> должны работать с такими внутренними кортежами особым образом. За дополнительными сведениями обратитесь к <A
+HREF="spgist-implementation.html#SPGIST-ALL-THE-SAME"
+>Подразделу 57.4.3</A
+>.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>picksplit</CODE
+> может применяться к одному кортежу на уровне листьев, только когда функция <CODE
+CLASS="FUNCTION"
+>config</CODE
+> установила в <TT
+CLASS="STRUCTFIELD"
+>longValuesOK</TT
+> значение true и было передано входное значение, большее страницы. В этом случае цель операции — отделить префикс и получить новое, более короткое значение для листа. Этот вызов будет повторяться, пока значение уровня листа не уменьшится настолько, чтобы уместиться в странице. За дополнительными сведениями обратитесь к <A
+HREF="spgist-implementation.html#SPGIST-LIMITS"
+>Подразделу 57.4.1</A
+>.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>inner_consistent</CODE
+></DT
+><DD
+><P
+>Возвращает набор узлов (ветвей), по которым надо продолжать поиск.</P
+><P
+>В <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> эта функция должна объявляться так: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION my_inner_consistent(internal, internal) RETURNS void ...</PRE
+><P> В первом аргументе передаётся указатель на структуру <TT
+CLASS="STRUCTNAME"
+>spgInnerConsistentIn</TT
+> языка C, содержащую входные данные для функции. Во втором аргументе передаётся указатель на структуру <TT
+CLASS="STRUCTNAME"
+>spgInnerConsistentOut</TT
+> языка C, в которую функция должна поместить результат. </P><PRE
+CLASS="PROGRAMLISTING"
+>typedef struct spgInnerConsistentIn
+{
+    ScanKey     scankeys;       /* массив операторов и искомых значений */
+    int         nkeys;          /* длина массива */
+
+    Datum       reconstructedValue;     /* значение, восстановленное для родителя */
+    int         level;          /* текущий уровень (отсчитывая от нуля) */
+    bool        returnData;     /* нужно ли возвращать исходные данные? */
+
+    /* Данные из текущего внутреннего кортежа */
+    bool        allTheSame;     /* кортеж с признаком все-равны? */
+    bool        hasPrefix;      /* у кортежа есть префикс? */
+    Datum       prefixDatum;    /* если да, то это значение префикса */
+    int         nNodes;         /* число узлов во внутреннем кортеже */
+    Datum      *nodeLabels;     /* значения меток узлов (NULL, если их нет) */
+} spgInnerConsistentIn;
+
+typedef struct spgInnerConsistentOut
+{
+    int         nNodes;         /* число дочерних узлов, которые нужно посетить */
+    int        *nodeNumbers;    /* их номера в массиве узлов */
+    int        *levelAdds;      /* шаги увеличения уровня для этих узлов */
+    Datum      *reconstructedValues;    /* связанные восстановленные значения */
+} spgInnerConsistentOut;</PRE
+><P> Массив <TT
+CLASS="STRUCTFIELD"
+>scankeys</TT
+> длины <TT
+CLASS="STRUCTFIELD"
+>nkeys</TT
+> описывает условия поиска по индексу. Эти условия объединяются операцией AND &mdash; найдены должны быть только те записи, которые удовлетворяют всем условиям. (Заметьте, что с <TT
+CLASS="STRUCTFIELD"
+>nkeys</TT
+> = 0 подразумевается, что запросу удовлетворяют все записи в индексе.) Обычно эту функцию интересуют только поля <TT
+CLASS="STRUCTFIELD"
+>sk_strategy</TT
+> и <TT
+CLASS="STRUCTFIELD"
+>sk_argument</TT
+> в каждой записи массива, в которых определяется соответственно индексируемый оператор и искомое значение. В частности, нет необходимости проверять <TT
+CLASS="STRUCTFIELD"
+>sk_flags</TT
+>, чтобы распознать NULL в искомом значении, так как ядро SP-GiST отфильтрует такие условия. В <TT
+CLASS="STRUCTFIELD"
+>reconstructedValue</TT
+> передаётся значение, восстановленное для родительского кортежа; это может быть <TT
+CLASS="LITERAL"
+>(Datum) 0</TT
+> на уровне корня или если функция <CODE
+CLASS="FUNCTION"
+>inner_consistent</CODE
+> не установила значение на предыдущем уровне. В <TT
+CLASS="STRUCTFIELD"
+>level</TT
+> передаётся уровень текущего внутреннего кортежа (уровень корня считается нулевым). Флаг <TT
+CLASS="STRUCTFIELD"
+>returnData</TT
+> устанавливается, когда для этого запроса нужно получить восстановленные данные; это возможно, только если функция <CODE
+CLASS="FUNCTION"
+>config</CODE
+> установила признак <TT
+CLASS="STRUCTFIELD"
+>canReturnData</TT
+>. Признак <TT
+CLASS="STRUCTFIELD"
+>allTheSame</TT
+> устанавливается, если текущий внутренний кортеж имеет пометку <SPAN
+CLASS="QUOTE"
+>"все-равны"</SPAN
+>; в этом случае все узлы имеют одну метку (если имеют) и значит, либо все они, либо никакой не соответствует запросу (см. <A
+HREF="spgist-implementation.html#SPGIST-ALL-THE-SAME"
+>Подраздел 57.4.3</A
+>). Признак <TT
+CLASS="STRUCTFIELD"
+>hasPrefix</TT
+> устанавливается, если текущий внутренний кортеж содержит префикс; в этом случае в <TT
+CLASS="STRUCTFIELD"
+>prefixDatum</TT
+> находится его значение. В <TT
+CLASS="STRUCTFIELD"
+>nNodes</TT
+> задаётся число дочерних узлов, содержащихся во внутреннем кортеже, а в <TT
+CLASS="STRUCTFIELD"
+>nodeLabels</TT
+> — массив их меток, либо NULL, если они не имеют меток.</P
+><P
+>В <TT
+CLASS="STRUCTFIELD"
+>nNodes</TT
+> нужно записать число дочерних узлов, которые нужно посетить при поиске, а в <TT
+CLASS="STRUCTFIELD"
+>nodeNumbers</TT
+> — массив их индексов. Если класс операторов отслеживает уровни, в <TT
+CLASS="STRUCTFIELD"
+>levelAdds</TT
+> нужно передать массив с шагами увеличения уровня при посещении каждого узла. (Часто шаг будет одним для всех узлов, но может быть и по-другому, поэтому применяется массив.) Если потребовалось восстановить значения, поместите в <TT
+CLASS="STRUCTFIELD"
+>reconstructedValues</TT
+> указатель на массив значений, восстановленных для каждого дочернего узла, который нужно посетить; в противном случае оставьте <TT
+CLASS="STRUCTFIELD"
+>reconstructedValues</TT
+> равным NULL. Заметьте, что функция <CODE
+CLASS="FUNCTION"
+>inner_consistent</CODE
+> сама должна выделять память, используя palloc, для массивов <TT
+CLASS="STRUCTFIELD"
+>nodeNumbers</TT
+>, <TT
+CLASS="STRUCTFIELD"
+>levelAdds</TT
+> и <TT
+CLASS="STRUCTFIELD"
+>reconstructedValues</TT
+>.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>leaf_consistent</CODE
+></DT
+><DD
+><P
+>Возвращает true, если кортеж листа удовлетворяет запросу.</P
+><P
+>В <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> эта функция должна объявляться так: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION my_leaf_consistent(internal, internal) RETURNS bool ...</PRE
+><P> В первом аргументе передаётся указатель на структуру <TT
+CLASS="STRUCTNAME"
+>spgLeafConsistentIn</TT
+> языка C, содержащую входные данные для функции. Во втором аргументе передаётся указатель на структуру <TT
+CLASS="STRUCTNAME"
+>spgLeafConsistentOut</TT
+> языка C, в которую функция должна поместить результат. </P><PRE
+CLASS="PROGRAMLISTING"
+>typedef struct spgLeafConsistentIn
+{
+    ScanKey     scankeys;       /* массив операторов и искомых значений */
+    int         nkeys;          /* длина массива */
+
+    Datum       reconstructedValue;     /* значение, восстановленное для родителя */
+    int         level;          /* текущий уровень (отсчитывая от нуля) */
+    bool        returnData;     /* нужно ли возвращать исходные данные? */
+
+    Datum       leafDatum;      /* значение в кортеже листа */
+} spgLeafConsistentIn;
+
+typedef struct spgLeafConsistentOut
+{
+    Datum       leafValue;      /* восстановленные исходные данные, при наличии */
+    bool        recheck;        /* true, если оператор нужно перепроверить*/
+} spgLeafConsistentOut;</PRE
+><P> Массив <TT
+CLASS="STRUCTFIELD"
+>scankeys</TT
+> длины <TT
+CLASS="STRUCTFIELD"
+>nkeys</TT
+> описывает условия поиска по индексу. Эти условия объединяются операцией AND &mdash; запросу удовлетворяют только те записи в индексе, которые удовлетворяют всем этим условиям. (Заметьте, что с <TT
+CLASS="STRUCTFIELD"
+>nkeys</TT
+> = 0 подразумевается, что запросу удовлетворяют все записи в индексе.) Обычно эту функцию интересуют только поля <TT
+CLASS="STRUCTFIELD"
+>sk_strategy</TT
+> и <TT
+CLASS="STRUCTFIELD"
+>sk_argument</TT
+> в каждой записи массива, в которых определяются соответственно индексируемый оператор и искомое значение. В частности, нет необходимости проверять <TT
+CLASS="STRUCTFIELD"
+>sk_flags</TT
+>, чтобы распознать NULL в искомом значении, так как ядро SP-GiST отфильтрует такие условия. В <TT
+CLASS="STRUCTFIELD"
+>reconstructedValue</TT
+> передаётся значение, восстановленное для родительского кортежа; это может быть <TT
+CLASS="LITERAL"
+>(Datum) 0</TT
+> на уровне корня или если функция <CODE
+CLASS="FUNCTION"
+>inner_consistent</CODE
+> не установила значение на предыдущем уровне. В <TT
+CLASS="STRUCTFIELD"
+>level</TT
+> передаётся уровень текущего внутреннего кортежа (уровень корня считается нулевым). Флаг <TT
+CLASS="STRUCTFIELD"
+>returnData</TT
+> устанавливается, когда для этого запроса нужно получить восстановленные данные; это возможно, только если функция <CODE
+CLASS="FUNCTION"
+>config</CODE
+> установила признак <TT
+CLASS="STRUCTFIELD"
+>canReturnData</TT
+>. В <TT
+CLASS="STRUCTFIELD"
+>leafDatum</TT
+> передаётся значение ключа, записанное в текущем кортеже листа.</P
+><P
+>Эта функция должна вернуть <TT
+CLASS="LITERAL"
+>true</TT
+>, если кортеж листа соответствует запросу, или <TT
+CLASS="LITERAL"
+>false</TT
+> в противном случае. В случае положительного результата, если в поле <TT
+CLASS="STRUCTFIELD"
+>returnData</TT
+> передано <TT
+CLASS="LITERAL"
+>true</TT
+>, нужно поместить в <TT
+CLASS="STRUCTFIELD"
+>leafValue</TT
+> значение, изначально переданное для индексации в этот кортеж. Кроме того, флагу <TT
+CLASS="STRUCTFIELD"
+>recheck</TT
+> можно присвоить <TT
+CLASS="LITERAL"
+>true</TT
+>, если соответствие неточное, так что для установления точного результата проверки нужно повторно применить оператор(ы) к актуальному кортежу данных.</P
+></DD
+></DL
+></DIV
+><P
+>Все опорные методы SP-GiST обычно вызываются в кратковременных контекстах памяти; то есть <TT
+CLASS="VARNAME"
+>CurrentMemoryContext</TT
+> сбрасывается после обработки каждого кортежа. Таким образом, можно не заботиться об освобождении любых блоков памяти, выделенных функцией palloc. (Метод <CODE
+CLASS="FUNCTION"
+>config</CODE
+> является исключением: в нём нужно не допускать утечек памяти. Но обычно метод <CODE
+CLASS="FUNCTION"
+>config</CODE
+> не делает ничего, кроме как присваивает константы переданной структуре параметров.)</P
+><P
+>Если индексируемая колонка имеет сортируемый тип данных, правило сортировки индекса будет передаваться всем опорным методам, используя стандартный механизм <CODE
+CLASS="FUNCTION"
+>PG_GET_COLLATION()</CODE
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="spgist-builtin-opclasses.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="spgist-implementation.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Встроенные классы операторов</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="spgist.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Реализация</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

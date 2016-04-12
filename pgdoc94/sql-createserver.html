@@ -1,0 +1,387 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>CREATE SERVER</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="CREATE SEQUENCE"
+HREF="sql-createsequence.html"><LINK
+REL="NEXT"
+TITLE="CREATE TABLE"
+HREF="sql-createtable.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="CREATE SEQUENCE"
+HREF="sql-createsequence.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="CREATE TABLE"
+HREF="sql-createtable.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-CREATESERVER"
+></A
+>CREATE SERVER</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN75539"
+></A
+><H2
+>Название</H2
+>CREATE SERVER&nbsp;--&nbsp;создать сторонний сервер</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN75542"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>CREATE SERVER <TT
+CLASS="REPLACEABLE"
+><I
+>имя_сервера</I
+></TT
+> [ TYPE '<TT
+CLASS="REPLACEABLE"
+><I
+>тип_сервера</I
+></TT
+>' ] [ VERSION '<TT
+CLASS="REPLACEABLE"
+><I
+>версия_сервера</I
+></TT
+>' ]
+    FOREIGN DATA WRAPPER <TT
+CLASS="REPLACEABLE"
+><I
+>имя_обёртки_сторонних_данных</I
+></TT
+>
+    [ OPTIONS ( <TT
+CLASS="REPLACEABLE"
+><I
+>параметр</I
+></TT
+> '<TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+>' [, ... ] ) ]</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN75550"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>CREATE SERVER</TT
+> создаёт сторонний сервер. Владельцем сервера становится создавший его пользователь.</P
+><P
+>Определение стороннего сервера обычно включает информацию о подключении, которую использует обёртка сторонних данных для доступа к внешнему ресурсу. Определяя сопоставления пользователей, можно установить и другие параметры подключения, связанные с пользователями.</P
+><P
+>Имя сервера должно быть уникальным в базе данных.</P
+><P
+>Для создания сервера требуется право <TT
+CLASS="LITERAL"
+>USAGE</TT
+> для обёртки сторонних данных.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN75558"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_сервера</I
+></TT
+></DT
+><DD
+><P
+>Имя создаваемого стороннего сервера.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>тип_сервера</I
+></TT
+></DT
+><DD
+><P
+>Необязательный тип сервера, может быть полезен для обёрток сторонних данных.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>версия_сервера</I
+></TT
+></DT
+><DD
+><P
+>Необязательная версия сервера, может быть полезна для обёрток сторонних данных.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_обёртки_сторонних_данных</I
+></TT
+></DT
+><DD
+><P
+>Имя обёртки сторонних данных, управляющей сервером.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>OPTIONS ( <TT
+CLASS="REPLACEABLE"
+><I
+>параметр</I
+></TT
+> '<TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+>' [, ... ] )</TT
+></DT
+><DD
+><P
+>Это предложение определяет параметры сервера. Эти параметры обычно задают свойства подключения к серверу; их конкретные имена и значения зависят от обёртки сторонних данных.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN75588"
+></A
+><H2
+>Замечания</H2
+><P
+>При использовании модуля <A
+HREF="dblink.html"
+>dblink</A
+> имя стороннего сервера может служить аргументом функции <A
+HREF="contrib-dblink-connect.html"
+>dblink_connect</A
+>, определяющим параметры подключения. Для такого варианта использования необходимо иметь право <TT
+CLASS="LITERAL"
+>USAGE</TT
+> для стороннего сервера.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN75594"
+></A
+><H2
+>Примеры</H2
+><P
+>Создание сервера <TT
+CLASS="LITERAL"
+>myserver</TT
+>, доступного через обёртку <TT
+CLASS="LITERAL"
+>postgres_fdw</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE SERVER myserver FOREIGN DATA WRAPPER postgres_fdw OPTIONS (host 'foo', dbname 'foodb', port '5432');</PRE
+><P> За подробностями обратитесь к <A
+HREF="postgres-fdw.html"
+>postgres_fdw</A
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN75601"
+></A
+><H2
+>Совместимость</H2
+><P
+><TT
+CLASS="COMMAND"
+>CREATE SERVER</TT
+> соответствует стандарту ISO/IEC 9075-9 (SQL/MED).</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN75605"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-alterserver.html"
+>ALTER SERVER</A
+>, <A
+HREF="sql-dropserver.html"
+>DROP SERVER</A
+>, <A
+HREF="sql-createforeigndatawrapper.html"
+>CREATE FOREIGN DATA WRAPPER</A
+>, <A
+HREF="sql-createforeigntable.html"
+>CREATE FOREIGN TABLE</A
+>, <A
+HREF="sql-createusermapping.html"
+>CREATE USER MAPPING</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-createsequence.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-createtable.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>CREATE SEQUENCE</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>CREATE TABLE</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

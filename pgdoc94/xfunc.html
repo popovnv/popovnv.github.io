@@ -1,0 +1,247 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Пользовательские функции</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Расширение SQL"
+HREF="extend.html"><LINK
+REL="PREVIOUS"
+TITLE="Система типов PostgreSQL"
+HREF="extend-type-system.html"><LINK
+REL="NEXT"
+TITLE="Функции на языке запросов (SQL)"
+HREF="xfunc-sql.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Система типов PostgreSQL"
+HREF="extend-type-system.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="extend.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 35. Расширение <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Функции на языке запросов (SQL)"
+HREF="xfunc-sql.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="XFUNC"
+>35.3. Пользовательские функции</A
+></H1
+><P
+>В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> представлены функции четырёх видов: <P
+></P
+></P><UL
+><LI
+><P
+>функции на языке запросов (функции, написанные на <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>) (<A
+HREF="xfunc-sql.html"
+>Раздел 35.4</A
+>)</P
+></LI
+><LI
+><P
+>функции на процедурных языках (функции, написанные, например, на <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> или <SPAN
+CLASS="APPLICATION"
+>PL/Tcl</SPAN
+>) (<A
+HREF="xfunc-pl.html"
+>Раздел 35.7</A
+>)</P
+></LI
+><LI
+><P
+>внутренние функции (<A
+HREF="xfunc-internal.html"
+>Раздел 35.8</A
+>)</P
+></LI
+><LI
+><P
+>функции на языке C (<A
+HREF="xfunc-c.html"
+>Раздел 35.9</A
+>)</P
+></LI
+></UL
+><P></P
+><P
+>Функции любых видов могут принимать в качестве аргументов (параметров) базовые типы, составные типы или их сочетания. Кроме того, любые функции могут возвращать значения базового или составного типа. Также можно определить функции, возвращающие наборы базовых или составных значений.</P
+><P
+>Функции многих видов могут также принимать или возвращать определённые псевдотипы (например, полиморфные типы), но доступные средства для работы с ними различаются. За подробностями обратитесь к описанию конкретного вида функций.</P
+><P
+>Проще всего определить функции на языке <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>, поэтому сначала мы рассмотрим их. Многие концепции, касающиеся функций на <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>, затем распространятся и на другие виды функций.</P
+><P
+>Изучая эту главу, будет полезно обращаться к странице справки по команде <A
+HREF="sql-createfunction.html"
+>CREATE FUNCTION</A
+>, чтобы лучше понимать примеры. Некоторые примеры из этой главы можно найти в файлах <TT
+CLASS="FILENAME"
+>funcs.sql</TT
+> и <TT
+CLASS="FILENAME"
+>funcs.c</TT
+> в каталоге <TT
+CLASS="FILENAME"
+>src/tutorial</TT
+> исходного кода <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="extend-type-system.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="xfunc-sql.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Система типов <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="extend.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Функции на языке запросов (<ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>)</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

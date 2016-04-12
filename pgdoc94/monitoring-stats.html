@@ -1,0 +1,3940 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Сборщик статистики</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Мониторинг работы СУБД"
+HREF="monitoring.html"><LINK
+REL="PREVIOUS"
+TITLE="Стандартные инструменты Unix"
+HREF="monitoring-ps.html"><LINK
+REL="NEXT"
+TITLE="Просмотр информации о блокировках"
+HREF="monitoring-locks.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Стандартные инструменты Unix"
+HREF="monitoring-ps.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="monitoring.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 27. Мониторинг работы СУБД</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Просмотр информации о блокировках"
+HREF="monitoring-locks.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="MONITORING-STATS"
+>27.2. Сборщик статистики</A
+></H1
+><P
+><I
+CLASS="FIRSTTERM"
+>Сборщик статистики</I
+> в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> представляет собой подсистему, которая собирает и отображает информацию о работе сервера. В настоящее время сборщик может подсчитывать количество обращений к таблицам и индексам &mdash; в виде количества прочитанных блоков или строк с диска. Кроме того, он отслеживает общее число строк в каждой таблице, информацию о выполнении очистки и сбора статистики для каждой таблицы. Он также может подсчитывать вызовы пользовательских функций и общее время, затраченное на выполнение каждой из них.</P
+><P
+>Кроме того, <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> может предоставить информацию обо всех командах, которые в настоящее время выполняются другими серверными процессами. Эта возможность не зависит от процесса сборщика.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="MONITORING-STATS-SETUP"
+>27.2.1. Конфигурация системы сбора статистики</A
+></H2
+><P
+>Поскольку сбор статистики несколько увеличивает накладные расходы при выполнении запроса, есть возможность настроить СУБД так, чтобы выполнять или не выполнять сбор статистической информации. Это контролируется конфигурационными параметрами, которые обычно устанавливаются в файле <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+>. (Подробно установка конфигурационных параметров описывается в <A
+HREF="runtime-config.html"
+>Главе 18</A
+>.)</P
+><P
+>Параметр <A
+HREF="runtime-config-statistics.html#GUC-TRACK-ACTIVITIES"
+>track_activities</A
+> включает мониторинг текущих команд, выполняемой любым серверным процессом.</P
+><P
+>Параметр <A
+HREF="runtime-config-statistics.html#GUC-TRACK-COUNTS"
+>track_counts</A
+> определяет необходимость сбора статистики по обращениям к таблицам и индексам.</P
+><P
+>Параметр <A
+HREF="runtime-config-statistics.html#GUC-TRACK-FUNCTIONS"
+>track_functions</A
+> включает отслеживание использования пользовательских функций.</P
+><P
+>Параметр <A
+HREF="runtime-config-statistics.html#GUC-TRACK-IO-TIMING"
+>track_io_timing</A
+> включает мониторинг времени чтения и записи блоков.</P
+><P
+>Обычно эти параметры устанавливаются в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+>, поэтому они применяются ко всем серверным процессам, однако, используя команду <A
+HREF="sql-set.html"
+>SET</A
+>, их можно включать и выключать в отдельных сессиях. (Для того чтобы обычные пользователи не скрывали свою работу от администратора СУБД, изменять эти параметры с помощью команды <TT
+CLASS="COMMAND"
+>SET</TT
+> могут только суперпользователи.)</P
+><P
+>Сборщик статистики использует временные файлы для передачи собранной информации другим процессам <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Имя каталога, в котором хранятся эти файлы, задаётся параметром <A
+HREF="runtime-config-statistics.html#GUC-STATS-TEMP-DIRECTORY"
+>stats_temp_directory</A
+>, по умолчанию он называется <TT
+CLASS="FILENAME"
+>pg_stat_tmp</TT
+>. Для повышения производительности <TT
+CLASS="VARNAME"
+>stats_temp_directory</TT
+> может указывать на каталог, расположенный в оперативной памяти, что сокращает время физического ввода/вывода. При остановке сервера постоянная копия статистической информации сохраняется в подкаталоге <TT
+CLASS="FILENAME"
+>pg_stat</TT
+>, поэтому статистику можно хранить на протяжении нескольких перезапусков сервера. Когда восстановление выполняется при запуске сервера (например, после непосредственного завершения работы, катастрофического отказа сервера, и восстановлении на заданную точку во времени), все статистические данные счётчиков сбрасываются.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="MONITORING-STATS-VIEWS"
+>27.2.2. Просмотр собранной статистики</A
+></H2
+><P
+>Для просмотра результатов сбора статистики существует несколько представлений, которые перечислены в <A
+HREF="monitoring-stats.html#MONITORING-STATS-VIEWS-TABLE"
+>Таблице 27-1</A
+>. Кроме того, с использованием встроенных статистических функций можно построить пользовательские представления, эта возможность рассматривается в <A
+HREF="monitoring-stats.html#MONITORING-STATS-FUNCTIONS"
+>Подразделе 27.2.3</A
+>.</P
+><P
+>При использовании статистической информации для мониторинга текущей работы СУБД важно понимать, что эта информация обновляется не сразу. Каждый серверный процесс передаёт новые статистические данные сборщику статистики сразу перед переходом в режим ожидания; то есть запрос или транзакция в процессе выполнения не влияют на отображаемые данные статистики. К тому же, сам сборщик статистики формирует новый отчёт не чаще, чем раз в <TT
+CLASS="VARNAME"
+>PGSTAT_STAT_INTERVAL</TT
+> миллисекунд (500 мс, если этот параметр не изменялся при установке сервера). Так что отображаемая информация отстаёт от того, что происходит в настоящий момент. Однако информация о текущем запросе, собираемая <TT
+CLASS="VARNAME"
+>track_activities</TT
+>, всегда актуальна.</P
+><P
+>Ещё одним важным моментом является то, что когда в серверном процессе запрашивают какую-либо статистику, сначала он получает наиболее свежий моментальный снимок от сборщика статистики и затем до окончания текущей транзакции использует этот снимок для всех статистических представлений и функций. Так что на протяжении одной транзакции статистическая информация меняться не будет. Подобным же образом информация о текущих запросах во всех сессиях собирается в тот момент, когда она впервые запрашивается в рамках транзакции, и эта же самая информация будет отображаться на протяжении всей транзакции. Это не ошибка, а полезное свойство СУБД, поскольку оно позволяет выполнять запросы к статистическим данным и сравнивать результаты, не беспокоясь о том, что статистические данные изменяются. Но если для каждого запроса вам нужны новые результаты, то их следует выполнять вне любых транзакционных блоков. Или же можно вызывать функцию <CODE
+CLASS="FUNCTION"
+>pg_stat_clear_snapshot</CODE
+>(), которая сбросит ранее полученный снимок статистики в текущей транзакции (если он был). При следующем обращении к статистической информации будет сформирован новый моментальный снимок.</P
+><P
+>Через представления <TT
+CLASS="STRUCTNAME"
+>pg_stat_xact_all_tables</TT
+>, <TT
+CLASS="STRUCTNAME"
+>pg_stat_xact_sys_tables</TT
+>, <TT
+CLASS="STRUCTNAME"
+>pg_stat_xact_user_tables</TT
+>, и <TT
+CLASS="STRUCTNAME"
+>pg_stat_xact_user_functions</TT
+> транзакции также доступна её собственная статистика (ещё не переданная сборщику статистики). Данные в этих представлениях ведут себя не так, как описано выше; наоборот, в течение транзакции они постоянно обновляются.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="MONITORING-STATS-VIEWS-TABLE"
+></A
+><P
+><B
+>Таблица 27-1. Основные статистические представления</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+>Имя представления</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>       <TT
+CLASS="STRUCTNAME"
+>pg_stat_activity</TT
+></TD
+><TD
+>Одна строка для каждого серверного процесса c информацией по текущей активности процесса, такой как состояние и текущий запрос. За подробностями обратитесь к <A
+HREF="monitoring-stats.html#PG-STAT-ACTIVITY-VIEW"
+>pg_stat_activity</A
+>.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_stat_archiver</TT
+></TD
+><TD
+>Только одна строка со статистикой о работе активности процесса архивации WAL. Более подробно смотрите <A
+HREF="monitoring-stats.html#PG-STAT-ARCHIVER-VIEW"
+>pg_stat_archiver</A
+>.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_stat_bgwriter</TT
+></TD
+><TD
+>Только одна строка со статистикой о работе фонового процесса записи. Более подробно смотрите <A
+HREF="monitoring-stats.html#PG-STAT-BGWRITER-VIEW"
+>pg_stat_bgwriter</A
+>.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_stat_database</TT
+></TD
+><TD
+>Одна строка для каждой базы данных со статистикой на уровне базы. Более подробно смотрите <A
+HREF="monitoring-stats.html#PG-STAT-DATABASE-VIEW"
+>pg_stat_database</A
+>.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_stat_all_tables</TT
+></TD
+><TD
+>По одной строке на каждую таблицу в текущей базе данных со статистикой по обращениям к этой таблице. Более подробно смотрите <A
+HREF="monitoring-stats.html#PG-STAT-ALL-TABLES-VIEW"
+>pg_stat_all_tables</A
+>.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_stat_sys_tables</TT
+></TD
+><TD
+>Аналогично <TT
+CLASS="STRUCTNAME"
+>pg_stat_all_tables</TT
+>, за исключением того, что отображаются только системные таблицы.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_stat_user_tables</TT
+></TD
+><TD
+>Аналогично <TT
+CLASS="STRUCTNAME"
+>pg_stat_all_tables</TT
+>, за исключением того, что отображаются только пользовательские таблицы.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_stat_xact_all_tables</TT
+></TD
+><TD
+>Подобно <TT
+CLASS="STRUCTNAME"
+>pg_stat_all_tables</TT
+>, но подсчитывает действия, выполненные в текущей транзакции к настоящему моменту (которые ещё <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>не</I
+></SPAN
+> вошли в <TT
+CLASS="STRUCTNAME"
+>pg_stat_all_tables</TT
+> и связанные представления). Колонки для числа живых и мёртвых строк, а также количества операций очистки и сбора статистики в этом представлении отсутствуют.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_stat_xact_sys_tables</TT
+></TD
+><TD
+>Аналогично <TT
+CLASS="STRUCTNAME"
+>pg_stat_xact_all_tables</TT
+>, за исключением того, что отображаются только системные таблицы.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_stat_xact_user_tables</TT
+></TD
+><TD
+>Аналогично <TT
+CLASS="STRUCTNAME"
+>pg_stat_xact_all_tables</TT
+>, за исключением того, что отображаются только пользовательские таблицы.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_stat_all_indexes</TT
+></TD
+><TD
+>По одной строке для каждого индекса в текущей базе данных со статистикой по обращениям к этому индексу. Более подробно смотрите <A
+HREF="monitoring-stats.html#PG-STAT-ALL-INDEXES-VIEW"
+>pg_stat_all_indexes</A
+>.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_stat_sys_indexes</TT
+></TD
+><TD
+>Аналогично <TT
+CLASS="STRUCTNAME"
+>pg_stat_all_indexes</TT
+>, за исключением того, что показываются только индексы по системным таблицам.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_stat_user_indexes</TT
+></TD
+><TD
+>Аналогично <TT
+CLASS="STRUCTNAME"
+>pg_stat_all_indexes</TT
+>, за исключением того, что показываются только индексы по пользовательским таблицам.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_statio_all_tables</TT
+></TD
+><TD
+>По одной строке для каждой таблицы в текущей базе данных со статистикой по операциям ввода/вывода для этой таблицы. Более подробно смотрите <A
+HREF="monitoring-stats.html#PG-STATIO-ALL-TABLES-VIEW"
+>pg_statio_all_tables</A
+>.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_statio_sys_tables</TT
+></TD
+><TD
+>Аналогично <TT
+CLASS="STRUCTNAME"
+>pg_statio_all_tables</TT
+>, за исключением того, что показываются только системные таблицы.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_statio_user_tables</TT
+></TD
+><TD
+>Аналогично <TT
+CLASS="STRUCTNAME"
+>pg_statio_all_tables</TT
+>, за исключением того, что показываются только пользовательские таблицы.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_statio_all_indexes</TT
+></TD
+><TD
+>По одной строке для каждого индекса в текущей базе данных со статистикой по операциям ввода/вывода для этого индекса. Более подробно смотрите <A
+HREF="monitoring-stats.html#PG-STATIO-ALL-INDEXES-VIEW"
+>pg_statio_all_indexes</A
+>.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_statio_sys_indexes</TT
+></TD
+><TD
+>Аналогично <TT
+CLASS="STRUCTNAME"
+>pg_statio_all_indexes</TT
+>, за исключением того, что показываются только индексы по системным таблицам.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_statio_user_indexes</TT
+></TD
+><TD
+>Аналогично <TT
+CLASS="STRUCTNAME"
+>pg_statio_all_indexes</TT
+>, за исключением того, что показываются только индексы по пользовательским таблицам.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_statio_all_sequences</TT
+></TD
+><TD
+>По одной строке для каждой последовательности в текущей базе данных со статистикой по операциям ввода/вывода для этой последовательности. Более подробно смотрите <A
+HREF="monitoring-stats.html#PG-STATIO-ALL-SEQUENCES-VIEW"
+>pg_statio_all_sequences</A
+>.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_statio_sys_sequences</TT
+></TD
+><TD
+>Аналогично <TT
+CLASS="STRUCTNAME"
+>pg_statio_all_sequences</TT
+>, за исключением того, что показываются только системные последовательности. (В настоящее время системных последовательностей нет, поэтому это представление всегда пусто.)</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_statio_user_sequences</TT
+></TD
+><TD
+>Аналогично <TT
+CLASS="STRUCTNAME"
+>pg_statio_all_sequences</TT
+>, за исключением того, что показываются только пользовательские последовательности.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_stat_user_functions</TT
+></TD
+><TD
+>По одной строке для каждой отслеживаемой функции со статистикой по выполнениям этой функции. Более подробно смотрите <A
+HREF="monitoring-stats.html#PG-STAT-USER-FUNCTIONS-VIEW"
+>pg_stat_user_functions</A
+>.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_stat_xact_user_functions</TT
+></TD
+><TD
+>Аналогично <TT
+CLASS="STRUCTNAME"
+>pg_stat_user_functions</TT
+>, однако подсчитываются только вызовы функций, выполненные в текущей транзакции (которые ещё <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>не</I
+></SPAN
+> были включены в <TT
+CLASS="STRUCTNAME"
+>pg_stat_user_functions</TT
+>).</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_stat_replication</TT
+></TD
+><TD
+>По одной строке для каждого процесса WAL-отправителя со статистикой по репликации на резервном сервере, к которому подключён этот процесс. За подробностями обратитесь к <A
+HREF="monitoring-stats.html#PG-STAT-REPLICATION-VIEW"
+>pg_stat_replication</A
+>.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTNAME"
+>pg_stat_database_conflicts</TT
+></TD
+><TD
+>По одной строке на каждую базу данных со статистикой по отменам запросов, выполненным вследствие конфликта с процессами восстановления на резервных серверах. Более подробно смотрите <A
+HREF="monitoring-stats.html#PG-STAT-DATABASE-CONFLICTS-VIEW"
+>pg_stat_database_conflicts</A
+>.</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Статистика по отдельным индексам особенно полезна для определения того, какие индексы используются и насколько они эффективны.</P
+><P
+>Представления <TT
+CLASS="STRUCTNAME"
+>pg_statio_</TT
+> полезны, прежде всего, для определения эффективности буферного кеша. Если количество фактических дисковых чтений существенно меньше количества чтений из буферного кеша, то это означает, что кеш справляется с большинством запросов на чтение без обращения к ядру. Однако эта статистика не даёт полной картины: <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> обрабатывает дисковый ввод/вывод так, что данные, не находящиеся в буферном кеше <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, могут все ещё располагаться в кеше ввода/вывода ядра, и, следовательно, для их получения физическое чтение может не использоваться. Для получения более детальной информации о процессе ввода/вывода в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> рекомендуется использовать сборщик статистики <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> в сочетании с утилитами операционной системы, которые дают более полное представление о том, как ядро осуществляет ввод/вывод.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="PG-STAT-ACTIVITY-VIEW"
+></A
+><P
+><B
+>Таблица 27-2. Представление <TT
+CLASS="STRUCTNAME"
+>pg_stat_activity</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Колонка</TH
+><TH
+>Тип</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>datid</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>oid</TT
+>
+                  </TD
+><TD
+>OID базы данных, к которой подключён этот серверный процесс</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>datname</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>name</TT
+>
+                  </TD
+><TD
+>Имя базы данных, к которой подключён этот серверный процесс</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>pid</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>integer</TT
+>
+                  </TD
+><TD
+>Идентификатор процесса этого серверного процесса</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>usesysid</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>oid</TT
+>
+                  </TD
+><TD
+>OID пользователя, подключённого к этому серверному процессу</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>usename</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>name</TT
+>
+                  </TD
+><TD
+>Имя пользователя, подключённого к этому серверному процессу</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>application_name</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>text</TT
+>
+                  </TD
+><TD
+>Название приложения, подключённого к этому серверному процессу</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>client_addr</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>inet</TT
+>
+                  </TD
+><TD
+>IP-адрес клиента, подключённого к этому серверному процессу. Значение null в этом поле означает, что клиент подключён через сокет Unix на стороне сервера или что это внутренний процесс, например, автоочистка.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>client_hostname</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>text</TT
+>
+                  </TD
+><TD
+>Имя компьютера для подключённого клиента, получаемое в результате обратного поиска в DNS по <TT
+CLASS="STRUCTFIELD"
+>client_addr</TT
+>. Это поле будет отлично от null только в случае соединений по IP и только при включённом режиме <A
+HREF="runtime-config-logging.html#GUC-LOG-HOSTNAME"
+>log_hostname</A
+>.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>client_port</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>integer</TT
+>
+                  </TD
+><TD
+>Номер TCP-порта, который используется клиентом для соединения с этим серверным процессом, или <TT
+CLASS="LITERAL"
+>-1</TT
+>, если используется сокет Unix</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>backend_start</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+>
+                  </TD
+><TD
+>Время запуска процесса, т. е. время, когда клиент подсоединился к серверу</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>xact_start</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+>
+                  </TD
+><TD
+>Время начала текущей транзакции в этом процессе, или null при отсутствии активной транзакции. Если текущий запрос был первым в своей транзакции, то значение в этой колонке совпадает со значением колонки <TT
+CLASS="STRUCTFIELD"
+>query_start</TT
+>.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>query_start</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+>
+                  </TD
+><TD
+>Время начала выполнения активного в данный момент запроса, или, если <TT
+CLASS="STRUCTFIELD"
+>state</TT
+> не <TT
+CLASS="LITERAL"
+>active</TT
+>, то время начала выполнения последнего запроса</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>state_change</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+>
+                  </TD
+><TD
+>Время последнего изменения <TT
+CLASS="STRUCTFIELD"
+>состояния</TT
+></TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>waiting</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>True, если этот серверный процесс ожидает освобождения блокировки</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>state</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>text</TT
+>
+                  </TD
+><TD
+>Общее текущее состояние этого серверного процесса. Возможные значения: <P
+></P
+><UL
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>active</TT
+>: серверный процесс выполняет запрос.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>idle</TT
+>: серверный процесс ожидает новой команды от клиента.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>idle in transaction</TT
+>: серверный процесс находится внутри транзакции, но в настоящее время не выполняет никакой запрос.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>idle in transaction (aborted)</TT
+>: Это состояние подобно <TT
+CLASS="LITERAL"
+>idle in transaction</TT
+>, за исключением того, что один из операторов в транзакции вызывал ошибку.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>fastpath function call</TT
+>: серверный процесс выполняет fast-path функцию.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>disabled</TT
+>: Это состояние отображается для серверных процессов, у которых параметр <A
+HREF="runtime-config-statistics.html#GUC-TRACK-ACTIVITIES"
+>track_activities</A
+> отключён.</P
+></LI
+></UL
+></TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>backend_xid</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>xid</TT
+>
+                  </TD
+><TD
+>Идентификатор верхнего уровня транзакции этого серверного процесса или любой другой.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>backend_xmin</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>xid</TT
+>
+                  </TD
+><TD
+>текущая граница <TT
+CLASS="LITERAL"
+>xmin</TT
+> для серверного процесса.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>query</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>text</TT
+>
+                  </TD
+><TD
+>Текст последнего запроса этого серверного процесса. Если <TT
+CLASS="STRUCTFIELD"
+>state</TT
+> имеет значение <TT
+CLASS="LITERAL"
+>active</TT
+>, то в этом поле отображается запрос, который выполняется в настоящий момент. Если процесс находится в любом другом состоянии, то в этом поле отображается последний выполненный запрос.</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>В представлении <TT
+CLASS="STRUCTNAME"
+>pg_stat_activity</TT
+> для каждого серверного процесса будет присутствовать по одной строке с информацией, относящейся к текущей деятельности этого процесса.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Значения в колонках <TT
+CLASS="STRUCTFIELD"
+>waiting</TT
+> и <TT
+CLASS="STRUCTFIELD"
+>state</TT
+> не зависят друг от друга. Серверный процесс, находящийся в состоянии <TT
+CLASS="LITERAL"
+>active</TT
+> может быть <TT
+CLASS="LITERAL"
+>waiting</TT
+>, а может и не быть. Если статусы процессов имеют значение true в <TT
+CLASS="LITERAL"
+>active</TT
+>, и <TT
+CLASS="STRUCTFIELD"
+>waiting</TT
+>, то это означает, что запрос выполняется, но его работе препятствует какая-то блокировка в системе.</P
+></BLOCKQUOTE
+></DIV
+><DIV
+CLASS="TABLE"
+><A
+NAME="PG-STAT-ARCHIVER-VIEW"
+></A
+><P
+><B
+>Таблица 27-3. Представление <TT
+CLASS="STRUCTNAME"
+>pg_stat_archiver</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Колонка</TH
+><TH
+>Тип</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>archived_count</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Число файлов WAL, которые были успешно архивированы</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>last_archived_wal</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>text</TT
+>
+                  </TD
+><TD
+>Имя последнего файла WAL успешно архивированного</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>last_archived_time</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+>
+                  </TD
+><TD
+>Время последней успешной архивации</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>failed_count</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Число неудачных попыток архивации файлов WAL</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>last_failed_wal</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>text</TT
+>
+                  </TD
+><TD
+>Имя файла WAL последней неудавшейся архивации</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>last_failed_time</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+>
+                  </TD
+><TD
+>Время последней неудавшейся архивации</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>stats_reset</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+>
+                  </TD
+><TD
+>Последнее время сброса этих статистических данных</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Представление <TT
+CLASS="STRUCTNAME"
+>pg_stat_archiver</TT
+> всегда будет иметь одну строку, содержащую данные о текущем состоянии процесса архивации кластера.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="PG-STAT-BGWRITER-VIEW"
+></A
+><P
+><B
+>Таблица 27-4. Представление <TT
+CLASS="STRUCTNAME"
+>pg_stat_bgwriter</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Колонка</TH
+><TH
+>Тип</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>checkpoints_timed</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Количество запланированных контрольных точек, которые уже были выполнены</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>checkpoints_req</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Количество запрошенных контрольных точек, которые уже были выполнены</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>checkpoint_write_time</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>double precision</TT
+>
+                  </TD
+><TD
+>Общее время, которое было затрачено на этап обработки контрольной точки, в котором файлы записываются на диск, в миллисекундах</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>checkpoint_sync_time</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>double precision</TT
+>
+                  </TD
+><TD
+>Общее время, которое было затрачено на этап обработки контрольной точки, в котором файлы синхронизируются с диском, в миллисекундах</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>buffers_checkpoint</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Количество буферов, записанных при выполнении контрольных точек</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>buffers_clean</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Количество буферов, записанных фоновым процессом записи</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>maxwritten_clean</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Сколько раз фоновый процесс записи останавливал сброс грязных страниц на диск из-за того, что записал слишком много буферов</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>buffers_backend</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Количество буферов, записанных самим серверным процессом</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>buffers_backend_fsync</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Сколько раз серверному процессу пришлось выполнить <CODE
+CLASS="FUNCTION"
+>fsync</CODE
+> самостоятельно (обычно фоновый процесс записи сам обрабатывает эти вызовы, даже когда серверный процесс выполняет запись самостоятельно)</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>buffers_alloc</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Количество выделенных буферов</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>stats_reset</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+>
+                  </TD
+><TD
+>Последнее время сброса этих статистических данных</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>В представлении <TT
+CLASS="STRUCTNAME"
+>pg_stat_bgwriter</TT
+> всегда будет только одна строка, в которой будут представлены общие данные по всему кластеру.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="PG-STAT-DATABASE-VIEW"
+></A
+><P
+><B
+>Таблица 27-5. Представление <TT
+CLASS="STRUCTNAME"
+>pg_stat_database</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Колонка</TH
+><TH
+>Тип</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>datid</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>oid</TT
+>
+                  </TD
+><TD
+>OID базы данных</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>datname</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>name</TT
+>
+                  </TD
+><TD
+>Имя базы данных</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>numbackends</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>integer</TT
+>
+                  </TD
+><TD
+>Количество серверных процессов, в настоящее время подключённых к этой базе данных. Это единственная колонка в этом представлении, значение в которой отражает текущее состояние; все другие колонки возвращают суммарные значения со времени последнего сброса статистики.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>xact_commit</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Количество зафиксированных транзакций в этой базе данных</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>xact_rollback</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Количество транзакций в этой базе данных, для которых был выполнен откат транзакции</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>blks_read</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Количество прочитанных дисковых блоков в этой базе данных</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>blks_hit</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Сколько раз дисковые блоки обнаруживались в буферном кеше, так что чтение с диска не потребовалось (в значение входят только случаи обнаружения в буферном кеше PostgreSQL, а не в кеше файловой системы ОС)</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>tup_returned</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Количество строк, возвращённое запросами в этой базе данных</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>tup_fetched</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Количество строк, извлечённое запросами в этой базе данных</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>tup_inserted</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Количество строк, вставленное запросами в этой базе данных</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>tup_updated</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Количество строк, изменённое запросами в этой базе данных</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>tup_deleted</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Количество строк, удалённое запросами в этой базе данных</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>conflicts</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Количество запросов, отменённых из-за конфликта с восстановлением в этой базе данных. (Конфликты происходят только на резервных серверах; более подробно смотрите <A
+HREF="monitoring-stats.html#PG-STAT-DATABASE-CONFLICTS-VIEW"
+>pg_stat_database_conflicts</A
+>.)</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>temp_files</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Количество временных файлов, созданных запросами в этой базе данных. Подсчитываются все временные файлы независимо от причины их создания (например, для сортировки или для хеширования) и независимо от установленного значения <A
+HREF="runtime-config-logging.html#GUC-LOG-TEMP-FILES"
+>log_temp_files</A
+></TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>temp_bytes</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Общий объём данных, записанных во временные файлы запросами в этой базе данных. Учитываются все временные файлы, вне зависимости от того, по какой причине они созданы и вне зависимости от значения <A
+HREF="runtime-config-logging.html#GUC-LOG-TEMP-FILES"
+>log_temp_files</A
+>.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>deadlocks</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Количество взаимных блокировок, зафиксированное в этой базе данных</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>blk_read_time</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>double precision</TT
+>
+                  </TD
+><TD
+>Время, затраченное серверными процессами в этой базе данных, на чтение блоков из файлов данных, в миллисекундах</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>blk_write_time</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>double precision</TT
+>
+                  </TD
+><TD
+>Время, затраченное серверными процессами в этой базе данных, на запись блоков в файлы данных, в миллисекундах</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>stats_reset</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+>
+                  </TD
+><TD
+>Последнее время сброса этих статистических данных</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Представление <TT
+CLASS="STRUCTNAME"
+>pg_stat_database</TT
+> содержит одну строку со статистикой на каждую базу данных кластера.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="PG-STAT-ALL-TABLES-VIEW"
+></A
+><P
+><B
+>Таблица 27-6. Представление <TT
+CLASS="STRUCTNAME"
+>pg_stat_all_tables</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Колонка</TH
+><TH
+>Тип</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>relid</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>oid</TT
+>
+                  </TD
+><TD
+>OID таблицы</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>schemaname</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>name</TT
+>
+                  </TD
+><TD
+>Имя схемы, в которой расположена эта таблица</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>relname</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>name</TT
+>
+                  </TD
+><TD
+>Имя таблицы</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>seq_scan</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Количество последовательных чтений, запущенных по этой таблице</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>seq_tup_read</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Количество "живых" строк, прочитанных при последовательных чтениях</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>idx_scan</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Количество сканирований по индексу, запущенных по этой таблице</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>idx_tup_fetch</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Количество "живых" строк, отобранных при сканированиях по индексу</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>n_tup_ins</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Количество вставленных строк</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>n_tup_upd</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Количество изменённых строк</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>n_tup_del</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Количество удалённых строк</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>n_tup_hot_upd</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Количество строк, обновлённых в режиме HOT (т. е. без отдельного изменения индекса)</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>n_live_tup</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Оценочное количество "живых" строк</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>n_dead_tup</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Оценочное количество "мёртвых" строк</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>n_mod_since_analyze</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Оценочное число строк, изменённых в этой таблице, с момента последнего сбора статистики</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>last_vacuum</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+>
+                  </TD
+><TD
+>Время последней очистки этой таблицы вручную (<TT
+CLASS="COMMAND"
+>VACUUM FULL</TT
+> не учитывается)</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>last_autovacuum</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+>
+                  </TD
+><TD
+>Время последней очистки таблицы фоновым процессом автоочистки</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>last_analyze</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+>
+                  </TD
+><TD
+>Время последнего выполнения сбора статистики для этой таблицы вручную</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>last_autoanalyze</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+>
+                  </TD
+><TD
+>Время последнего выполнения сбора статистики для этой таблицы фоновым процессом автоочистки</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>vacuum_count</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Сколько раз очистка этой таблицы была выполнена вручную (<TT
+CLASS="COMMAND"
+>VACUUM FULL</TT
+> не учитывается)</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>autovacuum_count</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Сколько раз очистка этой таблицы была выполнена фоновым процессом автоочистки</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>analyze_count</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Сколько раз сбор статистики для этой таблицы был выполнен вручную</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>autoanalyze_count</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Сколько раз сбор статистики для этой таблицы был выполнен фоновым процессом автоочистки</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Представление <TT
+CLASS="STRUCTNAME"
+>pg_stat_all_tables</TT
+> будет содержать по одной строке на каждую таблицу в текущей базе данных (включая таблицы TOAST) со статистикой по обращениям к этой таблице. Представления <TT
+CLASS="STRUCTNAME"
+>pg_stat_user_tables</TT
+> и <TT
+CLASS="STRUCTNAME"
+>pg_stat_sys_tables</TT
+> содержат ту же самую информацию, но отфильтрованную так, чтобы показывать только пользовательские и системные таблицы соответственно.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="PG-STAT-ALL-INDEXES-VIEW"
+></A
+><P
+><B
+>Таблица 27-7. Представление <TT
+CLASS="STRUCTNAME"
+>pg_stat_all_indexes</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Колонка</TH
+><TH
+>Тип</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>relid</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>oid</TT
+>
+                  </TD
+><TD
+>OID таблицы для индекса</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>indexrelid</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>oid</TT
+>
+                  </TD
+><TD
+>OID индекса</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>schemaname</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>name</TT
+>
+                  </TD
+><TD
+>Имя схемы, в которой расположен индекс</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>relname</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>name</TT
+>
+                  </TD
+><TD
+>Имя таблицы для индекса</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>indexrelname</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>name</TT
+>
+                  </TD
+><TD
+>Имя индекса</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>idx_scan</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Количество запущенных сканирований по этому индексу</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>idx_tup_read</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Количество элементов индекса, возвращённых при сканированиях по этому индексу</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>idx_tup_fetch</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Количество живых строк таблицы, отобранных при простых сканированиях по этому индексу</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Представление <TT
+CLASS="STRUCTNAME"
+>pg_stat_all_indexes</TT
+> для каждого индекса в текущей базе данных будет содержать по одной строке со статистикой по обращениям к этому индексу. Представления <TT
+CLASS="STRUCTNAME"
+>pg_stat_user_indexes</TT
+> и <TT
+CLASS="STRUCTNAME"
+>pg_stat_sys_indexes</TT
+> содержат ту же самую информацию, но отфильтрованную так, чтобы показывать только пользовательские и системные индексы соответственно.</P
+><P
+>Индексы можно использоваться при простом сканировании по индексу, кроме того, индексы могут участвовать в построении <SPAN
+CLASS="QUOTE"
+>"битовых"</SPAN
+> карт, на основе которых определяются возвращаемые строки. При сканировании битовых карт нескольких индексов, результаты могут объединяться через AND или OR, поэтому в этом случае сложно определить, с помощью какого конкретно индекса была получена каждая отдельная строка из кучи. Следовательно, сканирование битовых карт увеличивает значение(я) <TT
+CLASS="STRUCTNAME"
+>pg_stat_all_indexes</TT
+>.<TT
+CLASS="STRUCTFIELD"
+>idx_tup_read</TT
+> для индекса(ов), которые оно использует, а также счётчик <TT
+CLASS="STRUCTNAME"
+>pg_stat_all_tables</TT
+>.<TT
+CLASS="STRUCTFIELD"
+>idx_tup_fetch</TT
+> для таблицы, однако оно не влияет на <TT
+CLASS="STRUCTNAME"
+>pg_stat_all_indexes</TT
+>.<TT
+CLASS="STRUCTFIELD"
+>idx_tup_fetch</TT
+>.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Значения счётчиков <TT
+CLASS="STRUCTFIELD"
+>idx_tup_read</TT
+> и <TT
+CLASS="STRUCTFIELD"
+>idx_tup_fetch</TT
+> могут различаться, даже если сканирование с использованием битовой карты не используется, поскольку <TT
+CLASS="STRUCTFIELD"
+>idx_tup_read</TT
+> подсчитывает полученные из индекса элементы, а <TT
+CLASS="STRUCTFIELD"
+>idx_tup_fetch</TT
+> &mdash; количество "живых" строк, выбранных из таблицы. Различие будет меньше, если "мёртвые" или ещё незафиксированные строки будут извлекаться с использованием индекса или если для получения строк таблицы будет использоваться сканирование только по индексу.</P
+></BLOCKQUOTE
+></DIV
+><DIV
+CLASS="TABLE"
+><A
+NAME="PG-STATIO-ALL-TABLES-VIEW"
+></A
+><P
+><B
+>Таблица 27-8. Представление <TT
+CLASS="STRUCTNAME"
+>pg_statio_all_tables</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Колонка</TH
+><TH
+>Тип</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>relid</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>oid</TT
+>
+                  </TD
+><TD
+>OID таблицы</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>schemaname</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>name</TT
+>
+                  </TD
+><TD
+>Имя схемы, в которой расположена эта таблица</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>relname</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>name</TT
+>
+                  </TD
+><TD
+>Имя таблицы</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>heap_blks_read</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Количество дисковых блоков, прочитанных из этой таблицы</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>heap_blks_hit</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Число попаданий в буфер для этой таблицы</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>idx_blks_read</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Количество дисковых блоков, прочитанных из всех индексов этой таблицы</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>idx_blks_hit</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Число попаданий в буфер для всех индексов по этой таблице</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>toast_blks_read</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Количество прочитанных дисковых блоков TOAST (если есть) для этой таблицы</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>toast_blks_hit</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Число попаданий в буфер в таблице TOAST для этой таблицы (если такие есть)</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>tidx_blks_read</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Количество прочитанных дисковых блоков из индекса по TOAST (если есть) для этой таблицы</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>tidx_blks_hit</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Число попаданий в буфер для индекса по TOAST (если есть) для этой таблицы</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Представление <TT
+CLASS="STRUCTNAME"
+>pg_statio_all_tables</TT
+> для каждой таблицы (включая таблицы TOAST) в текущей базе данных будет содержать по одной строке со статистикой по операциям ввода/вывода для этой таблицы. Представления <TT
+CLASS="STRUCTNAME"
+>pg_statio_user_tables</TT
+> и <TT
+CLASS="STRUCTNAME"
+>pg_statio_sys_tables</TT
+> содержат ту же самую информацию, но отфильтрованную так, чтобы показывать только пользовательские или системные таблицы соответственно.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="PG-STATIO-ALL-INDEXES-VIEW"
+></A
+><P
+><B
+>Таблица 27-9. Представление <TT
+CLASS="STRUCTNAME"
+>pg_statio_all_indexes</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Колонка</TH
+><TH
+>Тип</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>relid</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>oid</TT
+>
+                  </TD
+><TD
+>OID таблицы для индекса</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>indexrelid</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>oid</TT
+>
+                  </TD
+><TD
+>OID индекса</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>schemaname</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>name</TT
+>
+                  </TD
+><TD
+>Имя схемы, в которой расположен индекс</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>relname</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>name</TT
+>
+                  </TD
+><TD
+>Имя таблицы для индекса</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>indexrelname</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>name</TT
+>
+                  </TD
+><TD
+>Имя индекса</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>idx_blks_read</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Количество дисковых блоков, прочитанных из этого индекса</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>idx_blks_hit</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Число попаданий в буфер для этого индекса</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Представление <TT
+CLASS="STRUCTNAME"
+>pg_statio_all_indexes</TT
+> для каждого индекса в текущей базе данных будет содержать по одной строке со статистикой по операциям ввода/вывода для этого индекса. Представления <TT
+CLASS="STRUCTNAME"
+>pg_statio_user_indexes</TT
+> и <TT
+CLASS="STRUCTNAME"
+>pg_statio_sys_indexes</TT
+> содержат ту же самую информацию, но отфильтрованную так, чтобы показывать только пользовательские или системные индексы соответственно.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="PG-STATIO-ALL-SEQUENCES-VIEW"
+></A
+><P
+><B
+>Таблица 27-10. Представление <TT
+CLASS="STRUCTNAME"
+>pg_statio_all_sequences</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Колонка</TH
+><TH
+>Тип</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>relid</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>oid</TT
+>
+                  </TD
+><TD
+>OID последовательности</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>schemaname</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>name</TT
+>
+                  </TD
+><TD
+>Имя схемы, в которой расположена эта последовательность</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>relname</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>name</TT
+>
+                  </TD
+><TD
+>Имя последовательности</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>blks_read</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Количество дисковых блоков, прочитанных из этой последовательности</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>blks_hit</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Число попаданий в буфер в этой последовательности</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Представление <TT
+CLASS="STRUCTNAME"
+>pg_statio_all_sequences</TT
+> для каждой последовательности в текущей базе данных будет содержать по одной строке со статистикой по операциям ввода/вывода для этой последовательности.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="PG-STAT-USER-FUNCTIONS-VIEW"
+></A
+><P
+><B
+>Таблица 27-11. Представление <TT
+CLASS="STRUCTNAME"
+>pg_stat_user_functions</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Колонка</TH
+><TH
+>Тип</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>funcid</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>oid</TT
+>
+                  </TD
+><TD
+>OID функции</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>schemaname</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>name</TT
+>
+                  </TD
+><TD
+>Имя схемы, в которой расположена функция</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>funcname</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>name</TT
+>
+                  </TD
+><TD
+>Имя функции</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>calls</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Сколько раз вызывалась функция</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>total_time</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>double precision</TT
+>
+                  </TD
+><TD
+>Общее время, потраченное на выполнение этой функции и всех других функций, вызванных ею, в миллисекундах</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>self_time</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>double precision</TT
+>
+                  </TD
+><TD
+>Общее время, потраченное на выполнение самой функции, без учёта других функций, которые были ею вызваны, в миллисекундах</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Представление <TT
+CLASS="STRUCTNAME"
+>pg_stat_user_functions</TT
+> для каждой отслеживаемой функции будет содержать по одной строке со статистикой по выполнениям этой функции. Отслеживаемые функции определяются параметром <A
+HREF="runtime-config-statistics.html#GUC-TRACK-FUNCTIONS"
+>track_functions</A
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="PG-STAT-REPLICATION-VIEW"
+></A
+><P
+><B
+>Таблица 27-12. Представление <TT
+CLASS="STRUCTNAME"
+>pg_stat_replication</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Колонка</TH
+><TH
+>Тип</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>pid</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>integer</TT
+>
+                  </TD
+><TD
+>Идентификатор процесса для WAL-отправителя процесса</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>usesysid</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>oid</TT
+>
+                  </TD
+><TD
+>OID пользователя, подключённого к этому процессу WAL-отправителя</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>usename</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>name</TT
+>
+                  </TD
+><TD
+>Имя пользователя, подключённого к этому процессу WAL-отправителя</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>application_name</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>text</TT
+>
+                  </TD
+><TD
+>Имя приложения, которое подключено к этому процессу WAL-отправителя</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>client_addr</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>inet</TT
+>
+                  </TD
+><TD
+>IP-адрес клиента, подключённого к этому процессу WAL-отправителя. Значение null в этом поле говорит о том, что клиент подсоединён через сокет Unix на сервере.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>client_hostname</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>text</TT
+>
+                  </TD
+><TD
+>Имя компьютера для подключённого клиента, получаемое в результате обратного поиска в DNS по <TT
+CLASS="STRUCTFIELD"
+>client_addr</TT
+>. Это поле будет отлично от null только в случае соединений по IP и только при включённом режиме <A
+HREF="runtime-config-logging.html#GUC-LOG-HOSTNAME"
+>log_hostname</A
+>.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>client_port</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>integer</TT
+>
+                  </TD
+><TD
+>Номер TCP-порта, который используется клиентом для взаимодействия с процессом WAL-отправителя, или <TT
+CLASS="LITERAL"
+>-1</TT
+>, если используется сокет Unix</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>backend_start</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+>
+                  </TD
+><TD
+>Время запуска процесса, т. е. когда клиент подключился к этому процессу WAL-отправителя</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>backend_xmin</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>xid</TT
+>
+                  </TD
+><TD
+>Значение <TT
+CLASS="LITERAL"
+>xmin</TT
+> полученное от резервного сервера при включённом <A
+HREF="runtime-config-replication.html#GUC-HOT-STANDBY-FEEDBACK"
+>hot_standby_feedback</A
+>.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>state</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>text</TT
+>
+                  </TD
+><TD
+>Текущее состояние процесса WAL-отправителя</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>sent_location</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>pg_lsn</TT
+>
+                  </TD
+><TD
+>Позиция последней транзакции в журнале транзакций, отправленной по этому соединению</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>write_location</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>pg_lsn</TT
+>
+                  </TD
+><TD
+>Позиция последней транзакции в журнале транзакций, записанной на диск резервным сервером</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>flush_location</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>pg_lsn</TT
+>
+                  </TD
+><TD
+>Позиция последней транзакции в журнале транзакций, сброшенной на диск резервным сервером</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>replay_location</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>pg_lsn</TT
+>
+                  </TD
+><TD
+>Позиция последней транзакции в журнале транзакций, выполненной в этой базе данных на резервном сервере</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>sync_priority</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>integer</TT
+>
+                  </TD
+><TD
+>Приоритет этого резервного сервера для выбора в качестве синхронного резервного</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>sync_state</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>text</TT
+>
+                  </TD
+><TD
+>Состояние синхронизации для этого резервного сервера</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Представление <TT
+CLASS="STRUCTNAME"
+>pg_stat_replication</TT
+> для каждого процесса WAL-отправителя будет содержать по одной строке со статистикой о репликации на резервный сервер, к которому подключён этот процесс. В представлении перечисляются только резервные серверы, подключённые напрямую; информация о резервных серверах, подключённых опосредованно, не представлена.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="PG-STAT-DATABASE-CONFLICTS-VIEW"
+></A
+><P
+><B
+>Таблица 27-13. Представление <TT
+CLASS="STRUCTNAME"
+>pg_stat_database_conflicts</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Колонка</TH
+><TH
+>Тип</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>datid</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>oid</TT
+>
+                  </TD
+><TD
+>OID базы данных</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>datname</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>name</TT
+>
+                  </TD
+><TD
+>Имя базы данных</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>confl_tablespace</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Количество запросов в этой базе данных, отменённых из-за того, что табличные пространства были удалены</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>confl_lock</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Количество запросов в этой базе данных, отменённых по истечении времени ожидания блокировки</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>confl_snapshot</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Количество запросов в этой базе данных, отменённых из-за устаревших снимков данных</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>confl_bufferpin</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Количество запросов в этой базе данных, отменённых из-за прикреплённых страниц буфера</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>confl_deadlock</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Количество запросов в этой базе данных, отменённых из-за взаимных блокировок</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Представление <TT
+CLASS="STRUCTNAME"
+>pg_stat_database_conflicts</TT
+> для каждой базы данных будет содержать по одной строке со статистикой на уровне базы по отменам запросов, произошедшим вследствие конфликтов с процессами восстановления на резервных серверах. В этом представлении будет содержаться только информация по резервным серверам, поскольку на главных серверах конфликты не возникают.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="MONITORING-STATS-FUNCTIONS"
+>27.2.3. Статистические функции</A
+></H2
+><P
+>Статистическую информацию можно просматривать и другими способами. Для этого можно написать запросы, использующие те же функции доступа к статистике, что лежат в основе описанных выше стандартных представлений. За более подробной информацией, например, об именах этих функций, обратитесь к определениям этих стандартных представлений. (Например, в <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> можно выполнить <TT
+CLASS="LITERAL"
+>\d+ pg_stat_activity</TT
+>.) В качестве аргумента функции, предоставляющие доступ к статистике на уровне базы, принимают OID базы данных, по которой должна быть выдана информация. Функции, которые работают на уровне таблиц и индексов, принимают в качестве аргумента OID таблицы или индекса. Аргументом для функции, предоставляющей статистику на уровне функций, является OID функции. Обратите внимание, что с помощью этих функций можно получить информацию по таблицам, индексам и функциям исключительно в текущей базе данных.</P
+><P
+>Дополнительные функции, связанные со сбором статистики, перечислены в <A
+HREF="monitoring-stats.html#MONITORING-STATS-FUNCS-TABLE"
+>Таблице 27-14</A
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="MONITORING-STATS-FUNCS-TABLE"
+></A
+><P
+><B
+>Таблица 27-14. Дополнительные статистические функции</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Функция</TH
+><TH
+>Тип результата</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>                      <CODE
+CLASS="FUNCTION"
+>pg_backend_pid()</CODE
+>
+                    </TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>integer</TT
+>
+                  </TD
+><TD
+>Идентификатор серверного процесса, выполняющего текущую сессию</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_stat_get_activity</CODE
+>(​<TT
+CLASS="TYPE"
+>integer</TT
+>)</TT
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>setof record</TT
+>
+                  </TD
+><TD
+>Возвращает запись с информацией о серверном процессе с заданным PID или по одной строке для каждого активного серверного процесса в системе, если был указан <TT
+CLASS="SYMBOL"
+>NULL</TT
+>. Возвращаемые поля являются подмножеством колонок представления <TT
+CLASS="STRUCTNAME"
+>pg_stat_activity</TT
+>.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>                      <CODE
+CLASS="FUNCTION"
+>pg_stat_clear_snapshot()</CODE
+>
+                    </TT
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>void</TT
+>
+                  </TD
+><TD
+>Сбросить текущий снимок статистики</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>                      <CODE
+CLASS="FUNCTION"
+>pg_stat_reset()</CODE
+>
+                    </TT
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>void</TT
+>
+                  </TD
+><TD
+>Сбросить все статистические счётчики в текущей базе данных в ноль (требуются привилегии суперпользователя)</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_stat_reset_shared</CODE
+>(text)</TT
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>void</TT
+>
+                  </TD
+><TD
+>Сбросить в ноль некоторые статистические счётчики на уровне кластера, в зависимости от заданного аргумента (требуются привилегии суперпользователя). Вызов <TT
+CLASS="LITERAL"
+>pg_stat_reset_shared('bgwriter')</TT
+> сбросит в ноль все счётчики, которые показываются в представлении <TT
+CLASS="STRUCTNAME"
+>pg_stat_bgwriter</TT
+>. Вызов <TT
+CLASS="LITERAL"
+>pg_stat_reset_shared('archiver')</TT
+> сбросит в ноль все счётчики, которые показываются в представлении <TT
+CLASS="STRUCTNAME"
+>pg_stat_archiver</TT
+>.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_stat_reset_single_table_counters</CODE
+>(oid)</TT
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>void</TT
+>
+                  </TD
+><TD
+>Сбросить в ноль статистику по отдельной таблице или индексу в текущей базе данных (требуются привилегии суперпользователя)</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_stat_reset_single_function_counters</CODE
+>(oid)</TT
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>void</TT
+>
+                  </TD
+><TD
+>Сбросить в ноль статистику по отдельной функции в текущей базе данных (требуются привилегии суперпользователя)</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>pg_stat_get_activity</CODE
+>, на которой основано представление <TT
+CLASS="STRUCTNAME"
+>pg_stat_activity</TT
+>, возвращает набор строк, содержащих всю доступную информацию о каждом серверном процессе. Иногда более удобным оказывается получение только части этой информации. В таких случаях можно использовать набор более старых функций, дающих доступ к статистике на уровне серверных процессов; эти функции описаны в <A
+HREF="monitoring-stats.html#MONITORING-STATS-BACKEND-FUNCS-TABLE"
+>Таблице 27-15</A
+>. Эти функции используют идентификатор серверного процесса, значение которого варьируется от единицы до числа активных в настоящий момент серверных процессов. Функция <CODE
+CLASS="FUNCTION"
+>pg_stat_get_backend_idset</CODE
+> генерирует по одной строке для каждого активного серверного процесса, что необходимо для вызова этих функций. Например, для того, чтобы отобразить значения <ACRONYM
+CLASS="ACRONYM"
+>PID</ACRONYM
+> и текущие запросы всех серверных процессов: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT pg_stat_get_backend_pid(s.backendid) AS pid,
+       pg_stat_get_backend_activity(s.backendid) AS query
+    FROM (SELECT pg_stat_get_backend_idset() AS backendid) AS s;</PRE
+><P></P
+><DIV
+CLASS="TABLE"
+><A
+NAME="MONITORING-STATS-BACKEND-FUNCS-TABLE"
+></A
+><P
+><B
+>Таблица 27-15. Статистические функции на уровне серверных процессов</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Функция</TH
+><TH
+>Тип результата</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>                      <CODE
+CLASS="FUNCTION"
+>pg_stat_get_backend_idset()</CODE
+>
+                    </TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>setof integer</TT
+>
+                  </TD
+><TD
+>Набор значений идентификаторов активных в настоящий момент серверных процессов (от 1 до числа активных серверных процессов)</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>                      <CODE
+CLASS="FUNCTION"
+>pg_stat_get_backend_activity(integer)</CODE
+>
+                    </TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>text</TT
+>
+                  </TD
+><TD
+>Текст последнего запроса этого серверного процесса</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>                      <CODE
+CLASS="FUNCTION"
+>pg_stat_get_backend_activity_start(integer)</CODE
+>
+                    </TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+>
+                  </TD
+><TD
+>Время запуска последнего запроса</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>                      <CODE
+CLASS="FUNCTION"
+>pg_stat_get_backend_client_addr(integer)</CODE
+>
+                    </TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>inet</TT
+>
+                  </TD
+><TD
+>IP-адрес клиента, подключённого к этому серверному процессу</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>                      <CODE
+CLASS="FUNCTION"
+>pg_stat_get_backend_client_port(integer)</CODE
+>
+                    </TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>integer</TT
+>
+                  </TD
+><TD
+>Номер TCP-порта, который клиент использует для взаимодействия</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>                      <CODE
+CLASS="FUNCTION"
+>pg_stat_get_backend_dbid(integer)</CODE
+>
+                    </TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>oid</TT
+>
+                  </TD
+><TD
+>OID базы данных, к которой подключён этот серверный процесс</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>                      <CODE
+CLASS="FUNCTION"
+>pg_stat_get_backend_pid(integer)</CODE
+>
+                    </TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>integer</TT
+>
+                  </TD
+><TD
+>Идентификатор процесса этого серверного процесса</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>                      <CODE
+CLASS="FUNCTION"
+>pg_stat_get_backend_start(integer)</CODE
+>
+                    </TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+>
+                  </TD
+><TD
+>Время запуска этого процесса</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>                      <CODE
+CLASS="FUNCTION"
+>pg_stat_get_backend_userid(integer)</CODE
+>
+                    </TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>oid</TT
+>
+                  </TD
+><TD
+>OID пользователя, подключённого к этому серверному процессу</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>                      <CODE
+CLASS="FUNCTION"
+>pg_stat_get_backend_waiting(integer)</CODE
+>
+                    </TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>True, если этот серверный процесс ожидает освобождения блокировки</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>                      <CODE
+CLASS="FUNCTION"
+>pg_stat_get_backend_xact_start(integer)</CODE
+>
+                    </TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+>
+                  </TD
+><TD
+>Время начала текущей транзакции</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="monitoring-ps.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="monitoring-locks.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Стандартные инструменты Unix</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="monitoring.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Просмотр информации о блокировках</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,326 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Функции для перечислений</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Функции и операторы"
+HREF="functions.html"><LINK
+REL="PREVIOUS"
+TITLE="Операторы и функции даты/времени"
+HREF="functions-datetime.html"><LINK
+REL="NEXT"
+TITLE="Геометрические функции и операторы"
+HREF="functions-geometry.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Операторы и функции даты/времени"
+HREF="functions-datetime.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 9. Функции и операторы</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Геометрические функции и операторы"
+HREF="functions-geometry.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="FUNCTIONS-ENUM"
+>9.10. Функции для перечислений</A
+></H1
+><P
+>Для типов перечислений (описанных в <A
+HREF="datatype-enum.html"
+>Разделе 8.7</A
+>) предусмотрено несколько функций, которые позволяют сделать код чище, не &laquo;зашивая&raquo; в нём конкретные значения перечисления. Эти функции перечислены в <A
+HREF="functions-enum.html#FUNCTIONS-ENUM-TABLE"
+>Таблице 9-30</A
+>. В этих примерах подразумевается, что перечисление создано так: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TYPE rainbow AS ENUM ('red', 'orange', 'yellow', 'green',
+ 'blue', 'purple');</PRE
+><P></P
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-ENUM-TABLE"
+></A
+><P
+><B
+>Таблица 9-30. Функции для перечислений</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Функция</TH
+><TH
+>Описание</TH
+><TH
+>Пример</TH
+><TH
+>Результат примера</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>enum_first(​anyenum)</TT
+>
+       </TD
+><TD
+>Возвращает первое значение заданного перечисления</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>enum_first(​null::rainbow)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>red</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>enum_last(​anyenum)</TT
+>
+       </TD
+><TD
+>Возвращает последнее значение заданного перечисления</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>enum_last(​null::rainbow)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>purple</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>enum_range(​anyenum)</TT
+>
+       </TD
+><TD
+>Возвращает все значения заданного перечисления в упорядоченном массиве</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>enum_range(​null::rainbow)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>{red,​orange,​yellow,​green,​blue,​purple}</TT
+>
+                </TD
+></TR
+><TR
+><TD
+ROWSPAN="3"
+>                  <TT
+CLASS="LITERAL"
+>enum_range(​anyenum, anyenum)</TT
+>
+                </TD
+><TD
+ROWSPAN="3"
+>Возвращает набор значений, лежащих между двумя заданными, в виде упорядоченного массива. Эти значения должны принадлежать одному перечислению. Если первый параметр равен NULL, функция возвращает первое значение перечисления, а если NULL второй &mdash; последнее.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>enum_range(​'orange'::rainbow, 'green'::rainbow)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>{orange,​yellow,​green}</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>enum_range(NULL, 'green'::rainbow)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>{red,​orange,​yellow,​green}</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>enum_range(​'orange'::rainbow, NULL)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>{orange,​yellow,​green,​blue,​purple}</TT
+>
+                </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Заметьте, что за исключением варианта <CODE
+CLASS="FUNCTION"
+>enum_range</CODE
+> с двумя аргументами, эти функции не обращают внимание на конкретное переданное им значение; их интересует только объявленный тип. Они возвращают один и тот же результат, когда им передаётся NULL или любое другое значение типа. Обычно эти функции применяются к колонкам таблицы или аргументам внешних функций, а не к предопределённым типам, как показано в этих примерах.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions-datetime.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="functions-geometry.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Операторы и функции даты/времени</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Геометрические функции и операторы</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

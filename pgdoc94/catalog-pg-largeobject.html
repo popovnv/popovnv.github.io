@@ -1,0 +1,320 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>          pg_largeobject
+        </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Системные каталоги"
+HREF="catalogs.html"><LINK
+REL="PREVIOUS"
+TITLE="          pg_language
+        "
+HREF="catalog-pg-language.html"><LINK
+REL="NEXT"
+TITLE="          pg_largeobject_metadata
+        "
+HREF="catalog-pg-largeobject-metadata.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="          pg_language
+        "
+HREF="catalog-pg-language.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 48. Системные каталоги</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="          pg_largeobject_metadata
+        "
+HREF="catalog-pg-largeobject-metadata.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CATALOG-PG-LARGEOBJECT"
+>48.29. <TT
+CLASS="STRUCTNAME"
+>pg_largeobject</TT
+></A
+></H1
+><P
+>В каталоге <TT
+CLASS="STRUCTNAME"
+>pg_largeobject</TT
+> содержатся данные, образующие <SPAN
+CLASS="QUOTE"
+>"большие объекты"</SPAN
+>. Большой объект идентифицируется по OID, назначаемому при его создании. Каждый большой объект разделяется на сегменты или <SPAN
+CLASS="QUOTE"
+>"страницы"</SPAN
+>, достаточно небольшие для удобного размещения в строках таблицы <TT
+CLASS="STRUCTNAME"
+>pg_largeobject</TT
+>. Объём данных на странице определяется как <TT
+CLASS="SYMBOL"
+>LOBLKSIZE</TT
+> (что в настоящее время составляет <TT
+CLASS="LITERAL"
+>BLCKSZ/4</TT
+>, то есть обычно 2 Кб).</P
+><P
+>До <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> 9.0 большие объекты не были связаны с механизмом разрешений. В результате таблица <TT
+CLASS="STRUCTNAME"
+>pg_largeobject</TT
+> была доступны на чтение для всех и через неё можно было получить OID (и содержимое) всех больших объектов в системе. Теперь это не так; для получения списка OID больших объектов нужно обратиться к <A
+HREF="catalog-pg-largeobject-metadata.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_largeobject_metadata</TT
+></A
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="AEN98081"
+></A
+><P
+><B
+>Таблица 48-29. Колонки <TT
+CLASS="STRUCTNAME"
+>pg_largeobject</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип</TH
+><TH
+>Ссылки</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>loid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-largeobject-metadata.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_largeobject_metadata</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Идентификатор большого объекта, включающего эту страницу</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>pageno</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int4</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Номер этой страницы в большом объекте (начиная с нуля)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>data</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bytea</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Собственно данные, хранящиеся в большом объекте. Их объём не может превышать <TT
+CLASS="SYMBOL"
+>LOBLKSIZE</TT
+>, но может быть меньше.</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>В каждой строке <TT
+CLASS="STRUCTNAME"
+>pg_largeobject</TT
+> содержатся данные для одной строки большого объекта, начиная со смещения (<TT
+CLASS="LITERAL"
+>pageno * LOBLKSIZE</TT
+>) внутри него (в байтах). Эта реализация допускает разреженное хранилище: страницы могут отсутствовать и могут быть короче <TT
+CLASS="LITERAL"
+>LOBLKSIZE</TT
+>, даже если это не последние страницы объектов. Пропущенные области в большом объекте будут считываться как нулевые.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="catalog-pg-language.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="catalog-pg-largeobject-metadata.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_language</TT
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_largeobject_metadata</TT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

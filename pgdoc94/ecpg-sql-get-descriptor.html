@@ -1,0 +1,414 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>GET DESCRIPTOR</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды встраиваемого SQL"
+HREF="ecpg-sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="EXECUTE IMMEDIATE"
+HREF="ecpg-sql-execute-immediate.html"><LINK
+REL="NEXT"
+TITLE="OPEN"
+HREF="ecpg-sql-open.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="EXECUTE IMMEDIATE"
+HREF="ecpg-sql-execute-immediate.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ecpg-sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="OPEN"
+HREF="ecpg-sql-open.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="ECPG-SQL-GET-DESCRIPTOR"
+></A
+>GET DESCRIPTOR</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN48031"
+></A
+><H2
+>Название</H2
+>GET DESCRIPTOR&nbsp;--&nbsp;получить информацию из области дескриптора SQL</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN48034"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>GET DESCRIPTOR <TT
+CLASS="REPLACEABLE"
+><I
+>имя_дескриптора</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>:cvariable</I
+></TT
+> = <TT
+CLASS="REPLACEABLE"
+><I
+>элемент_заголовка_дескриптора</I
+></TT
+> [, ... ]
+GET DESCRIPTOR <TT
+CLASS="REPLACEABLE"
+><I
+>имя_дескриптора</I
+></TT
+> VALUE <TT
+CLASS="REPLACEABLE"
+><I
+>номер_колонки</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>:cvariable</I
+></TT
+> = <TT
+CLASS="REPLACEABLE"
+><I
+>элемент_дескриптора</I
+></TT
+> [, ... ]</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN48043"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>GET DESCRIPTOR</TT
+> получает информацию о наборе результатов запроса из области дескриптора SQL и сохраняет её в переменные среды. Область дескриптора обычно предварительно заполняется командами <TT
+CLASS="COMMAND"
+>FETCH</TT
+> или <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, чтобы из неё можно было перенести сопутствующую информацию в переменные среды.</P
+><P
+>Эта команда имеет две формы: первая форма выдаёт элементы из <SPAN
+CLASS="QUOTE"
+>"заголовка"</SPAN
+> дескриптора, который относится ко всему набору результатов в целом. Например, это число строк. Другая форма, требующая указания в дополнительном параметре номера колонки, выдаёт информацию о конкретной колонке строки. В качестве примеров можно привести имя колонки и фактическое значение в этой колонке.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN48051"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_дескриптора</I
+></TT
+></DT
+><DD
+><P
+>Имя дескриптора.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>элемент_заголовка_дескриптора</I
+></TT
+></DT
+><DD
+><P
+>Идентификатор, определяющий, какой элемент заголовка нужно получить. В настоящее время поддерживается только <TT
+CLASS="LITERAL"
+>COUNT</TT
+>, позволяющий получить число колонок в наборе результатов.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>номер_колонки</I
+></TT
+></DT
+><DD
+><P
+>Номер колонки, информацию о которой нужно получить. Нумерация начинается с 1.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>элемент_дескриптора</I
+></TT
+></DT
+><DD
+><P
+>Идентификатор, определяющий, какой элемент информации о колонке нужно получить. Список поддерживаемых элементов приведён в <A
+HREF="ecpg-descriptors.html#ECPG-NAMED-DESCRIPTORS"
+>Подразделе 33.7.1</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>cvariable</I
+></TT
+></DT
+><DD
+><P
+>Переменная среды, в которую будут сохранены данные, полученные из области дескриптора.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN48081"
+></A
+><H2
+>Примеры</H2
+><P
+>Пример получения числа колонок в наборе результатов: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL GET DESCRIPTOR d :d_count = COUNT;</PRE
+><P></P
+><P
+>Пример получения размера данных в первой колонке: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL GET DESCRIPTOR d VALUE 1 :d_returned_octet_length = RETURNED_OCTET_LENGTH;</PRE
+><P></P
+><P
+>Пример получения содержимого данных второй колонки в виде строки: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL GET DESCRIPTOR d VALUE 2 :d_data = DATA;</PRE
+><P></P
+><P
+>Следующий пример демонстрирует всю процедуру выполнения <TT
+CLASS="LITERAL"
+>SELECT current_database();</TT
+> и вывода числа колонок, длины данных в колонке и содержимого колонки: </P><PRE
+CLASS="PROGRAMLISTING"
+>int
+main(void)
+{
+EXEC SQL BEGIN DECLARE SECTION;
+    int  d_count;
+    char d_data[1024];
+    int  d_returned_octet_length;
+EXEC SQL END DECLARE SECTION;
+
+    EXEC SQL CONNECT TO testdb AS con1 USER testuser;
+    EXEC SQL ALLOCATE DESCRIPTOR d;
+
+    /* Объявить, открыть курсор и присвоить ему дескриптор */
+    EXEC SQL DECLARE cur CURSOR FOR SELECT current_database();
+    EXEC SQL OPEN cur;
+    EXEC SQL FETCH NEXT FROM cur INTO SQL DESCRIPTOR d;
+
+    /* Получить общее число колонок */
+    EXEC SQL GET DESCRIPTOR d :d_count = COUNT;
+    printf("d_count                 = %d\n", d_count);
+
+    /* Получить размер возвращённой колонки */
+    EXEC SQL GET DESCRIPTOR d VALUE 1 :d_returned_octet_length = RETURNED_OCTET_LENGTH;
+    printf("d_returned_octet_length = %d\n", d_returned_octet_length);
+
+    /* Выбрать возвращённую колонку в виде строки */
+    EXEC SQL GET DESCRIPTOR d VALUE 1 :d_data = DATA;
+    printf("d_data                  = %s\n", d_data);
+
+    /* Закрытие */
+    EXEC SQL CLOSE cur;
+    EXEC SQL COMMIT;
+
+    EXEC SQL DEALLOCATE DESCRIPTOR d;
+    EXEC SQL DISCONNECT ALL;
+
+    return 0;
+}</PRE
+><P> При выполнении этого примера будет получен такой результат: </P><PRE
+CLASS="SCREEN"
+>d_count                 = 1
+d_returned_octet_length = 6
+d_data                  = testdb</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN48093"
+></A
+><H2
+>Совместимость</H2
+><P
+>Команда <TT
+CLASS="COMMAND"
+>GET DESCRIPTOR</TT
+> описана в стандарте SQL.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN48097"
+></A
+><H2
+>См. также</H2
+><A
+HREF="ecpg-sql-allocate-descriptor.html"
+>ALLOCATE DESCRIPTOR</A
+>, <A
+HREF="ecpg-sql-set-descriptor.html"
+>SET DESCRIPTOR</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ecpg-sql-execute-immediate.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ecpg-sql-open.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>EXECUTE IMMEDIATE</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ecpg-sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>OPEN</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

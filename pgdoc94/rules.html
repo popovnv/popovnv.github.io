@@ -1,0 +1,288 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Система правил</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Серверное программирование"
+HREF="server-programming.html"><LINK
+REL="PREVIOUS"
+TITLE="Полный пример триггера события"
+HREF="event-trigger-example.html"><LINK
+REL="NEXT"
+TITLE="Дерево запроса"
+HREF="querytree.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="CHAPTER"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Полный пример триггера события"
+HREF="event-trigger-example.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="server-programming.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Дерево запроса"
+HREF="querytree.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="RULES"
+></A
+>Глава 38. Система правил</H1
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Содержание</B
+></DT
+><DT
+>38.1. <A
+HREF="querytree.html"
+>Дерево запроса</A
+></DT
+><DT
+>38.2. <A
+HREF="rules-views.html"
+>Система правил и представления</A
+></DT
+><DD
+><DL
+><DT
+>38.2.1. <A
+HREF="rules-views.html#RULES-SELECT"
+>Как работают правила <TT
+CLASS="COMMAND"
+>SELECT</TT
+></A
+></DT
+><DT
+>38.2.2. <A
+HREF="rules-views.html#AEN59082"
+>Правила представлений не для <TT
+CLASS="COMMAND"
+>SELECT</TT
+></A
+></DT
+><DT
+>38.2.3. <A
+HREF="rules-views.html#AEN59138"
+>Преимущества представлений в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></A
+></DT
+><DT
+>38.2.4. <A
+HREF="rules-views.html#RULES-VIEWS-UPDATE"
+>Изменение представления</A
+></DT
+></DL
+></DD
+><DT
+>38.3. <A
+HREF="rules-materializedviews.html"
+>Материализованные представления</A
+></DT
+><DT
+>38.4. <A
+HREF="rules-update.html"
+>Правила для <TT
+CLASS="COMMAND"
+>INSERT</TT
+>, <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> и <TT
+CLASS="COMMAND"
+>DELETE</TT
+></A
+></DT
+><DD
+><DL
+><DT
+>38.4.1. <A
+HREF="rules-update.html#AEN59260"
+>Как работают правила для изменения</A
+></DT
+><DT
+>38.4.2. <A
+HREF="rules-update.html#RULES-UPDATE-VIEWS"
+>Сочетание с представлениями</A
+></DT
+></DL
+></DD
+><DT
+>38.5. <A
+HREF="rules-privileges.html"
+>Правила и права</A
+></DT
+><DT
+>38.6. <A
+HREF="rules-status.html"
+>Правила и статус команд</A
+></DT
+><DT
+>38.7. <A
+HREF="rules-triggers.html"
+>Сравнение правил и триггеров</A
+></DT
+></DL
+></DIV
+><P
+>В этой главе обсуждается система правил, реализованная в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Промышленные системы правил по сути довольно простые, но при их использовании приходится сталкиваться с множеством неочевидных вещей.</P
+><P
+>В некоторых других базах данных определяются активные правила баз данных, которые обычно реализуются в виде процедур и триггеров. Так же их можно реализовать и в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+><P
+>Система правил (точнее говоря, система правил перезаписи запросов) полностью отличается от механизма хранимых процедур и триггеров. Она изменяет запросы по заданным правилам, а затем передаёт модифицированный запрос планировщику для планирования и выполнения. Это очень мощное средство, подходящее для решения множества задач, например, для определения представлений и процедур на языке запросов или реализации версионности. Теоретические основы и преимущества этой системы правил также описаны в <A
+HREF="biblio.html#STON90B"
+><I
+><A
+HREF="http://db.cs.berkeley.edu/papers/ERL-M90-36.pdf"
+TARGET="_top"
+>On Rules, Procedures, Caching and Views in Database Systems</A
+></I
+></A
+> и <A
+HREF="biblio.html#ONG90"
+><I
+>A Unified Framework for Version Modeling Using Production Rules in a Database System</I
+></A
+> (на английском языке).</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="event-trigger-example.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="querytree.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Полный пример триггера события</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="server-programming.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Дерево запроса</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

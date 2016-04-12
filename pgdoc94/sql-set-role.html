@@ -1,0 +1,360 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>SET ROLE</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="SET CONSTRAINTS"
+HREF="sql-set-constraints.html"><LINK
+REL="NEXT"
+TITLE="SET SESSION AUTHORIZATION"
+HREF="sql-set-session-authorization.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="SET CONSTRAINTS"
+HREF="sql-set-constraints.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="SET SESSION AUTHORIZATION"
+HREF="sql-set-session-authorization.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-SET-ROLE"
+></A
+>SET ROLE</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN84555"
+></A
+><H2
+>Название</H2
+>SET ROLE&nbsp;--&nbsp;установить идентификатор текущего пользователя в рамках сеанса</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN84558"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>SET [ SESSION | LOCAL ] ROLE <TT
+CLASS="REPLACEABLE"
+><I
+>имя_роли</I
+></TT
+>
+SET [ SESSION | LOCAL ] ROLE NONE
+RESET ROLE</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN84561"
+></A
+><H2
+>Описание</H2
+><P
+>Эта команда меняет идентификатор текущего пользователя в активном сеансе SQL на <TT
+CLASS="REPLACEABLE"
+><I
+>имя_роли</I
+></TT
+>. Имя роли может быть записано в виде идентификатора или строковой константы. После <TT
+CLASS="COMMAND"
+>SET ROLE</TT
+>, права доступа для команд SQL проверяются так, как если бы сеанс изначально был установлен с этим именем роли.</P
+><P
+>Указывая определённое <TT
+CLASS="REPLACEABLE"
+><I
+>имя_роли</I
+></TT
+>, текущий пользователь должен являться членом этой роли. (Если пользователь сеанса является суперпользователем, он может выбрать любую роль.)</P
+><P
+>Указания <TT
+CLASS="LITERAL"
+>SESSION</TT
+> и <TT
+CLASS="LITERAL"
+>LOCAL</TT
+> действуют на эту команду так же, как и на обычную команду <A
+HREF="sql-set.html"
+>SET</A
+>.</P
+><P
+>Формы <TT
+CLASS="LITERAL"
+>NONE</TT
+> и <TT
+CLASS="LITERAL"
+>RESET</TT
+> сбрасывают идентификатор текущего пользователя, так что активным становится идентификатор пользователя сеанса. Эти формы могут выполняться любыми пользователями.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN84575"
+></A
+><H2
+>Замечания</H2
+><P
+>С помощью этой команды можно как добавить права, так и ограничить их. Если роль пользователя сеанса имеет атрибут <TT
+CLASS="LITERAL"
+>INHERITS</TT
+>, она автоматически получает права всех ролей, на которые может переключиться (с помощью <TT
+CLASS="COMMAND"
+>SET ROLE</TT
+>); в этом случае <TT
+CLASS="COMMAND"
+>SET ROLE</TT
+> убирает все права, назначенные непосредственно пользователю сеанса и другим ролям, в которые он включён, и оставляет только права, назначенные указанной роли. Если же роль пользователя сеанса имеет атрибут <TT
+CLASS="LITERAL"
+>NOINHERITS</TT
+>, <TT
+CLASS="COMMAND"
+>SET ROLE</TT
+> убирает права, назначенные непосредственно пользователю сеанса, и вместо них назначает права, которые имеет указанная роль.</P
+><P
+>В частности, когда суперпользователь переключается на роль не суперпользователя (используя <TT
+CLASS="COMMAND"
+>SET ROLE</TT
+>), он теряет свои права суперпользователя.</P
+><P
+><TT
+CLASS="COMMAND"
+>SET ROLE</TT
+> оказывает действие, сравнимое с <A
+HREF="sql-set-session-authorization.html"
+>SET SESSION AUTHORIZATION</A
+>, но проверка прав выполняется по-другому. Также <TT
+CLASS="COMMAND"
+>SET SESSION AUTHORIZATION</TT
+> определяет, какие роли разрешены для последующей <TT
+CLASS="COMMAND"
+>SET ROLE</TT
+>, тогда как при смене ролей командой <TT
+CLASS="COMMAND"
+>SET ROLE</TT
+> набор ролей, допустимых для последующей команды <TT
+CLASS="COMMAND"
+>SET ROLE</TT
+> не меняется.</P
+><P
+><TT
+CLASS="COMMAND"
+>SET ROLE</TT
+> не обрабатывает сеансовые переменные, указанные в свойствах роли (<A
+HREF="sql-alterrole.html"
+>ALTER ROLE</A
+>); они устанавливаются только при подключении.</P
+><P
+><TT
+CLASS="COMMAND"
+>SET ROLE</TT
+> нельзя использовать внутри функции с характеристикой <TT
+CLASS="LITERAL"
+>SECURITY DEFINER</TT
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN84598"
+></A
+><H2
+>Примеры</H2
+><PRE
+CLASS="PROGRAMLISTING"
+>SELECT SESSION_USER, CURRENT_USER;
+
+ session_user | current_user 
+--------------+--------------
+ peter        | peter
+
+SET ROLE 'paul';
+
+SELECT SESSION_USER, CURRENT_USER;
+
+ session_user | current_user 
+--------------+--------------
+ peter        | paul</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN84601"
+></A
+><H2
+>Совместимость</H2
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> принимает идентификаторы (<TT
+CLASS="LITERAL"
+>"имя_роли"</TT
+>), тогда как стандарт SQL требует, чтобы имя роли записывалось в виде строковой константы. Стандарт не позволяет выполнять эту команду в транзакции; в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> такого ограничения нет, так как для него нет причины. Указания <TT
+CLASS="LITERAL"
+>SESSION</TT
+> и <TT
+CLASS="LITERAL"
+>LOCAL</TT
+> относятся к расширениям <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, так же, как и синтаксис <TT
+CLASS="LITERAL"
+>RESET</TT
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN84611"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-set-session-authorization.html"
+>SET SESSION AUTHORIZATION</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-set-constraints.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-set-session-authorization.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>SET CONSTRAINTS</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>SET SESSION AUTHORIZATION</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

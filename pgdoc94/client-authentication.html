@@ -1,0 +1,305 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Аутентификация клиентского приложения</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Администрирование сервера"
+HREF="admin.html"><LINK
+REL="PREVIOUS"
+TITLE="Краткие аргументы"
+HREF="runtime-config-short.html"><LINK
+REL="NEXT"
+TITLE="Файл pg_hba.conf"
+HREF="auth-pg-hba-conf.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="CHAPTER"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Краткие аргументы"
+HREF="runtime-config-short.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="admin.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Файл pg_hba.conf"
+HREF="auth-pg-hba-conf.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="CLIENT-AUTHENTICATION"
+></A
+>Глава 19. Аутентификация клиентского приложения</H1
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Содержание</B
+></DT
+><DT
+>19.1. <A
+HREF="auth-pg-hba-conf.html"
+>Файл <TT
+CLASS="FILENAME"
+>pg_hba.conf</TT
+></A
+></DT
+><DT
+>19.2. <A
+HREF="auth-username-maps.html"
+>Файл сопоставления имён пользователей</A
+></DT
+><DT
+>19.3. <A
+HREF="auth-methods.html"
+>Методы аутентификации</A
+></DT
+><DD
+><DL
+><DT
+>19.3.1. <A
+HREF="auth-methods.html#AUTH-TRUST"
+>Метод аутентификации trust</A
+></DT
+><DT
+>19.3.2. <A
+HREF="auth-methods.html#AUTH-PASSWORD"
+>Метод аутентификации password</A
+></DT
+><DT
+>19.3.3. <A
+HREF="auth-methods.html#GSSAPI-AUTH"
+>Аутентификация GSSAPI</A
+></DT
+><DT
+>19.3.4. <A
+HREF="auth-methods.html#SSPI-AUTH"
+>Метод аутентификации SSPI</A
+></DT
+><DT
+>19.3.5. <A
+HREF="auth-methods.html#AUTH-IDENT"
+>Метод аутентификации Ident</A
+></DT
+><DT
+>19.3.6. <A
+HREF="auth-methods.html#AUTH-PEER"
+>Аутентификация peer</A
+></DT
+><DT
+>19.3.7. <A
+HREF="auth-methods.html#AUTH-LDAP"
+>Метод аутентификации LDAP</A
+></DT
+><DT
+>19.3.8. <A
+HREF="auth-methods.html#AUTH-RADIUS"
+>Аутентификация RADIUS</A
+></DT
+><DT
+>19.3.9. <A
+HREF="auth-methods.html#AUTH-CERT"
+>Аутентификация по сертификату</A
+></DT
+><DT
+>19.3.10. <A
+HREF="auth-methods.html#AUTH-PAM"
+>Метод аутентификации PAM</A
+></DT
+></DL
+></DD
+><DT
+>19.4. <A
+HREF="client-authentication-problems.html"
+>Проблемы аутентификации</A
+></DT
+></DL
+></DIV
+><P
+>При подключении к серверу базы данных, клиентское приложение указывает имя пользователя <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, так же как и при обычном входе пользователя на компьютер с ОС Unix. При работе в среде SQL по имени пользователя определяется, какие у него есть права доступа к объектам базы данных (подробнее это описывается в <A
+HREF="user-manag.html"
+>Главе 20</A
+>). Следовательно, важно указать на этом этапе, к каким базам пользователь имеет право подключиться.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Как можно узнать из <A
+HREF="user-manag.html"
+>Глава 20</A
+>, <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> управляет правами и привилегиями, используя термин <SPAN
+CLASS="QUOTE"
+>"роли"</SPAN
+>. В этой главе под <I
+CLASS="FIRSTTERM"
+>пользователем</I
+> мы подразумеваем <SPAN
+CLASS="QUOTE"
+>"роль с привилегией <TT
+CLASS="LITERAL"
+>LOGIN</TT
+>"</SPAN
+>.</P
+></BLOCKQUOTE
+></DIV
+><P
+><I
+CLASS="FIRSTTERM"
+>Аутентификация</I
+> это процесс идентификации клиента сервером базы данных, а также определение того, может ли клиентское приложение (или пользователь запустивший приложение) подключиться с указанным именем пользователя.</P
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> предлагает несколько различных методов аутентификации клиентов. Метод аутентификации конкретного клиентского соединения может основываться на адресе компьютера клиента, имени базы данных, имени пользователя.</P
+><P
+>Имена пользователей базы данных <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> не имеют прямой связи с пользователями операционной системы на которой запущен сервер. Если у всех пользователей базы данных заведена учётная запись в операционной системе сервера, то имеет смысл назначить им точно такие же имена для входа в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Однако, сервер, принимающий удалённые подключения, может иметь большое количество пользователей базы данных, у которых нет учётной записи в ОС. В таких случаях не требуется соответствие между именами пользователей базы данных и именами пользователей операционной системы.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="runtime-config-short.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="auth-pg-hba-conf.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Краткие аргументы</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="admin.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Файл <TT
+CLASS="FILENAME"
+>pg_hba.conf</TT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

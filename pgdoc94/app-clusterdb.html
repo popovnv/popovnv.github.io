@@ -1,0 +1,698 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>            clusterdb
+          </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Клиентские приложения PostgreSQL"
+HREF="reference-client.html"><LINK
+REL="PREVIOUS"
+TITLE="Клиентские приложения PostgreSQL"
+HREF="reference-client.html"><LINK
+REL="NEXT"
+TITLE="            createdb
+          "
+HREF="app-createdb.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Клиентские приложения PostgreSQL"
+HREF="reference-client.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="reference-client.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="            createdb
+          "
+HREF="app-createdb.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="APP-CLUSTERDB"
+></A
+><SPAN
+CLASS="APPLICATION"
+>clusterdb</SPAN
+></H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN85604"
+></A
+><H2
+>Название</H2
+>clusterdb&nbsp;--&nbsp;кластеризовать базу данных <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN85608"
+></A
+><H2
+>Синтаксис</H2
+><P
+><TT
+CLASS="COMMAND"
+>clusterdb</TT
+> [              <TT
+CLASS="REPLACEABLE"
+><I
+>параметр-подключения</I
+></TT
+>
+            ...] [                <TT
+CLASS="OPTION"
+>--verbose</TT
+>
+               |                 <TT
+CLASS="OPTION"
+>-v</TT
+>
+              ]        [         <TT
+CLASS="OPTION"
+>--table</TT
+> | <TT
+CLASS="OPTION"
+>-t</TT
+> 
+       <TT
+CLASS="REPLACEABLE"
+><I
+>таблица</I
+></TT
+>
+     ]
+   ...  [              <TT
+CLASS="REPLACEABLE"
+><I
+>база_данных</I
+></TT
+>
+            ]</P
+><P
+><TT
+CLASS="COMMAND"
+>clusterdb</TT
+> [              <TT
+CLASS="REPLACEABLE"
+><I
+>параметр-подключения</I
+></TT
+>
+            ...] [                <TT
+CLASS="OPTION"
+>--verbose</TT
+>
+               |                 <TT
+CLASS="OPTION"
+>-v</TT
+>
+              ]                  <TT
+CLASS="OPTION"
+>--all</TT
+>
+               |                 <TT
+CLASS="OPTION"
+>-a</TT
+>
+               </P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN85642"
+></A
+><H2
+>Описание</H2
+><P
+><SPAN
+CLASS="APPLICATION"
+>clusterdb</SPAN
+> это приложение для повторной кластеризации таблиц базы данных <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Утилита находит ранее кластеризованные таблицы и проводит операцию на основании последнего использованного индекса. Затрагиваются лишь ранее кластеризованные таблицы.</P
+><P
+><SPAN
+CLASS="APPLICATION"
+>clusterdb</SPAN
+> это обёртка для SQL-команды <A
+HREF="sql-cluster.html"
+>CLUSTER</A
+>. Оба пути кластеризации идентичны в результате.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN85650"
+></A
+><H2
+>Параметры</H2
+><P
+><SPAN
+CLASS="APPLICATION"
+>clusterdb</SPAN
+> принимает следующие аргументы командной строки: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="OPTION"
+>-a</TT
+><BR><TT
+CLASS="OPTION"
+>--all</TT
+></DT
+><DD
+><P
+>Кластеризовать все базы данных.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>[<SPAN
+CLASS="OPTIONAL"
+>-d</SPAN
+>] <TT
+CLASS="REPLACEABLE"
+><I
+>база_данных</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>[<SPAN
+CLASS="OPTIONAL"
+>--dbname=</SPAN
+>]<TT
+CLASS="REPLACEABLE"
+><I
+>база_данных</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Указывает имя базы данных для кластеризации. Если оно не указано, и параметр <TT
+CLASS="OPTION"
+>-a</TT
+> (или <TT
+CLASS="OPTION"
+>--all</TT
+>) не используется, то имя базы берётся из переменной окружения <TT
+CLASS="ENVAR"
+>PGDATABASE</TT
+>. Если переменная окружения не установлена, то берётся имя пользователя из параметров подключения в качестве имени целевой базы.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-e</TT
+><BR><TT
+CLASS="OPTION"
+>--echo</TT
+></DT
+><DD
+><P
+>Вывести команды к серверу, генерируемые при выполнении <SPAN
+CLASS="APPLICATION"
+>clusterdb</SPAN
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-q</TT
+><BR><TT
+CLASS="OPTION"
+>--quiet</TT
+></DT
+><DD
+><P
+>Подавлять вывод сообщений о прогрессе выполнения.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-t <TT
+CLASS="REPLACEABLE"
+><I
+>таблица</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--table=<TT
+CLASS="REPLACEABLE"
+><I
+>таблица</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Кластеризовать <TT
+CLASS="REPLACEABLE"
+><I
+>таблицу</I
+></TT
+>. Возможно множественное использование параметра <TT
+CLASS="OPTION"
+>-t</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-v</TT
+><BR><TT
+CLASS="OPTION"
+>--verbose</TT
+></DT
+><DD
+><P
+>Вывести подробную информацию во время процесса.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-V</TT
+><BR><TT
+CLASS="OPTION"
+>--version</TT
+></DT
+><DD
+><P
+>Вывести версию <SPAN
+CLASS="APPLICATION"
+>clusterdb</SPAN
+> и прервать дальнейшее выполнение.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-?</TT
+><BR><TT
+CLASS="OPTION"
+>--help</TT
+></DT
+><DD
+><P
+>Вывести справку по аргументам команды <SPAN
+CLASS="APPLICATION"
+>clusterdb</SPAN
+>.</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+><SPAN
+CLASS="APPLICATION"
+>clusterdb</SPAN
+> также принимает из командной строки параметры подключения: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="OPTION"
+>-h <TT
+CLASS="REPLACEABLE"
+><I
+>host</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--host=<TT
+CLASS="REPLACEABLE"
+><I
+>host</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Указывает имя компьютера, на котором запущен сервер. Если значение начинается с косой черты, оно интерпретируется как имя каталога с доменным сокетом Unix.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-p <TT
+CLASS="REPLACEABLE"
+><I
+>порт</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--port=<TT
+CLASS="REPLACEABLE"
+><I
+>порт</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Указывает TCP-порт или расширение файла Unix-сокета, на котором сервер слушает подключения.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-U <TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--username=<TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Имя пользователя, под которым производится подключение.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-w</TT
+><BR><TT
+CLASS="OPTION"
+>--no-password</TT
+></DT
+><DD
+><P
+>Не выдавать запрос на ввод пароля. Если сервер требует аутентификацию по паролю и пароль не доступен с помощью других средств, таких как файл <TT
+CLASS="FILENAME"
+>.pgpass</TT
+>, попытка соединения не удастся. Этот параметр может быть полезен в пакетных заданиях и скриптах, где нет пользователя, который вводит пароль.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-W</TT
+><BR><TT
+CLASS="OPTION"
+>--password</TT
+></DT
+><DD
+><P
+>Принудительно запрашивать пароль перед подключением к базе данных.</P
+><P
+>Это несущественный параметр, так как <SPAN
+CLASS="APPLICATION"
+>clusterdb</SPAN
+> запрашивает пароль автоматически, если сервер проверяет подлинность по паролю. Однако, чтобы понять это, <SPAN
+CLASS="APPLICATION"
+>clusterdb</SPAN
+> лишний раз подключается к серверу. Поэтому иногда имеет смысл ввести <TT
+CLASS="OPTION"
+>-W</TT
+>, чтобы исключить эту ненужную попытку подключения.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>--maintenance-db=<TT
+CLASS="REPLACEABLE"
+><I
+>база_данных</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Указывает имя базы данных, в качестве опорной, для определения необходимости кластеризации других баз данных. По умолчанию используется <TT
+CLASS="LITERAL"
+>postgres</TT
+>, а если она не существует, то используется <TT
+CLASS="LITERAL"
+>template1</TT
+>.</P
+></DD
+></DL
+></DIV
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN85782"
+></A
+><H2
+>Переменные окружения</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="ENVAR"
+>PGDATABASE</TT
+><BR><TT
+CLASS="ENVAR"
+>PGHOST</TT
+><BR><TT
+CLASS="ENVAR"
+>PGPORT</TT
+><BR><TT
+CLASS="ENVAR"
+>PGUSER</TT
+></DT
+><DD
+><P
+>Параметры подключения по умолчанию</P
+></DD
+></DL
+></DIV
+><P
+>Эта утилита, как и большинство других утилит <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, также использует переменные среды, поддерживаемые <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> (см. <A
+HREF="libpq-envars.html"
+>Раздел 31.14</A
+>).</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN85800"
+></A
+><H2
+>Диагностика</H2
+><P
+>В случае возникновения трудностей, обратитесь к <A
+HREF="sql-cluster.html"
+>CLUSTER</A
+> и <A
+HREF="app-psql.html"
+>            <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>
+          </A
+>. Переменные окружения и параметры подключения по умолчанию <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> будут применены при запуске утилиты, это следует учитывать при диагностике.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN85806"
+></A
+><H2
+>Примеры</H2
+><P
+>Для кластеризации базы данных <TT
+CLASS="LITERAL"
+>test</TT
+>: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$ </SAMP
+><KBD
+CLASS="USERINPUT"
+>clusterdb test</KBD
+></PRE
+><P></P
+><P
+>Для кластеризации отдельной таблицы <TT
+CLASS="LITERAL"
+>foo</TT
+> базы данных <TT
+CLASS="LITERAL"
+>xyzzy</TT
+>: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$ </SAMP
+><KBD
+CLASS="USERINPUT"
+>clusterdb --table foo xyzzy</KBD
+></PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN85819"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-cluster.html"
+>CLUSTER</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="reference-client.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="app-createdb.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Клиентские приложения PostgreSQL</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="reference-client.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><SPAN
+CLASS="APPLICATION"
+>createdb</SPAN
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

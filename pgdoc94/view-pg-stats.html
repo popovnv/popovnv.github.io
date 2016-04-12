@@ -1,0 +1,541 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>          pg_stats
+        </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Системные каталоги"
+HREF="catalogs.html"><LINK
+REL="PREVIOUS"
+TITLE="          pg_shadow
+        "
+HREF="view-pg-shadow.html"><LINK
+REL="NEXT"
+TITLE="          pg_tables
+        "
+HREF="view-pg-tables.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="          pg_shadow
+        "
+HREF="view-pg-shadow.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 48. Системные каталоги</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="          pg_tables
+        "
+HREF="view-pg-tables.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="VIEW-PG-STATS"
+>48.69. <TT
+CLASS="STRUCTNAME"
+>pg_stats</TT
+></A
+></H1
+><P
+>Представление <TT
+CLASS="STRUCTNAME"
+>pg_stats</TT
+> открывает доступ к информации, хранящейся в каталоге <A
+HREF="catalog-pg-statistic.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_statistic</TT
+></A
+>. Это представление даёт доступ только к тем строкам каталога <TT
+CLASS="STRUCTNAME"
+>pg_statistic</TT
+>, что соответствуют таблицам, которые пользователь может читать, таким образом это представление можно безопасно разрешить читать всем.</P
+><P
+>Кроме того, представление <TT
+CLASS="STRUCTNAME"
+>pg_stats</TT
+> сконструировано так, чтобы представлять информацию в более понятном формате, чем нижележащий каталог &mdash; ценой того, что его схему приходится расширять всякий раз, когда для <TT
+CLASS="STRUCTNAME"
+>pg_statistic</TT
+> определяются новые типы слотов.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="AEN102151"
+></A
+><P
+><B
+>Таблица 48-70. Колонки <TT
+CLASS="STRUCTNAME"
+>pg_stats</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип</TH
+><TH
+>Ссылки</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>schemaname</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>name</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-namespace.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_namespace</TT
+></A
+>.nspname</TT
+>
+                </TD
+><TD
+>Имя схемы, содержащей таблицу</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>tablename</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>name</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-class.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+></A
+>.relname</TT
+>
+                </TD
+><TD
+>Имя таблицы</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>attname</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>name</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-attribute.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_attribute</TT
+></A
+>.attname</TT
+>
+                </TD
+><TD
+>Имя колонки, описываемой этой строкой</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>inherited</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Если true, в данных этой строки учитываются значения в дочерних колонках, а не только в указанной таблице</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>null_frac</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>real</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Доля записей, в которых эта колонка содержит NULL</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>avg_width</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>integer</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Средний размер элементов в колонке, в байтах</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>n_distinct</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>real</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Число, большее нуля, представляет примерное количество различных значений в колонке. Если это число меньше нуля, его модуль представляет количество различных значений, делённое на количество строк. (Отрицательная форма применяется, когда <TT
+CLASS="COMMAND"
+>ANALYZE</TT
+> полагает, что число различных значений, скорее всего, будет расти по мере роста таблицы; положительная, когда в колонке, вероятно, будет фиксированное количество возможных значений.) Например, -1 указывает на колонку с уникальным содержимым, в которой количество различных значений совпадает с количеством строк.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>most_common_vals</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>anyarray</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Список самых частых значений в колонке. (NULL, если не находятся значения, появляющиеся чаще других.)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>most_common_freqs</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>real[]</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Список частот самых частых значений, то есть число их вхождений, делённое на общее количество строк. (NULL, вместе с <TT
+CLASS="STRUCTFIELD"
+>most_common_vals</TT
+>.)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>histogram_bounds</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>anyarray</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Список значений, разделяющих значения колонки на примерно одинаковые популяции. Значения <TT
+CLASS="STRUCTFIELD"
+>most_common_vals</TT
+>, если они присутствуют, не рассматриваются при вычислении этой гистограммы. (Эта колонка содержит NULL, если для типа данных колонки не определён оператор <TT
+CLASS="LITERAL"
+>&lt;</TT
+>, либо если в <TT
+CLASS="STRUCTFIELD"
+>most_common_vals</TT
+> перечисляется вся популяция.)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>correlation</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>real</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Статистическая корреляция между физическим порядком строк и логическим порядком значений колонки. Допустимые значения лежат в диапазоне -1 .. +1. Когда значение около -1 или +1, сканирование индекса по колонке будет считаться дешевле, чем когда это значение около нуля, как результат уменьшения случайного доступа к диску. (Эта колонка содержит NULL, если для типа данных колонки не определён оператор <TT
+CLASS="LITERAL"
+>&lt;</TT
+>.)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>most_common_elems</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>anyarray</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Список элементов, отличных от NULL, наиболее часто присутствующих в значениях колонки. (NULL для скалярных типов.)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>most_common_elem_freqs</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>real[]</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Список частот самых частых элементов, то есть доля строк, содержащих минимум один экземпляр данного значения. За частотами по элементам следуют два или три дополнительных значения: минимум и максимум предшествующих частот по элементам и дополнительно частота элементов NULL. (Принимает значение NULL вместе с <TT
+CLASS="STRUCTFIELD"
+>most_common_elems</TT
+>.)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>elem_count_histogram</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>real[]</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Гистограмма количеств различных и отличных от NULL элементов в значениях этой колонки, за которой следует среднее количество элементов, отличных от NULL. (Принимает значение NULL для скалярных типов.)</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Максимальным числом записей в полях-массивах можно управлять на уровне колонок, используя команду <TT
+CLASS="COMMAND"
+>ALTER TABLE SET STATISTICS</TT
+>, или глобально, задав параметр времени выполнения <A
+HREF="runtime-config-query.html#GUC-DEFAULT-STATISTICS-TARGET"
+>default_statistics_target</A
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="view-pg-shadow.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="view-pg-tables.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_shadow</TT
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_tables</TT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

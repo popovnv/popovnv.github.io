@@ -1,0 +1,623 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Инфраструктура сборки расширений</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Расширение SQL"
+HREF="extend.html"><LINK
+REL="PREVIOUS"
+TITLE="Упаковывание связанных объектов в расширение"
+HREF="extend-extensions.html"><LINK
+REL="NEXT"
+TITLE="Триггеры"
+HREF="triggers.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Упаковывание связанных объектов в расширение"
+HREF="extend-extensions.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="extend.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 35. Расширение <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Триггеры"
+HREF="triggers.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="EXTEND-PGXS"
+>35.16. Инфраструктура сборки расширений</A
+></H1
+><P
+>Если вы задумываетесь о распространении ваших модулей расширения <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, знайте, что организовать для них портируемую систему сборки может быть довольно сложно. Поэтому инсталляция <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> включает инфраструктуру сборки расширений, названную <ACRONYM
+CLASS="ACRONYM"
+>PGXS</ACRONYM
+>, так что несложные модули расширений можно собрать просто в среде установленного сервера. <ACRONYM
+CLASS="ACRONYM"
+>PGXS</ACRONYM
+> предназначена в первую очередь для расширений, написанных на C, хотя её можно применять и для расширения на чистом SQL. Заметьте, что <ACRONYM
+CLASS="ACRONYM"
+>PGXS</ACRONYM
+> не претендует на роль универсальной инфраструктуры сборки, способной собрать любой программный объект, взаимодействующий с <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>; она просто автоматизирует общие правила для сборки простых модулей расширения сервера. Для более сложных пакетов вам придётся разработать собственную систему сборки.</P
+><P
+>Чтобы использовать инфраструктуру <ACRONYM
+CLASS="ACRONYM"
+>PGXS</ACRONYM
+> для вашего расширения, вы должны написать простой сборочный файл. В нём вы должны установить нужные переменные и подключить глобальный сборочный файл <ACRONYM
+CLASS="ACRONYM"
+>PGXS</ACRONYM
+>. Следующий пример собирает модуль расширения с именем <TT
+CLASS="LITERAL"
+>isbn_issn</TT
+>, который включает разделяемую библиотеку, написанную на C, управляющий файл расширения, SQL-скрипт и текстовый файл документации: </P><PRE
+CLASS="PROGRAMLISTING"
+>MODULES = isbn_issn
+EXTENSION = isbn_issn
+DATA = isbn_issn--1.0.sql
+DOCS = README.isbn_issn
+
+PG_CONFIG = pg_config
+PGXS := $(shell $(PG_CONFIG) --pgxs)
+include $(PGXS)</PRE
+><P> Последние три строки всегда должны быть такими. Выше в файле вы определяете переменные или добавляете собственные правила для <SPAN
+CLASS="APPLICATION"
+>make</SPAN
+>.</P
+><P
+>Установите одну из этих трёх переменных, чтобы указать, что будет собрано: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="VARNAME"
+>MODULES</TT
+></DT
+><DD
+><P
+>список объектов разделяемых библиотек, которые должны быть собраны из исходных файлов с одной основой (суффиксы библиотек в этом списке не указываются)</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>MODULE_big</TT
+></DT
+><DD
+><P
+>разделяемая библиотека, которая должна быть собрана из нескольких исходных файлов (объектные файлы перечисляются в <TT
+CLASS="VARNAME"
+>OBJS</TT
+>)</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>PROGRAM</TT
+></DT
+><DD
+><P
+>исполняемая программа, которая должна быть собрана (объектные файлы перечисляются в <TT
+CLASS="VARNAME"
+>OBJS</TT
+>)</P
+></DD
+></DL
+></DIV
+><P> Также можно установить следующие переменные: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="VARNAME"
+>EXTENSION</TT
+></DT
+><DD
+><P
+>имена расширений(я); для каждого имени вы должны предоставить файл <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>расширение</I
+></TT
+>.control</TT
+>, который будет установлен в <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>префикс</I
+></TT
+>/share/extension</TT
+></P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>MODULEDIR</TT
+></DT
+><DD
+><P
+>подкаталог в каталоге <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>префикс</I
+></TT
+>/share</TT
+>, в который должны устанавливаться файлы DATA и DOCS (если не задан, подразумевается <TT
+CLASS="LITERAL"
+>extension</TT
+>, если установлена переменная <TT
+CLASS="VARNAME"
+>EXTENSION</TT
+>, или <TT
+CLASS="LITERAL"
+>contrib</TT
+> в противном случае)</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>DATA</TT
+></DT
+><DD
+><P
+>произвольные файлы, которые должны быть установлены в <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>префикс</I
+></TT
+>/share/$MODULEDIR</TT
+></P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>DATA_built</TT
+></DT
+><DD
+><P
+>произвольные файлы, которые должны быть сначала собраны, а затем установлены в <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>префикс</I
+></TT
+>/share/$MODULEDIR</TT
+></P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>DATA_TSEARCH</TT
+></DT
+><DD
+><P
+>произвольные файлы, которые должны быть установлены в <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>префикс</I
+></TT
+>/share/tsearch_data</TT
+></P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>DOCS</TT
+></DT
+><DD
+><P
+>произвольные файлы, которые должны быть установлены в <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>префикс</I
+></TT
+>/doc/$MODULEDIR</TT
+></P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>SCRIPTS</TT
+></DT
+><DD
+><P
+>скрипты (не двоичные файлы), которые должны быть установлены в <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>префикс</I
+></TT
+>/bin</TT
+></P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>SCRIPTS_built</TT
+></DT
+><DD
+><P
+>скрипты (не двоичные файлы), которые должны быть сначала собраны, а затем установлены в <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>префикс</I
+></TT
+>/bin</TT
+></P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>REGRESS</TT
+></DT
+><DD
+><P
+>список тестов регрессий (без суффикса), см. ниже</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>REGRESS_OPTS</TT
+></DT
+><DD
+><P
+>дополнительные параметры, передаваемые <SPAN
+CLASS="APPLICATION"
+>pg_regress</SPAN
+></P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>EXTRA_CLEAN</TT
+></DT
+><DD
+><P
+>дополнительные файлы, которые должны быть удалены при <TT
+CLASS="LITERAL"
+>make clean</TT
+></P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>PG_CPPFLAGS</TT
+></DT
+><DD
+><P
+>флаги, добавляемые в <TT
+CLASS="VARNAME"
+>CPPFLAGS</TT
+></P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>PG_LIBS</TT
+></DT
+><DD
+><P
+>будет добавлено в строку компоновки <TT
+CLASS="VARNAME"
+>PROGRAM</TT
+></P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>SHLIB_LINK</TT
+></DT
+><DD
+><P
+>будет добавлено в строку компоновки <TT
+CLASS="VARNAME"
+>MODULE_big</TT
+></P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>PG_CONFIG</TT
+></DT
+><DD
+><P
+>путь к программе <SPAN
+CLASS="APPLICATION"
+>pg_config</SPAN
+> в инсталляции <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, с которой будет выполняться сборка (обычно указывается просто <TT
+CLASS="LITERAL"
+>pg_config</TT
+>, и используется первый экземпляр, найденный по пути в <TT
+CLASS="VARNAME"
+>PATH</TT
+>)</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>Поместите этот сборочный файл под именем <TT
+CLASS="LITERAL"
+>Makefile</TT
+> в каталог, где находится ваше расширение. После этого выполните <TT
+CLASS="LITERAL"
+>make</TT
+>, чтобы скомпилировать, а затем <TT
+CLASS="LITERAL"
+>make install</TT
+>, чтобы установить ваш модуль. По умолчанию расширение компилируется и устанавливается для той инсталляции <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, которая соответствует экземпляру <TT
+CLASS="COMMAND"
+>pg_config</TT
+>, найденному первым при поиске по пути в <TT
+CLASS="VARNAME"
+>PATH</TT
+>. Чтобы использовать другую инсталляцию, вы можете задать в <TT
+CLASS="VARNAME"
+>PG_CONFIG</TT
+> путь к её экземпляру <TT
+CLASS="COMMAND"
+>pg_config</TT
+> либо внутри сборочного файла, либо в командном файле <TT
+CLASS="LITERAL"
+>make</TT
+>.</P
+><P
+>Вы также можете запустить <TT
+CLASS="LITERAL"
+>make</TT
+> в каталоге вне каталога исходного дерева вашего расширения, если хотите отделить каталог сборки. Эта процедура называется сборкой с <I
+CLASS="FIRSTTERM"
+>VPATH</I
+> и выполняется так: </P><PRE
+CLASS="PROGRAMLISTING"
+>mkdir build_dir
+cd build_dir
+make -f /path/to/extension/source/tree/Makefile
+make -f /path/to/extension/source/tree/Makefile install</PRE
+><P></P
+><P
+>Также вы можете подготовить каталог для сборки с VPATH таким же образом, как это делается в коде ядра сервера. Как один из вариантов, для этого можно воспользоваться скриптом ядра <TT
+CLASS="FILENAME"
+>config/prep_buildtree</TT
+>. Затем вы сможете выполнить сборку, установив переменную <TT
+CLASS="VARNAME"
+>VPATH</TT
+> для <TT
+CLASS="LITERAL"
+>make</TT
+> таким образом: </P><PRE
+CLASS="PROGRAMLISTING"
+>make VPATH=/path/to/extension/source/tree
+make VPATH=/path/to/extension/source/tree install</PRE
+><P> Эта процедура поддерживает самые разные расположения каталогов.</P
+><P
+>Скрипты, перечисленные в переменной <TT
+CLASS="VARNAME"
+>REGRESS</TT
+>, используются для тестирования регрессии в вашем модуле, и вызвать их можно командой <TT
+CLASS="LITERAL"
+>make installcheck</TT
+> после <TT
+CLASS="LITERAL"
+>make install</TT
+>. Для проведения тестов необходим работающий сервер <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Файлы скриптов, перечисленные в <TT
+CLASS="VARNAME"
+>REGRESS</TT
+>, должны размещаться в подкаталоге <TT
+CLASS="LITERAL"
+>sql/</TT
+> каталога расширения. Эти файлы должны иметь расширение <TT
+CLASS="LITERAL"
+>.sql</TT
+>, но указывать его в списке <TT
+CLASS="VARNAME"
+>REGRESS</TT
+> в сборочном файле не нужно. Для каждого теста также должен создаваться файл с ожидаемым выводом в подкаталоге <TT
+CLASS="LITERAL"
+>expected/</TT
+>, с тем же базовым именем и расширением <TT
+CLASS="LITERAL"
+>.out</TT
+>. Команда <TT
+CLASS="LITERAL"
+>make installcheck</TT
+> выполнит каждый тест в <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> и сравнит полученный вывод с ожидаемым. Все выявленные различия будут записаны в файл <TT
+CLASS="LITERAL"
+>regression.diffs</TT
+> в формате команды <TT
+CLASS="COMMAND"
+>diff -c</TT
+>. Заметьте, что при попытке запустить тест без файла ожидаемого вывода этот тест будет отмечен как <SPAN
+CLASS="QUOTE"
+>"проблемный"</SPAN
+>, поэтому убедитесь, что все такие файлы присутствуют.</P
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>Проще всего для этого создать пустые файлы ожидаемого вывода, а затем выполнить тест (при этом конечно будут выявлены несоответствия). Изучите полученные файлы результатов, сохранённые в каталоге <TT
+CLASS="LITERAL"
+>results/</TT
+>, и, если они соответствуют вашим ожиданиям от теста, скопируйте их в <TT
+CLASS="LITERAL"
+>expected/</TT
+>.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="extend-extensions.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="triggers.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Упаковывание связанных объектов в расширение</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="extend.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Триггеры</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

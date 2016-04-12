@@ -1,0 +1,2639 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Типы даты/времени</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Типы данных"
+HREF="datatype.html"><LINK
+REL="PREVIOUS"
+TITLE="Двоичные типы данных"
+HREF="datatype-binary.html"><LINK
+REL="NEXT"
+TITLE="Логический тип"
+HREF="datatype-boolean.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Двоичные типы данных"
+HREF="datatype-binary.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="datatype.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 8. Типы данных</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Логический тип"
+HREF="datatype-boolean.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="DATATYPE-DATETIME"
+>8.5. Типы даты/времени</A
+></H1
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> поддерживает полный набор типов даты и времени <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>, показанный в <A
+HREF="datatype-datetime.html#DATATYPE-DATETIME-TABLE"
+>Таблице 8-9</A
+>. Операции, возможные с этими типами данных, описаны в <A
+HREF="functions-datetime.html"
+>Разделе 9.9</A
+>. Все даты считаются по Григорианскому календарю, даже для времени до его введения (за дополнительными сведениями обратитесь к <A
+HREF="datetime-units-history.html"
+>Разделу B.4</A
+>).</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="DATATYPE-DATETIME-TABLE"
+></A
+><P
+><B
+>Таблица 8-9. Типы даты/времени</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Размер</TH
+><TH
+>Описание</TH
+><TH
+>Наименьшее значение</TH
+><TH
+>Наибольшее значение</TH
+><TH
+>Точность</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>timestamp [ (<TT
+CLASS="REPLACEABLE"
+><I
+>p</I
+></TT
+>) ] [ without time zone ]</TT
+>
+                </TD
+><TD
+>8 байт</TD
+><TD
+>дата и время (без часового пояса)</TD
+><TD
+>4713 до н. э.</TD
+><TD
+>294276 н. э.</TD
+><TD
+>1 микросекунда / 14 цифр</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>timestamp [ (<TT
+CLASS="REPLACEABLE"
+><I
+>p</I
+></TT
+>) ] with time zone</TT
+>
+                </TD
+><TD
+>8 байт</TD
+><TD
+>дата и время (с часовым поясом)</TD
+><TD
+>4713 до н. э.</TD
+><TD
+>294276 н. э.</TD
+><TD
+>1 микросекунда / 14 цифр</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>date</TT
+>
+                </TD
+><TD
+>4 байта</TD
+><TD
+>дата (без времени суток)</TD
+><TD
+>4713 до н. э.</TD
+><TD
+>5874897 н. э.</TD
+><TD
+>1 день</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>time [ (<TT
+CLASS="REPLACEABLE"
+><I
+>p</I
+></TT
+>) ] [ without time zone ]</TT
+>
+                </TD
+><TD
+>8 байт</TD
+><TD
+>время суток (без даты)</TD
+><TD
+>00:00:00</TD
+><TD
+>24:00:00</TD
+><TD
+>1 микросекунда / 14 цифр</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>time [ (<TT
+CLASS="REPLACEABLE"
+><I
+>p</I
+></TT
+>) ] with time zone</TT
+>
+                </TD
+><TD
+>12 байт</TD
+><TD
+>только время суток (без часового пояса)</TD
+><TD
+>00:00:00+1459</TD
+><TD
+>24:00:00-1459</TD
+><TD
+>1 микросекунда / 14 цифр</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>interval [ <TT
+CLASS="REPLACEABLE"
+><I
+>поля</I
+></TT
+> ] [ (<TT
+CLASS="REPLACEABLE"
+><I
+>p</I
+></TT
+>) ]</TT
+>
+                </TD
+><TD
+>16 байт</TD
+><TD
+>временной интервал</TD
+><TD
+>-178000000 лет</TD
+><TD
+>178000000 лет</TD
+><TD
+>1 микросекунда / 14 цифр</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Стандарт SQL требует, чтобы тип <TT
+CLASS="TYPE"
+>timestamp</TT
+> подразумевал <TT
+CLASS="TYPE"
+>timestamp without time zone</TT
+> (время без часового пояса), и <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> следует этому. Для краткости <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+> можно записать как <TT
+CLASS="TYPE"
+>timestamptz</TT
+>; это расширение <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+></BLOCKQUOTE
+></DIV
+><P
+>Типы <TT
+CLASS="TYPE"
+>time</TT
+>, <TT
+CLASS="TYPE"
+>timestamp</TT
+> и <TT
+CLASS="TYPE"
+>interval</TT
+> принимают необязательное значение точности <TT
+CLASS="REPLACEABLE"
+><I
+>p</I
+></TT
+>, определяющее, сколько знаков после запятой должно сохраняться в секундах. По умолчанию точность не ограничивается. Для типов <TT
+CLASS="TYPE"
+>timestamp</TT
+> и <TT
+CLASS="TYPE"
+>interval</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>p</I
+></TT
+> может принимать значения от 0 до 6.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Когда значения <TT
+CLASS="TYPE"
+>timestamp</TT
+> хранятся в восьмибайтных целых (сейчас по умолчанию это так), на всём интервале значений обеспечивается точность в микросекундах. Если же значения этого типа сохраняются в числах двойной точности с плавающей точкой (устаревший вариант компиляции), фактический предел точности может быть меньше 6. Значения <TT
+CLASS="TYPE"
+>timestamp</TT
+> сохраняются в секундах до или после полуночи 1 января 2000 г. Когда при этом используются числа с плавающей точкой, микросекундная точность достигается для дат в пределах нескольких лет от этой даты, а при удалении от неё точность теряется. Однако заметьте, что даты в числах с плавающей точкой позволяют представить больший диапазон <TT
+CLASS="TYPE"
+>timestamp</TT
+>, чем было показано выше: от 4713 до н. э. до 5874897 н. э.</P
+><P
+>В зависимости от того же варианта компиляции, типы <TT
+CLASS="TYPE"
+>time</TT
+> и <TT
+CLASS="TYPE"
+>interval</TT
+> могут сохраняться в виде чисел с плавающей точкой или в восьмибайтных целых. В случае с плавающей точкой при больших значениях <TT
+CLASS="TYPE"
+>interval</TT
+> точность уменьшается.</P
+></BLOCKQUOTE
+></DIV
+><P
+>Для типа <TT
+CLASS="TYPE"
+>time</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>p</I
+></TT
+> может принимать значения от 0 до 6 при хранении типа в восьмибайтном целом и от 0 до 10 при хранении в числе с плавающей точкой.</P
+><P
+>Тип <TT
+CLASS="TYPE"
+>interval</TT
+> дополнительно позволяет ограничить набор сохраняемых полей следующими фразами: </P><PRE
+CLASS="LITERALLAYOUT"
+>YEAR
+MONTH
+DAY
+HOUR
+MINUTE
+SECOND
+YEAR TO MONTH
+DAY TO HOUR
+DAY TO MINUTE
+DAY TO SECOND
+HOUR TO MINUTE
+HOUR TO SECOND
+MINUTE TO SECOND</PRE
+><P> Заметьте, что если указаны и <TT
+CLASS="REPLACEABLE"
+><I
+>поля</I
+></TT
+>, и точность <TT
+CLASS="REPLACEABLE"
+><I
+>p</I
+></TT
+>, указание <TT
+CLASS="REPLACEABLE"
+><I
+>полей</I
+></TT
+> должно включать <TT
+CLASS="LITERAL"
+>SECOND</TT
+>, так как точность применима только к секундам.</P
+><P
+>Тип <TT
+CLASS="TYPE"
+>time with time zone</TT
+> определён стандартом SQL, но в его определении описаны свойства сомнительной ценности. В большинстве случае сочетание типов <TT
+CLASS="TYPE"
+>date</TT
+>, <TT
+CLASS="TYPE"
+>time</TT
+>, <TT
+CLASS="TYPE"
+>timestamp without time zone</TT
+> и <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+> удовлетворяет все потребности в функционале дат/времени, возникающие в приложениях.</P
+><P
+>Типы <TT
+CLASS="TYPE"
+>abstime</TT
+> и <TT
+CLASS="TYPE"
+>reltime</TT
+> имеют меньшую точность и предназначены для внутреннего использования. Эти типы не рекомендуется использоваться в обычных приложениях; их может не быть в будущих версиях.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="DATATYPE-DATETIME-INPUT"
+>8.5.1. Ввод даты/времени</A
+></H2
+><P
+>Значения даты и времени принимаются практически в любом разумном формате, включая ISO 8601, <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>-совместимый, традиционный формат <SPAN
+CLASS="PRODUCTNAME"
+>POSTGRES</SPAN
+> и другие. В некоторых форматах порядок даты, месяца и года во вводимой дате неоднозначен и поэтому поддерживается явное определение формата. Для этого предназначен параметр <A
+HREF="runtime-config-client.html#GUC-DATESTYLE"
+>DateStyle</A
+>. Когда он имеет значение <TT
+CLASS="LITERAL"
+>MDY</TT
+>, выбирается интерпретация месяц-день-год, значению <TT
+CLASS="LITERAL"
+>DMY</TT
+> соответствует день-месяц-год, а <TT
+CLASS="LITERAL"
+>YMD</TT
+> &mdash; год-месяц-день.</P
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> обрабатывает вводимые значения даты/времени более гибко, чем того требует стандарт <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>. Точные правила разбора даты/времени и распознаваемые текстовые поля, в том числе названия месяцев, дней недели и часовых поясов описаны в <A
+HREF="datetime-appendix.html"
+>Приложении B</A
+>.</P
+><P
+>Помните, что любые вводимые значения даты и времени нужно заключать в апострофы, как текстовые строки. За дополнительной информацией обратитесь к <A
+HREF="sql-syntax-lexical.html#SQL-SYNTAX-CONSTANTS-GENERIC"
+>Подразделу 4.1.2.7</A
+>. <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> предусматривает следующий синтаксис: </P><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>тип</I
+></TT
+> [ (<TT
+CLASS="REPLACEABLE"
+><I
+>p</I
+></TT
+>) ] '<TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+>'</PRE
+><P>Здесь <TT
+CLASS="REPLACEABLE"
+><I
+>p</I
+></TT
+> &mdash; необязательное указание точности, определяющее число знаков после точки в секундах. Точность может быть определена для типов <TT
+CLASS="TYPE"
+>time</TT
+>, <TT
+CLASS="TYPE"
+>timestamp</TT
+> и <TT
+CLASS="TYPE"
+>interval</TT
+> в пределах, описанных выше. Если в определении константы точность не указана, она считается равной точности значения в строке.</P
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN5778"
+>8.5.1.1. Даты</A
+></H3
+><P
+>В <A
+HREF="datatype-datetime.html#DATATYPE-DATETIME-DATE-TABLE"
+>Таблице 8-10</A
+> приведены некоторые допустимые значения типа <TT
+CLASS="TYPE"
+>date</TT
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="DATATYPE-DATETIME-DATE-TABLE"
+></A
+><P
+><B
+>Таблица 8-10. Вводимые даты</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+>Пример</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>1999-01-08</TD
+><TD
+>ISO 8601; 8 января в любом режиме (рекомендуемый формат)</TD
+></TR
+><TR
+><TD
+>January 8, 1999</TD
+><TD
+>воспринимается однозначно в любом режиме <TT
+CLASS="VARNAME"
+>datestyle</TT
+></TD
+></TR
+><TR
+><TD
+>1/8/1999</TD
+><TD
+>8 января в режиме <TT
+CLASS="LITERAL"
+>MDY</TT
+> и 1 августа в режиме <TT
+CLASS="LITERAL"
+>DMY</TT
+></TD
+></TR
+><TR
+><TD
+>1/18/1999</TD
+><TD
+>18 января в режиме <TT
+CLASS="LITERAL"
+>MDY</TT
+>; недопустимая дата в других режимах</TD
+></TR
+><TR
+><TD
+>01/02/03</TD
+><TD
+>2 января 2003 г. в режиме <TT
+CLASS="LITERAL"
+>MDY</TT
+>; 1 февраля 2003 г. в режиме <TT
+CLASS="LITERAL"
+>DMY</TT
+> и 3 февраля 2001 г. в режиме <TT
+CLASS="LITERAL"
+>YMD</TT
+></TD
+></TR
+><TR
+><TD
+>1999-Jan-08</TD
+><TD
+>8 января в любом режиме</TD
+></TR
+><TR
+><TD
+>Jan-08-1999</TD
+><TD
+>8 января в любом режиме</TD
+></TR
+><TR
+><TD
+>08-Jan-1999</TD
+><TD
+>8 января в любом режиме</TD
+></TR
+><TR
+><TD
+>99-Jan-08</TD
+><TD
+>8 января в режиме <TT
+CLASS="LITERAL"
+>YMD</TT
+>; ошибка в других режимах</TD
+></TR
+><TR
+><TD
+>08-Jan-99</TD
+><TD
+>8 января; ошибка в режиме <TT
+CLASS="LITERAL"
+>YMD</TT
+></TD
+></TR
+><TR
+><TD
+>Jan-08-99</TD
+><TD
+>8 января; ошибка в режиме <TT
+CLASS="LITERAL"
+>YMD</TT
+></TD
+></TR
+><TR
+><TD
+>19990108</TD
+><TD
+>ISO 8601; 8 января 1999 в любом режиме</TD
+></TR
+><TR
+><TD
+>990108</TD
+><TD
+>ISO 8601; 8 января 1999 в любом режиме</TD
+></TR
+><TR
+><TD
+>1999.008</TD
+><TD
+>год и день года</TD
+></TR
+><TR
+><TD
+>J2451187</TD
+><TD
+>дата по юлианскому календарю</TD
+></TR
+><TR
+><TD
+>January 8, 99 BC</TD
+><TD
+>99 до н. э.</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN5851"
+>8.5.1.2. Время</A
+></H3
+><P
+>Для хранения времени суток без даты предназначены типы <TT
+CLASS="TYPE"
+>time [ (<TT
+CLASS="REPLACEABLE"
+><I
+>p</I
+></TT
+>) ] without time zone</TT
+> и <TT
+CLASS="TYPE"
+>time [ (<TT
+CLASS="REPLACEABLE"
+><I
+>p</I
+></TT
+>) ] with time zone</TT
+>. Тип <TT
+CLASS="TYPE"
+>time</TT
+> без уточнения эквивалентен типу <TT
+CLASS="TYPE"
+>time without time zone</TT
+>.</P
+><P
+>Допустимые вводимые значения этих типов состоят из записи времени суток и необязательного указания часового пояса. (См. <A
+HREF="datatype-datetime.html#DATATYPE-DATETIME-TIME-TABLE"
+>Таблицу 8-11</A
+> и <A
+HREF="datatype-datetime.html#DATATYPE-TIMEZONE-TABLE"
+>Таблицу 8-12</A
+>.) Если в значении для типа <TT
+CLASS="TYPE"
+>time without time zone</TT
+> указывается часовой пояс, он просто игнорируется. Так же будет игнорироваться дата, если её указать, за исключением случаев, когда в указанном часовом поясе принят переход на летнее время, например <TT
+CLASS="LITERAL"
+>America/New_York</TT
+>. В данном случае указать дату необходимо, чтобы система могла определить, применяется ли обычное или летнее время. Соответствующее смещение часового пояса записывается в значении <TT
+CLASS="TYPE"
+>time with time zone</TT
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="DATATYPE-DATETIME-TIME-TABLE"
+></A
+><P
+><B
+>Таблица 8-11. Вводимое время</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+>Пример</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                      <TT
+CLASS="LITERAL"
+>04:05:06.789</TT
+>
+                    </TD
+><TD
+>ISO 8601</TD
+></TR
+><TR
+><TD
+>                      <TT
+CLASS="LITERAL"
+>04:05:06</TT
+>
+                    </TD
+><TD
+>ISO 8601</TD
+></TR
+><TR
+><TD
+>                      <TT
+CLASS="LITERAL"
+>04:05</TT
+>
+                    </TD
+><TD
+>ISO 8601</TD
+></TR
+><TR
+><TD
+>                      <TT
+CLASS="LITERAL"
+>040506</TT
+>
+                    </TD
+><TD
+>ISO 8601</TD
+></TR
+><TR
+><TD
+>                      <TT
+CLASS="LITERAL"
+>04:05 AM</TT
+>
+                    </TD
+><TD
+>то же, что и 04:05; AM не меняет значение времени</TD
+></TR
+><TR
+><TD
+>                      <TT
+CLASS="LITERAL"
+>04:05 PM</TT
+>
+                    </TD
+><TD
+>то же, что и 16:05; часы должны быть &lt;= 12</TD
+></TR
+><TR
+><TD
+>                      <TT
+CLASS="LITERAL"
+>04:05:06.789-8</TT
+>
+                    </TD
+><TD
+>ISO 8601</TD
+></TR
+><TR
+><TD
+>                      <TT
+CLASS="LITERAL"
+>04:05:06-08:00</TT
+>
+                    </TD
+><TD
+>ISO 8601</TD
+></TR
+><TR
+><TD
+>                      <TT
+CLASS="LITERAL"
+>04:05-08:00</TT
+>
+                    </TD
+><TD
+>ISO 8601</TD
+></TR
+><TR
+><TD
+>                      <TT
+CLASS="LITERAL"
+>040506-08</TT
+>
+                    </TD
+><TD
+>ISO 8601</TD
+></TR
+><TR
+><TD
+>                      <TT
+CLASS="LITERAL"
+>04:05:06 PST</TT
+>
+                    </TD
+><TD
+>часовой пояс задаётся аббревиатурой</TD
+></TR
+><TR
+><TD
+>                      <TT
+CLASS="LITERAL"
+>2003-04-12 04:05:06 America/New_York</TT
+>
+                    </TD
+><TD
+>часовой пояс задаётся полным названием</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><DIV
+CLASS="TABLE"
+><A
+NAME="DATATYPE-TIMEZONE-TABLE"
+></A
+><P
+><B
+>Таблица 8-12. Вводимый часовой пояс</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+>Пример</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                      <TT
+CLASS="LITERAL"
+>PST</TT
+>
+                    </TD
+><TD
+>аббревиатура (Pacific Standard Time, Стандартное тихоокеанское время)</TD
+></TR
+><TR
+><TD
+>                      <TT
+CLASS="LITERAL"
+>America/New_York</TT
+>
+                    </TD
+><TD
+>полное название часового пояса</TD
+></TR
+><TR
+><TD
+>                      <TT
+CLASS="LITERAL"
+>PST8PDT</TT
+>
+                    </TD
+><TD
+>указание часового пояса в стиле POSIX</TD
+></TR
+><TR
+><TD
+>                      <TT
+CLASS="LITERAL"
+>-8:00</TT
+>
+                    </TD
+><TD
+>смещение часового пояса PST по ISO-8601</TD
+></TR
+><TR
+><TD
+>                      <TT
+CLASS="LITERAL"
+>-800</TT
+>
+                    </TD
+><TD
+>смещение часового пояса PST по ISO-8601</TD
+></TR
+><TR
+><TD
+>                      <TT
+CLASS="LITERAL"
+>-8</TT
+>
+                    </TD
+><TD
+>смещение часового пояса PST по ISO-8601</TD
+></TR
+><TR
+><TD
+>                      <TT
+CLASS="LITERAL"
+>zulu</TT
+>
+                    </TD
+><TD
+>принятое у военных сокращение UTC</TD
+></TR
+><TR
+><TD
+>                      <TT
+CLASS="LITERAL"
+>z</TT
+>
+                    </TD
+><TD
+>краткая форма <TT
+CLASS="LITERAL"
+>zulu</TT
+></TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Подробнее узнать о том, как указывается часовой пояс, можно в <A
+HREF="datatype-datetime.html#DATATYPE-TIMEZONES"
+>Подразделе 8.5.3</A
+>.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN5971"
+>8.5.1.3. Даты и время</A
+></H3
+><P
+>Допустимые значения типов timestamp состоят из записи даты и времени, после которого может указываться часовой пояс и необязательное уточнение <TT
+CLASS="LITERAL"
+>AD</TT
+> или <TT
+CLASS="LITERAL"
+>BC</TT
+>, определяющее эпоху до нашей эры и нашу эру соответственно. (<TT
+CLASS="LITERAL"
+>AD</TT
+>/<TT
+CLASS="LITERAL"
+>BC</TT
+> можно указать и перед часовым поясом, но предпочтительнее первый вариант.) Таким образом: </P><PRE
+CLASS="PROGRAMLISTING"
+>1999-01-08 04:05:06</PRE
+><P> и </P><PRE
+CLASS="PROGRAMLISTING"
+>1999-01-08 04:05:06 -8:00</PRE
+><P> допустимые варианты, соответствующие стандарту <ACRONYM
+CLASS="ACRONYM"
+>ISO</ACRONYM
+> 8601. В дополнение к этому поддерживается распространённый формат: </P><PRE
+CLASS="PROGRAMLISTING"
+>January 8 04:05:06 1999 PST</PRE
+><P></P
+><P
+>Стандарт <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> различает константы типов <TT
+CLASS="TYPE"
+>timestamp without time zone</TT
+> и <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+> по знаку <SPAN
+CLASS="QUOTE"
+>"+"</SPAN
+> или <SPAN
+CLASS="QUOTE"
+>"-"</SPAN
+> и смещению часового пояса, добавленному после времени. Следовательно, согласно стандарту, записи </P><PRE
+CLASS="PROGRAMLISTING"
+>TIMESTAMP '2004-10-19 10:23:54'</PRE
+><P> должен соответствовать тип <TT
+CLASS="TYPE"
+>timestamp without time zone</TT
+>, а </P><PRE
+CLASS="PROGRAMLISTING"
+>TIMESTAMP '2004-10-19 10:23:54+02'</PRE
+><P> тип <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+>. <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> никогда не анализирует содержимое текстовой строки, чтобы определить тип значения, и поэтому обе записи будут обработаны как значения типа <TT
+CLASS="TYPE"
+>timestamp without time zone</TT
+>. Чтобы текстовая константа обрабатывалась как <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+>, укажите этот тип явно: </P><PRE
+CLASS="PROGRAMLISTING"
+>TIMESTAMP WITH TIME ZONE '2004-10-19 10:23:54+02'</PRE
+><P> В константе типа <TT
+CLASS="TYPE"
+>timestamp without time zone</TT
+> <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> просто игнорирует часовой пояс. То есть результирующее значение вычисляется только из полей даты/времени и не подстраивается под указанный часовой пояс.</P
+><P
+>Значения <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+> внутри всегда хранятся в UTC (Universal Coordinated Time, Всемирное скоординированное время или время по Гринвичу, <ACRONYM
+CLASS="ACRONYM"
+>GMT</ACRONYM
+>). Вводимое значение, в котором явно указан часовой пояс, переводится в UTC с учётом смещения данного часового пояса. Если во входной строке не указан часовой пояс, подразумевается часовой пояс, заданный системным параметром <A
+HREF="runtime-config-client.html#GUC-TIMEZONE"
+>TimeZone</A
+> и время так же пересчитывается в UTC со смещением <TT
+CLASS="VARNAME"
+>timezone</TT
+>.</P
+><P
+>Когда значение <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+> выводится, оно всегда преобразуется из UTC в текущий часовой пояс <TT
+CLASS="VARNAME"
+>timezone</TT
+> и отображается как локальное время. Чтобы получить время для другого часового пояса, нужно либо изменить <TT
+CLASS="VARNAME"
+>timezone</TT
+>, либо воспользоваться конструкцией <TT
+CLASS="LITERAL"
+>AT TIME ZONE</TT
+> (см. <A
+HREF="functions-datetime.html#FUNCTIONS-DATETIME-ZONECONVERT"
+>Подраздел 9.9.3</A
+>).</P
+><P
+>В преобразованиях между <TT
+CLASS="TYPE"
+>timestamp without time zone</TT
+> и <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+> обычно предполагается, что значение <TT
+CLASS="TYPE"
+>timestamp without time zone</TT
+> содержит местное время (для часового пояса <TT
+CLASS="VARNAME"
+>timezone</TT
+>). Другой часовой пояс для преобразования можно задать с помощью <TT
+CLASS="LITERAL"
+>AT TIME ZONE</TT
+>.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN6021"
+>8.5.1.4. Специальные значения</A
+></H3
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> для удобства поддерживает несколько специальных значений даты/времени, перечисленных в <A
+HREF="datatype-datetime.html#DATATYPE-DATETIME-SPECIAL-TABLE"
+>Таблице 8-13</A
+>. Значения <TT
+CLASS="LITERAL"
+>infinity</TT
+> и <TT
+CLASS="LITERAL"
+>-infinity</TT
+> имеют особое представление в системе и они отображаются в том же виде, тогда как другие варианты при чтении преобразуются в значения даты/времени. (В частности, <TT
+CLASS="LITERAL"
+>now</TT
+> и подобные строки преобразуются в актуальные значения времени в момент чтения.) Чтобы использовать эти значения в качестве констант в командах SQL, их нужно заключать в апострофы.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="DATATYPE-DATETIME-SPECIAL-TABLE"
+></A
+><P
+><B
+>Таблица 8-13. Специальные значения даты/времени</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Вводимая строка</TH
+><TH
+>Допустимые типы</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                      <TT
+CLASS="LITERAL"
+>epoch</TT
+>
+                    </TD
+><TD
+><TT
+CLASS="TYPE"
+>date</TT
+>, <TT
+CLASS="TYPE"
+>timestamp</TT
+></TD
+><TD
+>1970-01-01 00:00:00+00 (точка отсчёта времени в Unix)</TD
+></TR
+><TR
+><TD
+>                      <TT
+CLASS="LITERAL"
+>infinity</TT
+>
+                    </TD
+><TD
+><TT
+CLASS="TYPE"
+>date</TT
+>, <TT
+CLASS="TYPE"
+>timestamp</TT
+></TD
+><TD
+>время после максимальной допустимой даты</TD
+></TR
+><TR
+><TD
+>                      <TT
+CLASS="LITERAL"
+>-infinity</TT
+>
+                    </TD
+><TD
+><TT
+CLASS="TYPE"
+>date</TT
+>, <TT
+CLASS="TYPE"
+>timestamp</TT
+></TD
+><TD
+>время до минимальной допустимой даты</TD
+></TR
+><TR
+><TD
+>                      <TT
+CLASS="LITERAL"
+>now</TT
+>
+                    </TD
+><TD
+><TT
+CLASS="TYPE"
+>date</TT
+>, <TT
+CLASS="TYPE"
+>time</TT
+>, <TT
+CLASS="TYPE"
+>timestamp</TT
+></TD
+><TD
+>время начала текущей транзакции</TD
+></TR
+><TR
+><TD
+>                      <TT
+CLASS="LITERAL"
+>today</TT
+>
+                    </TD
+><TD
+><TT
+CLASS="TYPE"
+>date</TT
+>, <TT
+CLASS="TYPE"
+>timestamp</TT
+></TD
+><TD
+>время начала текущих суток</TD
+></TR
+><TR
+><TD
+>                      <TT
+CLASS="LITERAL"
+>tomorrow</TT
+>
+                    </TD
+><TD
+><TT
+CLASS="TYPE"
+>date</TT
+>, <TT
+CLASS="TYPE"
+>timestamp</TT
+></TD
+><TD
+>время начала следующих суток</TD
+></TR
+><TR
+><TD
+>                      <TT
+CLASS="LITERAL"
+>yesterday</TT
+>
+                    </TD
+><TD
+><TT
+CLASS="TYPE"
+>date</TT
+>, <TT
+CLASS="TYPE"
+>timestamp</TT
+></TD
+><TD
+>время начала предыдущих суток</TD
+></TR
+><TR
+><TD
+>                      <TT
+CLASS="LITERAL"
+>allballs</TT
+>
+                    </TD
+><TD
+>                      <TT
+CLASS="TYPE"
+>time</TT
+>
+                    </TD
+><TD
+>00:00:00.00 UTC</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Для получения текущей даты/времени соответствующего типа можно также использовать следующие <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>-совместимые функции: <TT
+CLASS="LITERAL"
+>CURRENT_DATE</TT
+>, <TT
+CLASS="LITERAL"
+>CURRENT_TIME</TT
+>, <TT
+CLASS="LITERAL"
+>CURRENT_TIMESTAMP</TT
+>, <TT
+CLASS="LITERAL"
+>LOCALTIME</TT
+> и <TT
+CLASS="LITERAL"
+>LOCALTIMESTAMP</TT
+>. Последние четыре функции принимают необязательное указание точности. (См. <A
+HREF="functions-datetime.html#FUNCTIONS-DATETIME-CURRENT"
+>Подраздел 9.9.4</A
+>.) Заметьте, что во входных строках эти SQL-функции <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>не</I
+></SPAN
+> распознаются.</P
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="DATATYPE-DATETIME-OUTPUT"
+>8.5.2. Вывод даты/времени</A
+></H2
+><P
+>В качестве выходного формата типов даты/времени можно использовать один из четырёх стилей: ISO 8601, <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> (Ingres), традиционный формат <SPAN
+CLASS="PRODUCTNAME"
+>POSTGRES</SPAN
+> (формат <SPAN
+CLASS="APPLICATION"
+>date</SPAN
+> в Unix) или German. По умолчанию выбран формат <ACRONYM
+CLASS="ACRONYM"
+>ISO</ACRONYM
+>. (Стандарт <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> требует, чтобы использовался именно ISO 8601. Другой формат называется <SPAN
+CLASS="QUOTE"
+>"SQL"</SPAN
+> исключительно по историческим причинам.) Примеры всех стилей вывода перечислены в <A
+HREF="datatype-datetime.html#DATATYPE-DATETIME-OUTPUT-TABLE"
+>Таблице 8-14</A
+>. Вообще со значениями типов <TT
+CLASS="TYPE"
+>date</TT
+> и <TT
+CLASS="TYPE"
+>time</TT
+> выводилась бы только часть даты или времени из показанных примеров, но со стилем <SPAN
+CLASS="PRODUCTNAME"
+>POSTGRES</SPAN
+> значение даты без времени выводится в формате <ACRONYM
+CLASS="ACRONYM"
+>ISO</ACRONYM
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="DATATYPE-DATETIME-OUTPUT-TABLE"
+></A
+><P
+><B
+>Таблица 8-14. Стили вывода даты/время</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Стиль</TH
+><TH
+>Описание</TH
+><TH
+>Пример</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>ISO</TT
+>
+                  </TD
+><TD
+>ISO 8601, стандарт SQL</TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>1997-12-17 07:37:16-08</TT
+>
+                  </TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>SQL</TT
+>
+                  </TD
+><TD
+>традиционный стиль</TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>12/17/1997 07:37:16.00 PST</TT
+>
+                  </TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>Postgres</TT
+>
+                  </TD
+><TD
+>изначальный стиль</TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>Wed Dec 17 07:37:16 1997 PST</TT
+>
+                  </TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>German</TT
+>
+                  </TD
+><TD
+>региональный стиль</TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>17.12.1997 07:37:16.00 PST</TT
+>
+                  </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>ISO 8601 указывает, что дата должна отделяться от времени буквой <TT
+CLASS="LITERAL"
+>T</TT
+> в верхнем регистре. <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> принимает этот формат при вводе, но при выводе вставляет вместо <TT
+CLASS="LITERAL"
+>T</TT
+> пробел, как показано выше. Это сделано для улучшения читаемости и для совместимости с RFC 3339 и другими СУБД.</P
+></BLOCKQUOTE
+></DIV
+><P
+>В стилях <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> и POSTGRES день выводится перед месяцем, если установлен порядок DMY, а в противном случае месяц выводится перед днём. (Как этот параметр также влияет на интерпретацию входных значений, описано в <A
+HREF="datatype-datetime.html#DATATYPE-DATETIME-INPUT"
+>Подразделе 8.5.1</A
+>) Соответствующие примеры показаны в <A
+HREF="datatype-datetime.html#DATATYPE-DATETIME-OUTPUT2-TABLE"
+>Таблице 8-15</A
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="DATATYPE-DATETIME-OUTPUT2-TABLE"
+></A
+><P
+><B
+>Таблица 8-15. Соглашения о порядке компонентов даты</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Параметр <TT
+CLASS="VARNAME"
+>datestyle</TT
+></TH
+><TH
+>Порядок при вводе</TH
+><TH
+>Пример вывода</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>SQL, DMY</TT
+>
+                  </TD
+><TD
+><TT
+CLASS="REPLACEABLE"
+><I
+>день</I
+></TT
+>/<TT
+CLASS="REPLACEABLE"
+><I
+>месяц</I
+></TT
+>/<TT
+CLASS="REPLACEABLE"
+><I
+>год</I
+></TT
+></TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>17/12/1997 15:37:16.00 CET</TT
+>
+                  </TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>SQL, MDY</TT
+>
+                  </TD
+><TD
+><TT
+CLASS="REPLACEABLE"
+><I
+>месяц</I
+></TT
+>/<TT
+CLASS="REPLACEABLE"
+><I
+>день</I
+></TT
+>/<TT
+CLASS="REPLACEABLE"
+><I
+>год</I
+></TT
+></TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>12/17/1997 07:37:16.00 PST</TT
+>
+                  </TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>Postgres, DMY</TT
+>
+                  </TD
+><TD
+><TT
+CLASS="REPLACEABLE"
+><I
+>день</I
+></TT
+>/<TT
+CLASS="REPLACEABLE"
+><I
+>месяц</I
+></TT
+>/<TT
+CLASS="REPLACEABLE"
+><I
+>год</I
+></TT
+></TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>Wed 17 Dec 07:37:16 1997 PST</TT
+>
+                  </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Стиль даты/времени пользователь может выбрать с помощью команды <TT
+CLASS="COMMAND"
+>SET datestyle</TT
+>, параметра <A
+HREF="runtime-config-client.html#GUC-DATESTYLE"
+>DateStyle</A
+> в файле конфигурации <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+> или переменной окружения <TT
+CLASS="ENVAR"
+>PGDATESTYLE</TT
+> на сервере или клиенте.</P
+><P
+>Для большей гибкости при форматировании выводимой даты/времени можно использовать функцию <CODE
+CLASS="FUNCTION"
+>to_char</CODE
+> (см. <A
+HREF="functions-formatting.html"
+>Раздел 9.8</A
+>).</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="DATATYPE-TIMEZONES"
+>8.5.3. Часовые пояса</A
+></H2
+><P
+>Часовые пояса и правила их применения определяются, как вы знаете, не только по географическим, но и по политическим соображениям. Часовые пояса во всём мире были более-менее стандартизированы в начале прошлого века, но они продолжают претерпевать изменения, в частности это касается перехода на летнее время. Для расчёта времени в прошлом <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> получает исторические сведения о правилах часовых поясов из распространённой базы данных IANA (Olson). Для будущего времени предполагается, что в заданном часовом поясе будут продолжать действовать последние принятые правила.</P
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> стремится к совместимости со стандартом <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> в наиболее типичных случаях. Однако стандарт <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> допускает некоторые странности при смешивании типов даты и времени. Две очевидные проблемы: <P
+></P
+></P><UL
+><LI
+><P
+>Хотя для типа <TT
+CLASS="TYPE"
+>date</TT
+> часовой пояс указать нельзя, это можно сделать для типа <TT
+CLASS="TYPE"
+>time</TT
+>. В реальности это не очень полезно, так как без даты нельзя точно определить смещение при переходе на летнее время.</P
+></LI
+><LI
+><P
+>По умолчанию часовой пояс задаётся постоянным смещением от <ACRONYM
+CLASS="ACRONYM"
+>UTC</ACRONYM
+>. Это также не позволяет учесть летнее время при арифметических операций с датами, пересекающими границы летнего времени.</P
+></LI
+></UL
+><P></P
+><P
+>Поэтому мы советуем использовать часовой пояс с типами, включающими и время, и дату. Мы <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>не</I
+></SPAN
+> рекомендуем использовать тип <TT
+CLASS="TYPE"
+>time with time zone</TT
+> (хотя <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> поддерживает его для старых приложений и совместимости со стандартом <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>). Для типов, включающих только дату или только время, в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> предполагается местный часовой пояс.</P
+><P
+>Все значения даты и времени с часовым поясом представляются внутри в <ACRONYM
+CLASS="ACRONYM"
+>UTC</ACRONYM
+>, а при передаче клиентскому приложению они переводятся в местное время, при этом часовой пояс по умолчанию определяется параметром конфигурации <A
+HREF="runtime-config-client.html#GUC-TIMEZONE"
+>TimeZone</A
+>.</P
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> позволяет задать часовой пояс тремя способами: <P
+></P
+></P><UL
+><LI
+><P
+>Полное название часового пояса, например <TT
+CLASS="LITERAL"
+>America/New_York</TT
+>. Все допустимые названия перечислены в представлении <TT
+CLASS="LITERAL"
+>pg_timezone_names</TT
+> (см. <A
+HREF="view-pg-timezone-names.html"
+>Раздел 48.72</A
+>). Определения часовых поясов <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> берёт из широко распространённой базы IANA, так что имена часовых поясов PostgreSQL будут воспринимать и многие другие приложения.</P
+></LI
+><LI
+><P
+>Аббревиатура часового пояса, например <TT
+CLASS="LITERAL"
+>PST</TT
+>. Такое определение просто задаёт смещение от UTC, в отличие от полных названий поясов, которые кроме того подразумевают и правила перехода на летнее время. Распознаваемые аббревиатуры перечислены в представлении <TT
+CLASS="LITERAL"
+>pg_timezone_abbrevs</TT
+> (см. <A
+HREF="view-pg-timezone-abbrevs.html"
+>Раздел 48.71</A
+>). Аббревиатуры можно использовать во вводимых значениях даты/времени и в операторе <TT
+CLASS="LITERAL"
+>AT TIME ZONE</TT
+>, но не в параметрах конфигурации <A
+HREF="runtime-config-client.html#GUC-TIMEZONE"
+>TimeZone</A
+> и <A
+HREF="runtime-config-logging.html#GUC-LOG-TIMEZONE"
+>log_timezone</A
+>.</P
+></LI
+><LI
+><P
+>В дополнение к полным названиям и аббревиатурам часовых поясов <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> принимает указания часового пояса в стиле POSIX: <TT
+CLASS="REPLACEABLE"
+><I
+>STD</I
+></TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>смещение</I
+></TT
+> или <TT
+CLASS="REPLACEABLE"
+><I
+>STD</I
+></TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>смещение</I
+></TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>DST</I
+></TT
+>, где <TT
+CLASS="REPLACEABLE"
+><I
+>STD</I
+></TT
+> &mdash; аббревиатура пояса, <TT
+CLASS="REPLACEABLE"
+><I
+>смещение</I
+></TT
+> &mdash; разница с UTC, а <TT
+CLASS="REPLACEABLE"
+><I
+>DST</I
+></TT
+> &mdash; необязательное дополнение, обозначающее летнее время и добавляющее к смещению ещё один час. Например, если бы обозначение <TT
+CLASS="LITERAL"
+>EST5EDT</TT
+> не являлось названием часового пояса, оно всё равно было бы воспринято и функционально соответствовало бы поясу североамериканского восточного времени. При такой записи аббревиатура пояса может быть набором букв или обычной строкой, заключённой в угловые скобки ((<TT
+CLASS="LITERAL"
+>&lt;&gt;</TT
+>). Когда представлено название пояса с летним временем, при пересчёте времени будут использоваться правила перехода на летнее время, описанные в базе данных IANA в файле <TT
+CLASS="FILENAME"
+>posixrules</TT
+>. В стандартной инсталляции <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> файл <TT
+CLASS="FILENAME"
+>posixrules</TT
+> соответствует описанию <TT
+CLASS="LITERAL"
+>US/Eastern</TT
+>, так что для указаний часовых поясов в стиле POSIX применяются правила перехода на летнее время, принятые в США. При необходимости это можно изменить, заменив файл <TT
+CLASS="FILENAME"
+>posixrules</TT
+>.</P
+></LI
+></UL
+><P> Вкратце, различие между аббревиатурами и полными названиями заключаются в следующем: аббревиатуры представляют определённый сдвиг от UTC, а полное название подразумевает ещё и местное правило по переходу на летнее время, то есть, возможно, два сдвига от UTC. Например, <TT
+CLASS="LITERAL"
+>2014-06-04 12:00 America/New_York</TT
+> представляет полдень по местному времени в Нью-Йорк, что для данного дня было бы летним восточным временем (EDT или UTC-4). Так что <TT
+CLASS="LITERAL"
+>2014-06-04 12:00 EDT</TT
+> обозначает тот же момент времени. Но <TT
+CLASS="LITERAL"
+>2014-06-04 12:00 EST</TT
+> задаёт стандартное восточное время (UTC-5), не зависящее о того, действовало ли летнее время в этот день.</P
+><P
+>Мало того, в некоторых юрисдикциях одна и та же аббревиатура часового пояса означала разные сдвиги UTC в разное время; например, аббревиатура московского времени <TT
+CLASS="LITERAL"
+>MSK</TT
+> несколько лет означала UTC+3, а затем стала означать UTC+4. <SPAN
+CLASS="APPLICATION"
+>PostgreSQL</SPAN
+> обрабатывает такие аббревиатуры в соответствии с их значениями на заданную дату, но, как и с примером выше <TT
+CLASS="LITERAL"
+>EST</TT
+>, это не обязательно будет соответствовать местному гражданскому времени в этот день.</P
+><P
+>При этом следует использовать возможность указания часового пояса в стиле POSIX с осторожностью, так как при этом могут быть приняты заведомо неверные данные, потому что разумность аббревиатуры никак не проверяется. Например, команда <TT
+CLASS="LITERAL"
+>SET TIMEZONE TO FOOBAR0</TT
+> будет работать и система примет эту довольно оригинальную аббревиатуру для UTC. Также следует учитывать, что в названиях часовых поясов POSIX положительные смещения соответствуют сдвигу <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>к западу</I
+></SPAN
+> Гринвича. Во всех остальных формах <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> следует соглашению ISO-8601, по которому положительным смещениям соответствует сдвиг <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>к востоку</I
+></SPAN
+> от Гринвича.</P
+><P
+>Независимо от формы, регистр в названиях и аббревиатурах часовых поясов не важен. (В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> до версии 8.2 он где-то имел значение, а где-то нет.)</P
+><P
+>Ни названия, ни аббревиатуры часовых поясов, не зашиты в самом сервере; они считываются из файлов конфигурации, находящихся в путях <TT
+CLASS="FILENAME"
+>.../share/timezone/</TT
+> и <TT
+CLASS="FILENAME"
+>.../share/timezonesets/</TT
+> относительно каталога установки (см. <A
+HREF="datetime-config-files.html"
+>Раздел B.3</A
+>).</P
+><P
+>Параметр конфигурации <A
+HREF="runtime-config-client.html#GUC-TIMEZONE"
+>TimeZone</A
+> можно установить в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+> или любым другим стандартным способом, описанным в <A
+HREF="runtime-config.html"
+>Главе 18</A
+>. Часовой пояс может быть также определён следующими специальными способами: <P
+></P
+></P><UL
+><LI
+><P
+>Часовой пояс для текущего сеанса можно установить с помощью <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>-команды <TT
+CLASS="COMMAND"
+>SET TIME ZONE</TT
+>. Это альтернативная запись команды <TT
+CLASS="COMMAND"
+>SET TIMEZONE TO</TT
+>, более соответствующая SQL-стандарту.</P
+></LI
+><LI
+><P
+>Если установлена переменная окружения <TT
+CLASS="ENVAR"
+>PGTZ</TT
+>, клиенты <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> используют её значение, выполняя при подключении к серверу команду <TT
+CLASS="COMMAND"
+>SET TIME ZONE</TT
+>.</P
+></LI
+></UL
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="DATATYPE-INTERVAL-INPUT"
+>8.5.4. Ввод интервалов</A
+></H2
+><P
+>Значения типа <TT
+CLASS="TYPE"
+>interval</TT
+> могут быть записаны в следующей расширенной форме: </P><PRE
+CLASS="SYNOPSIS"
+>[<SPAN
+CLASS="OPTIONAL"
+>@</SPAN
+>] <TT
+CLASS="REPLACEABLE"
+><I
+>количество</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>единица</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>количество</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>единица</I
+></TT
+>...</SPAN
+>] [<SPAN
+CLASS="OPTIONAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>направление</I
+></TT
+></SPAN
+>]</PRE
+><P> где <TT
+CLASS="REPLACEABLE"
+><I
+>количество</I
+></TT
+> &mdash; это число (возможно, со знаком); <TT
+CLASS="REPLACEABLE"
+><I
+>единица </I
+></TT
+> &mdash; одно из значений: <TT
+CLASS="LITERAL"
+>microsecond</TT
+>, <TT
+CLASS="LITERAL"
+>millisecond</TT
+>, <TT
+CLASS="LITERAL"
+>second</TT
+>, <TT
+CLASS="LITERAL"
+>minute</TT
+>, <TT
+CLASS="LITERAL"
+>hour</TT
+>, <TT
+CLASS="LITERAL"
+>day</TT
+>, <TT
+CLASS="LITERAL"
+>week</TT
+>, <TT
+CLASS="LITERAL"
+>month</TT
+>, <TT
+CLASS="LITERAL"
+>year</TT
+>, <TT
+CLASS="LITERAL"
+>decade</TT
+>, <TT
+CLASS="LITERAL"
+>century</TT
+>, <TT
+CLASS="LITERAL"
+>millennium</TT
+> (которые обозначают соответственно микросекунды, миллисекунды, секунды, минуты, часы, дни, недели, месяцы, годы, десятилетия, века и тысячелетия), либо эти же слова во множественном числе, либо их сокращения; <TT
+CLASS="REPLACEABLE"
+><I
+>направление</I
+></TT
+> может принимать значение <TT
+CLASS="LITERAL"
+>ago</TT
+> (назад) или быть пустым. Знак <TT
+CLASS="LITERAL"
+>@</TT
+> является необязательным. Все заданные величины различных единиц суммируются вместе с учётом знака чисел. Указание <TT
+CLASS="LITERAL"
+>ago</TT
+> меняет знак всех полей на противоположный. Этот синтаксис также используется при выводе интервала, если параметр <A
+HREF="runtime-config-client.html#GUC-INTERVALSTYLE"
+>IntervalStyle</A
+> имеет значение <TT
+CLASS="LITERAL"
+>postgres_verbose</TT
+>.</P
+><P
+>Количества дней, часов, минут и секунд можно определить, не указывая явно соответствующие единицы. Например, запись <TT
+CLASS="LITERAL"
+>'1 12:59:10'</TT
+> равнозначна <TT
+CLASS="LITERAL"
+>'1 day 12 hours 59 min 10 sec'</TT
+>. Сочетание года и месяца также можно записать через минус; например <TT
+CLASS="LITERAL"
+>'200-10'</TT
+> означает то, же что и <TT
+CLASS="LITERAL"
+>'200 years 10 months'</TT
+>. (На самом деле только эти краткие формы разрешены стандартом <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> и они используются при выводе, когда <TT
+CLASS="VARNAME"
+>IntervalStyle</TT
+> имеет значение <TT
+CLASS="LITERAL"
+>sql_standard</TT
+>.)</P
+><P
+>Интервалы можно также записывать в виде, определённом в ISO 8601, либо в <SPAN
+CLASS="QUOTE"
+>"формате с кодами"</SPAN
+>, описанном в разделе 4.4.3.2 этого стандарта, либо в <SPAN
+CLASS="QUOTE"
+>"альтернативном формате"</SPAN
+>, описанном в разделе 4.4.3.3. Формат с кодами выглядит так: </P><PRE
+CLASS="SYNOPSIS"
+>P <TT
+CLASS="REPLACEABLE"
+><I
+>количество</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>единица</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+> <TT
+CLASS="REPLACEABLE"
+><I
+>количество</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>единица</I
+></TT
+> ...</SPAN
+>] [<SPAN
+CLASS="OPTIONAL"
+> T [<SPAN
+CLASS="OPTIONAL"
+> <TT
+CLASS="REPLACEABLE"
+><I
+>количество</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>единица</I
+></TT
+> ...</SPAN
+>]</SPAN
+>]</PRE
+><P> Строка должна начинаться с символа <TT
+CLASS="LITERAL"
+>P</TT
+> и может включать также <TT
+CLASS="LITERAL"
+>T</TT
+> перед временем суток. Допустимые коды единиц перечислены в <A
+HREF="datatype-datetime.html#DATATYPE-INTERVAL-ISO8601-UNITS"
+>Таблице 8-16</A
+>. Коды единиц можно опустить или указать в любом порядке, но компоненты времени суток должны идти после символа <TT
+CLASS="LITERAL"
+>T</TT
+>. В частности, значение кода <TT
+CLASS="LITERAL"
+>M</TT
+> зависит от того, располагается ли он до или после <TT
+CLASS="LITERAL"
+>T</TT
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="DATATYPE-INTERVAL-ISO8601-UNITS"
+></A
+><P
+><B
+>Таблица 8-16. Коды единиц временных интервалов ISO 8601</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+>Код</TH
+><TH
+>Значение</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>Y</TD
+><TD
+>годы</TD
+></TR
+><TR
+><TD
+>M</TD
+><TD
+>месяцы (в дате)</TD
+></TR
+><TR
+><TD
+>W</TD
+><TD
+>недели</TD
+></TR
+><TR
+><TD
+>D</TD
+><TD
+>дни</TD
+></TR
+><TR
+><TD
+>H</TD
+><TD
+>часы</TD
+></TR
+><TR
+><TD
+>M</TD
+><TD
+>минуты (во времени)</TD
+></TR
+><TR
+><TD
+>S</TD
+><TD
+>секунды</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>В альтернативном формате: </P><PRE
+CLASS="SYNOPSIS"
+>P [<SPAN
+CLASS="OPTIONAL"
+> <TT
+CLASS="REPLACEABLE"
+><I
+>год</I
+></TT
+>-<TT
+CLASS="REPLACEABLE"
+><I
+>месяц</I
+></TT
+>-<TT
+CLASS="REPLACEABLE"
+><I
+>день</I
+></TT
+> </SPAN
+>] [<SPAN
+CLASS="OPTIONAL"
+> T <TT
+CLASS="REPLACEABLE"
+><I
+>часы</I
+></TT
+>:<TT
+CLASS="REPLACEABLE"
+><I
+>минуты</I
+></TT
+>:<TT
+CLASS="REPLACEABLE"
+><I
+>секунды</I
+></TT
+> </SPAN
+>]</PRE
+><P> строка должна начинаться с <TT
+CLASS="LITERAL"
+>P</TT
+>, а <TT
+CLASS="LITERAL"
+>T</TT
+> разделяет компоненты даты и времени. Значения выражаются числами так же, как и в датах ISO 8601.</P
+><P
+>При записи интервальной константы с указанием <TT
+CLASS="REPLACEABLE"
+><I
+>полей</I
+></TT
+> или присвоении колонке типа interval строки с <TT
+CLASS="REPLACEABLE"
+><I
+>полями</I
+></TT
+>, интерпретация непомеченных величин зависит от <TT
+CLASS="REPLACEABLE"
+><I
+>полей</I
+></TT
+>. Например, <TT
+CLASS="LITERAL"
+>INTERVAL '1' YEAR</TT
+> воспринимается как 1 год, а <TT
+CLASS="LITERAL"
+>INTERVAL '1'</TT
+> &mdash; как 1 секунда. Кроме того, значения <SPAN
+CLASS="QUOTE"
+>"справа"</SPAN
+> от меньшего значащего поля, заданного в определении <TT
+CLASS="REPLACEABLE"
+><I
+>полей</I
+></TT
+>, просто отбрасываются. Например, в записи <TT
+CLASS="LITERAL"
+>INTERVAL '1 day 2:03:04' HOUR TO MINUTE</TT
+> будут отброшены секунды, но не день.</P
+><P
+>Согласно стандарту <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>, все компоненты значения interval должны быть одного знака, и ведущий минус применяется ко всем компонентам; например, минус в записи <TT
+CLASS="LITERAL"
+>'-1 2:03:04'</TT
+> применяется и к дню, и к часам/минутам/секундам. <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> позволяет задавать для разных компонентов разные знаки и традиционно обрабатывает знак каждого компонента в текстовом представлении отдельно от других, так что в данном случае часы/минуты/секунды будут считаться положительными. Если параметр <TT
+CLASS="VARNAME"
+>IntervalStyle</TT
+> имеет значение <TT
+CLASS="LITERAL"
+>sql_standard</TT
+>, ведущий знак применяется ко всем компонентам (но только если они не содержат знаки явно). В противном случае действуют традиционные правила <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Во избежание неоднозначности рекомендуется добавлять знак к каждому компоненту с отрицательным значением.</P
+><P
+>Тип <TT
+CLASS="TYPE"
+>interval</TT
+> представлен внутри в виде отдельных значений месяцев, дней и секунд. Это объясняется тем, что число дней в месяце может быть разным, а в сутках может быть и 23, и 25 часов в дни перехода на летнее/зимнее время. Значения месяцев и дней представлены целыми числами, а число секунд может быть дробным. Так как интервалы обычно получаются из строковых констант или при вычитании типов <TT
+CLASS="TYPE"
+>timestamp</TT
+>, этот способ хранения эффективен в большинстве случаев. Для корректировки числа дней и часов, когда они выходят за обычные границы, в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> есть специальные функции <CODE
+CLASS="FUNCTION"
+>justify_days</CODE
+> и <CODE
+CLASS="FUNCTION"
+>justify_hours</CODE
+>.</P
+><P
+>В расширенном формате ввода и в некоторых полях более компактных форматов значения компонентов могут иметь дробные части, например <TT
+CLASS="LITERAL"
+>'1.5 week'</TT
+> или <TT
+CLASS="LITERAL"
+>'01:02:03.45'</TT
+>. Такое значение при сохранении пересчитывается в соответствующее число месяцев, дней и секунд. Когда при этом остаётся дробная часть в месяцах или в днях, она переносится в младший компонент с допущением, что 1 месяц = 30 дней, а 1 день = 24 часа. Например, значение <TT
+CLASS="LITERAL"
+>'1.5 month'</TT
+> будет преобразовано в 1 месяц и 15 дней. В виде дробного числа хранятся и выводятся только секунды.</P
+><P
+>В <A
+HREF="datatype-datetime.html#DATATYPE-INTERVAL-INPUT-EXAMPLES"
+>Таблице 8-17</A
+> показано несколько примеров допустимых вводимых значений типа <TT
+CLASS="TYPE"
+>interval</TT
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="DATATYPE-INTERVAL-INPUT-EXAMPLES"
+></A
+><P
+><B
+>Таблица 8-17. Ввод интервалов</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+>Пример</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>1-2</TD
+><TD
+>Стандартный формат SQL: 1 год и 2 месяца</TD
+></TR
+><TR
+><TD
+>3 4:05:06</TD
+><TD
+>Стандартный формат SQL: 3 дня 4 часа 5 минут 6 секунд</TD
+></TR
+><TR
+><TD
+>1 year 2 months 3 days 4 hours 5 minutes 6 seconds</TD
+><TD
+>Традиционный формат Postgres: 1 год 2 месяца 3 дня 4 часа 5 минут 6 секунд</TD
+></TR
+><TR
+><TD
+>P1Y2M3DT4H5M6S</TD
+><TD
+><SPAN
+CLASS="QUOTE"
+>"Формат с кодами"</SPAN
+> ISO 8601: то же значение, что и выше</TD
+></TR
+><TR
+><TD
+>P0001-02-03T04:05:06</TD
+><TD
+><SPAN
+CLASS="QUOTE"
+>"Альтернативный формат"</SPAN
+> ISO 8601: то же значение, что и выше</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="DATATYPE-INTERVAL-OUTPUT"
+>8.5.5. Вывод интервалов</A
+></H2
+><P
+>Формат вывода типа interval может определяться одним из четырёх стилей: <TT
+CLASS="LITERAL"
+>sql_standard</TT
+>, <TT
+CLASS="LITERAL"
+>postgres</TT
+>, <TT
+CLASS="LITERAL"
+>postgres_verbose</TT
+> и <TT
+CLASS="LITERAL"
+>iso_8601</TT
+>. Выбрать нужный стиль позволяет команда <TT
+CLASS="LITERAL"
+>SET intervalstyle</TT
+> (по умолчанию выбран <TT
+CLASS="LITERAL"
+>postgres</TT
+>). Примеры форматов разных стилей показаны в <A
+HREF="datatype-datetime.html#INTERVAL-STYLE-OUTPUT-TABLE"
+>Таблице 8-18</A
+>.</P
+><P
+>Стиль <TT
+CLASS="LITERAL"
+>sql_standard</TT
+> выдаёт результат, соответствующий стандарту SQL, если значение интервала удовлетворяет ограничениям стандарта (и содержит либо только год и месяц, либо только день и время, и при этом все его компоненты одного знака). В противном случае выводится год-месяц, за которым идёт дата-время, а в компоненты для однозначности явно добавляются знаки.</P
+><P
+>Вывод в стиле <TT
+CLASS="LITERAL"
+>postgres</TT
+> соответствует формату, который был принят в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> до версии 8.4, когда параметр <A
+HREF="runtime-config-client.html#GUC-DATESTYLE"
+>DateStyle</A
+> имел значение <TT
+CLASS="LITERAL"
+>ISO</TT
+>.</P
+><P
+>Вывод в стиле <TT
+CLASS="LITERAL"
+>postgres_verbose</TT
+> соответствует формату, который был принят в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> до версии 8.4, когда значением параметром <TT
+CLASS="VARNAME"
+>DateStyle</TT
+> было не <TT
+CLASS="LITERAL"
+>ISO</TT
+>.</P
+><P
+>Вывод в стиле <TT
+CLASS="LITERAL"
+>iso_8601</TT
+> соответствует <SPAN
+CLASS="QUOTE"
+>"формату с кодами"</SPAN
+> описанному в разделе 4.4.3.2 формата ISO 8601.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="INTERVAL-STYLE-OUTPUT-TABLE"
+></A
+><P
+><B
+>Таблица 8-18. Примеры стилей вывода интервалов</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Стиль</TH
+><TH
+>Интервал год-месяц</TH
+><TH
+>Интервал день-время</TH
+><TH
+>Смешанный интервал</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>sql_standard</TT
+>
+                  </TD
+><TD
+>1-2</TD
+><TD
+>3 4:05:06</TD
+><TD
+>-1-2 +3 -4:05:06</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>postgres</TT
+>
+                  </TD
+><TD
+>1 year 2 mons</TD
+><TD
+>3 days 04:05:06</TD
+><TD
+>-1 year -2 mons +3 days -04:05:06</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>postgres_verbose</TT
+>
+                  </TD
+><TD
+>@ 1 year 2 mons</TD
+><TD
+>@ 3 days 4 hours 5 mins 6 secs</TD
+><TD
+>@ 1 year 2 mons -3 days 4 hours 5 mins 6 secs ago</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>iso_8601</TT
+>
+                  </TD
+><TD
+>P1Y2M</TD
+><TD
+>P3DT4H5M6S</TD
+><TD
+>P-1Y-2M3DT-4H-5M-6S</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="datatype-binary.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="datatype-boolean.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Двоичные типы данных</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="datatype.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Логический тип</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

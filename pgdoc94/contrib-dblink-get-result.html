@@ -1,0 +1,348 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>dblink_get_result</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="dblink"
+HREF="dblink.html"><LINK
+REL="PREVIOUS"
+TITLE="dblink_get_notify"
+HREF="contrib-dblink-get-notify.html"><LINK
+REL="NEXT"
+TITLE="dblink_cancel_query"
+HREF="contrib-dblink-cancel-query.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="dblink_get_notify"
+HREF="contrib-dblink-get-notify.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="dblink.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="dblink_cancel_query"
+HREF="contrib-dblink-cancel-query.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="CONTRIB-DBLINK-GET-RESULT"
+></A
+>dblink_get_result</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN120067"
+></A
+><H2
+>Название</H2
+>dblink_get_result&nbsp;--&nbsp;получает результат асинхронного запроса</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN120070"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>dblink_get_result(text connname [, bool fail_on_error]) returns setof record</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN120072"
+></A
+><H2
+>Описание</H2
+><P
+><CODE
+CLASS="FUNCTION"
+>dblink_get_result</CODE
+> получает результаты асинхронного запроса, запущенного ранее вызовом <CODE
+CLASS="FUNCTION"
+>dblink_send_query</CODE
+>. Если запрос ещё выполняется, <CODE
+CLASS="FUNCTION"
+>dblink_get_result</CODE
+> будет ждать его завершения.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN120078"
+></A
+><H2
+>Аргументы</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="PARAMETER"
+>conname</TT
+></DT
+><DD
+><P
+>Имя используемого подключения.</P
+></DD
+><DT
+><TT
+CLASS="PARAMETER"
+>fail_on_error</TT
+></DT
+><DD
+><P
+>Если равен true (это значение по умолчанию), в случае ошибки, выданной на удалённой стороне соединения, ошибка также выдаётся локально. Если равен false, удалённая ошибка выдаётся локально как ЗАМЕЧАНИЕ, и функция не возвращает строки.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN120091"
+></A
+><H2
+>Возвращаемое значение</H2
+><P
+>Для асинхронного запроса (то есть, SQL-оператора, возвращающего строки) эта функция выдаёт строки, полученные в результате запроса. Чтобы использовать эту функцию, вы должны задать ожидаемый набор колонок, как ранее говорилось в описании <CODE
+CLASS="FUNCTION"
+>dblink</CODE
+>.</P
+><P
+>Для асинхронной команды (то есть, SQL-оператора, не возвращающего строки), эта функция возвращает одну строку с одной текстовой колонкой, содержащей строку состояния команды. Для такого вызова в предложении <TT
+CLASS="LITERAL"
+>FROM</TT
+> так же необходимо определить, что результат будет содержать одну текстовую колонку.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN120097"
+></A
+><H2
+>Замечания</H2
+><P
+>Эта функция <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>должна</I
+></SPAN
+> вызываться, если <CODE
+CLASS="FUNCTION"
+>dblink_send_query</CODE
+> возвращает 1. Её нужно вызывать по одному разу для каждого отправленного запроса, а затем ещё раз для получения пустого набора данных, прежде чем подключением можно будет пользоваться снова.</P
+><P
+>Когда используются <CODE
+CLASS="FUNCTION"
+>dblink_send_query</CODE
+> и <CODE
+CLASS="FUNCTION"
+>dblink_get_result</CODE
+>, подсистема <SPAN
+CLASS="APPLICATION"
+>dblink</SPAN
+> получает весь набор удалённых результатов, прежде чем передавать его для локальной обработки. Если запрос возвращает большое количество строк, это может занимать много памяти в локальном сеансе. Поэтому может быть лучше открыть такой запрос как курсор, вызвав <CODE
+CLASS="FUNCTION"
+>dblink_open</CODE
+>, а затем выбирать результаты удобоваримыми порциями. Кроме того, можно воспользоваться простой функцией <CODE
+CLASS="FUNCTION"
+>dblink()</CODE
+>, которая не допускает заполнения памяти, выгружая большие наборы результатов на диск.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN120108"
+></A
+><H2
+>Примеры</H2
+><PRE
+CLASS="SCREEN"
+>contrib_regression=# SELECT dblink_connect('dtest1', 'dbname=contrib_regression');
+ dblink_connect
+----------------
+ OK
+(1 row)
+
+contrib_regression=# SELECT * FROM
+contrib_regression-# dblink_send_query('dtest1', 'select * from foo where f1 &lt; 3') AS t1;
+ t1
+----
+  1
+(1 row)
+
+contrib_regression=# SELECT * FROM dblink_get_result('dtest1') AS t1(f1 int, f2 text, f3 text[]);
+ f1 | f2 |     f3
+----+----+------------
+  0 | a  | {a0,b0,c0}
+  1 | b  | {a1,b1,c1}
+  2 | c  | {a2,b2,c2}
+(3 rows)
+
+contrib_regression=# SELECT * FROM dblink_get_result('dtest1') AS t1(f1 int, f2 text, f3 text[]);
+ f1 | f2 | f3
+----+----+----
+(0 rows)
+
+contrib_regression=# SELECT * FROM
+contrib_regression-# dblink_send_query('dtest1', 'select * from foo where f1 &lt; 3; select * from foo where f1 &gt; 6') AS t1;
+ t1
+----
+  1
+(1 row)
+
+contrib_regression=# SELECT * FROM dblink_get_result('dtest1') AS t1(f1 int, f2 text, f3 text[]);
+ f1 | f2 |     f3
+----+----+------------
+  0 | a  | {a0,b0,c0}
+  1 | b  | {a1,b1,c1}
+  2 | c  | {a2,b2,c2}
+(3 rows)
+
+contrib_regression=# SELECT * FROM dblink_get_result('dtest1') AS t1(f1 int, f2 text, f3 text[]);
+ f1 | f2 |      f3
+----+----+---------------
+  7 | h  | {a7,b7,c7}
+  8 | i  | {a8,b8,c8}
+  9 | j  | {a9,b9,c9}
+ 10 | k  | {a10,b10,c10}
+(4 rows)
+
+contrib_regression=# SELECT * FROM dblink_get_result('dtest1') AS t1(f1 int, f2 text, f3 text[]);
+ f1 | f2 | f3
+----+----+----
+(0 rows)</PRE
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="contrib-dblink-get-notify.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="contrib-dblink-cancel-query.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>dblink_get_notify</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="dblink.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>dblink_cancel_query</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

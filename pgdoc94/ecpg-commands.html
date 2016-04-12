@@ -1,0 +1,465 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Запуск команд SQL</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="ECPG — встраиваемый SQL в C"
+HREF="ecpg.html"><LINK
+REL="PREVIOUS"
+TITLE="Управление подключениями к базе данных"
+HREF="ecpg-connect.html"><LINK
+REL="NEXT"
+TITLE="Использование переменных среды"
+HREF="ecpg-variables.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Управление подключениями к базе данных"
+HREF="ecpg-connect.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ecpg.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 33. <SPAN
+CLASS="APPLICATION"
+>ECPG</SPAN
+> — встраиваемый <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> в C</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Использование переменных среды"
+HREF="ecpg-variables.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="ECPG-COMMANDS"
+>33.3. Запуск команд SQL</A
+></H1
+><P
+>В приложении со встраиваемым SQL можно запустить любую команду SQL. Ниже приведены несколько примеров, показывающих как это делать.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="ECPG-EXECUTING"
+>33.3.1. Выполнение операторов SQL</A
+></H2
+><P
+>Создание таблицы: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL CREATE TABLE foo (number integer, ascii char(16));
+EXEC SQL CREATE UNIQUE INDEX num1 ON foo(number);
+EXEC SQL COMMIT;</PRE
+><P></P
+><P
+>Добавление строк: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL INSERT INTO foo (number, ascii) VALUES (9999, 'doodad');
+EXEC SQL COMMIT;</PRE
+><P></P
+><P
+>Удаление строк: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL DELETE FROM foo WHERE number = 9999;
+EXEC SQL COMMIT;</PRE
+><P></P
+><P
+>Изменение: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL UPDATE foo
+    SET ascii = 'foobar'
+    WHERE number = 9999;
+EXEC SQL COMMIT;</PRE
+><P></P
+><P
+>Операторы <TT
+CLASS="LITERAL"
+>SELECT</TT
+>, возвращающую одну строку результата, также могут выполняться непосредственно командой <TT
+CLASS="LITERAL"
+>EXEC SQL</TT
+>. Чтобы обработать наборы результатов с несколькими строками, приложение должно использовать курсоры; см. <A
+HREF="ecpg-commands.html#ECPG-CURSORS"
+>Подраздел 33.3.2</A
+> ниже. (В отдельных случаях приложение может выбрать сразу несколько строк в переменную массива; см. <A
+HREF="ecpg-variables.html#ECPG-VARIABLES-ARRAYS"
+>Подраздел 33.4.4.3.1</A
+>.)</P
+><P
+>Выборка одной строки: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL SELECT foo INTO :FooBar FROM table1 WHERE ascii = 'doodad';</PRE
+><P></P
+><P
+>Так же можно получить параметр конфигурации командой <TT
+CLASS="LITERAL"
+>SHOW</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL SHOW search_path INTO :var;</PRE
+><P></P
+><P
+>Идентификаторы вида <TT
+CLASS="LITERAL"
+>:<TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></TT
+> воспринимаются как <I
+CLASS="FIRSTTERM"
+>переменные среды</I
+>, то есть они ссылаются на переменные программы C. Они рассматриваются в <A
+HREF="ecpg-variables.html"
+>Разделе 33.4</A
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="ECPG-CURSORS"
+>33.3.2. Использование курсоров</A
+></H2
+><P
+>Чтобы получить набор результатов, содержащий несколько строк, приложение должно объявить курсор и выбирать каждую строку через него. Использование курсора подразумевает следующие шаги: объявление курсора, открытие его, выборку строки через курсор, повторение предыдущего шага, и наконец, закрытие курсора.</P
+><P
+>Выборка с использованием курсоров: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL DECLARE foo_bar CURSOR FOR
+    SELECT number, ascii FROM foo
+    ORDER BY ascii;
+EXEC SQL OPEN foo_bar;
+EXEC SQL FETCH foo_bar INTO :FooBar, DooDad;
+...
+EXEC SQL CLOSE foo_bar;
+EXEC SQL COMMIT;</PRE
+><P></P
+><P
+>Более подробно объявление курсора описывается в <A
+HREF="ecpg-sql-declare.html"
+>DECLARE</A
+>, а команда <TT
+CLASS="LITERAL"
+>FETCH</TT
+> описана в <A
+HREF="sql-fetch.html"
+>FETCH</A
+>.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Команда <TT
+CLASS="COMMAND"
+>DECLARE</TT
+> в ECPG на самом деле не передаёт этот оператор серверу PostgreSQL. Курсор открывается на сервере (командой сервера <TT
+CLASS="COMMAND"
+>DECLARE</TT
+>) в момент, когда выполняется команда <TT
+CLASS="COMMAND"
+>OPEN</TT
+>.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="ECPG-TRANSACTIONS"
+>33.3.3. Управление транзакциями</A
+></H2
+><P
+>В режиме по умолчанию операторы фиксируются только когда выполняется <TT
+CLASS="COMMAND"
+>EXEC SQL COMMIT</TT
+>. Интерфейс встраиваемого SQL также поддерживает автофиксацию транзакций (подобно <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>); она включается аргументом командной строки <TT
+CLASS="OPTION"
+>-t</TT
+> программы <TT
+CLASS="COMMAND"
+>ecpg</TT
+> (см. <A
+HREF="app-ecpg.html"
+>            <SPAN
+CLASS="APPLICATION"
+>ecpg</SPAN
+>
+          </A
+>) либо оператором <TT
+CLASS="LITERAL"
+>EXEC SQL SET AUTOCOMMIT TO ON</TT
+>. В режиме автофиксации каждая команда фиксируется автоматически, если только она не помещена в явный блок транзакции. Этот режим можно выключить явным образом, выполнив <TT
+CLASS="LITERAL"
+>EXEC SQL SET AUTOCOMMIT TO OFF</TT
+>.</P
+><P
+>Поддерживаются следующие команды управления транзакциями: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>EXEC SQL COMMIT</TT
+></DT
+><DD
+><P
+>Зафиксировать текущую транзакцию.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>EXEC SQL ROLLBACK</TT
+></DT
+><DD
+><P
+>Откатить текущую транзакцию.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>EXEC SQL SET AUTOCOMMIT TO ON</TT
+></DT
+><DD
+><P
+>Включить режим автофиксации.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>SET AUTOCOMMIT TO OFF</TT
+></DT
+><DD
+><P
+>Отключить режим автофиксации. По умолчанию он отключён.</P
+></DD
+></DL
+></DIV
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="ECPG-PREPARED"
+>33.3.4. Подготовленные операторы</A
+></H2
+><P
+>Когда значения, передаваемые оператору SQL, неизвестны во время компиляции, или один и тот же оператор будет использоваться многократно, могут быть полезны подготовленные операторы.</P
+><P
+>Оператор подготавливается командой <TT
+CLASS="LITERAL"
+>PREPARE</TT
+>. Вместо значений, которые ещё неизвестны, вставляются местозаполнители <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>?</TT
+>"</SPAN
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL PREPARE stmt1 FROM "SELECT oid, datname FROM pg_database WHERE oid = ?";</PRE
+><P></P
+><P
+>Если оператор возвращает одну строку, приложение может вызвать <TT
+CLASS="LITERAL"
+>EXECUTE</TT
+> после <TT
+CLASS="LITERAL"
+>PREPARE</TT
+> для выполнения этого оператора, указав фактические значения для местозаполнителей в предложении <TT
+CLASS="LITERAL"
+>USING</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL EXECUTE stmt1 INTO :dboid, :dbname USING 1;</PRE
+><P></P
+><P
+>Если оператор возвращает несколько строк, приложение может использовать курсор, объявленный на базе подготовленного оператора. Чтобы привязать входные параметры, курсор нужно открыть с предложением <TT
+CLASS="LITERAL"
+>USING</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL PREPARE stmt1 FROM "SELECT oid,datname FROM pg_database WHERE oid &gt; ?";
+EXEC SQL DECLARE foo_bar CURSOR FOR stmt1;
+
+/* по достижении конца набора результатов прервать цикл while */
+EXEC SQL WHENEVER NOT FOUND DO BREAK;
+
+EXEC SQL OPEN foo_bar USING 100;
+...
+while (1)
+{
+    EXEC SQL FETCH NEXT FROM foo_bar INTO :dboid, :dbname;
+    ...
+}
+EXEC SQL CLOSE foo_bar;</PRE
+><P></P
+><P
+>Когда подготовленный оператор больше не нужен, его следует освободить: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL DEALLOCATE PREPARE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+>;</PRE
+><P></P
+><P
+>Подробнее оператор <TT
+CLASS="LITERAL"
+>PREPARE</TT
+> описан в <A
+HREF="ecpg-sql-prepare.html"
+>PREPARE</A
+>. Также обратитесь к <A
+HREF="ecpg-dynamic.html"
+>Разделу 33.5</A
+> за дополнительными сведениями о местозаполнителях и входных параметрах.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ecpg-connect.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ecpg-variables.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Управление подключениями к базе данных</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ecpg.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Использование переменных среды</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

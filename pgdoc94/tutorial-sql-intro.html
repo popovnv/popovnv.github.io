@@ -1,0 +1,287 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Введение</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Язык SQL"
+HREF="tutorial-sql.html"><LINK
+REL="PREVIOUS"
+TITLE="Язык SQL"
+HREF="tutorial-sql.html"><LINK
+REL="NEXT"
+TITLE="Основные понятия"
+HREF="tutorial-concepts.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Язык SQL"
+HREF="tutorial-sql.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="tutorial-sql.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 2. Язык <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Основные понятия"
+HREF="tutorial-concepts.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="TUTORIAL-SQL-INTRO"
+>2.1. Введение</A
+></H1
+><P
+>В этой главе рассматривается использование <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> для выполнения простых операций. Она призвана только познакомить вас с <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>, но ни в коей мере не претендует на исчерпывающее руководство. Про <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> написано множество книг, включая <A
+HREF="biblio.html#MELT93"
+><I
+>Understanding the New <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+></I
+></A
+> и <A
+HREF="biblio.html#DATE97"
+><I
+>A Guide to the <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> Standard</I
+></A
+>. При этом следует учитывать, что некоторые возможности языка <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> являются расширениями стандарта.</P
+><P
+>В следующих примерах мы предполагаем, что вы создали базу данных <TT
+CLASS="LITERAL"
+>mydb</TT
+>, как описано в предыдущей главе, и смогли запустить <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>.</P
+><P
+>Примеры этого руководства также можно найти в пакете исходного кода <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> в каталоге <TT
+CLASS="FILENAME"
+>src/tutorial/</TT
+>. (Дистрибутивы исполняемого кода <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> могут не включать эти файлы.) Чтобы использовать эти файлы, перейдите в этот каталог и запустите <SPAN
+CLASS="APPLICATION"
+>make</SPAN
+>: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>cd <TT
+CLASS="REPLACEABLE"
+><I
+>....</I
+></TT
+>/src/tutorial</KBD
+>
+<SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>make</KBD
+></PRE
+><P> При этом будут созданы скрипты и скомпилированы модули C, содержащие пользовательские функции и типы. Затем, чтобы начать работу по книге, выполните следующее: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>cd <TT
+CLASS="REPLACEABLE"
+><I
+>....</I
+></TT
+>/tutorial</KBD
+>
+<SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>psql -s mydb</KBD
+>
+<SAMP
+CLASS="COMPUTEROUTPUT"
+>...</SAMP
+>
+
+<SAMP
+CLASS="PROMPT"
+>mydb=&gt;</SAMP
+> <KBD
+CLASS="USERINPUT"
+>\i basics.sql</KBD
+></PRE
+><P> Команда <TT
+CLASS="LITERAL"
+>\i</TT
+> считывает и выполняет команды из заданного файла. Переданный <TT
+CLASS="COMMAND"
+>psql</TT
+> параметр <TT
+CLASS="LITERAL"
+>-s</TT
+> переводит его в пошаговый режим, когда он делает паузу перед отправкой каждого оператора серверу. Команды, используемые в этом разделе, находятся в файле <TT
+CLASS="FILENAME"
+>basics.sql</TT
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="tutorial-sql.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="tutorial-concepts.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Язык <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="tutorial-sql.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Основные понятия</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

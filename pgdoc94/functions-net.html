@@ -1,0 +1,1115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Функции и операторы для работы с сетевыми адресами</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Функции и операторы"
+HREF="functions.html"><LINK
+REL="PREVIOUS"
+TITLE="Геометрические функции и операторы"
+HREF="functions-geometry.html"><LINK
+REL="NEXT"
+TITLE="Функции и операторы текстового поиска"
+HREF="functions-textsearch.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Геометрические функции и операторы"
+HREF="functions-geometry.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 9. Функции и операторы</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Функции и операторы текстового поиска"
+HREF="functions-textsearch.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="FUNCTIONS-NET"
+>9.12. Функции и операторы для работы с сетевыми адресами</A
+></H1
+><P
+>В <A
+HREF="functions-net.html#CIDR-INET-OPERATORS-TABLE"
+>Таблица 9-34</A
+> показаны операторы, работающие с типами <TT
+CLASS="TYPE"
+>cidr</TT
+> и <TT
+CLASS="TYPE"
+>inet</TT
+>. Операторы <TT
+CLASS="LITERAL"
+>&lt;&lt;</TT
+>, <TT
+CLASS="LITERAL"
+>&lt;&lt;=</TT
+>, <TT
+CLASS="LITERAL"
+>&gt;&gt;</TT
+>, <TT
+CLASS="LITERAL"
+>&gt;&gt;=</TT
+> и <TT
+CLASS="LITERAL"
+>&amp;&amp;</TT
+> проверяют включения подсетей, рассматривая только биты сети в обоих адресах (игнорируя биты узлов) и определяя, идентична ли одна сеть другой или её подсети.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="CIDR-INET-OPERATORS-TABLE"
+></A
+><P
+><B
+>Таблица 9-34. Операторы для типов <TT
+CLASS="TYPE"
+>cidr</TT
+> и <TT
+CLASS="TYPE"
+>inet</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Оператор</TH
+><TH
+>Описание</TH
+><TH
+>Пример</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>&lt;</TT
+> </TD
+><TD
+>меньше</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>inet '192.168.1.5' &lt; inet '192.168.1.6'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>&lt;=</TT
+> </TD
+><TD
+>меньше или равно</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>inet '192.168.1.5' &lt;= inet '192.168.1.5'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>=</TT
+> </TD
+><TD
+>равно</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>inet '192.168.1.5' = inet '192.168.1.5'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>&gt;=</TT
+> </TD
+><TD
+>больше или равно</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>inet '192.168.1.5' &gt;= inet '192.168.1.5'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>&gt;</TT
+> </TD
+><TD
+>больше</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>inet '192.168.1.5' &gt; inet '192.168.1.4'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>&lt;&gt;</TT
+> </TD
+><TD
+>не равно</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>inet '192.168.1.5' &lt;&gt; inet '192.168.1.4'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>&lt;&lt;</TT
+> </TD
+><TD
+>содержится в</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>inet '192.168.1.5' &lt;&lt; inet '192.168.1/24'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>&lt;&lt;=</TT
+> </TD
+><TD
+>равно или содержится в</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>inet '192.168.1/24' &lt;&lt;= inet '192.168.1/24'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>&gt;&gt;</TT
+> </TD
+><TD
+>содержит</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>inet '192.168.1/24' &gt;&gt; inet '192.168.1.5'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>&gt;&gt;=</TT
+> </TD
+><TD
+>равно или содержит</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>inet '192.168.1/24' &gt;&gt;= inet '192.168.1/24'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>&amp;&amp;</TT
+> </TD
+><TD
+>содержит или содержится в</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>inet '192.168.1/24' &amp;&amp; inet '192.168.1.80/28'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>~</TT
+> </TD
+><TD
+>битовый NOT</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>~ inet '192.168.1.6'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>&amp;</TT
+> </TD
+><TD
+>битовый AND</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>inet '192.168.1.6' &amp; inet '0.0.0.255'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>|</TT
+> </TD
+><TD
+>битовый OR</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>inet '192.168.1.6' | inet '0.0.0.255'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>+</TT
+> </TD
+><TD
+>сложение</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>inet '192.168.1.6' + 25</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>-</TT
+> </TD
+><TD
+>вычитание</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>inet '192.168.1.43' - 36</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>-</TT
+> </TD
+><TD
+>вычитание</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>inet '192.168.1.43' - inet '192.168.1.19'</TT
+>
+                </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>В <A
+HREF="functions-net.html#CIDR-INET-FUNCTIONS-TABLE"
+>Таблице 9-35</A
+> перечислены функции, работающие с типами <TT
+CLASS="TYPE"
+>cidr</TT
+> и <TT
+CLASS="TYPE"
+>inet</TT
+>. Функции <CODE
+CLASS="FUNCTION"
+>abbrev</CODE
+>, <CODE
+CLASS="FUNCTION"
+>host</CODE
+> и <CODE
+CLASS="FUNCTION"
+>text</CODE
+> предназначены в основном для вывода данных в альтернативных форматах.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="CIDR-INET-FUNCTIONS-TABLE"
+></A
+><P
+><B
+>Таблица 9-35. Функции для типов <TT
+CLASS="TYPE"
+>cidr</TT
+> и <TT
+CLASS="TYPE"
+>inet</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Функция</TH
+><TH
+>Тип результата</TH
+><TH
+>Описание</TH
+><TH
+>Пример</TH
+><TH
+>Результат</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>abbrev(<TT
+CLASS="TYPE"
+>inet</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>вывод адрес в кратком текстовом виде</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>abbrev(inet '10.1.0.0/16')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>10.1.0.0/16</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>abbrev(<TT
+CLASS="TYPE"
+>cidr</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>вывод адрес в кратком текстовом виде</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>abbrev(cidr '10.1.0.0/16')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>10.1/16</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>broadcast(<TT
+CLASS="TYPE"
+>inet</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>inet</TT
+>
+                </TD
+><TD
+>широковещательный адрес сети</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>broadcast(​'192.168.1.5/​24')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>192.168.1.255/​24</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>family(<TT
+CLASS="TYPE"
+>inet</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int</TT
+>
+                </TD
+><TD
+>возвращает семейство адреса; <TT
+CLASS="LITERAL"
+>4</TT
+> для адреса IPv4, <TT
+CLASS="LITERAL"
+>6</TT
+> для IPv6</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>family('::1')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>6</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>host(<TT
+CLASS="TYPE"
+>inet</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>извлекает IP-адрес в виде текста</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>host(​'192.168.1.5/​24')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>192.168.1.5</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>hostmask(<TT
+CLASS="TYPE"
+>inet</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>inet</TT
+>
+                </TD
+><TD
+>вычисляет маску узла для сетевого адреса</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>hostmask(​'192.168.23.20/​30')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>0.0.0.3</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>masklen(<TT
+CLASS="TYPE"
+>inet</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int</TT
+>
+                </TD
+><TD
+>выдаёт длину маски сети</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>masklen(​'192.168.1.5/​24')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>24</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>netmask(<TT
+CLASS="TYPE"
+>inet</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>inet</TT
+>
+                </TD
+><TD
+>вычисляет маску сети для сетевого адреса</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>netmask(​'192.168.1.5/​24')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>255.255.255.0</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>network(<TT
+CLASS="TYPE"
+>inet</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>cidr</TT
+>
+                </TD
+><TD
+>извлекает компонент сети из адреса</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>network(​'192.168.1.5/​24')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>192.168.1.0/24</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>set_masklen(​<TT
+CLASS="TYPE"
+>inet</TT
+>, <TT
+CLASS="TYPE"
+>int</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>inet</TT
+>
+                </TD
+><TD
+>задаёт размер маски для значения <TT
+CLASS="TYPE"
+>inet</TT
+></TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>set_masklen(​'192.168.1.5/​24', 16)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>192.168.1.5/16</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>set_masklen(​<TT
+CLASS="TYPE"
+>cidr</TT
+>, <TT
+CLASS="TYPE"
+>int</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>cidr</TT
+>
+                </TD
+><TD
+>задаёт размер маски для значения <TT
+CLASS="TYPE"
+>cidr</TT
+></TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>set_masklen(​'192.168.1.0/​24'​::cidr, 16)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>192.168.0.0/16</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>text(<TT
+CLASS="TYPE"
+>inet</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>выводит в текстовом виде IP-адрес и длину маски</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>text(inet '192.168.1.5')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>192.168.1.5/32</TT
+>
+                </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Любое значение <TT
+CLASS="TYPE"
+>cidr</TT
+> можно привести к типу <TT
+CLASS="TYPE"
+>inet</TT
+>, явно или нет; поэтому все функции, показанные выше с типом <TT
+CLASS="TYPE"
+>inet</TT
+>, также будут работать со значениями <TT
+CLASS="TYPE"
+>cidr</TT
+>. (Некоторые из функций указаны отдельно для типов <TT
+CLASS="TYPE"
+>inet</TT
+> и <TT
+CLASS="TYPE"
+>cidr</TT
+>, потому что их поведение с разными типами различается.) Кроме того, значение <TT
+CLASS="TYPE"
+>inet</TT
+> тоже можно привести к типу <TT
+CLASS="TYPE"
+>cidr</TT
+>. При этом все биты справа от сетевой маски просто обнуляются, чтобы значение стало допустимым для типа <TT
+CLASS="TYPE"
+>cidr</TT
+>. К типам <TT
+CLASS="TYPE"
+>inet</TT
+> и <TT
+CLASS="TYPE"
+>cidr</TT
+> можно привести и обычные текстовые значения, используя обычный синтаксис, например: <TT
+CLASS="LITERAL"
+>inet(<TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+>)</TT
+> или <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>колонка</I
+></TT
+>::cidr</TT
+>.</P
+><P
+>В <A
+HREF="functions-net.html#MACADDR-FUNCTIONS-TABLE"
+>Таблице 9-36</A
+> приведена функция, предназначенная для работы с типом <TT
+CLASS="TYPE"
+>macaddr</TT
+>. Функция <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>trunc(<TT
+CLASS="TYPE"
+>macaddr</TT
+>)</CODE
+></TT
+> возвращает MAC-адрес, последние 3 байта в котором равны 0. Это может быть полезно для вычисления префикса, определяющего производителя.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="MACADDR-FUNCTIONS-TABLE"
+></A
+><P
+><B
+>Таблица 9-36. Функции <TT
+CLASS="TYPE"
+>macaddr</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Функция</TH
+><TH
+>Тип результата</TH
+><TH
+>Описание</TH
+><TH
+>Пример</TH
+><TH
+>Результат</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>trunc(<TT
+CLASS="TYPE"
+>macaddr</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>macaddr</TT
+>
+                </TD
+><TD
+>обнуляет последние 3 байта</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>trunc(macaddr '12:34:56:​78:90:ab')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>12:34:56:​00:00:00</TT
+>
+                </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Тип <TT
+CLASS="TYPE"
+>macaddr</TT
+> также поддерживает стандартные реляционные операторы лексической сортировки (<TT
+CLASS="LITERAL"
+>&gt;</TT
+>, <TT
+CLASS="LITERAL"
+>&lt;=</TT
+> и т. д.) и операторы битовой арифметики (<TT
+CLASS="LITERAL"
+>~</TT
+>, <TT
+CLASS="LITERAL"
+>&amp;</TT
+> и <TT
+CLASS="LITERAL"
+>|</TT
+>), соответствующие операциям NOT, AND и OR.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions-geometry.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="functions-textsearch.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Геометрические функции и операторы</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Функции и операторы текстового поиска</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

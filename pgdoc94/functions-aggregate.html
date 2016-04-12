@@ -1,0 +1,2067 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Агрегатные функции</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Функции и операторы"
+HREF="functions.html"><LINK
+REL="PREVIOUS"
+TITLE="Диапазонные функции и операторы"
+HREF="functions-range.html"><LINK
+REL="NEXT"
+TITLE="Оконные функции"
+HREF="functions-window.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Диапазонные функции и операторы"
+HREF="functions-range.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 9. Функции и операторы</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Оконные функции"
+HREF="functions-window.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="FUNCTIONS-AGGREGATE"
+>9.20. Агрегатные функции</A
+></H1
+><P
+><I
+CLASS="FIRSTTERM"
+>Агрегатные функции</I
+> получают единственный результат из набора входных значений. Встроенные обычные агрегатные функции перечислены в <A
+HREF="functions-aggregate.html#FUNCTIONS-AGGREGATE-TABLE"
+>Таблице 9-49</A
+> и <A
+HREF="functions-aggregate.html#FUNCTIONS-AGGREGATE-STATISTICS-TABLE"
+>Таблице 9-50</A
+>, а сортирующие агрегатные функции &mdash; в <A
+HREF="functions-aggregate.html#FUNCTIONS-ORDEREDSET-TABLE"
+>Таблице 9-51</A
+> и <A
+HREF="functions-aggregate.html#FUNCTIONS-HYPOTHETICAL-TABLE"
+>Таблице 9-52</A
+>. Особенности синтаксиса агрегатных функций разъясняются в <A
+HREF="sql-expressions.html#SYNTAX-AGGREGATES"
+>Подразделе 4.2.7</A
+>. За дополнительной вводной информацией обратитесь к <A
+HREF="tutorial-agg.html"
+>Разделу 2.7</A
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-AGGREGATE-TABLE"
+></A
+><P
+><B
+>Таблица 9-49. Агрегатные функции общего назначения</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Функция</TH
+><TH
+>Типы аргумента</TH
+><TH
+>Тип результата</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>array_agg(<TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+>)</CODE
+>
+      </TD
+><TD
+>any</TD
+><TD
+>массив элементов с типом аргумента</TD
+><TD
+>входные значения, включая NULL, объединяются в массив</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>avg(<TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+>)</CODE
+>
+      </TD
+><TD
+><TT
+CLASS="TYPE"
+>smallint</TT
+>, <TT
+CLASS="TYPE"
+>int</TT
+>, <TT
+CLASS="TYPE"
+>bigint</TT
+>, <TT
+CLASS="TYPE"
+>real</TT
+>, <TT
+CLASS="TYPE"
+>double precision</TT
+>, <TT
+CLASS="TYPE"
+>numeric</TT
+> или <TT
+CLASS="TYPE"
+>interval</TT
+></TD
+><TD
+><TT
+CLASS="TYPE"
+>numeric</TT
+> для любых целочисленных аргументов, <TT
+CLASS="TYPE"
+>double precision</TT
+> для аргументов с плавающей точкой, в противном случае тип данных аргумента</TD
+><TD
+>арифметическое среднее для всех входных значений</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>bit_and(<TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+>)</CODE
+>
+      </TD
+><TD
+><TT
+CLASS="TYPE"
+>smallint</TT
+>, <TT
+CLASS="TYPE"
+>int</TT
+>, <TT
+CLASS="TYPE"
+>bigint</TT
+> или <TT
+CLASS="TYPE"
+>bit</TT
+></TD
+><TD
+>тот же, что и тип аргумента</TD
+><TD
+>побитовое И для всех входных значений, не равных NULL, или NULL, если таких нет</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>bit_or(<TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+>)</CODE
+>
+      </TD
+><TD
+><TT
+CLASS="TYPE"
+>smallint</TT
+>, <TT
+CLASS="TYPE"
+>int</TT
+>, <TT
+CLASS="TYPE"
+>bigint</TT
+> или <TT
+CLASS="TYPE"
+>bit</TT
+></TD
+><TD
+>тот же, что и тип аргумента</TD
+><TD
+>побитовое ИЛИ для всех входных значений, не равных NULL, или NULL, если таких нет</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>bool_and(<TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+>)</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>bool</TT
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>bool</TT
+>
+      </TD
+><TD
+>true, если все входные значения равны true, и false в противном случае</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>bool_or(<TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+>)</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>bool</TT
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>bool</TT
+>
+      </TD
+><TD
+>true, если хотя бы одно входное значение равно true, и false в противном случае</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>count(*)</CODE
+>
+      </TD
+><TD
+>&nbsp;</TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                </TD
+><TD
+>количество входных строк</TD
+></TR
+><TR
+><TD
+>                  <CODE
+CLASS="FUNCTION"
+>count(<TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+>)</CODE
+>
+                </TD
+><TD
+>any</TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                </TD
+><TD
+>количество входных строк, для которых значение <TT
+CLASS="REPLACEABLE"
+><I
+>выражения</I
+></TT
+> не равно NULL</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>every(<TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+>)</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>bool</TT
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>bool</TT
+>
+      </TD
+><TD
+>синоним <CODE
+CLASS="FUNCTION"
+>bool_and</CODE
+></TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>json_agg(<TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+>)</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>any</TT
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>json</TT
+>
+      </TD
+><TD
+>агрегирует значения в виде массива JSON</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>json_object_agg(​<TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+>)</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>(any, any)</TT
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>json</TT
+>
+      </TD
+><TD
+>агрегирует пары имя/значение в виде объекта JSON</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>max(<TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+>)</CODE
+>
+      </TD
+><TD
+>любой массив, число, строка или дата/время</TD
+><TD
+>тот же, что и тип аргумента</TD
+><TD
+>максимальное значение <TT
+CLASS="REPLACEABLE"
+><I
+>выражения</I
+></TT
+> среди всех входных данных</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>min(<TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+>)</CODE
+>
+      </TD
+><TD
+>любой массив, число, строка или дата/время</TD
+><TD
+>тот же, что и тип аргумента</TD
+><TD
+>минимальное значение <TT
+CLASS="REPLACEABLE"
+><I
+>выражения</I
+></TT
+> среди всех входных данных</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>string_agg(​<TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>разделитель</I
+></TT
+>)</CODE
+>
+      </TD
+><TD
+>(<TT
+CLASS="TYPE"
+>text</TT
+>, <TT
+CLASS="TYPE"
+>text</TT
+>) или (<TT
+CLASS="TYPE"
+>bytea</TT
+>, <TT
+CLASS="TYPE"
+>bytea</TT
+>)</TD
+><TD
+>тот же, что и типы аргументов</TD
+><TD
+>входные данные складываются в строку через заданный разделитель</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>sum(<TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+>)</CODE
+>
+      </TD
+><TD
+><TT
+CLASS="TYPE"
+>smallint</TT
+>, <TT
+CLASS="TYPE"
+>int</TT
+>, <TT
+CLASS="TYPE"
+>bigint</TT
+>, <TT
+CLASS="TYPE"
+>real</TT
+>, <TT
+CLASS="TYPE"
+>double precision</TT
+>, <TT
+CLASS="TYPE"
+>numeric</TT
+>, <TT
+CLASS="TYPE"
+>interval</TT
+> или <TT
+CLASS="TYPE"
+>money</TT
+></TD
+><TD
+><TT
+CLASS="TYPE"
+>bigint</TT
+> для аргументов <TT
+CLASS="TYPE"
+>smallint</TT
+> или <TT
+CLASS="TYPE"
+>int</TT
+>, <TT
+CLASS="TYPE"
+>numeric</TT
+> для аргументов <TT
+CLASS="TYPE"
+>bigint</TT
+>, и тип аргумента в остальных случаях</TD
+><TD
+>сумма значений <TT
+CLASS="REPLACEABLE"
+><I
+>выражения</I
+></TT
+> по всем входным данным</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>xmlagg(<TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+>)</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>xml</TT
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>xml</TT
+>
+      </TD
+><TD
+>соединение XML-значений (см. также <A
+HREF="functions-xml.html#FUNCTIONS-XML-XMLAGG"
+>Подраздел 9.14.1.7</A
+>)</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Следует заметить, что за исключением <CODE
+CLASS="FUNCTION"
+>count</CODE
+>, все эти функции возвращают NULL, если для них не была выбрана ни одна строка. В частности, функция <CODE
+CLASS="FUNCTION"
+>sum</CODE
+>, не получив строк, возвращает NULL, а не 0, как можно было бы ожидать, и <CODE
+CLASS="FUNCTION"
+>array_agg</CODE
+> в этом случае возвращает NULL, а не пустой массив. Если необходимо, подставить в результат 0 или пустой массив вместо NULL можно с помощью функции <CODE
+CLASS="FUNCTION"
+>coalesce</CODE
+>.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Булевы агрегатные функции <CODE
+CLASS="FUNCTION"
+>bool_and</CODE
+> и <CODE
+CLASS="FUNCTION"
+>bool_or</CODE
+> соответствуют стандартным SQL-агрегатам <CODE
+CLASS="FUNCTION"
+>every</CODE
+> и <CODE
+CLASS="FUNCTION"
+>any</CODE
+> или <CODE
+CLASS="FUNCTION"
+>some</CODE
+>. Что касается <CODE
+CLASS="FUNCTION"
+>any</CODE
+> и <CODE
+CLASS="FUNCTION"
+>some</CODE
+>, по стандарту их синтаксис допускает некоторую неоднозначность: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT b1 = ANY((SELECT b2 FROM t2 ...)) FROM t1 ...;</PRE
+><P> Здесь <CODE
+CLASS="FUNCTION"
+>ANY</CODE
+> можно рассматривать и как объявление подзапроса, и как агрегатную функцию, если этот подзапрос возвращает одну строку с булевым значением. Таким образом, этим агрегатным функциям нельзя было дать стандартные имена.</P
+></BLOCKQUOTE
+></DIV
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Пользователи с опытом использования других СУБД SQL могут быть недовольны скоростью агрегатной функции <CODE
+CLASS="FUNCTION"
+>count</CODE
+>, когда она применяется ко всей таблице. Подобный запрос: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT count(*) FROM sometable;</PRE
+><P> потребует затрат в количестве, пропорциональном размеру таблицы: <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> придётся полностью просканировать либо всю таблицу, либо один из индексов, включающий все её строки.</P
+></BLOCKQUOTE
+></DIV
+><P
+>Агрегатные функции <CODE
+CLASS="FUNCTION"
+>array_agg</CODE
+>, <CODE
+CLASS="FUNCTION"
+>json_agg</CODE
+>, <CODE
+CLASS="FUNCTION"
+>json_object_agg</CODE
+>, <CODE
+CLASS="FUNCTION"
+>string_agg</CODE
+> и <CODE
+CLASS="FUNCTION"
+>xmlagg</CODE
+> так же, как и подобные пользовательские агрегатные функции, выдают разные по смыслу результаты в зависимости от порядка входных данных. По умолчанию порядок не определён, но его можно задать, дополнив вызов агрегатной функции предложением <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+>, как описано в <A
+HREF="sql-expressions.html#SYNTAX-AGGREGATES"
+>Подразделе 4.2.7</A
+>. Нужного результата также можно добиться, передав агрегатной функции результат подзапроса с сортировкой. Например: </P><PRE
+CLASS="SCREEN"
+>SELECT xmlagg(x) FROM (SELECT x FROM test ORDER BY y DESC) AS tab;</PRE
+><P> Но учтите, что этот синтаксис не соответствует стандарту SQL и не будет работать в других СУБД.</P
+><P
+>В <A
+HREF="functions-aggregate.html#FUNCTIONS-AGGREGATE-STATISTICS-TABLE"
+>Таблице 9-50</A
+> перечислены агрегатные функции, обычно применяемые в статистическом анализе. (Они выделены просто для того, чтобы не загромождать список наиболее популярных агрегатных функций.) В их описании под <TT
+CLASS="REPLACEABLE"
+><I
+>N</I
+></TT
+> подразумевается число входных строк, для которых входные выражения не равны NULL. Все эти функции возвращают NULL во всех случаях, когда вычисление бессмысленно, например, когда <TT
+CLASS="REPLACEABLE"
+><I
+>N</I
+></TT
+> равно 0.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-AGGREGATE-STATISTICS-TABLE"
+></A
+><P
+><B
+>Таблица 9-50. Агрегатные функции для статистических вычислений</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Функция</TH
+><TH
+>Тип аргумента</TH
+><TH
+>Тип результата</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>corr(<TT
+CLASS="REPLACEABLE"
+><I
+>Y</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>X</I
+></TT
+>)</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>double precision</TT
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>double precision</TT
+>
+      </TD
+><TD
+>коэффициент корреляции</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>covar_pop(<TT
+CLASS="REPLACEABLE"
+><I
+>Y</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>X</I
+></TT
+>)</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>double precision</TT
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>double precision</TT
+>
+      </TD
+><TD
+>ковариация совокупности</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>covar_samp(<TT
+CLASS="REPLACEABLE"
+><I
+>Y</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>X</I
+></TT
+>)</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>double precision</TT
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>double precision</TT
+>
+      </TD
+><TD
+>ковариация выборки</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>regr_avgx(<TT
+CLASS="REPLACEABLE"
+><I
+>Y</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>X</I
+></TT
+>)</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>double precision</TT
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>double precision</TT
+>
+      </TD
+><TD
+>среднее независимой переменной (<TT
+CLASS="LITERAL"
+>sum(<TT
+CLASS="REPLACEABLE"
+><I
+>X</I
+></TT
+>)/<TT
+CLASS="REPLACEABLE"
+><I
+>N</I
+></TT
+></TT
+>)</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>regr_avgy(<TT
+CLASS="REPLACEABLE"
+><I
+>Y</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>X</I
+></TT
+>)</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>double precision</TT
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>double precision</TT
+>
+      </TD
+><TD
+>среднее зависимой переменной (<TT
+CLASS="LITERAL"
+>sum(<TT
+CLASS="REPLACEABLE"
+><I
+>Y</I
+></TT
+>)/<TT
+CLASS="REPLACEABLE"
+><I
+>N</I
+></TT
+></TT
+>)</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>regr_count(<TT
+CLASS="REPLACEABLE"
+><I
+>Y</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>X</I
+></TT
+>)</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>double precision</TT
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>bigint</TT
+>
+      </TD
+><TD
+>число входных строк, в которых оба выражения не NULL</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>regr_intercept(<TT
+CLASS="REPLACEABLE"
+><I
+>Y</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>X</I
+></TT
+>)</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>double precision</TT
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>double precision</TT
+>
+      </TD
+><TD
+>пересечение с осью OY линии, полученной методом наименьших квадратов по данным (<TT
+CLASS="REPLACEABLE"
+><I
+>X</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>Y</I
+></TT
+>)</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>regr_r2(<TT
+CLASS="REPLACEABLE"
+><I
+>Y</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>X</I
+></TT
+>)</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>double precision</TT
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>double precision</TT
+>
+      </TD
+><TD
+>квадрат коэффициента корреляции</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>regr_slope(<TT
+CLASS="REPLACEABLE"
+><I
+>Y</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>X</I
+></TT
+>)</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>double precision</TT
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>double precision</TT
+>
+      </TD
+><TD
+>наклон линии, полученной методом наименьших квадратов по данным (<TT
+CLASS="REPLACEABLE"
+><I
+>X</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>Y</I
+></TT
+>)</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>regr_sxx(<TT
+CLASS="REPLACEABLE"
+><I
+>Y</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>X</I
+></TT
+>)</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>double precision</TT
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>double precision</TT
+>
+      </TD
+><TD
+><TT
+CLASS="LITERAL"
+>sum(<TT
+CLASS="REPLACEABLE"
+><I
+>X</I
+></TT
+>^2) - sum(<TT
+CLASS="REPLACEABLE"
+><I
+>X</I
+></TT
+>)^2/<TT
+CLASS="REPLACEABLE"
+><I
+>N</I
+></TT
+></TT
+> (<SPAN
+CLASS="QUOTE"
+>"сумма квадратов"</SPAN
+> независимой переменной)</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>regr_sxy(<TT
+CLASS="REPLACEABLE"
+><I
+>Y</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>X</I
+></TT
+>)</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>double precision</TT
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>double precision</TT
+>
+      </TD
+><TD
+><TT
+CLASS="LITERAL"
+>sum(<TT
+CLASS="REPLACEABLE"
+><I
+>X</I
+></TT
+>*<TT
+CLASS="REPLACEABLE"
+><I
+>Y</I
+></TT
+>) - sum(<TT
+CLASS="REPLACEABLE"
+><I
+>X</I
+></TT
+>) * sum(<TT
+CLASS="REPLACEABLE"
+><I
+>Y</I
+></TT
+>)/<TT
+CLASS="REPLACEABLE"
+><I
+>N</I
+></TT
+></TT
+> (<SPAN
+CLASS="QUOTE"
+>"сумма произведений"</SPAN
+> независимых и зависимых переменных)</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>regr_syy(<TT
+CLASS="REPLACEABLE"
+><I
+>Y</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>X</I
+></TT
+>)</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>double precision</TT
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>double precision</TT
+>
+      </TD
+><TD
+><TT
+CLASS="LITERAL"
+>sum(<TT
+CLASS="REPLACEABLE"
+><I
+>Y</I
+></TT
+>^2) - sum(<TT
+CLASS="REPLACEABLE"
+><I
+>Y</I
+></TT
+>)^2/<TT
+CLASS="REPLACEABLE"
+><I
+>N</I
+></TT
+></TT
+> (<SPAN
+CLASS="QUOTE"
+>"сумма квадратов"</SPAN
+> зависимой переменной)</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>stddev(<TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+>)</CODE
+>
+      </TD
+><TD
+><TT
+CLASS="TYPE"
+>smallint</TT
+>, <TT
+CLASS="TYPE"
+>int</TT
+>, <TT
+CLASS="TYPE"
+>bigint</TT
+>, <TT
+CLASS="TYPE"
+>real</TT
+>, <TT
+CLASS="TYPE"
+>double precision</TT
+> или <TT
+CLASS="TYPE"
+>numeric</TT
+></TD
+><TD
+><TT
+CLASS="TYPE"
+>double precision</TT
+> для аргументов с плавающей точкой, <TT
+CLASS="TYPE"
+>numeric</TT
+> для остальных</TD
+><TD
+>сохранившийся синоним <CODE
+CLASS="FUNCTION"
+>stddev_samp</CODE
+></TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>stddev_pop(​<TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+>)</CODE
+>
+      </TD
+><TD
+><TT
+CLASS="TYPE"
+>smallint</TT
+>, <TT
+CLASS="TYPE"
+>int</TT
+>, <TT
+CLASS="TYPE"
+>bigint</TT
+>, <TT
+CLASS="TYPE"
+>real</TT
+>, <TT
+CLASS="TYPE"
+>double precision</TT
+> или <TT
+CLASS="TYPE"
+>numeric</TT
+></TD
+><TD
+><TT
+CLASS="TYPE"
+>double precision</TT
+> для аргументов с плавающей точкой, <TT
+CLASS="TYPE"
+>numeric</TT
+> для остальных</TD
+><TD
+>стандартное отклонение по генеральной совокупности входных значений</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>stddev_samp(​<TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+>)</CODE
+>
+      </TD
+><TD
+><TT
+CLASS="TYPE"
+>smallint</TT
+>, <TT
+CLASS="TYPE"
+>int</TT
+>, <TT
+CLASS="TYPE"
+>bigint</TT
+>, <TT
+CLASS="TYPE"
+>real</TT
+>, <TT
+CLASS="TYPE"
+>double precision</TT
+> или <TT
+CLASS="TYPE"
+>numeric</TT
+></TD
+><TD
+><TT
+CLASS="TYPE"
+>double precision</TT
+> для аргументов с плавающей точкой, <TT
+CLASS="TYPE"
+>numeric</TT
+> для остальных</TD
+><TD
+>стандартное отклонение по выборке входных значений</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>variance</CODE
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+>)</TD
+><TD
+><TT
+CLASS="TYPE"
+>smallint</TT
+>, <TT
+CLASS="TYPE"
+>int</TT
+>, <TT
+CLASS="TYPE"
+>bigint</TT
+>, <TT
+CLASS="TYPE"
+>real</TT
+>, <TT
+CLASS="TYPE"
+>double precision</TT
+> или <TT
+CLASS="TYPE"
+>numeric</TT
+></TD
+><TD
+><TT
+CLASS="TYPE"
+>double precision</TT
+> для аргументов с плавающей точкой, <TT
+CLASS="TYPE"
+>numeric</TT
+> для остальных</TD
+><TD
+>сохранившийся синоним <CODE
+CLASS="FUNCTION"
+>var_samp</CODE
+></TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>var_pop</CODE
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+>)</TD
+><TD
+><TT
+CLASS="TYPE"
+>smallint</TT
+>, <TT
+CLASS="TYPE"
+>int</TT
+>, <TT
+CLASS="TYPE"
+>bigint</TT
+>, <TT
+CLASS="TYPE"
+>real</TT
+>, <TT
+CLASS="TYPE"
+>double precision</TT
+> или <TT
+CLASS="TYPE"
+>numeric</TT
+></TD
+><TD
+><TT
+CLASS="TYPE"
+>double precision</TT
+> для аргументов с плавающей точкой, <TT
+CLASS="TYPE"
+>numeric</TT
+> для остальных</TD
+><TD
+>дисперсия для генеральной совокупности входных значений (квадрат стандартного отклонения)</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>var_samp</CODE
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+>)</TD
+><TD
+><TT
+CLASS="TYPE"
+>smallint</TT
+>, <TT
+CLASS="TYPE"
+>int</TT
+>, <TT
+CLASS="TYPE"
+>bigint</TT
+>, <TT
+CLASS="TYPE"
+>real</TT
+>, <TT
+CLASS="TYPE"
+>double precision</TT
+> или <TT
+CLASS="TYPE"
+>numeric</TT
+></TD
+><TD
+><TT
+CLASS="TYPE"
+>double precision</TT
+> для аргументов с плавающей точкой, <TT
+CLASS="TYPE"
+>numeric</TT
+> для остальных</TD
+><TD
+>дисперсия по выборке для входных значений (квадрат отклонения по выборке)</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>В <A
+HREF="functions-aggregate.html#FUNCTIONS-ORDEREDSET-TABLE"
+>Таблице 9-51</A
+> показаны некоторые агрегатные функции, использующие синтаксис <I
+CLASS="FIRSTTERM"
+>сортирующих агрегатных функций</I
+>. Иногда такие функции функциями называют функциями <SPAN
+CLASS="QUOTE"
+>"обратного распределения"</SPAN
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-ORDEREDSET-TABLE"
+></A
+><P
+><B
+>Таблица 9-51. Сортирующие агрегатные функции</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Функция</TH
+><TH
+>Тип непосредственного аргумента</TH
+><TH
+>Тип агрегированного аргумента</TH
+><TH
+>Тип результата</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>mode() WITHIN GROUP (ORDER BY <TT
+CLASS="REPLACEABLE"
+><I
+>выражение_сортировки</I
+></TT
+>)</CODE
+>
+      </TD
+><TD
+>&nbsp;</TD
+><TD
+>любой сортируемый тип</TD
+><TD
+>тот же, что у выражения сортировки</TD
+><TD
+>возвращает значение, наиболее часто встречающееся во входных данных (если одинаково часто встречаются несколько значений, произвольно выбирается первое из них)</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>percentile_cont(<TT
+CLASS="REPLACEABLE"
+><I
+>дробь</I
+></TT
+>) WITHIN GROUP (ORDER BY <TT
+CLASS="REPLACEABLE"
+><I
+>выражение_сортировки</I
+></TT
+>)</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>double precision</TT
+>
+      </TD
+><TD
+><TT
+CLASS="TYPE"
+>double precision</TT
+> или <TT
+CLASS="TYPE"
+>interval</TT
+></TD
+><TD
+>тот же, что у выражения сортировки</TD
+><TD
+>непрерывный перцентиль: возвращает значение, соответствующее заданной дроби по порядку, интерполируя соседние входные значения, если необходимо</TD
+></TR
+><TR
+><TD
+>       <CODE
+CLASS="FUNCTION"
+>percentile_cont(<TT
+CLASS="REPLACEABLE"
+><I
+>дроби</I
+></TT
+>) WITHIN GROUP (ORDER BY <TT
+CLASS="REPLACEABLE"
+><I
+>выражение_сортировки</I
+></TT
+>)</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>double precision[]</TT
+>
+      </TD
+><TD
+><TT
+CLASS="TYPE"
+>double precision</TT
+> или <TT
+CLASS="TYPE"
+>interval</TT
+></TD
+><TD
+>массив типа выражения сортировки</TD
+><TD
+>множественный непрерывный перцентиль: возвращает массив результатов, соответствующих значениям в параметре <TT
+CLASS="LITERAL"
+>дроби</TT
+> (для каждого элемента не NULL подставляется значение, соответствующее данному перцентилю)</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>percentile_disc(<TT
+CLASS="REPLACEABLE"
+><I
+>дробь</I
+></TT
+>) WITHIN GROUP (ORDER BY <TT
+CLASS="REPLACEABLE"
+><I
+>выражение_сортировки</I
+></TT
+>)</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>double precision</TT
+>
+      </TD
+><TD
+>любой сортируемый тип</TD
+><TD
+>тот же, что у выражения сортировки</TD
+><TD
+>дискретный перцентиль: возвращает первое значение из входных данных, позиция которого по порядку равна или превосходит указанную дробь</TD
+></TR
+><TR
+><TD
+>       <CODE
+CLASS="FUNCTION"
+>percentile_disc(<TT
+CLASS="REPLACEABLE"
+><I
+>дроби</I
+></TT
+>) WITHIN GROUP (ORDER BY <TT
+CLASS="REPLACEABLE"
+><I
+>выражение_сортировки</I
+></TT
+>)</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>double precision[]</TT
+>
+      </TD
+><TD
+>любой сортируемый тип</TD
+><TD
+>массив типа выражения сортировки</TD
+><TD
+>множественный дискретный перцентиль: возвращает массив результатов, соответствующих значениям в параметре <TT
+CLASS="LITERAL"
+>дроби</TT
+> (для каждого элемента не NULL подставляется входное значение, соответствующее данному перцентилю)</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Все агрегатные функции, перечисленные в <A
+HREF="functions-aggregate.html#FUNCTIONS-ORDEREDSET-TABLE"
+>Таблице 9-51</A
+>, игнорируют значения NULL при сортировке данных. Для функций, принимающих параметр <TT
+CLASS="REPLACEABLE"
+><I
+>дробь</I
+></TT
+>, значение этого параметра должно быть от 0 до 1; в противном случае возникает ошибка. Однако, если в этом параметре передаётся NULL, эти функции просто выдают NULL.</P
+><P
+>Все агрегатные функции, перечисленные в <A
+HREF="functions-aggregate.html#FUNCTIONS-HYPOTHETICAL-TABLE"
+>Таблице 9-52</A
+>, связаны с одноимёнными оконными функциями, определёнными в <A
+HREF="functions-window.html"
+>Разделе 9.21</A
+>. В каждом случае их результат &mdash; значение, которое вернула бы связанная оконная функция для <SPAN
+CLASS="QUOTE"
+>"гипотетической"</SPAN
+> строки, полученной из <TT
+CLASS="REPLACEABLE"
+><I
+>аргументов</I
+></TT
+>, если бы такая строка была добавлена в сортированную группу строк, которую образуют <TT
+CLASS="REPLACEABLE"
+><I
+>сортированные_аргументы</I
+></TT
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-HYPOTHETICAL-TABLE"
+></A
+><P
+><B
+>Таблица 9-52. Гипотезирующие агрегатные функции</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Функция</TH
+><TH
+>Тип непосредственного аргумента</TH
+><TH
+>Тип агрегированного аргумента</TH
+><TH
+>Тип результата</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>rank(<TT
+CLASS="REPLACEABLE"
+><I
+>аргументы</I
+></TT
+>) WITHIN GROUP (ORDER BY <TT
+CLASS="REPLACEABLE"
+><I
+>сортированные_аргументы</I
+></TT
+>)</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="LITERAL"
+>VARIADIC</TT
+> <TT
+CLASS="TYPE"
+>"any"</TT
+>
+      </TD
+><TD
+>       <TT
+CLASS="LITERAL"
+>VARIADIC</TT
+> <TT
+CLASS="TYPE"
+>"any"</TT
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>bigint</TT
+>
+      </TD
+><TD
+>ранг гипотетической строки, с пропусками повторяющихся строк</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>dense_rank(<TT
+CLASS="REPLACEABLE"
+><I
+>аргументы</I
+></TT
+>) WITHIN GROUP (ORDER BY <TT
+CLASS="REPLACEABLE"
+><I
+>сортированные_аргументы</I
+></TT
+>)</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="LITERAL"
+>VARIADIC</TT
+> <TT
+CLASS="TYPE"
+>"any"</TT
+>
+      </TD
+><TD
+>       <TT
+CLASS="LITERAL"
+>VARIADIC</TT
+> <TT
+CLASS="TYPE"
+>"any"</TT
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>bigint</TT
+>
+      </TD
+><TD
+>ранг гипотетической строки, без пропусков</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>percent_rank(<TT
+CLASS="REPLACEABLE"
+><I
+>аргументы</I
+></TT
+>) WITHIN GROUP (ORDER BY <TT
+CLASS="REPLACEABLE"
+><I
+>сортированные_аргументы</I
+></TT
+>)</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="LITERAL"
+>VARIADIC</TT
+> <TT
+CLASS="TYPE"
+>"any"</TT
+>
+      </TD
+><TD
+>       <TT
+CLASS="LITERAL"
+>VARIADIC</TT
+> <TT
+CLASS="TYPE"
+>"any"</TT
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>double precision</TT
+>
+      </TD
+><TD
+>относительный ранг гипотетической строки, от 0 до 1</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>cume_dist(<TT
+CLASS="REPLACEABLE"
+><I
+>аргументы</I
+></TT
+>) WITHIN GROUP (ORDER BY <TT
+CLASS="REPLACEABLE"
+><I
+>сортированные_аргументы</I
+></TT
+>)</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="LITERAL"
+>VARIADIC</TT
+> <TT
+CLASS="TYPE"
+>"any"</TT
+>
+      </TD
+><TD
+>       <TT
+CLASS="LITERAL"
+>VARIADIC</TT
+> <TT
+CLASS="TYPE"
+>"any"</TT
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>double precision</TT
+>
+      </TD
+><TD
+>относительный ранг гипотетической строки, от 1/<TT
+CLASS="REPLACEABLE"
+><I
+>N</I
+></TT
+> до 1</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Для всех этих гипотезирующих агрегатных функций непосредственные <TT
+CLASS="REPLACEABLE"
+><I
+>аргументы</I
+></TT
+> должны соответствовать (по количеству и типу) <TT
+CLASS="REPLACEABLE"
+><I
+>сортированным_аргументам</I
+></TT
+>. В отличие от встроенных агрегатных функций, они не являются строгими, то есть не отбрасывают входные строки, содержащие NULL. Значения NULL сортируются согласно правилу, указанному в предложении <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions-range.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="functions-window.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Диапазонные функции и операторы</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Оконные функции</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

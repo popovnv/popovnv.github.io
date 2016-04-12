@@ -1,0 +1,6402 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>            psql
+          </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Клиентские приложения PostgreSQL"
+HREF="reference-client.html"><LINK
+REL="PREVIOUS"
+TITLE="pg_restore"
+HREF="app-pgrestore.html"><LINK
+REL="NEXT"
+TITLE="            reindexdb
+          "
+HREF="app-reindexdb.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="pg_restore"
+HREF="app-pgrestore.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="reference-client.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="            reindexdb
+          "
+HREF="app-reindexdb.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="APP-PSQL"
+></A
+><SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+></H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN90123"
+></A
+><H2
+>Название</H2
+>            <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>
+          &nbsp;--&nbsp;интерактивный терминал <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN90128"
+></A
+><H2
+>Синтаксис</H2
+><P
+><TT
+CLASS="COMMAND"
+>psql</TT
+> [              <TT
+CLASS="REPLACEABLE"
+><I
+>параметр</I
+></TT
+>
+            ...] [<TT
+CLASS="REPLACEABLE"
+><I
+>база_данных</I
+></TT
+>
+    [<TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+>]]</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN90137"
+></A
+><H2
+>Описание</H2
+><P
+><SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> — это терминальный клиент для работы с <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Позволяет интерактивно вводить запросы, отправлять их в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> и смотреть результаты. Ввод может быть не только интерактивным, но и из файла. Кроме того, предоставляется ряд метакоманд и различные возможности подобные тем, что имеются у командных оболочек, для облегчения написания скриптов и автоматизации широкого спектра задач.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="R1-APP-PSQL-3"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="OPTION"
+>-a</TT
+><BR><TT
+CLASS="OPTION"
+>--echo-all</TT
+></DT
+><DD
+><P
+>Отправляет на стандартный вывод все непустые входные строки по мере их чтения. (Это не относится к строкам, считанным в интерактивном режиме.) Эквивалентно установке переменной <TT
+CLASS="VARNAME"
+>ECHO</TT
+> в значение <TT
+CLASS="LITERAL"
+>all</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-A</TT
+><BR><TT
+CLASS="OPTION"
+>--no-align</TT
+></DT
+><DD
+><P
+>Переключение на невыровненный режим вывода. (По умолчанию, наоборот, используется выровненный режим вывода.)</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-c <TT
+CLASS="REPLACEABLE"
+><I
+>команда</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--command=<TT
+CLASS="REPLACEABLE"
+><I
+>команда</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Указывает, что <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> должен выполнить одну командную строку, <TT
+CLASS="REPLACEABLE"
+><I
+>command</I
+></TT
+>, а затем завершить работу. Это полезно в скриптах. Файлы запуска (<TT
+CLASS="FILENAME"
+>psqlrc</TT
+> и <TT
+CLASS="FILENAME"
+>~/.psqlrc</TT
+>) с этим параметром игнорируются.</P
+><P
+><TT
+CLASS="REPLACEABLE"
+><I
+>command</I
+></TT
+> должна быть либо командной строкой, которая полностью интерпретируется сервером (т. е. не содержит специфических для <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> возможностей), либо одиночной командой, начинающейся с \. Таким образом, при использовании этого параметра нельзя смешивать <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> и метакоманды <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>. Тем не менее, этого можно добиться, если передать строку в <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> вот так: <TT
+CLASS="LITERAL"
+>echo '\x \\ SELECT * FROM foo;' | psql</TT
+>. (<TT
+CLASS="LITERAL"
+>\\</TT
+> является разделителем для метакоманд.)</P
+><P
+>Если командная строка содержит несколько команд SQL, они обрабатываются в одной транзакции, если только нет явных <TT
+CLASS="COMMAND"
+>BEGIN</TT
+>/<TT
+CLASS="COMMAND"
+>COMMIT</TT
+> команд, включённых в строку, разделяющих её на несколько транзакций. Это отличается от поведения, если эту же строку подать на стандартный ввод <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>. Также, возвращается результат только последней SQL-команды.</P
+><P
+>Из-за такого унаследованного поведения, использование более одной команды в параметре <TT
+CLASS="OPTION"
+>-c</TT
+> часто приводит к неожиданным результатам. Лучше подавать несколько команд на стандартный ввод <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>, либо с использованием <SPAN
+CLASS="APPLICATION"
+>echo</SPAN
+>, как показано выше, либо через возможности командной оболочки ОС, например: </P><PRE
+CLASS="PROGRAMLISTING"
+>psql &lt;&lt;EOF
+\x
+SELECT * FROM foo;
+EOF</PRE
+><P></P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-d <TT
+CLASS="REPLACEABLE"
+><I
+>база_данных</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--dbname=<TT
+CLASS="REPLACEABLE"
+><I
+>база_данных</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Указывает имя базы данных для подключения. Эквивалентно указанию <TT
+CLASS="REPLACEABLE"
+><I
+>dbname</I
+></TT
+> в качестве первого аргумента, не являющегося параметром в командной строке.</P
+><P
+>Если этот параметр содержит знак <TT
+CLASS="SYMBOL"
+>=</TT
+> или начинается с допустимого префикса <ACRONYM
+CLASS="ACRONYM"
+>URI</ACRONYM
+> (<TT
+CLASS="LITERAL"
+>postgresql://</TT
+> или <TT
+CLASS="LITERAL"
+>postgres://</TT
+>), он воспринимается как строка <TT
+CLASS="PARAMETER"
+>conninfo</TT
+>. За дополнительными сведениями обратитесь к <A
+HREF="libpq-connect.html#LIBPQ-CONNSTRING"
+>Подразделу 31.1.1</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-e</TT
+><BR><TT
+CLASS="OPTION"
+>--echo-queries</TT
+></DT
+><DD
+><P
+>Посылает все команды SQL, отправленные на сервер, ещё и на стандартный вывод. Эквивалентно установке переменной <TT
+CLASS="VARNAME"
+>ECHO</TT
+> в значение <TT
+CLASS="LITERAL"
+>queries</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-E</TT
+><BR><TT
+CLASS="OPTION"
+>--echo-hidden</TT
+></DT
+><DD
+><P
+>Отображает фактические запросы, генерируемые <TT
+CLASS="COMMAND"
+>\d</TT
+> и другими командами, начинающимися с \. Это можно использовать для изучения внутренних операций в <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>. Эквивалентно установке переменной <TT
+CLASS="VARNAME"
+>ECHO_HIDDEN</TT
+> значения <TT
+CLASS="LITERAL"
+>on</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-f <TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--file=<TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Использует файл <TT
+CLASS="REPLACEABLE"
+><I
+>filename</I
+></TT
+> в качестве источника команд вместо чтения команд в интерактивном режиме. После обработки файла работа <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> завершается. Это во многом эквивалентно метакоманде <TT
+CLASS="COMMAND"
+>\i</TT
+>.</P
+><P
+>Если <TT
+CLASS="REPLACEABLE"
+><I
+>filename</I
+></TT
+> это <TT
+CLASS="LITERAL"
+>-</TT
+> (дефис), то читается стандартный ввод.</P
+><P
+>Использование этого параметра немного отличается от <TT
+CLASS="LITERAL"
+>psql &lt; <TT
+CLASS="REPLACEABLE"
+><I
+>filename</I
+></TT
+></TT
+>. В основном, оба варианта будут делать то, что вы ожидаете, но с <TT
+CLASS="LITERAL"
+>-f</TT
+> доступны некоторые полезные свойства, такие как сообщения об ошибках с номерами строк. Также есть небольшая вероятность, что запуск в таком режиме будет быстрее. С другой стороны, вариант с перенаправлением ввода из командного интерпретатора (в теории) гарантирует получение точно такого же вывода, какой вы получили бы, если бы ввели всё вручную.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-F <TT
+CLASS="REPLACEABLE"
+><I
+>separator</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--field-separator=<TT
+CLASS="REPLACEABLE"
+><I
+>separator</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Использование <TT
+CLASS="REPLACEABLE"
+><I
+>separator</I
+></TT
+> в качестве разделителя полей при невыровненном режиме вывода. Эквивалентно <TT
+CLASS="COMMAND"
+>\pset fieldsep</TT
+> или <TT
+CLASS="COMMAND"
+>\f</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-h <TT
+CLASS="REPLACEABLE"
+><I
+>компьютер</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--host=<TT
+CLASS="REPLACEABLE"
+><I
+>компьютер</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Указывает имя компьютера, на котором запущен сервер. Если значение начинается с косой черты, оно интерпретируется как имя каталога с доменным сокетом Unix.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-H</TT
+><BR><TT
+CLASS="OPTION"
+>--html</TT
+></DT
+><DD
+><P
+>Включает табличный вывод в формате <ACRONYM
+CLASS="ACRONYM"
+>HTML</ACRONYM
+>. Эквивалентно <TT
+CLASS="LITERAL"
+>\pset format html</TT
+> или команде <TT
+CLASS="COMMAND"
+>\H</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-l</TT
+><BR><TT
+CLASS="OPTION"
+>--list</TT
+></DT
+><DD
+><P
+>Выводит список всех доступных баз данных и завершает работу. Другие параметры, не связанные с соединением, игнорируются. Это похоже на метакоманду <TT
+CLASS="COMMAND"
+>\list</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-L <TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--log-file=<TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+></TT
+></DT
+><DD
+><P
+>В дополнение к обычному выводу, записывает вывод результатов всех запросов в файл <TT
+CLASS="REPLACEABLE"
+><I
+>filename</I
+></TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-n</TT
+><BR><TT
+CLASS="OPTION"
+>--no-readline</TT
+></DT
+><DD
+><P
+>Отключает использование <SPAN
+CLASS="APPLICATION"
+>Readline</SPAN
+> для редактирования командной строки и использования истории команд. Может быть полезно для выключения расширенных действий клавиши табуляции при вырезании и вставке.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-o <TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--output=<TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Записывает вывод результатов всех запросов в файл <TT
+CLASS="REPLACEABLE"
+><I
+>filename</I
+></TT
+>. Эквивалентно команде <TT
+CLASS="COMMAND"
+>\o</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-p <TT
+CLASS="REPLACEABLE"
+><I
+>порт</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--port=<TT
+CLASS="REPLACEABLE"
+><I
+>порт</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Задаёт TCP-порт или файл локального доменного сокета Unix, через который сервер принимает подключения. Значение по умолчанию определяется переменной среды <TT
+CLASS="ENVAR"
+>PGPORT</TT
+>, а если она не установлена, выбирается порт, указанный при компиляции, обычно 5432.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-P <TT
+CLASS="REPLACEABLE"
+><I
+>assignment</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--pset=<TT
+CLASS="REPLACEABLE"
+><I
+>assignment</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Задаёт параметры печати, в стиле команды <TT
+CLASS="COMMAND"
+>\pset</TT
+>. Обратите внимание, что имя параметра и значение разделяются знаком равенства, а не пробела. Например, чтобы установить формат вывода в <SPAN
+CLASS="APPLICATION"
+>LaTeX</SPAN
+>, нужно написать <TT
+CLASS="LITERAL"
+>-P format=latex</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-q</TT
+><BR><TT
+CLASS="OPTION"
+>--quiet</TT
+></DT
+><DD
+><P
+>Указывает, что <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> должен работать без вывода дополнительных сообщений. По умолчанию, выводятся приветствия и различные информационные сообщения. Этого не произойдёт с использованием данного параметра. Полезно вместе с параметром <TT
+CLASS="OPTION"
+>-c</TT
+>. Этот же эффект можно получить, установив для переменной <TT
+CLASS="VARNAME"
+>QUIET</TT
+> значение <TT
+CLASS="LITERAL"
+>on</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-R <TT
+CLASS="REPLACEABLE"
+><I
+>separator</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--record-separator=<TT
+CLASS="REPLACEABLE"
+><I
+>separator</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Использует <TT
+CLASS="REPLACEABLE"
+><I
+>separator</I
+></TT
+> как разделитель записей при невыровненном режиме вывода. Эквивалентно команде <TT
+CLASS="COMMAND"
+>\pset recordsep</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-s</TT
+><BR><TT
+CLASS="OPTION"
+>--single-step</TT
+></DT
+><DD
+><P
+>Запуск в пошаговом режиме. Это означает, что пользователь будет подтверждать выполнение каждой команды, отправляемой на сервер, с возможностью отменить выполнение. Используется для отладки скриптов.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-S</TT
+><BR><TT
+CLASS="OPTION"
+>--single-line</TT
+></DT
+><DD
+><P
+>Запуск в однострочном режиме, при котором символ новой строки завершает SQL-команды, также как это делает точка с запятой.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Этот режим реализован для тех, кому он нужен, но это не обязательно означает, что и вам нужно его использовать. В частности, если смешивать в одной строке команды <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> и метакоманды, порядок их выполнения может быть не всегда понятен для неопытного пользователя.</P
+></BLOCKQUOTE
+></DIV
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-t</TT
+><BR><TT
+CLASS="OPTION"
+>--tuples-only</TT
+></DT
+><DD
+><P
+>Отключает вывод имён столбцов и результирующей строки с количеством выбранных записей. Эквивалентно команде <TT
+CLASS="COMMAND"
+>\t</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-T <TT
+CLASS="REPLACEABLE"
+><I
+>table_options</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--table-attr=<TT
+CLASS="REPLACEABLE"
+><I
+>table_options</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Задаёт атрибуты, которые будут вставлены в тег <ACRONYM
+CLASS="ACRONYM"
+>HTML</ACRONYM
+> <CODE
+CLASS="SGMLTAG"
+>table</CODE
+>. За подробностями обратитесь к описанию <TT
+CLASS="COMMAND"
+>\pset</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-U <TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--username=<TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Подключение к базе данных под пользователем <TT
+CLASS="REPLACEABLE"
+><I
+>username</I
+></TT
+> вместо используемого по умолчанию. (Разумеется, при наличии прав на это.)</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-v <TT
+CLASS="REPLACEABLE"
+><I
+>assignment</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--set=<TT
+CLASS="REPLACEABLE"
+><I
+>assignment</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--variable=<TT
+CLASS="REPLACEABLE"
+><I
+>assignment</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Выполняет присвоение значения переменной, как метакоманда <TT
+CLASS="COMMAND"
+>\set</TT
+>. Обратите внимание на то, что необходимо разделить имя переменной и значение (при наличии) знаком равенства в командной строке. Чтобы сбросить переменную, опустите знак равенства. Чтобы установить пустое значение, поставьте знак равенства, но опустите значение. Присваивания выполняются на очень ранней стадии запуска, поэтому если переменные зарезервированы для внутренних целей, то позже они могут быть перезаписаны.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-V</TT
+><BR><TT
+CLASS="OPTION"
+>--version</TT
+></DT
+><DD
+><P
+>Выводит версию <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> и завершает работу.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-w</TT
+><BR><TT
+CLASS="OPTION"
+>--no-password</TT
+></DT
+><DD
+><P
+>Не выдавать запрос на ввод пароля. Если сервер требует аутентификацию по паролю и пароль не доступен с помощью других средств, таких как файл <TT
+CLASS="FILENAME"
+>.pgpass</TT
+>, попытка соединения не удастся. Этот параметр может быть полезен в пакетных заданиях и скриптах, где нет пользователя, который вводит пароль.</P
+><P
+>Обратите внимание, что этот параметр действует на протяжении всей сессии и, таким образом, влияет на метакоманду <TT
+CLASS="COMMAND"
+>\connect</TT
+>, также как и на первую попытку соединения.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-W</TT
+><BR><TT
+CLASS="OPTION"
+>--password</TT
+></DT
+><DD
+><P
+>Принудительно запрашивать пароль перед подключением к базе данных.</P
+><P
+>Это несущественный параметр, так как <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> запрашивает пароль автоматически, если сервер проверяет подлинность по паролю. Однако, чтобы понять это, <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> лишний раз подключается к серверу. Поэтому иногда имеет смысл ввести <TT
+CLASS="OPTION"
+>-W</TT
+>, чтобы исключить эту ненужную попытку подключения.</P
+><P
+>Обратите внимание, что этот параметр действует на протяжении всей сессии и, таким образом, влияет на метакоманду <TT
+CLASS="COMMAND"
+>\connect</TT
+>, также как и на первую попытку соединения.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-x</TT
+><BR><TT
+CLASS="OPTION"
+>--expanded</TT
+></DT
+><DD
+><P
+>Включает режим развёрнутого вывода таблицы. Эквивалентно команде <TT
+CLASS="COMMAND"
+>\x</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-X,</TT
+><BR><TT
+CLASS="OPTION"
+>--no-psqlrc</TT
+></DT
+><DD
+><P
+>Не читать стартовые файлы (ни общесистемный файл <TT
+CLASS="FILENAME"
+>psqlrc</TT
+>, ни пользовательский файл <TT
+CLASS="FILENAME"
+>~/.psqlrc</TT
+>).</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-z</TT
+><BR><TT
+CLASS="OPTION"
+>--field-separator-zero</TT
+></DT
+><DD
+><P
+>Установить нулевой байт в качестве разделителя полей для невыровненного режима вывода.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-0</TT
+><BR><TT
+CLASS="OPTION"
+>--record-separator-zero</TT
+></DT
+><DD
+><P
+>Установить нулевой байт в качестве разделителя записей для невыровненного режима вывода. Это полезно при взаимодействии с другими программами, например, с <TT
+CLASS="LITERAL"
+>xargs -0</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-1</TT
+><BR><TT
+CLASS="OPTION"
+>--single-transaction</TT
+></DT
+><DD
+><P
+>Если <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> выполняет скрипт, то добавление этого параметра заключает скрипт в <TT
+CLASS="COMMAND"
+>BEGIN</TT
+>/<TT
+CLASS="COMMAND"
+>COMMIT</TT
+> для выполнения в рамках одной транзакции. Это гарантирует, что либо все команды успешно завершены, либо никаких изменений не произведено.</P
+><P
+>Если в самом скрипте используются <TT
+CLASS="COMMAND"
+>BEGIN</TT
+>, <TT
+CLASS="COMMAND"
+>COMMIT</TT
+> или <TT
+CLASS="COMMAND"
+>ROLLBACK</TT
+>, то этот параметр не будет иметь желаемого эффекта. Кроме того, если скрипт содержит любую команду, которая не может быть выполнена внутри транзакционного блока, указание этого параметра приведёт к сбою команды и, следовательно, всей транзакции.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-?</TT
+><BR><TT
+CLASS="OPTION"
+>--help</TT
+></DT
+><DD
+><P
+>Показывает справку об аргументах командной строки <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> и завершает работу.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN90505"
+></A
+><H2
+>Код завершения</H2
+><P
+>При нормальном завершении <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> возвращает 0 в командную оболочку ОС, 1 — если произошла фатальная ошибка в самом <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> (например, нехватка памяти, файл не найден), 2 — при неудачном соединении с сервером неинтерактивного сеанса, 3 — при ошибке в скрипте и установленной переменной <TT
+CLASS="VARNAME"
+>ON_ERROR_STOP</TT
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN90511"
+></A
+><H2
+>Usage</H2
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="R2-APP-PSQL-CONNECTING"
+></A
+><H3
+>Подключение к базе данных</H3
+><P
+><SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> это клиент для <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Для подключения к базе данных нужно знать имя базы данных, имя сервера, номер порта сервера и имя пользователя, под которым вы хотите подключиться. Эти свойства можно задать через аргументы командной строки, а именно <TT
+CLASS="OPTION"
+>-d</TT
+>, <TT
+CLASS="OPTION"
+>-h</TT
+>, <TT
+CLASS="OPTION"
+>-p</TT
+> и <TT
+CLASS="OPTION"
+>-U</TT
+> соответственно. Если в командной строке есть аргумент, который не относится к параметрам <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>, то он используется в качестве имени базы данных (или имени пользователя, если база данных уже задана). Задавать все эти аргументы необязательно, у них есть разумные значения по умолчанию. Если опустить имя сервера, <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> будет подключаться через доменный сокет Unix к локальному серверу, либо подключаться к <TT
+CLASS="LITERAL"
+>localhost</TT
+> по TCP/IP в системах, не поддерживающих UNIX-сокеты. Номер порта по умолчанию определяется во время компиляции. Поскольку сервер базы данных использует то же значение по умолчанию, чаще всего указывать номер порта не нужно. Имя пользователя по умолчанию, как и имя базы данных по умолчанию, совпадает с именем пользователя в операционной системе. Заметьте, что просто так подключаться к любой базе данных под любым именем пользователя вы не сможете. Узнать о ваших правах можно у администратора баз данных.</P
+><P
+>Если значения по умолчанию не подходят, можно сэкономить на вводе параметров подключения, установив переменные среды <TT
+CLASS="ENVAR"
+>PGDATABASE</TT
+>, <TT
+CLASS="ENVAR"
+>PGHOST</TT
+>, <TT
+CLASS="ENVAR"
+>PGPORT</TT
+> и/или <TT
+CLASS="ENVAR"
+>PGUSER</TT
+>. (Другие переменные среды описаны в <A
+HREF="libpq-envars.html"
+>Разделе 31.14</A
+>.) Также удобно иметь файл <TT
+CLASS="FILENAME"
+>~/.pgpass</TT
+>, чтобы не вводить пароли снова и снова. За дополнительными сведениями обратитесь к <A
+HREF="libpq-pgpass.html"
+>Разделу 31.15</A
+>.</P
+><P
+>Альтернативный способ указать параметры подключения это использование строки <TT
+CLASS="PARAMETER"
+>conninfo</TT
+> или <ACRONYM
+CLASS="ACRONYM"
+>URI</ACRONYM
+> вместо имени базы данных. Этот механизм даёт широкие возможности по управлению параметрами подключения. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>$ <KBD
+CLASS="USERINPUT"
+>psql "service=myservice sslmode=require"</KBD
+>
+$ <KBD
+CLASS="USERINPUT"
+>psql postgresql://dbmaster:5433/mydb?sslmode=require</KBD
+></PRE
+><P> Этот способ также позволяет использовать <ACRONYM
+CLASS="ACRONYM"
+>LDAP</ACRONYM
+> для получения параметров подключения, как описано в <A
+HREF="libpq-ldap.html"
+>Разделе 31.17</A
+>. Более полно все имеющиеся параметры соединения описаны в <A
+HREF="libpq-connect.html#LIBPQ-PARAMKEYWORDS"
+>Подразделе 31.1.2</A
+>.</P
+><P
+>Если соединение не может быть установлено по любой причине (например, нет прав, сервер не работает и т. д.), <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> вернёт ошибку и прекратит работу.</P
+><P
+>Если и стандартный ввод, и стандартный вывод являются терминалом, то <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> установит кодировку клиента в <SPAN
+CLASS="QUOTE"
+>"auto"</SPAN
+>, и подходящая клиентская кодировка будет определяться из локальных установок (переменная окружения <TT
+CLASS="ENVAR"
+>LC_CTYPE</TT
+> в Unix). Если это работает не так, как ожидалось, кодировку клиента можно изменить, установив переменную окружения <TT
+CLASS="ENVAR"
+>PGCLIENTENCODING</TT
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="R2-APP-PSQL-4"
+></A
+><H3
+>Ввод SQL-команд</H3
+><P
+>Как правило, приглашение <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> состоит из имени базы данных, к которой <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> в данный момент подключён, а затем строки <TT
+CLASS="LITERAL"
+>=&gt;</TT
+>. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>$ <KBD
+CLASS="USERINPUT"
+>psql testdb</KBD
+>
+psql (9.4.1)
+Type "help" for help.
+
+testdb=&gt;</PRE
+><P></P
+><P
+>В командной строке пользователь может вводить команды <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>. Обычно введённые строки отправляются на сервер, когда встречается точка с запятой, завершающая команду. Конец строки не завершает команду. Это позволяет разбивать команды на несколько строк для лучшего понимания. Если команда была отправлена и выполнена без ошибок, то результат команды выводится на экран.</P
+><P
+>При каждом выполнении команды <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> также проверяет асинхронные уведомления о событиях, генерируемые командами <A
+HREF="sql-listen.html"
+>LISTEN</A
+> и <A
+HREF="sql-notify.html"
+>NOTIFY</A
+>.</P
+><P
+>Комментарии в стиле C передаются для обработки на сервер, в то время как комментарии в стандарте SQL <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> удаляет перед отправкой.</P
+></DIV
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="APP-PSQL-META-COMMANDS"
+></A
+><H3
+>Метакоманды</H3
+><P
+>Всё, что вводится в <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> не взятое в кавычки и начинающееся с обратной косой черты, является метакомандой <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> и обрабатывается самим <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>. Эти команды делают <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> полезным для задач администрирования и разработки скриптов.</P
+><P
+>Формат команды <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> следующий: обратная косая черта, сразу за ней команда, затем аргументы. Аргументы отделяются от команды и друг от друга любым количеством пробелов.</P
+><P
+>Чтобы включить пробел в значение аргумента, нужно заключить его в одинарные кавычки. Чтобы включить одинарную кавычку в значение аргумента, нужно написать две одинарные кавычки внутри текста в одинарных кавычках. Всё, что содержится в одинарных кавычках подлежит заменам, принятым в языке C: <TT
+CLASS="LITERAL"
+>\n</TT
+> (новая строка), <TT
+CLASS="LITERAL"
+>\t</TT
+> (табуляция), <TT
+CLASS="LITERAL"
+>\b</TT
+> (backspace), <TT
+CLASS="LITERAL"
+>\r</TT
+> (возврат каретки), <TT
+CLASS="LITERAL"
+>\f</TT
+> (подача страницы), <TT
+CLASS="LITERAL"
+>\</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>цифры</I
+></TT
+> (восьмеричное число), и <TT
+CLASS="LITERAL"
+>\x</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>цифры</I
+></TT
+> (шестнадцатеричное число). Если внутри текста в одинарных кавычках встречается обратная косая перед любым другим символом, то она экранирует этот символ.</P
+><P
+>Текст аргумента, заключённый в обратные кавычки (<TT
+CLASS="LITERAL"
+>`</TT
+>), считается командной строкой, которая передаётся в командную оболочку ОС. Вывод от этой команды (с удалёнными в конце символами новой строки) заменяет текст в обратных кавычках.</P
+><P
+>Если внутри аргумента встречается не взятое в кавычки имя <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> переменной с двоеточием (<TT
+CLASS="LITERAL"
+>:</TT
+>) перед ним, то оно заменяется на значение <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> переменной, как описано в <A
+HREF="app-psql.html#APP-PSQL-INTERPOLATION"
+><I
+>Интерполяция <I
+>SQL</I
+></I
+></A
+>.</P
+><P
+>Некоторые команды принимают идентификатор <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> (например, имя таблицы) в качестве аргумента. Такие аргументы следуют правилам синтаксиса <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>: буквы, не взятые в кавычки, преобразуются в нижний регистр, буквы, взятые в двойные кавычки (<TT
+CLASS="LITERAL"
+>"</TT
+>) предотвращают преобразование регистра и позволяют включать пробелы в идентификатор. Внутри двойных кавычек две двойные кавычки сокращаются до одной. Например, <TT
+CLASS="LITERAL"
+>FOO"BAR"BAZ</TT
+> интерпретируется как <TT
+CLASS="LITERAL"
+>fooBARbaz</TT
+>, а <TT
+CLASS="LITERAL"
+>"A weird"" name"</TT
+> становится <TT
+CLASS="LITERAL"
+>A weird" name</TT
+>.</P
+><P
+>Разбор аргументов останавливается в конце строки или когда встречается другая обратная косая черта, не внутри кавычек. Обратная косая не внутри кавычек рассматривается как начало новой метакоманды. Специальная последовательность <TT
+CLASS="LITERAL"
+>\\</TT
+> (две обратных косых черты) обозначает окончание аргументов, далее продолжается разбор команд <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>, если таковые имеются. Таким образом, команды <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> и <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> можно свободно смешивать на одной строке. Но в любом случае, аргументы метакоманды не могут выходить за пределы текущей строки.</P
+><P
+>Определены следующие метакоманды: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>\a</TT
+></DT
+><DD
+><P
+>Если текущий режим вывода таблицы невыровненный, то он переключается на выровненный режим. Если текущий режим выровненный, то устанавливается невыровненный. Эта команда поддерживается для обратной совместимости. См. <TT
+CLASS="COMMAND"
+>\pset</TT
+> для более общего решения.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\c</TT
+> или <TT
+CLASS="LITERAL"
+>\connect</TT
+> <TT
+CLASS="LITERAL"
+>[ <TT
+CLASS="REPLACEABLE"
+><I
+>dbname</I
+></TT
+> [ <TT
+CLASS="REPLACEABLE"
+><I
+>username</I
+></TT
+> ] [ <TT
+CLASS="REPLACEABLE"
+><I
+>host</I
+></TT
+> ] [ <TT
+CLASS="REPLACEABLE"
+><I
+>port</I
+></TT
+> ] ]</TT
+></DT
+><DD
+><P
+>Устанавливает новое подключение к серверу <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Если новое подключение устанавливается успешно, предыдущее подключение закрывается. Если один из параметров <TT
+CLASS="REPLACEABLE"
+><I
+>dbname</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>username</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>host</I
+></TT
+> или <TT
+CLASS="REPLACEABLE"
+><I
+>port</I
+></TT
+> опущен или задан как <TT
+CLASS="LITERAL"
+>-</TT
+>, используется значение этого параметра из предыдущего подключения. Если предыдущего подключения не было, используется значение этого параметра, принятое по умолчанию в <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>.</P
+><P
+>Если попытка подключения не удалась (неверное имя пользователя, доступ запрещён и т. д.), то предыдущее соединение останется активным, только если <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> находится в интерактивном режиме. Если скрипт выполняется не интерактивно, обработка немедленно останавливается с сообщением об ошибке. Такое различие в поведении было выбрано для удобства пользователя в отношении опечаток с одной стороны и механизма безопасности, при котором скрипты не будут запущены на неправильной базе данных, с другой стороны.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\C [ <TT
+CLASS="REPLACEABLE"
+><I
+>title</I
+></TT
+> ]</TT
+></DT
+><DD
+><P
+>Задаёт заголовок, который будет выводиться для результатов любых запросов или отменяет установленный ранее заголовок. Эта команда эквивалентна <TT
+CLASS="LITERAL"
+>\pset title <TT
+CLASS="REPLACEABLE"
+><I
+>title</I
+></TT
+></TT
+>. (Название этой команды происходит от <SPAN
+CLASS="QUOTE"
+>"caption"</SPAN
+>, так как ранее это использовалось только для задания заголовков <ACRONYM
+CLASS="ACRONYM"
+>HTML</ACRONYM
+> таблиц.)</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\cd [ <TT
+CLASS="REPLACEABLE"
+><I
+>каталог</I
+></TT
+> ]</TT
+></DT
+><DD
+><P
+>Заменяет текущий рабочий каталог на <TT
+CLASS="REPLACEABLE"
+><I
+>directory</I
+></TT
+>. Без аргумента устанавливается домашний каталог текущего пользователя.</P
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>для печати текущего рабочего каталога используйте <TT
+CLASS="LITERAL"
+>\! pwd</TT
+>.</P
+></BLOCKQUOTE
+></DIV
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\conninfo</TT
+></DT
+><DD
+><P
+>Выводит информацию о текущем подключении к базе данных.</P
+></DD
+><DT
+><A
+NAME="APP-PSQL-META-COMMANDS-COPY"
+></A
+><TT
+CLASS="LITERAL"
+>\copy { <TT
+CLASS="REPLACEABLE"
+><I
+>таблица</I
+></TT
+> [ ( <TT
+CLASS="REPLACEABLE"
+><I
+>column_list</I
+></TT
+> ) ] | ( <TT
+CLASS="REPLACEABLE"
+><I
+>запрос</I
+></TT
+> ) } { <TT
+CLASS="LITERAL"
+>from</TT
+> | <TT
+CLASS="LITERAL"
+>to</TT
+> } { <TT
+CLASS="REPLACEABLE"
+><I
+>'filename'</I
+></TT
+> | program <TT
+CLASS="REPLACEABLE"
+><I
+>'command'</I
+></TT
+> | stdin | stdout | pstdin | pstdout } [ [ with ] ( <TT
+CLASS="REPLACEABLE"
+><I
+>параметр</I
+></TT
+> [, ...] ) ]</TT
+></DT
+><DD
+><P
+>Выполняет копирование на клиенте. Это операция, которая выполняет <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>-команду <A
+HREF="sql-copy.html"
+>COPY</A
+>, но вместо чтения или записи в файл на сервере <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> читает или записывает файл и пересылает данные между сервером и локальной файловой системой. Это означает, что для доступа к файлам используются привилегии локального пользователя, а не сервера, и не требуются привилегии суперпользователя SQL.</P
+><P
+>Когда указана <TT
+CLASS="LITERAL"
+>program</TT
+>, <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> выполняет <TT
+CLASS="REPLACEABLE"
+><I
+>command</I
+></TT
+> и данные из/в <TT
+CLASS="REPLACEABLE"
+><I
+>command</I
+></TT
+> передаются между сервером и клиентом. Это опять же означает, что для выполнения программ используются привилегии локального пользователя, а не сервера, и не требуются привилегии суперпользователя SQL.</P
+><P
+>При выполнении <TT
+CLASS="LITERAL"
+>\copy ... from stdin</TT
+> строки с данными считываются из источника, выполнившего команду, и считываются до тех пор, пока не встретится <TT
+CLASS="LITERAL"
+>\.</TT
+> или не будет достигнут конец файла. Этот параметр полезен для заполнения таблиц прямо в SQL-скриптах. При выполнении <TT
+CLASS="LITERAL"
+>\copy ... to stdout</TT
+> вывод направляется в то же место, что и вывод <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> команд. Статус команды <TT
+CLASS="LITERAL"
+>COPY <TT
+CLASS="REPLACEABLE"
+><I
+>count</I
+></TT
+></TT
+> не отображается, чтобы не перепутать со строкой данных. Для чтения/записи стандартного ввода/вывода <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>, вне зависимости от источника текущей команды или параметра <TT
+CLASS="LITERAL"
+>\o</TT
+>, используйте <TT
+CLASS="LITERAL"
+>from pstdin</TT
+> или <TT
+CLASS="LITERAL"
+>to pstdout</TT
+>.</P
+><P
+>Синтаксис команды похож на синтаксис <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>-команды <A
+HREF="sql-copy.html"
+>COPY</A
+>. Все параметры, кроме источника и получателя данных, соответствуют параметрам <A
+HREF="sql-copy.html"
+>COPY</A
+>. Поэтому к команде <TT
+CLASS="COMMAND"
+>\copy</TT
+> применяются специальные правила разбора. В частности, не применяются правила подстановки переменных и экранирование с обратной косой чертой.</P
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>Эта операция не так эффективна, как <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>-команда <TT
+CLASS="COMMAND"
+>COPY</TT
+>, потому что все данные перемещаются между клиентом и сервером. Для больших объёмов данных <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>-команда может быть предпочтительнее.</P
+></BLOCKQUOTE
+></DIV
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\copyright</TT
+></DT
+><DD
+><P
+>Показывает информацию об авторских правах и условиях распространения <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\d[S+] [ <A
+HREF="app-psql.html#APP-PSQL-PATTERNS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+></A
+> ]</TT
+></DT
+><DD
+><P
+>Для каждого отношения (таблицы, представления, индекса, последовательности, внешней таблицы) или составного типа, соответствующих шаблону <TT
+CLASS="REPLACEABLE"
+><I
+>pattern</I
+></TT
+>, показывает столбцы, их типы, табличное пространство (если не по умолчанию) и любые специальные атрибуты, такие как <TT
+CLASS="LITERAL"
+>NOT NULL</TT
+> или значения по умолчанию. Также показываются связанные индексы, ограничения, правила и триггеры. Для внешних таблиц показывается связанный внешний сервер. (<SPAN
+CLASS="QUOTE"
+>"Соответствие шаблону"</SPAN
+> определяется ниже в <A
+HREF="app-psql.html#APP-PSQL-PATTERNS"
+><I
+>Шаблоны поиска (Patterns)</I
+></A
+>.)</P
+><P
+>Для некоторых типов отношений <TT
+CLASS="LITERAL"
+>\d</TT
+> показывает дополнительную информацию по каждому столбцу: значения столбца для последовательностей, индексное выражение для индексов и параметры обработчика внешних данных для внешних таблиц.</P
+><P
+>Вариант команды <TT
+CLASS="LITERAL"
+>\d+</TT
+> похож на <TT
+CLASS="LITERAL"
+>\d</TT
+>, но выводит больше информации: комментарии к столбцам таблицы, наличие в таблице OID, для представления показывается его определение, отличные от значений по умолчанию установки <A
+HREF="sql-altertable.html#SQL-CREATETABLE-REPLICA-IDENTITY"
+>replica identity</A
+>.</P
+><P
+>По умолчанию отображаются только объекты, созданные пользователем. Для включения системных объектов нужно задать шаблон или добавить модификатор <TT
+CLASS="LITERAL"
+>S</TT
+>.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Если <TT
+CLASS="COMMAND"
+>\d</TT
+> используется без <TT
+CLASS="REPLACEABLE"
+><I
+>pattern</I
+></TT
+>, это эквивалентно <TT
+CLASS="COMMAND"
+>\dtvsE</TT
+> и показывает список всех доступных таблиц, представлений, последовательностей и внешних таблиц. Чисто для удобства.</P
+></BLOCKQUOTE
+></DIV
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\da[S] [ <A
+HREF="app-psql.html#APP-PSQL-PATTERNS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+></A
+> ]</TT
+></DT
+><DD
+><P
+>Выводит список агрегатных функций вместе с типом возвращаемого значения и типами данных, которыми они оперируют. Если указан <TT
+CLASS="REPLACEABLE"
+><I
+>pattern</I
+></TT
+>, отображаются только функции, имена которых соответствуют шаблону. По умолчанию отображаются только объекты, созданные пользователем. Для включения системных объектов нужно задать шаблон или добавить модификатор <TT
+CLASS="LITERAL"
+>S</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\db[+] [ <A
+HREF="app-psql.html#APP-PSQL-PATTERNS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+></A
+> ]</TT
+></DT
+><DD
+><P
+>Выводит список табличных пространств. Если указан <TT
+CLASS="REPLACEABLE"
+><I
+>pattern</I
+></TT
+>, отображаются только табличные пространства, имена которых соответствуют шаблону. При добавлении <TT
+CLASS="LITERAL"
+>+</TT
+> к имени команды для каждого объекта дополнительно будут выводиться права доступа и описание.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\dc[S+] [ <A
+HREF="app-psql.html#APP-PSQL-PATTERNS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+></A
+> ]</TT
+></DT
+><DD
+><P
+>Выводит список преобразований между кодировками наборов символов. Если указан <TT
+CLASS="REPLACEABLE"
+><I
+>pattern</I
+></TT
+>, отображаются только преобразования кодировок, имена которых соответствуют шаблону. По умолчанию отображаются только объекты, созданные пользователем. Для включения системных объектов нужно задать шаблон или добавить модификатор <TT
+CLASS="LITERAL"
+>S</TT
+>. При добавлении <TT
+CLASS="LITERAL"
+>+</TT
+> к имени команды для каждого объекта дополнительно будет выводиться описание.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\dC[+] [ <A
+HREF="app-psql.html#APP-PSQL-PATTERNS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+></A
+> ]</TT
+></DT
+><DD
+><P
+>Выводит список приведения типов. Если указан <TT
+CLASS="REPLACEABLE"
+><I
+>pattern</I
+></TT
+>, отображаются только приведения типов, имена которых соответствуют шаблону. При добавлении <TT
+CLASS="LITERAL"
+>+</TT
+> к имени команды для каждого объекта дополнительно будет выводиться описание.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\dd[S] [ <A
+HREF="app-psql.html#APP-PSQL-PATTERNS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+></A
+> ]</TT
+></DT
+><DD
+><P
+>Показывает описания объектов следующих типов: <TT
+CLASS="LITERAL"
+>constraint</TT
+>, <TT
+CLASS="LITERAL"
+>operator class</TT
+>, <TT
+CLASS="LITERAL"
+>operator family</TT
+>, <TT
+CLASS="LITERAL"
+>rule</TT
+> и <TT
+CLASS="LITERAL"
+>trigger</TT
+>. Описания для остальных объектов можно посмотреть соответствующими метакомандами для этих типов объектов.</P
+><P
+><TT
+CLASS="LITERAL"
+>\dd</TT
+> показывает описания для объектов, соответствующих шаблону <TT
+CLASS="REPLACEABLE"
+><I
+>pattern</I
+></TT
+>, или для доступных объектов указанных типов, если аргументы не заданы. Но в любом случае выводятся только те объекты, которые имеют описание. По умолчанию отображаются только объекты, созданные пользователем. Для включения системных объектов нужно задать шаблон или добавить модификатор <TT
+CLASS="LITERAL"
+>S</TT
+>.</P
+><P
+>Описания объектов создаются <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>-командой <A
+HREF="sql-comment.html"
+>COMMENT</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\ddp [ <A
+HREF="app-psql.html#APP-PSQL-PATTERNS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+></A
+> ]</TT
+></DT
+><DD
+><P
+>Выводит список прав доступа по умолчанию. Выводится строка для каждой роли (и схемы, если применимо), для которой права доступа по умолчанию отличаются от встроенных. Если указан <TT
+CLASS="REPLACEABLE"
+><I
+>pattern</I
+></TT
+>, выводятся строки только для тех ролей и схем, чьи имена соответствуют шаблону.</P
+><P
+>Права доступа по умолчанию устанавливаются командой <A
+HREF="sql-alterdefaultprivileges.html"
+>ALTER DEFAULT PRIVILEGES</A
+>. Смысл отображаемых привилегий объясняется в описании <A
+HREF="sql-grant.html"
+>GRANT</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\dD[S+] [ <A
+HREF="app-psql.html#APP-PSQL-PATTERNS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+></A
+> ]</TT
+></DT
+><DD
+><P
+>Выводит список доменов. Если указан <TT
+CLASS="REPLACEABLE"
+><I
+>pattern</I
+></TT
+>, отображаются только домены, имена которых соответствуют шаблону. По умолчанию отображаются только объекты, созданные пользователем. Для включения системных объектов нужно задать шаблон или добавить модификатор <TT
+CLASS="LITERAL"
+>S</TT
+>. При добавлении <TT
+CLASS="LITERAL"
+>+</TT
+> к имени команды для каждого объекта дополнительно будут выводиться права доступа и описание.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\dE[S+] [ <A
+HREF="app-psql.html#APP-PSQL-PATTERNS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+></A
+> ]</TT
+><BR><TT
+CLASS="LITERAL"
+>\di[S+] [ <A
+HREF="app-psql.html#APP-PSQL-PATTERNS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+></A
+> ]</TT
+><BR><TT
+CLASS="LITERAL"
+>\dm[S+] [ <A
+HREF="app-psql.html#APP-PSQL-PATTERNS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+></A
+> ]</TT
+><BR><TT
+CLASS="LITERAL"
+>\ds[S+] [ <A
+HREF="app-psql.html#APP-PSQL-PATTERNS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+></A
+> ]</TT
+><BR><TT
+CLASS="LITERAL"
+>\dt[S+] [ <A
+HREF="app-psql.html#APP-PSQL-PATTERNS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+></A
+> ]</TT
+><BR><TT
+CLASS="LITERAL"
+>\dv[S+] [ <A
+HREF="app-psql.html#APP-PSQL-PATTERNS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+></A
+> ]</TT
+></DT
+><DD
+><P
+>В этой группе команд буквы <TT
+CLASS="LITERAL"
+>E</TT
+>, <TT
+CLASS="LITERAL"
+>i</TT
+>, <TT
+CLASS="LITERAL"
+>m</TT
+>, <TT
+CLASS="LITERAL"
+>s</TT
+>, <TT
+CLASS="LITERAL"
+>t</TT
+> и <TT
+CLASS="LITERAL"
+>v</TT
+> обозначают соответственно: внешнюю таблицу, индекс, материализованное представление, последовательность, таблицу и представление. Можно указывать все или часть этих букв, в произвольном порядке, чтобы получить список объектов этих типов. Например, <TT
+CLASS="LITERAL"
+>\dit</TT
+> выводит список индексов и таблиц. При добавлении <TT
+CLASS="LITERAL"
+>+</TT
+> к имени команды для каждого объекта дополнительно будут выводиться физический размер на диске и описание, при наличии. Если указан <TT
+CLASS="REPLACEABLE"
+><I
+>pattern</I
+></TT
+>, отображаются только объекты, имена которых соответствуют шаблону. По умолчанию отображаются только объекты, созданные пользователем. Для включения системных объектов нужно задать шаблон или добавить модификатор <TT
+CLASS="LITERAL"
+>S</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\des[+] [ <A
+HREF="app-psql.html#APP-PSQL-PATTERNS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+></A
+> ]</TT
+></DT
+><DD
+><P
+>Выводит список внешних серверов (мнемоника: <SPAN
+CLASS="QUOTE"
+>"external servers"</SPAN
+>). Если указан <TT
+CLASS="REPLACEABLE"
+><I
+>pattern</I
+></TT
+>, отображаются только серверы, имена которых соответствуют шаблону. Если используется форма <TT
+CLASS="LITERAL"
+>\des+</TT
+>, то выводится полное описание каждого сервера, включая права доступа, тип, версию, параметры и описание.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\det[+] [ <A
+HREF="app-psql.html#APP-PSQL-PATTERNS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+></A
+> ]</TT
+></DT
+><DD
+><P
+>Выводит список внешних таблиц (мнемоника: <SPAN
+CLASS="QUOTE"
+>"external tables"</SPAN
+>). Если указан <TT
+CLASS="REPLACEABLE"
+><I
+>pattern</I
+></TT
+>, выводятся только те записи, у которых имя таблицы или схемы соответствуют шаблону. Если используется форма <TT
+CLASS="LITERAL"
+>\det+</TT
+>, то дополнительно выводятся общие параметры и описание внешней таблицы.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\deu[+] [ <A
+HREF="app-psql.html#APP-PSQL-PATTERNS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+></A
+> ]</TT
+></DT
+><DD
+><P
+>Выводит список сопоставлений пользователей (мнемоника: <SPAN
+CLASS="QUOTE"
+>"external users"</SPAN
+>). Если указан <TT
+CLASS="REPLACEABLE"
+><I
+>pattern</I
+></TT
+>, отображаются только сопоставления, у которых имена пользователей соответствуют шаблону. Если используется форма <TT
+CLASS="LITERAL"
+>\deu+</TT
+>, то выводится дополнительная информация о каждом сопоставлении пользователей.</P
+><DIV
+CLASS="CAUTION"
+><P
+></P
+><TABLE
+CLASS="CAUTION"
+BORDER="1"
+WIDTH="90%"
+><TR
+><TD
+ALIGN="CENTER"
+><B
+>Предостережение</B
+></TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+><P
+><TT
+CLASS="LITERAL"
+>\deu+</TT
+> также может отображать имя и пароль удалённого пользователя, поэтому следует позаботиться о том, чтобы не раскрывать их.</P
+></TD
+></TR
+></TABLE
+></DIV
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\dew[+] [ <A
+HREF="app-psql.html#APP-PSQL-PATTERNS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+></A
+> ]</TT
+></DT
+><DD
+><P
+>Выводит список обработчиков внешних данных (мнемоника: <SPAN
+CLASS="QUOTE"
+>"external wrappers"</SPAN
+>). Если указан <TT
+CLASS="REPLACEABLE"
+><I
+>pattern</I
+></TT
+>, отображаются только обработчики внешних данных, имена которых соответствуют шаблону. Если используется форма <TT
+CLASS="LITERAL"
+>\dew+</TT
+>, то дополнительно выводятся права доступа, параметры и описание обработчика.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\df[antwS+] [ <A
+HREF="app-psql.html#APP-PSQL-PATTERNS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+></A
+> ]</TT
+></DT
+><DD
+><P
+>Возвращает список функций вместе с их аргументами, возвращаемыми типами и типами функций, которые классифицируются как <SPAN
+CLASS="QUOTE"
+>"agg"</SPAN
+> (агрегатная), <SPAN
+CLASS="QUOTE"
+>"normal"</SPAN
+> (обычная), <SPAN
+CLASS="QUOTE"
+>"trigger"</SPAN
+> (триггерная) или <SPAN
+CLASS="QUOTE"
+>"window"</SPAN
+> (оконная). Чтобы отобразить только функции определённого типа(ов), добавьте в команду соответствующие буквы <TT
+CLASS="LITERAL"
+>a</TT
+>, <TT
+CLASS="LITERAL"
+>n</TT
+>, <TT
+CLASS="LITERAL"
+>t</TT
+> или <TT
+CLASS="LITERAL"
+>w</TT
+>. Если указан <TT
+CLASS="REPLACEABLE"
+><I
+>pattern</I
+></TT
+>, отображаются только функции, имена которых соответствуют шаблону. По умолчанию выводятся только функции, созданные пользователем; для включения системных объектов нужно задать шаблон или добавить модификатор <TT
+CLASS="LITERAL"
+>S</TT
+>. Если используется форма <TT
+CLASS="LITERAL"
+>\df+</TT
+>, то выводится дополнительная информация о каждой функции: безопасность, изменчивость, владелец, язык, исходный код и описание.</P
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>Чтобы найти функции с аргументами или возвращаемыми значениями определённого типа, используйте возможности поиска вашего пейджера для прокрутки вывода команды <TT
+CLASS="LITERAL"
+>\df</TT
+>.</P
+></BLOCKQUOTE
+></DIV
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\dF[+] [ <A
+HREF="app-psql.html#APP-PSQL-PATTERNS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+></A
+> ]</TT
+></DT
+><DD
+><P
+>Выводит список конфигураций текстового поиска. Если указан <TT
+CLASS="REPLACEABLE"
+><I
+>pattern</I
+></TT
+>, отображаются только конфигурации, имена которых соответствуют шаблону. Если используется форма <TT
+CLASS="LITERAL"
+>\dF+</TT
+>, то выводится полное описание для каждой конфигурации, включая базовый синтаксический анализатор и используемые словари для каждого типа фрагмента.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\dFd[+] [ <A
+HREF="app-psql.html#APP-PSQL-PATTERNS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+></A
+> ]</TT
+></DT
+><DD
+><P
+>Выводит список словарей текстового поиска. Если указан <TT
+CLASS="REPLACEABLE"
+><I
+>pattern</I
+></TT
+>, отображаются только словари, имена которых соответствуют шаблону. Если используется форма <TT
+CLASS="LITERAL"
+>\dFd+</TT
+>, то выводится дополнительная информация о каждом словаре, включая базовый шаблон текстового поиска и параметры инициализации.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\dFp[+] [ <A
+HREF="app-psql.html#APP-PSQL-PATTERNS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+></A
+> ]</TT
+></DT
+><DD
+><P
+>Выводит список анализаторов текстового поиска. Если указан <TT
+CLASS="REPLACEABLE"
+><I
+>pattern</I
+></TT
+>, отображаются только анализаторы, имена которых соответствуют шаблону. Если используется форма <TT
+CLASS="LITERAL"
+>\dFp+</TT
+>, то выводится полное описание для каждого анализатора, включая базовые функции и список типов фрагментов.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\dFt[+] [ <A
+HREF="app-psql.html#APP-PSQL-PATTERNS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+></A
+> ]</TT
+></DT
+><DD
+><P
+>Выводит список шаблонов текстового поиска. Если указан <TT
+CLASS="REPLACEABLE"
+><I
+>pattern</I
+></TT
+>, отображаются только шаблоны, имена которых соответствуют шаблону. Если используется форма <TT
+CLASS="LITERAL"
+>\dFt+</TT
+>, то выводится дополнительная информация о каждом шаблоне, включая имена основных функций.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\dg[+] [ <A
+HREF="app-psql.html#APP-PSQL-PATTERNS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+></A
+> ]</TT
+></DT
+><DD
+><P
+>Выводит список ролей базы данных. (Так как понятия <SPAN
+CLASS="QUOTE"
+>"пользователи"</SPAN
+> и <SPAN
+CLASS="QUOTE"
+>"группы"</SPAN
+> были объединены в <SPAN
+CLASS="QUOTE"
+>"роли"</SPAN
+>, эта команда теперь эквивалентна <TT
+CLASS="LITERAL"
+>\du</TT
+>.) Если указан <TT
+CLASS="REPLACEABLE"
+><I
+>pattern</I
+></TT
+>, отображаются только роли, имена которых соответствуют шаблону. Если используется форма <TT
+CLASS="LITERAL"
+>\dg+</TT
+>, то выводится дополнительная информация о каждой роли; в настоящее время добавлено описание роли.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\dl</TT
+></DT
+><DD
+><P
+>Это псевдоним для <TT
+CLASS="COMMAND"
+>\lo_list</TT
+>, показывает список больших объектов.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\dL[S+] [ <A
+HREF="app-psql.html#APP-PSQL-PATTERNS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+></A
+> ]</TT
+></DT
+><DD
+><P
+>Выводит список процедурных языков. Если указан <TT
+CLASS="REPLACEABLE"
+><I
+>pattern</I
+></TT
+>, отображаются только языки, имена которых соответствуют шаблону. По умолчанию отображаются только языки, созданные пользователем. Для включения системных объектов нужно задать шаблон или добавить модификатор <TT
+CLASS="LITERAL"
+>S</TT
+>. При добавлении <TT
+CLASS="LITERAL"
+>+</TT
+> к имени команды для каждого языка дополнительно будут выводиться: обработчик вызова, функция проверки, права доступа и является ли язык системным объектом.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\dn[S+] [ <A
+HREF="app-psql.html#APP-PSQL-PATTERNS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+></A
+> ]</TT
+></DT
+><DD
+><P
+>Выводит список схем (пространств имён). Если указан <TT
+CLASS="REPLACEABLE"
+><I
+>pattern</I
+></TT
+>, отображаются только схемы, имена которых соответствуют шаблону. По умолчанию отображаются только объекты, созданные пользователем. Для включения системных объектов нужно задать шаблон или добавить модификатор <TT
+CLASS="LITERAL"
+>S</TT
+>. При добавлении <TT
+CLASS="LITERAL"
+>+</TT
+> к имени команды для каждого объекта дополнительно будут выводиться права доступа и описание, при наличии.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\do[S+] [ <A
+HREF="app-psql.html#APP-PSQL-PATTERNS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+></A
+> ]</TT
+></DT
+><DD
+><P
+>Выводит список операторов, их операндов и типы результата. Если указан <TT
+CLASS="REPLACEABLE"
+><I
+>pattern</I
+></TT
+>, отображаются только операторы, имена которых соответствуют шаблону. По умолчанию отображаются только объекты, созданные пользователем. Для включения системных объектов нужно задать шаблон или добавить модификатор <TT
+CLASS="LITERAL"
+>S</TT
+>. При добавлении <TT
+CLASS="LITERAL"
+>+</TT
+> к имени команды для каждого оператора будет выводиться дополнительная информация, сейчас это имя функции, на которой основан оператор.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\dO[S+] [ <A
+HREF="app-psql.html#APP-PSQL-PATTERNS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+></A
+> ]</TT
+></DT
+><DD
+><P
+>Выводит список правил сортировки. Если указан <TT
+CLASS="REPLACEABLE"
+><I
+>pattern</I
+></TT
+>, отображаются только правила, имена которых соответствуют шаблону. По умолчанию отображаются только объекты, созданные пользователем. Для включения системных объектов нужно задать шаблон или добавить модификатор <TT
+CLASS="LITERAL"
+>S</TT
+>. При добавлении <TT
+CLASS="LITERAL"
+>+</TT
+> к имени команды для каждого объекта дополнительно будет выводиться описание, при наличии. Обратите внимание, что отображаются только правила сортировки, применимые к кодировке текущей базы данных, поэтому результат команды может отличаться для различных баз данных этой же установки <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\dp [ <A
+HREF="app-psql.html#APP-PSQL-PATTERNS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+></A
+> ]</TT
+></DT
+><DD
+><P
+>Выводит список таблиц, представлений и последовательностей с их правами доступа. Если указан <TT
+CLASS="REPLACEABLE"
+><I
+>pattern</I
+></TT
+>, отображаются только таблицы, представления и последовательности, имена которых соответствуют шаблону.</P
+><P
+>Для установки прав доступа используются команды <A
+HREF="sql-grant.html"
+>GRANT</A
+> и <A
+HREF="sql-revoke.html"
+>REVOKE</A
+>. Смысл отображаемых привилегий объясняется в описании <A
+HREF="sql-grant.html"
+>GRANT</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\drds [ <A
+HREF="app-psql.html#APP-PSQL-PATTERNS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>role-pattern</I
+></TT
+></A
+> [ <A
+HREF="app-psql.html#APP-PSQL-PATTERNS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>database-pattern</I
+></TT
+></A
+> ] ]</TT
+></DT
+><DD
+><P
+>Выводит список специфических параметров конфигурации. Эти параметры могут быть специфическими для роли, специфическими для базы данных, или обеих. <TT
+CLASS="REPLACEABLE"
+><I
+>role-pattern</I
+></TT
+> и <TT
+CLASS="REPLACEABLE"
+><I
+>database-pattern</I
+></TT
+> используются для отбора по конкретным ролям и базам данных. Если они опущены, или указано <TT
+CLASS="LITERAL"
+>*</TT
+>, выводятся все параметры конфигурации, в том числе не относящиеся к ролям или базам данных.</P
+><P
+>Команды <A
+HREF="sql-alterrole.html"
+>ALTER ROLE</A
+> и <A
+HREF="sql-alterdatabase.html"
+>ALTER DATABASE</A
+> используются для определения параметров конфигурации, специфических для роли или базы данных.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\dT[S+] [ <A
+HREF="app-psql.html#APP-PSQL-PATTERNS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+></A
+> ]</TT
+></DT
+><DD
+><P
+>Выводит список типов данных. Если указан <TT
+CLASS="REPLACEABLE"
+><I
+>pattern</I
+></TT
+>, отображаются только типы, имена которых соответствуют шаблону. При добавлении <TT
+CLASS="LITERAL"
+>+</TT
+> к имени команды для каждого типа данных дополнительно будет выводиться: внутреннее имя типа, размер, допустимые значения для типа <TT
+CLASS="TYPE"
+>enum</TT
+> и права доступа. По умолчанию отображаются только объекты, созданные пользователем. Для включения системных объектов нужно задать шаблон или добавить модификатор <TT
+CLASS="LITERAL"
+>S</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\du[+] [ <A
+HREF="app-psql.html#APP-PSQL-PATTERNS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+></A
+> ]</TT
+></DT
+><DD
+><P
+>Выводит список ролей базы данных. (Так как понятия <SPAN
+CLASS="QUOTE"
+>"пользователи"</SPAN
+> и <SPAN
+CLASS="QUOTE"
+>"группы"</SPAN
+> были объединены в <SPAN
+CLASS="QUOTE"
+>"роли"</SPAN
+>, эта команда теперь эквивалентна <TT
+CLASS="LITERAL"
+>\dg</TT
+>.) Если указан <TT
+CLASS="REPLACEABLE"
+><I
+>pattern</I
+></TT
+>, отображаются только роли, имена которых соответствуют шаблону. Если используется форма <TT
+CLASS="LITERAL"
+>\du+</TT
+>, то выводится дополнительная информация о каждой роли; в настоящее время добавлено описание роли.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\dx[+] [ <A
+HREF="app-psql.html#APP-PSQL-PATTERNS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+></A
+> ]</TT
+></DT
+><DD
+><P
+>Выводит список установленных расширений. Если указан <TT
+CLASS="REPLACEABLE"
+><I
+>pattern</I
+></TT
+>, отображаются только расширения, имена которых соответствуют шаблону. Если используется форма <TT
+CLASS="LITERAL"
+>\dx+</TT
+>, то для каждого расширения выводятся все принадлежащие ему объекты.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\dy[+] [ <A
+HREF="app-psql.html#APP-PSQL-PATTERNS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+></A
+> ]</TT
+></DT
+><DD
+><P
+>Выводит список триггеров событий. Если указан <TT
+CLASS="REPLACEABLE"
+><I
+>pattern</I
+></TT
+>, отображаются только триггеры событий, имена которых соответствуют шаблону. При добавлении <TT
+CLASS="LITERAL"
+>+</TT
+> к имени команды для каждого объекта дополнительно будет выводиться описание.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\e</TT
+> или <TT
+CLASS="LITERAL"
+>\edit</TT
+> <TT
+CLASS="LITERAL"
+>[<SPAN
+CLASS="OPTIONAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>filename</I
+></TT
+></SPAN
+>] [<SPAN
+CLASS="OPTIONAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>line_number</I
+></TT
+></SPAN
+>]</TT
+></DT
+><DD
+><P
+>Если указано имя файла <TT
+CLASS="REPLACEABLE"
+><I
+>filename</I
+></TT
+>, файл открывается для редактирования. После выхода из редактора его содержимое копируется в буфер запроса. Если не указано имя файла, текущий буфер запроса копируется во временный файл и открывается в редакторе.</P
+><P
+>Затем новый буфер запроса повторно анализируется согласно обычным правилам <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>, при этом весь буфер рассматривается как одна строка. (Таким образом, это не подходит для создания скриптов. Для скриптов используйте <TT
+CLASS="COMMAND"
+>\i</TT
+>.) Если запрос заканчивается (или содержит) точкой с запятой, он немедленно выполняется. В противном случае он просто будет ждать в буфере запроса. Введите точку с запятой или <TT
+CLASS="LITERAL"
+>\g</TT
+> для отправки на выполнение или <TT
+CLASS="LITERAL"
+>\r</TT
+> для отмены.</P
+><P
+>Если указан номер строки, <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> будет позиционировать курсор на указанную строку файла или буфера запроса. Обратите внимание, что если указан один аргумент и он числовой, <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> предполагает, что это номер строки, а не имя файла.</P
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>См. ниже в разделе <A
+HREF="app-psql.html#APP-PSQL-ENVIRONMENT"
+><I
+>Переменные окружения</I
+></A
+> о том, как настроить редактор.</P
+></BLOCKQUOTE
+></DIV
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\echo <TT
+CLASS="REPLACEABLE"
+><I
+>текст</I
+></TT
+> [ ... ]</TT
+></DT
+><DD
+><P
+>Выводит аргументы на стандартный вывод, разделяя их одним пробелом, в конце следует перевод строки. Команда полезна для формирования вывода из скриптов. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>=&gt; <KBD
+CLASS="USERINPUT"
+>\echo `date`</KBD
+>
+Tue Oct 26 21:40:57 CEST 1999</PRE
+><P> Если первый аргумент <TT
+CLASS="LITERAL"
+>-n</TT
+> без кавычек, то перевод строки в конце не ставится.</P
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>Если используется команда <TT
+CLASS="COMMAND"
+>\o</TT
+> для перенаправления вывода запросов, возможно, следует применять команду <TT
+CLASS="COMMAND"
+>\qecho</TT
+> вместо этой.</P
+></BLOCKQUOTE
+></DIV
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\ef [<SPAN
+CLASS="OPTIONAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>function_description</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>line_number</I
+></TT
+></SPAN
+>]</SPAN
+>]</TT
+></DT
+><DD
+><P
+>Эта команда извлекает из базы данных определение заданной функции в форме <TT
+CLASS="COMMAND"
+>CREATE OR REPLACE FUNCTION</TT
+> и отправляет его на редактирование. Редактирование осуществляется таким же образом, как и для <TT
+CLASS="LITERAL"
+>\edit</TT
+>. После выхода из редактора изменённая команда будет находиться в буфере запроса. Введите точку с запятой или <TT
+CLASS="LITERAL"
+>\g</TT
+> для выполнения или <TT
+CLASS="LITERAL"
+>\r</TT
+> для отмены.</P
+><P
+>Для функции может быть задано только имя или имя и аргументы, например <TT
+CLASS="LITERAL"
+>foo(integer, text)</TT
+>. Типы аргументов необходимы, если существует более чем одна функция с тем же именем.</P
+><P
+>Если функция не задана, для редактирования открывается пустой шаблон команды <TT
+CLASS="COMMAND"
+>CREATE FUNCTION</TT
+>.</P
+><P
+>Если указан номер строки, <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> будет позиционировать курсор на указанную строку тела функции. (Обратите внимание, что тело функции обычно не начинается на первой строке файла).</P
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>См. ниже в разделе <A
+HREF="app-psql.html#APP-PSQL-ENVIRONMENT"
+><I
+>Переменные окружения</I
+></A
+> о том, как настроить редактор.</P
+></BLOCKQUOTE
+></DIV
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\encoding [ <TT
+CLASS="REPLACEABLE"
+><I
+>кодировка</I
+></TT
+> ]</TT
+></DT
+><DD
+><P
+>Устанавливает кодировку набора символов на клиенте. Без аргумента команда показывает текущую кодировку.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\f [ <TT
+CLASS="REPLACEABLE"
+><I
+>строка</I
+></TT
+> ]</TT
+></DT
+><DD
+><P
+>Устанавливает разделитель полей для невыровненного режима вывода запросов. По умолчанию используется вертикальная черта (<TT
+CLASS="LITERAL"
+>|</TT
+>). См. также <TT
+CLASS="COMMAND"
+>\pset</TT
+> для универсального способа настройки параметров вывода.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\g [ <TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+> ]</TT
+><BR><TT
+CLASS="LITERAL"
+>\g [ |<TT
+CLASS="REPLACEABLE"
+><I
+>команда</I
+></TT
+> ]</TT
+></DT
+><DD
+><P
+>Отправляет текущий буфер запроса на сервер для выполнения, с возможностью сохранения результата запроса в файле <TT
+CLASS="REPLACEABLE"
+><I
+>filename</I
+></TT
+> или перенаправления вывода в команду оболочки ОС <TT
+CLASS="REPLACEABLE"
+><I
+>command</I
+></TT
+>. Вывод направляется в файл или команду, только если запрос успешно вернул 0 или более строк. Этого не происходит, если запрос завершился неудачно или выполнялась команда, не возвращающая данные.</P
+><P
+><TT
+CLASS="LITERAL"
+>\g</TT
+> без аргументов, по сути, эквивалентен точке с запятой. <TT
+CLASS="LITERAL"
+>\g</TT
+> с аргументом является разовой альтернативой команде <TT
+CLASS="COMMAND"
+>\o</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\gset [ <TT
+CLASS="REPLACEABLE"
+><I
+>prefix</I
+></TT
+> ]</TT
+></DT
+><DD
+><P
+>Отправляет текущий буфер запроса на сервер для выполнения и сохраняет результат запроса в переменных <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> (см. <A
+HREF="app-psql.html#APP-PSQL-VARIABLES"
+><I
+>Переменные</I
+></A
+>). Выполняемый запрос должен возвращать ровно одну строку. Каждый столбец строки результата сохраняется в отдельной переменной, которая называется также как и столбец. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>=&gt; <KBD
+CLASS="USERINPUT"
+>SELECT 'hello' AS var1, 10 AS var2</KBD
+>
+-&gt; <KBD
+CLASS="USERINPUT"
+>\gset</KBD
+>
+=&gt; <KBD
+CLASS="USERINPUT"
+>\echo :var1 :var2</KBD
+>
+hello 10</PRE
+><P></P
+><P
+>Если указан <TT
+CLASS="REPLACEABLE"
+><I
+>prefix</I
+></TT
+>, то он добавляется в начале к именам переменных: </P><PRE
+CLASS="PROGRAMLISTING"
+>=&gt; <KBD
+CLASS="USERINPUT"
+>SELECT 'hello' AS var1, 10 AS var2</KBD
+>
+-&gt; <KBD
+CLASS="USERINPUT"
+>\gset result_</KBD
+>
+=&gt; <KBD
+CLASS="USERINPUT"
+>\echo :result_var1 :result_var2</KBD
+>
+hello 10</PRE
+><P></P
+><P
+>Если значение столбца NULL, то вместо присвоения значения соответствующая переменная удаляется.</P
+><P
+>Если запрос завершается ошибкой или не возвращает одну строку, то никакие переменные не меняются.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\h</TT
+> или <TT
+CLASS="LITERAL"
+>\help</TT
+> <TT
+CLASS="LITERAL"
+>[ <TT
+CLASS="REPLACEABLE"
+><I
+>command</I
+></TT
+> ]</TT
+></DT
+><DD
+><P
+>Выводит подсказку по синтаксису указанной команды <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>. Если <TT
+CLASS="REPLACEABLE"
+><I
+>command</I
+></TT
+> не указана, то <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> выводит список всех команд, для которых доступна справка. Если в качестве command указана звёздочка (<TT
+CLASS="LITERAL"
+>*</TT
+>), то выводится справка по всем командам <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Для упрощения ввода команды, состоящие из нескольких слов, можно не заключать в кавычки. Таким образом, можно просто писать <KBD
+CLASS="USERINPUT"
+>\help alter table</KBD
+>.</P
+></BLOCKQUOTE
+></DIV
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\H</TT
+> или <TT
+CLASS="LITERAL"
+>\html</TT
+></DT
+><DD
+><P
+>Включает вывод запросов в формате <ACRONYM
+CLASS="ACRONYM"
+>HTML</ACRONYM
+>. Если формат <ACRONYM
+CLASS="ACRONYM"
+>HTML</ACRONYM
+> уже включён, происходит переключение обратно на выровненный формат. Эта команда используется для совместимости и удобства, но в описании <TT
+CLASS="COMMAND"
+>\pset</TT
+> вы можете узнать о других вариантах вывода.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\i</TT
+> или <TT
+CLASS="LITERAL"
+>\include</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>filename</I
+></TT
+></DT
+><DD
+><P
+>Читает ввод из файла <TT
+CLASS="REPLACEABLE"
+><I
+>filename</I
+></TT
+> и выполняет его, как будто он был набран на клавиатуре.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Если вы хотите видеть строки файла на экране по мере их чтения, необходимо установить переменную <TT
+CLASS="VARNAME"
+>ECHO</TT
+> в значение <TT
+CLASS="LITERAL"
+>all</TT
+>.</P
+></BLOCKQUOTE
+></DIV
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\ir</TT
+> или <TT
+CLASS="LITERAL"
+>\include_relative</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>filename</I
+></TT
+></DT
+><DD
+><P
+>Команда <TT
+CLASS="LITERAL"
+>\ir</TT
+> похожа на <TT
+CLASS="LITERAL"
+>\i</TT
+>, но по-разному интерпретирует относительные имена файлов. При выполнении в интерактивном режиме две команды ведут себя одинаково. Однако, при вызове из скрипта <TT
+CLASS="LITERAL"
+>\ir</TT
+> интерпретирует имена файлов относительно каталога, в котором расположен скрипт, а не текущего рабочего каталога.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\l[+]</TT
+> или <TT
+CLASS="LITERAL"
+>\list[+] [ <A
+HREF="app-psql.html#APP-PSQL-PATTERNS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>pattern</I
+></TT
+></A
+> ]</TT
+></DT
+><DD
+><P
+>Выводит список баз данных на сервере и показывает их имена, владельцев, кодировку набора символов и права доступа. Если указан <TT
+CLASS="REPLACEABLE"
+><I
+>pattern</I
+></TT
+>, отображаются только базы данных, имена которых соответствуют шаблону. При добавлении <TT
+CLASS="LITERAL"
+>+</TT
+> к имени команды также отображаются: размер базы данных, табличное пространство по умолчанию и описание. (Информация о размере доступна только для баз данных, к которым текущий пользователь может подключиться.)</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\lo_export <TT
+CLASS="REPLACEABLE"
+><I
+>oid_БО</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Читает большой объект с <ACRONYM
+CLASS="ACRONYM"
+>OID</ACRONYM
+> <TT
+CLASS="REPLACEABLE"
+><I
+>loid</I
+></TT
+> из базы данных и записывает его в файл <TT
+CLASS="REPLACEABLE"
+><I
+>filename</I
+></TT
+>. Обратите внимание, что это немного отличается от функции сервера <CODE
+CLASS="FUNCTION"
+>lo_export</CODE
+>, которая действует с правами пользователя, от имени которого работает сервер базы данных, и в файловой системе сервера.</P
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>Используйте <TT
+CLASS="COMMAND"
+>\lo_list</TT
+> для получения <ACRONYM
+CLASS="ACRONYM"
+>OID</ACRONYM
+> больших объектов.</P
+></BLOCKQUOTE
+></DIV
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\lo_import <TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+> [ <TT
+CLASS="REPLACEABLE"
+><I
+>comment</I
+></TT
+> ]</TT
+></DT
+><DD
+><P
+>Сохраняет файл в большом объекте <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. При этом с объектом может быть связан указанный комментарий. Пример: </P><PRE
+CLASS="PROGRAMLISTING"
+>foo=&gt; <KBD
+CLASS="USERINPUT"
+>\lo_import '/home/peter/pictures/photo.xcf' 'a picture of me'</KBD
+>
+lo_import 152801</PRE
+><P> Ответ указывает на то, что большой объект получил OID 152801, который может быть использован для доступа к вновь созданному объекту в будущем. Для удобства чтения рекомендуется всегда связывать объекты с понятными комментариями. OID и комментарии можно посмотреть с помощью команды <TT
+CLASS="COMMAND"
+>\lo_list</TT
+>.</P
+><P
+>Обратите внимание, что это немного отличается от функции сервера <CODE
+CLASS="FUNCTION"
+>lo_import</CODE
+>, так как действует от имени локального пользователя в локальной файловой системе, а не пользователя сервера в файловой системе сервера.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\lo_list</TT
+></DT
+><DD
+><P
+>Показывает список всех больших объектов <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, хранящихся в базе данных, вместе с предоставленными комментариями.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\lo_unlink <TT
+CLASS="REPLACEABLE"
+><I
+>oid_БО</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Удаляет большой объект с <ACRONYM
+CLASS="ACRONYM"
+>OID</ACRONYM
+> 
+        <TT
+CLASS="REPLACEABLE"
+><I
+>loid</I
+></TT
+> из базы данных.</P
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>Используйте <TT
+CLASS="COMMAND"
+>\lo_list</TT
+> для получения <ACRONYM
+CLASS="ACRONYM"
+>OID</ACRONYM
+> больших объектов.</P
+></BLOCKQUOTE
+></DIV
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\o</TT
+> или <TT
+CLASS="LITERAL"
+>\out [ <TT
+CLASS="REPLACEABLE"
+><I
+>filename</I
+></TT
+> ]</TT
+><BR><TT
+CLASS="LITERAL"
+>\o</TT
+> или <TT
+CLASS="LITERAL"
+>\out [ |<TT
+CLASS="REPLACEABLE"
+><I
+>command</I
+></TT
+> ]</TT
+></DT
+><DD
+><P
+>Результаты запросов будут сохраняться в <TT
+CLASS="REPLACEABLE"
+><I
+>filename</I
+></TT
+> или перенаправляться в команду оболочки ОС <TT
+CLASS="REPLACEABLE"
+><I
+>command</I
+></TT
+>, Если аргумент не указан, вывод запросов переключается на стандартный вывод.</P
+><P
+><SPAN
+CLASS="QUOTE"
+>"Результаты запросов"</SPAN
+> включают в себя все таблицы, ответы команд, уведомления, полученные от сервера базы данных, а также вывод от метакоманд, запрашивающих базу данных (таких как <TT
+CLASS="COMMAND"
+>\d</TT
+>), но не сообщения об ошибках.</P
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>Чтобы вставить текст между результатами запросов, используйте <TT
+CLASS="COMMAND"
+>\qecho</TT
+>.</P
+></BLOCKQUOTE
+></DIV
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\p</TT
+> или <TT
+CLASS="LITERAL"
+>\print</TT
+></DT
+><DD
+><P
+>Печатает содержимое буфера запросов на стандартный вывод.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\password [ <TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+> ]</TT
+></DT
+><DD
+><P
+>Изменяет пароль указанного пользователя (по умолчанию, текущего пользователя). Эта команда запрашивает новый пароль, шифрует и отправляет его на сервер в виде команды <TT
+CLASS="COMMAND"
+>ALTER ROLE</TT
+>. Это гарантирует, что новый пароль не отображается в открытом виде в истории команд, журнале сервера или в другом месте.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\prompt [ <TT
+CLASS="REPLACEABLE"
+><I
+>текст</I
+></TT
+> ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Предлагает пользователю ввести значение, которое будет присвоено переменной <TT
+CLASS="REPLACEABLE"
+><I
+>name</I
+></TT
+>. Дополнительно можно указать подсказку <TT
+CLASS="REPLACEABLE"
+><I
+>text</I
+></TT
+>. (Если подсказка состоит из нескольких слов, то её текст нужно взять в одинарные кавычки).</P
+><P
+>По умолчанию, <TT
+CLASS="LITERAL"
+>\prompt</TT
+> использует терминал для ввода и вывода. Однако, если используется параметр командной строки <TT
+CLASS="OPTION"
+>-f</TT
+>, <TT
+CLASS="LITERAL"
+>\prompt</TT
+> использует стандартный ввод и стандартный вывод.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\pset [ <TT
+CLASS="REPLACEABLE"
+><I
+>параметр</I
+></TT
+> [ <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> ] ]</TT
+></DT
+><DD
+><P
+>Эта команда устанавливает параметры, влияющие на вывод результатов запросов. <TT
+CLASS="REPLACEABLE"
+><I
+>option</I
+></TT
+> указывает, какой параметр необходимо установить. Семантика <TT
+CLASS="REPLACEABLE"
+><I
+>value</I
+></TT
+> меняется в зависимости от выбранного параметра. Для некоторых параметров, отсутствие <TT
+CLASS="REPLACEABLE"
+><I
+>value</I
+></TT
+> означает переключение значения, либо сброс значения, как описано ниже в разделе конкретного параметра. Если такое поведение не упоминается, то пропуск <TT
+CLASS="REPLACEABLE"
+><I
+>value</I
+></TT
+> приводит к отображению текущего значения параметра.</P
+><P
+><TT
+CLASS="COMMAND"
+>\pset</TT
+> без аргументов выводит текущий статус всех параметров команды.</P
+><P
+>Имеются следующие параметры: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>border</TT
+></DT
+><DD
+><P
+><TT
+CLASS="REPLACEABLE"
+><I
+>value</I
+></TT
+> должно быть числом. В целом, чем выше число, тем больше границ и линий будут иметь таблицы, но это зависит от конкретного формата. В формате <ACRONYM
+CLASS="ACRONYM"
+>HTML</ACRONYM
+> это напрямую преобразуется в атрибут <TT
+CLASS="LITERAL"
+>border=...</TT
+>. В других форматах имеют смысл только следующие значения: 0 (границ нет), 1 (разделительные линии внутри таблицы) и 2 (рамка вокруг таблицы). Форматы <TT
+CLASS="LITERAL"
+>latex</TT
+> и <TT
+CLASS="LITERAL"
+>latex-longtable</TT
+> также поддерживают значение 3, которое добавляет разделительные линии между строками.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>columns</TT
+></DT
+><DD
+><P
+>Устанавливает максимальную ширину для формата <TT
+CLASS="LITERAL"
+>wrapped</TT
+>, а также ограничение по ширине, свыше которого будет требоваться пейджер для просмотра или переключение в вертикальное отображение при режиме <TT
+CLASS="LITERAL"
+>expanded auto</TT
+>. При значении 0 (по умолчанию) максимальная ширина управляется переменной среды <TT
+CLASS="ENVAR"
+>COLUMNS</TT
+> или шириной экрана, если <TT
+CLASS="ENVAR"
+>COLUMNS</TT
+> не установлена. Кроме того, если <TT
+CLASS="LITERAL"
+>columns</TT
+> равно нулю, то формат wrapped влияет только на вывод на экран. Если <TT
+CLASS="LITERAL"
+>columns</TT
+> не равно 0, то это также влияет на вывод в файл или в другую команду через канал.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>expanded</TT
+> (или <TT
+CLASS="LITERAL"
+>x</TT
+>)</DT
+><DD
+><P
+>Для <TT
+CLASS="REPLACEABLE"
+><I
+>value</I
+></TT
+> возможны следующие значения: <TT
+CLASS="LITERAL"
+>on</TT
+> или <TT
+CLASS="LITERAL"
+>off</TT
+>, которые включают или отключают развёрнутый режим, или значение <TT
+CLASS="LITERAL"
+>auto</TT
+>. Если <TT
+CLASS="REPLACEABLE"
+><I
+>value</I
+></TT
+> не указано, то команда переключает текущее значение в <TT
+CLASS="LITERAL"
+>on</TT
+> или <TT
+CLASS="LITERAL"
+>off</TT
+>. Если включён развёрнутый режим, результаты запроса отображаются в две колонки: имя столбца в левой колонке, данные в правой. Этот режим полезен, если данные не помещаются на экране в обычном <SPAN
+CLASS="QUOTE"
+>"горизонтальном"</SPAN
+> режиме. При выборе <TT
+CLASS="LITERAL"
+>auto</TT
+> расширенный режим используется всякий раз, когда результат запроса шире, чем экран, в противном случае используется обычный режим. <TT
+CLASS="LITERAL"
+>auto</TT
+> действует только в форматах <TT
+CLASS="LITERAL"
+>aligned</TT
+> и <TT
+CLASS="LITERAL"
+>wrapped</TT
+>. В других форматах поведение такое, как если расширенный режим отключён.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>fieldsep</TT
+></DT
+><DD
+><P
+>Устанавливает разделитель полей для невыровненного режима вывода запросов. Таким образом, можно формировать вывод, в котором значения будут разделены табуляцией или запятыми. Это может быть предпочтительным для использования в других программах. Для установки символа табуляции в качестве разделителя полей, введите <TT
+CLASS="LITERAL"
+>\pset fieldsep '\t'</TT
+>. По умолчанию используется вертикальная черта (<TT
+CLASS="LITERAL"
+>'|'</TT
+>).</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>fieldsep_zero</TT
+></DT
+><DD
+><P
+>Устанавливает разделитель полей для невыровненного режима вывода в нулевой байт.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>footer</TT
+></DT
+><DD
+><P
+>Для <TT
+CLASS="REPLACEABLE"
+><I
+>value</I
+></TT
+> возможны два значения: <TT
+CLASS="LITERAL"
+>on</TT
+> или <TT
+CLASS="LITERAL"
+>off</TT
+>, которые включают или отключают вывод результирующей строки с количеством выбранных записей <TT
+CLASS="LITERAL"
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+> строк)</TT
+>. Если <TT
+CLASS="REPLACEABLE"
+><I
+>value</I
+></TT
+> не указано, то команда переключает текущее значение в <TT
+CLASS="LITERAL"
+>on</TT
+> или <TT
+CLASS="LITERAL"
+>off</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>format</TT
+></DT
+><DD
+><P
+>Устанавливает формат вывода в один из следующих: <TT
+CLASS="LITERAL"
+>unaligned</TT
+>, <TT
+CLASS="LITERAL"
+>aligned</TT
+>, <TT
+CLASS="LITERAL"
+>wrapped</TT
+>, <TT
+CLASS="LITERAL"
+>html</TT
+>, <TT
+CLASS="LITERAL"
+>latex</TT
+> (использует <TT
+CLASS="LITERAL"
+>tabular</TT
+>), <TT
+CLASS="LITERAL"
+>latex-longtable</TT
+> или <TT
+CLASS="LITERAL"
+>troff-ms</TT
+>. Допускается сокращение слова до уникального значения. (Это значит, что одной буквы будет достаточно.)</P
+><P
+>В <TT
+CLASS="LITERAL"
+>unaligned</TT
+> формате все столбцы размещаются на одной строке и отделяются друг от друга разделителем полей. Это полезно для создания вывода, который будет читаться другими программами (например, формат с выводом значений разделённых запятыми или табуляцией).</P
+><P
+>Формат <TT
+CLASS="LITERAL"
+>aligned</TT
+> это стандартный, удобочитаемый, хорошо отформатированный текстовый вывод. Используется по умолчанию.</P
+><P
+>Формат <TT
+CLASS="LITERAL"
+>wrapped</TT
+> похож на <TT
+CLASS="LITERAL"
+>aligned</TT
+>, но переносит длинные значения столбцов на новые строки, чтобы общий вывод поместился в заданную ширину. Задание ширины вывода описано в параметре <TT
+CLASS="LITERAL"
+>columns</TT
+>. Обратите внимание, что <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> не будет пытаться переносить на новые строки заголовки столбцов. Поэтому формат <TT
+CLASS="LITERAL"
+>wrapped</TT
+> работает так же, как <TT
+CLASS="LITERAL"
+>aligned</TT
+> если общая ширина, требуемая для всех заголовков столбцов, превышает установленную максимальную ширину.</P
+><P
+>Форматы <TT
+CLASS="LITERAL"
+>html</TT
+>, <TT
+CLASS="LITERAL"
+>latex</TT
+>, <TT
+CLASS="LITERAL"
+>latex-longtable</TT
+> и <TT
+CLASS="LITERAL"
+>troff-ms</TT
+> выводят таблицы, которые предназначены для включения в документы с помощью соответствующего языка разметки. Они не являются полноценными документами! Возможно это не обязательно в <ACRONYM
+CLASS="ACRONYM"
+>HTML</ACRONYM
+>, но в <SPAN
+CLASS="APPLICATION"
+>LaTeX</SPAN
+> необходимо иметь полный упаковщик документа. <TT
+CLASS="LITERAL"
+>latex-longtable</TT
+> также требует установленных <SPAN
+CLASS="APPLICATION"
+>LaTeX</SPAN
+> пакетов <TT
+CLASS="LITERAL"
+>longtable</TT
+> и <TT
+CLASS="LITERAL"
+>booktabs</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>linestyle</TT
+></DT
+><DD
+><P
+>Задаёт стиль отрисовки линий границы: <TT
+CLASS="LITERAL"
+>ascii</TT
+>, <TT
+CLASS="LITERAL"
+>old-ascii</TT
+> или <TT
+CLASS="LITERAL"
+>unicode</TT
+>. Допускается сокращение слова до уникального значения. (Это значит, что одной буквы будет достаточно.) Значение по умолчанию: <TT
+CLASS="LITERAL"
+>ascii</TT
+>. Этот параметр действует только в форматах <TT
+CLASS="LITERAL"
+>aligned</TT
+> и <TT
+CLASS="LITERAL"
+>wrapped</TT
+>.</P
+><P
+>Стиль <TT
+CLASS="LITERAL"
+>ascii</TT
+> использует обычные символы <ACRONYM
+CLASS="ACRONYM"
+>ASCII</ACRONYM
+>. Символы новой строки в данных показываются с использованием символа <TT
+CLASS="LITERAL"
+>+</TT
+> в правом поле. Когда при формате <TT
+CLASS="LITERAL"
+>wrapped</TT
+> происходит перенос данных на новую строку (без символа новой строки), ставится точка (<TT
+CLASS="LITERAL"
+>.</TT
+>) в правом поле первой строки и точка в левом поле следующей строки.</P
+><P
+>Стиль <TT
+CLASS="LITERAL"
+>old-ascii</TT
+> использует обычные символы <ACRONYM
+CLASS="ACRONYM"
+>ASCII</ACRONYM
+> в стиле <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> 8.4 и раньше. Символы новой строки в данных отображаются, используя символ <TT
+CLASS="LITERAL"
+>:</TT
+> вместо левого разделителя полей. Когда происходит перенос данных на новую строку без символа новой строки, символ <TT
+CLASS="LITERAL"
+>;</TT
+> используется вместо левого разделителя полей.</P
+><P
+>Стиль <TT
+CLASS="LITERAL"
+>unicode</TT
+> использует символы Юникод для рисования линий. Символы новой строки в данных показываются с использованием символа возврата каретки в правом поле. Когда при формате <TT
+CLASS="LITERAL"
+>wrapped</TT
+> происходит перенос данных на новую строку (без символа новой строки), ставится символ многоточия в правом поле первой строки и в левом поле следующей строки.</P
+><P
+>Когда <TT
+CLASS="LITERAL"
+>border</TT
+> больше нуля, параметр также определяет символы, которыми будут рисоваться границы. Обычные символы <ACRONYM
+CLASS="ACRONYM"
+>ASCII</ACRONYM
+> будут работать везде, но символы в Юникоде выглядят лучше на терминалах, распознающих их.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>null</TT
+></DT
+><DD
+><P
+>Устанавливает строку, которая будет напечатана вместо значения null. По умолчанию не печатается ничего, что можно ошибочно принять за пустую строку. Например, можно было бы предпочесть <TT
+CLASS="LITERAL"
+>\pset null '(null)'</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>numericlocale</TT
+></DT
+><DD
+><P
+>Для <TT
+CLASS="REPLACEABLE"
+><I
+>value</I
+></TT
+> возможны два значения: <TT
+CLASS="LITERAL"
+>on</TT
+> или <TT
+CLASS="LITERAL"
+>off</TT
+>, которые включают или отключают вывод чисел в локализованном формате. Если <TT
+CLASS="REPLACEABLE"
+><I
+>value</I
+></TT
+> не указано, то команда переключает вывод чисел с локализованного на обычный и обратно.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>pager</TT
+></DT
+><DD
+><P
+>Контролирует использование пейджера для просмотра результатов запросов и справочной информации <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>. Если переменная среды <TT
+CLASS="ENVAR"
+>PAGER</TT
+> установлена, то данные передаются в указанную программу. В противном случае используется платформозависимая программа по умолчанию (например, <TT
+CLASS="FILENAME"
+>more</TT
+>).</P
+><P
+>Если <TT
+CLASS="LITERAL"
+>pager</TT
+> имеет значение <TT
+CLASS="LITERAL"
+>off</TT
+>, программа пейджер не используется. Если <TT
+CLASS="LITERAL"
+>pager</TT
+> имеет значение <TT
+CLASS="LITERAL"
+>on</TT
+>, программа пейджер используется при необходимости, т. е. когда вывод на терминал не помещается на экране. Параметр pager также может быть установлен в значение <TT
+CLASS="LITERAL"
+>always</TT
+>, при этом программа пейджер будет использоваться всегда, независимо от того, помещается вывод на экран терминала или нет. <TT
+CLASS="LITERAL"
+>\pset pager</TT
+> без указания <TT
+CLASS="REPLACEABLE"
+><I
+>value</I
+></TT
+> переключает значения <TT
+CLASS="LITERAL"
+>on</TT
+> и <TT
+CLASS="LITERAL"
+>off</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>recordsep</TT
+></DT
+><DD
+><P
+>Устанавливает разделитель записей (строк) для невыровненного режима вывода. По умолчанию используется символ новой строки.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>recordsep_zero</TT
+></DT
+><DD
+><P
+>Устанавливает разделитель записей для невыровненного режима вывода в нулевой байт.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>tableattr</TT
+> (или <TT
+CLASS="LITERAL"
+>T</TT
+>)</DT
+><DD
+><P
+>Устанавливает атрибуты, которые будут помещены в тег <CODE
+CLASS="SGMLTAG"
+>table</CODE
+>, при формате вывода <ACRONYM
+CLASS="ACRONYM"
+>HTML</ACRONYM
+>. Например, это может быть <TT
+CLASS="LITERAL"
+>cellpadding</TT
+> или <TT
+CLASS="LITERAL"
+>border</TT
+>. Заметьте, что, вероятно, не нужно здесь задавать <TT
+CLASS="LITERAL"
+>border</TT
+>, так как для этого уже есть <TT
+CLASS="LITERAL"
+>\pset border</TT
+>. Если <TT
+CLASS="REPLACEABLE"
+><I
+>value</I
+></TT
+> не задано, атрибуты таблицы удаляются.</P
+><P
+>В формате <TT
+CLASS="LITERAL"
+>latex-longtable</TT
+> этот параметр контролирует пропорциональную ширину каждого столбца, данные которого выровнены по левому краю. Он указывается как список разделённых пробелами значений, например <TT
+CLASS="LITERAL"
+>'0.2 0.2 0.6'</TT
+>. Для неуказанных столбцов используется последнее из заданных значений.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>title</TT
+></DT
+><DD
+><P
+>Устанавливает заголовок таблицы для любых впоследствии выводимых таблиц. Это можно использовать для задания описательных тегов при формировании вывода. Если <TT
+CLASS="REPLACEABLE"
+><I
+>value</I
+></TT
+> не задано, заголовок таблицы удаляется.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>tuples_only</TT
+> (или <TT
+CLASS="LITERAL"
+>t</TT
+>)</DT
+><DD
+><P
+>Для <TT
+CLASS="REPLACEABLE"
+><I
+>value</I
+></TT
+> возможны два значения: <TT
+CLASS="LITERAL"
+>on</TT
+> или <TT
+CLASS="LITERAL"
+>off</TT
+>, которые включают или отключают режим вывода только кортежей. Если <TT
+CLASS="REPLACEABLE"
+><I
+>value</I
+></TT
+> не указано, то команда переключает с режима вывода только кортежей на обычный режим и обратно. Обычный вывод включает в себя дополнительную информацию, такую как заголовки столбцов и различные колонтитулы. В режиме вывода только кортежей отображаются только фактические табличные данные.</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>Иллюстрацию того, как могут выглядеть различные форматы можно посмотреть в разделе <A
+HREF="app-psql.html#APP-PSQL-EXAMPLES"
+><I
+>Примеры</I
+></A
+>.</P
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>Для некоторых параметров <TT
+CLASS="COMMAND"
+>\pset</TT
+> есть короткие команды. См. <TT
+CLASS="COMMAND"
+>\a</TT
+>, <TT
+CLASS="COMMAND"
+>\C</TT
+>, <TT
+CLASS="COMMAND"
+>\H</TT
+>, <TT
+CLASS="COMMAND"
+>\t</TT
+>, <TT
+CLASS="COMMAND"
+>\T</TT
+> и <TT
+CLASS="COMMAND"
+>\x</TT
+>.</P
+></BLOCKQUOTE
+></DIV
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\q</TT
+> или <TT
+CLASS="LITERAL"
+>\quit</TT
+></DT
+><DD
+><P
+>Выход из <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>. При использовании в скрипте прекращается только выполнение этого скрипта.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\qecho <TT
+CLASS="REPLACEABLE"
+><I
+>текст</I
+></TT
+> [ ... ]</TT
+></DT
+><DD
+><P
+>Эта команда идентична <TT
+CLASS="COMMAND"
+>\echo</TT
+> за исключением того, что вывод будет записываться в канал вывода запросов, установленный <TT
+CLASS="COMMAND"
+>\o</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\r</TT
+> или <TT
+CLASS="LITERAL"
+>\reset</TT
+></DT
+><DD
+><P
+>Сбрасывает (очищает) буфер запроса.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\s [ <TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+> ]</TT
+></DT
+><DD
+><P
+>Записывает историю команд <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> в файл <TT
+CLASS="REPLACEABLE"
+><I
+>filename</I
+></TT
+>. Если <TT
+CLASS="REPLACEABLE"
+><I
+>filename</I
+></TT
+> не указан, то история команд выводится на стандартный вывод (с использованием пейджера, где уместно). Этот параметр недоступен, если <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> был собран без поддержки <SPAN
+CLASS="APPLICATION"
+>Readline</SPAN
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\set [ <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> [ <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> [ ... ] ] ]</TT
+></DT
+><DD
+><P
+>Задаёт <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> переменной <TT
+CLASS="REPLACEABLE"
+><I
+>name</I
+></TT
+> значение <TT
+CLASS="REPLACEABLE"
+><I
+>value</I
+></TT
+> или, если задано более одного значения, их конкатенацию. Если задан только один аргумент, то переменной с этим именем присваивается пустое значение. Для удаления переменной используйте команду <TT
+CLASS="COMMAND"
+>\unset</TT
+>.</P
+><P
+><TT
+CLASS="COMMAND"
+>\set</TT
+> без аргументов выводит имена и значения всех <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> переменных, установленных в настоящее время.</P
+><P
+>Имена переменных могут содержать буквы, цифры и знаки подчёркивания. См. <A
+HREF="app-psql.html#APP-PSQL-VARIABLES"
+><I
+>Переменные</I
+></A
+> ниже для деталей. Имена переменных чувствительны к регистру.</P
+><P
+>Хотя вы можете задать любой переменной любое значение, <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> рассматривает несколько переменных особым образом. Они документированы в разделе о переменных.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Эта команда не имеет отношения к <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>-команде <A
+HREF="sql-set.html"
+>SET</A
+>.</P
+></BLOCKQUOTE
+></DIV
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\setenv <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> [ <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> ]</TT
+></DT
+><DD
+><P
+>Задаёт для переменной среды <TT
+CLASS="REPLACEABLE"
+><I
+>name</I
+></TT
+> значение <TT
+CLASS="REPLACEABLE"
+><I
+>value</I
+></TT
+> или, если <TT
+CLASS="REPLACEABLE"
+><I
+>value</I
+></TT
+> не задано, удаляет переменную среды. Пример: </P><PRE
+CLASS="PROGRAMLISTING"
+>testdb=&gt; <KBD
+CLASS="USERINPUT"
+>\setenv PAGER less</KBD
+>
+testdb=&gt; <KBD
+CLASS="USERINPUT"
+>\setenv LESS -imx4F</KBD
+></PRE
+><P></P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\sf[+] <TT
+CLASS="REPLACEABLE"
+><I
+>function_description</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Извлекает из базы данных и выводит определение заданной функции в форме команды <TT
+CLASS="COMMAND"
+>CREATE OR REPLACE FUNCTION</TT
+>. Определение печатается в текущий канал вывода запросов, установленный <TT
+CLASS="COMMAND"
+>\o</TT
+>.</P
+><P
+>Для функции может быть задано только имя или имя и аргументы, например <TT
+CLASS="LITERAL"
+>foo(integer, text)</TT
+>. Типы аргументов необходимы, если существует более чем одна функция с тем же именем.</P
+><P
+>При добавлении <TT
+CLASS="LITERAL"
+>+</TT
+> к имени команды строки вывода нумеруются, первая строка тела функции получит номер 1.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\t</TT
+></DT
+><DD
+><P
+>Включает/выключает отображение имён столбцов и результирующей строки с количеством выбранных записей для запросов. Эта команда эквивалентна <TT
+CLASS="LITERAL"
+>\pset tuples_only</TT
+> и предоставлена для удобства.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\T <TT
+CLASS="REPLACEABLE"
+><I
+>table_options</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Устанавливает атрибуты, которые будут помещены в тег <CODE
+CLASS="SGMLTAG"
+>table</CODE
+> при формате вывода <ACRONYM
+CLASS="ACRONYM"
+>HTML</ACRONYM
+>. Эта команда эквивалентна <TT
+CLASS="LITERAL"
+>\pset tableattr <TT
+CLASS="REPLACEABLE"
+><I
+>table_options</I
+></TT
+></TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\timing [ <TT
+CLASS="REPLACEABLE"
+><I
+>on</I
+></TT
+> | <TT
+CLASS="REPLACEABLE"
+><I
+>off</I
+></TT
+> ]</TT
+></DT
+><DD
+><P
+>Включает/отключает отображение времени выполнения команд SQL в миллисекундах. Без параметра переключает текущий режим отображения времени выполнения.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\unset <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Удаляет <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> переменную <TT
+CLASS="REPLACEABLE"
+><I
+>name</I
+></TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\w</TT
+> или <TT
+CLASS="LITERAL"
+>\write</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>filename</I
+></TT
+><BR><TT
+CLASS="LITERAL"
+>\w</TT
+> или <TT
+CLASS="LITERAL"
+>\write</TT
+> <TT
+CLASS="LITERAL"
+>|</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>command</I
+></TT
+></DT
+><DD
+><P
+>Выводит текущий буфер запроса в файл <TT
+CLASS="REPLACEABLE"
+><I
+>filename</I
+></TT
+> или передаёт в команду ОС <TT
+CLASS="REPLACEABLE"
+><I
+>command</I
+></TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\watch [ <TT
+CLASS="REPLACEABLE"
+><I
+>секунды</I
+></TT
+> ]</TT
+></DT
+><DD
+><P
+>Команда многократно выполняет текущий буфер запроса (подобно <TT
+CLASS="LITERAL"
+>\g</TT
+>), пока не будет прервана или не произойдёт сбой запроса. Аргумент задаёт количество секунд ожидания между выполнениями запроса (по умолчанию 2 секунды).</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\x [ <TT
+CLASS="REPLACEABLE"
+><I
+>on</I
+></TT
+> | <TT
+CLASS="REPLACEABLE"
+><I
+>off</I
+></TT
+> | <TT
+CLASS="REPLACEABLE"
+><I
+>auto</I
+></TT
+> ]</TT
+></DT
+><DD
+><P
+>Устанавливает или переключает режим развёрнутого вывода таблицы. Это эквивалентно <TT
+CLASS="LITERAL"
+>\pset expanded</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\z [ <A
+HREF="app-psql.html#APP-PSQL-PATTERNS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+></A
+> ]</TT
+></DT
+><DD
+><P
+>Выводит список таблиц, представлений и последовательностей с их правами доступа. Если указан <TT
+CLASS="REPLACEABLE"
+><I
+>pattern</I
+></TT
+>, отображаются только таблицы, представления и последовательности, имена которых соответствуют шаблону.</P
+><P
+>Это псевдоним для <TT
+CLASS="COMMAND"
+>\dp</TT
+> (<SPAN
+CLASS="QUOTE"
+>"показать права доступа"</SPAN
+>).</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\! [ <TT
+CLASS="REPLACEABLE"
+><I
+>команда</I
+></TT
+> ]</TT
+></DT
+><DD
+><P
+>Выполняет команду ОС <TT
+CLASS="REPLACEABLE"
+><I
+>command</I
+></TT
+>. Без указания <TT
+CLASS="REPLACEABLE"
+><I
+>command</I
+></TT
+> запускает отдельную командную оболочку ОС. Последующие аргументы не интерпретируются, командная оболочка ОС увидит их как есть. В частности, не применяются правила подстановки переменных и экранирование с обратной косой чертой.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>\?</TT
+></DT
+><DD
+><P
+>Показывает справочную информацию о метакомандах.</P
+></DD
+></DL
+></DIV
+><P></P
+><DIV
+CLASS="REFSECT3"
+><A
+NAME="APP-PSQL-PATTERNS"
+></A
+><H4
+>Шаблоны поиска (Patterns)</H4
+><P
+>Различные <TT
+CLASS="LITERAL"
+>\d</TT
+> команды принимают параметр <TT
+CLASS="REPLACEABLE"
+><I
+>pattern</I
+></TT
+> для указания имени (имён) объектов для отображения. В простейшем случае шаблон - это точное имя объекта. Символы внутри шаблона обычно приводятся к нижнему регистру, как и для имён SQL-объектов; к примеру <TT
+CLASS="LITERAL"
+>\dt FOO</TT
+> выводит таблицу с именем <TT
+CLASS="LITERAL"
+>foo</TT
+>. Как и для SQL имён, двойные кавычки вокруг шаблона предотвращают перевод в нижний регистр. Для включения символа двойной кавычки в шаблон используются два символа двойных кавычек подряд внутри шаблона в двойных кавычках. Опять же, это соответствует правилам для SQL-идентификаторов. Например <TT
+CLASS="LITERAL"
+>\dt "FOO""BAR"</TT
+> будет выводить таблицу с именем <TT
+CLASS="LITERAL"
+>FOO"BAR</TT
+> (но не <TT
+CLASS="LITERAL"
+>foo"bar</TT
+>). В отличие от обычных правил для SQL-имён, можно взять в двойные кавычки только часть шаблона, например <TT
+CLASS="LITERAL"
+>\dt FOO"FOO"BAR</TT
+> будет выводить таблицу с именем <TT
+CLASS="LITERAL"
+>fooFOObar</TT
+>.</P
+><P
+>Если <TT
+CLASS="REPLACEABLE"
+><I
+>pattern</I
+></TT
+> вообще не указан, <TT
+CLASS="LITERAL"
+>\d</TT
+> команды выводят все объекты, видимые для текущей схемы. Это эквивалентно указанию <TT
+CLASS="LITERAL"
+>*</TT
+> в качестве шаблона. (Объект считается <I
+CLASS="FIRSTTERM"
+>видимым</I
+>, если схема, в которой он находится, лежит на пути поиска, и объект с таким типом и именем на пути поиска ещё не появлялся. Это эквивалентно утверждению, что на объект можно ссылаться по имени, без явного указания схемы.) Чтобы увидеть все объекты в базе данных, независимо от видимости, в качестве шаблона используется <TT
+CLASS="LITERAL"
+>*.*</TT
+>.</P
+><P
+>Внутри шаблона <TT
+CLASS="LITERAL"
+>*</TT
+> обозначает любое количество символов, включая отсутствие символов. <TT
+CLASS="LITERAL"
+>?</TT
+> соответствует любому одному символу. (Это соответствует шаблонам имён файлов в Unix.) Например, <TT
+CLASS="LITERAL"
+>\dt int*</TT
+> отображает все таблицы, чьи имена начинаются на <TT
+CLASS="LITERAL"
+>int</TT
+>. Однако внутри двойных кавычек <TT
+CLASS="LITERAL"
+>*</TT
+> и <TT
+CLASS="LITERAL"
+>?</TT
+> теряют своё специальное значение и становятся обычными символами.</P
+><P
+>Шаблон, содержащий точку (<TT
+CLASS="LITERAL"
+>.</TT
+>), интерпретируется как шаблон имени схемы, за которым следует шаблон имени объекта. Например, <TT
+CLASS="LITERAL"
+>\dt foo*.*bar*</TT
+> отображает все таблицы, имена которых включают <TT
+CLASS="LITERAL"
+>bar</TT
+>, и расположенные в схемах, имена которых начинаются с <TT
+CLASS="LITERAL"
+>foo</TT
+>. Шаблону, не содержащему точку, могут соответствовать только объекты текущей схемы. Опять же, точка внутри двойных кавычек теряет своё специальное значение.</P
+><P
+>Опытные пользователи могут использовать возможности регулярных выражений, такие как классы символов. Например <TT
+CLASS="LITERAL"
+>[0-9]</TT
+> соответствует любой цифре. Все специальные символы регулярных выражений работают как описано в <A
+HREF="functions-matching.html#FUNCTIONS-POSIX-REGEXP"
+>Подразделе 9.7.3</A
+>, за исключением: <TT
+CLASS="LITERAL"
+>.</TT
+> используется в качестве разделителя, как говорилось выше; <TT
+CLASS="LITERAL"
+>*</TT
+> соответствует регулярному выражению <TT
+CLASS="LITERAL"
+>.*</TT
+>; <TT
+CLASS="LITERAL"
+>?</TT
+> соответствует <TT
+CLASS="LITERAL"
+>.</TT
+>, а также символ <TT
+CLASS="LITERAL"
+>$</TT
+>, который не имеет специального значения. При необходимости эти символы можно эмулировать указывая <TT
+CLASS="LITERAL"
+>?</TT
+> для эмуляции <TT
+CLASS="LITERAL"
+>.</TT
+>, <TT
+CLASS="LITERAL"
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>R</I
+></TT
+>+|)</TT
+> для <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>R</I
+></TT
+>*</TT
+>, <TT
+CLASS="LITERAL"
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>R</I
+></TT
+>|)</TT
+> для <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>R</I
+></TT
+>?</TT
+>. <TT
+CLASS="LITERAL"
+>$</TT
+> не требуется, как символ регулярного выражения, потому что шаблон должен соответствовать имени целиком, в отличие от обычной интерпретации регулярных выражений (другими словами, <TT
+CLASS="LITERAL"
+>$</TT
+> автоматически добавляется в шаблон). Используйте <TT
+CLASS="LITERAL"
+>*</TT
+> в начале и/или в конце, если не хотите, чтобы шаблон закреплялся. Обратите внимание, что внутри двойных кавычек, все специальные символы регулярных выражений теряют свое специальное значение и соответствуют сами себе. Также, специальные символы регулярных выражений не действуют в шаблонах для имён операторов (т. е. в аргументе команды <TT
+CLASS="LITERAL"
+>\do</TT
+>).</P
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN91776"
+></A
+><H3
+>Расширенные возможности</H3
+><DIV
+CLASS="REFSECT3"
+><A
+NAME="APP-PSQL-VARIABLES"
+></A
+><H4
+>Переменные</H4
+><P
+><SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> предоставляет возможности подстановки переменных подобные тем, что используются в командных оболочках Unix. Переменные представляют собой пары имя/значение, где значением может быть любая строка любой длины. Имя должно состоять из букв (включая нелатинские буквы), цифр и знаков подчёркивания.</P
+><P
+>Чтобы установить переменную, используется <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> метакоманда <TT
+CLASS="COMMAND"
+>\set</TT
+>. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>testdb=&gt; <KBD
+CLASS="USERINPUT"
+>\set foo bar</KBD
+></PRE
+><P> присваивает переменной <TT
+CLASS="LITERAL"
+>foo</TT
+> значение <TT
+CLASS="LITERAL"
+>bar</TT
+>. Чтобы получить значение переменной, нужно поставить двоеточие перед её именем, например: </P><PRE
+CLASS="PROGRAMLISTING"
+>testdb=&gt; <KBD
+CLASS="USERINPUT"
+>\echo :foo</KBD
+>
+bar</PRE
+><P> Это работает как в обычных SQL-командах, так и в метакомандах, подробности в разделе <A
+HREF="app-psql.html#APP-PSQL-INTERPOLATION"
+><I
+>Интерполяция <I
+>SQL</I
+></I
+></A
+> ниже.</P
+><P
+>При вызове <TT
+CLASS="COMMAND"
+>\set</TT
+> без второго аргумента переменной присваивается пустая строка. Для удаления переменной используется команда <TT
+CLASS="COMMAND"
+>\unset</TT
+>. Чтобы посмотреть значения всех переменных, нужно вызвать <TT
+CLASS="COMMAND"
+>\set</TT
+> без аргументов.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>На аргументы <TT
+CLASS="COMMAND"
+>\set</TT
+> распространяются те же правила подстановки, что и для других команд. Таким образом можно создавать интересные ссылки, например <TT
+CLASS="LITERAL"
+>\set :foo 'something'</TT
+>, получая <SPAN
+CLASS="QUOTE"
+>"мягкие ссылки"</SPAN
+> в <SPAN
+CLASS="PRODUCTNAME"
+>Perl</SPAN
+> или <SPAN
+CLASS="QUOTE"
+>"переменные переменных"</SPAN
+> в <SPAN
+CLASS="PRODUCTNAME"
+><ACRONYM
+CLASS="ACRONYM"
+>PHP</ACRONYM
+></SPAN
+>. К сожалению (или к счастью?), с этими конструкциями нельзя сделать ничего полезного. С другой стороны, <TT
+CLASS="LITERAL"
+>\set bar :foo</TT
+> является прекрасным способом копирования переменной.</P
+></BLOCKQUOTE
+></DIV
+><P
+>Некоторые переменные обрабатываются в <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> особым образом. Они представляют собой определённые параметры, которые могут быть изменены во время выполнения путём присваивания нового значения, а в некоторых переменных содержится изменяемое состояние <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>. Хотя эти переменные можно использовать и для других целей, делать это не рекомендуется, так как поведение программы может быстро стать очень странным. По соглашению, имена специальных переменных состоят из всех заглавных ASCII букв (и, возможно, цифр и знаков подчёркивания). Для максимальной совместимости в будущем старайтесь не использовать такие имена для собственных переменных. Далее идет список переменных, обрабатываемых особым образом.</P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="VARNAME"
+>AUTOCOMMIT</TT
+></DT
+><DD
+><P
+>При значении <TT
+CLASS="LITERAL"
+>on</TT
+> (по умолчанию) после каждой успешно выполненной команды выполняется фиксация изменений. Чтобы отложить фиксацию изменений в этом режиме, нужно выполнить SQL-команду <TT
+CLASS="COMMAND"
+>BEGIN</TT
+> или <TT
+CLASS="COMMAND"
+>START TRANSACTION</TT
+>. При значении <TT
+CLASS="LITERAL"
+>off</TT
+> или если переменная не определена, фиксация изменений не происходит до тех пор, пока явно не выполнена команда <TT
+CLASS="COMMAND"
+>COMMIT</TT
+> или <TT
+CLASS="COMMAND"
+>END</TT
+>. При значении <TT
+CLASS="LITERAL"
+>off</TT
+> неявно выполняется <TT
+CLASS="COMMAND"
+>BEGIN</TT
+> непосредственно перед любой командой, за исключением случаев когда: команда уже в транзакционном блоке; перед самой командой <TT
+CLASS="COMMAND"
+>BEGIN</TT
+> или другой командой управления транзакциями; перед командой, которая не может выполняться внутри транзакционного блока (например <TT
+CLASS="COMMAND"
+>VACUUM</TT
+>).</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Если режим <TT
+CLASS="LITERAL"
+>autocommit</TT
+> отключён, необходимо явно откатывать изменения в неуспешных транзакциях, выполняя команду <TT
+CLASS="COMMAND"
+>ABORT</TT
+> или <TT
+CLASS="COMMAND"
+>ROLLBACK</TT
+>. Также имейте в виду, что при выходе из сессии без фиксации изменений несохранённые изменения будут потеряны.</P
+></BLOCKQUOTE
+></DIV
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Включённый режим <TT
+CLASS="LITERAL"
+>autocommit</TT
+> является традиционным для <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, а выключенный режим ближе к спецификации SQL. Если вы предпочитаете отключить режим <TT
+CLASS="LITERAL"
+>autocommit</TT
+>, это можно сделать в общесистемном файле <TT
+CLASS="FILENAME"
+>psqlrc</TT
+> или в персональном файле <TT
+CLASS="FILENAME"
+>~/.psqlrc</TT
+>.</P
+></BLOCKQUOTE
+></DIV
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>COMP_KEYWORD_CASE</TT
+></DT
+><DD
+><P
+>Определяет, какой регистр букв будет использован при автоматическом завершении ключевых слов SQL. Если установлено в <TT
+CLASS="LITERAL"
+>lower</TT
+> или <TT
+CLASS="LITERAL"
+>upper</TT
+>, будет использоваться нижний или верхний регистр соответственно. Если установлено в <TT
+CLASS="LITERAL"
+>preserve-lower</TT
+> или <TT
+CLASS="LITERAL"
+>preserve-upper</TT
+> (по умолчанию), то завершаемое слово будет в том же регистре, что и уже введённое начало слова, но последующие слова, завершаемые полностью, будут в нижнем или верхнем регистре соответственно.</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>DBNAME</TT
+></DT
+><DD
+><P
+>Имя базы данных, к которой вы сейчас подключены. Устанавливается всякий раз при подключении к базе данных (в том числе при старте программы), но эту переменную можно удалить.</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>ECHO</TT
+></DT
+><DD
+><P
+>Со значением <TT
+CLASS="LITERAL"
+>all</TT
+>, все непустые входящие строки выводятся на стандартный вывод по мере их чтения. (Это не относится к интерактивному режиму.) Чтобы включить такое поведение при старте <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>, используйте параметр <TT
+CLASS="OPTION"
+>-a</TT
+>. Со значением <TT
+CLASS="LITERAL"
+>queries</TT
+>, <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> выводит каждый запрос на стандартный вывод после отправки его на сервер. Параметр командной строки для такого поведения <TT
+CLASS="OPTION"
+>-e</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>ECHO_HIDDEN</TT
+></DT
+><DD
+><P
+>Если эта переменная установлена в значение <TT
+CLASS="LITERAL"
+>on</TT
+>, то при выполнении метакоманд, запрашивающих базу данных, сначала будет выводиться текст запроса. Это позволяет изучать внутреннее устройство <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> и реализовывать похожую функциональность в своих программах. (Чтобы включить такое поведение при старте <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>, используйте параметр <TT
+CLASS="OPTION"
+>-E</TT
+>.) При установке переменной в значение <TT
+CLASS="LITERAL"
+>noexec</TT
+> запросы просто отображаются, но не отправляются на сервер и не выполняются.</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>ENCODING</TT
+></DT
+><DD
+><P
+>Содержит текущую кодировку набора символов клиента.</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>FETCH_COUNT</TT
+></DT
+><DD
+><P
+>Если переменная установлена в целое значение &gt; 0, результаты запросов <TT
+CLASS="COMMAND"
+>SELECT</TT
+> извлекаются из базы данных и отображаются группами с таким количеством строк, в отличие от поведения по умолчанию, когда перед отображением результирующий набор накапливается целиком. Это позволяет использовать ограниченный размер памяти независимо от размера выборки. При включении этой функциональности обычно используются значения от 100 до 1000. Имейте в виду, что запрос может завершиться ошибкой после отображения некоторого количества строк.</P
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>Хотя можно использовать любой формат вывода, формат по умолчанию <TT
+CLASS="LITERAL"
+>aligned</TT
+> как правило выглядит хуже, потому что каждая группа по <TT
+CLASS="VARNAME"
+>FETCH_COUNT</TT
+> строк форматируется отдельно, что может привести к разной ширине столбцов в разных группах. Остальные форматы вывода работают лучше.</P
+></BLOCKQUOTE
+></DIV
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>HISTCONTROL</TT
+></DT
+><DD
+><P
+>Если переменная установлена в <TT
+CLASS="LITERAL"
+>ignorespace</TT
+>, строки, начинающиеся с пробела, не сохраняются в истории. Если установлена в <TT
+CLASS="LITERAL"
+>ignoredups</TT
+>, строки, которые уже есть в истории, повторно не сохраняются. Значение <TT
+CLASS="LITERAL"
+>ignoreboth</TT
+> сочетает в себе оба варианта. Если значение не задано или отличается от перечисленных выше, все строки, введённые в интерактивном режиме, сохраняются в истории.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Эта функциональность была бессовестно списана с <SPAN
+CLASS="APPLICATION"
+>Bash</SPAN
+>.</P
+></BLOCKQUOTE
+></DIV
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>HISTFILE</TT
+></DT
+><DD
+><P
+>Имя файла для хранения истории команд. Значение по умолчанию <TT
+CLASS="FILENAME"
+>~/.psql_history</TT
+>. Например, установив: </P><PRE
+CLASS="PROGRAMLISTING"
+>\set HISTFILE ~/.psql_history- :DBNAME</PRE
+><P> в <TT
+CLASS="FILENAME"
+>~/.psqlrc</TT
+>, <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> будет поддерживать отдельную историю для каждой базы данных.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Эта функциональность была бессовестно списана с <SPAN
+CLASS="APPLICATION"
+>Bash</SPAN
+>.</P
+></BLOCKQUOTE
+></DIV
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>HISTSIZE</TT
+></DT
+><DD
+><P
+>Количество команд для хранения в истории. Значение по умолчанию 500.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Эта функциональность была бессовестно списана с <SPAN
+CLASS="APPLICATION"
+>Bash</SPAN
+>.</P
+></BLOCKQUOTE
+></DIV
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>HOST</TT
+></DT
+><DD
+><P
+>Имя компьютера, где работает сервер базы данных, к которому вы сейчас подключены. Устанавливается всякий раз при подключении к базе данных (в том числе при старте программы), но эту переменную можно удалить.</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>IGNOREEOF</TT
+></DT
+><DD
+><P
+>Если не установлена, то ввод символа <ACRONYM
+CLASS="ACRONYM"
+>EOF</ACRONYM
+> (обычно <B
+CLASS="KEYCAP"
+>Control</B
+>+<B
+CLASS="KEYCAP"
+>D</B
+>) в интерактивной сессии <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> завершает работу приложения. Если задано числовое значение, то именно такое количество символов <ACRONYM
+CLASS="ACRONYM"
+>EOF</ACRONYM
+> будет проигнорировано, прежде чем приложение завершит работу. Если переменная задана, но имеет не числовое значение, то значение по умолчанию 10.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Эта функциональность была бессовестно списана с <SPAN
+CLASS="APPLICATION"
+>Bash</SPAN
+>.</P
+></BLOCKQUOTE
+></DIV
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>LASTOID</TT
+></DT
+><DD
+><P
+>Содержит значение последнего OID, полученного командой <TT
+CLASS="COMMAND"
+>INSERT</TT
+> или <TT
+CLASS="COMMAND"
+>\lo_import</TT
+>. Корректное значение переменной гарантируется до тех пор, пока не будет отображён результат следующей <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>-команды.</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>ON_ERROR_ROLLBACK</TT
+></DT
+><DD
+><P
+>При значении <TT
+CLASS="LITERAL"
+>on</TT
+>, если команда в транзакционном блоке выдаёт ошибку, ошибка игнорируется и транзакция продолжается. При значении <TT
+CLASS="LITERAL"
+>interactive</TT
+> такие ошибки игнорируются только в интерактивных сессиях, но не в скриптах. Если переменная не установлена или при значении <TT
+CLASS="LITERAL"
+>off</TT
+> команда, вызвавшая ошибку в транзакционном блоке, отменяет всю транзакцию. Режим отката транзакции при возникновении ошибки обеспечивается выполнением неявных команд <TT
+CLASS="COMMAND"
+>SAVEPOINT</TT
+> перед каждой командой в транзакционном блоке и откатом к точке сохранения в случае ошибки.</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>ON_ERROR_STOP</TT
+></DT
+><DD
+><P
+>По умолчанию, после возникновения ошибки обработка команд продолжается. Если эта переменная установлена в значение <TT
+CLASS="LITERAL"
+>on</TT
+>, обработка команд будет немедленно прекращена. В интерактивном режиме <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> вернётся в командную строку; иначе <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> прекратит работу с кодом возврата 3, чтобы отличить этот случай от фатальных ошибок, для которых используется код возврата 1. В любом случае, выполнение всех запущенных скриптов (высокоуровневый скрипт и любые другие, которые он мог запустить) будет немедленно прекращено. Если высокоуровневая командная строка содержит несколько SQL-команд, выполнение завершится на текущей команде.</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>PORT</TT
+></DT
+><DD
+><P
+>Содержит порт сервера базы данных, к которому вы сейчас подключены. Устанавливается всякий раз при подключении к базе данных (в том числе при старте программы), но эту переменную можно удалить.</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>PROMPT1</TT
+><BR><TT
+CLASS="VARNAME"
+>PROMPT2</TT
+><BR><TT
+CLASS="VARNAME"
+>PROMPT3</TT
+></DT
+><DD
+><P
+>Указывают, как должны выглядеть приглашения <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>. См. <A
+HREF="app-psql.html#APP-PSQL-PROMPTING"
+><I
+>Настройка приглашений</I
+></A
+> ниже.</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>QUIET</TT
+></DT
+><DD
+><P
+>Установка значения <TT
+CLASS="LITERAL"
+>on</TT
+> эквивалента параметру командной строки <TT
+CLASS="OPTION"
+>-q</TT
+>. Это, вероятно, не слишком полезно в интерактивном режиме.</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>SINGLELINE</TT
+></DT
+><DD
+><P
+>Установка значения <TT
+CLASS="LITERAL"
+>on</TT
+> эквивалентна параметру командной строки <TT
+CLASS="OPTION"
+>-S</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>SINGLESTEP</TT
+></DT
+><DD
+><P
+>Эта переменная эквивалентна параметру командной строки <TT
+CLASS="OPTION"
+>-s</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>USER</TT
+></DT
+><DD
+><P
+>Содержит имя пользователя базы данных, который сейчас подключён. Устанавливается всякий раз при подключении к базе данных (в том числе при старте программы), но эту переменную можно удалить.</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>VERBOSITY</TT
+></DT
+><DD
+><P
+>Этой переменной можно присвоить значения <TT
+CLASS="LITERAL"
+>default</TT
+>, <TT
+CLASS="LITERAL"
+>verbose</TT
+> или <TT
+CLASS="LITERAL"
+>terse</TT
+> для контроля уровня детализации отчётов об ошибках.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT3"
+><A
+NAME="APP-PSQL-INTERPOLATION"
+></A
+><H4
+>Интерполяция <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+></H4
+><P
+>Ключевой особенностью переменных <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> является возможность подставлять (<SPAN
+CLASS="QUOTE"
+>"интерполировать"</SPAN
+>) их в команды <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>, также как и в аргументы метакоманд. Кроме того, <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> предоставляет средства для корректного использования кавычек для значений переменных, которые используются как литералы или идентификаторы SQL. Чтобы подставить значение без кавычек, нужно добавить перед именем переменной двоеточие (<TT
+CLASS="LITERAL"
+>:</TT
+>). Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>testdb=&gt; <KBD
+CLASS="USERINPUT"
+>\set foo 'my_table'</KBD
+>
+testdb=&gt; <KBD
+CLASS="USERINPUT"
+>SELECT * FROM :foo;</KBD
+></PRE
+><P> будет запрашивать таблицу <TT
+CLASS="LITERAL"
+>my_table</TT
+>. Обратите внимание, что это может быть небезопасным: значение переменной копируется буквально, поэтому оно может содержать непарные кавычки или даже метакоманды. При применении необходимо убедиться, что это имеет смысл.</P
+><P
+>Когда значение будет использоваться в качестве SQL литерала или идентификатора, безопаснее заключить его в кавычки. Если значение переменной используется как SQL литерал, то после двоеточия нужно написать имя переменной в одинарных кавычках. Если значение переменной используется как SQL идентификатор, то после двоеточия нужно написать имя переменной в двойных кавычках. Эти конструкции корректно работают с кавычками и другими специальными символами, которые могут содержаться в значении переменной. Предыдущий пример более безопасно выглядит так: </P><PRE
+CLASS="PROGRAMLISTING"
+>testdb=&gt; <KBD
+CLASS="USERINPUT"
+>\set foo 'my_table'</KBD
+>
+testdb=&gt; <KBD
+CLASS="USERINPUT"
+>SELECT * FROM :"foo";</KBD
+></PRE
+><P></P
+><P
+>Подстановка переменных не будет выполняться, если <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> литералы или идентификаторы заключены в кавычки. Поэтому конструкция <TT
+CLASS="LITERAL"
+>':foo'</TT
+> не превратится во взятое в кавычки значение переменной (и это было бы небезопасно, если бы работало, так как обработка кавычек внутри значения переменной была бы некорректной).</P
+><P
+>Один из примеров использования данного механизма — это копирование содержимого файла в столбец таблицы. Сначала загрузим содержимое файла в переменную, затем подставим значение переменной как строку в кавычках: </P><PRE
+CLASS="PROGRAMLISTING"
+>testdb=&gt; <KBD
+CLASS="USERINPUT"
+>\set content `cat my_file.txt`</KBD
+>
+testdb=&gt; <KBD
+CLASS="USERINPUT"
+>INSERT INTO my_table VALUES (:'content');</KBD
+></PRE
+><P> (Отметим, что это пока не будет работать, если <TT
+CLASS="FILENAME"
+>my_file.txt</TT
+> содержит байт NUL. <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> не поддерживает NUL в значениях переменных.)</P
+><P
+>Так как двоеточие может легально присутствовать в SQL-командах, попытка подстановки (например для <TT
+CLASS="LITERAL"
+>:name</TT
+>, <TT
+CLASS="LITERAL"
+>:'name'</TT
+> или <TT
+CLASS="LITERAL"
+>:"name"</TT
+>) не выполняется, если переменная не установлена. В любом случае, можно экранировать двоеточие с помощью обратной косой черты, чтобы предотвратить подстановку.</P
+><P
+>Использование двоеточия для переменных является стандартом <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> для встраиваемых языков запросов, таких как <SPAN
+CLASS="APPLICATION"
+>ECPG</SPAN
+>. Использование двоеточия для срезов массивов и приведения типов является расширениями <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, что иногда может конфликтовать со стандартным использованием. Использование двоеточия и кавычек для экранирования значения переменной при подстановке в качестве SQL литерала или идентификатора — это расширение <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT3"
+><A
+NAME="APP-PSQL-PROMPTING"
+></A
+><H4
+>Настройка приглашений</H4
+><P
+>Приглашения <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> можно настроить по своему предпочтению. Три переменные <TT
+CLASS="VARNAME"
+>PROMPT1</TT
+>, <TT
+CLASS="VARNAME"
+>PROMPT2</TT
+> и <TT
+CLASS="VARNAME"
+>PROMPT3</TT
+> содержат строки и специальные escape-последовательности, которые описывают внешний вид приглашения. <TT
+CLASS="VARNAME"
+>PROMPT1</TT
+> это обычное приглашение, которое выдаётся, когда <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> ожидает ввода новой команды. <TT
+CLASS="VARNAME"
+>PROMPT2</TT
+> выдаётся при переходе на новую строку, когда вводимая команда не завершается точкой с запятой или не закрыта кавычка. <TT
+CLASS="VARNAME"
+>PROMPT3</TT
+> выдаётся при выполнении <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>-команды <TT
+CLASS="COMMAND"
+>COPY</TT
+>, когда ожидается ввод значений строк с терминала.</P
+><P
+>Значения этих переменных выводятся буквально, за исключением случаев, когда в них встречается знак процента (<TT
+CLASS="LITERAL"
+>%</TT
+>). В зависимости от следующего символа будет подставляться определённый текст. Существуют следующие подстановки: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>%M</TT
+></DT
+><DD
+><P
+>Полное имя компьютера (с именем домена) сервера базы данных или <TT
+CLASS="LITERAL"
+>[local]</TT
+>, если подключение выполнено через доменный сокет Unix, либо <TT
+CLASS="LITERAL"
+>[local:<TT
+CLASS="REPLACEABLE"
+><I
+>/dir/name</I
+></TT
+>]</TT
+>, если при компиляции был изменён путь доменного сокета Unix по умолчанию.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>%m</TT
+></DT
+><DD
+><P
+>Имя компьютера, где работает сервер баз данных, усечённое до первой точки или <TT
+CLASS="LITERAL"
+>[local]</TT
+>, если подключение выполнено через доменный сокет Unix.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>%&gt;</TT
+></DT
+><DD
+><P
+>Номер порта, который прослушивает сервер базы данных.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>%n</TT
+></DT
+><DD
+><P
+>Имя пользователя базы данных для текущей сессии. (Это значение может меняться в течение сессии в результате выполнения команды <TT
+CLASS="COMMAND"
+>SET SESSION AUTHORIZATION</TT
+>.)</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>%/</TT
+></DT
+><DD
+><P
+>Имя текущей базы данных.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>%~</TT
+></DT
+><DD
+><P
+>Похоже на <TT
+CLASS="LITERAL"
+>%/</TT
+>, но выводит тильду <TT
+CLASS="LITERAL"
+>~</TT
+>, если текущая база данных совпадает с базой данных по умолчанию.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>%#</TT
+></DT
+><DD
+><P
+>Если пользователь текущей сессии является суперпользователем базы данных, то выводит <TT
+CLASS="LITERAL"
+>#</TT
+>, иначе <TT
+CLASS="LITERAL"
+>&gt;</TT
+>. (Это значение может меняться в течение сессии в результате выполнения команды <TT
+CLASS="COMMAND"
+>SET SESSION AUTHORIZATION</TT
+>.)</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>%R</TT
+></DT
+><DD
+><P
+>Для <TT
+CLASS="VARNAME"
+>PROMPT1</TT
+> это обычно соответствует <TT
+CLASS="LITERAL"
+>=</TT
+>, но в однострочном режиме выводит <TT
+CLASS="LITERAL"
+>^</TT
+>, а если произошло отключение от базы данных (например при сбое в <TT
+CLASS="COMMAND"
+>\connect</TT
+>) то <TT
+CLASS="LITERAL"
+>!</TT
+>. Для <TT
+CLASS="VARNAME"
+>PROMPT2</TT
+> будет выводиться <TT
+CLASS="LITERAL"
+>-</TT
+>, <TT
+CLASS="LITERAL"
+>*</TT
+>, одинарная кавычка, двойная кавычка или знак доллара в зависимости от того, почему потребовалась дополнительная строка ввода: команда не была завершена, мы находимся внутри комментария <TT
+CLASS="LITERAL"
+>/* ... */</TT
+> или потому, что мы внутри кавычек или внутри строки, экранированной знаками доллара. Для <TT
+CLASS="VARNAME"
+>PROMPT3</TT
+> эта последовательность ничего не выводит.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>%x</TT
+></DT
+><DD
+><P
+>Состояние транзакции: пустая строка, если не в транзакционном блоке; <TT
+CLASS="LITERAL"
+>*</TT
+>, когда в транзакционном блоке; <TT
+CLASS="LITERAL"
+>!</TT
+>, когда в транзакционном блоке, в котором произошла ошибка и <TT
+CLASS="LITERAL"
+>?</TT
+>, когда состояние транзакции не определено (например, нет подключения к базе данных).</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>%</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>цифры</I
+></TT
+></DT
+><DD
+><P
+>Подставляется символ с указанным восьмеричным кодом.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>%:</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+><TT
+CLASS="LITERAL"
+>:</TT
+></DT
+><DD
+><P
+>Подставляется значение <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> переменной <TT
+CLASS="REPLACEABLE"
+><I
+>name</I
+></TT
+>. За подробностями обратитесь к <A
+HREF="app-psql.html#APP-PSQL-VARIABLES"
+><I
+>Переменные</I
+></A
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>%`</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>команда</I
+></TT
+><TT
+CLASS="LITERAL"
+>`</TT
+></DT
+><DD
+><P
+>Подставляется вывод команды <TT
+CLASS="REPLACEABLE"
+><I
+>command</I
+></TT
+>, как и в обычной подстановке с обратными апострофами.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>%[</TT
+> ... <TT
+CLASS="LITERAL"
+>%]</TT
+></DT
+><DD
+><P
+>Приглашения могут содержать управляющие символы терминала, которые, например, изменяют цвет, фон и стиль текста приглашения или изменяют заголовок окна терминала. Для того, чтобы возможности редактирования <SPAN
+CLASS="APPLICATION"
+>Readline</SPAN
+> работали правильно, непечатаемые символы нужно расположить между <TT
+CLASS="LITERAL"
+>%[</TT
+> и <TT
+CLASS="LITERAL"
+>%]</TT
+>, чтобы сделать невидимыми. Можно делать несколько таких включений в приглашение. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>testdb=&gt; \set PROMPT1 '%[%033[1;33;40m%]%n@%/%R%[%033[0m%]%# '</PRE
+><P> выдаст жирное (<TT
+CLASS="LITERAL"
+>1;</TT
+>), желтое на черном (<TT
+CLASS="LITERAL"
+>33;40</TT
+>) приглашение для VT100 совместимых цветных терминалов.</P
+></DD
+></DL
+></DIV
+><P> Чтобы вставить знак процента, нужно написать <TT
+CLASS="LITERAL"
+>%%</TT
+>. По умолчанию используются значения <TT
+CLASS="LITERAL"
+>'%/%R%# '</TT
+> для <TT
+CLASS="VARNAME"
+>PROMPT1</TT
+> и <TT
+CLASS="VARNAME"
+>PROMPT2</TT
+> и <TT
+CLASS="LITERAL"
+>'&gt;&gt; '</TT
+> для <TT
+CLASS="VARNAME"
+>PROMPT3</TT
+>.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Эта функциональность была бессовестно списана с <SPAN
+CLASS="APPLICATION"
+>tcsh</SPAN
+>.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT3"
+><A
+NAME="AEN92181"
+></A
+><H4
+>Редактирование командной строки</H4
+><P
+><SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> поддерживает библиотеку <SPAN
+CLASS="APPLICATION"
+>Readline</SPAN
+> для удобного редактирования командной строки. История команд автоматически сохраняется при выходе из <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> и загружается при запуске. Завершение клавишей <TT
+CLASS="LITERAL"
+>TAB</TT
+> также поддерживается, хотя логика завершения не претендует на роль анализатора <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>. Запросы, генерируемые завершением по <TT
+CLASS="LITERAL"
+>TAB</TT
+>, также могут конфликтовать с другими командами SQL, например <TT
+CLASS="LITERAL"
+>SET TRANSACTION ISOLATION LEVEL</TT
+>. Если по какой-либо причине вам не нравится завершение по клавише <TT
+CLASS="LITERAL"
+>TAB</TT
+>, его можно отключить в файле <TT
+CLASS="FILENAME"
+>.inputrc</TT
+> в вашем домашнем каталоге: </P><PRE
+CLASS="PROGRAMLISTING"
+>$if psql
+set disable-completion on
+$endif</PRE
+><P> (Это возможность не <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>, а <SPAN
+CLASS="APPLICATION"
+>Readline</SPAN
+>. Читайте документацию к <SPAN
+CLASS="APPLICATION"
+>Readline</SPAN
+> для дополнительной информации.)</P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="APP-PSQL-ENVIRONMENT"
+></A
+><H2
+>Переменные окружения</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="ENVAR"
+>COLUMNS</TT
+></DT
+><DD
+><P
+>Если <TT
+CLASS="LITERAL"
+>\pset columns</TT
+> равно нулю, управляет шириной формата вывода <TT
+CLASS="LITERAL"
+>wrapped</TT
+>, а также определяет, нужно ли использовать пейджер и нужно ли переключаться в вертикальный формат в режиме <TT
+CLASS="LITERAL"
+>expanded auto</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="ENVAR"
+>PAGER</TT
+></DT
+><DD
+><P
+>Если результат запроса не помещается на экране, он передаётся в эту команду для отображения. Обычно это <TT
+CLASS="LITERAL"
+>more</TT
+> или <TT
+CLASS="LITERAL"
+>less</TT
+>. Значение по умолчанию зависит от платформы. Использование пейджера можно отключить с помощью команды <TT
+CLASS="COMMAND"
+>\pset</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="ENVAR"
+>PGDATABASE</TT
+><BR><TT
+CLASS="ENVAR"
+>PGHOST</TT
+><BR><TT
+CLASS="ENVAR"
+>PGPORT</TT
+><BR><TT
+CLASS="ENVAR"
+>PGUSER</TT
+></DT
+><DD
+><P
+>Параметры подключения по умолчанию (см. <A
+HREF="libpq-envars.html"
+>Раздел 31.14</A
+>).</P
+></DD
+><DT
+><TT
+CLASS="ENVAR"
+>PSQL_EDITOR</TT
+><BR><TT
+CLASS="ENVAR"
+>EDITOR</TT
+><BR><TT
+CLASS="ENVAR"
+>VISUAL</TT
+></DT
+><DD
+><P
+>Редактор, используемый командами <TT
+CLASS="COMMAND"
+>\e</TT
+> и <TT
+CLASS="COMMAND"
+>\ef</TT
+>. Переменные рассматриваются в перечисленном порядке. Будет использовано значение первой установленной переменной.</P
+><P
+>По умолчанию в Unix-подобных системах используется <TT
+CLASS="FILENAME"
+>vi</TT
+>, а в Windows — <TT
+CLASS="FILENAME"
+>notepad.exe</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="ENVAR"
+>PSQL_EDITOR_LINENUMBER_ARG</TT
+></DT
+><DD
+><P
+>Если в командах <TT
+CLASS="COMMAND"
+>\e</TT
+> или <TT
+CLASS="COMMAND"
+>\ef</TT
+> указан номер строки, эта переменная задаёт название параметра командной строки, который используется для передачи номера строки в редактор. Для таких редакторов как <SPAN
+CLASS="PRODUCTNAME"
+>vi</SPAN
+> или <SPAN
+CLASS="PRODUCTNAME"
+>Emacs</SPAN
+> это знак плюс. Добавьте в конец значения пробел, если он требуется для разделения названия параметра и номера строки. Примеры: </P><PRE
+CLASS="PROGRAMLISTING"
+>PSQL_EDITOR_LINENUMBER_ARG='+'
+PSQL_EDITOR_LINENUMBER_ARG='--line '</PRE
+><P></P
+><P
+>Значение по умолчанию <TT
+CLASS="LITERAL"
+>+</TT
+> в Unix-подобных системах (соответствует редактору по умолчанию <TT
+CLASS="FILENAME"
+>vi</TT
+> и многим другим распространённым редакторам). На платформе Windows нет значения по умолчанию.</P
+></DD
+><DT
+><TT
+CLASS="ENVAR"
+>PSQL_HISTORY</TT
+></DT
+><DD
+><P
+>Альтернативное расположение файла с историей команд. Допускается использование тильды (<TT
+CLASS="LITERAL"
+>~</TT
+>).</P
+></DD
+><DT
+><TT
+CLASS="ENVAR"
+>PSQLRC</TT
+></DT
+><DD
+><P
+>Альтернативное расположение пользовательского файла <TT
+CLASS="FILENAME"
+>.psqlrc</TT
+>. Допускается использование тильды (<TT
+CLASS="LITERAL"
+>~</TT
+>).</P
+></DD
+><DT
+><TT
+CLASS="ENVAR"
+>SHELL</TT
+></DT
+><DD
+><P
+>Команда операционной системы, выполняемая метакомандой <TT
+CLASS="COMMAND"
+>\!</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="ENVAR"
+>TMPDIR</TT
+></DT
+><DD
+><P
+>Каталог для хранения временных файлов. По умолчанию <TT
+CLASS="FILENAME"
+>/tmp</TT
+>.</P
+></DD
+></DL
+></DIV
+><P
+>Эта утилита, как и большинство других утилит <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, также использует переменные среды, поддерживаемые <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> (см. <A
+HREF="libpq-envars.html"
+>Раздел 31.14</A
+>).</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN92284"
+></A
+><H2
+>Files</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="FILENAME"
+>psqlrc</TT
+> и <TT
+CLASS="FILENAME"
+>~/.psqlrc</TT
+></DT
+><DD
+><P
+>При запуске без параметров <TT
+CLASS="OPTION"
+>-X</TT
+> или <TT
+CLASS="OPTION"
+>-c</TT
+> <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> пытается считать и выполнить команды из общесистемного стартового файла (<TT
+CLASS="FILENAME"
+>psqlrc</TT
+>), а затем из персонального стартового файла пользователя (<TT
+CLASS="FILENAME"
+>~/.psqlrc</TT
+>). Это происходит после подключения к базе данных, но до получения обычных команд. Эти файлы могут использоваться для настройки клиента и/или сервера, как правило, с помощью команд <TT
+CLASS="COMMAND"
+>\set</TT
+> и <TT
+CLASS="COMMAND"
+>SET</TT
+>.</P
+><P
+>Общесистемный стартовый файл называется <TT
+CLASS="FILENAME"
+>psqlrc</TT
+>, он будет искаться в каталоге установки <SPAN
+CLASS="QUOTE"
+>"конфигурация системы"</SPAN
+>. Для того чтобы узнать этот каталог, надёжнее всего выполнить команду <TT
+CLASS="LITERAL"
+>pg_config --sysconfdir</TT
+>. По умолчанию он расположен в <TT
+CLASS="FILENAME"
+>../etc/</TT
+> относительно каталога, содержащего исполняемые файлы <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Имя этого каталога можно задать явно через переменную окружения <TT
+CLASS="ENVAR"
+>PGSYSCONFDIR</TT
+>.</P
+><P
+>Персональный стартовый файл пользователя называется <TT
+CLASS="FILENAME"
+>.psqlrc</TT
+>, он будет искаться в домашнем каталоге вызывающего пользователя. В Windows, где отсутствует такое понятие, персональный стартовый файл называется <TT
+CLASS="FILENAME"
+>%APPDATA%\postgresql\psqlrc.conf</TT
+>. Расположение персонального стартового файла пользователя можно задать явно через переменную окружения <TT
+CLASS="ENVAR"
+>PSQLRC</TT
+>.</P
+><P
+>Оба стартовых файла, общесистемный и персональный, можно привязать к конкретной версии <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>. Для этого в конце имени файла нужно добавить номер основного или корректирующего релиза <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, например <TT
+CLASS="FILENAME"
+>~/.psqlrc-9.2</TT
+> или <TT
+CLASS="FILENAME"
+>~/.psqlrc-9.2.5</TT
+>. При наличии нескольких файлов, файл с более детальным номером версии будет иметь предпочтение.</P
+></DD
+><DT
+><TT
+CLASS="FILENAME"
+>.psql_history</TT
+></DT
+><DD
+><P
+>История командной строки хранится в файле <TT
+CLASS="FILENAME"
+>~/.psql_history</TT
+> или <TT
+CLASS="FILENAME"
+>%APPDATA%\postgresql\psql_history</TT
+> на Windows.</P
+><P
+>Расположение файла истории можно задать явно через переменную окружения <TT
+CLASS="ENVAR"
+>PSQL_HISTORY</TT
+>.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN92325"
+></A
+><H2
+>Замечания</H2
+><P
+></P
+><UL
+><LI
+><P
+>В ранних версиях <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> первый аргумент в однобуквенных метакомандах мог начинаться сразу после самой команды, без промежуточных пробелов. Начиная с <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> 8.4 это не разрешается.</P
+></LI
+><LI
+><P
+><SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> лучше всего работает с серверами той же или более старой основной версии. Сбой метакоманды наиболее вероятен, если версия сервера новее, чем версия <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>. Однако, команды семейства <TT
+CLASS="LITERAL"
+>\d</TT
+> должны работать с версиями сервера до 7.4, хотя и необязательно с серверами новее, чем сам <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>. Общая функциональность запуска SQL-команд и отображения результатов запросов также должна работать на серверах с более новой основной версией, но это не гарантируется во всех случаях.</P
+><P
+>Если вы хотите подключаться к нескольким серверам с различными основными версиями, рекомендуется использовать последнюю версию <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>. Кроме того можно сохранить копию <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> от каждой основной версии и использовать ту, которая соответствует версии сервера. Но на практике в этих дополнительных сложностях нет необходимости.</P
+></LI
+></UL
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN92341"
+></A
+><H2
+>Замечания для пользователей Windows</H2
+><P
+><SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> создан как <SPAN
+CLASS="QUOTE"
+>"консольное приложение"</SPAN
+>. Поскольку в Windows консольные окна используют кодировку символов отличную от той, что используется для остальной системы, нужно проявить особую осторожность при использовании 8-битных символов. Если <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> обнаружит проблемную кодовую страницу консоли, он предупредит вас при запуске. Чтобы изменить кодовую страницу консоли, необходимы две вещи: <P
+></P
+></P><UL
+><LI
+><P
+>Задать кодовую страницу, выполнив <KBD
+CLASS="USERINPUT"
+>cmd.exe /c chcp 1251</KBD
+>. (1251 это кодовая страница для России, замените на ваше значение.) При использовании Cygwin, эту команду можно записать в <TT
+CLASS="FILENAME"
+>/etc/profile</TT
+>.</P
+></LI
+><LI
+><P
+>Установите консольный шрифт в <TT
+CLASS="LITERAL"
+>Lucida Console</TT
+>, потому что растровый шрифт не работает с кодовой страницей ANSI.</P
+></LI
+></UL
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="APP-PSQL-EXAMPLES"
+></A
+><H2
+>Примеры</H2
+><P
+>Первый пример показывает, что для ввода одной команды может потребоваться несколько строк. Обратите внимание, как меняется приглашение: </P><PRE
+CLASS="PROGRAMLISTING"
+>testdb=&gt; <KBD
+CLASS="USERINPUT"
+>CREATE TABLE my_table (</KBD
+>
+testdb(&gt; <KBD
+CLASS="USERINPUT"
+> first integer not null default 0,</KBD
+>
+testdb(&gt; <KBD
+CLASS="USERINPUT"
+> second text)</KBD
+>
+testdb-&gt; <KBD
+CLASS="USERINPUT"
+>;</KBD
+>
+CREATE TABLE</PRE
+><P> Теперь посмотрим на определение таблицы: </P><PRE
+CLASS="PROGRAMLISTING"
+>testdb=&gt; <KBD
+CLASS="USERINPUT"
+>\d my_table</KBD
+>
+             Таблица "my_table"
+ Колонка |  Тип    |    Модификаторы
+---------+---------+--------------------
+ first   | integer | NOT NULL DEFAULT 0
+ second  | text    |</PRE
+><P> Теперь изменим приглашение на что-то более интересное: </P><PRE
+CLASS="PROGRAMLISTING"
+>testdb=&gt; <KBD
+CLASS="USERINPUT"
+>\set PROMPT1 '%n@%m %~%R%# '</KBD
+>
+peter@localhost testdb=&gt;</PRE
+><P> Предположим, что вы внесли данные в таблицу и хотите на них посмотреть: </P><PRE
+CLASS="PROGRAMLISTING"
+>peter@localhost testdb=&gt; SELECT * FROM my_table;
+ first | second
+-------+--------
+     1 | Один
+     2 | Два
+     3 | Три  
+     4 | Четыре
+(4 строки)</PRE
+><P> Таблицу можно вывести разными способами при помощи команды <TT
+CLASS="COMMAND"
+>\pset</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>peter@localhost testdb=&gt; <KBD
+CLASS="USERINPUT"
+>\pset border 2</KBD
+>
+Установлен стиль границ: 2.
+peter@localhost testdb=&gt; <KBD
+CLASS="USERINPUT"
+>SELECT * FROM my_table;</KBD
+>
++-------+--------+
+| first | second |
++-------+--------+
+|     1 | Один   |
+|     2 | Два    |
+|     3 | Три    |
+|     4 | Четыре |
++-------+--------+
+(4 строки)
+
+peter@localhost testdb=&gt; <KBD
+CLASS="USERINPUT"
+>\pset border 0</KBD
+>
+Установлен стиль границ: 0.
+peter@localhost testdb=&gt; <KBD
+CLASS="USERINPUT"
+>SELECT * FROM my_table;</KBD
+>
+first second
+----- ------
+    1 Один
+    2 Два
+    3 Три  
+    4 Четыре
+(4 строки)
+
+peter@localhost testdb=&gt; <KBD
+CLASS="USERINPUT"
+>\pset border 1</KBD
+>
+Установлен стиль границ: 1.
+peter@localhost testdb=&gt; <KBD
+CLASS="USERINPUT"
+>\pset format unaligned</KBD
+>
+Формат вывода: unaligned.
+peter@localhost testdb=&gt; <KBD
+CLASS="USERINPUT"
+>\pset fieldsep ','</KBD
+>
+Разделитель полей: ",".
+peter@localhost testdb=&gt; <KBD
+CLASS="USERINPUT"
+>\pset tuples_only</KBD
+>
+Выводятся только кортежи.
+peter@localhost testdb=&gt; <KBD
+CLASS="USERINPUT"
+>SELECT second, first FROM my_table;</KBD
+>
+Один,1
+Два,2
+Три,3
+Четыре,4</PRE
+><P> Также можно использовать короткие команды: </P><PRE
+CLASS="PROGRAMLISTING"
+>peter@localhost testdb=&gt; <KBD
+CLASS="USERINPUT"
+>\a \t \x</KBD
+>
+Формат вывода: aligned.
+Режим вывода только кортежей выключен.
+Расширенный вывод включён.
+peter@localhost testdb=&gt; <KBD
+CLASS="USERINPUT"
+>SELECT * FROM my_table;</KBD
+>
+-[ RECORD 1 ]-
+first  | 1
+second | Один
+-[ RECORD 2 ]-
+first  | 2
+second | Два
+-[ RECORD 3 ]-
+first  | 3
+second | Три  
+-[ RECORD 4 ]-
+first  | 4
+second | Четыре</PRE
+><P></P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="app-pgrestore.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="app-reindexdb.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>pg_restore</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="reference-client.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><SPAN
+CLASS="APPLICATION"
+>reindexdb</SPAN
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

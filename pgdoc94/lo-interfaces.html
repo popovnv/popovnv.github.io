@@ -1,0 +1,784 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Клиентские интерфейсы</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Большие объекты"
+HREF="largeobjects.html"><LINK
+REL="PREVIOUS"
+TITLE="Особенности реализации"
+HREF="lo-implementation.html"><LINK
+REL="NEXT"
+TITLE="Серверные функции"
+HREF="lo-funcs.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Особенности реализации"
+HREF="lo-implementation.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="largeobjects.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 32. Большие объекты</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Серверные функции"
+HREF="lo-funcs.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="LO-INTERFACES"
+>32.3. Клиентские интерфейсы</A
+></H1
+><P
+>В этом разделе описываются средства, которые представляет клиентская библиотека <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> для обращения к большим объектам. Интерфейс работы с большими объектами <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> создан по подобию интерфейса файловых систем <ACRONYM
+CLASS="ACRONYM"
+>Unix</ACRONYM
+>, так что он включает аналоги функций <CODE
+CLASS="FUNCTION"
+>open</CODE
+>, <CODE
+CLASS="FUNCTION"
+>read</CODE
+>, <CODE
+CLASS="FUNCTION"
+>write</CODE
+>, <CODE
+CLASS="FUNCTION"
+>lseek</CODE
+> и т. д.</P
+><P
+>Все операции с большими объектами с применением этих функций <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>должны</I
+></SPAN
+> иметь место в блоке транзакции SQL, так как дескрипторы больших объектов актуальны только во время транзакции.</P
+><P
+>Если при выполнении одной из этих функций происходит ошибка, эта функция возвращает значение иначе невозможное, обычно 0 или -1. Сообщение, описывающее ошибку, сохраняется в объекте соединения; получить его можно с помощью <CODE
+CLASS="FUNCTION"
+>PQerrorMessage</CODE
+>.</P
+><P
+>Клиентские приложения, которые используют эти функции, должны включать заголовочный файл <TT
+CLASS="FILENAME"
+>libpq/libpq-fs.h</TT
+> и компоноваться с библиотекой <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="LO-CREATE"
+>32.3.1. Создание большого объекта</A
+></H2
+><P
+> Функция </P><PRE
+CLASS="SYNOPSIS"
+>Oid lo_creat(PGconn *conn, int mode);</PRE
+><P> создаёт новый большой объект. Возвращаемым значением будет OID, назначенный новому объекту, либо <TT
+CLASS="SYMBOL"
+>InvalidOid</TT
+> (ноль) в случае ошибки. Параметр <TT
+CLASS="REPLACEABLE"
+><I
+>mode</I
+></TT
+> не используется и игнорируется, начиная с <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> 8.1; однако для обратной совместимости с более ранними выпусками в нём лучше задать значение <TT
+CLASS="SYMBOL"
+>INV_READ</TT
+>, <TT
+CLASS="SYMBOL"
+>INV_WRITE</TT
+> или <TT
+CLASS="SYMBOL"
+>INV_READ</TT
+> <TT
+CLASS="LITERAL"
+>|</TT
+> <TT
+CLASS="SYMBOL"
+>INV_WRITE</TT
+>. (Эти константы определены в заголовочном файле <TT
+CLASS="FILENAME"
+>libpq/libpq-fs.h</TT
+>.)</P
+><P
+>Пример: </P><PRE
+CLASS="PROGRAMLISTING"
+>inv_oid = lo_creat(conn, INV_READ|INV_WRITE);</PRE
+><P></P
+><P
+> Функция </P><PRE
+CLASS="SYNOPSIS"
+>Oid lo_create(PGconn *conn, Oid lobjId);</PRE
+><P> также создаёт новый большой объект. В <TT
+CLASS="REPLACEABLE"
+><I
+>lobjId</I
+></TT
+> можно задать назначаемый ему OID; при этом произойдёт ошибка, если этот OID уже присвоен какому-либо большому объекту. Если в <TT
+CLASS="REPLACEABLE"
+><I
+>lobjId</I
+></TT
+> передаётся <TT
+CLASS="SYMBOL"
+>InvalidOid</TT
+> (ноль), <CODE
+CLASS="FUNCTION"
+>lo_create</CODE
+> присваивает большому объекту свободный OID (так же, как и <CODE
+CLASS="FUNCTION"
+>lo_creat</CODE
+>). Возвращаемым значением будет OID, назначенный новому большому объекту, либо <TT
+CLASS="SYMBOL"
+>InvalidOid</TT
+> (ноль) в случае ошибки.</P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>lo_create</CODE
+> появилась в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> 8.1; если попытаться выполнить её с сервером более старой версии, произойдёт ошибка и будет возвращено <TT
+CLASS="SYMBOL"
+>InvalidOid</TT
+>.</P
+><P
+>Пример: </P><PRE
+CLASS="PROGRAMLISTING"
+>inv_oid = lo_create(conn, desired_oid);</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="LO-IMPORT"
+>32.3.2. Импорт большого объекта</A
+></H2
+><P
+> Чтобы импортировать в качестве большого объекта файл операционной системы, вызовите </P><PRE
+CLASS="SYNOPSIS"
+>Oid lo_import(PGconn *conn, const char *filename);</PRE
+><P>
+     В <TT
+CLASS="REPLACEABLE"
+><I
+>filename</I
+></TT
+> задаётся имя файла в операционной системе, который будет импортирован как большой объект. Возвращаемым значением будет OID, назначенный новому большому объекту, либо <TT
+CLASS="SYMBOL"
+>InvalidOid</TT
+> (ноль) в случае ошибки. Заметьте, что этот файл читает библиотека клиентского интерфейса, а не сервер; таким образом, он должен существовать в файловой системе на стороне клиента и быть доступным для чтения клиентскому приложению.</P
+><P
+> Функция </P><PRE
+CLASS="SYNOPSIS"
+>Oid lo_import_with_oid(PGconn *conn, const char *filename, Oid lobjId);</PRE
+><P> также импортирует новый большой объект. В <TT
+CLASS="REPLACEABLE"
+><I
+>lobjId</I
+></TT
+> можно задать назначаемый ему OID; при этом произойдёт ошибка, если этот OID уже присвоен какому-либо большому объекту. Если в <TT
+CLASS="REPLACEABLE"
+><I
+>lobjId</I
+></TT
+> передаётся <TT
+CLASS="SYMBOL"
+>InvalidOid</TT
+> (ноль), <CODE
+CLASS="FUNCTION"
+>lo_import_with_oid</CODE
+> присваивает большому объекту свободный OID (так же, как и <CODE
+CLASS="FUNCTION"
+>lo_import</CODE
+>). Возвращаемым значением будет OID, назначенный новому большому объекту, либо <TT
+CLASS="SYMBOL"
+>InvalidOid</TT
+> (ноль) в случае ошибки.</P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>lo_import_with_oid</CODE
+> появилась в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> 8.4 и вызывает внутри <CODE
+CLASS="FUNCTION"
+>lo_create</CODE
+>, появившуюся в 8.1; если попытаться выполнить её с сервером версии 8.0 или ранней, она завершится ошибкой и возвратит <TT
+CLASS="SYMBOL"
+>InvalidOid</TT
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="LO-EXPORT"
+>32.3.3. Экспорт большого объекта</A
+></H2
+><P
+> Чтобы экспортировать большой объект в файл операционной системы, вызовите </P><PRE
+CLASS="SYNOPSIS"
+>int lo_export(PGconn *conn, Oid lobjId, const char *filename);</PRE
+><P> В аргументе <TT
+CLASS="PARAMETER"
+>lobjId</TT
+> задаётся OID экспортируемого большого объекта, а в аргументе <TT
+CLASS="PARAMETER"
+>filename</TT
+> задаётся имя файла в операционной системе. Заметьте, что файл записывается библиотекой клиентского интерфейса, а не сервером. Возвращает 1 при успешном выполнении, -1 при ошибке.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="LO-OPEN"
+>32.3.4. Открытие существующего большого объекта</A
+></H2
+><P
+> Чтобы открыть существующий большой объект для чтения или записи, вызовите </P><PRE
+CLASS="SYNOPSIS"
+>int lo_open(PGconn *conn, Oid lobjId, int mode);</PRE
+><P> В аргументе <TT
+CLASS="PARAMETER"
+>lobjId</TT
+> задаётся OID открываемого большого объекта. Биты в аргументе <TT
+CLASS="PARAMETER"
+>mode</TT
+> определяют, открывается ли файл для чтения (<TT
+CLASS="SYMBOL"
+>INV_READ</TT
+>), для записи (<TT
+CLASS="SYMBOL"
+>INV_WRITE</TT
+>), либо для чтения/записи. (Эти константы определяются в заголовочном файле <TT
+CLASS="FILENAME"
+>libpq/libpq-fs.h</TT
+>.) Функция <CODE
+CLASS="FUNCTION"
+>lo_open</CODE
+> возвращает дескриптор большого объекта (неотрицательный) для последующего использования в функциях <CODE
+CLASS="FUNCTION"
+>lo_read</CODE
+>, <CODE
+CLASS="FUNCTION"
+>lo_write</CODE
+>, <CODE
+CLASS="FUNCTION"
+>lo_lseek</CODE
+>, <CODE
+CLASS="FUNCTION"
+>lo_lseek64</CODE
+>, <CODE
+CLASS="FUNCTION"
+>lo_tell</CODE
+>, <CODE
+CLASS="FUNCTION"
+>lo_tell64</CODE
+>, <CODE
+CLASS="FUNCTION"
+>lo_truncate</CODE
+>, <CODE
+CLASS="FUNCTION"
+>lo_truncate64</CODE
+> и <CODE
+CLASS="FUNCTION"
+>lo_close</CODE
+>. Этот дескриптор актуален только до завершения текущей транзакции. В случае ошибки возвращается -1.</P
+><P
+>В настоящее время сервер не различает режимы <TT
+CLASS="SYMBOL"
+>INV_WRITE</TT
+> и <TT
+CLASS="SYMBOL"
+>INV_READ</TT
+> <TT
+CLASS="LITERAL"
+>|</TT
+>
+     <TT
+CLASS="SYMBOL"
+>INV_WRITE</TT
+>: с таким дескриптором можно читать данные в любом случае. Однако есть значительное отличие этих режимов от одиночного <TT
+CLASS="SYMBOL"
+>INV_READ</TT
+>: с дескриптором <TT
+CLASS="SYMBOL"
+>INV_READ</TT
+> записывать данные нельзя, а данные, считываемые через него, будут отражать содержимое большого объекта в снимке транзакции, который был активен при выполнении <CODE
+CLASS="FUNCTION"
+>lo_open</CODE
+>, то есть не будут включать изменения, произведённые позже этой или другими транзакциями. При чтении с дескриптором <TT
+CLASS="SYMBOL"
+>INV_WRITE</TT
+> возвращаются данные, отражающие все изменения, произведённые другими зафиксированными транзакциями, а также текущей транзакцией. Это подобно различиям режимов <TT
+CLASS="LITERAL"
+>REPEATABLE READ</TT
+> и <TT
+CLASS="LITERAL"
+>READ COMMITTED</TT
+> для обычных команд SQL <TT
+CLASS="COMMAND"
+>SELECT</TT
+>.</P
+><P
+>Пример: </P><PRE
+CLASS="PROGRAMLISTING"
+>inv_fd = lo_open(conn, inv_oid, INV_READ|INV_WRITE);</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="LO-WRITE"
+>32.3.5. Запись данных в большой объект</A
+></H2
+><P
+> Функция </P><PRE
+CLASS="SYNOPSIS"
+>int lo_write(PGconn *conn, int fd, const char *buf, size_t len);</PRE
+><P> записывает <TT
+CLASS="PARAMETER"
+>len</TT
+> байт из буфера <TT
+CLASS="PARAMETER"
+>buf</TT
+> (который должен иметь размер <TT
+CLASS="PARAMETER"
+>len</TT
+>) в дескриптор большого объекта <TT
+CLASS="PARAMETER"
+>fd</TT
+>. В <TT
+CLASS="PARAMETER"
+>fd</TT
+> должно передаваться значение, возвращённое предыдущим вызовом <CODE
+CLASS="FUNCTION"
+>lo_open</CODE
+>. Возвращает эта функция число фактически записанных байт (в текущей реализации это всегда <TT
+CLASS="PARAMETER"
+>len</TT
+>, если только не произошла ошибка). В случае ошибки возвращается значение -1.</P
+><P
+>Хотя параметр <TT
+CLASS="PARAMETER"
+>len</TT
+> объявлен как <TT
+CLASS="TYPE"
+>size_t</TT
+>, эта функция не принимает значение длины, превышающее <TT
+CLASS="LITERAL"
+>INT_MAX</TT
+>. На практике всё равно лучше передавать данные фрагментами не больше нескольких мегабайт.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="LO-READ"
+>32.3.6. Чтение данных из большого объекта</A
+></H2
+><P
+> Функция </P><PRE
+CLASS="SYNOPSIS"
+>int lo_read(PGconn *conn, int fd, char *buf, size_t len);</PRE
+><P> читает до <TT
+CLASS="PARAMETER"
+>len</TT
+> байт из дескриптора большого объекта <TT
+CLASS="PARAMETER"
+>fd</TT
+> в буфер <TT
+CLASS="PARAMETER"
+>buf</TT
+> (который должен иметь размер <TT
+CLASS="PARAMETER"
+>len</TT
+>). В <TT
+CLASS="PARAMETER"
+>fd</TT
+> должно передаваться значение, возвращённое предыдущим вызовом <CODE
+CLASS="FUNCTION"
+>lo_open</CODE
+>. Возвращает эта функция число фактически прочитанных байт; это число должно быть меньше <TT
+CLASS="PARAMETER"
+>len</TT
+>, если при чтении был достигнут конец объекта. В случае ошибки возвращается -1.</P
+><P
+>Хотя параметр <TT
+CLASS="PARAMETER"
+>len</TT
+> объявлен как <TT
+CLASS="TYPE"
+>size_t</TT
+>, эта функция не принимает значение длины, превышающее <TT
+CLASS="LITERAL"
+>INT_MAX</TT
+>. На практике всё равно лучше передавать данные фрагментами не больше нескольких мегабайт.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="LO-SEEK"
+>32.3.7. Перемещение в большом объекте</A
+></H2
+><P
+> Чтобы изменить текущее положение чтения или записи, связанное с дескриптором большого объекта, вызовите </P><PRE
+CLASS="SYNOPSIS"
+>int lo_lseek(PGconn *conn, int fd, int offset, int whence);</PRE
+><P> Эта функция перемещает указатель текущего положения для дескриптора большого объекта <TT
+CLASS="PARAMETER"
+>fd</TT
+> в новое положение, заданное аргументом <TT
+CLASS="PARAMETER"
+>offset</TT
+>. Для аргумента <TT
+CLASS="PARAMETER"
+>whence</TT
+> задаются значения <TT
+CLASS="SYMBOL"
+>SEEK_SET</TT
+> (перемещение от начала объекта), <TT
+CLASS="SYMBOL"
+>SEEK_CUR</TT
+> (перемещение от текущего положения) и <TT
+CLASS="SYMBOL"
+>SEEK_END</TT
+> (перемещение от конца объекта). Возвращает эта функция новое положение указателя, либо -1 в случае ошибки.</P
+><P
+> Оперируя с большими объектами, размер которых превышает 2 ГБ, используйте </P><PRE
+CLASS="SYNOPSIS"
+>pg_int64 lo_lseek64(PGconn *conn, int fd, pg_int64 offset, int whence);</PRE
+><P> Эта функция действует так же, как и <CODE
+CLASS="FUNCTION"
+>lo_lseek</CODE
+>, но может принять значение <TT
+CLASS="PARAMETER"
+>offset</TT
+>, превышающее 2 ГБ, и/или вернуть результат, превышающий 2 ГБ. Заметьте, что если новое положение указателя оказывается за границей в 2ГБ, функция <CODE
+CLASS="FUNCTION"
+>lo_lseek</CODE
+> выдаёт ошибку.</P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>lo_lseek64</CODE
+> появилась в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> 9.3. Если попытаться выполнить её с сервером более старой версии, произойдёт ошибка и будет возвращено -1.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="LO-TELL"
+>32.3.8. Получение текущего положения в большом объекте</A
+></H2
+><P
+> Чтобы получить текущее положение чтения или записи для дескриптора большого объекта, вызовите </P><PRE
+CLASS="SYNOPSIS"
+>int lo_tell(PGconn *conn, int fd);</PRE
+><P> Если возникает ошибка, возвращается -1.</P
+><P
+> Оперируя с большими объектами, размер которых может превышать 2 ГБ, используйте </P><PRE
+CLASS="SYNOPSIS"
+>pg_int64 lo_tell64(PGconn *conn, int fd);</PRE
+><P> Эта функция действует так же, как <CODE
+CLASS="FUNCTION"
+>lo_tell</CODE
+>, но может выдавать результат, превышающий 2 ГБ. Заметьте, что <CODE
+CLASS="FUNCTION"
+>lo_tell</CODE
+> выдаёт ошибку, если текущее положение чтения/записи оказывается за границей в 2 ГБ.</P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>lo_tell64</CODE
+> появилась в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> 9.3. Если попытаться выполнить её с сервером более старой версии, произойдёт ошибка и будет возвращено -1.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="LO-TRUNCATE"
+>32.3.9. Усечение большого объекта</A
+></H2
+><P
+> Чтобы усечь большой объект до требуемой длины, вызовите </P><PRE
+CLASS="SYNOPSIS"
+>int lo_truncate(PGcon *conn, int fd, size_t len);</PRE
+><P> Эта функция усекает большой объект с дескриптором <TT
+CLASS="PARAMETER"
+>fd</TT
+> до длины <TT
+CLASS="PARAMETER"
+>len</TT
+>. В <TT
+CLASS="PARAMETER"
+>fd</TT
+> должно передаваться значение, возвращённое предыдущим вызовом <CODE
+CLASS="FUNCTION"
+>lo_open</CODE
+>. Если <TT
+CLASS="PARAMETER"
+>len</TT
+> превышает текущую длину большого объекта, большой объект расширяется до заданной длины нулевыми байтами ('\0'). В случае успеха <CODE
+CLASS="FUNCTION"
+>lo_truncate</CODE
+> возвращает ноль, а при ошибке возвращается -1.</P
+><P
+>Положение чтения/записи, связанное с дескриптором <TT
+CLASS="PARAMETER"
+>fd</TT
+>, при этом не меняется.</P
+><P
+>Хотя параметр <TT
+CLASS="PARAMETER"
+>len</TT
+> объявлен как <TT
+CLASS="TYPE"
+>size_t</TT
+>, <CODE
+CLASS="FUNCTION"
+>lo_truncate</CODE
+> не принимает значение длины, превышающее <TT
+CLASS="LITERAL"
+>INT_MAX</TT
+>.</P
+><P
+> Оперируя с большими объектами, размер которых может превышать 2 ГБ, используйте </P><PRE
+CLASS="SYNOPSIS"
+>int lo_truncate64(PGcon *conn, int fd, pg_int64 len);</PRE
+><P> Эта функция действует так же, как <CODE
+CLASS="FUNCTION"
+>lo_truncate</CODE
+>, но может принимать значения <TT
+CLASS="PARAMETER"
+>len</TT
+>, превышающие 2 ГБ.</P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>lo_truncate</CODE
+> появилась в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> 8.3; если попытаться выполнить её с сервером более старой версии, произойдёт ошибка и будет возвращено -1.</P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>lo_truncate64</CODE
+> появилась в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> 9.3; если попытаться выполнить её с сервером более старой версии, произойдёт ошибка и будет возвращено -1.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="LO-CLOSE"
+>32.3.10. Закрытие дескриптора большого объекта</A
+></H2
+><P
+> Дескриптор большого объекта можно закрыть, вызвав </P><PRE
+CLASS="SYNOPSIS"
+>int lo_close(PGconn *conn, int fd);</PRE
+><P> Здесь <TT
+CLASS="PARAMETER"
+>fd</TT
+> — дескриптор большого объекта, возвращённый функцией <CODE
+CLASS="FUNCTION"
+>lo_open</CODE
+>. В случае успеха <CODE
+CLASS="FUNCTION"
+>lo_close</CODE
+> возвращает ноль. При ошибке возвращается -1.</P
+><P
+>Все дескрипторы больших объектов, остающиеся открытыми в конце транзакции, закрываются автоматически.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="LO-UNLINK"
+>32.3.11. Удаление большого объекта</A
+></H2
+><P
+> Чтобы удалить большой объект из базы данных, вызовите </P><PRE
+CLASS="SYNOPSIS"
+>int lo_unlink(PGconn *conn, Oid lobjId);</PRE
+><P> В аргументе <TT
+CLASS="PARAMETER"
+>lobjId</TT
+> задаётся OID большого объекта, который нужно удалить. В случае успеха возвращается 1, а в случае ошибки -1.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="lo-implementation.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="lo-funcs.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Особенности реализации</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="largeobjects.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Серверные функции</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

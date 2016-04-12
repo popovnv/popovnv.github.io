@@ -1,0 +1,351 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>CREATE TEXT SEARCH PARSER</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="CREATE TEXT SEARCH DICTIONARY"
+HREF="sql-createtsdictionary.html"><LINK
+REL="NEXT"
+TITLE="CREATE TEXT SEARCH TEMPLATE"
+HREF="sql-createtstemplate.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="CREATE TEXT SEARCH DICTIONARY"
+HREF="sql-createtsdictionary.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="CREATE TEXT SEARCH TEMPLATE"
+HREF="sql-createtstemplate.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-CREATETSPARSER"
+></A
+>CREATE TEXT SEARCH PARSER</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN76803"
+></A
+><H2
+>Название</H2
+>CREATE TEXT SEARCH PARSER&nbsp;--&nbsp;создать анализатор текстового поиска</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN76806"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>CREATE TEXT SEARCH PARSER <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> (
+    START = <TT
+CLASS="REPLACEABLE"
+><I
+>функция_начала</I
+></TT
+> ,
+    GETTOKEN = <TT
+CLASS="REPLACEABLE"
+><I
+>функция_выдачи_фрагмента</I
+></TT
+> ,
+    END = <TT
+CLASS="REPLACEABLE"
+><I
+>функция_окончания</I
+></TT
+> ,
+    LEXTYPES = <TT
+CLASS="REPLACEABLE"
+><I
+>функция_лекс_типов</I
+></TT
+>
+    [, HEADLINE = <TT
+CLASS="REPLACEABLE"
+><I
+>функция_выдержек</I
+></TT
+> ]
+)</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN76814"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>CREATE TEXT SEARCH PARSER</TT
+> создаёт анализатор текстового поиска. Анализатор текстового поиска определяет способ разделения текстовой строки на фрагменты и назначения типов (категорий) этим фрагментам. Анализатор не очень полезен сам по себе, для осуществления поиска он должен быть подключён к конфигурации текстового поиска вместе с определёнными словарями.</P
+><P
+>Если указывается имя схемы, словарь текстового поиска создаётся в указанной схеме. В противном случае он создаётся в текущей схеме.</P
+><P
+>Выполнить <TT
+CLASS="COMMAND"
+>CREATE TEXT SEARCH PARSER</TT
+> может только суперпользователь. (Это ограничение введено потому, что ошибочное определение анализатора текстового поиска может вызвать нарушения или даже сбой в работе сервера.)</P
+><P
+>За дополнительными сведениями обратитесь к <A
+HREF="textsearch.html"
+>Главе 12</A
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN76823"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></DT
+><DD
+><P
+>Имя создаваемого анализатора текстового поиска, возможно, дополненное схемой.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>функция_начала</I
+></TT
+></DT
+><DD
+><P
+>Имя функции, вызываемой в начале обработки.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>функция_выдачи_фрагмента</I
+></TT
+></DT
+><DD
+><P
+>Имя функции, выдающей следующий фрагмент.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>функция_окончания</I
+></TT
+></DT
+><DD
+><P
+>Имя функции, вызываемой по окончании обработки.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>функция_лекс_типов</I
+></TT
+></DT
+><DD
+><P
+>Имя функции перечисления лексических типов (эта функция выдаёт информацию о множестве типов фрагментов, выделяемых анализатором).</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>функция_выдержек</I
+></TT
+></DT
+><DD
+><P
+>Имя функции извлечения выдержек (эта функция выделяет краткое содержание для набора фрагментов).</P
+></DD
+></DL
+></DIV
+><P
+>Имена функций могут быть дополнены именем схемы, если требуется. Типы аргументов не указываются, так как список аргументов для всех типов функций предопределён. Обязательными являются все функции, кроме функции выдержек.</P
+><P
+>Аргументы могут перечисляться в любом порядке, не только в том, что показан выше.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN76858"
+></A
+><H2
+>Совместимость</H2
+><P
+>Оператор <TT
+CLASS="COMMAND"
+>CREATE TEXT SEARCH PARSER</TT
+> отсутствует в стандарте SQL.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN76862"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-altertsparser.html"
+>ALTER TEXT SEARCH PARSER</A
+>, <A
+HREF="sql-droptsparser.html"
+>DROP TEXT SEARCH PARSER</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-createtsdictionary.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-createtstemplate.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>CREATE TEXT SEARCH DICTIONARY</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>CREATE TEXT SEARCH TEMPLATE</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

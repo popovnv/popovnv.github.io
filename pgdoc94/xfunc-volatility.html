@@ -1,0 +1,373 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Категории изменчивости функций</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Расширение SQL"
+HREF="extend.html"><LINK
+REL="PREVIOUS"
+TITLE="Перегрузка функций"
+HREF="xfunc-overload.html"><LINK
+REL="NEXT"
+TITLE="Функции на процедурных языках"
+HREF="xfunc-pl.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Перегрузка функций"
+HREF="xfunc-overload.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="extend.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 35. Расширение <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Функции на процедурных языках"
+HREF="xfunc-pl.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="XFUNC-VOLATILITY"
+>35.6. Категории изменчивости функций</A
+></H1
+><P
+>Для каждой функции определяется характеристика <I
+CLASS="FIRSTTERM"
+>изменчивости</I
+>, с возможными вариантами: <TT
+CLASS="LITERAL"
+>VOLATILE</TT
+>, <TT
+CLASS="LITERAL"
+>STABLE</TT
+> и <TT
+CLASS="LITERAL"
+>IMMUTABLE</TT
+>. Если эта характеристика не задаётся явно в команде <A
+HREF="sql-createfunction.html"
+>CREATE FUNCTION</A
+>, по умолчанию подразумевается <TT
+CLASS="LITERAL"
+>VOLATILE</TT
+>. Категория изменчивости представляет собой обещание некоторого поведения функции для оптимизатора: <P
+></P
+></P><UL
+><LI
+><P
+>Изменчивая функция (<TT
+CLASS="LITERAL"
+>VOLATILE</TT
+>) может делать всё, что угодно, в том числе, модифицировать базу данных. Она может возвращать различные результаты при нескольких вызовах с одинаковыми аргументами. Оптимизатор не делает никаких предположений о поведении таких функций. В запросе, использующем изменчивую функцию, она будет вычисляться заново для каждой строки, когда потребуется её результат.</P
+></LI
+><LI
+><P
+>Стабильная функция (<TT
+CLASS="LITERAL"
+>STABLE</TT
+>) не может модифицировать базу данных и гарантированно возвращает одинаковый результат, получая одинаковые аргументы, для всех строк в одном операторе. Эта характеристика позволяет оптимизатору заменить множество вызовов этой функции одним. В частности, выражение, содержащее такую функцию, можно безопасно использовать в условии поиска по индексу. (Так как при поиске по индексу целевое значение вычисляется только один раз, а не для каждой строки, использовать функцию с характеристикой <TT
+CLASS="LITERAL"
+>VOLATILE</TT
+> в условии поиска по индексу нельзя.)</P
+></LI
+><LI
+><P
+>Постоянная функция (<TT
+CLASS="LITERAL"
+>IMMUTABLE</TT
+>) не может модифицировать базу данных и гарантированно всегда возвращает одинаковые результаты для одних и тех же аргументов. Эта характеристика позволяет оптимизатору предварительно вычислить функцию, когда она вызывается в запросе с постоянными аргументами. Например, запрос вида <TT
+CLASS="LITERAL"
+>SELECT ... WHERE x = 2 + 2</TT
+> можно упростить до <TT
+CLASS="LITERAL"
+>SELECT ... WHERE x = 4</TT
+>, так как нижележащая функция оператора сложения помечена как <TT
+CLASS="LITERAL"
+>IMMUTABLE</TT
+>.</P
+></LI
+></UL
+><P></P
+><P
+>Для наилучших результатов оптимизации, функции следует назначать самую строгую характеристику изменчивости, которой она соответствует.</P
+><P
+>Любая функция с побочными эффектами <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>должна</I
+></SPAN
+> быть помечена как <TT
+CLASS="LITERAL"
+>VOLATILE</TT
+>, чтобы обращения к ней не исключались при оптимизации. Даже если функция не имеет побочных эффектов, её нужно пометить как <TT
+CLASS="LITERAL"
+>VOLATILE</TT
+>, если её значение может меняться при выполнении одного запроса; таковы функции <TT
+CLASS="LITERAL"
+>random()</TT
+>, <TT
+CLASS="LITERAL"
+>currval()</TT
+> и <TT
+CLASS="LITERAL"
+>timeofday()</TT
+>.</P
+><P
+>Другой важный пример представляет семейство функций <CODE
+CLASS="FUNCTION"
+>current_timestamp</CODE
+>, которые имеют характеристику <TT
+CLASS="LITERAL"
+>STABLE</TT
+>, потому что их значения не меняются в рамках одной транзакции.</P
+><P
+>Характеристики <TT
+CLASS="LITERAL"
+>STABLE</TT
+> и <TT
+CLASS="LITERAL"
+>IMMUTABLE</TT
+> мало различаются, когда речь идёт о простых интерактивных запросах, которые планируются и сразу же выполняются; не имеет большого значения, будет ли функция выполнена однократно на этапе планирования или в начале выполнения. Существенное различие проявляется, когда план сохраняется и многократно используется позже. Если функция помечена как <TT
+CLASS="LITERAL"
+>IMMUTABLE</TT
+>, тогда как на самом деле она не является постоянной, она может быть сведена к константе во время планирования, так что при последующих выполнениях плана вместо неё будет использоваться неактуальное значение. Это опасно при использовании подготовленных операторов или языков функций, кеширующих планы (например, <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+>).</P
+><P
+>У функций, написанных на SQL или на любом другом стандартном процедурном языке, есть ещё одно важное свойство, определяемое характеристикой изменчивости, а именно видимость изменений, произведённых командой SQL, которая вызывает эту функцию. Функция <TT
+CLASS="LITERAL"
+>VOLATILE</TT
+> будет видеть такие изменения, тогда как <TT
+CLASS="LITERAL"
+>STABLE</TT
+> и <TT
+CLASS="LITERAL"
+>IMMUTABLE</TT
+> — нет. Это поведение реализуется посредством снимков в MVCC (см. <A
+HREF="mvcc.html"
+>Главу 13</A
+>): <TT
+CLASS="LITERAL"
+>STABLE</TT
+> и <TT
+CLASS="LITERAL"
+>IMMUTABLE</TT
+> используют снимок, полученный в начале вызывающего запроса, тогда как функции <TT
+CLASS="LITERAL"
+>VOLATILE</TT
+> получают свежий снимок в начале каждого запроса, который они выполняют.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Функции, написанные на C, могут работать со снимками как угодно, но обычно лучше сделать так, чтобы они действовали аналогично.</P
+></BLOCKQUOTE
+></DIV
+><P
+>Вследствие такой организации работы со снимками, функцию, содержащую только команды <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, можно безопасно пометить как <TT
+CLASS="LITERAL"
+>STABLE</TT
+>, даже если она выбирает данные из таблиц, которые могут быть изменены параллельными запросами. <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> выполнит все команды в функции <TT
+CLASS="LITERAL"
+>STABLE</TT
+> со снимком, полученным для вызывающего запроса, так что они будут видеть одно представление базы данных на протяжении всего запроса.</P
+><P
+>То же самое поведение со снимками распространяется на команды <TT
+CLASS="COMMAND"
+>SELECT</TT
+> в функциях <TT
+CLASS="LITERAL"
+>IMMUTABLE</TT
+>. Вообще в функциях <TT
+CLASS="LITERAL"
+>IMMUTABLE</TT
+> обычно неразумно выбирать данные из таблиц, так как &laquo;постоянство&raquo; функции будет нарушено, если содержимое таблиц изменится. Однако <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> не принуждает вас явно отказаться от этого.</P
+><P
+>Одна из распространённых ошибок — помечать функцию как <TT
+CLASS="LITERAL"
+>IMMUTABLE</TT
+>, при том, что её результаты зависят от параметра конфигурации. Например, функция, работающая с временем, может выдавать результаты, зависящие от параметра <A
+HREF="runtime-config-client.html#GUC-TIMEZONE"
+>TimeZone</A
+>. Для надёжности такие функции следует помечать как <TT
+CLASS="LITERAL"
+>STABLE</TT
+>.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> требует, чтобы функции <TT
+CLASS="LITERAL"
+>STABLE</TT
+> и <TT
+CLASS="LITERAL"
+>IMMUTABLE</TT
+> не содержали SQL-команд, кроме <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, для предотвращения модификации данных. (Это не совсем непробиваемое ограничение, так как эти функции всё же могут вызывать функции <TT
+CLASS="LITERAL"
+>VOLATILE</TT
+>, способные модифицировать базу данных. Если вы реализуете такую схему, вы увидите, что функция <TT
+CLASS="LITERAL"
+>STABLE</TT
+> и <TT
+CLASS="LITERAL"
+>IMMUTABLE</TT
+> не замечает изменений в базе данных, произведённых вызванной функцией, так как они не проявляются в её снимке данных.)</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="xfunc-overload.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="xfunc-pl.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Перегрузка функций</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="extend.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Функции на процедурных языках</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

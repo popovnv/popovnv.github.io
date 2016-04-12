@@ -1,0 +1,1135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Обработка ошибок</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="ECPG — встраиваемый SQL в C"
+HREF="ecpg.html"><LINK
+REL="PREVIOUS"
+TITLE="Использование областей дескрипторов"
+HREF="ecpg-descriptors.html"><LINK
+REL="NEXT"
+TITLE="Директивы препроцессора"
+HREF="ecpg-preproc.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Использование областей дескрипторов"
+HREF="ecpg-descriptors.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ecpg.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 33. <SPAN
+CLASS="APPLICATION"
+>ECPG</SPAN
+> — встраиваемый <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> в C</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Директивы препроцессора"
+HREF="ecpg-preproc.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="ECPG-ERRORS"
+>33.8. Обработка ошибок</A
+></H1
+><P
+>В этом разделе описывается, как можно обрабатывать исключительные условия и предупреждения в программе со встраиваемым SQL. Для этого предназначены два средства, которые могут дополнять друг друга. <P
+></P
+></P><UL
+><LI
+><P
+>Можно настроить функции-обработчики для обработки предупреждений и ошибок, воспользовавшись командой <TT
+CLASS="LITERAL"
+>WHENEVER</TT
+>.</P
+></LI
+><LI
+><P
+>Подробную информацию об ошибке или предупреждении можно получить через переменную <TT
+CLASS="VARNAME"
+>sqlca</TT
+>.</P
+></LI
+></UL
+><P></P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="ECPG-WHENEVER"
+>33.8.1. Установка обработчиков</A
+></H2
+><P
+>Один простой метод перехвата ошибок и предупреждений заключается в назначении определённого действия, которое будет выполняться при некотором условии. В общем виде: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL WHENEVER <TT
+CLASS="REPLACEABLE"
+><I
+>условие</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>действие</I
+></TT
+>;</PRE
+><P></P
+><P
+>Здесь <TT
+CLASS="REPLACEABLE"
+><I
+>условие</I
+></TT
+> может быть следующим: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>SQLERROR</TT
+></DT
+><DD
+><P
+>Указанное действие вызывается, когда при выполнении оператора SQL происходит ошибка.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>SQLWARNING</TT
+></DT
+><DD
+><P
+>Указанное действие вызывается, когда при выполнении оператора SQL выдаётся предупреждение.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>NOT FOUND</TT
+></DT
+><DD
+><P
+>Указанное действие вызывается, когда оператор SQL получает или обрабатывает ноль строк. (Это обстоятельство не считается ошибкой, но бывает полезно отследить его.)</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+><TT
+CLASS="REPLACEABLE"
+><I
+>действие</I
+></TT
+> может быть следующим: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>CONTINUE</TT
+></DT
+><DD
+><P
+>Это фактически означает, что условие игнорируется. Это поведение по умолчанию.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>GOTO <TT
+CLASS="REPLACEABLE"
+><I
+>метка</I
+></TT
+></TT
+><BR><TT
+CLASS="LITERAL"
+>GO TO <TT
+CLASS="REPLACEABLE"
+><I
+>метка</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Перейти к указанной метке (используя оператор <TT
+CLASS="LITERAL"
+>goto</TT
+> языка C).</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>SQLPRINT</TT
+></DT
+><DD
+><P
+>Вывести сообщение в устройство стандартного вывода. Это полезно для простых программ или при разработке прототипов. Содержание этого сообщения не настраивается.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>STOP</TT
+></DT
+><DD
+><P
+>Вызвать <TT
+CLASS="LITERAL"
+>exit(1)</TT
+>, что приведёт к завершению программы.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>DO BREAK</TT
+></DT
+><DD
+><P
+>Выполнить оператор <TT
+CLASS="LITERAL"
+>break</TT
+> языка C. Этот вариант следует использовать только в циклах или операторах <TT
+CLASS="LITERAL"
+>switch</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>CALL <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> (<TT
+CLASS="REPLACEABLE"
+><I
+>аргументы</I
+></TT
+>)</TT
+><BR><TT
+CLASS="LITERAL"
+>DO <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> (<TT
+CLASS="REPLACEABLE"
+><I
+>аргументы</I
+></TT
+>)</TT
+></DT
+><DD
+><P
+>Вызвать указанные функции C с заданными аргументами.</P
+></DD
+></DL
+></DIV
+><P> В стандарте SQL описаны только действия <TT
+CLASS="LITERAL"
+>CONTINUE</TT
+> и <TT
+CLASS="LITERAL"
+>GOTO</TT
+> (и <TT
+CLASS="LITERAL"
+>GO TO</TT
+>).</P
+><P
+>Ниже показан простой пример использования этих команд. Эта конструкция выводит простое сообщение при выдаче предупреждения и прерывает программу в случае ошибки: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL WHENEVER SQLWARNING SQLPRINT;
+EXEC SQL WHENEVER SQLERROR STOP;</PRE
+><P></P
+><P
+>Оператор <TT
+CLASS="LITERAL"
+>EXEC SQL WHENEVER</TT
+> является директивой препроцессора SQL, а не оператором языка C. Устанавливаемое им действие при ошибках или предупреждениях применяется ко всем встраиваемым операторам SQL ниже точки, где устанавливается обработчик, если только это действие не было изменено после первой команды <TT
+CLASS="LITERAL"
+>EXEC SQL WHENEVER</TT
+>, и до SQL-оператора, вызвавшего это условие, вне зависимости от хода выполнения программы на C. Поэтому обе следующие программы на C не дадут желаемого эффекта: </P><PRE
+CLASS="PROGRAMLISTING"
+>/*
+ * НЕПРАВИЛЬНО
+ */
+int main(int argc, char *argv[])
+{
+    ...
+    if (verbose) {
+        EXEC SQL WHENEVER SQLWARNING SQLPRINT;
+    }
+    ...
+    EXEC SQL SELECT ...;
+    ...
+}</PRE
+><P>
+
+</P><PRE
+CLASS="PROGRAMLISTING"
+>/*
+ * НЕПРАВИЛЬНО
+ */
+int main(int argc, char *argv[])
+{
+    ...
+    set_error_handler();
+    ...
+    EXEC SQL SELECT ...;
+    ...
+}
+
+static void set_error_handler(void)
+{
+    EXEC SQL WHENEVER SQLERROR STOP;
+}</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="ECPG-SQLCA"
+>33.8.2. sqlca</A
+></H2
+><P
+>Для более гибкой обработки ошибок в интерфейсе встраиваемого SQL представлена глобальная переменная с именем <TT
+CLASS="VARNAME"
+>sqlca</TT
+> (SQL Communication Area, Область сведений SQL), имеющая следующую структуру: </P><PRE
+CLASS="PROGRAMLISTING"
+>struct
+{
+    char sqlcaid[8];
+    long sqlabc;
+    long sqlcode;
+    struct
+    {
+        int sqlerrml;
+        char sqlerrmc[SQLERRMC_LEN];
+    } sqlerrm;
+    char sqlerrp[8];
+    long sqlerrd[6];
+    char sqlwarn[8];
+    char sqlstate[5];
+} sqlca;</PRE
+><P> (В многопоточной программе каждый поток автоматически получает собственную копию <TT
+CLASS="VARNAME"
+>sqlca</TT
+>. Это работает подобно стандартной в C глобальной переменной <TT
+CLASS="VARNAME"
+>errno</TT
+>.)</P
+><P
+>Структура <TT
+CLASS="VARNAME"
+>sqlca</TT
+> покрывает и предупреждения, и ошибки. Если в процессе выполнения оператора выдаётся несколько предупреждений или ошибок, <TT
+CLASS="VARNAME"
+>sqlca</TT
+> будет содержать сведения только о последнем(ей) из них.</P
+><P
+>Если последний оператор <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> выполняется без ошибки, <TT
+CLASS="LITERAL"
+>sqlca.sqlcode</TT
+> будет содержать 0, а <TT
+CLASS="LITERAL"
+>sqlca.sqlstate</TT
+> — <TT
+CLASS="LITERAL"
+>"00000"</TT
+>. Если выдаётся предупреждение или ошибка, в <TT
+CLASS="LITERAL"
+>sqlca.sqlcode</TT
+> будет содержаться отрицательное число, а <TT
+CLASS="LITERAL"
+>sqlca.sqlstate</TT
+> будет отличаться от <TT
+CLASS="LITERAL"
+>"00000"</TT
+>. Положительное значение <TT
+CLASS="LITERAL"
+>sqlca.sqlcode</TT
+> устанавливается при нейтральном событии, например, когда последний запрос возвращает ноль строк. Поля <TT
+CLASS="LITERAL"
+>sqlcode</TT
+> и <TT
+CLASS="LITERAL"
+>sqlstate</TT
+> представляют две различные схемы кодов ошибок; подробнее они описаны ниже.</P
+><P
+>Если последний оператор SQL был успешным, в <TT
+CLASS="LITERAL"
+>sqlca.sqlerrd[1]</TT
+> содержится OID обработанной строки (если это уместно), а в <TT
+CLASS="LITERAL"
+>sqlca.sqlerrd[2]</TT
+> количество обработанных или возвращённых строк (если это уместно для команды).</P
+><P
+>В случае ошибки или предупреждения <TT
+CLASS="LITERAL"
+>sqlca.sqlerrm.sqlerrmc</TT
+> будет содержать строку, описывающую ошибку. Поле <TT
+CLASS="LITERAL"
+>sqlca.sqlerrm.sqlerrml</TT
+> содержит длину сообщения об ошибке, которое хранится в <TT
+CLASS="LITERAL"
+>sqlca.sqlerrm.sqlerrmc</TT
+> (результат функции <CODE
+CLASS="FUNCTION"
+>strlen()</CODE
+>, который не очень интересен для программиста C). Заметьте, что некоторые сообщения могут не умещаться в массив <TT
+CLASS="LITERAL"
+>sqlerrmc</TT
+> фиксированного размера; они будут обрезаться.</P
+><P
+>В случае предупреждения, в <TT
+CLASS="LITERAL"
+>sqlca.sqlwarn[2]</TT
+> записывается символ <TT
+CLASS="LITERAL"
+>W</TT
+>. (Во всех других случаях значение будет отличным от <TT
+CLASS="LITERAL"
+>W</TT
+>.) Символ <TT
+CLASS="LITERAL"
+>W</TT
+> в <TT
+CLASS="LITERAL"
+>sqlca.sqlwarn[1]</TT
+> показывает, что значение было обрезано при сохранении в переменной среды. <TT
+CLASS="LITERAL"
+>W</TT
+> в <TT
+CLASS="LITERAL"
+>sqlca.sqlwarn[0]</TT
+> устанавливается, если предупреждение отмечается в каком-либо другом элементе массива.</P
+><P
+>Поля <TT
+CLASS="STRUCTFIELD"
+>sqlcaid</TT
+>, <TT
+CLASS="STRUCTFIELD"
+>sqlcabc</TT
+>, <TT
+CLASS="STRUCTFIELD"
+>sqlerrp</TT
+> и остальные элементы <TT
+CLASS="STRUCTFIELD"
+>sqlerrd</TT
+> и <TT
+CLASS="STRUCTFIELD"
+>sqlwarn</TT
+> в настоящее время не содержат полезной информации.</P
+><P
+>Структура <TT
+CLASS="VARNAME"
+>sqlca</TT
+> не определена в стандарте SQL, но реализована в нескольких других СУБД SQL. Принципиально она определяется одинаково, но если вы хотите, чтобы ваши приложения были переносимыми, тщательно изучите различия реализаций.</P
+><P
+>В следующем примере, демонстрирующем применение <TT
+CLASS="LITERAL"
+>WHENEVER</TT
+> в сочетании с <TT
+CLASS="VARNAME"
+>sqlca</TT
+>, выводится содержимое <TT
+CLASS="VARNAME"
+>sqlca</TT
+> при возникновении ошибки. Это может быть полезно для отладки или в прототипах, пока не реализован более <SPAN
+CLASS="QUOTE"
+>"дружественный пользователю"</SPAN
+> обработчик ошибок. </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL WHENEVER SQLERROR CALL print_sqlca();
+
+void
+print_sqlca()
+{
+    fprintf(stderr, "==== sqlca ====\n");
+    fprintf(stderr, "sqlcode: %ld\n", sqlca.sqlcode);
+    fprintf(stderr, "sqlerrm.sqlerrml: %d\n", sqlca.sqlerrm.sqlerrml);
+    fprintf(stderr, "sqlerrm.sqlerrmc: %s\n", sqlca.sqlerrm.sqlerrmc);
+    fprintf(stderr, "sqlerrd: %ld %ld %ld %ld %ld %ld\n", sqlca.sqlerrd[0],sqlca.sqlerrd[1],sqlca.sqlerrd[2],
+                                                          sqlca.sqlerrd[3],sqlca.sqlerrd[4],sqlca.sqlerrd[5]);
+    fprintf(stderr, "sqlwarn: %d %d %d %d %d %d %d %d\n", sqlca.sqlwarn[0], sqlca.sqlwarn[1], sqlca.sqlwarn[2],
+                                                          sqlca.sqlwarn[3], sqlca.sqlwarn[4], sqlca.sqlwarn[5],
+                                                          sqlca.sqlwarn[6], sqlca.sqlwarn[7]);
+    fprintf(stderr, "sqlstate: %5s\n", sqlca.sqlstate);
+    fprintf(stderr, "===============\n");
+}</PRE
+><P> Результат может выглядеть следующим образом (при ошибке, вызванной опечаткой в имени таблицы): </P><PRE
+CLASS="SCREEN"
+>==== sqlca ====
+sqlcode: -400
+sqlerrm.sqlerrml: 49
+sqlerrm.sqlerrmc: relation "pg_databasep" does not exist on line 38
+sqlerrd: 0 0 0 0 0 0
+sqlwarn: 0 0 0 0 0 0 0 0
+sqlstate: 42P01
+===============</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="ECPG-SQLSTATE-SQLCODE"
+>33.8.3. <TT
+CLASS="LITERAL"
+>SQLSTATE</TT
+> и <TT
+CLASS="LITERAL"
+>SQLCODE</TT
+></A
+></H2
+><P
+>Поля <TT
+CLASS="LITERAL"
+>sqlca.sqlstate</TT
+> и <TT
+CLASS="LITERAL"
+>sqlca.sqlcode</TT
+> отражают две различные схемы, представляющие коды ошибок. Обе схемы пришли из стандарта SQL, но схема <TT
+CLASS="LITERAL"
+>SQLCODE</TT
+> была признана устаревшей в редакции SQL-92 и исключена в последующих редакциях. Поэтому в новых приложениях настоятельно рекомендуется использовать <TT
+CLASS="LITERAL"
+>SQLSTATE</TT
+>.</P
+><P
+><TT
+CLASS="LITERAL"
+>SQLSTATE</TT
+> задаётся в массиве из пяти символов. Эти пять символов содержат цифры или буквы в верхнем регистре, представляющие коды различных условий ошибок и предупреждений. <TT
+CLASS="LITERAL"
+>SQLSTATE</TT
+> определяется по иерархической схеме: первые два символа обозначают общий класс условия, а следующие три — подкласс общего условия. Успешное состояние обозначается кодом <TT
+CLASS="LITERAL"
+>00000</TT
+>. По большей части коды <TT
+CLASS="LITERAL"
+>SQLSTATE</TT
+> определены в стандарте SQL. Сервер <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> поддерживает коды ошибок <TT
+CLASS="LITERAL"
+>SQLSTATE</TT
+> естественным образом; поэтому используя во всех приложениях именно эту схему кодов ошибок, можно добиться высокой степени согласованности. За дальнейшими сведениями обратитесь к <A
+HREF="errcodes-appendix.html"
+>Приложению A</A
+>.</P
+><P
+><TT
+CLASS="LITERAL"
+>SQLCODE</TT
+> — устаревшая схема, в которой коды ошибок представлены просто целыми числами. Значение 0 обозначает успешное завершение, положительное значение — успешное завершение с дополнительной информацией, а отрицательное говорит об ошибке. В стандарте SQL определено только положительное значение +100, показывающее, что последняя команда вернула или затронула ноль строк, но отрицательные значения не определены. Таким образом, с этой схемой нельзя рассчитывать на переносимость и она не имеет иерархической структуры. Исторически сложилось, что процессор встраиваемого SQL для <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> назначает некоторые определённые значения <TT
+CLASS="LITERAL"
+>SQLCODE</TT
+> для собственного использования; они перечислены ниже с числовыми значениями и символьными именами. Помните, что эти коды несовместимы с другими реализациями SQL. Поэтому для упрощения перевода приложений на схему <TT
+CLASS="LITERAL"
+>SQLSTATE</TT
+> вместе с этими кодами перечисляются соответствующие значения <TT
+CLASS="LITERAL"
+>SQLSTATE</TT
+>. Однако однозначного соответствия один-к-одному или один-ко-многим между этими двумя схемами не существует (на самом деле это соответствие многие-ко-многим), поэтому следует свериться со списком <TT
+CLASS="LITERAL"
+>SQLSTATE</TT
+> в <A
+HREF="errcodes-appendix.html"
+>Приложении A</A
+> в каждом случае.</P
+><P
+><TT
+CLASS="LITERAL"
+>SQLCODE</TT
+> может принимать следующие значения: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+>0 (<TT
+CLASS="SYMBOL"
+>ECPG_NO_ERROR</TT
+>)</DT
+><DD
+><P
+>Показывает, что ошибки нет. (SQLSTATE 00000)</P
+></DD
+><DT
+>100 (<TT
+CLASS="SYMBOL"
+>ECPG_NOT_FOUND</TT
+>)</DT
+><DD
+><P
+>Это нейтральное условие, показывающее, что последняя команда вернула или обработала ноль строк, либо курсор достиг конца. (SQLSTATE 02000)</P
+><P
+>Выбирая данные из курсора в цикле, можно проверять этот код, чтобы понять, когда нужно прервать цикл, следующим образом: </P><PRE
+CLASS="PROGRAMLISTING"
+>while (1)
+{
+    EXEC SQL FETCH ... ;
+    if (sqlca.sqlcode == ECPG_NOT_FOUND)
+        break;
+}</PRE
+><P> Но <TT
+CLASS="LITERAL"
+>WHENEVER NOT FOUND DO BREAK</TT
+> внутри по сути делает это же, поэтому такое явное условие обычно ничем не лучше.</P
+></DD
+><DT
+>-12 (<TT
+CLASS="SYMBOL"
+>ECPG_OUT_OF_MEMORY</TT
+>)</DT
+><DD
+><P
+>Указывает, что закончилась виртуальная память. Числовое значение определено как <TT
+CLASS="LITERAL"
+>-ENOMEM</TT
+>. (SQLSTATE YE001)</P
+></DD
+><DT
+>-200 (<TT
+CLASS="SYMBOL"
+>ECPG_UNSUPPORTED</TT
+>)</DT
+><DD
+><P
+>Указывает, что препроцессор сгенерировал код, который не понимает библиотека. Возможно, вы используете несовместимые версии препроцессора и библиотеки. (SQLSTATE YE002)</P
+></DD
+><DT
+>-201 (<TT
+CLASS="SYMBOL"
+>ECPG_TOO_MANY_ARGUMENTS</TT
+>)</DT
+><DD
+><P
+>Это означает, что в команде было указано больше переменных среды, чем она ожидает. (SQLSTATE 07001 или 07002)</P
+></DD
+><DT
+>-202 (<TT
+CLASS="SYMBOL"
+>ECPG_TOO_FEW_ARGUMENTS</TT
+>)</DT
+><DD
+><P
+>Это означает, что в команде было указано меньше переменных среды, чем она ожидает. (SQLSTATE 07001 или 07002)</P
+></DD
+><DT
+>-203 (<TT
+CLASS="SYMBOL"
+>ECPG_TOO_MANY_MATCHES</TT
+>)</DT
+><DD
+><P
+>Это означает, что запрос вернул несколько строк, но оператор был подготовлен только для одной строки результата (например, потому что переданные переменные — не массивы). (SQLSTATE 21000)</P
+></DD
+><DT
+>-204 (<TT
+CLASS="SYMBOL"
+>ECPG_INT_FORMAT</TT
+>)</DT
+><DD
+><P
+>Переменная среды типа <TT
+CLASS="TYPE"
+>int</TT
+> и данные в базе имеют разные типы, и в этих данных содержится значение, которое нельзя преобразовать в <TT
+CLASS="TYPE"
+>int</TT
+>. Для этого преобразования библиотека использует функцию <CODE
+CLASS="FUNCTION"
+>strtol()</CODE
+>. (SQLSTATE 42804)</P
+></DD
+><DT
+>-205 (<TT
+CLASS="SYMBOL"
+>ECPG_UINT_FORMAT</TT
+>)</DT
+><DD
+><P
+>Переменная среды типа <TT
+CLASS="TYPE"
+>unsigned int</TT
+> и данные в базе имеют разные типы, и в этих данных содержится значение, которое нельзя преобразовать в <TT
+CLASS="TYPE"
+>unsigned int</TT
+>. Для этого преобразования библиотека использует функцию <CODE
+CLASS="FUNCTION"
+>strtoul()</CODE
+>. (SQLSTATE 42804)</P
+></DD
+><DT
+>-206 (<TT
+CLASS="SYMBOL"
+>ECPG_FLOAT_FORMAT</TT
+>)</DT
+><DD
+><P
+>Переменная среды типа <TT
+CLASS="TYPE"
+>float</TT
+> и данные в базе имеют разные типы, и в этих данных содержится значение, которое нельзя преобразовать во <TT
+CLASS="TYPE"
+>float</TT
+>. Для этого преобразования библиотека использует функцию <CODE
+CLASS="FUNCTION"
+>strtod()</CODE
+>. (SQLSTATE 42804)</P
+></DD
+><DT
+>-207 (<TT
+CLASS="SYMBOL"
+>ECPG_NUMERIC_FORMAT</TT
+>)</DT
+><DD
+><P
+>Переменная среды типа <TT
+CLASS="TYPE"
+>numeric</TT
+> и данные в базе имеют разные типы, и в этих данных содержится значение, которое нельзя преобразовать в <TT
+CLASS="TYPE"
+>numeric</TT
+>. (SQLSTATE 42804)</P
+></DD
+><DT
+>-208 (<TT
+CLASS="SYMBOL"
+>ECPG_INTERVAL_FORMAT</TT
+>)</DT
+><DD
+><P
+>Переменная среды типа <TT
+CLASS="TYPE"
+>interval</TT
+> и данные в базе имеют разные типы, и в этих данных содержится значение, которое нельзя преобразовать в <TT
+CLASS="TYPE"
+>interval</TT
+>. (SQLSTATE 42804)</P
+></DD
+><DT
+>-209 (<TT
+CLASS="SYMBOL"
+>ECPG_DATE_FORMAT</TT
+>)</DT
+><DD
+><P
+>Переменная среды типа <TT
+CLASS="TYPE"
+>date</TT
+> и данные в базе имеют разные типы, и в этих данных содержится значение, которое нельзя преобразовать в <TT
+CLASS="TYPE"
+>date</TT
+>. (SQLSTATE 42804)</P
+></DD
+><DT
+>-210 (<TT
+CLASS="SYMBOL"
+>ECPG_TIMESTAMP_FORMAT</TT
+>)</DT
+><DD
+><P
+>Переменная среды типа <TT
+CLASS="TYPE"
+>timestamp</TT
+> и данные в базе имеют разные типы, и в этих данных содержится значение, которое нельзя преобразовать в <TT
+CLASS="TYPE"
+>timestamp</TT
+>. (SQLSTATE 42804)</P
+></DD
+><DT
+>-211 (<TT
+CLASS="SYMBOL"
+>ECPG_CONVERT_BOOL</TT
+>)</DT
+><DD
+><P
+>Это означает, что переменная среды имеет тип <TT
+CLASS="TYPE"
+>bool</TT
+>, а значение в базе данных отличается от <TT
+CLASS="LITERAL"
+>'t'</TT
+> или <TT
+CLASS="LITERAL"
+>'f'</TT
+>. (SQLSTATE 42804)</P
+></DD
+><DT
+>-212 (<TT
+CLASS="SYMBOL"
+>ECPG_EMPTY</TT
+>)</DT
+><DD
+><P
+>Серверу <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> был передан пустой оператор. (Этого обычно не должно происходить в программе со встраиваемым SQL, так что это может указывать на внутреннюю ошибку.) (SQLSTATE YE002)</P
+></DD
+><DT
+>-213 (<TT
+CLASS="SYMBOL"
+>ECPG_MISSING_INDICATOR</TT
+>)</DT
+><DD
+><P
+>Возвращено значение NULL, но переменная-индикатор NULL не задана. (SQLSTATE 22002)</P
+></DD
+><DT
+>-214 (<TT
+CLASS="SYMBOL"
+>ECPG_NO_ARRAY</TT
+>)</DT
+><DD
+><P
+>Там, где требуется массив, была передана обычная переменная. (SQLSTATE 42804)</P
+></DD
+><DT
+>-215 (<TT
+CLASS="SYMBOL"
+>ECPG_DATA_NOT_ARRAY</TT
+>)</DT
+><DD
+><P
+>База данных возвратила обычную переменную там, где требуется значение-массив. (SQLSTATE 42804)</P
+></DD
+><DT
+>-220 (<TT
+CLASS="SYMBOL"
+>ECPG_NO_CONN</TT
+>)</DT
+><DD
+><P
+>Программа попыталась использовать несуществующее подключение. (SQLSTATE 08003)</P
+></DD
+><DT
+>-221 (<TT
+CLASS="SYMBOL"
+>ECPG_NOT_CONN</TT
+>)</DT
+><DD
+><P
+>Программа попыталась использовать подключение, которое существует, но не было открыто. (Это внутренняя ошибка.) (SQLSTATE YE002)</P
+></DD
+><DT
+>-230 (<TT
+CLASS="SYMBOL"
+>ECPG_INVALID_STMT</TT
+>)</DT
+><DD
+><P
+>Оператор, который вы пытаетесь выполнить, не был подготовлен. (SQLSTATE 26000)</P
+></DD
+><DT
+>-239 (<TT
+CLASS="SYMBOL"
+>ECPG_INFORMIX_DUPLICATE_KEY</TT
+>)</DT
+><DD
+><P
+>Ошибка повторяющегося ключа, нарушение ограничения уникальности (режим совместимости с Informix). (SQLSTATE 23505)</P
+></DD
+><DT
+>-240 (<TT
+CLASS="SYMBOL"
+>ECPG_UNKNOWN_DESCRIPTOR</TT
+>)</DT
+><DD
+><P
+>Указанный дескриптор не найден. Оператор, который вы пытаетесь использовать, не был подготовлен. (SQLSTATE 33000)</P
+></DD
+><DT
+>-241 (<TT
+CLASS="SYMBOL"
+>ECPG_INVALID_DESCRIPTOR_INDEX</TT
+>)</DT
+><DD
+><P
+>Указанный индекс дескриптора вне диапазона. (SQLSTATE 07009)</P
+></DD
+><DT
+>-242 (<TT
+CLASS="SYMBOL"
+>ECPG_UNKNOWN_DESCRIPTOR_ITEM</TT
+>)</DT
+><DD
+><P
+>Запрошен неверный элемент дескриптора. (Это внутренняя ошибка.) (SQLSTATE YE002)</P
+></DD
+><DT
+>-243 (<TT
+CLASS="SYMBOL"
+>ECPG_VAR_NOT_NUMERIC</TT
+>)</DT
+><DD
+><P
+>При выполнении динамического оператора база данных возвратила числовое значение, тогда как переменная среды — не числовая. (SQLSTATE 07006)</P
+></DD
+><DT
+>-244 (<TT
+CLASS="SYMBOL"
+>ECPG_VAR_NOT_CHAR</TT
+>)</DT
+><DD
+><P
+>При выполнении динамического оператора база данных возвратила не числовое значение, тогда как переменная среды — числовая. (SQLSTATE 07006)</P
+></DD
+><DT
+>-284 (<TT
+CLASS="SYMBOL"
+>ECPG_INFORMIX_SUBSELECT_NOT_ONE</TT
+>)</DT
+><DD
+><P
+>Результат подзапроса представлен не одной строкой (режим совместимости с Informix). (SQLSTATE 21000)</P
+></DD
+><DT
+>-400 (<TT
+CLASS="SYMBOL"
+>ECPG_PGSQL</TT
+>)</DT
+><DD
+><P
+>Ошибка произошла на стороне сервера <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. В тексте ошибки содержится сообщение об ошибке от сервера <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+></DD
+><DT
+>-401 (<TT
+CLASS="SYMBOL"
+>ECPG_TRANS</TT
+>)</DT
+><DD
+><P
+>Сервер <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> сообщает, что клиент не может запускать, фиксировать или отменять транзакцию. (SQLSTATE 08007)</P
+></DD
+><DT
+>-402 (<TT
+CLASS="SYMBOL"
+>ECPG_CONNECT</TT
+>)</DT
+><DD
+><P
+>Попытка подключения к базе данных была неудачной. (SQLSTATE 08001)</P
+></DD
+><DT
+>-403 (<TT
+CLASS="SYMBOL"
+>ECPG_DUPLICATE_KEY</TT
+>)</DT
+><DD
+><P
+>Ошибка повторяющегося ключа, нарушение ограничения уникальности. (SQLSTATE 23505)</P
+></DD
+><DT
+>-404 (<TT
+CLASS="SYMBOL"
+>ECPG_SUBSELECT_NOT_ONE</TT
+>)</DT
+><DD
+><P
+>Результат подзапроса представлен не одной строкой. (SQLSTATE 21000)</P
+></DD
+><DT
+>-602 (<TT
+CLASS="SYMBOL"
+>ECPG_WARNING_UNKNOWN_PORTAL</TT
+>)</DT
+><DD
+><P
+>Указано неверное имя курсора. (SQLSTATE 34000)</P
+></DD
+><DT
+>-603 (<TT
+CLASS="SYMBOL"
+>ECPG_WARNING_IN_TRANSACTION</TT
+>)</DT
+><DD
+><P
+>Транзакция в процессе выполнения. (SQLSTATE 25001)</P
+></DD
+><DT
+>-604 (<TT
+CLASS="SYMBOL"
+>ECPG_WARNING_NO_TRANSACTION</TT
+>)</DT
+><DD
+><P
+>Нет активной (выполняющейся) транзакции. (SQLSTATE 25P01)</P
+></DD
+><DT
+>-605 (<TT
+CLASS="SYMBOL"
+>ECPG_WARNING_PORTAL_EXISTS</TT
+>)</DT
+><DD
+><P
+>Было указано имя существующего курсора. (SQLSTATE 42P03)</P
+></DD
+></DL
+></DIV
+><P></P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ecpg-descriptors.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ecpg-preproc.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Использование областей дескрипторов</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ecpg.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Директивы препроцессора</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

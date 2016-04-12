@@ -1,0 +1,1253 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Явные блокировки</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Управление конкурентным доступом"
+HREF="mvcc.html"><LINK
+REL="PREVIOUS"
+TITLE="Изоляция транзакций"
+HREF="transaction-iso.html"><LINK
+REL="NEXT"
+TITLE="Проверки целостности данных на уровне приложения"
+HREF="applevel-consistency.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Изоляция транзакций"
+HREF="transaction-iso.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="mvcc.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 13. Управление конкурентным доступом</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Проверки целостности данных на уровне приложения"
+HREF="applevel-consistency.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="EXPLICIT-LOCKING"
+>13.3. Явные блокировки</A
+></H1
+><P
+>Для управления параллельным доступом к данным в таблицах <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> предоставляет несколько режимов явных блокировок. Эти режимы могут применяться для блокировки данных со стороны приложения в ситуациях, когда <ACRONYM
+CLASS="ACRONYM"
+>MVCC</ACRONYM
+> не даёт желаемый результат. Кроме того, большинство команд <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> автоматически получают блокировки соответствующих режимов, защищающие от удаления или изменения задействованных таблиц, не совместимого с характером выполняемой команды. (Например, <TT
+CLASS="COMMAND"
+>TRUNCATE</TT
+> не может безопасно выполняться одновременно с другими операциями с этой таблицей, так что во избежание конфликта эта команда получает исключительную блокировку для данной таблицы.)</P
+><P
+>Список текущих активных блокировок на сервере можно получить, прочитав системное представление <A
+HREF="view-pg-locks.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_locks</TT
+></A
+>. За дополнительными сведениями о наблюдении за состоянием менеджера блокировок обратитесь к <A
+HREF="monitoring.html"
+>Главе 27</A
+>.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="LOCKING-TABLES"
+>13.3.1. Блокировки на уровне таблицы</A
+></H2
+><P
+>В приведённом ниже списке перечислены имеющиеся режимы блокировок и контексты, где их автоматически применяет <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Вы можете также явно запросить любую из этих блокировок с помощью команды <A
+HREF="sql-lock.html"
+>LOCK</A
+>. Помните, что все эти режимы работают на уровне таблицы, даже если имя режима содержит слово <SPAN
+CLASS="QUOTE"
+>"row"</SPAN
+>; такие имена сложились исторически. В некоторой степени эти имена отражают типичное применение каждого режима блокировки, но смысл у всех один. Единственное, что действительно отличает один режим блокировки от другого, это набор режимов, с которыми конфликтует каждый из них (см. <A
+HREF="explicit-locking.html#TABLE-LOCK-COMPATIBILITY"
+>Таблицу 13-2</A
+>). Две транзакции не могут одновременно владеть блокировками конфликтующих режимов для одной и той же таблицы. (Однако учтите, что транзакция никогда не конфликтует с собой. Например, она может запросить блокировку <TT
+CLASS="LITERAL"
+>ACCESS EXCLUSIVE</TT
+>, а затем <TT
+CLASS="LITERAL"
+>ACCESS SHARE</TT
+> для той же таблицы.) При этом разные транзакции свободно могут одновременно владеть блокировками не конфликтующих режимов. Заметьте, что некоторые режимы блокировки конфликтуют сами с собой (например, блокировкой <TT
+CLASS="LITERAL"
+>ACCESS EXCLUSIVE</TT
+> в один момент времени может владеть только одна транзакция), а некоторые &mdash; нет (например, блокировку <TT
+CLASS="LITERAL"
+>ACCESS SHARE</TT
+> могут получить сразу несколько транзакций).</P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><P
+><B
+>Режимы блокировок на уровне таблицы</B
+></P
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>ACCESS SHARE</TT
+></DT
+><DD
+><P
+>Конфликтует только с режимом блокировки <TT
+CLASS="LITERAL"
+>ACCESS EXCLUSIVE</TT
+>.</P
+><P
+>Команда <TT
+CLASS="COMMAND"
+>SELECT</TT
+> получает такую блокировку для таблиц, на которые она ссылается. Вообще говоря, блокировку в этом режиме получает любой запрос, который только <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>читает</I
+></SPAN
+> таблицу, но не меняет её данные.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>ROW SHARE</TT
+></DT
+><DD
+><P
+>Конфликтует с режимами блокировки <TT
+CLASS="LITERAL"
+>EXCLUSIVE</TT
+> и <TT
+CLASS="LITERAL"
+>ACCESS EXCLUSIVE</TT
+>.</P
+><P
+>Команды <TT
+CLASS="COMMAND"
+>SELECT FOR UPDATE</TT
+> и <TT
+CLASS="COMMAND"
+>SELECT FOR SHARE</TT
+> получают такую блокировку для своих целевых таблиц (помимо блокировок <TT
+CLASS="LITERAL"
+>ACCESS SHARE</TT
+> для любых таблиц, которые используется в этих запросов, но не в предложении <TT
+CLASS="OPTION"
+>FOR UPDATE/FOR SHARE</TT
+>).</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>ROW EXCLUSIVE</TT
+></DT
+><DD
+><P
+>Конфликтует с режимами блокировки <TT
+CLASS="LITERAL"
+>SHARE</TT
+>, <TT
+CLASS="LITERAL"
+>SHARE ROW EXCLUSIVE</TT
+>, <TT
+CLASS="LITERAL"
+>EXCLUSIVE</TT
+> и <TT
+CLASS="LITERAL"
+>ACCESS EXCLUSIVE</TT
+>.</P
+><P
+>Команды <TT
+CLASS="COMMAND"
+>UPDATE</TT
+>, <TT
+CLASS="COMMAND"
+>DELETE</TT
+> и <TT
+CLASS="COMMAND"
+>INSERT</TT
+> получают такую блокировку для целевой таблицы (в дополнение к блокировкам <TT
+CLASS="LITERAL"
+>ACCESS SHARE</TT
+> для всех других задействованных таблиц). Вообще говоря, блокировку в этом режиме получает любая команда, которая <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>изменяет данные</I
+></SPAN
+> в таблице.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>SHARE UPDATE EXCLUSIVE</TT
+></DT
+><DD
+><P
+>Конфликтует с режимами блокировки <TT
+CLASS="LITERAL"
+>SHARE UPDATE EXCLUSIVE</TT
+>, <TT
+CLASS="LITERAL"
+>SHARE</TT
+>, <TT
+CLASS="LITERAL"
+>SHARE ROW EXCLUSIVE</TT
+>, <TT
+CLASS="LITERAL"
+>EXCLUSIVE</TT
+> и <TT
+CLASS="LITERAL"
+>ACCESS EXCLUSIVE</TT
+>. Этот режим защищает таблицу от параллельного изменения схемы и запуска процесса <TT
+CLASS="COMMAND"
+>VACUUM</TT
+>.</P
+><P
+>Запрашивается командами <TT
+CLASS="COMMAND"
+>VACUUM</TT
+> (без <TT
+CLASS="OPTION"
+>FULL</TT
+>), <TT
+CLASS="COMMAND"
+>ANALYZE</TT
+>, <TT
+CLASS="COMMAND"
+>CREATE INDEX CONCURRENTLY</TT
+>, <TT
+CLASS="COMMAND"
+>ALTER TABLE VALIDATE</TT
+> и другими видами <TT
+CLASS="COMMAND"
+>ALTER TABLE</TT
+> (за подробностями обратитесь к <A
+HREF="sql-altertable.html"
+>ALTER TABLE</A
+>).</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>SHARE</TT
+></DT
+><DD
+><P
+>Конфликтует с режимами блокировки <TT
+CLASS="LITERAL"
+>ROW EXCLUSIVE</TT
+>, <TT
+CLASS="LITERAL"
+>SHARE UPDATE EXCLUSIVE</TT
+>, <TT
+CLASS="LITERAL"
+>SHARE ROW EXCLUSIVE</TT
+>, <TT
+CLASS="LITERAL"
+>EXCLUSIVE</TT
+> и <TT
+CLASS="LITERAL"
+>ACCESS EXCLUSIVE</TT
+>. Этот режим защищает таблицу от параллельного изменения данных.</P
+><P
+>Запрашивается командой <TT
+CLASS="COMMAND"
+>CREATE INDEX</TT
+> (без параметра <TT
+CLASS="OPTION"
+>CONCURRENTLY</TT
+>).</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>SHARE ROW EXCLUSIVE</TT
+></DT
+><DD
+><P
+>Конфликтует с режимами блокировки <TT
+CLASS="LITERAL"
+>ROW EXCLUSIVE</TT
+>, <TT
+CLASS="LITERAL"
+>SHARE UPDATE EXCLUSIVE</TT
+>, <TT
+CLASS="LITERAL"
+>SHARE</TT
+>, <TT
+CLASS="LITERAL"
+>SHARE ROW EXCLUSIVE</TT
+>, <TT
+CLASS="LITERAL"
+>EXCLUSIVE</TT
+> и <TT
+CLASS="LITERAL"
+>ACCESS EXCLUSIVE</TT
+>. Этот режим защищает таблицу от параллельных изменений данных и при этом он является самоисключающим, так что такую блокировку может получить только один сеанс.</P
+><P
+>Этот режим не запрашивается автоматически никакой командой <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>EXCLUSIVE</TT
+></DT
+><DD
+><P
+>Конфликтует с режимами блокировки <TT
+CLASS="LITERAL"
+>ROW SHARE</TT
+>, <TT
+CLASS="LITERAL"
+>ROW EXCLUSIVE</TT
+>, <TT
+CLASS="LITERAL"
+>SHARE UPDATE EXCLUSIVE</TT
+>, <TT
+CLASS="LITERAL"
+>SHARE</TT
+>, <TT
+CLASS="LITERAL"
+>SHARE ROW EXCLUSIVE</TT
+>, <TT
+CLASS="LITERAL"
+>EXCLUSIVE</TT
+> и <TT
+CLASS="LITERAL"
+>ACCESS EXCLUSIVE</TT
+>. Этот режим совместим только с блокировкой <TT
+CLASS="LITERAL"
+>ACCESS SHARE</TT
+>, то есть параллельно с транзакцией, получившей блокировку в этой режиме, допускается только чтение таблицы.</P
+><P
+>Запрашивается командой <TT
+CLASS="COMMAND"
+>REFRESH MATERIALIZED VIEW CONCURRENTLY</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>ACCESS EXCLUSIVE</TT
+></DT
+><DD
+><P
+>Конфликтует со всеми режимами блокировки (<TT
+CLASS="LITERAL"
+>ACCESS SHARE</TT
+>, <TT
+CLASS="LITERAL"
+>ROW SHARE</TT
+>, <TT
+CLASS="LITERAL"
+>ROW EXCLUSIVE</TT
+>, <TT
+CLASS="LITERAL"
+>SHARE UPDATE EXCLUSIVE</TT
+>, <TT
+CLASS="LITERAL"
+>SHARE</TT
+>, <TT
+CLASS="LITERAL"
+>SHARE ROW EXCLUSIVE</TT
+>, <TT
+CLASS="LITERAL"
+>EXCLUSIVE</TT
+> и <TT
+CLASS="LITERAL"
+>ACCESS EXCLUSIVE</TT
+>). Этот режим гарантирует, что кроме транзакции, получившей эту блокировку, никакая другая транзакция не может обращаться к таблице каким-либо способом.</P
+><P
+>Запрашивается командами <TT
+CLASS="COMMAND"
+>DROP TABLE</TT
+>, <TT
+CLASS="COMMAND"
+>TRUNCATE</TT
+>, <TT
+CLASS="COMMAND"
+>REINDEX</TT
+>, <TT
+CLASS="COMMAND"
+>CLUSTER</TT
+> и <TT
+CLASS="COMMAND"
+>VACUUM FULL</TT
+>. Блокировку на этом уровне запрашивают также многие виды <TT
+CLASS="COMMAND"
+>ALTER TABLE</TT
+> (см. <A
+HREF="sql-altertable.html"
+>ALTER TABLE</A
+>). В этом режиме по умолчанию запрашивают блокировку и операторы <TT
+CLASS="COMMAND"
+>LOCK TABLE</TT
+>, если явно не выбран другой режим.</P
+></DD
+></DL
+></DIV
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>Только блокировка <TT
+CLASS="LITERAL"
+>ACCESS EXCLUSIVE</TT
+> блокирует оператор <TT
+CLASS="COMMAND"
+>SELECT</TT
+> (без <TT
+CLASS="OPTION"
+>FOR UPDATE/SHARE</TT
+>).</P
+></BLOCKQUOTE
+></DIV
+><P
+>Полученная транзакцией блокировка обычно сохраняется до конца транзакции. Но если блокировка получена после установки точки сохранения, она освобождается немедленно в случае отката к этой точке. Это согласуется с принципом действия <TT
+CLASS="COMMAND"
+>ROLLBACK</TT
+> &mdash; эта команда отменяет эффекты всех команд после точки сохранения. То же справедливо и для блокировок, полученных в блоке исключений <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+>: при выходе из блока с ошибкой такие блокировки освобождаются.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE-LOCK-COMPATIBILITY"
+></A
+><P
+><B
+>Таблица 13-2. Конфликтующие режимы блокировки</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL
+WIDTH="1*"
+TITLE="lockst"><COL><COL><COL><COL><COL><COL><COL
+WIDTH="1*"
+TITLE="lockend"><THEAD
+><TR
+><TH
+ROWSPAN="2"
+>Запраши​ваемый режим блоки​ровки</TH
+><TH
+COLSPAN="8"
+>Текущий режим блокировки</TH
+></TR
+><TR
+><TH
+>ACCESS SHARE</TH
+><TH
+>ROW SHARE</TH
+><TH
+>ROW EXCLUSIVE</TH
+><TH
+>SHARE UPDATE EXCLUSIVE</TH
+><TH
+>SHARE</TH
+><TH
+>SHARE ROW EXCLUSIVE</TH
+><TH
+>EXCLU​SIVE</TH
+><TH
+>ACCESS EXCLUSIVE</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>ACCESS SHARE</TD
+><TD
+ALIGN="CENTER"
+>&nbsp;</TD
+><TD
+ALIGN="CENTER"
+>&nbsp;</TD
+><TD
+ALIGN="CENTER"
+>&nbsp;</TD
+><TD
+ALIGN="CENTER"
+>&nbsp;</TD
+><TD
+ALIGN="CENTER"
+>&nbsp;</TD
+><TD
+ALIGN="CENTER"
+>&nbsp;</TD
+><TD
+ALIGN="CENTER"
+>&nbsp;</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+></TR
+><TR
+><TD
+>ROW SHARE</TD
+><TD
+ALIGN="CENTER"
+>&nbsp;</TD
+><TD
+ALIGN="CENTER"
+>&nbsp;</TD
+><TD
+ALIGN="CENTER"
+>&nbsp;</TD
+><TD
+ALIGN="CENTER"
+>&nbsp;</TD
+><TD
+ALIGN="CENTER"
+>&nbsp;</TD
+><TD
+ALIGN="CENTER"
+>&nbsp;</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+></TR
+><TR
+><TD
+>ROW EXCLUSIVE</TD
+><TD
+ALIGN="CENTER"
+>&nbsp;</TD
+><TD
+ALIGN="CENTER"
+>&nbsp;</TD
+><TD
+ALIGN="CENTER"
+>&nbsp;</TD
+><TD
+ALIGN="CENTER"
+>&nbsp;</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+></TR
+><TR
+><TD
+>SHARE UPDATE EXCLUSIVE</TD
+><TD
+ALIGN="CENTER"
+>&nbsp;</TD
+><TD
+ALIGN="CENTER"
+>&nbsp;</TD
+><TD
+ALIGN="CENTER"
+>&nbsp;</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+></TR
+><TR
+><TD
+>SHARE</TD
+><TD
+ALIGN="CENTER"
+>&nbsp;</TD
+><TD
+ALIGN="CENTER"
+>&nbsp;</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+><TD
+ALIGN="CENTER"
+>&nbsp;</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+></TR
+><TR
+><TD
+>SHARE ROW EXCLUSIVE</TD
+><TD
+ALIGN="CENTER"
+>&nbsp;</TD
+><TD
+ALIGN="CENTER"
+>&nbsp;</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+></TR
+><TR
+><TD
+>EXCLU​SIVE</TD
+><TD
+ALIGN="CENTER"
+>&nbsp;</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+></TR
+><TR
+><TD
+>ACCESS EXCLUSIVE</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="LOCKING-ROWS"
+>13.3.2. Блокировки на уровне строк</A
+></H2
+><P
+>В дополнение к блокировкам на уровне таблицы, существуют блокировки на уровне строк, перечисленные ниже с контекстами, где <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> применяет их по умолчанию. Полный перечень конфликтов блокировок на уровне строк приведён в <A
+HREF="explicit-locking.html#ROW-LOCK-COMPATIBILITY"
+>Таблице 13-3</A
+>. Заметьте, что одна транзакция может владеть несколькими конфликтующими блокировки одной строки, даже в разных подтранзакциях; но две разных транзакции никогда не получат конфликтующие блокировки одной и той же строки. Блокировки на уровне строк блокируют только <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>запись в определённые строки</I
+></SPAN
+>, но никак не влияют на выборку.</P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><P
+><B
+>Режимы блокировки на уровне строк</B
+></P
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>FOR UPDATE</TT
+></DT
+><DD
+><P
+>В режиме <TT
+CLASS="LITERAL"
+>FOR UPDATE</TT
+> строки, выданные оператором <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, блокируются как для изменения. При этом они защищаются от блокировки, изменения и удаления другими транзакциями до завершения текущей. То есть другие транзакции, пытающиеся выполнить <TT
+CLASS="COMMAND"
+>UPDATE</TT
+>, <TT
+CLASS="COMMAND"
+>DELETE</TT
+>, <TT
+CLASS="COMMAND"
+>SELECT FOR UPDATE</TT
+>, <TT
+CLASS="COMMAND"
+>SELECT FOR NO KEY UPDATE</TT
+>, <TT
+CLASS="COMMAND"
+>SELECT FOR SHARE</TT
+> или <TT
+CLASS="COMMAND"
+>SELECT FOR KEY SHARE</TT
+> с этими строками, будут заблокированы до завершения текущей транзакции; и наоборот, команда <TT
+CLASS="COMMAND"
+>SELECT FOR UPDATE</TT
+> будет ожидать окончания параллельной транзакции, в которой выполнилась одна из этих команд с той же строкой, а затем установит блокировку и вернёт изменённую строку (или не вернёт, если она была удалена). Однако в транзакции <TT
+CLASS="LITERAL"
+>REPEATABLE READ</TT
+> или <TT
+CLASS="LITERAL"
+>SERIALIZABLE</TT
+> возникнет ошибка, если блокируемая строка изменилась с момента начала транзакции. Подробнее это обсуждается в <A
+HREF="applevel-consistency.html"
+>Разделе 13.4</A
+>.</P
+><P
+>Режим блокировки <TT
+CLASS="LITERAL"
+>FOR UPDATE</TT
+> также запрашивается на уровне строки любой командой <TT
+CLASS="COMMAND"
+>DELETE</TT
+> и командой <TT
+CLASS="COMMAND"
+>UPDATE</TT
+>, изменяющей значения определённых колонок. В настоящее время блокировка с <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> касается колонок, по которым создан уникальный индекс, применимый в качестве внешнего ключа (так что на частичные индексы и индексы выражений это не распространяется), но в будущем это может поменяться.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>FOR NO KEY UPDATE</TT
+></DT
+><DD
+><P
+>Действует подобно <TT
+CLASS="LITERAL"
+>FOR UPDATE</TT
+>, но запрашиваемая в этом режиме блокировка слабее: она не будет блокировать команды <TT
+CLASS="LITERAL"
+>SELECT FOR KEY SHARE</TT
+>, пытающиеся получить блокировку тех же строк. Этот режим блокировки также запрашивается любой командой <TT
+CLASS="COMMAND"
+>UPDATE</TT
+>, которая не требует блокировки <TT
+CLASS="LITERAL"
+>FOR UPDATE</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>FOR SHARE</TT
+></DT
+><DD
+><P
+>Действует подобно <TT
+CLASS="LITERAL"
+>FOR NO KEY UPDATE</TT
+>, за исключением того, что для каждой из полученных строк запрашивается разделяемая, а не исключительная блокировка. Разделяемая блокировка не позволяет другим транзакциям выполнять с этими строками <TT
+CLASS="COMMAND"
+>UPDATE</TT
+>, <TT
+CLASS="COMMAND"
+>DELETE</TT
+>, <TT
+CLASS="COMMAND"
+>SELECT FOR UPDATE</TT
+> или <TT
+CLASS="COMMAND"
+>SELECT FOR NO KEY UPDATE</TT
+>, но допускает <TT
+CLASS="COMMAND"
+>SELECT FOR SHARE</TT
+> и <TT
+CLASS="COMMAND"
+>SELECT FOR KEY SHARE</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>FOR KEY SHARE</TT
+></DT
+><DD
+><P
+>Действует подобно <TT
+CLASS="LITERAL"
+>FOR SHARE</TT
+>, но устанавливает более слабую блокировку: блокируется <TT
+CLASS="LITERAL"
+>SELECT FOR UPDATE</TT
+>, но не <TT
+CLASS="LITERAL"
+>SELECT FOR NO KEY UPDATE</TT
+>. Блокировка разделяемого ключа не позволяет другим транзакциям выполнять команды <TT
+CLASS="COMMAND"
+>DELETE</TT
+> и <TT
+CLASS="COMMAND"
+>UPDATE</TT
+>, только если они меняют значение ключа (но не другие <TT
+CLASS="COMMAND"
+>UPDATE</TT
+>), и при этом допускает выполнение команд <TT
+CLASS="COMMAND"
+>SELECT FOR NO KEY UPDATE</TT
+>, <TT
+CLASS="COMMAND"
+>SELECT FOR SHARE</TT
+> и <TT
+CLASS="COMMAND"
+>SELECT FOR KEY SHARE</TT
+>.</P
+></DD
+></DL
+></DIV
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> не держит информацию об изменённых строках в памяти, так что никаких ограничений на число блокируемых строк нет. Однако блокировка строки может повлечь запись на диск, например, если <TT
+CLASS="COMMAND"
+>SELECT FOR UPDATE</TT
+> изменяет выбранные строки, чтобы заблокировать их, при этом происходит запись на диск.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="ROW-LOCK-COMPATIBILITY"
+></A
+><P
+><B
+>Таблица 13-3. Конфликтующие блокировки на уровне строк</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL
+WIDTH="1*"
+TITLE="lockst"><COL><COL><COL
+WIDTH="1*"
+TITLE="lockend"><THEAD
+><TR
+><TH
+ROWSPAN="2"
+>Запраши​ваемый режим блоки​ровки</TH
+><TH
+COLSPAN="4"
+>Текущий режим блокировки</TH
+></TR
+><TR
+><TH
+>FOR KEY SHARE</TH
+><TH
+>FOR SHARE</TH
+><TH
+>FOR NO KEY UPDATE</TH
+><TH
+>FOR UPDATE</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>FOR KEY SHARE</TD
+><TD
+ALIGN="CENTER"
+>&nbsp;</TD
+><TD
+ALIGN="CENTER"
+>&nbsp;</TD
+><TD
+ALIGN="CENTER"
+>&nbsp;</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+></TR
+><TR
+><TD
+>FOR SHARE</TD
+><TD
+ALIGN="CENTER"
+>&nbsp;</TD
+><TD
+ALIGN="CENTER"
+>&nbsp;</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+></TR
+><TR
+><TD
+>FOR NO KEY UPDATE</TD
+><TD
+ALIGN="CENTER"
+>&nbsp;</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+></TR
+><TR
+><TD
+>FOR UPDATE</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+><TD
+ALIGN="CENTER"
+>X</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="LOCKING-PAGES"
+>13.3.3. Блокировки на уровне страниц</A
+></H2
+><P
+>В дополнение к блокировкам на уровне таблицы и строк, для управления доступом к страницам таблиц в общих буферах используются блокировки на уровне страниц, исключительные и разделяемые. Эти блокировки освобождаются немедленно после выборки или изменения строк. Разработчикам приложений обычно можно не задумываться о блокировках страниц, здесь они упоминаются только для полноты картины.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="LOCKING-DEADLOCKS"
+>13.3.4. Взаимоблокировки</A
+></H2
+><P
+>Частое применение явных блокировок может увеличить вероятность <I
+CLASS="FIRSTTERM"
+>взаимоблокировок</I
+>, то есть ситуаций, когда две (или более) транзакций держат блокировки так, что взаимно блокируют друг друга. Например, если транзакция 1 получает исключительную блокировку таблицы A, а затем пытается получить исключительную блокировку таблицы B, которую до этого получила транзакция 2, в данный момент требующая исключительную блокировку таблицы A, ни одна из транзакций не сможет продолжить работу. <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> автоматически выявляет такие ситуации и разрешает их, прерывая одну из сцепившихся транзакций и тем самым позволяя другой (другим) продолжить работу. (Какая именно транзакция будет прервана, обычно сложно предсказать, так что рассчитывать на определённое поведение не следует.)</P
+><P
+>Заметьте, что взаимоблокировки могут вызываться и блокировками на уровне строк (таким образом, они возможны, даже если не применяются явные блокировки). Рассмотрим случай, когда две параллельных транзакции изменяют таблицу. Первая транзакция выполняет: </P><PRE
+CLASS="SCREEN"
+>UPDATE accounts SET balance = balance + 100.00 WHERE acctnum = 11111;</PRE
+><P> При этом она получает блокировку строки с указанным номером счёта. Затем вторая транзакция выполняет: </P><PRE
+CLASS="SCREEN"
+>UPDATE accounts SET balance = balance + 100.00 WHERE acctnum = 22222;
+UPDATE accounts SET balance = balance - 100.00 WHERE acctnum = 11111;</PRE
+><P> Первый оператор <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> успешно получает блокировку указанной строки и изменяет данные в ней. Однако второй оператор <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> обнаруживает, что строка, которую он пытается изменить, уже заблокирована, так что он ждёт завершения транзакции, получившей блокировку. Таким образом, вторая транзакция сможет продолжиться только после завершения первой. Теперь первая транзакция выполняет: </P><PRE
+CLASS="SCREEN"
+>UPDATE accounts SET balance = balance - 100.00 WHERE acctnum = 22222;</PRE
+><P> Первая транзакция пытается получить блокировку заданной строки, но ей это не удаётся: эта блокировка уже принадлежит второй транзакции. Поэтому первой транзакции остаётся только ждать завершения второй. В результате первая транзакция блокируется второй, а вторая &mdash; первой: происходит взаимоблокировка. <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> выявляет эту ситуацию и прерывает одну из транзакций.</P
+><P
+>Обычно лучший способ предотвращения взаимоблокировок &mdash; добиться, чтобы все приложения, обращающиеся к базе данных, запрашивали блокировки нескольких объектов единообразно. В данном примере, если бы обе транзакции изменяли строки в одном порядке, взаимоблокировка бы не произошла. Блокировки в транзакции следует упорядочивать так, чтобы первой для какого-либо объекта запрашивалась наиболее ограничивающая из тех, которые для него потребуются. Если заранее обеспечить такой порядок нельзя, взаимоблокировки можно обработать по факту, повторяя прерванные транзакции.</P
+><P
+>Если ситуация взаимоблокировки не будет выявлена, транзакция, ожидающая блокировки на уровне таблицы или строки, будет ждать её освобождения неограниченное время. Это означает, что приложения не должны оставлять транзакции открытыми долгое время (например, ожидая ввода пользователя).</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="ADVISORY-LOCKS"
+>13.3.5. Рекомендательные блокировки</A
+></H2
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> также имеет средства создания блокировок, смысл которых определяют сами приложения. Такие блокировки называются <I
+CLASS="FIRSTTERM"
+>рекомендательными</I
+>, так как система не форсирует их использование &mdash; правильно их использовать должно само приложение. Рекомендательные блокировки бывают полезны для реализаций стратегий блокирования, плохо вписывающихся в модель MVCC. Например, рекомендательные блокировки часто применяются для исполнения стратегии пессимистичной блокировки, типичной для систем управления данными <SPAN
+CLASS="QUOTE"
+>"плоский файл"</SPAN
+>. Хотя для этого можно использовать и дополнительные флаги в таблицах, рекомендательные блокировки работают быстрее, не нагружают таблицы и автоматически ликвидируется сервером в конце сеанса.</P
+><P
+>В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> есть два варианта получить рекомендательные блокировки: на уровне сеанса и на уровне транзакции. Рекомендательная блокировка, полученная на уровне сеанса, удерживается, пока она не будет явно освобождена, или до конца сеанса. В отличие от стандартных рекомендательные блокировки уровня сеанса нарушают логику транзакций &mdash; блокировка, полученная в транзакции, даже если произойдёт откат этой транзакции, будет сохраняться в сеансе; аналогично, освобождение блокировки остаётся в силе, даже если транзакция, в которой была оно было выполнено, позже прерывается. Вызывающий процесс может запросить блокировку несколько раз; при этом каждому запросу блокировки должен соответствовать запрос освобождения, чтобы она была действительно освобождения. Рекомендательные блокировки на уровне транзакций, напротив, во многом похожи на обычные блокировки: они автоматически освобождаются в конце транзакций и не требуют явного освобождения. Для кратковременного применения блокировок это поведение часто более уместно, чем поведение рекомендательных блокировок на уровне сеанса. Запросы рекомендательных блокировок одного идентификатора на уровне сеанса и на уровне транзакции будут блокировать друг друга вполне предсказуемым образом. Если сеанс уже владеет данной рекомендуемой блокировкой, дополнительные запросы её в том же сеансе будут всегда успешны, даже если её ожидают другие сеансы. Это утверждение справедливо вне зависимости от того, на каком уровне (сеанса или транзакции) установлены или запрашиваются новые блокировки.</P
+><P
+>Как и остальные блокировки в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, все рекомендательные блокировки, связанные с любыми сеансами, можно просмотреть в системном представлении <A
+HREF="view-pg-locks.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_locks</TT
+></A
+>.</P
+><P
+>И рекомендательные, и обычные блокировки сохраняются в области общей памяти, размер которой определяется параметрами конфигурации <A
+HREF="runtime-config-locks.html#GUC-MAX-LOCKS-PER-TRANSACTION"
+>max_locks_per_transaction</A
+> и <A
+HREF="runtime-config-connection.html#GUC-MAX-CONNECTIONS"
+>max_connections</A
+>. Важно, чтобы этой памяти было достаточно, так как в противном случае сервер не сможет выдать никакую блокировку. Таким образом, число рекомендуемых блокировок, которые может выдать сервер, ограничивается обычно десятками или сотнями тысяч в зависимости от конфигурации сервера.</P
+><P
+>В определённых случаях при использовании рекомендательных блокировок, особенно в запросах с явными указаниями <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> и <TT
+CLASS="LITERAL"
+>LIMIT</TT
+>, важно учитывать, что получаемые блокировки могут зависеть от порядка вычисления SQL-выражений. Например: </P><PRE
+CLASS="SCREEN"
+>SELECT pg_advisory_lock(id) FROM foo WHERE id = 12345; -- ok
+SELECT pg_advisory_lock(id) FROM foo WHERE id &gt; 12345 LIMIT 100; -- опасно!
+SELECT pg_advisory_lock(q.id) FROM
+(
+  SELECT id FROM foo WHERE id &gt; 12345 LIMIT 100
+) q; -- ok</PRE
+><P> В этом примере второй вариант опасен, так как <TT
+CLASS="LITERAL"
+>LIMIT</TT
+> не обязательно будет применяться перед вызовом функции блокировки. В результате приложение может получить блокировки, на которые оно не рассчитывает и которые оно не сможет освободить (до завершения сеанса). С точки зрения приложения такие блокировки окажутся в подвешенном состоянии, хотя они и будут отображаться в <TT
+CLASS="STRUCTNAME"
+>pg_locks</TT
+>.</P
+><P
+>Функции, предназначенные для работы с рекомендательными блокировками, описаны в <A
+HREF="functions-admin.html#FUNCTIONS-ADVISORY-LOCKS"
+>Подразделе 9.26.9</A
+>.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="transaction-iso.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="applevel-consistency.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Изоляция транзакций</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="mvcc.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Проверки целостности данных на уровне приложения</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

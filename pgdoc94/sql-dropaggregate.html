@@ -1,0 +1,434 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>DROP AGGREGATE</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="DO"
+HREF="sql-do.html"><LINK
+REL="NEXT"
+TITLE="DROP CAST"
+HREF="sql-dropcast.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="DO"
+HREF="sql-do.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="DROP CAST"
+HREF="sql-dropcast.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-DROPAGGREGATE"
+></A
+>DROP AGGREGATE</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN78565"
+></A
+><H2
+>Название</H2
+>DROP AGGREGATE&nbsp;--&nbsp;удалить агрегатную функцию</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN78568"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>DROP AGGREGATE [ IF EXISTS ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> ( <TT
+CLASS="REPLACEABLE"
+><I
+>сигнатура_агр_функции</I
+></TT
+> ) [ CASCADE | RESTRICT ]
+
+<SPAN
+CLASS="phrase"
+><SPAN
+CLASS="PHRASE"
+>Здесь <TT
+CLASS="REPLACEABLE"
+><I
+>сигнатура_агр_функции</I
+></TT
+>:</SPAN
+></SPAN
+>
+
+* |
+[ <TT
+CLASS="REPLACEABLE"
+><I
+>режим_аргумента</I
+></TT
+> ] [ <TT
+CLASS="REPLACEABLE"
+><I
+>имя_аргумента</I
+></TT
+> ] <TT
+CLASS="REPLACEABLE"
+><I
+>тип_аргумента</I
+></TT
+> [ , ... ] |
+[ [ <TT
+CLASS="REPLACEABLE"
+><I
+>режим_аргумента</I
+></TT
+> ] [ <TT
+CLASS="REPLACEABLE"
+><I
+>имя_аргумента</I
+></TT
+> ] <TT
+CLASS="REPLACEABLE"
+><I
+>тип_аргумента</I
+></TT
+> [ , ... ] ] ORDER BY [ <TT
+CLASS="REPLACEABLE"
+><I
+>режим_аргумента</I
+></TT
+> ] [ <TT
+CLASS="REPLACEABLE"
+><I
+>имя_аргумента</I
+></TT
+> ] <TT
+CLASS="REPLACEABLE"
+><I
+>тип_аргумента</I
+></TT
+> [ , ... ]</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN78583"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>DROP AGGREGATE</TT
+> удаляет существующую агрегатную функцию. Пользователь, выполняющий эту команду, должен быть владельцем агрегатной функции.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN78587"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>IF EXISTS</TT
+></DT
+><DD
+><P
+>Не считать ошибкой, если агрегатная функция не существует. В этом случае будет выдано замечание.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></DT
+><DD
+><P
+>Имя (возможно, дополненное схемой) существующей агрегатной функции.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>режим_аргумента</I
+></TT
+></DT
+><DD
+><P
+>Режим аргумента: <TT
+CLASS="LITERAL"
+>IN</TT
+> или <TT
+CLASS="LITERAL"
+>VARIADIC</TT
+>. По умолчанию подразумевается <TT
+CLASS="LITERAL"
+>IN</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_аргумента</I
+></TT
+></DT
+><DD
+><P
+>Имя аргумента. Заметьте, что на самом деле <TT
+CLASS="COMMAND"
+>DROP AGGREGATE</TT
+> не обращает внимание на имена аргументов, так как для однозначной идентификации агрегатной функции достаточно только типов аргументов.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>тип_аргумента</I
+></TT
+></DT
+><DD
+><P
+>Тип входных данных, с которыми работает агрегатная функция. Чтобы сослаться на агрегатную функцию без аргументов, укажите вместо списка аргументов <TT
+CLASS="LITERAL"
+>*</TT
+>, а чтобы сослаться на сортирующую агрегатную функцию, добавьте <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> между указаниями непосредственных и агрегируемых аргументов.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>CASCADE</TT
+></DT
+><DD
+><P
+>Автоматически удалять объекты, зависящие от данной агрегатной функции.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>RESTRICT</TT
+></DT
+><DD
+><P
+>Отказать в удалении агрегатной функции, если от неё зависят какие-либо объекты. Это поведение по умолчанию.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN78631"
+></A
+><H2
+>Замечания</H2
+><P
+>Альтернативные варианты указания сортирующих агрегатов описаны в <A
+HREF="sql-alteraggregate.html"
+>ALTER AGGREGATE</A
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN78635"
+></A
+><H2
+>Примеры</H2
+><P
+>Удаление агрегатной функции <TT
+CLASS="LITERAL"
+>myavg</TT
+> для типа <TT
+CLASS="TYPE"
+>integer</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>DROP AGGREGATE myavg(integer);</PRE
+><P></P
+><P
+>Удаление гипотезирующей агрегатной функции <TT
+CLASS="LITERAL"
+>myrank</TT
+>, которая принимает произвольный список сортируемых колонок и соответствующий список прямых аргументов: </P><PRE
+CLASS="PROGRAMLISTING"
+>DROP AGGREGATE myrank(VARIADIC "any" ORDER BY VARIADIC "any");</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN78644"
+></A
+><H2
+>Совместимость</H2
+><P
+>Оператор <TT
+CLASS="COMMAND"
+>DROP AGGREGATE</TT
+> отсутствует в стандарте SQL.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN78648"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-alteraggregate.html"
+>ALTER AGGREGATE</A
+>, <A
+HREF="sql-createaggregate.html"
+>CREATE AGGREGATE</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-do.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-dropcast.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>DO</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>DROP CAST</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

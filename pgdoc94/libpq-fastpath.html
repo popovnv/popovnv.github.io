@@ -1,0 +1,266 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Интерфейс быстрого пути</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="libpq — библиотека для языка C"
+HREF="libpq.html"><LINK
+REL="PREVIOUS"
+TITLE="Отмена запросов в процессе выполнения"
+HREF="libpq-cancel.html"><LINK
+REL="NEXT"
+TITLE="Асинхронное уведомление"
+HREF="libpq-notify.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Отмена запросов в процессе выполнения"
+HREF="libpq-cancel.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="libpq.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 31. <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> — библиотека для языка C</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Асинхронное уведомление"
+HREF="libpq-notify.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="LIBPQ-FASTPATH"
+>31.7. Интерфейс быстрого пути</A
+></H1
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> предоставляет интерфейс для передачи серверу простых вызовов функций по быстрому пути.</P
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>Этот интерфейс несколько устарел, поскольку можно достичь подобной производительности и большей функциональности путём создания подготовленного оператора, определяющего вызов функции. Последующее выполнение этого оператора с передачей параметров и результатов в двоичном виде можно считать заменой вызову по быстрому пути.</P
+></BLOCKQUOTE
+></DIV
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>PQfn</CODE
+> запрашивает выполнение серверной функции посредством интерфейса быстрого доступа: </P><PRE
+CLASS="SYNOPSIS"
+>PGresult *PQfn(PGconn *conn,
+               int fnid,
+               int *result_buf,
+               int *result_len,
+               int result_is_int,
+               const PQArgBlock *args,
+               int nargs);
+
+typedef struct
+{
+    int len;
+    int isint;
+    union
+    {
+        int *ptr;
+        int integer;
+    } u;
+} PQArgBlock;</PRE
+><P></P
+><P
+>Аргумент <TT
+CLASS="PARAMETER"
+>fnid</TT
+> представляет собой OID функции, которая подлежит выполнению. <TT
+CLASS="PARAMETER"
+>args</TT
+> и <TT
+CLASS="PARAMETER"
+>nargs</TT
+> определяют параметры, которые должны быть переданы этой функции; они должны соответствовать списку аргументов объявленной функции. Когда поле <TT
+CLASS="PARAMETER"
+>isint</TT
+> структуры, передаваемой в качестве параметра, имеет значение "истина", тогда значение <TT
+CLASS="PARAMETER"
+>u.integer</TT
+> передаётся серверу в виде целого числа указанной длины (это должно 1, 2 или 4 байта); при этом устанавливается нужный порядок байтов. Когда <TT
+CLASS="PARAMETER"
+>isint</TT
+> имеет значение "ложь", тогда указанное число байтов по адресу <TT
+CLASS="PARAMETER"
+>*u.ptr</TT
+> отправляется без какой-либо обработки; данные должны быть представлены в формате, которого ожидает сервер для передачи в двоичном виде данных того типа, что и аргументы функции. <TT
+CLASS="PARAMETER"
+>result_buf</TT
+> указывает на буфер, в который должно быть помещено возвращаемое значение функции. Вызывающая функция должна выделить достаточное место для сохранения возвращаемого значения. (Никакой проверки не выполняется!) Фактическая длина результирующего значения в байтах будет возвращена в переменной целого типа, на которую указывает <TT
+CLASS="PARAMETER"
+>result_len</TT
+>. Если ожидается получение двух- или четырёхбайтового целочисленного результата, то установите параметру <TT
+CLASS="PARAMETER"
+>result_is_int</TT
+> значение 1, в противном случае назначьте ему 0. Установка значения параметра <TT
+CLASS="PARAMETER"
+>result_is_int</TT
+> в 1 заставляет <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> переставить байты в передаваемом значении, если это необходимо, так, чтобы оно было доставлено на клиентскую машину в виде правильного значения типа <TT
+CLASS="TYPE"
+>int</TT
+>. Когда <TT
+CLASS="PARAMETER"
+>result_is_int</TT
+> равен 0, тогда строка байтов в двоичном формате, отправленная сервером, будет возвращена немодифицированной.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>PQfn</CODE
+> всегда возвращает действительный указатель на объект <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+>. Перед использованием результата нужно сначала проверить его статус. Вызывающая функция отвечает за освобождение памяти, занимаемой объектом <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+>, когда он больше не нужен, с помощью <CODE
+CLASS="FUNCTION"
+>PQclear</CODE
+>.</P
+><P
+>Обратите внимание, что при использовании этого интерфейса невозможно обработать NULL в аргументах и результате, а также множества значений в результате.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="libpq-cancel.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="libpq-notify.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Отмена запросов в процессе выполнения</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="libpq.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Асинхронное уведомление</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

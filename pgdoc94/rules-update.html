@@ -1,0 +1,1069 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Правила для INSERT, UPDATE и DELETE</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Система правил"
+HREF="rules.html"><LINK
+REL="PREVIOUS"
+TITLE="Материализованные представления"
+HREF="rules-materializedviews.html"><LINK
+REL="NEXT"
+TITLE="Правила и права"
+HREF="rules-privileges.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Материализованные представления"
+HREF="rules-materializedviews.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="rules.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 38. Система правил</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Правила и права"
+HREF="rules-privileges.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="RULES-UPDATE"
+>38.4. Правила для <TT
+CLASS="COMMAND"
+>INSERT</TT
+>, <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> и <TT
+CLASS="COMMAND"
+>DELETE</TT
+></A
+></H1
+><P
+>Правила, определяемые для команд <TT
+CLASS="COMMAND"
+>INSERT</TT
+>, <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> и <TT
+CLASS="COMMAND"
+>DELETE</TT
+>, значительно отличаются от правил представлений, описанных в предыдущем разделе. Во-первых, команда <TT
+CLASS="COMMAND"
+>CREATE RULE</TT
+> позволяет создавать правила со следующими особенностями: <P
+></P
+></P><UL
+><LI
+><P
+>Они могут не определять действия.</P
+></LI
+><LI
+><P
+>Они могут определять несколько действий.</P
+></LI
+><LI
+><P
+>Они могут действовать в режиме <TT
+CLASS="LITERAL"
+>INSTEAD</TT
+> или <TT
+CLASS="LITERAL"
+>ALSO</TT
+> (по умолчанию).</P
+></LI
+><LI
+><P
+>Становятся полезными псевдоотношения <TT
+CLASS="LITERAL"
+>NEW</TT
+> и <TT
+CLASS="LITERAL"
+>OLD</TT
+>.</P
+></LI
+><LI
+><P
+>Они могут иметь условия применения.</P
+></LI
+></UL
+><P> Во-вторых, они не модифицируют само исходное дерево запроса. Вместо этого они создают несколько новых деревьев запросов и могут заменить исходное.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN59260"
+>38.4.1. Как работают правила для изменения</A
+></H2
+><P
+>Запомните синтаксис: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE [ OR REPLACE ] RULE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> AS ON <TT
+CLASS="REPLACEABLE"
+><I
+>событие</I
+></TT
+>
+    TO <TT
+CLASS="REPLACEABLE"
+><I
+>table</I
+></TT
+> [ WHERE <TT
+CLASS="REPLACEABLE"
+><I
+>условие</I
+></TT
+> ]
+    DO [ ALSO | INSTEAD ] { NOTHING | <TT
+CLASS="REPLACEABLE"
+><I
+>команда</I
+></TT
+> | ( <TT
+CLASS="REPLACEABLE"
+><I
+>команда</I
+></TT
+> ; <TT
+CLASS="REPLACEABLE"
+><I
+>команда</I
+></TT
+> ... ) }</PRE
+><P> В дальнейшем, под <I
+CLASS="FIRSTTERM"
+>правилами для изменения</I
+> подразумеваются правила, определяемые для команд <TT
+CLASS="COMMAND"
+>INSERT</TT
+>, <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> или <TT
+CLASS="COMMAND"
+>DELETE</TT
+>.</P
+><P
+>Правила для изменения применяются системой правил, когда результирующее отношение и тип команды в дереве запроса совпадает с объектом и событием, заданным в команде <TT
+CLASS="COMMAND"
+>CREATE RULE</TT
+>. Для такого правила система правил создаёт список деревьев запросов. Изначально этот список пуст. С правилом может быть связано ноль (ключевое слово <TT
+CLASS="LITERAL"
+>NOTHING</TT
+>), одно или несколько действий. Простоты ради мы рассмотрим правило с одним действием. Правило может иметь, а может не иметь условия применения, и действует в режиме <TT
+CLASS="LITERAL"
+>INSTEAD</TT
+> или <TT
+CLASS="LITERAL"
+>ALSO</TT
+> (по умолчанию).</P
+><P
+>Что такое условие применения правила? Это условие, которое говорит, когда нужно, а когда не нужно применять действия правила. В этом условии можно обращаться к псевдоотношениям <TT
+CLASS="LITERAL"
+>NEW</TT
+> и/или <TT
+CLASS="LITERAL"
+>OLD</TT
+>, которые представляют целевое отношение (но с особым значением).</P
+><P
+>Всего есть три варианта формирования деревьев запросов для правила с одним действием. <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+>Без условия применения в режиме <TT
+CLASS="LITERAL"
+>ALSO</TT
+> или <TT
+CLASS="LITERAL"
+>INSTEAD</TT
+></DT
+><DD
+><P
+>дерево запроса из действия правила с добавленным условием исходного дерева</P
+></DD
+><DT
+>С условием применения в режиме <TT
+CLASS="LITERAL"
+>ALSO</TT
+></DT
+><DD
+><P
+>дерево запроса из действия правила с условием применения правила и условием, добавленным из исходного дерева</P
+></DD
+><DT
+>С условием применения в режиме <TT
+CLASS="LITERAL"
+>INSTEAD</TT
+></DT
+><DD
+><P
+>дерево запроса из действия правила с условием применения правила и условием из исходного дерева; также добавляется исходное дерево запроса с условием, обратным условию применения правила</P
+></DD
+></DL
+></DIV
+><P> Наконец, для правил <TT
+CLASS="LITERAL"
+>ALSO</TT
+> в список добавляется исходное дерево запроса без изменений. Так как исходное дерево запроса также добавляют только правила <TT
+CLASS="LITERAL"
+>INSTEAD</TT
+> с условиями применения, в итоге для правила с одним действием мы можем получить только одно или два дерева запросов.</P
+><P
+>Для правил <TT
+CLASS="LITERAL"
+>ON INSERT</TT
+> исходный запрос (если он не перекрывается режимом <TT
+CLASS="LITERAL"
+>INSTEAD</TT
+>) выполняется перед действиями, добавленными правилами. Поэтому эти действия могут видеть вставленные строки. Но для правил <TT
+CLASS="LITERAL"
+>ON UPDATE</TT
+> и <TT
+CLASS="LITERAL"
+>ON DELETE</TT
+> исходный запрос выполняется после действий, добавленных правилами. При таком порядке эти действия будут видеть строки, подлежащие изменению или удалению; иначе бы действия не работали, не найдя строк, соответствующих их условиям применения (эти строки уже будут изменены или удалены).</P
+><P
+>Деревья запросов, полученные из действий правил, снова попадают в систему перезаписи, где могут примениться дополнительные правила, добавляющие или убирающие деревья запроса. Поэтому действия правила должны выполнять команды другого типа или работать с другим результирующим отношением, иначе возникнет бесконечная рекурсия. (Система выявляет подобное рекурсивное разворачивание правил и выдаёт ошибку.)</P
+><P
+>Деревья запросов, заданные для действий в системном каталоге <TT
+CLASS="STRUCTNAME"
+>pg_rewrite</TT
+>, представляют собой только шаблоны. Так как они могут обращаться к элементам <TT
+CLASS="LITERAL"
+>NEW</TT
+> и <TT
+CLASS="LITERAL"
+>OLD</TT
+> в списке отношений, их можно будет использовать только после некоторых подстановок. В случае ссылки на <TT
+CLASS="LITERAL"
+>NEW</TT
+> соответствующий элемент ищется в целевом списке исходного запроса. Если он найден, ссылка заменяется выражением этого элемента. В противном случае <TT
+CLASS="LITERAL"
+>NEW</TT
+> означает то же самое, что и <TT
+CLASS="LITERAL"
+>OLD</TT
+> (для команды <TT
+CLASS="COMMAND"
+>UPDATE</TT
+>) или заменяется значением NULL (для команды <TT
+CLASS="COMMAND"
+>INSERT</TT
+>). Любые ссылки на <TT
+CLASS="LITERAL"
+>OLD</TT
+> заменяются ссылкой на элемент результирующего отношения в списке отношений.</P
+><P
+>После того как система применит все правила для изменения, она применяет правила представления к полученному дереву (или деревьям) запроса. Представления не могут добавлять новые действия для изменения, поэтому нет необходимости применять такие правила к результату перезаписи представления.</P
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN59320"
+>38.4.1.1. Пошаговый разбор первого правила</A
+></H3
+><P
+>Предположим, что нам нужно отслеживать изменения в колонке <TT
+CLASS="LITERAL"
+>sl_avail</TT
+> таблицы <TT
+CLASS="LITERAL"
+>shoelace_data</TT
+>. Мы можем создать таблицу для ведения журнала и правило, которое будет добавлять в неё записи по условию, когда для <TT
+CLASS="LITERAL"
+>shoelace_data</TT
+> выполняется <TT
+CLASS="COMMAND"
+>UPDATE</TT
+>. </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE shoelace_log (
+    sl_name    text,          -- шнурки, количество которых изменилось
+    sl_avail   integer,       -- новое количество
+    log_who    text,          -- кто изменил
+    log_when   timestamp      -- когда
+);
+
+CREATE RULE log_shoelace AS ON UPDATE TO shoelace_data
+    WHERE NEW.sl_avail &lt;&gt; OLD.sl_avail
+    DO INSERT INTO shoelace_log VALUES (
+                                    NEW.sl_name,
+                                    NEW.sl_avail,
+                                    current_user,
+                                    current_timestamp
+                                );</PRE
+><P></P
+><P
+>Теперь, если кто-то выполнит: </P><PRE
+CLASS="PROGRAMLISTING"
+>UPDATE shoelace_data SET sl_avail = 6 WHERE sl_name = 'sl7';</PRE
+><P> мы увидим в таблице журнала: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT * FROM shoelace_log;
+
+ sl_name | sl_avail | log_who | log_when                        
+---------+----------+---------+----------------------------------
+ sl7     |        6 | Al      | Tue Oct 20 16:14:45 1998 MET DST
+(1 row)</PRE
+><P></P
+><P
+>Именно это нам и нужно. При этом внутри происходит следующее. Анализатор запроса создаёт дерево: </P><PRE
+CLASS="PROGRAMLISTING"
+>UPDATE shoelace_data SET sl_avail = 6
+  FROM shoelace_data shoelace_data
+ WHERE shoelace_data.sl_name = 'sl7';</PRE
+><P> В системном каталоге находится правило <TT
+CLASS="LITERAL"
+>log_shoelace</TT
+>, настроенное на изменение (<TT
+CLASS="LITERAL"
+>ON UPDATE</TT
+>) с условием применения: </P><PRE
+CLASS="PROGRAMLISTING"
+>NEW.sl_avail &lt;&gt; OLD.sl_avail</PRE
+><P> и действием: </P><PRE
+CLASS="PROGRAMLISTING"
+>INSERT INTO shoelace_log VALUES (
+       new.sl_name, new.sl_avail,
+       current_user, current_timestamp )
+  FROM shoelace_data new, shoelace_data old;</PRE
+><P> (Это выглядит несколько странно, так как обычно нельзя написать <TT
+CLASS="LITERAL"
+>INSERT ... VALUES ... FROM</TT
+>. Предложение <TT
+CLASS="LITERAL"
+>FROM</TT
+> здесь добавлено, просто чтобы показать, что в дереве запроса для ссылок <TT
+CLASS="LITERAL"
+>new</TT
+> и <TT
+CLASS="LITERAL"
+>old</TT
+> есть элементы в списке отношений. Они необходимы для того, чтобы к ним могли обращаться переменные в дереве запроса команды <TT
+CLASS="COMMAND"
+>INSERT</TT
+>.)</P
+><P
+>Так как это правило <TT
+CLASS="LITERAL"
+>ALSO</TT
+> с условием применения, система правил должна выдать два дерева запросов: изменённое действие правила и исходное дерево запроса. На первом шаге список отношений исходного запроса вставляется в дерево действия правила и получается: </P><PRE
+CLASS="PROGRAMLISTING"
+>INSERT INTO shoelace_log VALUES (
+       new.sl_name, new.sl_avail,
+       current_user, current_timestamp )
+  FROM shoelace_data new, shoelace_data old,
+       <B
+CLASS="EMPHASIS"
+>shoelace_data shoelace_data</B
+>;</PRE
+><P> На втором шаге в это дерево добавляется условие применения правила, так что результирующий набор ограничивается строками, в которых меняется <TT
+CLASS="LITERAL"
+>sl_avail</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>INSERT INTO shoelace_log VALUES (
+       new.sl_name, new.sl_avail,
+       current_user, current_timestamp )
+  FROM shoelace_data new, shoelace_data old,
+       shoelace_data shoelace_data
+ <B
+CLASS="EMPHASIS"
+>WHERE new.sl_avail &lt;&gt; old.sl_avail</B
+>;</PRE
+><P> (Это выглядит ещё более странно, ведь в <TT
+CLASS="LITERAL"
+>INSERT ... VALUES</TT
+> не записывается и предложение <TT
+CLASS="LITERAL"
+>WHERE</TT
+>, но планировщик и исполнитель не испытывают затруднений с этим. Они всё равно должны поддерживать эту функциональность для <TT
+CLASS="LITERAL"
+>INSERT ... SELECT</TT
+>.)</P
+><P
+>На третьем шаге добавляется условие исходного дерева, что ещё больше ограничивает результирующий набор, оставляя в нём только строки, которые затронул бы исходный запрос: </P><PRE
+CLASS="PROGRAMLISTING"
+>INSERT INTO shoelace_log VALUES (
+       new.sl_name, new.sl_avail,
+       current_user, current_timestamp )
+  FROM shoelace_data new, shoelace_data old,
+       shoelace_data shoelace_data
+ WHERE new.sl_avail &lt;&gt; old.sl_avail
+   <B
+CLASS="EMPHASIS"
+>AND shoelace_data.sl_name = 'sl7'</B
+>;</PRE
+><P></P
+><P
+>На четвёртом шаге ссылки на <TT
+CLASS="LITERAL"
+>NEW</TT
+> заменяются элементами выходного списка из исходного дерева запроса или переменными из результирующего отношения: </P><PRE
+CLASS="PROGRAMLISTING"
+>INSERT INTO shoelace_log VALUES (
+       <B
+CLASS="EMPHASIS"
+>shoelace_data.sl_name</B
+>, <B
+CLASS="EMPHASIS"
+>6</B
+>,
+       current_user, current_timestamp )
+  FROM shoelace_data new, shoelace_data old,
+       shoelace_data shoelace_data
+ WHERE <B
+CLASS="EMPHASIS"
+>6</B
+> &lt;&gt; old.sl_avail
+   AND shoelace_data.sl_name = 'sl7';</PRE
+><P></P
+><P
+>На последнем, пятом шаге ссылки на <TT
+CLASS="LITERAL"
+>OLD</TT
+> заменяются ссылками на результирующее отношение: </P><PRE
+CLASS="PROGRAMLISTING"
+>INSERT INTO shoelace_log VALUES (
+       shoelace_data.sl_name, 6,
+       current_user, current_timestamp )
+  FROM shoelace_data new, shoelace_data old,
+       shoelace_data shoelace_data
+ WHERE 6 &lt;&gt; <B
+CLASS="EMPHASIS"
+>shoelace_data.sl_avail</B
+>
+   AND shoelace_data.sl_name = 'sl7';</PRE
+><P></P
+><P
+>Вот и всё. Так как правило действует в режиме <TT
+CLASS="LITERAL"
+>ALSO</TT
+>, мы также выводим исходное дерево запроса. Таким образом, система правил выдаёт список с двумя деревьями запросов, соответствующими этим операторам: </P><PRE
+CLASS="PROGRAMLISTING"
+>INSERT INTO shoelace_log VALUES (
+       shoelace_data.sl_name, 6,
+       current_user, current_timestamp )
+  FROM shoelace_data
+ WHERE 6 &lt;&gt; shoelace_data.sl_avail
+   AND shoelace_data.sl_name = 'sl7';
+
+UPDATE shoelace_data SET sl_avail = 6
+ WHERE sl_name = 'sl7';</PRE
+><P> Они выполняются в показанном порядке и именно это должно делать данное правило.</P
+><P
+>Благодаря заменам и добавленным условиям в журнал не добавится запись, например, при таком исходном запросе: </P><PRE
+CLASS="PROGRAMLISTING"
+>UPDATE shoelace_data SET sl_color = 'green'
+ WHERE sl_name = 'sl7';</PRE
+><P> В этом случае исходное дерево запроса не содержит элемент выходного списка для <TT
+CLASS="LITERAL"
+>sl_avail</TT
+>, так что <TT
+CLASS="LITERAL"
+>NEW.sl_avail</TT
+> будет заменено переменной <TT
+CLASS="LITERAL"
+>shoelace_data.sl_avail</TT
+>. Таким образом, дополнительная команда, созданная правилом, будет такой: </P><PRE
+CLASS="PROGRAMLISTING"
+>INSERT INTO shoelace_log VALUES (
+       shoelace_data.sl_name, <B
+CLASS="EMPHASIS"
+>shoelace_data.sl_avail</B
+>,
+       current_user, current_timestamp )
+  FROM shoelace_data
+ WHERE <B
+CLASS="EMPHASIS"
+>shoelace_data.sl_avail</B
+> &lt;&gt; shoelace_data.sl_avail
+   AND shoelace_data.sl_name = 'sl7';</PRE
+><P> Это условие применения не будет выполняться никогда.</P
+><P
+>Это также будет работать, если исходный запрос изменяет несколько строк. Так, если кто-то выполнит команду: </P><PRE
+CLASS="PROGRAMLISTING"
+>UPDATE shoelace_data SET sl_avail = 0
+ WHERE sl_color = 'black';</PRE
+><P> фактически будут изменены четыре строки (<TT
+CLASS="LITERAL"
+>sl1</TT
+>, <TT
+CLASS="LITERAL"
+>sl2</TT
+>, <TT
+CLASS="LITERAL"
+>sl3</TT
+> и <TT
+CLASS="LITERAL"
+>sl4</TT
+>). Но для <TT
+CLASS="LITERAL"
+>sl3</TT
+> значение <TT
+CLASS="LITERAL"
+>sl_avail = 0</TT
+>. В этом случае условие исходного дерева другое, так что это правило выдаёт такое дополнительное дерево запроса: </P><PRE
+CLASS="PROGRAMLISTING"
+>INSERT INTO shoelace_log
+SELECT shoelace_data.sl_name, 0,
+       current_user, current_timestamp
+  FROM shoelace_data
+ WHERE 0 &lt;&gt; shoelace_data.sl_avail
+   AND <B
+CLASS="EMPHASIS"
+>shoelace_data.sl_color = 'black'</B
+>;</PRE
+><P>. С таким деревом запроса в журнал определённо будут добавлены три записи. И это абсолютно правильно.</P
+><P
+>Здесь мы видим, почему важно, чтобы исходное дерево запроса выполнялось в конце. Если бы оператор <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> выполнился сначала, все строки уже получили бы нулевые значения, так что записывающий в журнал <TT
+CLASS="COMMAND"
+>INSERT</TT
+> не нашёл бы строк, в которых <TT
+CLASS="LITERAL"
+>0 &lt;&gt; shoelace_data.sl_avail</TT
+>.</P
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="RULES-UPDATE-VIEWS"
+>38.4.2. Сочетание с представлениями</A
+></H2
+><P
+>Есть один простой вариант защититься от ранее упомянутой возможности выполнять <TT
+CLASS="COMMAND"
+>INSERT</TT
+>, <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> или <TT
+CLASS="COMMAND"
+>DELETE</TT
+> для представлений, когда это нежелательно — создать правила, просто отбрасывающие деревья этих запросов. В нашем случае они будут выглядеть так: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE RULE shoe_ins_protect AS ON INSERT TO shoe
+    DO INSTEAD NOTHING;
+CREATE RULE shoe_upd_protect AS ON UPDATE TO shoe
+    DO INSTEAD NOTHING;
+CREATE RULE shoe_del_protect AS ON DELETE TO shoe
+    DO INSTEAD NOTHING;</PRE
+><P> Если теперь кто-то попытается выполнить одну из этих операций с представлением <TT
+CLASS="LITERAL"
+>shoe</TT
+>, система правил применит эти правила. Так как это правила без действий в режиме <TT
+CLASS="LITERAL"
+>INSTEAD</TT
+>, результирующий список деревьев запроса будет пуст и весь запрос аннулируется, так что после работы системы правил будет нечего оптимизировать и выполнять.</P
+><P
+>Более сложный вариант — использовать систему правил для создания правил, преобразующих дерево запроса в выполняющее нужную операцию с реальными таблицами. Чтобы реализовать это с представлением <TT
+CLASS="LITERAL"
+>shoelace</TT
+>, мы создадим следующие правила: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE RULE shoelace_ins AS ON INSERT TO shoelace
+    DO INSTEAD
+    INSERT INTO shoelace_data VALUES (
+           NEW.sl_name,
+           NEW.sl_avail,
+           NEW.sl_color,
+           NEW.sl_len,
+           NEW.sl_unit
+    );
+
+CREATE RULE shoelace_upd AS ON UPDATE TO shoelace
+    DO INSTEAD
+    UPDATE shoelace_data
+       SET sl_name = NEW.sl_name,
+           sl_avail = NEW.sl_avail,
+           sl_color = NEW.sl_color,
+           sl_len = NEW.sl_len,
+           sl_unit = NEW.sl_unit
+     WHERE sl_name = OLD.sl_name;
+
+CREATE RULE shoelace_del AS ON DELETE TO shoelace
+    DO INSTEAD
+    DELETE FROM shoelace_data
+     WHERE sl_name = OLD.sl_name;</PRE
+><P></P
+><P
+>Если вы хотите поддерживать также запросы к представлению с <TT
+CLASS="LITERAL"
+>RETURNING</TT
+>, вам надо создать правила с предложениями <TT
+CLASS="LITERAL"
+>RETURNING</TT
+>, которые будут вычислять строки представления. Это обычно довольно тривиально для представлений с одной нижележащей таблицей, но несколько затруднительно для представлений с соединением, таких как <TT
+CLASS="LITERAL"
+>shoelace</TT
+>. Например, для <TT
+CLASS="COMMAND"
+>INSERT</TT
+> это будет выглядеть так: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE RULE shoelace_ins AS ON INSERT TO shoelace
+    DO INSTEAD
+    INSERT INTO shoelace_data VALUES (
+           NEW.sl_name,
+           NEW.sl_avail,
+           NEW.sl_color,
+           NEW.sl_len,
+           NEW.sl_unit
+    )
+    RETURNING
+           shoelace_data.*,
+           (SELECT shoelace_data.sl_len * u.un_fact
+            FROM unit u WHERE shoelace_data.sl_unit = u.un_name);</PRE
+><P> Заметьте, что это одно правило поддерживает запросы и <TT
+CLASS="COMMAND"
+>INSERT</TT
+>, и <TT
+CLASS="COMMAND"
+>INSERT RETURNING</TT
+> к этому представлению &mdash; предложение <TT
+CLASS="LITERAL"
+>RETURNING</TT
+> просто игнорируется при обычном <TT
+CLASS="COMMAND"
+>INSERT</TT
+>.</P
+><P
+>Теперь предположим, что на фабрику прибывает партия шнурков с объёмной сопроводительной накладной. Но вы не хотите вручную вносить по одной записи в представление <TT
+CLASS="LITERAL"
+>shoelace</TT
+>. Вместо этого можно создать две маленькие таблицы: в первую вы будете вставлять записи из накладной, а вторая пригодится для специального приёма. Для этого мы выполним следующие команды: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE shoelace_arrive (
+    arr_name    text,
+    arr_quant   integer
+);
+
+CREATE TABLE shoelace_ok (
+    ok_name     text,
+    ok_quant    integer
+);
+
+CREATE RULE shoelace_ok_ins AS ON INSERT TO shoelace_ok
+    DO INSTEAD
+    UPDATE shoelace
+       SET sl_avail = sl_avail + NEW.ok_quant
+     WHERE sl_name = NEW.ok_name;</PRE
+><P> Теперь вы можете наполнить таблицу <TT
+CLASS="LITERAL"
+>shoelace_arrive</TT
+> данными о поступивших шнурках из накладной: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT * FROM shoelace_arrive;
+
+ arr_name | arr_quant
+----------+-----------
+ sl3      |        10
+ sl6      |        20
+ sl8      |        20
+(3 rows)</PRE
+><P> Взгляните на текущие данные: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT * FROM shoelace;
+
+ sl_name  | sl_avail | sl_color | sl_len | sl_unit | sl_len_cm
+----------+----------+----------+--------+---------+-----------
+ sl1      |        5 | black    |     80 | cm      |        80
+ sl2      |        6 | black    |    100 | cm      |       100
+ sl7      |        6 | brown    |     60 | cm      |        60
+ sl3      |        0 | black    |     35 | inch    |      88.9
+ sl4      |        8 | black    |     40 | inch    |     101.6
+ sl8      |        1 | brown    |     40 | inch    |     101.6
+ sl5      |        4 | brown    |      1 | m       |       100
+ sl6      |        0 | brown    |    0.9 | m       |        90
+(8 rows)</PRE
+><P> Теперь переместите прибывшие шнурки во вторую таблицу: </P><PRE
+CLASS="PROGRAMLISTING"
+>INSERT INTO shoelace_ok SELECT * FROM shoelace_arrive;</PRE
+><P> Проверьте, что получилось: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT * FROM shoelace ORDER BY sl_name;
+
+ sl_name  | sl_avail | sl_color | sl_len | sl_unit | sl_len_cm
+----------+----------+----------+--------+---------+-----------
+ sl1      |        5 | black    |     80 | cm      |        80
+ sl2      |        6 | black    |    100 | cm      |       100
+ sl7      |        6 | brown    |     60 | cm      |        60
+ sl4      |        8 | black    |     40 | inch    |     101.6
+ sl3      |       10 | black    |     35 | inch    |      88.9
+ sl8      |       21 | brown    |     40 | inch    |     101.6
+ sl5      |        4 | brown    |      1 | m       |       100
+ sl6      |       20 | brown    |    0.9 | m       |        90
+(8 rows)
+
+SELECT * FROM shoelace_log;
+
+ sl_name | sl_avail | log_who| log_when                        
+---------+----------+--------+----------------------------------
+ sl7     |        6 | Al     | Tue Oct 20 19:14:45 1998 MET DST
+ sl3     |       10 | Al     | Tue Oct 20 19:25:16 1998 MET DST
+ sl6     |       20 | Al     | Tue Oct 20 19:25:16 1998 MET DST
+ sl8     |       21 | Al     | Tue Oct 20 19:25:16 1998 MET DST
+(4 rows)</PRE
+><P></P
+><P
+>Чтобы получить эти результаты из одного <TT
+CLASS="LITERAL"
+>INSERT ... SELECT</TT
+>, была проделана большая работа. Мы подробно опишем всё преобразование дерева запросов в продолжении этой главы. Начнём с дерева, выданного анализатором запроса: </P><PRE
+CLASS="PROGRAMLISTING"
+>INSERT INTO shoelace_ok
+SELECT shoelace_arrive.arr_name, shoelace_arrive.arr_quant
+  FROM shoelace_arrive shoelace_arrive, shoelace_ok shoelace_ok;</PRE
+><P> Теперь применяется первое правило <TT
+CLASS="LITERAL"
+>shoelace_ok_ins</TT
+>, создающее такое дерево: </P><PRE
+CLASS="PROGRAMLISTING"
+>UPDATE shoelace
+   SET sl_avail = shoelace.sl_avail + shoelace_arrive.arr_quant
+  FROM shoelace_arrive shoelace_arrive, shoelace_ok shoelace_ok,
+       shoelace_ok old, shoelace_ok new,
+       shoelace shoelace
+ WHERE shoelace.sl_name = shoelace_arrive.arr_name;</PRE
+><P> и отбрасывающее исходный <TT
+CLASS="COMMAND"
+>INSERT</TT
+> в <TT
+CLASS="LITERAL"
+>shoelace_ok</TT
+>. Этот переписанный запрос снова поступает в систему правил и второе применяемое правило <TT
+CLASS="LITERAL"
+>shoelace_upd</TT
+> выдаёт: </P><PRE
+CLASS="PROGRAMLISTING"
+>UPDATE shoelace_data
+   SET sl_name = shoelace.sl_name,
+       sl_avail = shoelace.sl_avail + shoelace_arrive.arr_quant,
+       sl_color = shoelace.sl_color,
+       sl_len = shoelace.sl_len,
+       sl_unit = shoelace.sl_unit
+  FROM shoelace_arrive shoelace_arrive, shoelace_ok shoelace_ok,
+       shoelace_ok old, shoelace_ok new,
+       shoelace shoelace, shoelace old,
+       shoelace new, shoelace_data shoelace_data
+ WHERE shoelace.sl_name = shoelace_arrive.arr_name
+   AND shoelace_data.sl_name = shoelace.sl_name;</PRE
+><P> Это тоже правило <TT
+CLASS="LITERAL"
+>INSTEAD</TT
+>, так что предыдущее дерево запроса отбрасывается. Заметьте, что этот запрос по-прежнему использует представление <TT
+CLASS="LITERAL"
+>shoelace</TT
+>. Но система правил ещё не закончила свою работу, она продолжает и применяет правило <TT
+CLASS="LITERAL"
+>_RETURN</TT
+>, так что мы получаем: </P><PRE
+CLASS="PROGRAMLISTING"
+>UPDATE shoelace_data
+   SET sl_name = s.sl_name,
+       sl_avail = s.sl_avail + shoelace_arrive.arr_quant,
+       sl_color = s.sl_color,
+       sl_len = s.sl_len,
+       sl_unit = s.sl_unit
+  FROM shoelace_arrive shoelace_arrive, shoelace_ok shoelace_ok,
+       shoelace_ok old, shoelace_ok new,
+       shoelace shoelace, shoelace old,
+       shoelace new, shoelace_data shoelace_data,
+       shoelace old, shoelace new,
+       shoelace_data s, unit u
+ WHERE s.sl_name = shoelace_arrive.arr_name
+   AND shoelace_data.sl_name = s.sl_name;</PRE
+><P> Наконец, применяется правило <TT
+CLASS="LITERAL"
+>log_shoelace</TT
+> и выдаётся дополнительное дерево запроса: </P><PRE
+CLASS="PROGRAMLISTING"
+>INSERT INTO shoelace_log
+SELECT s.sl_name,
+       s.sl_avail + shoelace_arrive.arr_quant,
+       current_user,
+       current_timestamp
+  FROM shoelace_arrive shoelace_arrive, shoelace_ok shoelace_ok,
+       shoelace_ok old, shoelace_ok new,
+       shoelace shoelace, shoelace old,
+       shoelace new, shoelace_data shoelace_data,
+       shoelace old, shoelace new,
+       shoelace_data s, unit u,
+       shoelace_data old, shoelace_data new
+       shoelace_log shoelace_log
+ WHERE s.sl_name = shoelace_arrive.arr_name
+   AND shoelace_data.sl_name = s.sl_name
+   AND (s.sl_avail + shoelace_arrive.arr_quant) &lt;&gt; s.sl_avail;</PRE
+><P> Теперь, обработав все правила, система правил выдаёт построенные деревья запросов.</P
+><P
+>В итоге мы получаем два дерева запросов, равнозначные следующим операторам <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>INSERT INTO shoelace_log
+SELECT s.sl_name,
+       s.sl_avail + shoelace_arrive.arr_quant,
+       current_user,
+       current_timestamp
+  FROM shoelace_arrive shoelace_arrive, shoelace_data shoelace_data,
+       shoelace_data s
+ WHERE s.sl_name = shoelace_arrive.arr_name
+   AND shoelace_data.sl_name = s.sl_name
+   AND s.sl_avail + shoelace_arrive.arr_quant &lt;&gt; s.sl_avail;
+
+UPDATE shoelace_data
+   SET sl_avail = shoelace_data.sl_avail + shoelace_arrive.arr_quant
+  FROM shoelace_arrive shoelace_arrive,
+       shoelace_data shoelace_data,
+       shoelace_data s
+ WHERE s.sl_name = shoelace_arrive.sl_name
+   AND shoelace_data.sl_name = s.sl_name;</PRE
+><P> В результате вся операция, в ходе которой данные, поступающие из одного отношения, вставляются в другое, вставка преобразуется в изменение третьего, что затем становится изменением четвёртого, и запись об этом изменении добавляется в пятое, сводится к двум запросам.</P
+><P
+>Здесь можно заметить маленькую не очень красивую деталь. Как видно, в этих двух запросах таблица <TT
+CLASS="LITERAL"
+>shoelace_data</TT
+> фигурирует в списке отношений дважды, тогда как определённо достаточно и одного вхождения. Планировщик не понимает этого и поэтому для дерева запроса <TT
+CLASS="COMMAND"
+>INSERT</TT
+>, выданного системой правил, будет получен такой план: </P><PRE
+CLASS="LITERALLAYOUT"
+>Nested Loop
+  -&gt;  Merge Join
+        -&gt;  Seq Scan
+              -&gt;  Sort
+                    -&gt;  Seq Scan on s
+        -&gt;  Seq Scan
+              -&gt;  Sort
+                    -&gt;  Seq Scan on shoelace_arrive
+  -&gt;  Seq Scan on shoelace_data</PRE
+><P> Тогда как без лишнего элемента в списке отношений мы получили бы: </P><PRE
+CLASS="LITERALLAYOUT"
+>Merge Join
+  -&gt;  Seq Scan
+        -&gt;  Sort
+              -&gt;  Seq Scan on s
+  -&gt;  Seq Scan
+        -&gt;  Sort
+              -&gt;  Seq Scan on shoelace_arrive</PRE
+><P> При этом в журнале оказались бы точно такие же записи. Таким образом, применение правил повлекло дополнительное сканирование таблицы <TT
+CLASS="LITERAL"
+>shoelace_data</TT
+>, в котором не было никакой необходимости. И такое же избыточное сканирование выполняется ещё раз в <TT
+CLASS="COMMAND"
+>UPDATE</TT
+>. Отнеситесь к этому с пониманием, ведь сделать всё это возможным в принципе было действительно сложно.</P
+><P
+>И наконец, ещё одна, завершающая демонстрация системы правил <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> и всей её мощи. Предположим, что вы добавили в базу данных шнурки с экстраординарными цветами: </P><PRE
+CLASS="PROGRAMLISTING"
+>INSERT INTO shoelace VALUES ('sl9', 0, 'pink', 35.0, 'inch', 0.0);
+INSERT INTO shoelace VALUES ('sl10', 1000, 'magenta', 40.0, 'inch', 0.0);</PRE
+><P> Давайте создадим представление, чтобы убедиться, что шнурки (записи в <TT
+CLASS="LITERAL"
+>shoelace</TT
+>) не подходят ни к каким туфлям. Оно будет определено так: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE VIEW shoelace_mismatch AS
+    SELECT * FROM shoelace WHERE NOT EXISTS
+        (SELECT shoename FROM shoe WHERE slcolor = sl_color);</PRE
+><P> Через него мы получаем наши записи: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT * FROM shoelace_mismatch;
+
+ sl_name | sl_avail | sl_color | sl_len | sl_unit | sl_len_cm
+---------+----------+----------+--------+---------+-----------
+ sl9     |        0 | pink     |     35 | inch    |      88.9
+ sl10    |     1000 | magenta  |     40 | inch    |     101.6</PRE
+><P></P
+><P
+>Теперь мы хотим, чтобы шнурки, которые ни к чему не подходят, удалялись из базы данных. Чтобы немного усложнить задачу для <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, мы не будем удалять их непосредственно из таблицы. Вместо этого мы создадим ещё одно представление: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE VIEW shoelace_can_delete AS
+    SELECT * FROM shoelace_mismatch WHERE sl_avail = 0;</PRE
+><P> И удалим их так: </P><PRE
+CLASS="PROGRAMLISTING"
+>DELETE FROM shoelace WHERE EXISTS
+    (SELECT * FROM shoelace_can_delete
+             WHERE sl_name = shoelace.sl_name);</PRE
+><P>
+
+    Вуаля: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT * FROM shoelace;
+
+ sl_name | sl_avail | sl_color | sl_len | sl_unit | sl_len_cm
+---------+----------+----------+--------+---------+-----------
+ sl1     |        5 | black    |     80 | cm      |        80
+ sl2     |        6 | black    |    100 | cm      |       100
+ sl7     |        6 | brown    |     60 | cm      |        60
+ sl4     |        8 | black    |     40 | inch    |     101.6
+ sl3     |       10 | black    |     35 | inch    |      88.9
+ sl8     |       21 | brown    |     40 | inch    |     101.6
+ sl10    |     1000 | magenta  |     40 | inch    |     101.6
+ sl5     |        4 | brown    |      1 | m       |       100
+ sl6     |       20 | brown    |    0.9 | m       |        90
+(9 rows)</PRE
+><P></P
+><P
+>Так запрос <TT
+CLASS="COMMAND"
+>DELETE</TT
+> для представления с ограничивающим условием-подзапросом, использующим в совокупности 4 вложенных/соединённых представления, с одним из которых тоже связано условие с подзапросом, задействующим представление, и где используются вычисляемые колонки представлений, переписывается и преобразуется в одно дерево запроса, которое удаляет требуемые данные из реальной таблицы.</P
+><P
+>На практике ситуации, когда необходима такая сложная конструкция, встречаются довольно редко, но, тем не менее, приятно осознавать, что всё это возможно и работает.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="rules-materializedviews.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="rules-privileges.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Материализованные представления</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="rules.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Правила и права</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

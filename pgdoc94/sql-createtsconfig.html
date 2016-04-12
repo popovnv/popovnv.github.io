@@ -1,0 +1,314 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>CREATE TEXT SEARCH CONFIGURATION</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="CREATE TABLESPACE"
+HREF="sql-createtablespace.html"><LINK
+REL="NEXT"
+TITLE="CREATE TEXT SEARCH DICTIONARY"
+HREF="sql-createtsdictionary.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="CREATE TABLESPACE"
+HREF="sql-createtablespace.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="CREATE TEXT SEARCH DICTIONARY"
+HREF="sql-createtsdictionary.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-CREATETSCONFIG"
+></A
+>CREATE TEXT SEARCH CONFIGURATION</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN76681"
+></A
+><H2
+>Название</H2
+>CREATE TEXT SEARCH CONFIGURATION&nbsp;--&nbsp;создать конфигурацию текстового поиска</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN76684"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>CREATE TEXT SEARCH CONFIGURATION <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> (
+    PARSER = <TT
+CLASS="REPLACEABLE"
+><I
+>имя_анализатора</I
+></TT
+> |
+    COPY = <TT
+CLASS="REPLACEABLE"
+><I
+>исходная_конфигурация</I
+></TT
+>
+)</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN76689"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>CREATE TEXT SEARCH CONFIGURATION</TT
+> создаёт конфигурацию текстового поиска. Конфигурация текстового поиска определяет анализатор текстового поиска, разделяющий строку на фрагменты, и словари, позволяющие установить, какие именно фрагменты представляют интерес при поиске.</P
+><P
+>Если задаётся только анализатор, новая конфигурация текстового поиска не будет содержать сопоставления типов фрагментов со словарями и, как следствие, будет игнорировать все слова. Для создания сопоставлений, которые бы сделали конфигурацию полезной, затем нужно будет воспользоваться командой <TT
+CLASS="COMMAND"
+>ALTER TEXT SEARCH CONFIGURATION</TT
+>. Другой вариант команды позволяет скопировать конфигурацию текстового поиска.</P
+><P
+>Если указывается имя схемы, конфигурация текстового поиска создаётся в указанной схеме. В противном случае она создаётся в текущей схеме.</P
+><P
+>Владельцем конфигурации текстового поиска становится пользователь её создавший.</P
+><P
+>За дополнительными сведениями обратитесь к <A
+HREF="textsearch.html"
+>Главе 12</A
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN76699"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></DT
+><DD
+><P
+>Имя создаваемой конфигурации текстового поиска, возможно, дополненное схемой.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_анализатора</I
+></TT
+></DT
+><DD
+><P
+>Имя анализатора текстового поиска, который будет использоваться этой конфигурацией.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>исходная_конфигурация</I
+></TT
+></DT
+><DD
+><P
+>Имя существующей конфигурации текстового поиска, которая будет скопирована.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN76717"
+></A
+><H2
+>Замечания</H2
+><P
+>Параметры <TT
+CLASS="LITERAL"
+>PARSER</TT
+> и <TT
+CLASS="LITERAL"
+>COPY</TT
+> являются взаимоисключающими, так как при копировании существующей конфигурации выбранный в ней анализатор копируется тоже.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN76722"
+></A
+><H2
+>Совместимость</H2
+><P
+>Оператор <TT
+CLASS="COMMAND"
+>CREATE TEXT SEARCH CONFIGURATION</TT
+> отсутствует в стандарте SQL.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN76726"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-altertsconfig.html"
+>ALTER TEXT SEARCH CONFIGURATION</A
+>, <A
+HREF="sql-droptsconfig.html"
+>DROP TEXT SEARCH CONFIGURATION</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-createtablespace.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-createtsdictionary.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>CREATE TABLESPACE</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>CREATE TEXT SEARCH DICTIONARY</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

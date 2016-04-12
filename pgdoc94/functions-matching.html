@@ -1,0 +1,3675 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Поиск по шаблону</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Функции и операторы"
+HREF="functions.html"><LINK
+REL="PREVIOUS"
+TITLE="Функции и операторы для работы с битовыми строками"
+HREF="functions-bitstring.html"><LINK
+REL="NEXT"
+TITLE="Функции форматирования данных"
+HREF="functions-formatting.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Функции и операторы для работы с битовыми строками"
+HREF="functions-bitstring.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 9. Функции и операторы</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Функции форматирования данных"
+HREF="functions-formatting.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="FUNCTIONS-MATCHING"
+>9.7. Поиск по шаблону</A
+></H1
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> предлагает три разных способа поиска текста по шаблону: традиционный оператор <CODE
+CLASS="FUNCTION"
+>LIKE</CODE
+> языка <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>, более современный <CODE
+CLASS="FUNCTION"
+>SIMILAR TO</CODE
+> (добавленный в SQL:1999) и регулярные выражения в стиле <ACRONYM
+CLASS="ACRONYM"
+>POSIX</ACRONYM
+>. Помимо простых операторов, отвечающих на вопрос <SPAN
+CLASS="QUOTE"
+>"соответствует ли строка этому шаблону?"</SPAN
+>, в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> есть функции для извлечения или замены соответствующих подстрок и для разделения строки по заданному шаблону.</P
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>Если этих встроенных возможностей оказывается недостаточно, вы можете написать собственные функции на языке Perl или Tcl.</P
+></BLOCKQUOTE
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="FUNCTIONS-LIKE"
+>9.7.1. <CODE
+CLASS="FUNCTION"
+>LIKE</CODE
+></A
+></H2
+><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>строка</I
+></TT
+> LIKE <TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>ESCAPE <TT
+CLASS="REPLACEABLE"
+><I
+>спецсимвол</I
+></TT
+></SPAN
+>]
+<TT
+CLASS="REPLACEABLE"
+><I
+>строка</I
+></TT
+> NOT LIKE <TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>ESCAPE <TT
+CLASS="REPLACEABLE"
+><I
+>спецсимвол</I
+></TT
+></SPAN
+>]</PRE
+><P
+>Выражение <CODE
+CLASS="FUNCTION"
+>LIKE</CODE
+> возвращает true, если <TT
+CLASS="REPLACEABLE"
+><I
+>строка</I
+></TT
+> соответствует заданному <TT
+CLASS="REPLACEABLE"
+><I
+>шаблону</I
+></TT
+>. (Как можно было ожидать, выражение <CODE
+CLASS="FUNCTION"
+>NOT LIKE</CODE
+> возвращает false, когда <CODE
+CLASS="FUNCTION"
+>LIKE</CODE
+> возвращает true, и наоборот. Этому выражению равносильно выражение <TT
+CLASS="LITERAL"
+>NOT (<TT
+CLASS="REPLACEABLE"
+><I
+>строка</I
+></TT
+> LIKE <TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+>)</TT
+>.)</P
+><P
+>Если <TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+> не содержит знаков процента и подчёркиваний, тогда шаблон представляет в точности строку и <CODE
+CLASS="FUNCTION"
+>LIKE</CODE
+> работает как оператор сравнения. Подчёркивание (<TT
+CLASS="LITERAL"
+>_</TT
+>) в <TT
+CLASS="REPLACEABLE"
+><I
+>шаблоне</I
+></TT
+> подменяет (вместо него подходит) любой символ; а знак процента (<TT
+CLASS="LITERAL"
+>%</TT
+>) подменяет любую (в том числе и пустую) последовательность символов.</P
+><P
+>Несколько примеров: </P><PRE
+CLASS="PROGRAMLISTING"
+>'abc' LIKE 'abc'    <I
+CLASS="LINEANNOTATION"
+>true</I
+>
+'abc' LIKE 'a%'     <I
+CLASS="LINEANNOTATION"
+>true</I
+>
+'abc' LIKE '_b_'    <I
+CLASS="LINEANNOTATION"
+>true</I
+>
+'abc' LIKE 'c'      <I
+CLASS="LINEANNOTATION"
+>false</I
+></PRE
+><P></P
+><P
+>При проверке по шаблону <CODE
+CLASS="FUNCTION"
+>LIKE</CODE
+> всегда рассматривается вся строка. Поэтому, если нужно найти последовательность символов где-то в середине строки, шаблон должен начинаться и заканчиваться знаками процента.</P
+><P
+>Чтобы найти в строке буквальное вхождение знака процента или подчёркивания, перед соответствующим символом в <TT
+CLASS="REPLACEABLE"
+><I
+>шаблоне</I
+></TT
+> нужно добавить спецсимвол. По умолчанию в качестве спецсимвола выбрана обратная косая черта, но с помощью предложения <TT
+CLASS="LITERAL"
+>ESCAPE</TT
+> можно выбрать и другой. Чтобы включить спецсимвол в шаблон поиска, продублируйте его.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Если параметр <A
+HREF="runtime-config-compatible.html#GUC-STANDARD-CONFORMING-STRINGS"
+>standard_conforming_strings</A
+> выключен, каждый символ обратной косой черты, записываемый в текстовой константе, нужно дублировать. Подробнее это описано в <A
+HREF="sql-syntax-lexical.html#SQL-SYNTAX-STRINGS"
+>Подразделе 4.1.2.1</A
+>.</P
+></BLOCKQUOTE
+></DIV
+><P
+>Также можно отказаться от спецсимвола, написав <TT
+CLASS="LITERAL"
+>ESCAPE ''</TT
+>. При этом механизм спецпоследовательностей фактически отключается и использовать знаки процента и подчёркивания буквально в шаблоне нельзя.</P
+><P
+>Вместо <TT
+CLASS="TOKEN"
+>LIKE</TT
+> можно использовать ключевое слово <TT
+CLASS="TOKEN"
+>ILIKE</TT
+>, чтобы поиск был регистр-независимым с учётом текущей языковой среды. Этот оператор не описан в стандарте <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>; это расширение <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+><P
+>Кроме того, в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> есть оператор <TT
+CLASS="LITERAL"
+>~~</TT
+>, равнозначный <CODE
+CLASS="FUNCTION"
+>LIKE</CODE
+>, и <TT
+CLASS="LITERAL"
+>~~*</TT
+>, соответствующий <CODE
+CLASS="FUNCTION"
+>ILIKE</CODE
+>. Есть также два оператора <TT
+CLASS="LITERAL"
+>!~~</TT
+> и <TT
+CLASS="LITERAL"
+>!~~*</TT
+>, представляющие <CODE
+CLASS="FUNCTION"
+>NOT LIKE</CODE
+> и <CODE
+CLASS="FUNCTION"
+>NOT ILIKE</CODE
+>, соответственно. Все эти операторы можно отнести к особенностям <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="FUNCTIONS-SIMILARTO-REGEXP"
+>9.7.2. Регулярные выражения <CODE
+CLASS="FUNCTION"
+>SIMILAR TO</CODE
+></A
+></H2
+><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>строка</I
+></TT
+> SIMILAR TO <TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>ESCAPE <TT
+CLASS="REPLACEABLE"
+><I
+>спецсимвол</I
+></TT
+></SPAN
+>]
+<TT
+CLASS="REPLACEABLE"
+><I
+>строка</I
+></TT
+> NOT SIMILAR TO <TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>ESCAPE <TT
+CLASS="REPLACEABLE"
+><I
+>спецсимвол</I
+></TT
+></SPAN
+>]</PRE
+><P
+>Оператор <CODE
+CLASS="FUNCTION"
+>SIMILAR TO</CODE
+> возвращает true или false в зависимости от того, соответствует ли данная строка шаблону или нет. Он работает подобно оператору <CODE
+CLASS="FUNCTION"
+>LIKE</CODE
+>, только его шаблоны соответствуют определению регулярных выражений в стандарте SQL. Регулярные выражения SQL представляют собой любопытный гибрид синтаксиса <CODE
+CLASS="FUNCTION"
+>LIKE</CODE
+> с синтаксисом обычных регулярных выражений.</P
+><P
+>Как и <CODE
+CLASS="FUNCTION"
+>LIKE</CODE
+>, условие <CODE
+CLASS="FUNCTION"
+>SIMILAR TO</CODE
+> истинно, только если шаблон соответствует всей строке; это отличается от условий с регулярными выражениями, в которых шаблон может соответствовать любой части строки. Также подобно <CODE
+CLASS="FUNCTION"
+>LIKE</CODE
+>, <CODE
+CLASS="FUNCTION"
+>SIMILAR TO</CODE
+> воспринимает символы <TT
+CLASS="LITERAL"
+>_</TT
+> и <TT
+CLASS="LITERAL"
+>%</TT
+> как знаки подстановки, подменяющие любой один символ или любую подстроку, соответственно (в регулярных выражениях POSIX им аналогичны символы <TT
+CLASS="LITERAL"
+>.</TT
+> и <TT
+CLASS="LITERAL"
+>.*</TT
+>).</P
+><P
+>Помимо средств описания шаблонов, позаимствованных от <CODE
+CLASS="FUNCTION"
+>LIKE</CODE
+>, <CODE
+CLASS="FUNCTION"
+>SIMILAR TO</CODE
+> поддерживает следующие метасимволы, унаследованные от регулярных выражений POSIX: <P
+></P
+></P><UL
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>|</TT
+> означает выбор (одного из двух вариантов).</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>*</TT
+> означает повторение предыдущего элемента 0 и более раз.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>+</TT
+> означает повторение предыдущего элемента 1 и более раз.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>?</TT
+> означает вхождение предыдущего элемента 0 или 1 раз.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>{</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>m</I
+></TT
+><TT
+CLASS="LITERAL"
+>}</TT
+> означает повторяет предыдущего элемента ровно <TT
+CLASS="REPLACEABLE"
+><I
+>m</I
+></TT
+> раз.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>{</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>m</I
+></TT
+><TT
+CLASS="LITERAL"
+>,}</TT
+> означает повторение предыдущего элемента <TT
+CLASS="REPLACEABLE"
+><I
+>m</I
+></TT
+> или более раз.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>{</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>m</I
+></TT
+><TT
+CLASS="LITERAL"
+>,</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+><TT
+CLASS="LITERAL"
+>}</TT
+> означает повторение предыдущего элемента не менее чем <TT
+CLASS="REPLACEABLE"
+><I
+>m</I
+></TT
+> и не более чем <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+> раз.</P
+></LI
+><LI
+><P
+>Скобки <TT
+CLASS="LITERAL"
+>()</TT
+> объединяют несколько элементов в одну логическую группу.</P
+></LI
+><LI
+><P
+>Квадратные скобки <TT
+CLASS="LITERAL"
+>[...]</TT
+> обозначают класс символов так же, как и в регулярных выражениях POSIX.</P
+></LI
+></UL
+><P> Обратите внимание, точка (<TT
+CLASS="LITERAL"
+>.</TT
+>) не является метасимволом для оператора <CODE
+CLASS="FUNCTION"
+>SIMILAR TO</CODE
+>.</P
+><P
+>Как и с <CODE
+CLASS="FUNCTION"
+>LIKE</CODE
+>, обратная косая черта отменяет специальное значение любого из этих метасимволов, а предложение <TT
+CLASS="LITERAL"
+>ESCAPE</TT
+> позволяет выбрать другой спецсимвол.</P
+><P
+>Несколько примеров: </P><PRE
+CLASS="PROGRAMLISTING"
+>'abc' SIMILAR TO 'abc'      <I
+CLASS="LINEANNOTATION"
+>true</I
+>
+'abc' SIMILAR TO 'a'        <I
+CLASS="LINEANNOTATION"
+>false</I
+>
+'abc' SIMILAR TO '%(b|d)%'  <I
+CLASS="LINEANNOTATION"
+>true</I
+>
+'abc' SIMILAR TO '(b|c)%'   <I
+CLASS="LINEANNOTATION"
+>false</I
+></PRE
+><P></P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>substring</CODE
+> с тремя параметрами, <CODE
+CLASS="FUNCTION"
+>substring(<TT
+CLASS="REPLACEABLE"
+><I
+>строка</I
+></TT
+> from <TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+> for <TT
+CLASS="REPLACEABLE"
+><I
+>спецсимвол</I
+></TT
+>)</CODE
+> извлекает подстроку, соответствующую шаблону регулярного выражения SQL. Как и с <TT
+CLASS="LITERAL"
+>SIMILAR TO</TT
+>, указанному шаблону должна соответствовать вся строка, в противном случае функция не найдёт ничего и вернёт NULL. Для обозначения части шаблона, которая должна быть возвращена в случае успеха, шаблон должен содержать два спецсимвола и кавычки (<TT
+CLASS="LITERAL"
+>"</TT
+>) после каждого. Эта функция возвращает часть шаблона между двумя такими маркерами.</P
+><P
+>Несколько примеров с маркерами <TT
+CLASS="LITERAL"
+>#"</TT
+>, выделяющими возвращаемую строку: </P><PRE
+CLASS="PROGRAMLISTING"
+>substring('foobar' from '%#"o_b#"%' for '#')   <I
+CLASS="LINEANNOTATION"
+>oob</I
+>
+substring('foobar' from '#"o_b#"%' for '#')    <I
+CLASS="LINEANNOTATION"
+>NULL</I
+></PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="FUNCTIONS-POSIX-REGEXP"
+>9.7.3. Регулярные выражения <ACRONYM
+CLASS="ACRONYM"
+>POSIX</ACRONYM
+></A
+></H2
+><P
+>В <A
+HREF="functions-matching.html#FUNCTIONS-POSIX-TABLE"
+>Таблице 9-12</A
+> перечислены все существующие операторы для проверки строк регулярными выражениями POSIX.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-POSIX-TABLE"
+></A
+><P
+><B
+>Таблица 9-12. Операторы регулярных выражений</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Оператор</TH
+><TH
+>Описание</TH
+><TH
+>Пример</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>~</TT
+> </TD
+><TD
+>Проверяет соответствие регулярному выражению с учётом регистра</TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>'thomas' ~ '.*thomas.*'</TT
+>
+                  </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>~*</TT
+> </TD
+><TD
+>Проверяет соответствие регулярному выражению без учёта регистра</TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>'thomas' ~* '.*Thomas.*'</TT
+>
+                  </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>!~</TT
+> </TD
+><TD
+>Проверяет несоответствие регулярному выражению с учётом регистра</TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>'thomas' !~ '.*Thomas.*'</TT
+>
+                  </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>!~*</TT
+> </TD
+><TD
+>Проверяет несоответствие регулярному выражению без учёта регистра</TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>'thomas' !~* '.*vadim.*'</TT
+>
+                  </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Регулярные выражения <ACRONYM
+CLASS="ACRONYM"
+>POSIX</ACRONYM
+> предоставляют более мощные средства поиска по шаблонам, чем операторы <CODE
+CLASS="FUNCTION"
+>LIKE</CODE
+> и <CODE
+CLASS="FUNCTION"
+>SIMILAR TO</CODE
+>. Во многих командах Unix, таких как <TT
+CLASS="COMMAND"
+>egrep</TT
+>, <TT
+CLASS="COMMAND"
+>sed</TT
+> и <TT
+CLASS="COMMAND"
+>awk</TT
+> используется язык шаблонов, похожий на описанный здесь.</P
+><P
+>Регулярное выражение &mdash; это последовательность символов, представляющая собой краткое определение набора строк (<I
+CLASS="FIRSTTERM"
+>регулярное множество</I
+>). Строка считается соответствующей регулярному выражению, если она является членом регулярного множества, описываемого регулярным выражением. Как и для <CODE
+CLASS="FUNCTION"
+>LIKE</CODE
+>, символы шаблона непосредственно соответствуют символам строки, за исключением специальных символов языка регулярных выражений. При этом спецсимволы регулярных выражений отличается от спецсимволов <CODE
+CLASS="FUNCTION"
+>LIKE</CODE
+>. В отличие от шаблонов <CODE
+CLASS="FUNCTION"
+>LIKE</CODE
+>, регулярное выражение может совпадать с любой частью строки, если только оно не привязано явно к началу и/или концу строки.</P
+><P
+>Несколько примеров: </P><PRE
+CLASS="PROGRAMLISTING"
+>'abc' ~ 'abc'    <I
+CLASS="LINEANNOTATION"
+>true</I
+>
+'abc' ~ '^a'     <I
+CLASS="LINEANNOTATION"
+>true</I
+>
+'abc' ~ '(b|d)'  <I
+CLASS="LINEANNOTATION"
+>true</I
+>
+'abc' ~ '^(b|c)' <I
+CLASS="LINEANNOTATION"
+>false</I
+></PRE
+><P></P
+><P
+>Более подробно язык шаблонов в стиле <ACRONYM
+CLASS="ACRONYM"
+>POSIX</ACRONYM
+> описан ниже.</P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>substring</CODE
+> с двумя параметрами, <CODE
+CLASS="FUNCTION"
+>substring(<TT
+CLASS="REPLACEABLE"
+><I
+>строка</I
+></TT
+> from <TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+>)</CODE
+>, извлекает подстроку, соответствующую шаблону регулярного выражения POSIX. Она возвращает фрагмент текста, подходящий шаблону, если таковой находится в строке, либо NULL в противном случае. Но если шаблон содержит скобки, она возвращает первое подвыражение, заключённое в скобки (то, которое начинается с самой первой открывающей скобки). Если вы хотите использовать скобки, но не в таком особом режиме, можно просто заключить в них всё выражение. Если же вам нужно включить скобки в шаблон до подвыражения, которое вы хотите извлечь, это можно сделать, используя группы без захвата, которые будут описаны ниже.</P
+><P
+>Несколько примеров: </P><PRE
+CLASS="PROGRAMLISTING"
+>substring('foobar' from 'o.b')     <I
+CLASS="LINEANNOTATION"
+>oob</I
+>
+substring('foobar' from 'o(.)b')   <I
+CLASS="LINEANNOTATION"
+>o</I
+></PRE
+><P></P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>regexp_replace</CODE
+> подставляет другой текст вместо подстрок, соответствующих шаблонам регулярных выражений POSIX. Она имеет синтаксис <CODE
+CLASS="FUNCTION"
+>regexp_replace</CODE
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>исходная_строка</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>замена</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>флаги</I
+></TT
+></SPAN
+>]). Если <TT
+CLASS="REPLACEABLE"
+><I
+>исходная_строка</I
+></TT
+> не содержит фрагмента, подходящего под <TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+>, она возвращается неизменной. Если же соответствие находится, возвращается <TT
+CLASS="REPLACEABLE"
+><I
+>исходная_строка</I
+></TT
+>, в которой вместо соответствующего фрагмента подставляется <TT
+CLASS="REPLACEABLE"
+><I
+>замена</I
+></TT
+>. Строка <TT
+CLASS="REPLACEABLE"
+><I
+>замена</I
+></TT
+> может содержать <TT
+CLASS="LITERAL"
+>\</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>, где <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+> &mdash; число от 1 до 9, указывающее на исходный фрагмент, соответствующий <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>-ому подвыражению в скобках, и может содержать обозначение <TT
+CLASS="LITERAL"
+>\&amp;</TT
+>, указывающее, что будет вставлен фрагмент, соответствующий всему шаблону. Если же в текст замены нужно включить обратную косую черту буквально, следует написать <TT
+CLASS="LITERAL"
+>\\</TT
+>. В необязательном параметре <TT
+CLASS="REPLACEABLE"
+><I
+>флаги</I
+></TT
+> передаётся текстовая строка, содержащая ноль или более однобуквенных флагов, меняющих поведение функции. Флаг <TT
+CLASS="LITERAL"
+>i</TT
+> включает поиск без учёта регистра, а флаг <TT
+CLASS="LITERAL"
+>g</TT
+> указывает, что заменяться должны все подходящие подстроки, а не только первая из них. Допустимые флаги (кроме <TT
+CLASS="LITERAL"
+>g</TT
+>) описаны в <A
+HREF="functions-matching.html#POSIX-EMBEDDED-OPTIONS-TABLE"
+>Таблице 9-20</A
+>.</P
+><P
+>Несколько примеров: </P><PRE
+CLASS="PROGRAMLISTING"
+>regexp_replace('foobarbaz', 'b..', 'X')
+                                   <I
+CLASS="LINEANNOTATION"
+>fooXbaz</I
+>
+regexp_replace('foobarbaz', 'b..', 'X', 'g')
+                                   <I
+CLASS="LINEANNOTATION"
+>fooXX</I
+>
+regexp_replace('foobarbaz', 'b(..)', E'X\\1Y', 'g')
+                                   <I
+CLASS="LINEANNOTATION"
+>fooXarYXazY</I
+></PRE
+><P></P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>regexp_matches</CODE
+> возвращает текстовый массив из всех подходящих подстрок, полученных в результате применения регулярного выражения POSIX. Она имеет синтаксис <CODE
+CLASS="FUNCTION"
+>regexp_matches</CODE
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>строка</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>флаги</I
+></TT
+></SPAN
+>]). Эта функция может вовсе не вернуть строк или вернуть одну или несколько строк (см. описание флага <TT
+CLASS="LITERAL"
+>g</TT
+> ниже). Если <TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+> не находится в строке, функция не возвращает строк. Если шаблон не содержит подвыражений в скобках, тогда для каждой строки возвращается массив с одним элементом, содержащим подстроку, соответствующую всему шаблону. Если же шаблон содержит подвыражения в скобках, функция возвращает массив элементов, в котором <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>-эй элемент соответствует <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>-ому подвыражению в скобках (не считая скобки <SPAN
+CLASS="QUOTE"
+>"без захвата"</SPAN
+>; подробнее об этом ниже). В необязательном параметре <TT
+CLASS="REPLACEABLE"
+><I
+>флаги</I
+></TT
+> передаётся текстовая строка, содержащая ноль или более однобуквенных флагов, меняющих поведение функции. Флаг <TT
+CLASS="LITERAL"
+>g</TT
+> указывает, что функция должна находить в строке не только первое, а все соответствия шаблону, и возвращать строку для каждого соответствия. Допустимые флаги (кроме <TT
+CLASS="LITERAL"
+>g</TT
+>) описаны в <A
+HREF="functions-matching.html#POSIX-EMBEDDED-OPTIONS-TABLE"
+>Таблице 9-20</A
+>.</P
+><P
+>Несколько примеров: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT regexp_matches('foobarbequebaz', '(bar)(beque)');
+ regexp_matches 
+----------------
+ {bar,beque}
+(1 row)
+
+SELECT regexp_matches(
+ 'foobarbequebazilbarfbonk', '(b[^b]+)(b[^b]+)', 'g');
+ regexp_matches 
+----------------
+ {bar,beque}
+ {bazil,barf}
+(2 rows)
+
+SELECT regexp_matches('foobarbequebaz', 'barbeque');
+ regexp_matches 
+----------------
+ {barbeque}
+(1 row)</PRE
+><P></P
+><P
+>Добиться, чтобы функция <CODE
+CLASS="FUNCTION"
+>regexp_matches()</CODE
+> всегда возвращала одну строку, можно с помощью вложенного подзапроса; это особенно полезно в списке выборки <TT
+CLASS="LITERAL"
+>SELECT</TT
+>, когда нужно получить все строки, в том числе и не соответствующие шаблону: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT col1, (SELECT regexp_matches(col2, '(bar)(beque)')) FROM tab;</PRE
+><P></P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>regexp_split_to_table</CODE
+> разделяет строку, используя в качестве разделителя шаблон регулярного выражения POSIX. Она имеет синтаксис <CODE
+CLASS="FUNCTION"
+>regexp_split_to_table</CODE
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>строка</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>флаги</I
+></TT
+></SPAN
+>]). Если <TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+> не находится в переданной строке, возвращается вся <TT
+CLASS="REPLACEABLE"
+><I
+>строка</I
+></TT
+> целиком. Если находится минимум одно вхождение, для каждого такого вхождения возвращается текст от конца предыдущего вхождения (или начала строки) до начала вхождения. После последнего найденного вхождения возвращается фрагмент от его конца до конца строки. В необязательном параметре <TT
+CLASS="REPLACEABLE"
+><I
+>флаги</I
+></TT
+> передаётся текстовая строка, содержащая ноль или более однобуквенных флагов, меняющих поведение функции. Флаги, которые поддерживает <CODE
+CLASS="FUNCTION"
+>regexp_split_to_table</CODE
+>, описаны в <A
+HREF="functions-matching.html#POSIX-EMBEDDED-OPTIONS-TABLE"
+>Таблице 9-20</A
+>.</P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>regexp_split_to_array</CODE
+> ведёт себя подобно <CODE
+CLASS="FUNCTION"
+>regexp_split_to_table</CODE
+>, за исключением того, что <CODE
+CLASS="FUNCTION"
+>regexp_split_to_array</CODE
+> возвращает результат в массиве элементов типа <TT
+CLASS="TYPE"
+>text</TT
+>. Она имеет синтаксис <CODE
+CLASS="FUNCTION"
+>regexp_split_to_array</CODE
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>строка</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>флаги</I
+></TT
+></SPAN
+>]). Параметры у этой функции те же, что и у <CODE
+CLASS="FUNCTION"
+>regexp_split_to_table</CODE
+>.</P
+><P
+>Несколько примеров: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT foo FROM regexp_split_to_table('the quick brown fox jumps over the lazy dog', E'\\s+') AS foo;
+  foo   
+-------
+ the    
+ quick  
+ brown  
+ fox    
+ jumps 
+ over   
+ the    
+ lazy   
+ dog    
+(9 rows)
+
+SELECT regexp_split_to_array('the quick brown fox jumps over the lazy dog', E'\\s+');
+              regexp_split_to_array             
+-----------------------------------------------
+ {the,quick,brown,fox,jumps,over,the,lazy,dog}
+(1 row)
+
+SELECT foo FROM regexp_split_to_table('the quick brown fox', E'\\s*') AS foo;
+ foo 
+-----
+ t         
+ h         
+ e         
+ q         
+ u         
+ i         
+ c         
+ k         
+ b         
+ r         
+ o         
+ w         
+ n         
+ f         
+ o         
+ x         
+(16 rows)</PRE
+><P></P
+><P
+>Как показывает последний пример, функции разделения по регулярным выражениям игнорируют вхождения нулевой длины, идущие в начале и в конце строки, а также непосредственно за предыдущим вхождением. Это поведение противоречит строгому определению поиска по регулярным выражениям, который реализует <CODE
+CLASS="FUNCTION"
+>regexp_matches</CODE
+>, но обычно более удобно на практике. Подобное поведение наблюдается и в других программных средах, например в Perl.</P
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="POSIX-SYNTAX-DETAILS"
+>9.7.3.1. Подробное описание регулярных выражений</A
+></H3
+><P
+>Регулярные выражения в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> реализованы с использованием программного пакета, который разработал Генри Спенсер (Henry Spencer). Практически всё следующее описание регулярных выражений дословно скопировано из его руководства.</P
+><P
+>Регулярное выражение (Regular expression, <ACRONYM
+CLASS="ACRONYM"
+>RE</ACRONYM
+>), согласно определению в <ACRONYM
+CLASS="ACRONYM"
+>POSIX</ACRONYM
+> 1003.2, может иметь две формы: <I
+CLASS="FIRSTTERM"
+>расширенное</I
+> <ACRONYM
+CLASS="ACRONYM"
+>RE</ACRONYM
+> или <ACRONYM
+CLASS="ACRONYM"
+>ERE</ACRONYM
+> (грубо говоря, это выражения которые понимает <TT
+CLASS="COMMAND"
+>egrep</TT
+>) и <I
+CLASS="FIRSTTERM"
+>простое</I
+> <ACRONYM
+CLASS="ACRONYM"
+>RE</ACRONYM
+> или <ACRONYM
+CLASS="ACRONYM"
+>BRE</ACRONYM
+> (грубо говоря, это выражения для <TT
+CLASS="COMMAND"
+>ed</TT
+>). <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> поддерживает обе формы, а кроме того реализует некоторые расширения, не предусмотренные стандартом POSIX, но широко используемые вследствие их доступности в некоторых языках программирования, например в Perl и Tcl. Регулярные выражения, использующие эти несовместимые с POSIX расширения, здесь называются <I
+CLASS="FIRSTTERM"
+>усовершенствованными</I
+> <ACRONYM
+CLASS="ACRONYM"
+>RE</ACRONYM
+> или <ACRONYM
+CLASS="ACRONYM"
+>ARE</ACRONYM
+>. ARE практически представляют собой надмножество ERE, тогда как BRE отличаются некоторой несовместимостью в записи (помимо того, что они гораздо более ограничены). Сначала мы опишем формы ARE и ERE, отметив особенности, присущие только ARE, а затем расскажем, чем от них отличаются BRE.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> изначально всегда предполагает, что регулярное выражение следует правилам ARE. Однако можно переключиться на более ограниченные правила ERE или BRE, добавив в шаблон RE <I
+CLASS="FIRSTTERM"
+>встроенный параметр</I
+>, как описано в <A
+HREF="functions-matching.html#POSIX-METASYNTAX"
+>Подразделе 9.7.3.4</A
+>. Это может быть полезно для совместимости с приложениями, ожидающими от СУБД строгого следования правилам <ACRONYM
+CLASS="ACRONYM"
+>POSIX</ACRONYM
+> 1003.2.</P
+></BLOCKQUOTE
+></DIV
+><P
+>Регулярное выражение определяется как одна или более <I
+CLASS="FIRSTTERM"
+>ветвей</I
+>, разделённых символами <TT
+CLASS="LITERAL"
+>|</TT
+>. Оно считается соответствующим всему, что соответствует одной из этих ветвей.</P
+><P
+>Ветвь &mdash; это ноль или несколько <I
+CLASS="FIRSTTERM"
+>количественных атомов</I
+> или <I
+CLASS="FIRSTTERM"
+>ограничений</I
+>, соединённых вместе. Соответствие ветви в целом образуется из соответствия первой части, за которым следует соответствие второй части и т. д.; пустой ветви соответствует пустая строка.</P
+><P
+>Количественный атом &mdash; это <I
+CLASS="FIRSTTERM"
+>атом</I
+>, за которым может следовать <I
+CLASS="FIRSTTERM"
+>определитель количества</I
+>. Без этого определителя ему соответствует одно вхождение атома. С определителем количества ему может соответствовать некоторое число вхождений этого атома. Все возможные <I
+CLASS="FIRSTTERM"
+>атомы</I
+> перечислены в <A
+HREF="functions-matching.html#POSIX-ATOMS-TABLE"
+>Таблице 9-13</A
+>. Варианты определителей количества и их значения перечислены в <A
+HREF="functions-matching.html#POSIX-QUANTIFIERS-TABLE"
+>Таблице 9-14</A
+>.</P
+><P
+><I
+CLASS="FIRSTTERM"
+>Ограничению</I
+> соответствует пустая строка, но это соответствие возможно только при выполнении определённых условий. Ограничения могут использоваться там же, где и атомы, за исключением того, что их нельзя дополнять определителями количества. Простые ограничения показаны в <A
+HREF="functions-matching.html#POSIX-CONSTRAINTS-TABLE"
+>Таблице 9-15</A
+>; некоторые дополнительные ограничения описаны ниже.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="POSIX-ATOMS-TABLE"
+></A
+><P
+><B
+>Таблица 9-13. Атомы регулярных выражений</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+>Атом</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>(</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>re</I
+></TT
+><TT
+CLASS="LITERAL"
+>)</TT
+> </TD
+><TD
+>(где <TT
+CLASS="REPLACEABLE"
+><I
+>re</I
+></TT
+> &mdash; любое регулярное выражение) описывает соответствие <TT
+CLASS="REPLACEABLE"
+><I
+>re</I
+></TT
+>, при этом данное соответствие захватывается для последующей обработки</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>(?:</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>re</I
+></TT
+><TT
+CLASS="LITERAL"
+>)</TT
+> </TD
+><TD
+>подобно предыдущему, но соответствие не захватывается (т. е. это набор скобок <SPAN
+CLASS="QUOTE"
+>"без захвата"</SPAN
+>) (применимо только к ARE)</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>.</TT
+> </TD
+><TD
+>соответствует любому символу</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>[</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>символы</I
+></TT
+><TT
+CLASS="LITERAL"
+>]</TT
+> </TD
+><TD
+><I
+CLASS="FIRSTTERM"
+>выражение в квадратных скобках</I
+>, соответствует любому из <TT
+CLASS="REPLACEABLE"
+><I
+>символов</I
+></TT
+> (подробнее это описано в <A
+HREF="functions-matching.html#POSIX-BRACKET-EXPRESSIONS"
+>Подразделе 9.7.3.2</A
+>)</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>\</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>k</I
+></TT
+> </TD
+><TD
+>(где <TT
+CLASS="REPLACEABLE"
+><I
+>k</I
+></TT
+> &mdash; не алфавитно-цифровой символ) соответствует обычному символу буквально, т. е. <TT
+CLASS="LITERAL"
+>\\</TT
+> соответствует обратной косой черте</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>\</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>c</I
+></TT
+> </TD
+><TD
+>где <TT
+CLASS="REPLACEABLE"
+><I
+>c</I
+></TT
+> &mdash; алфавитно-цифровой символ (за которым могут следовать другие символы), это <I
+CLASS="FIRSTTERM"
+>спецсимвол</I
+>, см. <A
+HREF="functions-matching.html#POSIX-ESCAPE-SEQUENCES"
+>Подраздел 9.7.3.3</A
+> (применим только к ARE; в ERE и BRE этому атому соответствует <TT
+CLASS="REPLACEABLE"
+><I
+>c</I
+></TT
+>)</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>{</TT
+> </TD
+><TD
+>когда за этим символом следует любой символ, кроме цифры, этот атом соответствует левой фигурной скобке (<TT
+CLASS="LITERAL"
+>{</TT
+>), если же за ним следует цифра, это обозначает начало <TT
+CLASS="REPLACEABLE"
+><I
+>границы</I
+></TT
+> (см. ниже)</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="REPLACEABLE"
+><I
+>x</I
+></TT
+> </TD
+><TD
+>(где <TT
+CLASS="REPLACEABLE"
+><I
+>x</I
+></TT
+> &mdash; один символ, не имеющий специального значения) соответствует этому символу</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Выражение RE не может заканчиваться обратной косой чертой (<TT
+CLASS="LITERAL"
+>\</TT
+>).</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Если параметр <A
+HREF="runtime-config-compatible.html#GUC-STANDARD-CONFORMING-STRINGS"
+>standard_conforming_strings</A
+> выключен, каждый символ обратной косой черты, записываемый в текстовой константе, нужно дублировать. Подробнее это описано в <A
+HREF="sql-syntax-lexical.html#SQL-SYNTAX-STRINGS"
+>Подразделе 4.1.2.1</A
+>.</P
+></BLOCKQUOTE
+></DIV
+><DIV
+CLASS="TABLE"
+><A
+NAME="POSIX-QUANTIFIERS-TABLE"
+></A
+><P
+><B
+>Таблица 9-14. Определители количества в регулярных выражениях</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+>Определитель</TH
+><TH
+>Соответствует</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>*</TT
+> </TD
+><TD
+>0 или более вхождений атома</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>+</TT
+> </TD
+><TD
+>1 или более вхождений атома</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>?</TT
+> </TD
+><TD
+>0 или 1 вхождение атома</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>{</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>m</I
+></TT
+><TT
+CLASS="LITERAL"
+>}</TT
+> </TD
+><TD
+>ровно <TT
+CLASS="REPLACEABLE"
+><I
+>m</I
+></TT
+> вхождений атома</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>{</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>m</I
+></TT
+><TT
+CLASS="LITERAL"
+>,}</TT
+> </TD
+><TD
+><TT
+CLASS="REPLACEABLE"
+><I
+>m</I
+></TT
+> или более вхождений атома</TD
+></TR
+><TR
+><TD
+>       <TT
+CLASS="LITERAL"
+>{</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>m</I
+></TT
+><TT
+CLASS="LITERAL"
+>,</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+><TT
+CLASS="LITERAL"
+>}</TT
+> </TD
+><TD
+>от <TT
+CLASS="REPLACEABLE"
+><I
+>m</I
+></TT
+> до <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+> (включая границы) вхождений атома; <TT
+CLASS="REPLACEABLE"
+><I
+>m</I
+></TT
+> не может быть больше <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+></TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>*?</TT
+> </TD
+><TD
+>не жадная версия <TT
+CLASS="LITERAL"
+>*</TT
+></TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>+?</TT
+> </TD
+><TD
+>не жадная версия <TT
+CLASS="LITERAL"
+>+</TT
+></TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>??</TT
+> </TD
+><TD
+>не жадная версия <TT
+CLASS="LITERAL"
+>?</TT
+></TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>{</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>m</I
+></TT
+><TT
+CLASS="LITERAL"
+>}?</TT
+> </TD
+><TD
+>не жадная версия <TT
+CLASS="LITERAL"
+>{</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>m</I
+></TT
+><TT
+CLASS="LITERAL"
+>}</TT
+></TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>{</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>m</I
+></TT
+><TT
+CLASS="LITERAL"
+>,}?</TT
+> </TD
+><TD
+>не жадная версия <TT
+CLASS="LITERAL"
+>{</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>m</I
+></TT
+><TT
+CLASS="LITERAL"
+>,}</TT
+></TD
+></TR
+><TR
+><TD
+>       <TT
+CLASS="LITERAL"
+>{</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>m</I
+></TT
+><TT
+CLASS="LITERAL"
+>,</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+><TT
+CLASS="LITERAL"
+>}?</TT
+> </TD
+><TD
+>не жадная версия <TT
+CLASS="LITERAL"
+>{</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>m</I
+></TT
+><TT
+CLASS="LITERAL"
+>,</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+><TT
+CLASS="LITERAL"
+>}</TT
+></TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>В формах с <TT
+CLASS="LITERAL"
+>{</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>...</I
+></TT
+><TT
+CLASS="LITERAL"
+>}</TT
+> числа <TT
+CLASS="REPLACEABLE"
+><I
+>m</I
+></TT
+> и <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+> определяют так называемые <I
+CLASS="FIRSTTERM"
+>границы</I
+> количества. Эти числа должны быть беззнаковыми десятичными целыми в диапазоне от 0 до 255 включительно.</P
+><P
+><I
+CLASS="FIRSTTERM"
+>Не жадные</I
+> определители (допустимые только в ARE) описывают те же возможные соответствия, что и аналогичные им обычные (&laquo;<I
+CLASS="FIRSTTERM"
+>жадные</I
+>&raquo;), но предпочитают выбирать наименьшее, а не наибольшее количество вхождений. Подробнее это описано в <A
+HREF="functions-matching.html#POSIX-MATCHING-RULES"
+>Подразделе 9.7.3.5</A
+>.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Определители количества не могут следовать один за другим, например запись <TT
+CLASS="LITERAL"
+>**</TT
+> будет ошибочной. Кроме того, определители не могут стоять в начале выражения или подвыражения и идти сразу после <TT
+CLASS="LITERAL"
+>^</TT
+> или <TT
+CLASS="LITERAL"
+>|</TT
+>.</P
+></BLOCKQUOTE
+></DIV
+><DIV
+CLASS="TABLE"
+><A
+NAME="POSIX-CONSTRAINTS-TABLE"
+></A
+><P
+><B
+>Таблица 9-15. Ограничения в регулярных выражениях</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+>Ограничение</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>^</TT
+> </TD
+><TD
+>соответствует началу строки</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>$</TT
+> </TD
+><TD
+>соответствует концу строки</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>(?=</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>re</I
+></TT
+><TT
+CLASS="LITERAL"
+>)</TT
+> </TD
+><TD
+><I
+CLASS="FIRSTTERM"
+>позитивный предпросмотр</I
+> находит соответствие в точке, где начинается подстрока, соответствующая <TT
+CLASS="REPLACEABLE"
+><I
+>re</I
+></TT
+> (только для ARE)</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>(?!</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>re</I
+></TT
+><TT
+CLASS="LITERAL"
+>)</TT
+> </TD
+><TD
+><I
+CLASS="FIRSTTERM"
+>негативный предпросмотр</I
+> находит соответствие там, где не начинается подстрока, соответствующая <TT
+CLASS="REPLACEABLE"
+><I
+>re</I
+></TT
+> (только для ARE)</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Ограничения предпросмотра не могут содержать <I
+CLASS="FIRSTTERM"
+>ссылки назад</I
+> (см. <A
+HREF="functions-matching.html#POSIX-ESCAPE-SEQUENCES"
+>Подраздел 9.7.3.3</A
+>) и все скобки в них считаются &laquo;скобками без захвата&raquo;.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="POSIX-BRACKET-EXPRESSIONS"
+>9.7.3.2. Выражения в квадратных скобках</A
+></H3
+><P
+><I
+CLASS="FIRSTTERM"
+>Выражение в квадратных скобках</I
+> содержит список символов, заключённый в <TT
+CLASS="LITERAL"
+>[]</TT
+>. Обычно ему соответствует любой символ из списка (об исключении написано ниже). Если список начинается с <TT
+CLASS="LITERAL"
+>^</TT
+>, ему соответствует любой символ, который <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>не</I
+></SPAN
+> перечисляется далее в этом списке. Если два символа в списке разделяются знаком <TT
+CLASS="LITERAL"
+>-</TT
+>, это воспринимается как краткая запись полного интервала символов между двумя заданными (и включая их) в порядке сортировки; например выражению <TT
+CLASS="LITERAL"
+>[0-9]</TT
+> в <ACRONYM
+CLASS="ACRONYM"
+>ASCII</ACRONYM
+> соответствует любая десятичная цифра. Два интервала не могут разделять одну границу, т. е. выражение <TT
+CLASS="LITERAL"
+>a-c-e</TT
+> недопустимо. Интервалы зависят от порядка сортировки, который может меняться, поэтому в переносимых программах их лучше не использовать.</P
+><P
+>Чтобы включить в список <TT
+CLASS="LITERAL"
+>]</TT
+>, этот символ нужно написать первым (сразу за <TT
+CLASS="LITERAL"
+>^</TT
+>, если он присутствует). Чтобы включить в список символ <TT
+CLASS="LITERAL"
+>-</TT
+>, его нужно написать первым или последним, либо как вторую границу интервала. Указать <TT
+CLASS="LITERAL"
+>-</TT
+> в качестве первой границы интервал можно, заключив его между <TT
+CLASS="LITERAL"
+>[.</TT
+> и <TT
+CLASS="LITERAL"
+>.]</TT
+>, чтобы он стал элементом сортировки (см. ниже). За исключением этих символов, некоторых комбинаций с <TT
+CLASS="LITERAL"
+>[</TT
+> (см. следующие абзацы) и спецсимволов (в ARE), все остальные специальные символы в квадратных скобках теряют своё особое значение. В частности, символ <TT
+CLASS="LITERAL"
+>\</TT
+> по правилам ERE или BRE воспринимается как обычный, хотя в ARE он экранирует символ, следующий за ним.</P
+><P
+>Выражения в квадратных скобках могут содержать элемент сортировки (символ или последовательность символов или имя такой последовательности), определение которого заключается между <TT
+CLASS="LITERAL"
+>[.</TT
+> и <TT
+CLASS="LITERAL"
+>.]</TT
+>. Определяющая его последовательность воспринимается в выражении в скобках как один элемент. Это позволяет включать в такие выражения элементы, соответствующие последовательности нескольких символов. Например, с элементом сортировки <TT
+CLASS="LITERAL"
+>ch</TT
+> в квадратных скобках регулярному выражению <TT
+CLASS="LITERAL"
+>[[.ch.]]*c</TT
+> будут соответствовать первые пять символов строки <TT
+CLASS="LITERAL"
+>chchcc</TT
+>.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>В настоящее время <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> не поддерживает элементы сортировки, состоящие из нескольких символов. Эта информация относится к возможному в будущем поведению.</P
+></BLOCKQUOTE
+></DIV
+><P
+>В квадратных скобках могут содержаться элементы сортировки, заключённые между <TT
+CLASS="LITERAL"
+>[=</TT
+> и <TT
+CLASS="LITERAL"
+>=]</TT
+>, обозначающие <I
+CLASS="FIRSTTERM"
+>классы эквивалентности</I
+>, т. е. последовательности символов из всех элементов сортировки, эквивалентных указанному, включая его самого. (Если для этого символа нет эквивалентных, он обрабатывается, как заключённый между <TT
+CLASS="LITERAL"
+>[.</TT
+> и <TT
+CLASS="LITERAL"
+>.]</TT
+>.) Например, если <TT
+CLASS="LITERAL"
+>е</TT
+> и <TT
+CLASS="LITERAL"
+>ё</TT
+> &mdash; члены одного класса эквивалентности, выражения <TT
+CLASS="LITERAL"
+>[[=е=]]</TT
+>, <TT
+CLASS="LITERAL"
+>[[=ё=]]</TT
+> и <TT
+CLASS="LITERAL"
+>[её]</TT
+> будут равнозначными. Класс эквивалентности нельзя указать в качестве границы интервала.</P
+><P
+>В квадратных скобках может также содержаться имя класса символов, заключённое между <TT
+CLASS="LITERAL"
+>[:</TT
+> и <TT
+CLASS="LITERAL"
+>:]</TT
+>, и заменяющее список всех символов этого класса. Стандартные имена классов: <TT
+CLASS="LITERAL"
+>alnum</TT
+>, <TT
+CLASS="LITERAL"
+>alpha</TT
+>, <TT
+CLASS="LITERAL"
+>blank</TT
+>, <TT
+CLASS="LITERAL"
+>cntrl</TT
+>, <TT
+CLASS="LITERAL"
+>digit</TT
+>, <TT
+CLASS="LITERAL"
+>graph</TT
+>, <TT
+CLASS="LITERAL"
+>lower</TT
+>, <TT
+CLASS="LITERAL"
+>print</TT
+>, <TT
+CLASS="LITERAL"
+>punct</TT
+>, <TT
+CLASS="LITERAL"
+>space</TT
+>, <TT
+CLASS="LITERAL"
+>upper</TT
+> и <TT
+CLASS="LITERAL"
+>xdigit</TT
+>. Весь этот набор классов определён в <SPAN
+CLASS="CITEREFENTRY"
+><SPAN
+CLASS="REFENTRYTITLE"
+>ctype</SPAN
+></SPAN
+> и он может меняться в зависимости от локали (языковой среды). Класс символов также нельзя использовать в качестве границы интервала.</P
+><P
+>Есть два особых вида выражений в квадратных скобках: выражения <TT
+CLASS="LITERAL"
+>[[:&lt;:]]</TT
+> и <TT
+CLASS="LITERAL"
+>[[:&gt;:]]</TT
+>, представляющие собой ограничения, соответствующие пустым строкам в начале и конце слова. Слово в данном контексте определяется как последовательность словосоставляющих символов, перед или после которой нет словосоставляющих символов. Словосоставляющий символ &mdash; это символ класса <TT
+CLASS="LITERAL"
+>alnum</TT
+> (определённого в <SPAN
+CLASS="CITEREFENTRY"
+><SPAN
+CLASS="REFENTRYTITLE"
+>ctype</SPAN
+></SPAN
+>) или подчёркивание. Это расширение совместимо со стандартом <ACRONYM
+CLASS="ACRONYM"
+>POSIX</ACRONYM
+> 1003.2, но не описано в нём, и поэтому его следует использовать с осторожностью там, где важна совместимость с другими системами. Обычно лучше использовать ограничивающие спецсимволы, описанные ниже; они также не совсем стандартны, но набрать их легче.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="POSIX-ESCAPE-SEQUENCES"
+>9.7.3.3. Спецсимволы регулярных выражений</A
+></H3
+><P
+><I
+CLASS="FIRSTTERM"
+>Спецсимволы</I
+> &mdash; это специальные команды, состоящие из <TT
+CLASS="LITERAL"
+>\</TT
+> и последующего алфавитно-цифрового символа. Можно выделить следующие категории спецсимволов: обозначения символов, коды классов, ограничения и ссылки назад. Символ <TT
+CLASS="LITERAL"
+>\</TT
+>, за которым идёт алфавитно-цифровой символ, не образующий допустимый спецсимвол, считается ошибочным в ARE. В ERE спецсимволов нет: вне квадратных скобок пара из <TT
+CLASS="LITERAL"
+>\</TT
+> и последующего алфавитно-цифрового символа, воспринимается просто как данный символ, а в квадратных скобках и сам символ <TT
+CLASS="LITERAL"
+>\</TT
+> воспринимается просто как обратная косая черта. (Последнее на самом деле нарушает совместимость между ERE и ARE.)</P
+><P
+><I
+CLASS="FIRSTTERM"
+>Спецобозначения символов</I
+> введены для того, чтобы облегчить ввод в RE непечатаемых и других неудобных символов. Они приведены в <A
+HREF="functions-matching.html#POSIX-CHARACTER-ENTRY-ESCAPES-TABLE"
+>Таблице 9-16</A
+>.</P
+><P
+><I
+CLASS="FIRSTTERM"
+>Коды классов</I
+> представляют собой краткий способ записи имён некоторых распространённых классов символов. Они перечислены в <A
+HREF="functions-matching.html#POSIX-CLASS-SHORTHAND-ESCAPES-TABLE"
+>Таблице 9-17</A
+>.</P
+><P
+><I
+CLASS="FIRSTTERM"
+>Спецсимволы ограничений</I
+> обозначают ограничения, которым при совпадении определённых условий соответствует пустая строка. Они перечислены в <A
+HREF="functions-matching.html#POSIX-CONSTRAINT-ESCAPES-TABLE"
+>Таблице 9-18</A
+>.</P
+><P
+><I
+CLASS="FIRSTTERM"
+>Ссылка назад</I
+> (<TT
+CLASS="LITERAL"
+>\</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>) соответствует той же строке, какой соответствовало предыдущее подвыражение в скобках под номером <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+> (см. <A
+HREF="functions-matching.html#POSIX-CONSTRAINT-BACKREF-TABLE"
+>Таблицу 9-19</A
+>). Например, <TT
+CLASS="LITERAL"
+>([bc])\1</TT
+> соответствует <TT
+CLASS="LITERAL"
+>bb</TT
+> или <TT
+CLASS="LITERAL"
+>cc</TT
+>, но не <TT
+CLASS="LITERAL"
+>bc</TT
+> или <TT
+CLASS="LITERAL"
+>cb</TT
+>. Это подвыражение должно полностью предшествовать ссылке назад в RE. Нумеруются подвыражения в порядке следования их открывающих скобок. При этом скобки без захвата исключаются из рассмотрения.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Не забывайте, что ведущий символ <TT
+CLASS="LITERAL"
+>\</TT
+> в спецпоследовательностях необходимо дублировать, когда регулярное выражение записывается в строковой константе SQL. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>'123' ~ E'^\\d{3}' <I
+CLASS="LINEANNOTATION"
+>true</I
+></PRE
+><P></P
+></BLOCKQUOTE
+></DIV
+><DIV
+CLASS="TABLE"
+><A
+NAME="POSIX-CHARACTER-ENTRY-ESCAPES-TABLE"
+></A
+><P
+><B
+>Таблица 9-16. Спецобозначения символов в регулярных выражениях</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+>Спецсимвол</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>\a</TT
+> </TD
+><TD
+>символ звонка, как в C</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>\b</TT
+> </TD
+><TD
+>символ &laquo;забой&raquo;, как в C</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>\B</TT
+> </TD
+><TD
+>синоним для обратной косой черты (<TT
+CLASS="LITERAL"
+>\</TT
+>), сокращающий потребность в дублировании этого символа</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>\c</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>X</I
+></TT
+> </TD
+><TD
+>(где <TT
+CLASS="REPLACEABLE"
+><I
+>X</I
+></TT
+> &mdash; любой символ) символ, младшие 5 бит которого те же, что и у <TT
+CLASS="REPLACEABLE"
+><I
+>X</I
+></TT
+>, а остальные равны 0</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>\e</TT
+> </TD
+><TD
+>символ, определённый в последовательности сортировки с именем <TT
+CLASS="LITERAL"
+>ESC</TT
+>, либо, если таковой не определён, символ с восьмеричным значением 033</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>\f</TT
+> </TD
+><TD
+>подача формы, как в C</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>\n</TT
+> </TD
+><TD
+>новая строка, как в C</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>\r</TT
+> </TD
+><TD
+>возврат каретки, как в C</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>\t</TT
+> </TD
+><TD
+>горизонтальная табуляция, как в C</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>\u</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>wxyz</I
+></TT
+> </TD
+><TD
+>(где <TT
+CLASS="REPLACEABLE"
+><I
+>wxyz</I
+></TT
+> &mdash; в точности четыре шестнадцатеричных цифры) символ UTF16 (16-битный Unicode) с кодом <TT
+CLASS="LITERAL"
+>U+</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>wxyz</I
+></TT
+> в локально установленном порядке байт</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>\U</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>stuvwxyz</I
+></TT
+> </TD
+><TD
+>(где <TT
+CLASS="REPLACEABLE"
+><I
+>stuvwxyz</I
+></TT
+> &mdash; восемь шестнадцатеричных цифр) зарезервировано для гипотетического расширения Unicode до 32 бит</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>\v</TT
+> </TD
+><TD
+>вертикальная табуляция, как в C</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>\x</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>hhh</I
+></TT
+> </TD
+><TD
+>(где <TT
+CLASS="REPLACEABLE"
+><I
+>hhh</I
+></TT
+> &mdash; несколько шестнадцатеричных цифр) символ с шестнадцатеричным кодом <TT
+CLASS="LITERAL"
+>0x</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>hhh</I
+></TT
+> (символ всегда один вне зависимости от числа шестнадцатеричных цифр)</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>\0</TT
+> </TD
+><TD
+>символ с кодом <TT
+CLASS="LITERAL"
+>0</TT
+> (нулевой байт)</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>\</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>xy</I
+></TT
+> </TD
+><TD
+>(где <TT
+CLASS="REPLACEABLE"
+><I
+>xy</I
+></TT
+> &mdash; ровно две восьмеричных цифры, не <I
+CLASS="FIRSTTERM"
+>ссылка назад</I
+>) символ с восьмеричным кодом <TT
+CLASS="LITERAL"
+>0</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>xy</I
+></TT
+></TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>\</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>xyz</I
+></TT
+> </TD
+><TD
+>(где <TT
+CLASS="REPLACEABLE"
+><I
+>xyz</I
+></TT
+> &mdash; ровно три восьмеричных цифры, не <I
+CLASS="FIRSTTERM"
+>ссылка назад</I
+>) символ с восьмеричным кодом <TT
+CLASS="LITERAL"
+>0</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>xyz</I
+></TT
+></TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Шестнадцатеричные цифры записываются символами <TT
+CLASS="LITERAL"
+>0</TT
+>-<TT
+CLASS="LITERAL"
+>9</TT
+> и <TT
+CLASS="LITERAL"
+>a</TT
+>-<TT
+CLASS="LITERAL"
+>f</TT
+> или <TT
+CLASS="LITERAL"
+>A</TT
+>-<TT
+CLASS="LITERAL"
+>F</TT
+>. Восьмеричные цифры &mdash; цифры от <TT
+CLASS="LITERAL"
+>0</TT
+> до <TT
+CLASS="LITERAL"
+>7</TT
+>.</P
+><P
+>Символы, переданные спецобозначением, всегда воспринимаются как обычные символы. Например, <TT
+CLASS="LITERAL"
+>\135</TT
+> кодирует <TT
+CLASS="LITERAL"
+>]</TT
+> в ASCII, но спецпоследовательность <TT
+CLASS="LITERAL"
+>\135</TT
+> не будет закрывать выражение в квадратных скобках.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="POSIX-CLASS-SHORTHAND-ESCAPES-TABLE"
+></A
+><P
+><B
+>Таблица 9-17. Спецкоды классов в регулярных выражениях</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+>Спецсимвол</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>\d</TT
+> </TD
+><TD
+> <TT
+CLASS="LITERAL"
+>[[:digit:]]</TT
+> </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>\s</TT
+> </TD
+><TD
+> <TT
+CLASS="LITERAL"
+>[[:space:]]</TT
+> </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>\w</TT
+> </TD
+><TD
+><TT
+CLASS="LITERAL"
+>[[:alnum:]_]</TT
+> (подчёркивание также включается)</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>\D</TT
+> </TD
+><TD
+> <TT
+CLASS="LITERAL"
+>[^[:digit:]]</TT
+> </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>\S</TT
+> </TD
+><TD
+> <TT
+CLASS="LITERAL"
+>[^[:space:]]</TT
+> </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>\W</TT
+> </TD
+><TD
+><TT
+CLASS="LITERAL"
+>[^[:alnum:]_]</TT
+> (подчёркивание также включается)</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>В выражениях в квадратных скобках спецсимволы <TT
+CLASS="LITERAL"
+>\d</TT
+>, <TT
+CLASS="LITERAL"
+>\s</TT
+> и <TT
+CLASS="LITERAL"
+>\w</TT
+> теряют свои внешние квадратные скобки, а <TT
+CLASS="LITERAL"
+>\D</TT
+>, <TT
+CLASS="LITERAL"
+>\S</TT
+> и <TT
+CLASS="LITERAL"
+>\W</TT
+> &mdash; недопустимы. (Так что, например запись <TT
+CLASS="LITERAL"
+>[a-c\d]</TT
+> равнозначна <TT
+CLASS="LITERAL"
+>[a-c[:digit:]]</TT
+>. А запись <TT
+CLASS="LITERAL"
+>[a-c\D]</TT
+>, которая была бы равнозначна <TT
+CLASS="LITERAL"
+>[a-c^[:digit:]]</TT
+>, &mdash; недопустима.)</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="POSIX-CONSTRAINT-ESCAPES-TABLE"
+></A
+><P
+><B
+>Таблица 9-18. Спецсимволы ограничений в регулярных выражений</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+>Спецсимвол</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>\A</TT
+> </TD
+><TD
+>соответствует только началу строки (чем это отличается от <TT
+CLASS="LITERAL"
+>^</TT
+>, описано в <A
+HREF="functions-matching.html#POSIX-MATCHING-RULES"
+>Подразделе 9.7.3.5</A
+>)</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>\m</TT
+> </TD
+><TD
+>соответствует только началу слова</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>\M</TT
+> </TD
+><TD
+>соответствует только концу слова</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>\y</TT
+> </TD
+><TD
+>соответствует только началу или концу слова</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>\Y</TT
+> </TD
+><TD
+>соответствует только положению не в начале и не в конце слова</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>\Z</TT
+> </TD
+><TD
+>соответствует только концу строки (чем это отличается от <TT
+CLASS="LITERAL"
+>$</TT
+>, описано в <A
+HREF="functions-matching.html#POSIX-MATCHING-RULES"
+>Подразделе 9.7.3.5</A
+>)</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Определением слова здесь служит то же, что было приведено выше в описании <TT
+CLASS="LITERAL"
+>[[:&lt;:]]</TT
+> и <TT
+CLASS="LITERAL"
+>[[:&gt;:]]</TT
+>. В квадратных скобках спецсимволы ограничений не допускаются.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="POSIX-CONSTRAINT-BACKREF-TABLE"
+></A
+><P
+><B
+>Таблица 9-19. Ссылки назад в регулярных выражениях</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+>Спецсимвол</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>\</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>m</I
+></TT
+> </TD
+><TD
+>(где <TT
+CLASS="REPLACEABLE"
+><I
+>m</I
+></TT
+> &mdash; цифра, отличная от 0) &mdash; ссылка назад на подвыражение под номером <TT
+CLASS="REPLACEABLE"
+><I
+>m</I
+></TT
+></TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>\</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>mnn</I
+></TT
+> </TD
+><TD
+>(где <TT
+CLASS="REPLACEABLE"
+><I
+>m</I
+></TT
+> &mdash; цифра, отличная от 0, а <TT
+CLASS="REPLACEABLE"
+><I
+>nn</I
+></TT
+> &mdash; ещё несколько цифр с десятичным значением <TT
+CLASS="REPLACEABLE"
+><I
+>mnn</I
+></TT
+>, не превышающим число закрытых до этого скобок с захватом) ссылка назад на подвыражение под номером <TT
+CLASS="REPLACEABLE"
+><I
+>mnn</I
+></TT
+></TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Регулярным выражениям присуща неоднозначность между восьмеричными кодами символов и ссылками назад, которая разрешается следующим образом (это упоминалось выше). Ведущий ноль всегда считается признаком восьмеричной последовательности. Единственная цифра, отличная от 0, за которой не следует ещё одна цифра, всегда воспринимается как ссылка назад. Последовательность из нескольких цифр, которая начинается не с 0, воспринимается как ссылка назад, если она идёт за подходящим подвыражением (т. е. число оказывается в диапазоне, допустимом для ссылки назад), в противном случае она воспринимается как восьмеричное число.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="POSIX-METASYNTAX"
+>9.7.3.4. Метасинтаксис регулярных выражений</A
+></H3
+><P
+>В дополнение к основному синтаксису, описанному выше, можно использовать также несколько особых форм и разнообразные синтаксические удобства.</P
+><P
+>Регулярное выражение может начинаться с одного из двух специальных префиксов режима. Если RE начинается с <TT
+CLASS="LITERAL"
+>***:</TT
+>, его продолжение рассматривается как ARE. (В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> это обычно не имеет значения, так как регулярные выражения воспринимаются как ARE по умолчанию; но это может быть полезно, когда параметр <TT
+CLASS="REPLACEABLE"
+><I
+>флаги</I
+></TT
+> функций regex включает режим ERE или BRE.) Если RE начинается с <TT
+CLASS="LITERAL"
+>***=</TT
+>, его продолжение воспринимается как обычная текстовая строка, все его символы воспринимаются буквально.</P
+><P
+>ARE может начинаться со <I
+CLASS="FIRSTTERM"
+>встроенных параметров</I
+>: последовательности <TT
+CLASS="LITERAL"
+>(?</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>xyz</I
+></TT
+><TT
+CLASS="LITERAL"
+>)</TT
+> (где <TT
+CLASS="REPLACEABLE"
+><I
+>xyz</I
+></TT
+> &mdash; один или несколько алфавитно-цифровых символов), определяющих параметры остального регулярного выражения. Эти параметры переопределяют любые ранее определённые параметры, в частности они могут переопределить режим чувствительности к регистру, подразумеваемый для оператора regex, или параметр <TT
+CLASS="REPLACEABLE"
+><I
+>флаги</I
+></TT
+> функции regex. Допустимые буквы параметров показаны в <A
+HREF="functions-matching.html#POSIX-EMBEDDED-OPTIONS-TABLE"
+>Таблице 9-20</A
+>. Заметьте, что те же буквы используются в параметре <TT
+CLASS="REPLACEABLE"
+><I
+>флаги</I
+></TT
+> функций regex.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="POSIX-EMBEDDED-OPTIONS-TABLE"
+></A
+><P
+><B
+>Таблица 9-20. Буквы встроенных параметров ARE</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+>Параметр</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>b</TT
+> </TD
+><TD
+>продолжение регулярного выражения &mdash; BRE</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>c</TT
+> </TD
+><TD
+>поиск соответствий с учётом регистра (переопределяет тип оператора)</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>e</TT
+> </TD
+><TD
+>продолжение RE &mdash; ERE</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>i</TT
+> </TD
+><TD
+>поиск соответствий без учёта регистра (см. <A
+HREF="functions-matching.html#POSIX-MATCHING-RULES"
+>Подраздел 9.7.3.5</A
+>) (переопределяет тип оператора)</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>m</TT
+> </TD
+><TD
+>исторически сложившийся синоним <TT
+CLASS="LITERAL"
+>n</TT
+></TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>n</TT
+> </TD
+><TD
+>поиск соответствий с учётом перевода строк (см. <A
+HREF="functions-matching.html#POSIX-MATCHING-RULES"
+>Подраздел 9.7.3.5</A
+>)</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>p</TT
+> </TD
+><TD
+>переводы строк учитываются частично (см. <A
+HREF="functions-matching.html#POSIX-MATCHING-RULES"
+>Подраздел 9.7.3.5</A
+>)</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>q</TT
+> </TD
+><TD
+>продолжение регулярного выражения &mdash; обычная строка (<SPAN
+CLASS="QUOTE"
+>"в кавычках"</SPAN
+>), содержимое которой воспринимается буквально</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>s</TT
+> </TD
+><TD
+>поиск соответствий без учёта перевода строк (по умолчанию)</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>t</TT
+> </TD
+><TD
+>компактный синтаксис (по умолчанию; см. ниже)</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>w</TT
+> </TD
+><TD
+>переводы строк учитываются частично, но в другом, <SPAN
+CLASS="QUOTE"
+>"странном"</SPAN
+> режиме (см. <A
+HREF="functions-matching.html#POSIX-MATCHING-RULES"
+>Подраздел 9.7.3.5</A
+>)</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>x</TT
+> </TD
+><TD
+>развёрнутый синтаксис (см. ниже)</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Внедрённые параметры начинают действовать сразу после скобки <TT
+CLASS="LITERAL"
+>)</TT
+>, завершающей их последовательность. Они могут находиться только в начале ARE (после указания <TT
+CLASS="LITERAL"
+>***:</TT
+>, если оно присутствует).</P
+><P
+>Помимо обычного (<I
+CLASS="FIRSTTERM"
+>компактного</I
+>) синтаксиса RE, в котором имеют значение все символы, поддерживается также <I
+CLASS="FIRSTTERM"
+>развёрнутый</I
+> синтаксис, включить который можно с помощью встроенного параметра <TT
+CLASS="LITERAL"
+>x</TT
+>. В развёрнутом синтаксисе игнорируются пробельные символы, а также все символы от <TT
+CLASS="LITERAL"
+>#</TT
+> до конца строки (или конца RE). Это позволяет разделять RE на строки и добавлять в него комментарии. Но есть три исключения: <P
+></P
+></P><UL
+><LI
+><P
+>пробельный символ или <TT
+CLASS="LITERAL"
+>#</TT
+>, за которым следует <TT
+CLASS="LITERAL"
+>\</TT
+>, сохраняется</P
+></LI
+><LI
+><P
+>пробельный символ или <TT
+CLASS="LITERAL"
+>#</TT
+> внутри выражения в квадратных скобках сохраняется</P
+></LI
+><LI
+><P
+>пробельные символы и комментарии не могут присутствовать в составных символах, например, в <TT
+CLASS="LITERAL"
+>(?:</TT
+></P
+></LI
+></UL
+><P> В данном контексте пробельными символами считаются пробел, табуляция, перевод строки и любой другой символ, относящийся к классу символов <TT
+CLASS="REPLACEABLE"
+><I
+>space</I
+></TT
+>.</P
+><P
+>И наконец, в ARE последовательность <TT
+CLASS="LITERAL"
+>(?#</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>ttt</I
+></TT
+><TT
+CLASS="LITERAL"
+>)</TT
+> (где <TT
+CLASS="REPLACEABLE"
+><I
+>ttt</I
+></TT
+> &mdash; любой текст, не содержащий <TT
+CLASS="LITERAL"
+>)</TT
+>) вне квадратных скобок также считается комментарием и полностью игнорируется. При этом она так же не может находиться внутри составных символов, таких как <TT
+CLASS="LITERAL"
+>(?:</TT
+>. Эти комментарии в большей степени историческое наследие, чем полезное средство; они считаются устаревшими, а вместо них рекомендуется использовать развёрнутый синтаксис.</P
+><P
+><SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>Ни одно</I
+></SPAN
+> из этих расширений метасинтаксиса не будет работать, если выражение начинается с префикса <TT
+CLASS="LITERAL"
+>***=</TT
+>, после которого строка воспринимается буквально, а не как RE.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="POSIX-MATCHING-RULES"
+>9.7.3.5. Правила соответствия регулярным выражениям</A
+></H3
+><P
+>В случае, когда RE может соответствовать более чем одной подстроке в заданной строке, соответствующей RE считается подстрока, которая начинается в ней первой. Если к данной позиции подобных соответствующих подстрок оказывается несколько, из них выбирается либо самая длинная, либо самая короткая из возможных, в зависимости от того, какой режим выбран в RE: <I
+CLASS="FIRSTTERM"
+>жадный</I
+> или <I
+CLASS="FIRSTTERM"
+>не жадный</I
+>.</P
+><P
+>Где жадный или не жадный характер RE определяется по следующим правилам: <P
+></P
+></P><UL
+><LI
+><P
+>Большинство атомов и все ограничения не имеют признака жадности (так как они всё равно не могут соответствовать подстрокам разного состава).</P
+></LI
+><LI
+><P
+>Скобки, окружающие RE, не влияют на его &laquo;жадность&raquo;.</P
+></LI
+><LI
+><P
+>Атом с определителем фиксированного количества (<TT
+CLASS="LITERAL"
+>{</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>m</I
+></TT
+><TT
+CLASS="LITERAL"
+>}</TT
+> или <TT
+CLASS="LITERAL"
+>{</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>m</I
+></TT
+><TT
+CLASS="LITERAL"
+>}?</TT
+>) имеет ту же характеристику жадности (или может не иметь её), как и сам атом.</P
+></LI
+><LI
+><P
+>Атом с другими обычными определителями количества (включая <TT
+CLASS="LITERAL"
+>{</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>m</I
+></TT
+><TT
+CLASS="LITERAL"
+>,</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+><TT
+CLASS="LITERAL"
+>}</TT
+>, где <TT
+CLASS="REPLACEABLE"
+><I
+>m</I
+></TT
+> равняется <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>) считается жадным (предпочитает соответствие максимальной длины).</P
+></LI
+><LI
+><P
+>Атом с не жадным определителем количества (включая <TT
+CLASS="LITERAL"
+>{</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>m</I
+></TT
+><TT
+CLASS="LITERAL"
+>,</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+><TT
+CLASS="LITERAL"
+>}?</TT
+>, где <TT
+CLASS="REPLACEABLE"
+><I
+>m</I
+></TT
+> равно <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>) считается не жадным (предпочитает соответствие минимальной длины).</P
+></LI
+><LI
+><P
+>Ветвь (RE без оператора <TT
+CLASS="LITERAL"
+>|</TT
+> на верхнем уровне) имеет ту же характеристику жадности, что и первый количественный атом в нём, имеющий атрибут жадности.</P
+></LI
+><LI
+><P
+>RE, образованное из двух или более ветвей, соединённых оператором <TT
+CLASS="LITERAL"
+>|</TT
+>, всегда считается жадным.</P
+></LI
+></UL
+><P></P
+><P
+>Эти правила связывают характеристики жадности не только с отдельными количественными атомами, но и с ветвями и целыми RE, содержащими количественные атомы. Это означает, что при сопоставлении ветвь или целое RE может соответствовать максимально длинной или короткой подстроке <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>в целом</I
+></SPAN
+>. Когда определена длина всего соответствия, часть его, соответствующая конкретному подвыражению, определяется с учётом характеристики жадности для этого подвыражения, при этом подвыражения, начинающиеся в RE раньше, имеют больший приоритет, чем следующие за ними.</P
+><P
+>Это иллюстрирует следующий пример: </P><PRE
+CLASS="SCREEN"
+>SELECT SUBSTRING('XY1234Z', 'Y*([0-9]{1,3})');
+<I
+CLASS="LINEANNOTATION"
+>Результат: </I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>123</SAMP
+>
+SELECT SUBSTRING('XY1234Z', 'Y*?([0-9]{1,3})');
+<I
+CLASS="LINEANNOTATION"
+>Результат: </I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>1</SAMP
+></PRE
+><P> В первом случае, RE в целом жадное, так как жадным является атом <TT
+CLASS="LITERAL"
+>Y*</TT
+>. Соответствие ему начинается с буквы <TT
+CLASS="LITERAL"
+>Y</TT
+> и оно включает подстроку максимальной длины с этого места, т. е. подстроку <TT
+CLASS="LITERAL"
+>Y123</TT
+>. Результат выражения &mdash; её часть, соответствующая подвыражению в скобках, т. е. <TT
+CLASS="LITERAL"
+>123</TT
+>. Во втором случае, RE в целом наследует не жадный характер от атома <TT
+CLASS="LITERAL"
+>Y*?</TT
+>. Соответствие ему так же начинается с <TT
+CLASS="LITERAL"
+>Y</TT
+>, но включает оно подстроку минимальной длины с этого места, т. е. <TT
+CLASS="LITERAL"
+>Y1</TT
+>. И хотя подвыражение <TT
+CLASS="LITERAL"
+>[0-9]{1,3}</TT
+> имеет жадный характер, оно не может повлиять на выбор длины соответствия в целом, поэтому ему остаётся только подстрока <TT
+CLASS="LITERAL"
+>1</TT
+>.</P
+><P
+>Другими словами, когда RE содержит и жадные, и не жадные подвыражения, всё соответствие будет максимально длинным или коротким в зависимости от характеристики всего RE. Характеристики, связанные с подвыражениями, влияют только на то, какую часть подстроки может <SPAN
+CLASS="QUOTE"
+>"поглотить"</SPAN
+> одно подвыражение относительно другого.</P
+><P
+>Чтобы явно придать характеристику &laquo;жадности&raquo; или &laquo;не жадности&raquo; подвыражению или всему RE, можно использовать определители количества <TT
+CLASS="LITERAL"
+>{1,1}</TT
+> и <TT
+CLASS="LITERAL"
+>{1,1}?</TT
+>, соответственно.</P
+><P
+>Длины соответствий определяются в символах, а не в элементах сортировки. Пустая строка считается длиннее, чем отсутствие соответствия. Например, выражению <TT
+CLASS="LITERAL"
+>bb*</TT
+> соответствуют три символа в середине строки <TT
+CLASS="LITERAL"
+>abbbc</TT
+>, выражению <TT
+CLASS="LITERAL"
+>(week|wee)(night|knights)</TT
+> &mdash; все десять символов <TT
+CLASS="LITERAL"
+>weeknights</TT
+>, когда выражение <TT
+CLASS="LITERAL"
+>(.*).*</TT
+> сопоставляется со строкой <TT
+CLASS="LITERAL"
+>abc</TT
+>, подвыражению в скобках соответствуют все три символа, а когда <TT
+CLASS="LITERAL"
+>(a*)*</TT
+> сопоставляется со строкой <TT
+CLASS="LITERAL"
+>bc</TT
+>, и RE в целом, и подстроке в скобках соответствует пустая строка.</P
+><P
+>Игнорирование регистра символов даёт практически тот же эффект, как если бы в алфавите исчезли различия прописных и строчных букв. Если буква, существующая и в верхнем, и в нижнем регистре, фигурирует вне квадратных скобок как обычный символ, она по сути преобразуется в выражение в квадратных скобках, содержащее оба варианта, например <TT
+CLASS="LITERAL"
+>x</TT
+> становится <TT
+CLASS="LITERAL"
+>[xX]</TT
+>. Если же она фигурирует в выражении в квадратных скобках, в это выражение добавляются все её варианты, например <TT
+CLASS="LITERAL"
+>[x]</TT
+> становится <TT
+CLASS="LITERAL"
+>[xX]</TT
+>, а <TT
+CLASS="LITERAL"
+>[^x]</TT
+> &mdash; <TT
+CLASS="LITERAL"
+>[^xX]</TT
+>.</P
+><P
+>Когда включён режим учёта перевода строк, атом <TT
+CLASS="LITERAL"
+>.</TT
+> и выражения в квадратных скобках с <TT
+CLASS="LITERAL"
+>^</TT
+> никогда не будут соответствовать символам конца строки (так что соответствия никогда не будут пересекать границы строк, если в RE нет явных указаний на эти символы), а <TT
+CLASS="LITERAL"
+>^</TT
+> и <TT
+CLASS="LITERAL"
+>$</TT
+> будут соответствовать пустой подстроке не только в начале и конце всего текста, но и в начале и конце каждой отдельной его строки. Однако спецсимволы ARE <TT
+CLASS="LITERAL"
+>\A</TT
+> и <TT
+CLASS="LITERAL"
+>\Z</TT
+> по-прежнему будут соответствовать <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>только</I
+></SPAN
+> началу и концу всего текста.</P
+><P
+>В режиме, когда переводы строк учитываются частично, особый смысл перевод строк имеет для атома <TT
+CLASS="LITERAL"
+>.</TT
+> и выражений в квадратных скобках, но не для <TT
+CLASS="LITERAL"
+>^</TT
+> и <TT
+CLASS="LITERAL"
+>$</TT
+>.</P
+><P
+>В обратном частичном режиме, перевод строк имеет особый смысл для <TT
+CLASS="LITERAL"
+>^</TT
+> и <TT
+CLASS="LITERAL"
+>$</TT
+>, как и в режиме с учётом перевода строк, но не для <TT
+CLASS="LITERAL"
+>.</TT
+> и выражений в квадратных скобках. Данный режим не очень полезен, но существует для симметрии.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="POSIX-LIMITS-COMPATIBILITY"
+>9.7.3.6. Пределы и совместимость</A
+></H3
+><P
+>В текущей реализации отсутствует какой-либо явно заданный предел длины RE. Однако, разрабатывая программы высокой степени переносимости, не следует применять RE длиннее 256 байт, так как другая POSIX-совместимая реализация может отказаться обрабатывать такие регулярные выражения.</P
+><P
+>Единственная особенность ARE, действительно несовместимая с ERE стандарта POSIX проявляется в том, что в ARE знак <TT
+CLASS="LITERAL"
+>\</TT
+> не теряет своё специальное значение в квадратных скобках. Все другие расширения ARE используют синтаксические возможности, которые не определены, не допустимы или не поддерживаются в ERE; синтаксис переключения режимов (<TT
+CLASS="LITERAL"
+>***</TT
+>) также выходит за рамки синтаксиса POSIX как для BRE, так и для ERE.</P
+><P
+>Многие расширения ARE заимствованы из языка Perl, но некоторые были изменены, оптимизированы, а некоторые расширения Perl были исключены. В результате имеют место следующие несовместимости: атомы <TT
+CLASS="LITERAL"
+>\b</TT
+> и <TT
+CLASS="LITERAL"
+>\B</TT
+>, отсутствие специальной обработки завершающего перевода строки, добавление исключений в квадратных скобках в число случаев, когда учитывается перевод строк, особые условия для скобок и ссылок назад в ограничениях предпросмотра и семантика <SPAN
+CLASS="QUOTE"
+>"наиболее длинное/короткое соответствие"</SPAN
+> (вместо <SPAN
+CLASS="QUOTE"
+>"первое соответствие"</SPAN
+>).</P
+><P
+>Важно отметить две несовместимости синтаксиса ARE и регулярных выражений ERE, которые воспринимал <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> до версии 7.4: <P
+></P
+></P><UL
+><LI
+><P
+>В ARE <TT
+CLASS="LITERAL"
+>\</TT
+> с последующим алфавитно-цифровым символом представляет либо спецсимвол, либо ошибочную последовательность, тогда как в предыдущих версиях так можно было записывать алфавитно-цифровые символы. Это не должно быть большой проблемой, так как раньше не было причин использовать такие последовательности.</P
+></LI
+><LI
+><P
+>В ARE знак <TT
+CLASS="LITERAL"
+>\</TT
+> сохраняет своё специальное значение в <TT
+CLASS="LITERAL"
+>[]</TT
+>, поэтому, чтобы передать <TT
+CLASS="LITERAL"
+>\</TT
+> в квадратных скобках буквально, его нужно записать как <TT
+CLASS="LITERAL"
+>\\</TT
+>.</P
+></LI
+></UL
+><P></P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="POSIX-BASIC-REGEXES"
+>9.7.3.7. Простые регулярные выражения</A
+></H3
+><P
+>BRE имеют ряд отличий от ERE. В BRE знаки <TT
+CLASS="LITERAL"
+>|</TT
+>, <TT
+CLASS="LITERAL"
+>+</TT
+> и <TT
+CLASS="LITERAL"
+>?</TT
+> теряют специальное значение, а замены им нет. Границы количества окружаются символами <TT
+CLASS="LITERAL"
+>\{</TT
+> и <TT
+CLASS="LITERAL"
+>\}</TT
+>, тогда как <TT
+CLASS="LITERAL"
+>{</TT
+> и <TT
+CLASS="LITERAL"
+>}</TT
+> рассматриваются как обычные символы. Вложенные подвыражения помещаются между <TT
+CLASS="LITERAL"
+>\(</TT
+> и <TT
+CLASS="LITERAL"
+>\)</TT
+>, а <TT
+CLASS="LITERAL"
+>(</TT
+> и <TT
+CLASS="LITERAL"
+>)</TT
+> представляют обычные символы. Символ <TT
+CLASS="LITERAL"
+>^</TT
+> воспринимается как обычный, если только он не находится в начале RE или подвыражения в скобках, <TT
+CLASS="LITERAL"
+>$</TT
+> &mdash; тоже обычный символ, если он находится не в конце RE или в конце подвыражения в скобках, и <TT
+CLASS="LITERAL"
+>*</TT
+> &mdash; обычный символ, когда он находится в начале RE или подвыражения в скобках (возможно, после начального <TT
+CLASS="LITERAL"
+>^</TT
+>). И, наконец, в BRE работают ссылки назад с одной цифрой, <TT
+CLASS="LITERAL"
+>\&lt;</TT
+> и <TT
+CLASS="LITERAL"
+>\&gt;</TT
+> &mdash; синонимы для <TT
+CLASS="LITERAL"
+>[[:&lt;:]]</TT
+> и <TT
+CLASS="LITERAL"
+>[[:&gt;:]]</TT
+>, соответственно; никакие другие спецсимволы в BRE не поддерживаются.</P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions-bitstring.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="functions-formatting.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Функции и операторы для работы с битовыми строками</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Функции форматирования данных</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

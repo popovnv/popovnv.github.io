@@ -1,0 +1,220 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>SPI_push</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Интерфейсные функции"
+HREF="spi-interface.html"><LINK
+REL="PREVIOUS"
+TITLE="SPI_finish"
+HREF="spi-spi-finish.html"><LINK
+REL="NEXT"
+TITLE="SPI_pop"
+HREF="spi-spi-pop.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="SPI_finish"
+HREF="spi-spi-finish.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="spi-interface.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="SPI_pop"
+HREF="spi-spi-pop.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SPI-SPI-PUSH"
+></A
+>SPI_push</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN63907"
+></A
+><H2
+>Название</H2
+>SPI_push&nbsp;--&nbsp;поднять стек SPI для входа в рекурсивное использование SPI</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN63910"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>void SPI_push(void)</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN63912"
+></A
+><H2
+>Описание</H2
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>SPI_push</CODE
+> должна вызываться перед выполнением другой процедуры, которая может пожелать самостоятельно использовать SPI. После <CODE
+CLASS="FUNCTION"
+>SPI_push</CODE
+>, SPI выходит из <SPAN
+CLASS="QUOTE"
+>"подключённого"</SPAN
+> состояния, и последующие вызовы функций SPI не будут выполняться, пока вновь не будет вызвана <CODE
+CLASS="FUNCTION"
+>SPI_connect</CODE
+>. Это обеспечивает чёткое разделение состояний SPI между вашей процедурой и процедурой, которую вы вызываете. После завершения другой процедуры вызовите <CODE
+CLASS="FUNCTION"
+>SPI_pop</CODE
+>, чтобы восстановить доступ к вашему состоянию SPI.</P
+><P
+>Заметьте, что <CODE
+CLASS="FUNCTION"
+>SPI_execute</CODE
+> и связанные функции автоматически выполняют действие, равнозначное вызову <CODE
+CLASS="FUNCTION"
+>SPI_push</CODE
+>, до передачи управления механизму исполнения SQL, так что вызывая эти функции, можно не беспокоиться об этом. Выполнять <CODE
+CLASS="FUNCTION"
+>SPI_push</CODE
+> и <CODE
+CLASS="FUNCTION"
+>SPI_pop</CODE
+> требуется, только если вы непосредственно вызываете произвольный код, который может содержать вызовы <CODE
+CLASS="FUNCTION"
+>SPI_connect</CODE
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="spi-spi-finish.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="spi-spi-pop.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>SPI_finish</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="spi-interface.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>SPI_pop</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

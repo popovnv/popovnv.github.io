@@ -1,0 +1,529 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>ALTER AGGREGATE</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="ABORT"
+HREF="sql-abort.html"><LINK
+REL="NEXT"
+TITLE="ALTER COLLATION"
+HREF="sql-altercollation.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="ABORT"
+HREF="sql-abort.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="ALTER COLLATION"
+HREF="sql-altercollation.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-ALTERAGGREGATE"
+></A
+>ALTER AGGREGATE</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN66660"
+></A
+><H2
+>Название</H2
+>ALTER AGGREGATE&nbsp;--&nbsp;изменить определение агрегатной функции</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN66663"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>ALTER AGGREGATE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> ( <TT
+CLASS="REPLACEABLE"
+><I
+>сигнатура_агр_функции</I
+></TT
+> ) RENAME TO <TT
+CLASS="REPLACEABLE"
+><I
+>новое_имя</I
+></TT
+>
+ALTER AGGREGATE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> ( <TT
+CLASS="REPLACEABLE"
+><I
+>сигнатура_агр_функции</I
+></TT
+> ) OWNER TO <TT
+CLASS="REPLACEABLE"
+><I
+>новый_владелец</I
+></TT
+>
+ALTER AGGREGATE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> ( <TT
+CLASS="REPLACEABLE"
+><I
+>сигнатура_агр_функции</I
+></TT
+> ) SET SCHEMA <TT
+CLASS="REPLACEABLE"
+><I
+>новая_схема</I
+></TT
+>
+
+<SPAN
+CLASS="phrase"
+><SPAN
+CLASS="PHRASE"
+>Здесь <TT
+CLASS="REPLACEABLE"
+><I
+>сигнатура_агр_функции</I
+></TT
+>:</SPAN
+></SPAN
+>
+
+* |
+[ <TT
+CLASS="REPLACEABLE"
+><I
+>режим_аргумента</I
+></TT
+> ] [ <TT
+CLASS="REPLACEABLE"
+><I
+>имя_аргумента</I
+></TT
+> ] <TT
+CLASS="REPLACEABLE"
+><I
+>тип_аргумента</I
+></TT
+> [ , ... ] |
+[ [ <TT
+CLASS="REPLACEABLE"
+><I
+>режим_аргумента</I
+></TT
+> ] [ <TT
+CLASS="REPLACEABLE"
+><I
+>имя_аргумента</I
+></TT
+> ] <TT
+CLASS="REPLACEABLE"
+><I
+>тип_аргумента</I
+></TT
+> [ , ... ] ] ORDER BY [ <TT
+CLASS="REPLACEABLE"
+><I
+>режим_аргумента</I
+></TT
+> ] [ <TT
+CLASS="REPLACEABLE"
+><I
+>имя_аргумента</I
+></TT
+> ] <TT
+CLASS="REPLACEABLE"
+><I
+>тип_аргумента</I
+></TT
+> [ , ... ]</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN66685"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>ALTER AGGREGATE</TT
+> изменяет определение агрегатной функции.</P
+><P
+>Выполнить <TT
+CLASS="COMMAND"
+>ALTER AGGREGATE</TT
+> может только владелец соответствующей агрегатной функции. Чтобы сменить схему агрегатной функции, необходимо также иметь право <TT
+CLASS="LITERAL"
+>CREATE</TT
+> в новой схеме. Чтобы сменить владельца, требуется также быть непосредственным или опосредованным членом новой роли, а эта роль должна иметь право <TT
+CLASS="LITERAL"
+>CREATE</TT
+> в схеме агрегатной функции. (С такими ограничениями при смене владельца не происходит ничего такого, что нельзя было бы сделать, имея право удалить и вновь создать агрегатную функцию. Однако суперпользователь может сменить владельца агрегатной функции в любом случае.)</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN66693"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></DT
+><DD
+><P
+>Имя (возможно, дополненное схемой) существующей агрегатной функции.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>режим_аргумента</I
+></TT
+></DT
+><DD
+><P
+>Режим аргумента: <TT
+CLASS="LITERAL"
+>IN</TT
+> или <TT
+CLASS="LITERAL"
+>VARIADIC</TT
+>. По умолчанию подразумевается <TT
+CLASS="LITERAL"
+>IN</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_аргумента</I
+></TT
+></DT
+><DD
+><P
+>Имя аргумента. Заметьте, что на самом деле <TT
+CLASS="COMMAND"
+>ALTER AGGREGATE</TT
+> не обращает внимание на имена аргументов, так как для однозначной идентификации агрегатной функции достаточно только типов аргументов.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>тип_аргумента</I
+></TT
+></DT
+><DD
+><P
+>Тип входных данных, с которыми работает агрегатная функция. Чтобы сослаться на агрегатную функцию без аргументов, укажите вместо списка аргументов <TT
+CLASS="LITERAL"
+>*</TT
+>, а чтобы сослаться на сортирующую агрегатную функцию, добавьте <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> между указаниями непосредственных и агрегируемых аргументов.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>новое_имя</I
+></TT
+></DT
+><DD
+><P
+>Новое имя агрегатной функции.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>новый_владелец</I
+></TT
+></DT
+><DD
+><P
+>Новый владелец агрегатной функции.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>новая_схема</I
+></TT
+></DT
+><DD
+><P
+>Новая схема агрегатной функции.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN66737"
+></A
+><H2
+>Замечания</H2
+><P
+>Если вы хотите сослаться на сортирующую агрегатную функцию, рекомендуется добавить <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> между непосредственными и агрегируемыми аргументами так же, как и в <A
+HREF="sql-createaggregate.html"
+>CREATE AGGREGATE</A
+>. Однако, команда сработает и без <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+>, если непосредственные и агрегирующие аргументы перечислены подряд в одном списке. В такой сокращённой форме, если и в списке непосредственных, и в списке агрегирующих аргументов содержится <TT
+CLASS="LITERAL"
+>VARIADIC "any"</TT
+>, достаточно написать <TT
+CLASS="LITERAL"
+>VARIADIC "any"</TT
+> только один раз.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN66745"
+></A
+><H2
+>Примеры</H2
+><P
+>Переименование агрегатной функции <TT
+CLASS="LITERAL"
+>myavg</TT
+> для типа <TT
+CLASS="TYPE"
+>integer</TT
+> в <TT
+CLASS="LITERAL"
+>my_average</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER AGGREGATE myavg(integer) RENAME TO my_average;</PRE
+><P></P
+><P
+>Смена владельца агрегатной функции <TT
+CLASS="LITERAL"
+>myavg</TT
+> для типа <TT
+CLASS="TYPE"
+>integer</TT
+> на <TT
+CLASS="LITERAL"
+>joe</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER AGGREGATE myavg(integer) OWNER TO joe;</PRE
+><P></P
+><P
+>Перемещение сортирующей агрегатной функции <TT
+CLASS="LITERAL"
+>mypercentile</TT
+> с непосредственным аргументом типа <TT
+CLASS="TYPE"
+>float8</TT
+> и агрегируемым аргументом типа <TT
+CLASS="TYPE"
+>integer</TT
+> в схему <TT
+CLASS="LITERAL"
+>myschema</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER AGGREGATE mypercentile(float8 ORDER BY integer) SET SCHEMA myschema;</PRE
+><P> Это тоже будет работать: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER AGGREGATE mypercentile(float8, integer) SET SCHEMA myschema;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN66764"
+></A
+><H2
+>Совместимость</H2
+><P
+>Оператор <TT
+CLASS="COMMAND"
+>ALTER AGGREGATE</TT
+> отсутствует в стандарте SQL.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN66768"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-createaggregate.html"
+>CREATE AGGREGATE</A
+>, <A
+HREF="sql-dropaggregate.html"
+>DROP AGGREGATE</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-abort.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-altercollation.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>ABORT</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>ALTER COLLATION</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

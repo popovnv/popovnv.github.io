@@ -1,0 +1,228 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Модули и команда unknown</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="PL/Tcl — процедурный язык Tcl"
+HREF="pltcl.html"><LINK
+REL="PREVIOUS"
+TITLE="Процедуры событийных триггеров в PL/Tcl"
+HREF="pltcl-event-trigger.html"><LINK
+REL="NEXT"
+TITLE="Имена процедур Tcl"
+HREF="pltcl-procnames.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Процедуры событийных триггеров в PL/Tcl"
+HREF="pltcl-event-trigger.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="pltcl.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 41. PL/Tcl — процедурный язык Tcl</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Имена процедур Tcl"
+HREF="pltcl-procnames.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="PLTCL-UNKNOWN"
+>41.8. Модули и команда <CODE
+CLASS="FUNCTION"
+>unknown</CODE
+></A
+></H1
+><P
+>PL/Tcl поддерживает автозагрузку кода Tcl. Для этого он задействует специальную таблицу, <TT
+CLASS="LITERAL"
+>pltcl_modules</TT
+>, предназначенную для размещения модулей кода Tcl. Если эта таблица существует, из таблицы выбирается модуль <TT
+CLASS="LITERAL"
+>unknown</TT
+> и загружается в интерпретатор Tcl непосредственно перед первым выполнением функции PL/Tcl в сеансе базы данных. (Это происходит независимо для каждого интерпретатора Tcl, если их несколько в одном сеансе; см. <A
+HREF="pltcl-global.html"
+>Раздел 41.4</A
+>.)</P
+><P
+>Хотя модуль <TT
+CLASS="LITERAL"
+>unknown</TT
+> может на самом деле содержать любой нужный вам скрипт инициализации, обычно в нём определяется процедура <CODE
+CLASS="FUNCTION"
+>unknown</CODE
+> языка Tcl, которая вызывается всякий раз, когда Tcl не распознаёт имя вызываемой процедуры. Принятая в <SPAN
+CLASS="APPLICATION"
+>PL/Tcl</SPAN
+> версия этой процедуры пытается найти в <TT
+CLASS="LITERAL"
+>pltcl_modules</TT
+> модуль, в котором будет определена требуемая процедура. Если такой модуль находится, он загружается в интерпретатор и затем выполнение изначального вызова процедуры может быть продолжено. Дополнительная таблица <TT
+CLASS="LITERAL"
+>pltcl_modfuncs</TT
+> содержит индекс, связывающий функции с модулями, в которых они определены, так что поиск выполняется довольно быстро.</P
+><P
+>В составе <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> поставляются вспомогательные скрипты для обслуживания этих таблиц: <TT
+CLASS="COMMAND"
+>pltcl_loadmod</TT
+>, <TT
+CLASS="COMMAND"
+>pltcl_listmod</TT
+>, <TT
+CLASS="COMMAND"
+>pltcl_delmod</TT
+>, а также исходный код стандартного модуля <TT
+CLASS="LITERAL"
+>unknown</TT
+> в <TT
+CLASS="FILENAME"
+>share/unknown.pltcl</TT
+>. Для поддержки механизма автозагрузки этот модуль должен изначально загружаться в каждую базу данных.</P
+><P
+>Таблицы <TT
+CLASS="LITERAL"
+>pltcl_modules</TT
+> и <TT
+CLASS="LITERAL"
+>pltcl_modfuncs</TT
+> должны быть доступны на чтение всем, но разрешать запись в них разумно только администратору базы данных (и только он должен быть их владельцем). В качестве меры предосторожности PL/Tcl будет игнорировать таблицу <TT
+CLASS="LITERAL"
+>pltcl_modules</TT
+> (и таким образом, не будет пытаться загрузить модуль <TT
+CLASS="LITERAL"
+>unknown</TT
+>), если она принадлежит не суперпользователю. Но право на изменение данных в ней можно дать и другим пользователям, если они заслуживают такого доверия.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="pltcl-event-trigger.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="pltcl-procnames.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Процедуры событийных триггеров в PL/Tcl</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="pltcl.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Имена процедур Tcl</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

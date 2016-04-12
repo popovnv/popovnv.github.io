@@ -1,0 +1,271 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Хранимое значение</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Преобразование типов"
+HREF="typeconv.html"><LINK
+REL="PREVIOUS"
+TITLE="Функции"
+HREF="typeconv-func.html"><LINK
+REL="NEXT"
+TITLE="UNION, CASE и связанные конструкции"
+HREF="typeconv-union-case.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Функции"
+HREF="typeconv-func.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="typeconv.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 10. Преобразование типов</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="UNION, CASE и связанные конструкции"
+HREF="typeconv-union-case.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="TYPECONV-QUERY"
+>10.4. Хранимое значение</A
+></H1
+><P
+>Значения, вставляемые в таблицу, преобразуется в тип данных целевой колонки по следующему алгоритму.</P
+><DIV
+CLASS="PROCEDURE"
+><P
+><B
+>Преобразование по типу хранения</B
+></P
+><OL
+TYPE="1"
+><LI
+CLASS="STEP"
+><P
+>Проверить точное совпадение с целевым типом.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Если типы не совпадают, попытаться привести тип к целевому. Это возможно, если зарегистрировано преобразование между двумя типами. Если результат выражения &mdash; строка неизвестного типа, содержимое этой строки будет подано на вход процедуре ввода целевого типа.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Проверить, не требуется ли приведение размера для целевого типа. Приведение размера &mdash; это преобразование типа к такому же. Если это приведение описано в каталоге <TT
+CLASS="STRUCTNAME"
+>pg_cast</TT
+>, применить к его к результату выражения, прежде чем сохранить в целевой колонке. Функция, реализующая такое приведение, всегда принимает дополнительный параметр типа <TT
+CLASS="TYPE"
+>integer</TT
+>, в котором передаётся значение <TT
+CLASS="STRUCTFIELD"
+>atttypmod</TT
+> для целевой колонки (обычно это её объявленный размер, хотя интерпретироваться значение <TT
+CLASS="STRUCTFIELD"
+>atttypmod</TT
+> для разных типов данных может по-разному), и третий параметр типа <TT
+CLASS="TYPE"
+>boolean</TT
+>, передающий признак явное/неявное преобразование. Функция приведения отвечает за все операции с длиной, включая её проверку и усечение данных.</P
+></LI
+></OL
+></DIV
+><DIV
+CLASS="EXAMPLE"
+><A
+NAME="AEN22963"
+></A
+><P
+><B
+>Пример 10-8. Преобразование для типа хранения <TT
+CLASS="TYPE"
+>character</TT
+></B
+></P
+><P
+>Следующие запросы показывают, что сохраняемое значение подгоняется под размер целевой колонки, объявленной как <TT
+CLASS="TYPE"
+>character(20)</TT
+>: </P><PRE
+CLASS="SCREEN"
+>CREATE TABLE vv (v character(20));
+INSERT INTO vv SELECT 'abc' || 'def';
+SELECT v, octet_length(v) FROM vv;
+
+          v           | octet_length
+----------------------+--------------
+ abcdef               |           20
+(1 row)</PRE
+><P></P
+><P
+>Суть происходящего здесь в том, что две константы неизвестного типа по умолчанию воспринимаются как значения <TT
+CLASS="TYPE"
+>text</TT
+>, что позволяет применить к ним оператор <TT
+CLASS="LITERAL"
+>||</TT
+> как оператор конкатенации значений <TT
+CLASS="TYPE"
+>text</TT
+>. Затем результат оператора, имеющий тип <TT
+CLASS="TYPE"
+>text</TT
+>, приводится к типу <TT
+CLASS="TYPE"
+>bpchar</TT
+> (<SPAN
+CLASS="QUOTE"
+>"blank-padded char"</SPAN
+> (символы, дополненные пробелами), внутреннее имя типа <TT
+CLASS="TYPE"
+>character</TT
+>) в соответствии с типом целевой колонки. (Так как типы <TT
+CLASS="TYPE"
+>text</TT
+> и <TT
+CLASS="TYPE"
+>bpchar</TT
+> двоично-совместимы, при этом преобразовании реальный вызов функции не добавляется.) Наконец, в системном каталоге находится функция изменения размера <TT
+CLASS="LITERAL"
+>bpchar(bpchar, integer, boolean)</TT
+> и применяется для результата оператора и длины колонки. Эта связанная с типом функция проверяет длину данных и добавляет недостающие пробелы.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="typeconv-func.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="typeconv-union-case.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Функции</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="typeconv.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><TT
+CLASS="LITERAL"
+>UNION</TT
+>, <TT
+CLASS="LITERAL"
+>CASE</TT
+> и связанные конструкции</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,244 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Написание обёртки сторонних данных</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Внутреннее устройство"
+HREF="internals.html"><LINK
+REL="PREVIOUS"
+TITLE="Написание обработчика процедурного языка"
+HREF="plhandler.html"><LINK
+REL="NEXT"
+TITLE="Функции обёрток сторонних данных"
+HREF="fdw-functions.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="CHAPTER"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Написание обработчика процедурного языка"
+HREF="plhandler.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="internals.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Функции обёрток сторонних данных"
+HREF="fdw-functions.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="FDWHANDLER"
+></A
+>Глава 53. Написание обёртки сторонних данных</H1
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Содержание</B
+></DT
+><DT
+>53.1. <A
+HREF="fdw-functions.html"
+>Функции обёрток сторонних данных</A
+></DT
+><DT
+>53.2. <A
+HREF="fdw-callbacks.html"
+>Подпрограммы обёртки сторонних данных</A
+></DT
+><DD
+><DL
+><DT
+>53.2.1. <A
+HREF="fdw-callbacks.html#FDW-CALLBACKS-SCAN"
+>Подпрограммы FDW для сканирования сторонних таблиц</A
+></DT
+><DT
+>53.2.2. <A
+HREF="fdw-callbacks.html#FDW-CALLBACKS-UPDATE"
+>Подпрограммы FDW для изменения данных в сторонних таблицах</A
+></DT
+><DT
+>53.2.3. <A
+HREF="fdw-callbacks.html#FDW-CALLBACKS-EXPLAIN"
+>Подпрограммы FDW для <TT
+CLASS="COMMAND"
+>EXPLAIN</TT
+></A
+></DT
+><DT
+>53.2.4. <A
+HREF="fdw-callbacks.html#FDW-CALLBACKS-ANALYZE"
+>Подпрограммы FDW для <TT
+CLASS="COMMAND"
+>ANALYZE</TT
+></A
+></DT
+></DL
+></DD
+><DT
+>53.3. <A
+HREF="fdw-helpers.html"
+>Вспомогательные функции для обёрток сторонних данных</A
+></DT
+><DT
+>53.4. <A
+HREF="fdw-planning.html"
+>Планирование запросов с обёртками сторонних данных</A
+></DT
+></DL
+></DIV
+><P
+>Все операции со сторонней таблицей производятся через созданную для неё обёртку сторонних данных, представляющую собой набор подпрограмм, которые вызывает ядро сервера. Обёртка сторонних данных отвечает за получение данных из удалённого источника данных и передачу их исполнителю запросов <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Чтобы поддерживалось изменение данных в сторонних таблицах, эту операцию также должна выполнять обёртка. В данной главе освещается написание обёртки сторонних данных.</P
+><P
+>Реализация обёрток сторонних данных, включённых в стандартный дистрибутив, может послужить хорошим примером при написании собственных обёрток. Её вы можете найти в подкаталоге <TT
+CLASS="FILENAME"
+>contrib</TT
+> дерева исходного кода. Некоторые полезные детали также можно узнать на странице справки <A
+HREF="sql-createforeigndatawrapper.html"
+>CREATE FOREIGN DATA WRAPPER</A
+>.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>В стандарте SQL описан интерфейс для написания обёрток сторонних данных, но PostgreSQL не реализует его, так как это потребовало бы больших усилий, а данный стандартизированный API всё равно не получил широкого распространения.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="plhandler.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="fdw-functions.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Написание обработчика процедурного языка</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="internals.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Функции обёрток сторонних данных</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,662 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Наполнение базы данных</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Оптимизация производительности"
+HREF="performance-tips.html"><LINK
+REL="PREVIOUS"
+TITLE="Управление планировщиком с помощью явных предложений JOIN"
+HREF="explicit-joins.html"><LINK
+REL="NEXT"
+TITLE="Оптимизация, угрожающая стабильности"
+HREF="non-durability.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Управление планировщиком с помощью явных предложений JOIN"
+HREF="explicit-joins.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="performance-tips.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 14. Оптимизация производительности</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Оптимизация, угрожающая стабильности"
+HREF="non-durability.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="POPULATE"
+>14.4. Наполнение базы данных</A
+></H1
+><P
+>Довольно часто в начале или в процессе использования базы данных возникает необходимость загрузить в неё большой объём данных. В этом разделе приведены рекомендации, которые помогут сделать это максимально эффективно.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="DISABLE-AUTOCOMMIT"
+>14.4.1. Отключите автофиксацию транзакций</A
+></H2
+><P
+>Выполняя серию команд <TT
+CLASS="COMMAND"
+>INSERT</TT
+>, выключите автофиксацию транзакций и зафиксируйте транзакцию только один раз в самом конце. (В обычном SQL это означает, что нужно выполнить <TT
+CLASS="COMMAND"
+>BEGIN</TT
+> до, и <TT
+CLASS="COMMAND"
+>COMMIT</TT
+> после этой серии. Некоторые клиентские библиотеки могут делать это автоматически, в таких случаях нужно убедиться, что это так.) Если вы будете фиксировать каждое добавление по отдельности, <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> придётся проделать много действий для каждой добавляемой строки. Выполнять все операции в одной транзакции хорошо ещё и потому, что в случае ошибки добавления одной из строк произойдёт откат к исходному состоянию и вы не окажетесь в сложной ситуации с частично загруженными данными.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="POPULATE-COPY-FROM"
+>14.4.2. Используйте <TT
+CLASS="COMMAND"
+>COPY</TT
+></A
+></H2
+><P
+>Используйте <A
+HREF="sql-copy.html"
+>COPY</A
+>, чтобы загрузить все строки одной командой вместо серии <TT
+CLASS="COMMAND"
+>INSERT</TT
+>. Команда <TT
+CLASS="COMMAND"
+>COPY</TT
+> оптимизирована для загрузки большого количества строк; хотя она не так гибка, как <TT
+CLASS="COMMAND"
+>INSERT</TT
+>, но при загрузке больших объёмов данных она влечёт гораздо меньше накладных расходов. Так как <TT
+CLASS="COMMAND"
+>COPY</TT
+> &mdash; это одна команда, применяя её, нет необходимости отключать автофиксацию транзакций.</P
+><P
+>В случаях, когда <TT
+CLASS="COMMAND"
+>COPY</TT
+> не подходит, может быть полезно создать подготовленный оператор <TT
+CLASS="COMMAND"
+>INSERT</TT
+> с помощью <A
+HREF="sql-prepare.html"
+>PREPARE</A
+>, а затем выполнять <TT
+CLASS="COMMAND"
+>EXECUTE</TT
+> столько раз, сколько потребуется. Это позволит избежать накладных расходов, связанных с разбором и анализом каждой команды <TT
+CLASS="COMMAND"
+>INSERT</TT
+>. В разных интерфейсах это может выглядеть по-разному; за подробностями обратитесь к описанию <SPAN
+CLASS="QUOTE"
+>"подготовленных операторов"</SPAN
+> в документации конкретного интерфейса.</P
+><P
+>Заметьте, что с помощью <TT
+CLASS="COMMAND"
+>COPY</TT
+> большое количество строк практически всегда загружается быстрее, чем с помощью <TT
+CLASS="COMMAND"
+>INSERT</TT
+>, даже если используется <TT
+CLASS="COMMAND"
+>PREPARE</TT
+> и серия операций добавления заключена в одну транзакцию.</P
+><P
+><TT
+CLASS="COMMAND"
+>COPY</TT
+> работает быстрее всего, если она выполняется в одной транзакции с командами <TT
+CLASS="COMMAND"
+>CREATE TABLE</TT
+> или <TT
+CLASS="COMMAND"
+>TRUNCATE</TT
+>. В таких случаях записывать WAL не нужно, так как в случае ошибки файлы, содержащие загружаемые данные, будут всё равно удалены. Однако это замечание справедливо, только когда параметр <A
+HREF="runtime-config-wal.html#GUC-WAL-LEVEL"
+>wal_level</A
+> равен <TT
+CLASS="LITERAL"
+>minimal</TT
+>, так как в противном случае все команды должны записывать свои изменения в WAL.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="POPULATE-RM-INDEXES"
+>14.4.3. Удалите индексы</A
+></H2
+><P
+>Если вы загружаете данные в только что созданную таблицу, быстрее всего будет загрузить данные с помощью <TT
+CLASS="COMMAND"
+>COPY</TT
+>, а затем создать все необходимые для неё индексы. На создание индекса для уже существующих данных уйдёт меньше времени, чем на последовательное его обновление при добавлении каждой строки.</P
+><P
+>Если вы добавляете данные в существующую таблицу, может иметь смысл удалить индексы, загрузить таблицу, а затем пересоздать индексы. Конечно, при этом надо учитывать, что временное отсутствие индексов может отрицательно повлиять на скорость работы других пользователей. Кроме того, следует дважды подумать, прежде чем удалять уникальные индексы, так как без них соответствующие проверки ключей не будут выполняться.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="POPULATE-RM-FKEYS"
+>14.4.4. Удалите ограничения внешних ключей</A
+></H2
+><P
+>Как и с индексами, проверки, связанные с ограничениями внешних ключей, выгоднее выполнять <SPAN
+CLASS="QUOTE"
+>"массово"</SPAN
+>, а не для каждой строки в отдельности. Поэтому может быть полезно удалить ограничения внешних ключей, загрузить данные, а затем восстановить прежние ограничения. И в этом случае тоже приходится выбирать между скоростью загрузки данных и риском допустить ошибки в отсутствие ограничений.</P
+><P
+>Более того, когда вы загружаете данные в таблицу с существующими ограничениями внешнего ключа, для каждой новой строки добавляется запись в очередь событий триггера (так как именно срабатывающий триггер проверяет такие ограничения для строки). При загрузке многих миллионов строк очередь событий триггера может занять всю доступную память, что приведёт к недопустимой нагрузке на файл подкачки или даже к сбою команды. Таким образом, загружая большие объёмы данных, может быть не просто желательно, а <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>необходимо</I
+></SPAN
+> удалять, а затем восстанавливать внешние ключи. Если же временное отключение этого ограничения неприемлемо, единственно возможным решением может быть разделение всей операции загрузки на меньшие транзакции.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="POPULATE-WORK-MEM"
+>14.4.5. Увеличьте <TT
+CLASS="VARNAME"
+>maintenance_work_mem</TT
+></A
+></H2
+><P
+>Ускорить загрузку больших объёмов данных можно, увеличив параметр конфигурации <A
+HREF="runtime-config-resource.html#GUC-MAINTENANCE-WORK-MEM"
+>maintenance_work_mem</A
+> на время загрузки. Это приведёт к увеличению быстродействия <TT
+CLASS="COMMAND"
+>CREATE INDEX</TT
+> и <TT
+CLASS="COMMAND"
+>ALTER TABLE ADD FOREIGN KEY</TT
+>. На скорость самой команды <TT
+CLASS="COMMAND"
+>COPY</TT
+> это не повлияет, так что этот совет будет полезен, только если вы применяете какой-либо из двух вышеописанных приёмов.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="POPULATE-CHECKPOINT-SEGMENTS"
+>14.4.6. Увеличьте <TT
+CLASS="VARNAME"
+>checkpoint_segments</TT
+></A
+></H2
+><P
+>Также массовую загрузку данных можно ускорить, изменив на время загрузки параметр конфигурации <A
+HREF="runtime-config-wal.html#GUC-CHECKPOINT-SEGMENTS"
+>checkpoint_segments</A
+>. Загружая большие объёмы данных, <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> вынужден увеличивать частоту контрольных точек по сравнению с обычной (которая задаётся параметром <TT
+CLASS="VARNAME"
+>checkpoint_timeout</TT
+>), а значит и чаще сбрасывать &laquo;грязные&raquo; страницы на диск. Временно увеличив <TT
+CLASS="VARNAME"
+>checkpoint_segments</TT
+>, можно уменьшить частоту контрольных точек и связанных с ними операций ввода-вывода.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="POPULATE-PITR"
+>14.4.7. Отключите архивацию WAL и потоковую репликацию</A
+></H2
+><P
+>Для загрузки больших объёмов данных в среде, где используется архивация WAL или потоковая репликация, быстрее будет сделать копию базы данных после загрузки данных, чем обрабатывать множество операций изменений в WAL. Чтобы отключить передачу изменений через WAL в процессе загрузки, отключите архивацию и потоковую репликацию, назначьте параметру <A
+HREF="runtime-config-wal.html#GUC-WAL-LEVEL"
+>wal_level</A
+> значение <TT
+CLASS="LITERAL"
+>minimal</TT
+>, <A
+HREF="runtime-config-wal.html#GUC-ARCHIVE-MODE"
+>archive_mode</A
+> &mdash; <TT
+CLASS="LITERAL"
+>off</TT
+>, а <A
+HREF="runtime-config-replication.html#GUC-MAX-WAL-SENDERS"
+>max_wal_senders</A
+> &mdash; 0. Но имейте в виду, что изменённые параметры вступят в силу только после перезапуска сервера.</P
+><P
+>Это не только поможет сэкономить время архивации и передачи WAL, но и непосредственно ускорит некоторые команды, которые могут вовсе не использовать WAL, если <TT
+CLASS="VARNAME"
+>wal_level</TT
+> равен <TT
+CLASS="LITERAL"
+>minimal</TT
+>. (Они могут гарантировать безопасность при сбое, не записывая все изменения в WAL, а выполнив только <CODE
+CLASS="FUNCTION"
+>fsync</CODE
+> в конце операции, что будет гораздо дешевле.) Это относится к следующим командам: <P
+></P
+></P><UL
+><LI
+><P
+>       <TT
+CLASS="COMMAND"
+>CREATE TABLE AS SELECT</TT
+>
+      </P
+></LI
+><LI
+><P
+><TT
+CLASS="COMMAND"
+>CREATE INDEX</TT
+> (и подобные команды, как например <TT
+CLASS="COMMAND"
+>ALTER TABLE ADD PRIMARY KEY</TT
+>)</P
+></LI
+><LI
+><P
+>       <TT
+CLASS="COMMAND"
+>ALTER TABLE SET TABLESPACE</TT
+>
+      </P
+></LI
+><LI
+><P
+>       <TT
+CLASS="COMMAND"
+>CLUSTER</TT
+>
+      </P
+></LI
+><LI
+><P
+><TT
+CLASS="COMMAND"
+>COPY FROM</TT
+>, когда целевая таблица была создана или опустошена ранее в той же транзакции</P
+></LI
+></UL
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="POPULATE-ANALYZE"
+>14.4.8. Выполните в конце <TT
+CLASS="COMMAND"
+>ANALYZE</TT
+></A
+></H2
+><P
+>Всякий раз, когда распределение данных в таблице значительно меняется, настоятельно рекомендуется выполнять <A
+HREF="sql-analyze.html"
+>ANALYZE</A
+>. Эта рекомендация касается и загрузки в таблицу большого объёма данных. Выполнив <TT
+CLASS="COMMAND"
+>ANALYZE</TT
+> (или <TT
+CLASS="COMMAND"
+>VACUUM ANALYZE</TT
+>), вы тем самым обновите статистику по данной таблице для планировщика. Когда планировщик не имеет статистики или она не соответствует действительности, он не сможет правильно планировать запросы, что приведёт к снижению быстродействия при работе с соответствующими таблицами. Заметьте, что если включён демон автоочистки, он может запускать <TT
+CLASS="COMMAND"
+>ANALYZE</TT
+> автоматически; подробнее об этом можно узнать в <A
+HREF="routine-vacuuming.html#VACUUM-FOR-STATISTICS"
+>Подразделе 23.1.3</A
+> и <A
+HREF="routine-vacuuming.html#AUTOVACUUM"
+>Подразделе 23.1.6</A
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="POPULATE-PG-DUMP"
+>14.4.9. Несколько замечаний относительно <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+></A
+></H2
+><P
+>В скриптах загрузки данных, которые генерирует <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+>, автоматически учитываются некоторые, но не все из этих рекомендаций. Чтобы загрузить данные, которые выгрузил <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+>, максимально быстро, вам нужно будет выполнить некоторые дополнительные действия вручную. (Заметьте, что эти замечания относятся только к <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>восстановлению</I
+></SPAN
+> данных, но не к <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>выгрузке</I
+></SPAN
+> их. Следующие рекомендации применимы вне зависимости от того, загружается ли архивный файл <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+> в <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> или в <SPAN
+CLASS="APPLICATION"
+>pg_restore</SPAN
+>.)</P
+><P
+>По умолчанию <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+> использует команду <TT
+CLASS="COMMAND"
+>COPY</TT
+> и когда она выгружает полностью схему и данные, в сгенерированном скрипте она сначала предусмотрительно загружает данные, а потом создаёт индексы и внешние ключи. Так что в этом случае часть рекомендаций выполняется автоматически. Вам остаётся учесть только следующие: <P
+></P
+></P><UL
+><LI
+><P
+>Установите подходящие (то есть превышающие обычные) значения для <TT
+CLASS="VARNAME"
+>maintenance_work_mem</TT
+> и <TT
+CLASS="VARNAME"
+>checkpoint_segments</TT
+>.</P
+></LI
+><LI
+><P
+>Если вы используете архивацию WAL или потоковую репликацию, по возможности отключите их на время восстановления. Для этого перед загрузкой данных, присвойте параметру <TT
+CLASS="VARNAME"
+>archive_mode</TT
+> значение <TT
+CLASS="LITERAL"
+>off</TT
+>, <TT
+CLASS="VARNAME"
+>wal_level</TT
+> &mdash; <TT
+CLASS="LITERAL"
+>minimal</TT
+>, а <TT
+CLASS="VARNAME"
+>max_wal_senders</TT
+> &mdash; 0. Закончив восстановление, верните их обычные значения и сделайте свежую базовую резервную копию.</P
+></LI
+><LI
+><P
+>Поэкспериментируйте с режимами параллельного копирования и восстановления команд <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+> и <SPAN
+CLASS="APPLICATION"
+>pg_restore</SPAN
+>, и подберите оптимальное число параллельных заданий. Параллельное копирование и восстановление данных, управляемое параметром <TT
+CLASS="OPTION"
+>-j</TT
+>, должно дать значительный выигрыш в скорости по сравнению с последовательным режимом.</P
+></LI
+><LI
+><P
+>Если это возможно в вашей ситуации, восстановите все данные в рамках одной транзакции. Для этого передайте параметр <TT
+CLASS="OPTION"
+>-1</TT
+> или <TT
+CLASS="OPTION"
+>--single-transaction</TT
+> команде <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> или <SPAN
+CLASS="APPLICATION"
+>pg_restore</SPAN
+>. Но учтите, что в этом режиме даже незначительная ошибка приведёт к откату всех изменений и часы восстановления будут потрачены зря. В зависимости от того, насколько взаимосвязаны данные, предпочтительнее может быть вычистить их вручную. Команды <TT
+CLASS="COMMAND"
+>COPY</TT
+> будут работать максимально быстро, когда они выполняются в одной транзакции и архивация WAL выключена.</P
+></LI
+><LI
+><P
+>Если на сервере баз данных установлено несколько процессоров, полезным может оказаться параметр <TT
+CLASS="OPTION"
+>--jobs</TT
+> команды <SPAN
+CLASS="APPLICATION"
+>pg_restore</SPAN
+>. С его помощью можно выполнить загрузку данных и создание индексов параллельно.</P
+></LI
+><LI
+><P
+>После загрузки данных запустите <TT
+CLASS="COMMAND"
+>ANALYZE</TT
+>.</P
+></LI
+></UL
+><P></P
+><P
+>При выгрузке данных без схемы тоже используется команда <TT
+CLASS="COMMAND"
+>COPY</TT
+>, но индексы, как и внешние ключи, при этом не удаляются и не пересоздаются. <A
+NAME="AEN26352"
+HREF="#FTN.AEN26352"
+><SPAN
+CLASS="footnote"
+>[1]</SPAN
+></A
+> Поэтому загружая только данные, вы сами должны решить, нужно ли для ускорения загрузки удалять и пересоздавать индексы и внешние ключи. При этом будет так же полезно увеличить параметр <TT
+CLASS="VARNAME"
+>checkpoint_segments</TT
+>, но не <TT
+CLASS="VARNAME"
+>maintenance_work_mem</TT
+>; его стоит менять, только если вы впоследствии пересоздаёте индексы и внешние ключи вручную. И не забудьте выполнить <TT
+CLASS="COMMAND"
+>ANALYZE</TT
+> после; подробнее об этом можно узнать в <A
+HREF="routine-vacuuming.html#VACUUM-FOR-STATISTICS"
+>Подразделе 23.1.3</A
+> и <A
+HREF="routine-vacuuming.html#AUTOVACUUM"
+>Подразделе 23.1.6</A
+>.</P
+></DIV
+></DIV
+><H3
+CLASS="FOOTNOTES"
+>Примечания</H3
+><TABLE
+BORDER="0"
+CLASS="FOOTNOTES"
+WIDTH="100%"
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+WIDTH="5%"
+><A
+NAME="FTN.AEN26352"
+HREF="populate.html#AEN26352"
+><SPAN
+CLASS="footnote"
+>[1]</SPAN
+></A
+></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+WIDTH="95%"
+><P
+>Вы можете отключить внешние ключи, используя параметр <TT
+CLASS="OPTION"
+>--disable-triggers</TT
+> &mdash; но при этом нужно понимать, что тем самым вы не просто отложите, а полностью выключите соответствующие проверки, что позволит вставить недопустимые данные.</P
+></TD
+></TR
+></TABLE
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="explicit-joins.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="non-durability.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Управление планировщиком с помощью явных предложений <TT
+CLASS="LITERAL"
+>JOIN</TT
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="performance-tips.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Оптимизация, угрожающая стабильности</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

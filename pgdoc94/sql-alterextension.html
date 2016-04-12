@@ -1,0 +1,830 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>ALTER EXTENSION</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="ALTER EVENT TRIGGER"
+HREF="sql-altereventtrigger.html"><LINK
+REL="NEXT"
+TITLE="ALTER FOREIGN DATA WRAPPER"
+HREF="sql-alterforeigndatawrapper.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="ALTER EVENT TRIGGER"
+HREF="sql-altereventtrigger.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="ALTER FOREIGN DATA WRAPPER"
+HREF="sql-alterforeigndatawrapper.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-ALTEREXTENSION"
+></A
+>ALTER EXTENSION</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN67361"
+></A
+><H2
+>Название</H2
+>ALTER EXTENSION&nbsp;--&nbsp;изменить определение расширения</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN67364"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>ALTER EXTENSION <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> UPDATE [ TO <TT
+CLASS="REPLACEABLE"
+><I
+>новая_версия</I
+></TT
+> ]
+ALTER EXTENSION <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> SET SCHEMA <TT
+CLASS="REPLACEABLE"
+><I
+>новая_схема</I
+></TT
+>
+ALTER EXTENSION <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> ADD <TT
+CLASS="REPLACEABLE"
+><I
+>элемент_объект</I
+></TT
+>
+ALTER EXTENSION <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> DROP <TT
+CLASS="REPLACEABLE"
+><I
+>элемент_объект</I
+></TT
+>
+
+<SPAN
+CLASS="phrase"
+><SPAN
+CLASS="PHRASE"
+>Здесь <TT
+CLASS="REPLACEABLE"
+><I
+>элемент_объект</I
+></TT
+>:</SPAN
+></SPAN
+>
+
+  AGGREGATE <TT
+CLASS="REPLACEABLE"
+><I
+>имя_агрегатной_функции</I
+></TT
+> ( <TT
+CLASS="REPLACEABLE"
+><I
+>сигнатура_агр_функции</I
+></TT
+> ) |
+  CAST (<TT
+CLASS="REPLACEABLE"
+><I
+>исходный_тип</I
+></TT
+> AS <TT
+CLASS="REPLACEABLE"
+><I
+>целевой_тип</I
+></TT
+>) |
+  COLLATION <TT
+CLASS="REPLACEABLE"
+><I
+>имя_объекта</I
+></TT
+> |
+  CONVERSION <TT
+CLASS="REPLACEABLE"
+><I
+>имя_объекта</I
+></TT
+> |
+  DOMAIN <TT
+CLASS="REPLACEABLE"
+><I
+>имя_объекта</I
+></TT
+> |
+  EVENT TRIGGER <TT
+CLASS="REPLACEABLE"
+><I
+>имя_объекта</I
+></TT
+> |
+  FOREIGN DATA WRAPPER <TT
+CLASS="REPLACEABLE"
+><I
+>имя_объекта</I
+></TT
+> |
+  FOREIGN TABLE <TT
+CLASS="REPLACEABLE"
+><I
+>имя_объекта</I
+></TT
+> |
+  FUNCTION <TT
+CLASS="REPLACEABLE"
+><I
+>имя_функции</I
+></TT
+> ( [ [ <TT
+CLASS="REPLACEABLE"
+><I
+>режим_аргумента</I
+></TT
+> ] [ <TT
+CLASS="REPLACEABLE"
+><I
+>имя_аргумента</I
+></TT
+> ] <TT
+CLASS="REPLACEABLE"
+><I
+>тип_аргумента</I
+></TT
+> [, ...] ] ) |
+  MATERIALIZED VIEW <TT
+CLASS="REPLACEABLE"
+><I
+>имя_объекта</I
+></TT
+> |
+  OPERATOR <TT
+CLASS="REPLACEABLE"
+><I
+>имя_оператора</I
+></TT
+> (<TT
+CLASS="REPLACEABLE"
+><I
+>тип_слева</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>тип_справа</I
+></TT
+>) |
+  OPERATOR CLASS <TT
+CLASS="REPLACEABLE"
+><I
+>имя_объекта</I
+></TT
+> USING <TT
+CLASS="REPLACEABLE"
+><I
+>метод_индекса</I
+></TT
+> |
+  OPERATOR FAMILY <TT
+CLASS="REPLACEABLE"
+><I
+>имя_объекта</I
+></TT
+> USING <TT
+CLASS="REPLACEABLE"
+><I
+>метод_индекса</I
+></TT
+> |
+  [ PROCEDURAL ] LANGUAGE <TT
+CLASS="REPLACEABLE"
+><I
+>имя_объекта</I
+></TT
+> |
+  SCHEMA <TT
+CLASS="REPLACEABLE"
+><I
+>имя_объекта</I
+></TT
+> |
+  SEQUENCE <TT
+CLASS="REPLACEABLE"
+><I
+>имя_объекта</I
+></TT
+> |
+  SERVER <TT
+CLASS="REPLACEABLE"
+><I
+>имя_объекта</I
+></TT
+> |
+  TABLE <TT
+CLASS="REPLACEABLE"
+><I
+>имя_объекта</I
+></TT
+> |
+  TEXT SEARCH CONFIGURATION <TT
+CLASS="REPLACEABLE"
+><I
+>имя_объекта</I
+></TT
+> |
+  TEXT SEARCH DICTIONARY <TT
+CLASS="REPLACEABLE"
+><I
+>имя_объекта</I
+></TT
+> |
+  TEXT SEARCH PARSER <TT
+CLASS="REPLACEABLE"
+><I
+>имя_объекта</I
+></TT
+> |
+  TEXT SEARCH TEMPLATE <TT
+CLASS="REPLACEABLE"
+><I
+>имя_объекта</I
+></TT
+> |
+  TYPE <TT
+CLASS="REPLACEABLE"
+><I
+>имя_объекта</I
+></TT
+> |
+  VIEW <TT
+CLASS="REPLACEABLE"
+><I
+>имя_объекта</I
+></TT
+>
+
+<SPAN
+CLASS="phrase"
+><SPAN
+CLASS="PHRASE"
+>и <TT
+CLASS="REPLACEABLE"
+><I
+>сигнатура_агр_функции</I
+></TT
+>:</SPAN
+></SPAN
+>
+
+* |
+[ <TT
+CLASS="REPLACEABLE"
+><I
+>режим_аргумента</I
+></TT
+> ] [ <TT
+CLASS="REPLACEABLE"
+><I
+>имя_аргумента</I
+></TT
+> ] <TT
+CLASS="REPLACEABLE"
+><I
+>тип_аргумента</I
+></TT
+> [ , ... ] |
+[ [ <TT
+CLASS="REPLACEABLE"
+><I
+>режим_аргумента</I
+></TT
+> ] [ <TT
+CLASS="REPLACEABLE"
+><I
+>имя_аргумента</I
+></TT
+> ] <TT
+CLASS="REPLACEABLE"
+><I
+>тип_аргумента</I
+></TT
+> [ , ... ] ] ORDER BY [ <TT
+CLASS="REPLACEABLE"
+><I
+>режим_аргумента</I
+></TT
+> ] [ <TT
+CLASS="REPLACEABLE"
+><I
+>имя_аргумента</I
+></TT
+> ] <TT
+CLASS="REPLACEABLE"
+><I
+>тип_аргумента</I
+></TT
+> [ , ... ]</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN67420"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>ALTER EXTENSION</TT
+> изменяет определение установленного расширения. Эта команда имеет несколько подвидов: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>UPDATE</TT
+></DT
+><DD
+><P
+>Эта форма обновляет версию расширения. Расширение должно предоставлять подходящий скрипт обновления (или набор скриптов), который может сменить текущую установленную версию на требуемую.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>SET SCHEMA</TT
+></DT
+><DD
+><P
+>Эта форма переносит объекты расширения в другую схему. Чтобы эта команда выполнилась успешно, расширение должно быть <I
+CLASS="FIRSTTERM"
+>перемещаемым</I
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>ADD <TT
+CLASS="REPLACEABLE"
+><I
+>элемент_объект</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Эта форма добавляет существующий объект в расширение. В основном это применяется в скриптах обновления расширений. Добавленный объект затем будет считаться частью расширения, и удалить его можно будет, только удалив расширение.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>DROP <TT
+CLASS="REPLACEABLE"
+><I
+>элемент_объект</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Эта форма удаляет из расширения включённый в него объект. В основном это применяется в скриптах обновления расширений. Сам объект при этом не уничтожается, а только отделяется от расширения.</P
+></DD
+></DL
+></DIV
+><P> Подробнее эти операции описаны в <A
+HREF="extend-extensions.html"
+>Разделе 35.15</A
+>.</P
+><P
+>Чтобы выполнить команду <TT
+CLASS="COMMAND"
+>ALTER EXTENSION</TT
+>, необходимо быть владельцем данного расширения. Для форм <TT
+CLASS="LITERAL"
+>ADD</TT
+>/<TT
+CLASS="LITERAL"
+>DROP</TT
+> требуется также быть владельцем добавляемого/удаляемого объекта.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN67453"
+></A
+><H2
+>Параметры</H2
+><P
+>   <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></DT
+><DD
+><P
+>Имя установленного расширения.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>новая_версия</I
+></TT
+></DT
+><DD
+><P
+>Запрашиваемая новая версия расширения. Её можно записать в виде идентификатора или строкового значения. Если она не указана, <TT
+CLASS="COMMAND"
+>ALTER EXTENSION UPDATE</TT
+> пытается выполнить обновление до версии, указанной в качестве версии по умолчанию в управляющем файле расширения.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>новая_схема</I
+></TT
+></DT
+><DD
+><P
+>Новая схема расширения.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_объекта</I
+></TT
+><BR><TT
+CLASS="REPLACEABLE"
+><I
+>имя_агрегатной_функции</I
+></TT
+><BR><TT
+CLASS="REPLACEABLE"
+><I
+>имя_функции</I
+></TT
+><BR><TT
+CLASS="REPLACEABLE"
+><I
+>имя_оператора</I
+></TT
+></DT
+><DD
+><P
+>Имя объекта, добавляемого или удаляемого из расширения. Имена таблиц, агрегатных функций, доменов, сторонних таблиц, функций, операторов, классов операторов, семейств операторов, последовательностей, объектов текстового поиска, типов и представлений можно дополнить именем схемы.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>исходный_тип</I
+></TT
+></DT
+><DD
+><P
+>Имя исходного типа данных для приведения.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>целевой_тип</I
+></TT
+></DT
+><DD
+><P
+>Имя целевого типа данных для приведения.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>режим_аргумента</I
+></TT
+></DT
+><DD
+><P
+>Режим аргумента обычной или агрегатной функции: <TT
+CLASS="LITERAL"
+>IN</TT
+>, <TT
+CLASS="LITERAL"
+>OUT</TT
+>, <TT
+CLASS="LITERAL"
+>INOUT</TT
+> или <TT
+CLASS="LITERAL"
+>VARIADIC</TT
+>. По умолчанию подразумевается <TT
+CLASS="LITERAL"
+>IN</TT
+>. Заметьте, что <TT
+CLASS="COMMAND"
+>ALTER EXTENSION</TT
+> на самом деле не учитывает аргументы <TT
+CLASS="LITERAL"
+>OUT</TT
+>, так как для идентификации функции нужные только типы входных аргументов. Поэтому достаточно перечислить только аргументы <TT
+CLASS="LITERAL"
+>IN</TT
+>, <TT
+CLASS="LITERAL"
+>INOUT</TT
+> и <TT
+CLASS="LITERAL"
+>VARIADIC</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_аргумента</I
+></TT
+></DT
+><DD
+><P
+>Имя аргумента обычной или агрегатной функции. Заметьте, что на самом деле <TT
+CLASS="COMMAND"
+>ALTER EXTENSION</TT
+> не обращает внимание на имена аргументов, так как для однозначной идентификации функции достаточно только типов аргументов.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>тип_аргумента</I
+></TT
+></DT
+><DD
+><P
+>Тип данных аргумента обычной или агрегатной функции.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>тип_слева</I
+></TT
+><BR><TT
+CLASS="REPLACEABLE"
+><I
+>тип_справа</I
+></TT
+></DT
+><DD
+><P
+>Тип данных аргументов оператора (возможно, дополненный именем схемы). В случае отсутствия аргумента префиксного или постфиксного оператора укажите вместо типа <TT
+CLASS="LITERAL"
+>NONE</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>PROCEDURAL</TT
+></DT
+><DD
+><P
+>Это слово не несёт смысловой нагрузки.</P
+></DD
+></DL
+></DIV
+><P>
+  </P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN67533"
+></A
+><H2
+>Примеры</H2
+><P
+>Обновление расширения <TT
+CLASS="LITERAL"
+>hstore</TT
+> до версии 2.0: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER EXTENSION hstore UPDATE TO '2.0';</PRE
+><P></P
+><P
+>Смена схемы расширения <TT
+CLASS="LITERAL"
+>hstore</TT
+> на <TT
+CLASS="LITERAL"
+>utils</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER EXTENSION hstore SET SCHEMA utils;</PRE
+><P></P
+><P
+>Добавление существующей функции в расширение <TT
+CLASS="LITERAL"
+>hstore</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER EXTENSION hstore ADD FUNCTION populate_record(anyelement, hstore);</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN67545"
+></A
+><H2
+>Совместимость</H2
+><P
+>Оператор <TT
+CLASS="COMMAND"
+>ALTER EXTENSION</TT
+> является расширением <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="SQL-ALTEREXTENSION-SEE-ALSO"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-createextension.html"
+>CREATE EXTENSION</A
+>, <A
+HREF="sql-dropextension.html"
+>DROP EXTENSION</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-altereventtrigger.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-alterforeigndatawrapper.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>ALTER EVENT TRIGGER</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>ALTER FOREIGN DATA WRAPPER</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

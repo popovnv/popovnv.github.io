@@ -1,0 +1,545 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>CONNECT</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды встраиваемого SQL"
+HREF="ecpg-sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="ALLOCATE DESCRIPTOR"
+HREF="ecpg-sql-allocate-descriptor.html"><LINK
+REL="NEXT"
+TITLE="DEALLOCATE DESCRIPTOR"
+HREF="ecpg-sql-deallocate-descriptor.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="ALLOCATE DESCRIPTOR"
+HREF="ecpg-sql-allocate-descriptor.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ecpg-sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="DEALLOCATE DESCRIPTOR"
+HREF="ecpg-sql-deallocate-descriptor.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="ECPG-SQL-CONNECT"
+></A
+>CONNECT</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN47697"
+></A
+><H2
+>Название</H2
+>CONNECT&nbsp;--&nbsp;установить подключение к базе данных</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN47700"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>CONNECT TO <TT
+CLASS="REPLACEABLE"
+><I
+>цель_подключения</I
+></TT
+> [ AS <TT
+CLASS="REPLACEABLE"
+><I
+>имя_подключения</I
+></TT
+> ] [ USER <TT
+CLASS="REPLACEABLE"
+><I
+>пользователь_подключения</I
+></TT
+> ]
+CONNECT TO DEFAULT
+CONNECT <TT
+CLASS="REPLACEABLE"
+><I
+>пользователь_подключения</I
+></TT
+>
+DATABASE <TT
+CLASS="REPLACEABLE"
+><I
+>цель_подключения</I
+></TT
+></PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN47707"
+></A
+><H2
+>Описание</H2
+><P
+>Команда <TT
+CLASS="COMMAND"
+>CONNECT</TT
+> устанавливает подключение клиента к серверу PostgreSQL.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN47711"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>цель_подключения</I
+></TT
+></DT
+><DD
+><P
+><TT
+CLASS="REPLACEABLE"
+><I
+>цель_соединения</I
+></TT
+> задаёт целевой сервер и базу для подключения в одной из нескольких форм. <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+>[ <TT
+CLASS="REPLACEABLE"
+><I
+>имя_базы</I
+></TT
+> ] [ <TT
+CLASS="LITERAL"
+>@</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>компьютер</I
+></TT
+> ] [ <TT
+CLASS="LITERAL"
+>:</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>порт</I
+></TT
+> ]</DT
+><DD
+><P
+>Подключение по TCP/IP</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>unix:postgresql://</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>компьютер</I
+></TT
+> [ <TT
+CLASS="LITERAL"
+>:</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>порт</I
+></TT
+> ] <TT
+CLASS="LITERAL"
+>/</TT
+> [ <TT
+CLASS="REPLACEABLE"
+><I
+>имя_базы</I
+></TT
+> ] [ <TT
+CLASS="LITERAL"
+>?</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>параметр_подключения</I
+></TT
+> ]</DT
+><DD
+><P
+>Подключение через доменные сокеты Unix</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>tcp:postgresql://</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>компьютер</I
+></TT
+> [ <TT
+CLASS="LITERAL"
+>:</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>порт</I
+></TT
+> ] <TT
+CLASS="LITERAL"
+>/</TT
+> [ <TT
+CLASS="REPLACEABLE"
+><I
+>имя_базы</I
+></TT
+> ] [ <TT
+CLASS="LITERAL"
+>?</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>параметр_подключения</I
+></TT
+> ]</DT
+><DD
+><P
+>Подключение по TCP/IP</P
+></DD
+><DT
+>Строковая константа SQL</DT
+><DD
+><P
+>содержащая значение в одной из показанных выше форм</P
+></DD
+><DT
+>переменная среды</DT
+><DD
+><P
+>переменная среды типа <TT
+CLASS="TYPE"
+>char[]</TT
+> или <TT
+CLASS="TYPE"
+>VARCHAR[]</TT
+>, содержащая значение в одной из показанных выше форм</P
+></DD
+></DL
+></DIV
+><P></P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>объект_соединения</I
+></TT
+></DT
+><DD
+><P
+>Необязательный идентификатор подключения, позволяющий обращаться к этому подключению в других командах. Это может быть идентификатор SQL или переменная среды.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>пользователь_подключения</I
+></TT
+></DT
+><DD
+><P
+>Имя пользователя для подключения к базе данных.</P
+><P
+>В этом параметре также можно передать имя и пароль одним из следующих способов: <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+>/<TT
+CLASS="REPLACEABLE"
+><I
+>пароль</I
+></TT
+></TT
+>, <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+> IDENTIFIED BY <TT
+CLASS="REPLACEABLE"
+><I
+>пароль</I
+></TT
+></TT
+> или <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+> USING <TT
+CLASS="REPLACEABLE"
+><I
+>пароль</I
+></TT
+></TT
+>.</P
+><P
+>В качестве имени пользователя и пароля можно задать идентификаторы SQL, строковые константы или переменные среды.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>DEFAULT</TT
+></DT
+><DD
+><P
+>Использовать все параметры подключения по умолчанию, которые определены библиотекой libpq.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN47790"
+></A
+><H2
+>Примеры</H2
+><P
+>Несколько вариантов указания параметров подключения: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL CONNECT TO "connectdb" AS main;
+EXEC SQL CONNECT TO "connectdb" AS second;
+EXEC SQL CONNECT TO "unix:postgresql://200.46.204.71/connectdb" AS main USER connectuser;
+EXEC SQL CONNECT TO "unix:postgresql://localhost/connectdb" AS main USER connectuser;
+EXEC SQL CONNECT TO 'connectdb' AS main;
+EXEC SQL CONNECT TO 'unix:postgresql://localhost/connectdb' AS main USER :user;
+EXEC SQL CONNECT TO :db AS :id;
+EXEC SQL CONNECT TO :db USER connectuser USING :pw;
+EXEC SQL CONNECT TO @localhost AS main USER connectdb;
+EXEC SQL CONNECT TO REGRESSDB1 as main;
+EXEC SQL CONNECT TO AS main USER connectdb;
+EXEC SQL CONNECT TO connectdb AS :id;
+EXEC SQL CONNECT TO connectdb AS main USER connectuser/connectdb;
+EXEC SQL CONNECT TO connectdb AS main;
+EXEC SQL CONNECT TO connectdb@localhost AS main;
+EXEC SQL CONNECT TO tcp:postgresql://localhost/ USER connectdb;
+EXEC SQL CONNECT TO tcp:postgresql://localhost/connectdb USER connectuser IDENTIFIED BY connectpw;
+EXEC SQL CONNECT TO tcp:postgresql://localhost:20/connectdb USER connectuser IDENTIFIED BY connectpw;
+EXEC SQL CONNECT TO unix:postgresql://localhost/ AS main USER connectdb;
+EXEC SQL CONNECT TO unix:postgresql://localhost/connectdb AS main USER connectuser;
+EXEC SQL CONNECT TO unix:postgresql://localhost/connectdb USER connectuser IDENTIFIED BY "connectpw";
+EXEC SQL CONNECT TO unix:postgresql://localhost/connectdb USER connectuser USING "connectpw";
+EXEC SQL CONNECT TO unix:postgresql://localhost/connectdb?connect_timeout=14 USER connectuser;</PRE
+><P></P
+><P
+>Следующий пример программы демонстрирует применение переменных среды для определения параметров подключения: </P><PRE
+CLASS="PROGRAMLISTING"
+>int
+main(void)
+{
+EXEC SQL BEGIN DECLARE SECTION;
+    char *dbname     = "testdb";    /* имя базы данных */
+    char *user       = "testuser";  /* имя пользователя подключения */
+    char *connection = "tcp:postgresql://localhost:5432/testdb";
+                                    /* строка подключения */
+    char ver[256];                  /* буфер для хранения строки версии */
+EXEC SQL END DECLARE SECTION;
+
+    ECPGdebug(1, stderr);
+
+    EXEC SQL CONNECT TO :dbname USER :user;
+    EXEC SQL SELECT version() INTO :ver;
+    EXEC SQL DISCONNECT;
+
+    printf("version: %s\n", ver);
+
+    EXEC SQL CONNECT TO :connection USER :user;
+    EXEC SQL SELECT version() INTO :ver;
+    EXEC SQL DISCONNECT;
+
+    printf("version: %s\n", ver);
+
+    return 0;
+}</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN47796"
+></A
+><H2
+>Совместимость</H2
+><P
+>Команда <TT
+CLASS="COMMAND"
+>CONNECT</TT
+> описана в стандарте SQL, но формат параметров подключения определяется реализацией.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN47800"
+></A
+><H2
+>См. также</H2
+><A
+HREF="ecpg-sql-disconnect.html"
+>DISCONNECT</A
+>, <A
+HREF="ecpg-sql-set-connection.html"
+>SET CONNECTION</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ecpg-sql-allocate-descriptor.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ecpg-sql-deallocate-descriptor.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>ALLOCATE DESCRIPTOR</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ecpg-sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>DEALLOCATE DESCRIPTOR</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

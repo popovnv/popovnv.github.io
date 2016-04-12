@@ -1,0 +1,202 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Видимость изменений в данных</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Интерфейс программирования сервера"
+HREF="spi.html"><LINK
+REL="PREVIOUS"
+TITLE="SPI_freeplan"
+HREF="spi-spi-freeplan.html"><LINK
+REL="NEXT"
+TITLE="Примеры"
+HREF="spi-examples.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="SPI_freeplan"
+HREF="spi-spi-freeplan.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="spi.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 44. Интерфейс программирования сервера</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Примеры"
+HREF="spi-examples.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="SPI-VISIBILITY"
+>44.4. Видимость изменений в данных</A
+></H1
+><P
+>Видимость изменений в данных, которые производятся функциями, использующими SPI, (или любыми другими функциями на C), описывается следующими правилами: <P
+></P
+></P><UL
+><LI
+><P
+>В процессе выполнения SQL-команды любые произведённые ей изменения не видны для неё самой. Например, в команде: </P><PRE
+CLASS="PROGRAMLISTING"
+>INSERT INTO a SELECT * FROM a;</PRE
+><P> вставляемые строки не видны в части <TT
+CLASS="COMMAND"
+>SELECT</TT
+>.</P
+></LI
+><LI
+><P
+>Изменения, произведённые командой К, видны во всех командах, запущенных после К, независимо от того, были ли эти команды запущены из К (во время выполнения К) или после завершения К.</P
+></LI
+><LI
+><P
+>Команды, выполняемые через SPI внутри функции, вызванной SQL-командой (будь то обычная функция или триггер), следуют одному или другому из вышеприведённых правил в зависимости флага чтения/записи, переданного SPI. Команды, выполняемые в режиме &laquo;только чтение&raquo;, следует первому правилу: они не видят изменений, произведённых вызывающей командой. Команды, выполняемые в режиме &laquo;чтение-запись&raquo;, следуют второму правилу: они могут видеть все произведённые к этому времени изменения.</P
+></LI
+><LI
+><P
+>Все стандартные процедурные языки устанавливают режим чтения-записи в SPI в зависимости от атрибута изменчивости функции. Команды функций <TT
+CLASS="LITERAL"
+>STABLE</TT
+> и <TT
+CLASS="LITERAL"
+>IMMUTABLE</TT
+> выполняются в режиме &laquo;только чтение&raquo;, тогда как команды функций <TT
+CLASS="LITERAL"
+>VOLATILE</TT
+> — в режиме &laquo;чтение-запись&raquo;. Хотя авторы функций на C могут нарушить это соглашение, вряд ли это будет хорошей идеей.</P
+></LI
+></UL
+><P></P
+><P
+>В следующем разделе приводится пример, иллюстрирующий применение этих правил.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="spi-spi-freeplan.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="spi-examples.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>SPI_freeplan</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="spi.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Примеры</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

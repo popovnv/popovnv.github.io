@@ -1,0 +1,409 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Статистика времени выполнения</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Настройка сервера"
+HREF="runtime-config.html"><LINK
+REL="PREVIOUS"
+TITLE="Регистрация ошибок и протоколирование работы сервера"
+HREF="runtime-config-logging.html"><LINK
+REL="NEXT"
+TITLE="Автоматическая очистка"
+HREF="runtime-config-autovacuum.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Регистрация ошибок и протоколирование работы сервера"
+HREF="runtime-config-logging.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="runtime-config.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 18. Настройка сервера</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Автоматическая очистка"
+HREF="runtime-config-autovacuum.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="RUNTIME-CONFIG-STATISTICS"
+>18.9. Статистика времени выполнения</A
+></H1
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="RUNTIME-CONFIG-STATISTICS-COLLECTOR"
+>18.9.1. Сбор статистики по запросам и индексам</A
+></H2
+><P
+>Эти параметры управляет функциями сбора статистики на уровне сервера. Когда ведётся сбор статистики, собираемые данные можно просмотреть в семействе системных представлений <TT
+CLASS="STRUCTNAME"
+>pg_stat</TT
+> и <TT
+CLASS="STRUCTNAME"
+>pg_statio</TT
+>. За дополнительными сведениями обратитесь к <A
+HREF="monitoring.html"
+>Главе 27</A
+>.</P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="GUC-TRACK-ACTIVITIES"
+></A
+><TT
+CLASS="VARNAME"
+>track_activities</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Включает сбор сведений о текущих командах, выполняющихся во всех сеансах (в частности, отслеживается время запуска команды). По умолчанию этот параметр включён. Заметьте, что даже когда сбор ведётся, собранная информация доступна не для всех пользователей, а только для суперпользователей и пользователя-владельца сеанса, в котором выполняется текущая команда. Поэтому это не должно повлечь риски, связанные с безопасностью. Изменить этот параметр могут только суперпользователи.</P
+></DD
+><DT
+><A
+NAME="GUC-TRACK-ACTIVITY-QUERY-SIZE"
+></A
+><TT
+CLASS="VARNAME"
+>track_activity_query_size</TT
+> (<TT
+CLASS="TYPE"
+>integer</TT
+>) </DT
+><DD
+><P
+>Задаёт число байт, которое будет зарезервировано для отслеживания выполняемой в данной момент команды в каждом активном сеансе, для поля <TT
+CLASS="STRUCTNAME"
+>pg_stat_activity</TT
+>.<TT
+CLASS="STRUCTFIELD"
+>query</TT
+>. Значение по умолчанию — 1024. Задать этот параметр можно только при запуске сервера.</P
+></DD
+><DT
+><A
+NAME="GUC-TRACK-COUNTS"
+></A
+><TT
+CLASS="VARNAME"
+>track_counts</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Включает сбор статистики активности в базе данных. Этот параметр по умолчанию включён, так как собранная информация требуется демону автоочистки. Изменить этот параметр могут только суперпользователи.</P
+></DD
+><DT
+><A
+NAME="GUC-TRACK-IO-TIMING"
+></A
+><TT
+CLASS="VARNAME"
+>track_io_timing</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Включает замер времени операций ввода/вывода. Этот параметр по умолчанию отключён, так как для этого требуется постоянно запрашивать текущее время у операционной системы, что может значительно замедлить работу на некоторых платформах. Для оценивания издержек замера времени на вашей платформе можно воспользоваться утилитой <A
+HREF="pgtesttiming.html"
+>              <SPAN
+CLASS="APPLICATION"
+>pg_test_timing</SPAN
+>
+            </A
+>. Статистику ввода/вывода можно получить через представление <A
+HREF="monitoring-stats.html#PG-STAT-DATABASE-VIEW"
+>pg_stat_database</A
+>, в выводе <A
+HREF="sql-explain.html"
+>EXPLAIN</A
+> (когда используется параметр <TT
+CLASS="LITERAL"
+>TIMING</TT
+>) и через представление <A
+HREF="pgstatstatements.html"
+>pg_stat_statements</A
+>. Изменить этот параметр могут только суперпользователи.</P
+></DD
+><DT
+><A
+NAME="GUC-TRACK-FUNCTIONS"
+></A
+><TT
+CLASS="VARNAME"
+>track_functions</TT
+> (<TT
+CLASS="TYPE"
+>enum</TT
+>) </DT
+><DD
+><P
+>Включает подсчёт вызовов функций и времени их выполнения. Значение <TT
+CLASS="LITERAL"
+>pl</TT
+> включает отслеживание только функций на процедурном языке, а <TT
+CLASS="LITERAL"
+>all</TT
+> — также функций на языках SQL и C. Значение по умолчанию — <TT
+CLASS="LITERAL"
+>none</TT
+>, то есть сбор статистики по функциям отключён. Изменить этот параметр могут только суперпользователи.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Функции на языке SQL, достаточно простые для <SPAN
+CLASS="QUOTE"
+>"внедрения"</SPAN
+> в вызывающий запрос, отслеживаться не будут вне зависимости от этого параметра.</P
+></BLOCKQUOTE
+></DIV
+></DD
+><DT
+><A
+NAME="GUC-UPDATE-PROCESS-TITLE"
+></A
+><TT
+CLASS="VARNAME"
+>update_process_title</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Включает изменение заголовка процесса при получении сервером каждой очередной команды SQL. Заголовок процесса виден в выводе команды <TT
+CLASS="COMMAND"
+>ps</TT
+>, а в Windows он показывается в <SPAN
+CLASS="APPLICATION"
+>Диспетчере задач</SPAN
+>. Изменить этот параметр могут только суперпользователи.</P
+></DD
+><DT
+><A
+NAME="GUC-STATS-TEMP-DIRECTORY"
+></A
+><TT
+CLASS="VARNAME"
+>stats_temp_directory</TT
+> (<TT
+CLASS="TYPE"
+>string</TT
+>) </DT
+><DD
+><P
+>Задаёт каталог, в котором будут храниться временные данные статистики. Этот путь может быть абсолютным или задаваться относительно каталога данных. Значение по умолчанию — <TT
+CLASS="FILENAME"
+>pg_stat_tmp</TT
+>. Если разместить целевой каталог в файловой системе в ОЗУ, это снизит нагрузку на физическое дисковое хранилище и может увеличить быстродействие. Задать этот параметр можно только в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+> или в командной строке при запуске сервера.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="RUNTIME-CONFIG-STATISTICS-MONITOR"
+>18.9.2. Мониторинг статистики</A
+></H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="VARNAME"
+>log_statement_stats</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) <BR><TT
+CLASS="VARNAME"
+>log_parser_stats</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) <BR><TT
+CLASS="VARNAME"
+>log_planner_stats</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) <BR><TT
+CLASS="VARNAME"
+>log_executor_stats</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Эти параметры включают вывод статистики по производительности соответствующего модуля в протокол работы сервера. Это грубый инструмент профилирования, похожий на функцию <CODE
+CLASS="FUNCTION"
+>getrusage()</CODE
+> в операционной системе. Параметр <TT
+CLASS="VARNAME"
+>log_statement_stats</TT
+> включает вывод общей статистики по операторам, тогда как другие управляют статистикой по модулям (разбор, планирование, выполнение). Включить <TT
+CLASS="VARNAME"
+>log_statement_stats</TT
+> одновременно с параметрами, управляющими модулями, нельзя. По умолчанию все эти параметры отключены. Изменить эти параметры могут только суперпользователи.</P
+></DD
+></DL
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="runtime-config-logging.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="runtime-config-autovacuum.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Регистрация ошибок и протоколирование работы сервера</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="runtime-config.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Автоматическая очистка</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

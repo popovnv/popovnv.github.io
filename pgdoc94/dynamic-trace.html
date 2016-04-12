@@ -1,0 +1,977 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Динамическая трассировка</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Мониторинг работы СУБД"
+HREF="monitoring.html"><LINK
+REL="PREVIOUS"
+TITLE="Просмотр информации о блокировках"
+HREF="monitoring-locks.html"><LINK
+REL="NEXT"
+TITLE="Мониторинг использования диска"
+HREF="diskusage.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Просмотр информации о блокировках"
+HREF="monitoring-locks.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="monitoring.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 27. Мониторинг работы СУБД</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Мониторинг использования диска"
+HREF="diskusage.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="DYNAMIC-TRACE"
+>27.4. Динамическая трассировка</A
+></H1
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> позволяет выполнять динамическую трассировку сервера базы данных. Имеющиеся возможности позволяют вызывать внешнюю утилиту в определённых точках кода и таким образом отслеживать его выполнение.</P
+><P
+>Несколько подобных точек сбора метрик, или точек трассировки, уже встроено в исходный код. Предполагается, что эти точки будут использоваться разработчиками и администраторами базы данных. По умолчанию точки трассировки не входят в сборку <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>; пользователь должен явно указать конфигурационному скрипту необходимость включения этих макросов.</P
+><P
+>В настоящее время поддерживается только утилита <A
+HREF="https://en.wikipedia.org/wiki/DTrace"
+TARGET="_top"
+>DTrace</A
+>, которая доступна для Solaris, OS X, FreeBSD, NetBSD, и Oracle Linux. Проект <A
+HREF="http://sourceware.org/systemtap/"
+TARGET="_top"
+>SystemTap</A
+> для Linux представляет собой эквивалент DTrace и также может быть использован. Теоретически возможна поддержка и других утилит динамической трассировки, для этого необходимо изменить определения для макроса в <TT
+CLASS="FILENAME"
+>src/include/utils/probes.h</TT
+>.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="COMPILING-FOR-TRACE"
+>27.4.1. Компиляция для включения динамической трассировки</A
+></H2
+><P
+>По умолчанию точки трассировки недоступны, поэтому в конфигурационном скрипте <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> требуется явно указать необходимость их подключения. Для поддержки утилиты DTrace укажите <TT
+CLASS="OPTION"
+>--enable-dtrace</TT
+> в конфигурационном файле. Более подробно смотрите <A
+HREF="install-procedure.html"
+>Раздел 15.4</A
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="TRACE-POINTS"
+>27.4.2. Встроенные точки трассировки</A
+></H2
+><P
+>В исходный код входит несколько стандартных точек трассировки, которые представлены в <A
+HREF="dynamic-trace.html#DTRACE-PROBE-POINT-TABLE"
+>Таблице 27-16</A
+>; в <A
+HREF="dynamic-trace.html#TYPEDEFS-TABLE"
+>Таблице 27-17</A
+> показаны типы данных, которые используются для этих точек. Конечно, для более детального отслеживания работы <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> можно добавлять и другие точки трассировки.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="DTRACE-PROBE-POINT-TABLE"
+></A
+><P
+><B
+>Таблица 27-16. Встроенные точки трассировки DTrace</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Параметры</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>transaction-start</TD
+><TD
+>(LocalTransactionId)</TD
+><TD
+>Срабатывает в начале новой транзакции. arg0 задаёт идентификатор транзакции.</TD
+></TR
+><TR
+><TD
+>transaction-commit</TD
+><TD
+>(LocalTransactionId)</TD
+><TD
+>Срабатывает при успешном завершении транзакции. arg0 задаёт идентификатор транзакции.</TD
+></TR
+><TR
+><TD
+>transaction-abort</TD
+><TD
+>(LocalTransactionId)</TD
+><TD
+>Срабатывает, когда транзакция завершается с ошибкой. arg0 задаёт идентификатор транзакции.</TD
+></TR
+><TR
+><TD
+>query-start</TD
+><TD
+>(const char *)</TD
+><TD
+>Срабатывает, когда начинается обработка запроса. arg0 задаёт текст запроса.</TD
+></TR
+><TR
+><TD
+>query-done</TD
+><TD
+>(const char *)</TD
+><TD
+>Срабатывает по завершении обработки запроса. arg0 задаёт текст запроса.</TD
+></TR
+><TR
+><TD
+>query-parse-start</TD
+><TD
+>(const char *)</TD
+><TD
+>Срабатывает, когда начинается разбор запроса. arg0 задаёт текст запроса.</TD
+></TR
+><TR
+><TD
+>query-parse-done</TD
+><TD
+>(const char *)</TD
+><TD
+>Срабатывает по завершении разбора (parsing) запроса. arg0 задаёт текст запроса.</TD
+></TR
+><TR
+><TD
+>query-rewrite-start</TD
+><TD
+>(const char *)</TD
+><TD
+>Срабатывает, когда начинается модификация запроса. arg0 задаёт текст запроса.</TD
+></TR
+><TR
+><TD
+>query-rewrite-done</TD
+><TD
+>(const char *)</TD
+><TD
+>Срабатывает по завершении модификации запроса. arg0 задаёт текст запроса.</TD
+></TR
+><TR
+><TD
+>query-plan-start</TD
+><TD
+>()</TD
+><TD
+>Срабатывает, когда начинает работать планировщик выполнения запроса.</TD
+></TR
+><TR
+><TD
+>query-plan-done</TD
+><TD
+>()</TD
+><TD
+>Срабатывает по завершении работы планировщика запроса.</TD
+></TR
+><TR
+><TD
+>query-execute-start</TD
+><TD
+>()</TD
+><TD
+>Срабатывает, когда начинается выполнение запроса.</TD
+></TR
+><TR
+><TD
+>query-execute-done</TD
+><TD
+>()</TD
+><TD
+>Срабатывает по завершении выполнения запроса.</TD
+></TR
+><TR
+><TD
+>statement-status</TD
+><TD
+>(const char *)</TD
+><TD
+>Срабатывает каждый раз, когда серверный процесс обновляет свой статус в <TT
+CLASS="STRUCTNAME"
+>pg_stat_activity</TT
+>.<TT
+CLASS="STRUCTFIELD"
+>status</TT
+>. arg0 задаёт новую строку состояния.</TD
+></TR
+><TR
+><TD
+>checkpoint-start</TD
+><TD
+>(int)</TD
+><TD
+>Срабатывает в начале контрольной точки. arg0 содержит битовые флаги, с помощью которых задаются разные типы контрольных точек, такие как shutdown, immediate или force.</TD
+></TR
+><TR
+><TD
+>checkpoint-done</TD
+><TD
+>(int, int, int, int, int)</TD
+><TD
+>Срабатывает по завершении контрольной точки. (Перечисленные далее точки трассировки срабатывают последовательно при обработке контрольной точки.) arg0 задаёт число записанных буферов. arg1 &mdash; общее число буферов. arg2, arg3 и arg4 задают число файлов xlog, которые были добавлены, удалены или переработаны соответственно.</TD
+></TR
+><TR
+><TD
+>clog-checkpoint-start</TD
+><TD
+>(bool)</TD
+><TD
+>Срабатывает, когда начинается запись контрольной точки в CLOG. arg0 = true для обычных контрольных точек и false для контрольных точек типа shutdown.</TD
+></TR
+><TR
+><TD
+>clog-checkpoint-done</TD
+><TD
+>(bool)</TD
+><TD
+>Срабатывает по завершении записи контрольной точки в CLOG. Значение arg0 задаётся аналогично значению для clog-checkpoint-start.</TD
+></TR
+><TR
+><TD
+>subtrans-checkpoint-start</TD
+><TD
+>(bool)</TD
+><TD
+>Срабатывает, когда начинается запись контрольной точки в SUBTRANS. arg0 = true для обычных контрольных точек и false для контрольных точек типа shutdown.</TD
+></TR
+><TR
+><TD
+>subtrans-checkpoint-done</TD
+><TD
+>(bool)</TD
+><TD
+>Срабатывает по завершении записи контрольной точки в SUBTRANS. Значение arg0 задаётся аналогично значению для subtrans-checkpoint-start.</TD
+></TR
+><TR
+><TD
+>multixact-checkpoint-start</TD
+><TD
+>(bool)</TD
+><TD
+>Срабатывает, когда начинается запись контрольной точки в MultiXact. arg0 = true для обычных контрольных точек и false для контрольных точек типа shutdown.</TD
+></TR
+><TR
+><TD
+>multixact-checkpoint-done</TD
+><TD
+>(bool)</TD
+><TD
+>Срабатывает по завершении записи контрольной точки в MultiXact. Значение arg0 задаётся аналогично значению для multixact-checkpoint-start.</TD
+></TR
+><TR
+><TD
+>buffer-checkpoint-start</TD
+><TD
+>(int)</TD
+><TD
+>Срабатывает, когда начинается запись буферов контрольной точки. arg0 содержит битовые флаги, с помощью которых задаются разные типы контрольных точек, такие как shutdown, immediate или force.</TD
+></TR
+><TR
+><TD
+>buffer-sync-start</TD
+><TD
+>(int, int)</TD
+><TD
+>Срабатывает во время контрольной точки, когда начинается запись грязных буферов (после нахождения буферов, которые должны быть записаны). arg0 задаёт общее число буферов. arg1 задаёт число буферов, которые в настоящий момент являются грязными и должны быть записаны.</TD
+></TR
+><TR
+><TD
+>buffer-sync-written</TD
+><TD
+>(int)</TD
+><TD
+>Срабатывает после записи каждого буфера при выполнении контрольной точки. arg0 задаёт идентификатор буфера.</TD
+></TR
+><TR
+><TD
+>buffer-sync-done</TD
+><TD
+>(int, int, int)</TD
+><TD
+>Срабатывает после записи всех грязных буферов. arg0 задаёт общее число буферов. arg1 задаёт число буферов, которые фактически были записаны процессом выполнения контрольной точки. arg2 задаёт число буферов, которое должно было быть записано (arg1 из buffer-sync-start); разные значения говорят о том, что во время выполнения этой контрольной точки буферы сбрасывались другими процессами.</TD
+></TR
+><TR
+><TD
+>buffer-checkpoint-sync-start</TD
+><TD
+>()</TD
+><TD
+>Срабатывает после записи грязных буферов в ядро и до начала формирования запросов fsync.</TD
+></TR
+><TR
+><TD
+>buffer-checkpoint-done</TD
+><TD
+>()</TD
+><TD
+>Срабатывает по завершении синхронизации буферов с диском.</TD
+></TR
+><TR
+><TD
+>twophase-checkpoint-start</TD
+><TD
+>()</TD
+><TD
+>Срабатывает, когда начинается двухфазный этап выполнения контрольной точки.</TD
+></TR
+><TR
+><TD
+>twophase-checkpoint-done</TD
+><TD
+>()</TD
+><TD
+>Срабатывает по завершении двухфазного этапа выполнения контрольной точки.</TD
+></TR
+><TR
+><TD
+>buffer-read-start</TD
+><TD
+>(ForkNumber, BlockNumber, Oid, Oid, Oid, int, bool)</TD
+><TD
+>Срабатывает, когда начинается чтение из буфера. arg0 и arg1 содержат PID дочернего процесса и номер блока этой страницы (arg1 будет иметь значение -1, если выполняется запрос на расширение места для таблицы). arg2, arg3 и arg4 содержат OID-ы табличного пространства, базы данных и отношения, которые однозначно идентифицируют отношение. arg5 для локального буфера задаёт идентификатор серверного процесса, создавшего временное отношение, или InvalidBackendId (-1) &mdash; для разделяемого буфера. arg6 = true для запросов на расширение места для таблицы, false &mdash; в случае обычного чтения.</TD
+></TR
+><TR
+><TD
+>buffer-read-done</TD
+><TD
+>(ForkNumber, BlockNumber, Oid, Oid, Oid, int, bool, bool)</TD
+><TD
+>Срабатывает по завершении чтения буфера. arg0 и arg1 содержат PID дочернего процесса и номер блока этой страницы (arg1 будет содержать номер только что добавленного блока, если выполняется запрос на расширение места для таблицы). arg2, arg3 и arg4 содержат OID-ы табличного пространства, базы данных и отношения, которые однозначно идентифицируют отношение. arg5 для локального буфера задаёт идентификатор серверного процесса, создавшего временное отношение, или InvalidBackendId (-1) &mdash; для разделяемого буфера. arg6 = true для запросов на расширение места для таблицы, false &mdash; в случае обычного чтения. arg7 = true, если буфер был обнаружен в пуле, false &mdash; если нет.</TD
+></TR
+><TR
+><TD
+>buffer-flush-start</TD
+><TD
+>(ForkNumber, BlockNumber, Oid, Oid, Oid)</TD
+><TD
+>Срабатывает перед формированием любого запроса на запись в разделяемый буфер. arg0 и arg1 содержат PID дочернего процесса и номер блока этой страницы. arg2, arg3 и arg4 содержат OID-ы табличного пространства, базы данных и отношения, которые однозначно идентифицируют отношение</TD
+></TR
+><TR
+><TD
+>buffer-flush-done</TD
+><TD
+>(ForkNumber, BlockNumber, Oid, Oid, Oid)</TD
+><TD
+>Срабатывает по завершении запроса на запись в разделяемый буфер. (Учтите, что это отражает только время на передачу данных в ядро; обычно на диск они ещё не записаны.) Аргументы аналогичны buffer-flush-start.</TD
+></TR
+><TR
+><TD
+>buffer-write-dirty-start</TD
+><TD
+>(ForkNumber, BlockNumber, Oid, Oid, Oid)</TD
+><TD
+>Срабатывает, когда серверный процесс начинает запись грязного буфера. (Частое повторение такой ситуации означает, что значение <A
+HREF="runtime-config-resource.html#GUC-SHARED-BUFFERS"
+>shared_buffers</A
+> слишком мало или что управляющие параметры bgwriter необходимо откорректировать.) arg0 и arg1 содержат PID дочернего процесса и номер блока этой страницы. arg2, arg3 и arg4 содержат OID-ы табличного пространства, базы данных и отношения, которые однозначно идентифицируют отношение.</TD
+></TR
+><TR
+><TD
+>buffer-write-dirty-done</TD
+><TD
+>(ForkNumber, BlockNumber, Oid, Oid, Oid)</TD
+><TD
+>Срабатывает по завершении записи грязного буфера. Аргументы аналогичны buffer-write-dirty-start.</TD
+></TR
+><TR
+><TD
+>wal-buffer-write-dirty-start</TD
+><TD
+>()</TD
+><TD
+>Срабатывает, когда серверный процесс начинает запись грязного WAL буфера из-за того, что свободные WAL буферы закончились. (Частое повторение такой ситуации означает, что значение <A
+HREF="runtime-config-wal.html#GUC-WAL-BUFFERS"
+>wal_buffers</A
+> слишком мало.)</TD
+></TR
+><TR
+><TD
+>wal-buffer-write-dirty-done</TD
+><TD
+>()</TD
+><TD
+>Срабатывает по завершении записи грязного WAL буфера.</TD
+></TR
+><TR
+><TD
+>xlog-insert</TD
+><TD
+>(unsigned char, unsigned char)</TD
+><TD
+>Срабатывает при добавлении записи в WAL. arg0 задаёт идентификатор менеджера ресурсов (rmid) для этой записи. arg1 задаёт информационные флаги.</TD
+></TR
+><TR
+><TD
+>xlog-switch</TD
+><TD
+>()</TD
+><TD
+>Срабатывает при запросе на переключение сегмента WAL.</TD
+></TR
+><TR
+><TD
+>smgr-md-read-start</TD
+><TD
+>(ForkNumber, BlockNumber, Oid, Oid, Oid, int)</TD
+><TD
+>Срабатывает, когда начинается чтение блока из отношения. arg0 и arg1 содержат PID дочернего процесса и номер блока этой страницы. arg2, arg3 и arg4 содержат OID-ы табличного пространства, базы данных и отношения, которые однозначно идентифицируют отношение. arg5 для локального буфера задаёт идентификатор серверного процесса, создавшего временное отношение, или InvalidBackendId (-1) &mdash; для разделяемого буфера.</TD
+></TR
+><TR
+><TD
+>smgr-md-read-done</TD
+><TD
+>(ForkNumber, BlockNumber, Oid, Oid, Oid, int, int, int)</TD
+><TD
+>Срабатывает по завершении чтения блока из отношения. arg0 и arg1 содержат PID дочернего процесса и номер блока этой страницы. arg2, arg3 и arg4 содержат OID-ы табличного пространства, базы данных и отношения, которые однозначно идентифицируют отношение. arg5 для локального буфера задаёт идентификатор серверного процесса, создавшего временное отношение, или InvalidBackendId (-1) &mdash; для разделяемого буфера. arg6 задаёт количество фактически прочитанных байтов, тогда как arg7 задаёт количество запрошенных байтов (различия говорят о наличии проблемы).</TD
+></TR
+><TR
+><TD
+>smgr-md-write-start</TD
+><TD
+>(ForkNumber, BlockNumber, Oid, Oid, Oid, int)</TD
+><TD
+>Срабатывает, когда начинается запись блока в отношение. arg0 и arg1 содержат PID дочернего процесса и номер блока этой страницы. arg2, arg3 и arg4 содержат OID-ы табличного пространства, базы данных и отношения, которые однозначно идентифицируют отношение. arg5 для локального буфера задаёт идентификатор серверного процесса, создавшего временное отношение, или InvalidBackendId (-1) &mdash; для разделяемого буфера.</TD
+></TR
+><TR
+><TD
+>smgr-md-write-done</TD
+><TD
+>(ForkNumber, BlockNumber, Oid, Oid, Oid, int, int, int)</TD
+><TD
+>Срабатывает по завершении записи блока в отношение. arg0 и arg1 содержат PID дочернего процесса и номер блока этой страницы. arg2, arg3 и arg4 содержат OID-ы табличного пространства, базы данных и отношения, которые однозначно идентифицируют отношение. arg5 для локального буфера задаёт идентификатор серверного процесса, создавшего временное отношение, или InvalidBackendId (-1) &mdash; для разделяемого буфера. arg6 задаёт количество фактически записанных байтов, тогда как arg7 задаёт количество запрошенных байтов (различия говорят о наличии проблемы).</TD
+></TR
+><TR
+><TD
+>sort-start</TD
+><TD
+>(int, bool, int, int, bool)</TD
+><TD
+>Срабатывает, когда начинается операция сортировки. arg0 задаёт сортировку таблицы, индекса или элемента данных. arg1 = true, если данные ожидаются уникальными. arg2 задаёт число ключевых колонок. arg3 задаёт объём доступной рабочей памяти в килобайтах. arg4 = true, если требуется произвольный доступ к результату сортировки.</TD
+></TR
+><TR
+><TD
+>sort-done</TD
+><TD
+>(bool, long)</TD
+><TD
+>Срабатывает по завершении сортировки. arg0 = true для внешней сортировки, false &mdash; для внутренней сортировки. arg1 задаёт число дисковых блоков, использованных для внешней сортировки, или объём памяти, использованной для внутренней сортировки, в килобайтах.</TD
+></TR
+><TR
+><TD
+>lwlock-acquire</TD
+><TD
+>(char *, int, LWLockMode)</TD
+><TD
+>Срабатывает, когда накладывается блокировка LWLock. arg0 задаёт идентификатор блокировки. arg1 задаёт смещение LWLOCK в своей части. arg2 задаёт тип запрошенной блокировки: монопольная или разделяемая.</TD
+></TR
+><TR
+><TD
+>lwlock-release</TD
+><TD
+>(char *, int)</TD
+><TD
+>Срабатывает, когда блокировка LWLock была снята (однако учтите, что никакие ждущие процессы ещё не были активированы). arg0 задаёт идентификатор блокировки LWLock. arg1 задаёт смещение внутри идентификатора блокировки LWLock.</TD
+></TR
+><TR
+><TD
+>lwlock-wait-start</TD
+><TD
+>(char *, int, LWLockMode)</TD
+><TD
+>Срабатывает, когда оказывается, что наложить блокировку LWLock немедленно нельзя, и серверный процесс начинает ожидать освобождения блокировки. arg0 задаёт идентификатор блокировки LWLock. arg1 задаёт смещение внутри идентификатора блокировки LWLock. arg2 задаёт тип запрошенной блокировки, монопольная или разделяемая.</TD
+></TR
+><TR
+><TD
+>lwlock-wait-done</TD
+><TD
+>(char *, int, LWLockMode)</TD
+><TD
+>Срабатывает, когда серверный процесс прекращает ожидание блокировки LWLock (но саму блокировку он ещё не получил). arg0 задаёт идентификатор блокировки LWLock. arg1 задаёт смещение внутри идентификатора блокировки LWLock. arg2 задаёт тип запрошенной блокировки, монопольная или разделяемая.</TD
+></TR
+><TR
+><TD
+>lwlock-condacquire</TD
+><TD
+>(char *, int, LWLockMode)</TD
+><TD
+>Срабатывает, когда блокировка LWLock была успешно получена процессом, запросившим её в режиме без ожидания. arg0 задаёт идентификатор блокировки LWLock. arg1 задаёт смещение внутри идентификатора блокировки LWLock. arg2 задаёт тип запрошенной блокировки, монопольная или разделяемая.</TD
+></TR
+><TR
+><TD
+>lwlock-condacquire-fail</TD
+><TD
+>(char *, int, LWLockMode)</TD
+><TD
+>Срабатывает, когда процесс, запросивший блокировку LWLock в режиме без ожидания, не смог её получить. arg0 задаёт идентификатор блокировки LWLock. arg1 задаёт смещение внутри идентификатора блокировки LWLock. arg2 задаёт тип запрошенной блокировки, монопольная или разделяемая.</TD
+></TR
+><TR
+><TD
+>lock-wait-start</TD
+><TD
+>(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, LOCKMODE)</TD
+><TD
+>Срабатывает, когда запрос на тяжёлую блокировку (блокировку lmgr) переходит в состояние ожидания, поскольку блокировка недоступна. Аргументы с arg0 до arg3 задают атрибуты, идентифицирующие объект, на который накладывается блокировка. arg4 задаёт тип объекта, на который накладывается блокировка. arg5 задаёт тип запрошенной блокировки.</TD
+></TR
+><TR
+><TD
+>lock-wait-done</TD
+><TD
+>(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, LOCKMODE)</TD
+><TD
+>Срабатывает, когда запрос на тяжёлую блокировку (блокировку lmgr) выходит из состояния ожидания (т. е. получает блокировку). Аргументы аналогичны lock-wait-start.</TD
+></TR
+><TR
+><TD
+>deadlock-found</TD
+><TD
+>()</TD
+><TD
+>Срабатывает, когда детектор взаимных блокировок обнаруживает такую взаимную блокировку</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><DIV
+CLASS="TABLE"
+><A
+NAME="TYPEDEFS-TABLE"
+></A
+><P
+><B
+>Таблица 27-17. Предопределённые типы, используемые в параметрах точек трассировки</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+>Тип</TH
+><TH
+>Определение</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>LocalTransactionId</TD
+><TD
+>unsigned int</TD
+></TR
+><TR
+><TD
+>LWLockMode</TD
+><TD
+>int</TD
+></TR
+><TR
+><TD
+>LOCKMODE</TD
+><TD
+>int</TD
+></TR
+><TR
+><TD
+>BlockNumber</TD
+><TD
+>unsigned int</TD
+></TR
+><TR
+><TD
+>Oid</TD
+><TD
+>unsigned int</TD
+></TR
+><TR
+><TD
+>ForkNumber</TD
+><TD
+>int</TD
+></TR
+><TR
+><TD
+>bool</TD
+><TD
+>char</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="USING-TRACE-POINTS"
+>27.4.3. Использование точек трассировки</A
+></H2
+><P
+>В приведённом ниже примере показан скрипт DTrace для анализа числа транзакций в системе, который можно использовать в качестве альтернативы созданию снимка данных <TT
+CLASS="STRUCTNAME"
+>pg_stat_database</TT
+> до и после выполнения теста производительности: </P><PRE
+CLASS="PROGRAMLISTING"
+>#!/usr/sbin/dtrace -qs
+
+postgresql$1:::transaction-start
+{
+      @start["Start"] = count();
+      self-&gt;ts  = timestamp;
+}
+
+postgresql$1:::transaction-abort
+{
+      @abort["Abort"] = count();
+}
+
+postgresql$1:::transaction-commit
+/self-&gt;ts/
+{
+      @commit["Commit"] = count();
+      @time["Total time (ns)"] = sum(timestamp - self-&gt;ts);
+      self-&gt;ts=0;
+}</PRE
+><P> При выполнении этот D-скрипт возвращает результат вида: </P><PRE
+CLASS="SCREEN"
+># ./txn_count.d `pgrep -n postgres` or ./txn_count.d &lt;PID&gt;
+^C
+
+Start                                          71
+Commit                                         70
+Total time (ns)                        2312105013</PRE
+><P></P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>SystemTap использует отличную от DTrace нотацию для скриптов трассировки, хотя лежащие в их основе точки трассировки совместимы. Стоит отметить, что на момент написания этой главы в скриптах SystemTap имена точек трассировки должны обрамляться двойными подчёркиваниями, а не дефисами. Ожидается, что эта проблема будет решена в следующих версиях SystemTap.</P
+></BLOCKQUOTE
+></DIV
+><P
+>Необходимо помнить, что скрипты DTrace должны быть аккуратно написаны и отлажены, в противном случае собранная трассировочная информация может оказаться бессмысленной. В большинстве случаев причиной обнаруженных проблем является инструментарий, а не сама система. Отправляя на рассмотрение данные, полученные с использованием динамической трассировки, обязательно прилагайте скрипт, с помощью которого они были получены, для того чтобы его также проверить и обсудить.</P
+><P
+>Больше скриптов с примерами можно найти в PgFoundry <A
+HREF="http://pgfoundry.org/projects/dtrace/"
+TARGET="_top"
+>dtrace project</A
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="DEFINING-TRACE-POINTS"
+>27.4.4. Задание новых точек трассировки</A
+></H2
+><P
+>Новые точки трассировки разработчик может определить в любом участке кода, однако это потребует перекомпиляции. Ниже приведены шаги, необходимые для добавления новых точек трассировки:</P
+><DIV
+CLASS="PROCEDURE"
+><OL
+TYPE="1"
+><LI
+CLASS="STEP"
+><P
+>Определить имена точек трассировки и данные, которые будут доступны в этих точках</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Добавить описание точек трассировки в <TT
+CLASS="FILENAME"
+>src/backend/utils/probes.d</TT
+></P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Включить <TT
+CLASS="FILENAME"
+>pg_trace.h</TT
+>, если его ещё не использовали в модуле (модулях), содержащих точки трассировки, и вставить <TT
+CLASS="LITERAL"
+>TRACE_POSTGRESQL</TT
+> отладочные макросы в нужные места исходного кода</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Перекомпилировать и убедиться в доступности новых точек трассировки</P
+></LI
+></OL
+></DIV
+><DIV
+CLASS="FORMALPARA"
+><P
+><B
+>Пример: </B
+>Вот пример того, как можно добавить точку для трассировки всех новых транзакций по их идентификатору.</P
+></DIV
+><DIV
+CLASS="PROCEDURE"
+><OL
+TYPE="1"
+><LI
+CLASS="STEP"
+><P
+>Решаем, что точка трассировки будет называться <TT
+CLASS="LITERAL"
+>transaction-start</TT
+> и будет принимать параметр типа LocalTransactionId</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Добавляем определение точки трассировки в <TT
+CLASS="FILENAME"
+>src/backend/utils/probes.d</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>probe transaction__start(LocalTransactionId);</PRE
+><P> Обратите внимание на использование двойного подчёркивания в имени точки трассировки. В скрипте DTrace, использующем эту точку, двойное подчёркивание нужно будет заменить дефисом, поэтому в документации для пользователей эта точка трассировки будет иметь имя <TT
+CLASS="LITERAL"
+>transaction-start</TT
+>.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Во время компиляции <TT
+CLASS="LITERAL"
+>transaction__start</TT
+> преобразуется в макрос <TT
+CLASS="LITERAL"
+>TRACE_POSTGRESQL_TRANSACTION_START</TT
+> (обратите внимание, что здесь используется одинарное подчёркивание), который доступен в результате включения <TT
+CLASS="FILENAME"
+>pg_trace.h</TT
+>. Добавим вызов макроса в требуемую точку исходного кода. В данном случае это будет выглядеть приблизительно так: </P><PRE
+CLASS="PROGRAMLISTING"
+>TRACE_POSTGRESQL_TRANSACTION_START(vxid.localTransactionId);</PRE
+><P></P
+></LI
+><LI
+CLASS="STEP"
+><P
+>После перекомпиляции и запуска нового бинарного файла используйте следующую команду DTrace, чтобы проверить доступность только что добавленной точки трассировки. Должен получиться результат, подобный этому: </P><PRE
+CLASS="SCREEN"
+># dtrace -ln transaction-start
+   ID    PROVIDER          MODULE           FUNCTION NAME
+18705 postgresql49878     postgres     StartTransactionCommand transaction-start
+18755 postgresql49877     postgres     StartTransactionCommand transaction-start
+18805 postgresql49876     postgres     StartTransactionCommand transaction-start
+18855 postgresql49875     postgres     StartTransactionCommand transaction-start
+18986 postgresql49873     postgres     StartTransactionCommand transaction-start</PRE
+><P></P
+></LI
+></OL
+></DIV
+><P
+>При добавлении макросов трассировки в код, написанный на языке C, необходимо позаботиться о следующем: <P
+></P
+></P><UL
+><LI
+><P
+>Нужно убедиться, что типы данных, определённые в параметрах точки трассировки, совпадают с типами данных переменных, которые используются в макросе. В противном случае компиляция завершится с ошибками.</P
+></LI
+><LI
+><P
+>В большинстве платформ в случае, если <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> собран с указанием <TT
+CLASS="OPTION"
+>--enable-dtrace</TT
+>, то аргументы макроса трассировки вычисляются каждый раз, когда макрос получает управление, <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>даже если трассировка не выполняется</I
+></SPAN
+>. Об этом не стоит беспокоиться, если вы просто возвращаете значения небольшого числа локальных переменных. Однако избегайте использования ресурсоёмких вызовов функций в аргументах. Если это необходимо, то постарайтесь защитить макрос проверкой, которая будет определять, действительно ли включена трассировка: </P><PRE
+CLASS="PROGRAMLISTING"
+>if (TRACE_POSTGRESQL_TRANSACTION_START_ENABLED())
+    TRACE_POSTGRESQL_TRANSACTION_START(some_function(...));</PRE
+><P> Каждый макрос трассировки имеет соответствующий макрос <TT
+CLASS="LITERAL"
+>ENABLED</TT
+>.</P
+></LI
+></UL
+><P></P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="monitoring-locks.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="diskusage.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Просмотр информации о блокировках</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="monitoring.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Мониторинг использования диска</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

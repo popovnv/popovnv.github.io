@@ -1,0 +1,525 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Переменные окружения</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="libpq — библиотека для языка C"
+HREF="libpq.html"><LINK
+REL="PREVIOUS"
+TITLE="Система событий"
+HREF="libpq-events.html"><LINK
+REL="NEXT"
+TITLE="Файл паролей"
+HREF="libpq-pgpass.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Система событий"
+HREF="libpq-events.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="libpq.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 31. <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> — библиотека для языка C</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Файл паролей"
+HREF="libpq-pgpass.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="LIBPQ-ENVARS"
+>31.14. Переменные окружения</A
+></H1
+><P
+>Воспользовавшись следующими переменными окружения, можно задать значения параметров соединения по умолчанию, которые будут использоваться функциями <CODE
+CLASS="FUNCTION"
+>PQconnectdb</CODE
+>, <CODE
+CLASS="FUNCTION"
+>PQsetdbLogin</CODE
+> и <CODE
+CLASS="FUNCTION"
+>PQsetdb</CODE
+>, если никакое значение не будет задано вызывающим кодом. В частности, используя их, можно обойтись без жёсткого задания параметров соединения в простых клиентских приложениях. <P
+></P
+></P><UL
+><LI
+><P
+><TT
+CLASS="ENVAR"
+>PGHOST</TT
+> действует так же, как параметр соединения <A
+HREF="libpq-connect.html#LIBPQ-CONNECT-HOST"
+>host</A
+>.</P
+></LI
+><LI
+><P
+><TT
+CLASS="ENVAR"
+>PGHOSTADDR</TT
+> действует так же, как параметр соединения <A
+HREF="libpq-connect.html#LIBPQ-CONNECT-HOSTADDR"
+>hostaddr</A
+>. Эту переменную можно задать вместо или вместе с <TT
+CLASS="ENVAR"
+>PGHOST</TT
+> для предотвращения поиска адреса в DNS.</P
+></LI
+><LI
+><P
+><TT
+CLASS="ENVAR"
+>PGPORT</TT
+> действует так же, как параметр соединения <A
+HREF="libpq-connect.html#LIBPQ-CONNECT-PORT"
+>port</A
+>.</P
+></LI
+><LI
+><P
+><TT
+CLASS="ENVAR"
+>PGDATABASE</TT
+> действует так же, как параметр соединения <A
+HREF="libpq-connect.html#LIBPQ-CONNECT-DBNAME"
+>dbname</A
+>.</P
+></LI
+><LI
+><P
+><TT
+CLASS="ENVAR"
+>PGUSER</TT
+> действует так же, как параметр соединения <A
+HREF="libpq-connect.html#LIBPQ-CONNECT-USER"
+>user</A
+>.</P
+></LI
+><LI
+><P
+><TT
+CLASS="ENVAR"
+>PGPASSWORD</TT
+> действует так же, как параметр соединения <A
+HREF="libpq-connect.html#LIBPQ-CONNECT-PASSWORD"
+>password</A
+>. Использовать эту переменную окружения не рекомендуется по соображениям безопасности, так как в некоторых операционных системах непривилегированные пользователи могут видеть переменные окружения процессов в выводе <SPAN
+CLASS="APPLICATION"
+>ps</SPAN
+>; вместо этого лучше использовать файл <TT
+CLASS="FILENAME"
+>~/.pgpass</TT
+> (см. <A
+HREF="libpq-pgpass.html"
+>Раздел 31.15</A
+>).</P
+></LI
+><LI
+><P
+><TT
+CLASS="ENVAR"
+>PGPASSFILE</TT
+> устанавливает имя файла паролей, в котором будут находиться сохранённые пароли. По умолчанию применяется имя файла <TT
+CLASS="FILENAME"
+>~/.pgpass</TT
+> (см. <A
+HREF="libpq-pgpass.html"
+>Раздел 31.15</A
+>).</P
+></LI
+><LI
+><P
+><TT
+CLASS="ENVAR"
+>PGSERVICE</TT
+> действует так же, как параметр соединения <A
+HREF="libpq-connect.html#LIBPQ-CONNECT-SERVICE"
+>service</A
+>.</P
+></LI
+><LI
+><P
+><TT
+CLASS="ENVAR"
+>PGSERVICEFILE</TT
+> задаёт имя личного файла пользователя с параметрами подключения к службам. По умолчанию применяется имя файла <TT
+CLASS="FILENAME"
+>~/.pg_service.conf</TT
+> (см. <A
+HREF="libpq-pgservice.html"
+>Раздел 31.16</A
+>).</P
+></LI
+><LI
+><P
+><TT
+CLASS="ENVAR"
+>PGREALM</TT
+> задаёт область Kerberos для <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, если она отличается от локальной области. Если значение <TT
+CLASS="ENVAR"
+>PGREALM</TT
+> установлено, приложения <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> будут аутентифицироваться на серверах, указывая эту область, и использовать отдельные файлы билетов во избежание конфликтов с локальными билетами. Эта переменная окружения используется, только если на сервере настроена проверка подлинности GSSAPI.</P
+></LI
+><LI
+><P
+><TT
+CLASS="ENVAR"
+>PGOPTIONS</TT
+> действует так же, как параметр соединения <A
+HREF="libpq-connect.html#LIBPQ-CONNECT-OPTIONS"
+>options</A
+>.</P
+></LI
+><LI
+><P
+><TT
+CLASS="ENVAR"
+>PGAPPNAME</TT
+> действует так же, как параметр соединения <A
+HREF="libpq-connect.html#LIBPQ-CONNECT-APPLICATION-NAME"
+>application_name</A
+>.</P
+></LI
+><LI
+><P
+><TT
+CLASS="ENVAR"
+>PGSSLMODE</TT
+> действует так же, как параметр соединения <A
+HREF="libpq-connect.html#LIBPQ-CONNECT-SSLMODE"
+>sslmode</A
+>.</P
+></LI
+><LI
+><P
+><TT
+CLASS="ENVAR"
+>PGREQUIRESSL</TT
+> действует так же, как параметр соединения <A
+HREF="libpq-connect.html#LIBPQ-CONNECT-REQUIRESSL"
+>requiressl</A
+>.</P
+></LI
+><LI
+><P
+><TT
+CLASS="ENVAR"
+>PGSSLCOMPRESSION</TT
+> действует так же, как параметр соединения <A
+HREF="libpq-connect.html#LIBPQ-CONNECT-SSLCOMPRESSION"
+>sslcompression</A
+>.</P
+></LI
+><LI
+><P
+><TT
+CLASS="ENVAR"
+>PGSSLCERT</TT
+> действует так же, как параметр соединения <A
+HREF="libpq-connect.html#LIBPQ-CONNECT-SSLCERT"
+>sslcert</A
+>.</P
+></LI
+><LI
+><P
+><TT
+CLASS="ENVAR"
+>PGSSLKEY</TT
+> действует так же, как параметр соединения <A
+HREF="libpq-connect.html#LIBPQ-CONNECT-SSLKEY"
+>sslkey</A
+>.</P
+></LI
+><LI
+><P
+><TT
+CLASS="ENVAR"
+>PGSSLROOTCERT</TT
+> действует так же, как параметр соединения <A
+HREF="libpq-connect.html#LIBPQ-CONNECT-SSLROOTCERT"
+>sslrootcert</A
+>.</P
+></LI
+><LI
+><P
+><TT
+CLASS="ENVAR"
+>PGSSLCRL</TT
+> действует так же, как параметр соединения <A
+HREF="libpq-connect.html#LIBPQ-CONNECT-SSLCRL"
+>sslcrl</A
+>.</P
+></LI
+><LI
+><P
+><TT
+CLASS="ENVAR"
+>PGREQUIREPEER</TT
+> действует так же, как параметр соединения <A
+HREF="libpq-connect.html#LIBPQ-CONNECT-REQUIREPEER"
+>requirepeer</A
+>.</P
+></LI
+><LI
+><P
+><TT
+CLASS="ENVAR"
+>PGKRBSRVNAME</TT
+> действует так же, как параметр соединения <A
+HREF="libpq-connect.html#LIBPQ-CONNECT-KRBSRVNAME"
+>krbsrvname</A
+>.</P
+></LI
+><LI
+><P
+><TT
+CLASS="ENVAR"
+>PGGSSLIB</TT
+> действует так же, как параметр соединения <A
+HREF="libpq-connect.html#LIBPQ-CONNECT-GSSLIB"
+>gsslib</A
+>.</P
+></LI
+><LI
+><P
+><TT
+CLASS="ENVAR"
+>PGCONNECT_TIMEOUT</TT
+> действует так же, как параметр соединения <A
+HREF="libpq-connect.html#LIBPQ-CONNECT-CONNECT-TIMEOUT"
+>connect_timeout</A
+>.</P
+></LI
+><LI
+><P
+><TT
+CLASS="ENVAR"
+>PGCLIENTENCODING</TT
+> действует так же, как параметр соединения <A
+HREF="libpq-connect.html#LIBPQ-CONNECT-CLIENT-ENCODING"
+>client_encoding</A
+>.</P
+></LI
+></UL
+><P></P
+><P
+>Следующие переменные окружения позволяют задать поведение по умолчанию для каждого отдельного сеанса <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. (См. также описание команд <A
+HREF="sql-alterrole.html"
+>ALTER ROLE</A
+> и <A
+HREF="sql-alterdatabase.html"
+>ALTER DATABASE</A
+>, позволяющих установить поведение по умолчанию для отдельного пользователя или отдельной базы.) <P
+></P
+></P><UL
+><LI
+><P
+><TT
+CLASS="ENVAR"
+>PGDATESTYLE</TT
+> устанавливает стиль представления даты/времени по умолчанию. (Равносильно <TT
+CLASS="LITERAL"
+>SET datestyle TO ...</TT
+>.)</P
+></LI
+><LI
+><P
+><TT
+CLASS="ENVAR"
+>PGTZ</TT
+> устанавливает часовой пояс по умолчанию. (Равносильно <TT
+CLASS="LITERAL"
+>SET timezone TO ...</TT
+>.)</P
+></LI
+><LI
+><P
+><TT
+CLASS="ENVAR"
+>PGGEQO</TT
+> устанавливает режим по умолчанию для генетического оптимизатора запросов. (Равносильно <TT
+CLASS="LITERAL"
+>SET geqo TO ...</TT
+>.)</P
+></LI
+></UL
+><P> Информацию о корректных значениях этих переменных окружения можно найти в описании <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>-команды <A
+HREF="sql-set.html"
+>SET</A
+>.</P
+><P
+>Следующие переменные среды определяют внутреннее поведение <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>; они переопределяют встроенные значения. <P
+></P
+></P><UL
+><LI
+><P
+><TT
+CLASS="ENVAR"
+>PGSYSCONFDIR</TT
+> задаёт каталог, в котором содержится файл <TT
+CLASS="FILENAME"
+>pg_service.conf</TT
+>, а в будущем он может содержать и другие общесистемные файлы конфигурации.</P
+></LI
+><LI
+><P
+><TT
+CLASS="ENVAR"
+>PGLOCALEDIR</TT
+> задаёт каталог, содержащий файлы <TT
+CLASS="LITERAL"
+>locale</TT
+>, предназначенные для перевода сообщений.</P
+></LI
+></UL
+><P></P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="libpq-events.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="libpq-pgpass.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Система событий</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="libpq.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Файл паролей</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

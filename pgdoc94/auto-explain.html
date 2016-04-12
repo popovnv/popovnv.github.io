@@ -1,0 +1,457 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>auto_explain</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Дополнительно поставляемые модули"
+HREF="contrib.html"><LINK
+REL="PREVIOUS"
+TITLE="auth_delay"
+HREF="auth-delay.html"><LINK
+REL="NEXT"
+TITLE="btree_gin"
+HREF="btree-gin.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="auth_delay"
+HREF="auth-delay.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Приложение E. Дополнительно поставляемые модули</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="btree_gin"
+HREF="btree-gin.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AUTO-EXPLAIN"
+>E.3. auto_explain</A
+></H1
+><P
+>Модуль <TT
+CLASS="FILENAME"
+>auto_explain</TT
+> предоставляет возможность автоматического протоколирования планов выполнения медленных операторов, что позволяет обойтись без выполнения <A
+HREF="sql-explain.html"
+>EXPLAIN</A
+> вручную. Это особенно полезно для выявления неоптимизированных запросов в больших приложениях.</P
+><P
+>Этот модуль не предоставляет функций, доступных из SQL. Чтобы использовать его, просто загрузите его в процесс сервера. Это можно сделать в отдельном сеансе: </P><PRE
+CLASS="PROGRAMLISTING"
+>LOAD 'auto_explain';</PRE
+><P> (Для этого нужно быть суперпользователем.) Более типична конфигурация, когда он загружается в некоторые или все сеансы в результате включения <TT
+CLASS="LITERAL"
+>auto_explain</TT
+> в переменную <A
+HREF="runtime-config-client.html#GUC-SESSION-PRELOAD-LIBRARIES"
+>session_preload_libraries</A
+> или в <A
+HREF="runtime-config-client.html#GUC-SHARED-PRELOAD-LIBRARIES"
+>shared_preload_libraries</A
+> в файле <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+>. Загрузив этот модуль, вы можете отслеживать исключительно медленные запросы, вне зависимости от того, когда они происходят. Конечно, это имеет свою цену.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN118894"
+>E.3.1. Параметры конфигурации</A
+></H2
+><P
+>Есть несколько параметров конфигурации, которые управляют поведением <TT
+CLASS="FILENAME"
+>auto_explain</TT
+>. Заметьте, что поведение по умолчанию сводится к бездействию, так что необходимо установить как минимум переменную <TT
+CLASS="VARNAME"
+>auto_explain.log_min_duration</TT
+>, если вы хотите получить какие-либо результаты.</P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="VARNAME"
+>auto_explain.log_min_duration</TT
+> (<TT
+CLASS="TYPE"
+>integer</TT
+>) </DT
+><DD
+><P
+>Переменная <TT
+CLASS="VARNAME"
+>auto_explain.log_min_duration</TT
+> задаёт время выполнения оператора, в миллисекундах, при превышении которого план оператора будет протоколироваться. Если это значение равно 0, протоколироваться будут планы всех операторов. При значении -1 (по умолчанию) протоколирование планов полностью отключается. Например, если вы установите значение <TT
+CLASS="LITERAL"
+>250ms</TT
+>, протоколироваться будут все запросы, выполняющиеся 250 мс и дольше. Изменить этот параметр могут только суперпользователи.</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>auto_explain.log_analyze</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>При включении параметра <TT
+CLASS="VARNAME"
+>auto_explain.log_analyze</TT
+> в протокол будет записываться вывод команды <TT
+CLASS="COMMAND"
+>EXPLAIN ANALYZE</TT
+>, а не простой <TT
+CLASS="COMMAND"
+>EXPLAIN</TT
+>. По умолчанию этот параметр отключён. Изменить его могут только суперпользователи.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Когда этот параметр включён, замер времени на уровне узлов плана производится для всех операторов, даже если они выполняются недостаточно долго для протоколирования. Это может оказать крайне негативное влияние на производительность. Отключение <TT
+CLASS="VARNAME"
+>auto_explain.log_timing</TT
+> исключает это влияние, но при этом собирается меньше информации.</P
+></BLOCKQUOTE
+></DIV
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>auto_explain.log_buffers</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Параметр <TT
+CLASS="VARNAME"
+>auto_explain.log_buffers</TT
+> определяет, будет ли при протоколировании плана выполнения выводиться статистика об использовании буферов; он равносилен указанию <TT
+CLASS="LITERAL"
+>BUFFERS</TT
+> команды <TT
+CLASS="COMMAND"
+>EXPLAIN</TT
+>. Этот параметр действует, только если включён параметр <TT
+CLASS="VARNAME"
+>auto_explain.log_analyze</TT
+>. По умолчанию этот параметр отключён. Изменить его могут только суперпользователи.</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>auto_explain.log_timing</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Параметр <TT
+CLASS="VARNAME"
+>auto_explain.log_timing</TT
+> определяет, будет ли при протоколировании плана выполнения выводиться длительность на уровне узлов: он равнозначен указанию <TT
+CLASS="LITERAL"
+>TIMING</TT
+> команды <TT
+CLASS="COMMAND"
+>EXPLAIN</TT
+>. Издержки от постоянного чтения системных часов могут значительно замедлить запросы в некоторых системах, так что может иметь смысл отключать этот параметр, когда нужно знать только знать количество строк, но не точную длительность каждого узла. Этот параметр действует, только если включён <TT
+CLASS="VARNAME"
+>auto_explain.log_analyze</TT
+>. По умолчанию этот параметр отключён. Изменить его могут только суперпользователи.</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>auto_explain.log_triggers</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>При включении параметра <TT
+CLASS="VARNAME"
+>auto_explain.log_triggers</TT
+> в протокол будет записываться статистика выполнения триггеров. Этот параметр действует, только если включён параметр <TT
+CLASS="VARNAME"
+>auto_explain.log_analyze</TT
+>. По умолчанию этот параметр отключён. Изменить его могут только суперпользователи.</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>auto_explain.log_verbose</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Параметр <TT
+CLASS="VARNAME"
+>auto_explain.log_verbose</TT
+> определяет, будут ли при протоколировании плана выполнения выводиться подробные сведения; он равнозначен указанию <TT
+CLASS="LITERAL"
+>VERBOSE</TT
+> команды <TT
+CLASS="COMMAND"
+>EXPLAIN</TT
+>. По умолчанию этот параметр отключён. Изменить его могут только суперпользователи.</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>auto_explain.log_format</TT
+> (<TT
+CLASS="TYPE"
+>enum</TT
+>) </DT
+><DD
+><P
+>Параметр <TT
+CLASS="VARNAME"
+>auto_explain.log_format</TT
+> выбирает формат вывода для <TT
+CLASS="COMMAND"
+>EXPLAIN</TT
+>. Он может принимать значение <TT
+CLASS="LITERAL"
+>text</TT
+>, <TT
+CLASS="LITERAL"
+>xml</TT
+>, <TT
+CLASS="LITERAL"
+>json</TT
+> и <TT
+CLASS="LITERAL"
+>yaml</TT
+>. Значение по умолчанию — text. Изменить этот параметр могут только суперпользователи.</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>auto_explain.log_nested_statements</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>При включении параметра <TT
+CLASS="VARNAME"
+>auto_explain.log_nested_statements</TT
+> протоколированию могут подлежать и вложенные операторы (операторы, выполняемые внутри функции). Когда он отключён, протоколируются планы запросов только верхнего уровня. Изменить этот параметр могут только суперпользователи.</P
+></DD
+></DL
+></DIV
+><P
+>В обычной ситуации эти параметры устанавливаются в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+>, хотя суперпользователи могут изменить их &laquo;на лету&raquo; в рамках своих сеансов. Типичное их использование может выглядеть так:</P
+><PRE
+CLASS="PROGRAMLISTING"
+># postgresql.conf
+session_preload_libraries = 'auto_explain'
+
+auto_explain.log_min_duration = '3s'</PRE
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN119003"
+>E.3.2. Пример</A
+></H2
+><PRE
+CLASS="PROGRAMLISTING"
+>postgres=# LOAD 'auto_explain';
+postgres=# SET auto_explain.log_min_duration = 0;
+postgres=# SET auto_explain.log_analyze = true;
+postgres=# SELECT count(*)
+           FROM pg_class, pg_index
+           WHERE oid = indrelid AND indisunique;</PRE
+><P
+>В результате этих команд может быть получен такой вывод:</P
+><PRE
+CLASS="SCREEN"
+>LOG:  duration: 3.651 ms  plan:
+  Query Text: SELECT count(*)
+              FROM pg_class, pg_index
+              WHERE oid = indrelid AND indisunique;
+  Aggregate  (cost=16.79..16.80 rows=1 width=0) (actual time=3.626..3.627 rows=1 loops=1)
+    -&gt;  Hash Join  (cost=4.17..16.55 rows=92 width=0) (actual time=3.349..3.594 rows=92 loops=1)
+          Hash Cond: (pg_class.oid = pg_index.indrelid)
+          -&gt;  Seq Scan on pg_class  (cost=0.00..9.55 rows=255 width=4) (actual time=0.016..0.140 rows=255 loops=1)
+          -&gt;  Hash  (cost=3.02..3.02 rows=92 width=4) (actual time=3.238..3.238 rows=92 loops=1)
+                Buckets: 1024  Batches: 1  Memory Usage: 4kB
+                -&gt;  Seq Scan on pg_index  (cost=0.00..3.02 rows=92 width=4) (actual time=0.008..3.187 rows=92 loops=1)
+                      Filter: indisunique</PRE
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN119008"
+>E.3.3. Автор</A
+></H2
+><P
+>Такахиро Итагаки <CODE
+CLASS="EMAIL"
+>&#60;<A
+HREF="mailto:itagaki.takahiro@oss.ntt.co.jp"
+>itagaki.takahiro@oss.ntt.co.jp</A
+>&#62;</CODE
+></P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="auth-delay.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="btree-gin.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>auth_delay</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>btree_gin</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

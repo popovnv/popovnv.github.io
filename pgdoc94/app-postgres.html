@@ -1,0 +1,1385 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>            postgres
+          </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Серверные утилиты PostgreSQL"
+HREF="reference-server.html"><LINK
+REL="PREVIOUS"
+TITLE="            pg_resetxlog
+          "
+HREF="app-pgresetxlog.html"><LINK
+REL="NEXT"
+TITLE="            postmaster
+          "
+HREF="app-postmaster.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="            pg_resetxlog
+          "
+HREF="app-pgresetxlog.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="reference-server.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="            postmaster
+          "
+HREF="app-postmaster.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="APP-POSTGRES"
+></A
+><SPAN
+CLASS="APPLICATION"
+>postgres</SPAN
+></H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN93867"
+></A
+><H2
+>Название</H2
+>postgres&nbsp;--&nbsp;Сервер баз данных <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN93871"
+></A
+><H2
+>Синтаксис</H2
+><P
+><TT
+CLASS="COMMAND"
+>postgres</TT
+> [              <TT
+CLASS="REPLACEABLE"
+><I
+>параметр</I
+></TT
+>
+            ...]</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN93876"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>postgres</TT
+> это сервер баз данных <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Для получения доступа к базе данных клиент устанавливает соединение (локально или по сети) с сервером <TT
+CLASS="COMMAND"
+>postgres</TT
+>. После установки соединения сервер <TT
+CLASS="COMMAND"
+>postgres</TT
+> поднимает выделенный процесс для его обслуживания.</P
+><P
+>Один экземпляр <TT
+CLASS="COMMAND"
+>postgres</TT
+> обслуживает кластер целиком. Кластер — это коллекция баз данных, хранящихся в файловой системе в определённом размещении (<SPAN
+CLASS="QUOTE"
+>"области данных"</SPAN
+>). На одном физическом сервере можно запустить несколько экземпляров <TT
+CLASS="COMMAND"
+>postgres</TT
+> одновременно, при условии, что они используют различные области данных и порты. При запуске <TT
+CLASS="COMMAND"
+>postgres</TT
+> необходимо указать размещение данных, которое задаётся в параметре <TT
+CLASS="OPTION"
+>-D</TT
+> или переменной окружения <TT
+CLASS="ENVAR"
+>PGDATA</TT
+>, значение по умолчанию отсутствует. Обычно <TT
+CLASS="OPTION"
+>-D</TT
+> или <TT
+CLASS="ENVAR"
+>PGDATA</TT
+> указывает на каталог, созданный во время развёртывания кластера с помощью <A
+HREF="app-initdb.html"
+>initdb</A
+>. Иные варианты рассмотрены в <A
+HREF="runtime-config-file-locations.html"
+>Разделе 18.2</A
+>.</P
+><P
+>По умолчанию <TT
+CLASS="COMMAND"
+>postgres</TT
+> запускается не в фоновом режиме, а вывод журнала осуществляет в стандартный поток ошибок. На практике <TT
+CLASS="COMMAND"
+>postgres</TT
+> должен запускаться в фоновом режиме, возможно, при старте системы.</P
+><P
+>Команду <TT
+CLASS="COMMAND"
+>postgres</TT
+> также возможно использовать в однопользовательском режиме. В основном этот режим используется на этапе начальной загрузки при выполнении <A
+HREF="app-initdb.html"
+>initdb</A
+>. Иногда также применяется в целях отладки или после аварийного сбоя. Стоит обратить внимание, что одно-пользовательский режим не совсем корректно использовать для отладки, так как условия далеки от реальных боевых. При запуске из командной строки в однопользовательском режиме можно вводить запросы и видеть результаты их выполнения на экране в форме пригодной для разработки, нежели конечных пользователей. Также в этом режиме ID сессионного пользователя выставляется в единицу, а пользователь неявно наделяется правами суперпользователя. Существование пользователя необязательно, поэтому режим можно использовать в некоторых ситуациях при повреждениях системных каталогов.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="APP-POSTGRES-OPTIONS"
+></A
+><H2
+>Параметры</H2
+><P
+><TT
+CLASS="COMMAND"
+>postgres</TT
+> может принимать параметры, рассматриваемые детально в <A
+HREF="runtime-config.html"
+>Глава 18</A
+>. Также можно сформировать конфигурационный файл, содержащий эти параметры. Некоторые из них специфично для сессии можно указать на стороне клиента. Например, если установлена переменная <TT
+CLASS="ENVAR"
+>PGOPTIONS</TT
+>, то клиенты, использующие <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>, передадут эти параметры в строке соединения к серверу.</P
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN93907"
+></A
+><H3
+>Параметры общего назначения</H3
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="OPTION"
+>-A 0|1</TT
+></DT
+><DD
+><P
+>Включает проверки утверждений во время исполнения в целях отладки программных ошибок. Параметр доступен, если при компиляции <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> были включены утверждения. По умолчанию в таком случае проверка утверждений включена.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-B <TT
+CLASS="REPLACEABLE"
+><I
+>количество буферов</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Устанавливает количество разделяемых между процессами буферов. Значение по умолчанию выбирается автоматически при развёртывании кластера с помощью <SPAN
+CLASS="APPLICATION"
+>initdb</SPAN
+>. Установка флага аналогична конфигурации параметра <A
+HREF="runtime-config-resource.html#GUC-SHARED-BUFFERS"
+>shared_buffers</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-c <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+>=<TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Устанавливает именованный параметр времени исполнения. Конфигурационные параметры, поддерживаемые <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, описаны в <A
+HREF="runtime-config.html"
+>Главе 18</A
+>. Большинство флагов командной строки это краткая форма, заданная подобным образом. Для задания нескольких таких параметров можно использовать <TT
+CLASS="OPTION"
+>-c</TT
+> повторно.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-C <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Отображает значение именованного параметра времени исполнения и прерывает дальнейшее выполнение (подробнее см. выше). Можно применять на работающем сервере, при этом будут возвращены значения <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+> с учётом проведённых в рамках вызова изменений. Значения, переданные при старте кластера, не отображаются.</P
+><P
+>Параметр предназначен для приложений, взаимодействующих с сервером, например, <A
+HREF="app-pg-ctl.html"
+>            <SPAN
+CLASS="APPLICATION"
+>pg_ctl</SPAN
+>
+          </A
+>, и запрашивающих параметры конфигурации. Пользовательские приложения должны использовать команду <A
+HREF="sql-show.html"
+>SHOW</A
+> или представление <TT
+CLASS="STRUCTNAME"
+>pg_settings</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-d <TT
+CLASS="REPLACEABLE"
+><I
+>уровень отладки</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Устанавливает уровень отладки (от 1 до 5). Чем выше значение, тем подробнее осуществляется вывод в журнал сервера. Также возможно передать <TT
+CLASS="LITERAL"
+>-d 0</TT
+> для отдельной сессии, что предотвратит в её рамках влияние выставленного для <TT
+CLASS="COMMAND"
+>postgres</TT
+> значения.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-D <TT
+CLASS="REPLACEABLE"
+><I
+>datadir</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Указывает размещение конфигурационных файлов базы в пределах файловой системы. За подробностями обратитесь к <A
+HREF="runtime-config-file-locations.html"
+>Разделу 18.2</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-e</TT
+></DT
+><DD
+><P
+>Устанавливает формат вводимых дат по умолчанию в <SPAN
+CLASS="QUOTE"
+>"European"</SPAN
+> с последовательностью значений <TT
+CLASS="LITERAL"
+>DMY</TT
+>. Также влияет на вывод дня, идущего перед значением месяца, более подробно см. <A
+HREF="datatype-datetime.html"
+>Раздел 8.5</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-F</TT
+></DT
+><DD
+><P
+>Отключает вызовы <CODE
+CLASS="FUNCTION"
+>fsync</CODE
+> для увеличения производительности, но с увеличением рисков потери данных в случае краха системы. Этот параметр работает аналогично параметру конфигурации <A
+HREF="runtime-config-wal.html#GUC-FSYNC"
+>fsync</A
+>. Внимательно прочтите документацию перед использованием данного параметра!</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-h <TT
+CLASS="REPLACEABLE"
+><I
+>компьютер</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Указывает IP-адрес или имя компьютера, на котором сервер <TT
+CLASS="COMMAND"
+>postgres</TT
+> принимает клиентские подключения по TCP/IP. Значением может быть список адресов, разделённых запятыми, либо символ <TT
+CLASS="LITERAL"
+>*</TT
+>, обозначающий все доступные интерфейсы. Если значение опущено, то подключения принимаются только через доменные сокеты Unix. По умолчанию принимаются подключения только к <SPAN
+CLASS="SYSTEMITEM"
+>localhost</SPAN
+>. Флаг работает аналогично конфигурационному параметру <A
+HREF="runtime-config-connection.html#GUC-LISTEN-ADDRESSES"
+>listen_addresses</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-i</TT
+></DT
+><DD
+><P
+>Позволяет клиентам подключаться по TCP/IP. Без этого параметра допускаются лишь локальные подключения. Действие этого параметра аналогично действию параметра конфигурации <TT
+CLASS="VARNAME"
+>listen_addresses</TT
+> со значением <TT
+CLASS="LITERAL"
+>*</TT
+> в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+> или ключа <TT
+CLASS="OPTION"
+>-h</TT
+>.</P
+><P
+>Параметр устарел, так как не даёт полной функциональности <A
+HREF="runtime-config-connection.html#GUC-LISTEN-ADDRESSES"
+>listen_addresses</A
+>. Лучше устанавливать значение <TT
+CLASS="VARNAME"
+>listen_addresses</TT
+> напрямую.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-k <TT
+CLASS="REPLACEABLE"
+><I
+>каталог</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Указывает каталог нахождения доменного сокета Unix, через который <TT
+CLASS="COMMAND"
+>postgres</TT
+> принимает соединения. Значением параметра может быть список каталогов через запятую. Если это значение пустое, использование сокетов Unix запрещается, разрешаются только подключения по TCP/IP. По умолчанию выбирается каталог <TT
+CLASS="FILENAME"
+>/tmp</TT
+>, но его можно сменить на этапе компиляции. Этот параметр действует аналогично параметру конфигурации <A
+HREF="runtime-config-connection.html#GUC-UNIX-SOCKET-DIRECTORIES"
+>unix_socket_directories</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-l</TT
+></DT
+><DD
+><P
+>Включает поддержку безопасных соединений с использованием <ACRONYM
+CLASS="ACRONYM"
+>SSL</ACRONYM
+> шифрования. <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> необходимо скомпилировать с поддержкой <ACRONYM
+CLASS="ACRONYM"
+>SSL</ACRONYM
+> для использования этого флага. Подробнее использование <ACRONYM
+CLASS="ACRONYM"
+>SSL</ACRONYM
+> описано в <A
+HREF="ssl-tcp.html"
+>Раздел 17.9</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-N <TT
+CLASS="REPLACEABLE"
+><I
+>максимальное количество соединений</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Устанавливает максимально возможное количество одновременных клиентских соединений. Значение по умолчанию устанавливается автоматически на этапе развёртывания с помощью <SPAN
+CLASS="APPLICATION"
+>initdb</SPAN
+>. Флаг работает аналогично конфигурационному параметру <A
+HREF="runtime-config-connection.html#GUC-MAX-CONNECTIONS"
+>max_connections</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-o <TT
+CLASS="REPLACEABLE"
+><I
+>дополнительные-параметры</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Аргументы командной строки, указанные в <TT
+CLASS="REPLACEABLE"
+><I
+>дополнительных-параметрах</I
+></TT
+>, передаются во все дочерние процессы, порождённые от <TT
+CLASS="COMMAND"
+>postgres</TT
+>. Используйте кавычки для экранирования пробелов.</P
+><P
+>Использование этого параметра считается устаревшим, так как на данный момент все параметры <TT
+CLASS="COMMAND"
+>postgres</TT
+> можно задать в командной строке.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-p <TT
+CLASS="REPLACEABLE"
+><I
+>порт</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Указывает порт TCP/IP или расширение файла Unix-сокета, на котором <TT
+CLASS="COMMAND"
+>postgres</TT
+> слушает клиентские соединения. По умолчанию принимает значение переменной окружения <TT
+CLASS="ENVAR"
+>PGPORT</TT
+>, или, если значение <TT
+CLASS="ENVAR"
+>PGPORT</TT
+> не установлено, то используется значение, установленное на этапе компиляции (обычно это 5432). Если значение порта меняется, то на стороне клиентов это необходимо учитывать, установив, либо <TT
+CLASS="ENVAR"
+>PGPORT</TT
+>, либо флаг командной строки.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-s</TT
+></DT
+><DD
+><P
+>Отображает информацию о времени и другую статистику после каждой выполненной команды, что полезно для оценки производительности во время настройки количества буферов.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-S</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>рабочая память</I
+></TT
+></DT
+><DD
+><P
+>Указывает объём рабочей памяти для внутренних сортировок и хешированных строк во избежание использования временных файлов. Обратитесь к описанию параметра <TT
+CLASS="VARNAME"
+>work_mem</TT
+>, приведённому в <A
+HREF="runtime-config-resource.html#RUNTIME-CONFIG-RESOURCE-MEMORY"
+>Подразделе 18.4.1</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-V</TT
+><BR><TT
+CLASS="OPTION"
+>--version</TT
+></DT
+><DD
+><P
+>Отображает версию <SPAN
+CLASS="APPLICATION"
+>postgres</SPAN
+> и прерывает дальнейшее выполнение.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>--<TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+>=<TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Устанавливает именованный параметр времени исполнения. Является короткой формой ключа <TT
+CLASS="OPTION"
+>-c</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>--describe-config</TT
+></DT
+><DD
+><P
+>Выводит значения конфигурационных переменных сервера, их описаний и значений по умолчанию в формате команды <TT
+CLASS="COMMAND"
+>COPY</TT
+> со знаком табуляции в качестве разделителя. В основном это предназначено для средств администрирования.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-?</TT
+><BR><TT
+CLASS="OPTION"
+>--help</TT
+></DT
+><DD
+><P
+>Выводит помощь по аргументам команды <SPAN
+CLASS="APPLICATION"
+>postgres</SPAN
+>.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN94087"
+></A
+><H3
+>Параметры для внутреннего использования</H3
+><P
+>Далее описанные параметры, в основном, применяются в целях отладки, а в некоторых случаях при восстановлении сильно повреждённых баз данных. Их описание приведено для системных разработчиков <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, поэтому они могут быть изменены без уведомления.</P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="OPTION"
+>-f</TT
+> <TT
+CLASS="LITERAL"
+>{ s | i | o | b | t | n | m | h }</TT
+></DT
+><DD
+><P
+>Запрещает использование специфических методов сканирования и объединения: <TT
+CLASS="LITERAL"
+>s</TT
+> и <TT
+CLASS="LITERAL"
+>i</TT
+> выключают последовательное сканирование и по индексу соответственно, а <TT
+CLASS="LITERAL"
+>o</TT
+>, <TT
+CLASS="LITERAL"
+>b</TT
+> и <TT
+CLASS="LITERAL"
+>t</TT
+> выключает сканирование только по индексу, сканирование по битовым векторам, и сканирование по ID кортежей соответственно, в то время как <TT
+CLASS="LITERAL"
+>n</TT
+>, <TT
+CLASS="LITERAL"
+>m</TT
+> и <TT
+CLASS="LITERAL"
+>h</TT
+> выключает вложенные циклы, слияния и хеширование соответственно.</P
+><P
+>Ни последовательное сканирование, ни вложенные циклы невозможно выключить полностью. Флаги <TT
+CLASS="LITERAL"
+>-fs</TT
+> и <TT
+CLASS="LITERAL"
+>-fn</TT
+> просто указывают планировщику избегать выполнения этих операций при наличии других альтернатив.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-n</TT
+></DT
+><DD
+><P
+>Параметр предназначен для отладки сервера в случае аномального завершения процесса. Обычная практика в таком случае — завершение порождённых процессов с дальнейшей инициализацией разделяемой памяти и семафоров. Это связано с тем, что потерянный процесс мог повредить область разделяемой памяти. Параметр указывает <TT
+CLASS="COMMAND"
+>postgres</TT
+> не производить повторной инициализации общих структур данных, что позволяет произвести дальнейшую отладку текущего состояния памяти и семафоров.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-O</TT
+></DT
+><DD
+><P
+>Разрешает модифицировать структуру системных таблиц. Используется командой <TT
+CLASS="COMMAND"
+>initdb</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-P</TT
+></DT
+><DD
+><P
+>Игнорировать системные индексы при чтении, но продолжать обновлять их при изменениях системных таблиц. Это используется при их восстановлении после повреждения.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-t</TT
+> <TT
+CLASS="LITERAL"
+>pa[rser] | pl[anner] | e[xecutor]</TT
+></DT
+><DD
+><P
+>Выводит статистику по времени исполнения каждого запроса в контексте каждого системного модуля. Использование флага совместно с <TT
+CLASS="OPTION"
+>-s</TT
+> невозможно.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-T</TT
+></DT
+><DD
+><P
+>Параметр предназначен для отладки сервера в случае аномального завершения процесса. Обычная практика в таком случае — завершение порождённых процессов с дальнейшей инициализацией разделяемой памяти и семафоров. Это связано с тем, что потерянный процесс мог повредить область разделяемой памяти. Параметр указывает <TT
+CLASS="COMMAND"
+>postgres</TT
+> на необходимость остановки порождённых процессов сигналом <TT
+CLASS="LITERAL"
+>SIGSTOP</TT
+>, но не завершит их, что позволяет разработчикам сделать снимки памяти процессов.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-v</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>протокол</I
+></TT
+></DT
+><DD
+><P
+>Указывает для данного сеанса версию протокола взаимодействия сервера с клиентом. Флаг используется лишь для внутренних целей.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-W</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>секунды</I
+></TT
+></DT
+><DD
+><P
+>При старте сервера производится задержка на указанное количество секунд, после чего производится процедура аутентификации, что позволяет подключить отладчик к процессу.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN94152"
+></A
+><H3
+>Параметры для однопользовательского режима</H3
+><P
+>Ниже описанные параметры применимы лишь для однопользовательского режима.</P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="OPTION"
+>--single</TT
+></DT
+><DD
+><P
+>Устанавливает однопользовательский режим. Параметр должен идти первым в командной строке.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>database</I
+></TT
+></DT
+><DD
+><P
+>Указывает имя базы данных, к которой производится подключение. Параметр должен идти последним в командной строке. Если не указан, то используется имя текущего системного пользователя.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-E</TT
+></DT
+><DD
+><P
+>Вывести все команды.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-j</TT
+></DT
+><DD
+><P
+>Предотвращает трактовку символа перевода каретки в качестве разделителя между инструкциями.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-r</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+></DT
+><DD
+><P
+>Отправляет вывод журнала сервера в файл <TT
+CLASS="REPLACEABLE"
+><I
+>filename</I
+></TT
+>. Этот параметр применяется лишь при запуске из командной строки.</P
+></DD
+></DL
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN94185"
+></A
+><H2
+>Переменные окружения</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="ENVAR"
+>PGCLIENTENCODING</TT
+></DT
+><DD
+><P
+>Кодировка, используемая клиентом по умолчанию. Может переопределяться на стороне клиента, а также устанавливаться в конфигурационном файле сервера.</P
+></DD
+><DT
+><TT
+CLASS="ENVAR"
+>PGDATA</TT
+></DT
+><DD
+><P
+>Каталог размещения данных кластера по умолчанию</P
+></DD
+><DT
+><TT
+CLASS="ENVAR"
+>PGDATESTYLE</TT
+></DT
+><DD
+><P
+>Значение по умолчанию для параметра времени исполнения <A
+HREF="runtime-config-client.html#GUC-DATESTYLE"
+>DateStyle</A
+>. Применение этой переменной является устаревшим.</P
+></DD
+><DT
+><TT
+CLASS="ENVAR"
+>PGPORT</TT
+></DT
+><DD
+><P
+>Порт по умолчанию, лучше устанавливать в конфигурационном файле.</P
+></DD
+><DT
+><TT
+CLASS="ENVAR"
+>TZ</TT
+></DT
+><DD
+><P
+>Часовой пояс сервера</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN94214"
+></A
+><H2
+>Диагностика</H2
+><P
+>Ошибки с упоминанием о <TT
+CLASS="LITERAL"
+>semget</TT
+> или <TT
+CLASS="LITERAL"
+>shmget</TT
+> говорят о возможной необходимости проведения более оптимального конфигурирования ядра. Подробнее это обсуждается в <A
+HREF="kernel-resources.html"
+>Разделе 17.4</A
+>. Отложить переконфигурирование можно, уменьшив <A
+HREF="runtime-config-resource.html#GUC-SHARED-BUFFERS"
+>shared_buffers</A
+> для снижения общего потребления разделяемой памяти <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> и/или уменьшив <A
+HREF="runtime-config-connection.html#GUC-MAX-CONNECTIONS"
+>max_connections</A
+> для снижения затрат на использование семафоров.</P
+><P
+>Необходимо внимательно проверять сообщения об ошибке с упоминанием о другом запущенном экземпляре, например, с использованием команды </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>ps ax | grep postgres</KBD
+></PRE
+><P> или </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>ps -ef | grep postgres</KBD
+></PRE
+><P> в зависимости от ОС. Если есть полная уверенность, что противоречий нет, необходимо самостоятельно удалить упомянутый в сообщении запирающий файл и повторить попытку.</P
+><P
+>Упоминание о невозможности привязки к порту в сообщениях об ошибках может указывать на то, что он уже занят другим процессом помимо <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Также сообщение может возникнуть при мгновенном рестарте <TT
+CLASS="COMMAND"
+>postgres</TT
+> на том же порту. В этом случае нужно немного подождать, пока ОС не закроет порт, и повторить попытку. Ещё возможна ситуация, в которой используется резервный системный порт. Например, многие Unix-подобные ОС резервируют <SPAN
+CLASS="QUOTE"
+>"доверительные"</SPAN
+> порты от 1024 и ниже, и лишь суперпользователь имеет к ним доступ.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN94234"
+></A
+><H2
+>Замечания</H2
+><P
+>Для комфортного запуска и остановки сервера можно использовать утилиту <A
+HREF="app-pg-ctl.html"
+>            <SPAN
+CLASS="APPLICATION"
+>pg_ctl</SPAN
+>
+          </A
+>.</P
+><P
+>Если возможно, <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>не используйте</I
+></SPAN
+> сигнал <TT
+CLASS="LITERAL"
+>SIGKILL</TT
+> для головного процесса <TT
+CLASS="COMMAND"
+>postgres</TT
+>. В этом случае <TT
+CLASS="COMMAND"
+>postgres</TT
+> не освободит системные ресурсы, например, разделяемую память и семафоры. Это может привести к проблемам при повторном запуске <TT
+CLASS="COMMAND"
+>postgres</TT
+>.</P
+><P
+>Для корректного завершения <TT
+CLASS="COMMAND"
+>postgres</TT
+> используются сигналы <TT
+CLASS="LITERAL"
+>SIGTERM</TT
+>, <TT
+CLASS="LITERAL"
+>SIGINT</TT
+> или <TT
+CLASS="LITERAL"
+>SIGQUIT</TT
+>. При первом будут ожидаться все дочерние процессы до их завершения, второй приведёт к принудительному закрытию соединений, а третий — к незамедлительному выходу без корректного завершения, приводящему к необходимости выполнения процедуры восстановления на следующем старте.</P
+><P
+>Получая сигнал <TT
+CLASS="LITERAL"
+>SIGHUP</TT
+>, сервер перечитывает свои файлы конфигурации. Также возможно отправить <TT
+CLASS="LITERAL"
+>SIGHUP</TT
+> отдельному процессу, но это чаще всего бессмысленно.</P
+><P
+>Для отмены исполняющегося запроса, отправьте <TT
+CLASS="LITERAL"
+>SIGINT</TT
+> обслуживающему его процессу. Для чистого завершения серверного процесса отправьте ему <TT
+CLASS="LITERAL"
+>SIGTERM</TT
+>. Также см. <CODE
+CLASS="FUNCTION"
+>pg_cancel_backend</CODE
+> и <CODE
+CLASS="FUNCTION"
+>pg_terminate_backend</CODE
+> в <A
+HREF="functions-admin.html#FUNCTIONS-ADMIN-SIGNAL"
+>Подразделе 9.26.2</A
+>, которые являются аналогами в форме SQL-инструкций.</P
+><P
+>Сервер <TT
+CLASS="COMMAND"
+>postgres</TT
+> обрабатывает <TT
+CLASS="LITERAL"
+>SIGQUIT</TT
+> для завершения дочерних процессов в грязную, и сигнал <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>не должен</I
+></SPAN
+> отправляться пользователем. Также не стоит посылать <TT
+CLASS="LITERAL"
+>SIGKILL</TT
+> серверному процессу &mdash; головной <TT
+CLASS="COMMAND"
+>postgres</TT
+> процесс расценит это как аварию и принудительно завершит остальные порождённые, как это было бы сделано при процедуре восстановления после сбоя.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="APP-POSTGRES-BUGS"
+></A
+><H2
+>Ошибки</H2
+><P
+>Флаги, начинающиеся с <TT
+CLASS="OPTION"
+>--</TT
+> не работают в ОС <SPAN
+CLASS="SYSTEMITEM"
+>FreeBSD</SPAN
+> или <SPAN
+CLASS="SYSTEMITEM"
+>OpenBSD</SPAN
+>. Чтобы обойти это, используйте <TT
+CLASS="OPTION"
+>-c</TT
+>. Это ошибка ОС. В будущих релизах <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> будет предоставлен обходной путь, если ошибка так и не будет устранена.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN94272"
+></A
+><H2
+>Usage</H2
+><P
+>Для запуска сервера в однопользовательском режиме используется, например, команда </P><PRE
+CLASS="SCREEN"
+><KBD
+CLASS="USERINPUT"
+>postgres --single -D /usr/local/pgsql/data <TT
+CLASS="REPLACEABLE"
+><I
+>другие параметры</I
+></TT
+> my_database</KBD
+></PRE
+><P> Необходимо указать корректный путь к каталогу хранения данных в параметре <TT
+CLASS="OPTION"
+>-D</TT
+>, или установить переменную окружения <TT
+CLASS="ENVAR"
+>PGDATA</TT
+>. Также замените имя базы данных на необходимое.</P
+><P
+>Обычно символ перевода каретки в однопользовательском режиме трактуется как завершение ввода команды. При этом точка с запятой подобным образом не обрабатывается, как это делается в <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>. Для того чтобы ввести много-строчную команду, необходимо добавить обратный слэш перед каждой новой строкой.</P
+><P
+>Параметр <TT
+CLASS="OPTION"
+>-j</TT
+> предотвращает трактовку символа перевода каретки в качестве разделителя между командами. В этом случае сервер читает стандартный ввод, пока не встретит маркер конца файла <ACRONYM
+CLASS="ACRONYM"
+>EOF</ACRONYM
+>, после чего выполнит все, как единую команду. Обратный слэш в этом случае не обрабатывается.</P
+><P
+>Для завершения сессии, введите <ACRONYM
+CLASS="ACRONYM"
+>EOF</ACRONYM
+> (обычно <B
+CLASS="KEYCAP"
+>Control</B
+>+<B
+CLASS="KEYCAP"
+>D</B
+>). Если использовался флаг <TT
+CLASS="OPTION"
+>-j</TT
+>, то для выхода необходимо ввести <ACRONYM
+CLASS="ACRONYM"
+>EOF</ACRONYM
+> дважды.</P
+><P
+>Одно-пользовательский режим не предоставляет особых средств работы с командной строкой, например, нет истории выполнявшихся команд. Также нет никакой фоновой обработки, например, автоматических контрольных точек.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="APP-POSTGRES-EXAMPLES"
+></A
+><H2
+>Примеры</H2
+><P
+>Для запуска <TT
+CLASS="COMMAND"
+>postgres</TT
+> в фоновом режиме с параметрами по умолчанию: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>nohup postgres &gt;logfile 2&gt;&amp;1 &lt;/dev/null &amp;</KBD
+></PRE
+><P></P
+><P
+>Для запуска <TT
+CLASS="COMMAND"
+>postgres</TT
+> с определённым портом, например, 1234: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>postgres -p 1234</KBD
+></PRE
+><P> Для соединения с помощью <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> укажите этот порт в параметре -p: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>psql -p 1234</KBD
+></PRE
+><P> или в переменной окружения <TT
+CLASS="ENVAR"
+>PGPORT</TT
+>: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>export PGPORT=1234</KBD
+>
+<SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>psql</KBD
+></PRE
+><P></P
+><P
+>Именованный параметр времени исполнения можно указать одним из приведённых способом: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>postgres -c work_mem=1234</KBD
+>
+<SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>postgres --work-mem=1234</KBD
+></PRE
+><P> Любой из методов переопределяет значение <TT
+CLASS="VARNAME"
+>work_mem</TT
+> конфигурации <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+>. Символ подчёркивания в именах можно указать и в виде тире. Задавать параметры обычно (не считая кратковременных экспериментов) лучше в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+>, а не в аргументах командной строки.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN94324"
+></A
+><H2
+>См. также</H2
+><P
+><A
+HREF="app-initdb.html"
+>initdb</A
+>, <A
+HREF="app-pg-ctl.html"
+>            <SPAN
+CLASS="APPLICATION"
+>pg_ctl</SPAN
+>
+          </A
+></P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="app-pgresetxlog.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="app-postmaster.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><SPAN
+CLASS="APPLICATION"
+>pg_resetxlog</SPAN
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="reference-server.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><SPAN
+CLASS="APPLICATION"
+>postmaster</SPAN
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

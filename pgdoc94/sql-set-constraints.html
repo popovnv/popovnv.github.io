@@ -1,0 +1,330 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>SET CONSTRAINTS</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="SET"
+HREF="sql-set.html"><LINK
+REL="NEXT"
+TITLE="SET ROLE"
+HREF="sql-set-role.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="SET"
+HREF="sql-set.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="SET ROLE"
+HREF="sql-set-role.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-SET-CONSTRAINTS"
+></A
+>SET CONSTRAINTS</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN84493"
+></A
+><H2
+>Название</H2
+>SET CONSTRAINTS&nbsp;--&nbsp;установить время проверки ограничений для текущей транзакции</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN84496"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>SET CONSTRAINTS { ALL | <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> [, ...] } { DEFERRED | IMMEDIATE }</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN84499"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>SET CONSTRAINTS</TT
+> определяет, когда будут проверяться ограничения в текущей транзакции. Ограничения <TT
+CLASS="LITERAL"
+>IMMEDIATE</TT
+> проверяются в конце каждого оператора, а ограничения <TT
+CLASS="LITERAL"
+>DEFERRED</TT
+> откладываются до фиксации транзакции. Режим <TT
+CLASS="LITERAL"
+>IMMEDIATE</TT
+> или <TT
+CLASS="LITERAL"
+>DEFERRED</TT
+> задаётся для каждого ограничения независимо.</P
+><P
+>При создании ограничение получает одну из следующих характеристик: <TT
+CLASS="LITERAL"
+>DEFERRABLE INITIALLY DEFERRED</TT
+> (откладываемое, изначально отложенное), <TT
+CLASS="LITERAL"
+>DEFERRABLE INITIALLY IMMEDIATE</TT
+> (откладываемое, изначально немедленное) или <TT
+CLASS="LITERAL"
+>NOT DEFERRABLE</TT
+> (неоткладываемое). Третий вариант всегда подразумевает <TT
+CLASS="LITERAL"
+>IMMEDIATE</TT
+> и на него команда <TT
+CLASS="COMMAND"
+>SET CONSTRAINTS</TT
+> не влияет. Первые два варианта запускаются в каждой транзакции в указанном режиме, но их поведение можно изменить в рамках транзакции командой <TT
+CLASS="COMMAND"
+>SET CONSTRAINTS</TT
+>.</P
+><P
+><TT
+CLASS="COMMAND"
+>SET CONSTRAINTS</TT
+> со списком имён ограничений меняет режим только этих ограничений (все они должны быть откладываемыми). Имя любого ограничения можно дополнить схемой. Если имя схемы не указано, в поисках первого подходящего имени будет просматриваться текущий путь поиска схем. <TT
+CLASS="COMMAND"
+>SET CONSTRAINTS ALL</TT
+> меняет режим всех откладываемых ограничений.</P
+><P
+>Когда <TT
+CLASS="COMMAND"
+>SET CONSTRAINTS</TT
+> меняет режим ограничения с <TT
+CLASS="LITERAL"
+>DEFERRED</TT
+> на <TT
+CLASS="LITERAL"
+>IMMEDIATE</TT
+>, новый режим начинает действовать в обратную сторону: все изменения данных, ожидающие проверки в конце транзакции, вместо этого проверяются в момент выполнения команды <TT
+CLASS="COMMAND"
+>SET CONSTRAINTS</TT
+>. Если какое-либо ограничение нарушается, при выполнении <TT
+CLASS="COMMAND"
+>SET CONSTRAINTS</TT
+> происходит ошибка (и режим проверки не меняется). Таким образом, с помощью <TT
+CLASS="COMMAND"
+>SET CONSTRAINTS</TT
+> можно принудительно проверить ограничения в определённом месте транзакции.</P
+><P
+>В настоящее время это распространяется только на ограничения <TT
+CLASS="LITERAL"
+>UNIQUE</TT
+>, <TT
+CLASS="LITERAL"
+>PRIMARY KEY</TT
+>, <TT
+CLASS="LITERAL"
+>REFERENCES</TT
+> (внешний ключ) и <TT
+CLASS="LITERAL"
+>EXCLUDE</TT
+>. Ограничения <TT
+CLASS="LITERAL"
+>NOT NULL</TT
+> и <TT
+CLASS="LITERAL"
+>CHECK</TT
+> всегда проверяются немедленно в момент добавления или изменения строки (<SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>не</I
+></SPAN
+> в конце оператора). Ограничения уникальности и ограничения-исключения, объявленные без указания <TT
+CLASS="LITERAL"
+>DEFERRABLE</TT
+>, так же проверяются немедленно.</P
+><P
+>Срабатывание триггеров, объявленных как <SPAN
+CLASS="QUOTE"
+>"триггеры ограничений"</SPAN
+> так же зависит от этой команды &mdash; они срабатывают в момент, когда должно проверяться соответствующее ограничение.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN84535"
+></A
+><H2
+>Замечания</H2
+><P
+>Так как <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> не требует, чтобы имена ограничений были уникальны в схеме (достаточно уникальности в таблице), возможно, что для заданного имени найдётся несколько соответствующих ограничений. В этом случае <TT
+CLASS="COMMAND"
+>SET CONSTRAINTS</TT
+> подействует на все эти ограничения. Для имён без указания схемы, её действие будет распространяться только на ограничение(я), найденное в первой из схем; другие схемы просматриваться не будут.</P
+><P
+>Эта команда меняет поведение ограничений только в текущей транзакции. При выполнении этой команды вне блока транзакции выдаётся предупреждение и больше ничего не происходит.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN84541"
+></A
+><H2
+>Совместимость</H2
+><P
+>Эта команда реализует поведение, описанное в стандарте SQL, с одним исключением — в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> она не влияет на проверку ограничений <TT
+CLASS="LITERAL"
+>NOT NULL</TT
+> и <TT
+CLASS="LITERAL"
+>CHECK</TT
+>. Кроме того, <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> проверяет неоткладываемые ограничения уникальности немедленно, а не в конце оператора, как предлагает стандарт.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-set.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-set-role.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>SET</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>SET ROLE</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,658 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>ALTER TYPE</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="ALTER TRIGGER"
+HREF="sql-altertrigger.html"><LINK
+REL="NEXT"
+TITLE="ALTER USER"
+HREF="sql-alteruser.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="ALTER TRIGGER"
+HREF="sql-altertrigger.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="ALTER USER"
+HREF="sql-alteruser.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-ALTERTYPE"
+></A
+>ALTER TYPE</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN70525"
+></A
+><H2
+>Название</H2
+>ALTER TYPE&nbsp;--&nbsp;изменить определение типа</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN70528"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>ALTER TYPE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>действие</I
+></TT
+> [, ... ]
+ALTER TYPE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> OWNER TO <TT
+CLASS="REPLACEABLE"
+><I
+>новый_владелец</I
+></TT
+>
+ALTER TYPE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> RENAME ATTRIBUTE <TT
+CLASS="REPLACEABLE"
+><I
+>имя_атрибута</I
+></TT
+> TO <TT
+CLASS="REPLACEABLE"
+><I
+>новое_имя_атрибута</I
+></TT
+> [ CASCADE | RESTRICT ]
+ALTER TYPE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> RENAME TO <TT
+CLASS="REPLACEABLE"
+><I
+>новое_имя</I
+></TT
+>
+ALTER TYPE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> SET SCHEMA <TT
+CLASS="REPLACEABLE"
+><I
+>новая_схема</I
+></TT
+>
+ALTER TYPE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> ADD VALUE [ IF NOT EXISTS ] <TT
+CLASS="REPLACEABLE"
+><I
+>новое_значение_перечисления</I
+></TT
+> [ { BEFORE | AFTER } <TT
+CLASS="REPLACEABLE"
+><I
+>существующее_значение_перечисления</I
+></TT
+> ]
+
+<SPAN
+CLASS="phrase"
+><SPAN
+CLASS="PHRASE"
+>Где возможные варианты <TT
+CLASS="REPLACEABLE"
+><I
+>действие</I
+></TT
+>:</SPAN
+></SPAN
+>
+
+    ADD ATTRIBUTE <TT
+CLASS="REPLACEABLE"
+><I
+>имя_атрибута</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>тип_данных</I
+></TT
+> [ COLLATE <TT
+CLASS="REPLACEABLE"
+><I
+>правило_сортировки</I
+></TT
+> ] [ CASCADE | RESTRICT ]
+    DROP ATTRIBUTE [ IF EXISTS ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_атрибута</I
+></TT
+> [ CASCADE | RESTRICT ]
+    ALTER ATTRIBUTE <TT
+CLASS="REPLACEABLE"
+><I
+>имя_атрибута</I
+></TT
+> [ SET DATA ] TYPE <TT
+CLASS="REPLACEABLE"
+><I
+>тип_данных</I
+></TT
+> [ COLLATE <TT
+CLASS="REPLACEABLE"
+><I
+>правило_сортировки</I
+></TT
+> ] [ CASCADE | RESTRICT ]</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN70553"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>ALTER TYPE</TT
+> изменяет определение существующего типа. Эта команда имеет несколько разновидностей: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>ADD ATTRIBUTE</TT
+></DT
+><DD
+><P
+>Эта форма добавляет в составной тип новый атрибут с тем же синтаксисом, что и <A
+HREF="sql-createtype.html"
+>CREATE TYPE</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>DROP ATTRIBUTE [ IF EXISTS ]</TT
+></DT
+><DD
+><P
+>Эта форма удаляет атрибут из составного типа. Если указано <TT
+CLASS="LITERAL"
+>IF EXISTS</TT
+> и атрибут не существует, это не считается ошибкой. В этом случае выдаётся только замечание.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>SET DATA TYPE</TT
+></DT
+><DD
+><P
+>Эта форма меняет тип атрибута составного типа.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>OWNER</TT
+></DT
+><DD
+><P
+>Эта форма меняет владельца типа.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>RENAME</TT
+></DT
+><DD
+><P
+>Эта форма меняет имя типа или имя отдельного атрибута составного типа.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>SET SCHEMA</TT
+></DT
+><DD
+><P
+>Эта форма переносит тип в другую схему.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>ADD VALUE [ IF NOT EXISTS ] [ BEFORE | AFTER ]</TT
+></DT
+><DD
+><P
+>Эта форма добавляет новое значение в тип-перечисление. Порядок нового значения в перечислении можно указать, добавив <TT
+CLASS="LITERAL"
+>BEFORE</TT
+> (перед) или <TT
+CLASS="LITERAL"
+>AFTER</TT
+> (после) с одним из существующих значений. Если такое указание отсутствует, новый элемент добавляется в конец списка значений.</P
+><P
+>С указанием <TT
+CLASS="LITERAL"
+>IF NOT EXISTS</TT
+>, если тип уже содержит новое значение, ошибки не произойдёт: будет выдано замечание и ничего больше. Без этого указания, если такое значение уже представлено, возникнет ошибка.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>CASCADE</TT
+></DT
+><DD
+><P
+>Автоматически распространять действие операции на типизированные таблицы, имеющий данный тип, и их потомки.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>RESTRICT</TT
+></DT
+><DD
+><P
+>Отказать в выполнении операции, если изменяемый тип является типом типизированной таблицы. Это поведение по умолчанию.</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>Операции <TT
+CLASS="LITERAL"
+>ADD ATTRIBUTE</TT
+>, <TT
+CLASS="LITERAL"
+>DROP ATTRIBUTE</TT
+> и <TT
+CLASS="LITERAL"
+>ALTER ATTRIBUTE</TT
+> можно объединить в один список множественных изменений для параллельного выполнения. Например, в одной команде можно добавить сразу несколько атрибутов и/или изменить тип нескольких атрибутов.</P
+><P
+>Выполнить <TT
+CLASS="COMMAND"
+>ALTER TYPE</TT
+> может только владелец соответствующего типа. Чтобы сменить схему типа, необходимо также иметь право <TT
+CLASS="LITERAL"
+>CREATE</TT
+> в новой схеме. Чтобы сменить владельца, необходимо быть непосредственным или опосредованным членом новой роли-владельца, а эта роль должна иметь право <TT
+CLASS="LITERAL"
+>CREATE</TT
+> в схеме типа. (С такими ограничениями при смене владельца не происходит ничего такого, что нельзя было бы сделать, имея право удалить и вновь создать тип. Однако суперпользователь может сменить владельца типа в любом случае.) Чтобы добавить атрибут или изменить тип атрибута, также требуется иметь право <TT
+CLASS="LITERAL"
+>USAGE</TT
+> для соответствующего типа данных.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN70618"
+></A
+><H2
+>Параметры</H2
+><P
+>    <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></DT
+><DD
+><P
+>Имя (возможно, дополненное схемой) существующего типа, подлежащего изменению.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>новое_имя</I
+></TT
+></DT
+><DD
+><P
+>Новое имя типа.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>новый_владелец</I
+></TT
+></DT
+><DD
+><P
+>Имя пользователя, назначаемого новым владельцем типа.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>новая_схема</I
+></TT
+></DT
+><DD
+><P
+>Новая схема типа.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_атрибута</I
+></TT
+></DT
+><DD
+><P
+>Имя атрибута, подлежащего добавлению, изменению или удалению.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>новое_имя_атрибута</I
+></TT
+></DT
+><DD
+><P
+>Новое имя атрибута</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>тип_данных</I
+></TT
+></DT
+><DD
+><P
+>Тип данных добавляемого атрибута, либо новый тип данных изменяемого атрибута.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>новое_значение_перечисления</I
+></TT
+></DT
+><DD
+><P
+>Новое значение добавляется в список значений перечисления. Как и все элементы перечисления, оно должно заключаться в кавычки.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>существующее_значение_перечисления</I
+></TT
+></DT
+><DD
+><P
+>Существующие значение в перечислении, непосредственно перед или после которого по порядку перечисления будет добавлено новое значение. Как и все элементы перечисления, оно должно заключаться в кавычки.</P
+></DD
+></DL
+></DIV
+><P>
+   </P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN70667"
+></A
+><H2
+>Замечания</H2
+><P
+><TT
+CLASS="COMMAND"
+>ALTER TYPE ... ADD VALUE</TT
+> (форму, добавляющую в тип-перечисление новое значение) нельзя выполнять внутри блока транзакции.</P
+><P
+>Сравнения с добавленными значениями перечисления иногда бывают медленнее сравнений, в которых задействуются только начальные члены типа-перечисления. Обычно это происходит, только если <TT
+CLASS="LITERAL"
+>BEFORE</TT
+> или <TT
+CLASS="LITERAL"
+>AFTER</TT
+> устанавливает порядок нового элемента не в конце списка. Однако, иногда это наблюдается даже тогда, когда новое значение добавляется в конец списка (это происходит, если счётчик OID <SPAN
+CLASS="QUOTE"
+>"прокручивается"</SPAN
+> с момента изначального создания типа-перечисления). Это замедление обычно несущественное, но если это важно, вернуть максимальную производительность можно, удалив и создав заново это перечисление, либо выгрузив копию базы данных и загрузив её вновь.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN70675"
+></A
+><H2
+>Примеры</H2
+><P
+>Переименование типа данных: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER TYPE electronic_mail RENAME TO email;</PRE
+><P></P
+><P
+>Смена владельца типа <TT
+CLASS="LITERAL"
+>email</TT
+> на <TT
+CLASS="LITERAL"
+>joe</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER TYPE email OWNER TO joe;</PRE
+><P></P
+><P
+>Смена схемы типа <TT
+CLASS="LITERAL"
+>email</TT
+> на <TT
+CLASS="LITERAL"
+>customers</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER TYPE email SET SCHEMA customers;</PRE
+><P></P
+><P
+>Добавление в тип нового атрибута: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER TYPE compfoo ADD ATTRIBUTE f3 int;</PRE
+><P></P
+><P
+>Добавление нового значения в тип-перечисление, в определённое положение по порядку: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER TYPE colors ADD VALUE 'orange' AFTER 'red';</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN70691"
+></A
+><H2
+>Совместимость</H2
+><P
+>Формы команды, предназначенные для добавления и удаления атрибутов, являются частью стандарта SQL; другие формы относятся к расширениям PostgreSQL.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="SQL-ALTERTYPE-SEE-ALSO"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-createtype.html"
+>CREATE TYPE</A
+>, <A
+HREF="sql-droptype.html"
+>DROP TYPE</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-altertrigger.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-alteruser.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>ALTER TRIGGER</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>ALTER USER</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

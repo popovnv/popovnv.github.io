@@ -1,0 +1,515 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Обновление кластера PostgreSQL</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Подготовка к работе и сопровождение сервера"
+HREF="runtime.html"><LINK
+REL="PREVIOUS"
+TITLE="Выключение сервера"
+HREF="server-shutdown.html"><LINK
+REL="NEXT"
+TITLE="Защита от подмены сервера"
+HREF="preventing-server-spoofing.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Выключение сервера"
+HREF="server-shutdown.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="runtime.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 17. Подготовка к работе и сопровождение сервера</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Защита от подмены сервера"
+HREF="preventing-server-spoofing.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="UPGRADING"
+>17.6. Обновление кластера <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></A
+></H1
+><P
+>В этом разделе рассказывается, как обновить ваш кластер базы данных с одной версии <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> на другую.</P
+><P
+>Основные версии <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> представляются первыми двумя группами цифр в полной версии, например, 8.4. Корректирующие выпуски <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> представляются третьей группой цифр, например, 8.4.2 — второй корректирующий выпуск версии 8.4. В корректирующих выпусках никогда не меняется внутренний формат хранения и они всегда совместимы с предыдущими и последующими выпусками той же основной версии, например выпуск 8.4.2 совместим с 8.4, 8.4.1 и 8.4.6. Для обновления версии на совместимую достаточно просто заменить исполняемые файлы при выключенном сервере и затем запустить сервер. Каталог данных при этом не затрагивается, так что обновить корректирующую версию довольно просто.</P
+><P
+>При обновлении <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>основных</I
+></SPAN
+> версий <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> внутренний формат данных может меняться, что усложняет процедуру обновления. Традиционный способ переноса данных в новую основную версию — выгрузить данные из старой версии, а затем загрузить их в новую (это не самый быстрый вариант). Выполнить обновление быстрее позволяет <A
+HREF="pgupgrade.html"
+>              <SPAN
+CLASS="APPLICATION"
+>pg_upgrade</SPAN
+>
+            </A
+>. Также для обновления можно использовать репликацию, как описано ниже.</P
+><P
+>Изменения основной версии обычно приносят какие-либо видимые пользователю несовместимости, которые могут требовать доработки приложений. Все подобные изменения описываются в замечаниях к выпуску; обращайте особое внимание на раздел "Migration" (Миграция). Если при обновлении вы пропускаете несколько основных версий, обязательно прочитайте замечания к выпуску, в том числе и для каждой пропускаемой версии.</P
+><P
+>Осторожные пользователи обычно тестируют свои клиентские приложения с новой версией, прежде чем переходить на неё полностью; поэтому часто имеет смысл установить рядом старую и новую версии. При тестировании обновления основной версии <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> изучите следующие области возможных изменений:</P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+>Администрирование</DT
+><DD
+><P
+>Средства и функции, предоставляемые администраторам для наблюдения и управления сервером, часто меняются и совершенствуются в каждой новой версии.</P
+></DD
+><DT
+>SQL</DT
+><DD
+><P
+>В этой области чаще наблюдается появление новых возможностей команд SQL, чем изменение поведения существующих, если только об этом не говорится в замечаниях к выпуску.</P
+></DD
+><DT
+>API библиотек</DT
+><DD
+><P
+>Обычно библиотеки типа <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> только расширяют свою функциональность, если об обратном так же не говорится в замечаниях к выпуску.</P
+></DD
+><DT
+>Системные каталоги</DT
+><DD
+><P
+>Изменения в системных каталогах обычно влияют только на средства управления базами данных.</P
+></DD
+><DT
+>API сервера для кода на C</DT
+><DD
+><P
+>Сюда относятся изменения в API серверных функций, которые написаны на языке программирования C. Такие изменения затрагивают код, обращающийся к служебным функциям глубоко внутри сервера.</P
+></DD
+></DL
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="UPGRADING-VIA-PGDUMPALL"
+>17.6.1. Обновление данных с применением <SPAN
+CLASS="APPLICATION"
+>pg_dumpall</SPAN
+></A
+></H2
+><P
+>Один из вариантов обновления заключается в выгрузке данных из одной основной версии <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> и загрузке их в другую &mdash; для этого необходимо использовать средство <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>логического</I
+></SPAN
+> копирования, например <SPAN
+CLASS="APPLICATION"
+>pg_dumpall</SPAN
+>; копирование на уровне файловой системы не подходит. (В самом сервере есть проверки, которые не дадут использовать каталог данных от несовместимой версии <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, так что если попытаться запустить с существующим каталогом данных неправильную версию сервера, никакого вреда не будет.)</P
+><P
+>Для создания копии рекомендуется применять программы <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+> и <SPAN
+CLASS="APPLICATION"
+>pg_dumpall</SPAN
+> от <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>новой</I
+></SPAN
+> версии <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, чтобы воспользоваться улучшенными функциями, которые могли в них появиться. Текущие версии этих программ способны читать данные любой версии сервера, начиная с 7.0.</P
+><P
+>В следующих указаниях предполагается, что сервер установлен в каталоге <TT
+CLASS="FILENAME"
+>/usr/local/pgsql</TT
+>, а данные находятся в <TT
+CLASS="FILENAME"
+>/usr/local/pgsql/data</TT
+>. Вам нужно подставить свои пути.</P
+><DIV
+CLASS="PROCEDURE"
+><OL
+TYPE="1"
+><LI
+CLASS="STEP"
+><P
+>При запуске резервного копирования убедитесь в том, что в базе данных не производятся изменения. Изменения не повлияют на целостность полученной копии, но изменённые данные, само собой, в неё не попадут. Если потребуется, измените разрешения в файле <TT
+CLASS="FILENAME"
+>/usr/local/pgsql/data/pg_hba.conf</TT
+> (или подобном), чтобы подключиться к серверу могли только вы. За дополнительными сведениями об управлении доступом обратитесь к <A
+HREF="client-authentication.html"
+>Главе 19</A
+>.</P
+><P
+> Чтобы получить копию всех ваших данных, введите: </P><PRE
+CLASS="SCREEN"
+><KBD
+CLASS="USERINPUT"
+>pg_dumpall &gt; <TT
+CLASS="REPLACEABLE"
+><I
+>выходной_файл</I
+></TT
+></KBD
+></PRE
+><P></P
+><P
+>Для создания резервной копии вы можете воспользоваться программой <SPAN
+CLASS="APPLICATION"
+>pg_dumpall</SPAN
+> от текущей версии сервера; за подробностями обратитесь к <A
+HREF="backup-dump.html#BACKUP-DUMP-ALL"
+>Подразделу 24.1.2</A
+>. Однако для лучшего результата стоит попробовать <SPAN
+CLASS="APPLICATION"
+>pg_dumpall</SPAN
+> из <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> 9.4.1, так как в эту версию вошли исправления ошибок и усовершенствования, по сравнению с предыдущими версиями. Хотя этот совет может показаться абсурдным, ведь новая версия ещё не установлена, всё же стоит последовать ему, если вы планируете установить новую версию рядом со старой. В этом случае вы сможете выполнить установку как обычно, а перенести данные позже. Это также сократит время обновления.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Остановите старый сервер: </P><PRE
+CLASS="SCREEN"
+><KBD
+CLASS="USERINPUT"
+>pg_ctl stop</KBD
+></PRE
+><P> В системах, где <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> запускается при загрузке, должен быть скрипт запуска, с которым можно сделать то же самое. Например, в <SPAN
+CLASS="SYSTEMITEM"
+>Red Hat Linux</SPAN
+> может сработать такой вариант: </P><PRE
+CLASS="SCREEN"
+><KBD
+CLASS="USERINPUT"
+>/etc/rc.d/init.d/postgresql stop</KBD
+></PRE
+><P> Подробнее запуск и остановка сервера описаны в <A
+HREF="runtime.html"
+>Главе 17</A
+>.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>При восстановлении из резервной копии удалите или переименуйте старый каталог, где был установлен сервер, если его имя не привязано к версии. Разумнее будет переименовать каталог, а не удалять его, чтобы его можно было восстановить в случае проблем. Однако учтите, что этот каталог может занимать много места на диске. Переименовать каталог можно, например так: </P><PRE
+CLASS="SCREEN"
+><KBD
+CLASS="USERINPUT"
+>mv /usr/local/pgsql /usr/local/pgsql.old</KBD
+></PRE
+><P> (Этот каталог нужно переименовывать (перемещать) как единое целое, чтобы относительные пути в нём не изменились.)</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Установите новую версию <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> как описано в <A
+HREF="install-procedure.html"
+>Разделе 15.4</A
+>.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>При необходимости создайте новый кластер баз данных. Помните, что следующие команды нужно выполнять под именем специального пользователя БД (вы уже действуете под этим именем, если производите обновление). </P><PRE
+CLASS="PROGRAMLISTING"
+><KBD
+CLASS="USERINPUT"
+>/usr/local/pgsql/bin/initdb -D /usr/local/pgsql/data</KBD
+></PRE
+><P></P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Перенесите изменения, внесённые в предыдущие версии <TT
+CLASS="FILENAME"
+>pg_hba.conf</TT
+> и <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+>.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Запустите сервер баз данных, так же применяя учётную запись специального пользователя БД: </P><PRE
+CLASS="PROGRAMLISTING"
+><KBD
+CLASS="USERINPUT"
+>/usr/local/pgsql/bin/postgres -D /usr/local/pgsql/data</KBD
+></PRE
+><P></P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Наконец, восстановите данные из резервной копии, выполнив: </P><PRE
+CLASS="SCREEN"
+><KBD
+CLASS="USERINPUT"
+>/usr/local/pgsql/bin/psql -d postgres -f <TT
+CLASS="REPLACEABLE"
+><I
+>выходной_файл</I
+></TT
+></KBD
+></PRE
+><P> (При этом будет использоваться <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>новый</I
+></SPAN
+> <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>.)</P
+></LI
+></OL
+></DIV
+><P
+>Минимизировать время отключения сервера можно, установив новый сервер в другой каталог и запустив параллельно оба сервера, старый и новый, с разными портами. Затем можно будет перенести данные примерно так: </P><PRE
+CLASS="PROGRAMLISTING"
+>pg_dumpall -p 5432 | psql -d postgres -p 5433</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="UPGRADING-VIA-PG-UPGRADE"
+>17.6.2. Обновление данных с применением <SPAN
+CLASS="APPLICATION"
+>pg_upgrade</SPAN
+></A
+></H2
+><P
+>Модуль <A
+HREF="pgupgrade.html"
+>              <SPAN
+CLASS="APPLICATION"
+>pg_upgrade</SPAN
+>
+            </A
+> позволяет обновить инсталляцию <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> с одной основной версии на другую непосредственно на месте. Такое обновление может выполняться за считанные минуты, особенно в режиме <TT
+CLASS="OPTION"
+>--link</TT
+>. Для него требуются примерно те же подготовительные действия, что и для варианта с <SPAN
+CLASS="APPLICATION"
+>pg_dumpall</SPAN
+>: запустить/остановить сервер, выполнить <SPAN
+CLASS="APPLICATION"
+>initdb</SPAN
+>. Все эти действия описаны в <A
+HREF="pgupgrade.html"
+>документации</A
+> <SPAN
+CLASS="APPLICATION"
+>pg_upgrade</SPAN
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="UPGRADING-VIA-REPLICATION"
+>17.6.3. Обновление данных с применением репликации</A
+></H2
+><P
+>Также можно использовать некоторые методы репликации, например <SPAN
+CLASS="PRODUCTNAME"
+>Slony</SPAN
+>, для создания резервного сервера с обновлённой версией <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Это возможно благодаря тому, что Slony поддерживает репликацию между разными основными версиями <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Резервный сервер может располагаться как на том же компьютере, так и на другом. Как только синхронизация с главным сервером (где работает старая версия <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>) будет завершена, можно сделать главным новый сервер, а старый экземпляр базы данных просто отключить. При таком переключении обновление можно осуществить, прервав работу сервера всего на несколько секунд.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="server-shutdown.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="preventing-server-spoofing.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Выключение сервера</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="runtime.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Защита от подмены сервера</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

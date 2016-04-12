@@ -1,0 +1,431 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>CREATE TABLESPACE</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="CREATE TABLE AS"
+HREF="sql-createtableas.html"><LINK
+REL="NEXT"
+TITLE="CREATE TEXT SEARCH CONFIGURATION"
+HREF="sql-createtsconfig.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="CREATE TABLE AS"
+HREF="sql-createtableas.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="CREATE TEXT SEARCH CONFIGURATION"
+HREF="sql-createtsconfig.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-CREATETABLESPACE"
+></A
+>CREATE TABLESPACE</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN76587"
+></A
+><H2
+>Название</H2
+>CREATE TABLESPACE&nbsp;--&nbsp;создать табличное пространство</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN76590"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>CREATE TABLESPACE <TT
+CLASS="REPLACEABLE"
+><I
+>табл_пространство</I
+></TT
+>
+    [ OWNER <TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+> ]
+    LOCATION '<TT
+CLASS="REPLACEABLE"
+><I
+>каталог</I
+></TT
+>'
+    [ WITH ( <TT
+CLASS="REPLACEABLE"
+><I
+>параметр_табличного пространства</I
+></TT
+> = <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> [, ... ] ) ]</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN76597"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>CREATE TABLESPACE</TT
+> регистрирует новое табличное пространство на уровне кластера баз данных. Имя табличного пространства должно отличаться от имён уже существующих табличных пространств в кластере.</P
+><P
+>Табличные пространства позволяют суперпользователям определять альтернативные расположения в файловой системе, где могут находиться файлы, содержащие объекты базы данных (например, таблицы или индексы).</P
+><P
+>Пользователь, имеющий соответствующие права, может передать параметр <TT
+CLASS="REPLACEABLE"
+><I
+>табл_пространство</I
+></TT
+> команде <TT
+CLASS="COMMAND"
+>CREATE DATABASE</TT
+>, <TT
+CLASS="COMMAND"
+>CREATE TABLE</TT
+>, <TT
+CLASS="COMMAND"
+>CREATE INDEX</TT
+> или <TT
+CLASS="COMMAND"
+>ADD CONSTRAINT</TT
+>, чтобы файлы данных для этих объектов хранились в указанном табличном пространстве.</P
+><DIV
+CLASS="WARNING"
+><P
+></P
+><TABLE
+CLASS="WARNING"
+BORDER="1"
+WIDTH="100%"
+><TR
+><TD
+ALIGN="CENTER"
+><B
+>Внимание</B
+></TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+><P
+>Табличное пространство нельзя использовать отдельно от кластера, в котором оно было определено; см. <A
+HREF="manage-ag-tablespaces.html"
+>Раздел 21.6</A
+>.</P
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN76611"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>табл_пространство</I
+></TT
+></DT
+><DD
+><P
+>Имя создаваемого табличного пространства. Это имя не может начинаться с <TT
+CLASS="LITERAL"
+>pg_</TT
+>, так как такие имена зарезервированы для системных табличных пространств.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+></DT
+><DD
+><P
+>Имя пользователя, который будет владельцем табличного пространства. Если опущено, владельцем по умолчанию станет пользователь, выполняющий команду. Создавать пространства имён могут только суперпользователи, но их владельцами могут быть назначены и обычные пользователи.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>каталог</I
+></TT
+></DT
+><DD
+><P
+>Каталог, который будет использован для этого табличного пространства. Этот каталог должен быть пустым и должен принадлежать системному пользователю <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Задаваться его расположение должно абсолютным путём.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>параметр_табличного пространства</I
+></TT
+></DT
+><DD
+><P
+>Устанавливаемый или сбрасываемый параметр табличного пространства. В настоящее время поддерживаются только параметры <TT
+CLASS="VARNAME"
+>seq_page_cost</TT
+> и <TT
+CLASS="VARNAME"
+>random_page_cost</TT
+>. При установке этих значений для заданного табличного пространства будет переопределена обычная оценка стоимости чтения страниц из таблиц в этом пространстве, настраиваемая одноимённым параметром конфигурации (см. <A
+HREF="runtime-config-query.html#GUC-SEQ-PAGE-COST"
+>seq_page_cost</A
+>, <A
+HREF="runtime-config-query.html#GUC-RANDOM-PAGE-COST"
+>random_page_cost</A
+>). Это может быть полезно, если одно из табличных пространств размещено на диске, который быстрее или медленнее остальной дисковой системы.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN76640"
+></A
+><H2
+>Замечания</H2
+><P
+>Табличные пространства поддерживаются только на платформах, поддерживающих символические ссылки.</P
+><P
+><TT
+CLASS="COMMAND"
+>CREATE TABLESPACE</TT
+> не может быть выполнена внутри блока транзакции.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN76645"
+></A
+><H2
+>Примеры</H2
+><P
+>Создание табличного пространства <TT
+CLASS="LITERAL"
+>dbspace</TT
+> в <TT
+CLASS="LITERAL"
+>/data/dbs</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLESPACE dbspace LOCATION '/data/dbs';</PRE
+><P></P
+><P
+>Создание табличного пространства <TT
+CLASS="LITERAL"
+>indexspace</TT
+> в <TT
+CLASS="LITERAL"
+>/data/indexes</TT
+> и назначение его владельцем <TT
+CLASS="LITERAL"
+>genevieve</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLESPACE indexspace OWNER genevieve LOCATION '/data/indexes';</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN76656"
+></A
+><H2
+>Совместимость</H2
+><P
+><TT
+CLASS="COMMAND"
+>CREATE TABLESPACE</TT
+> является расширением <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN76661"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-createdatabase.html"
+>CREATE DATABASE</A
+>, <A
+HREF="sql-createtable.html"
+>CREATE TABLE</A
+>, <A
+HREF="sql-createindex.html"
+>CREATE INDEX</A
+>, <A
+HREF="sql-droptablespace.html"
+>DROP TABLESPACE</A
+>, <A
+HREF="sql-altertablespace.html"
+>ALTER TABLESPACE</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-createtableas.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-createtsconfig.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>CREATE TABLE AS</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>CREATE TEXT SEARCH CONFIGURATION</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

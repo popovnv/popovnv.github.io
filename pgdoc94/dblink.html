@@ -1,0 +1,280 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>dblink</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Дополнительно поставляемые модули"
+HREF="contrib.html"><LINK
+REL="PREVIOUS"
+TITLE="cube"
+HREF="cube.html"><LINK
+REL="NEXT"
+TITLE="dblink_connect"
+HREF="contrib-dblink-connect.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="cube"
+HREF="cube.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Приложение E. Дополнительно поставляемые модули</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="dblink_connect"
+HREF="contrib-dblink-connect.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="DBLINK"
+>E.9. dblink</A
+></H1
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Содержание</B
+></DT
+><DT
+><A
+HREF="contrib-dblink-connect.html"
+>dblink_connect</A
+>&nbsp;--&nbsp;открывает постоянное подключение к удалённой базе данных</DT
+><DT
+><A
+HREF="contrib-dblink-connect-u.html"
+>dblink_connect_u</A
+>&nbsp;--&nbsp;открывает постоянное подключение к удалённой базе данных, небезопасно</DT
+><DT
+><A
+HREF="contrib-dblink-disconnect.html"
+>dblink_disconnect</A
+>&nbsp;--&nbsp;закрывает постоянное подключение к удалённой базе данных</DT
+><DT
+><A
+HREF="contrib-dblink-function.html"
+>dblink</A
+>&nbsp;--&nbsp;выполняет запрос в удалённой базе данных</DT
+><DT
+><A
+HREF="contrib-dblink-exec.html"
+>dblink_exec</A
+>&nbsp;--&nbsp;выполняет команду в удалённой базе данных</DT
+><DT
+><A
+HREF="contrib-dblink-open.html"
+>dblink_open</A
+>&nbsp;--&nbsp;открывает курсор в удалённой базе данных</DT
+><DT
+><A
+HREF="contrib-dblink-fetch.html"
+>dblink_fetch</A
+>&nbsp;--&nbsp;возвращает строки из открытого курсора в удалённой базе данных</DT
+><DT
+><A
+HREF="contrib-dblink-close.html"
+>dblink_close</A
+>&nbsp;--&nbsp;закрывает курсор в текущей базе данных</DT
+><DT
+><A
+HREF="contrib-dblink-get-connections.html"
+>dblink_get_connections</A
+>&nbsp;--&nbsp;возвращает имена всех открытых именованных подключений dblink</DT
+><DT
+><A
+HREF="contrib-dblink-error-message.html"
+>dblink_error_message</A
+>&nbsp;--&nbsp;выдаёт сообщение последней ошибки для именованного подключения</DT
+><DT
+><A
+HREF="contrib-dblink-send-query.html"
+>dblink_send_query</A
+>&nbsp;--&nbsp;передаёт асинхронный запрос в удалённую базу данных</DT
+><DT
+><A
+HREF="contrib-dblink-is-busy.html"
+>dblink_is_busy</A
+>&nbsp;--&nbsp;проверяет, не выполняется ли через подключение асинхронный запрос</DT
+><DT
+><A
+HREF="contrib-dblink-get-notify.html"
+>dblink_get_notify</A
+>&nbsp;--&nbsp;выдаёт асинхронные уведомления подключения</DT
+><DT
+><A
+HREF="contrib-dblink-get-result.html"
+>dblink_get_result</A
+>&nbsp;--&nbsp;получает результат асинхронного запроса</DT
+><DT
+><A
+HREF="contrib-dblink-cancel-query.html"
+>dblink_cancel_query</A
+>&nbsp;--&nbsp;отменяет любой активный запрос в заданном подключении</DT
+><DT
+><A
+HREF="contrib-dblink-get-pkey.html"
+>dblink_get_pkey</A
+>&nbsp;--&nbsp;возвращает позиции и имена полей первичного ключа отношения</DT
+><DT
+><A
+HREF="contrib-dblink-build-sql-insert.html"
+>dblink_build_sql_insert</A
+>&nbsp;--&nbsp;формирует оператор INSERT из локального кортежа, заменяя значения полей первичного ключа переданными альтернативными значениями</DT
+><DT
+><A
+HREF="contrib-dblink-build-sql-delete.html"
+>dblink_build_sql_delete</A
+>&nbsp;--&nbsp;формирует оператор DELETE со значениями, передаваемыми для полей первичного ключа</DT
+><DT
+><A
+HREF="contrib-dblink-build-sql-update.html"
+>dblink_build_sql_update</A
+>&nbsp;--&nbsp;формирует оператор UPDATE из локального кортежа, заменяя значения первичного ключа переданными альтернативными значениями</DT
+></DL
+></DIV
+><P
+>Модуль <TT
+CLASS="FILENAME"
+>dblink</TT
+> обеспечивает подключения к другим базам данных <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> из сеанса базы данных.</P
+><P
+>См. также описание модуля <A
+HREF="postgres-fdw.html"
+>postgres_fdw</A
+>, который предоставляет примерно ту же функциональность, но через более современную и стандартизированную инфраструктуру.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="cube.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="contrib-dblink-connect.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>cube</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>dblink_connect</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

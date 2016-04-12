@@ -1,0 +1,504 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>ALTER TEXT SEARCH CONFIGURATION</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="ALTER TABLESPACE"
+HREF="sql-altertablespace.html"><LINK
+REL="NEXT"
+TITLE="ALTER TEXT SEARCH DICTIONARY"
+HREF="sql-altertsdictionary.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="ALTER TABLESPACE"
+HREF="sql-altertablespace.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="ALTER TEXT SEARCH DICTIONARY"
+HREF="sql-altertsdictionary.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-ALTERTSCONFIG"
+></A
+>ALTER TEXT SEARCH CONFIGURATION</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN70170"
+></A
+><H2
+>Название</H2
+>ALTER TEXT SEARCH CONFIGURATION&nbsp;--&nbsp;изменить определение конфигурации текстового поиска</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN70173"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>ALTER TEXT SEARCH CONFIGURATION <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+>
+    ADD MAPPING FOR <TT
+CLASS="REPLACEABLE"
+><I
+>тип_фрагмента</I
+></TT
+> [, ... ] WITH <TT
+CLASS="REPLACEABLE"
+><I
+>имя_словаря</I
+></TT
+> [, ... ]
+ALTER TEXT SEARCH CONFIGURATION <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+>
+    ALTER MAPPING FOR <TT
+CLASS="REPLACEABLE"
+><I
+>тип_фрагмента</I
+></TT
+> [, ... ] WITH <TT
+CLASS="REPLACEABLE"
+><I
+>имя_словаря</I
+></TT
+> [, ... ]
+ALTER TEXT SEARCH CONFIGURATION <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+>
+    ALTER MAPPING REPLACE <TT
+CLASS="REPLACEABLE"
+><I
+>старый_словарь</I
+></TT
+> WITH <TT
+CLASS="REPLACEABLE"
+><I
+>новый_словарь</I
+></TT
+>
+ALTER TEXT SEARCH CONFIGURATION <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+>
+    ALTER MAPPING FOR <TT
+CLASS="REPLACEABLE"
+><I
+>тип_фрагмента</I
+></TT
+> [, ... ] REPLACE <TT
+CLASS="REPLACEABLE"
+><I
+>старый_словарь</I
+></TT
+> WITH <TT
+CLASS="REPLACEABLE"
+><I
+>новый_словарь</I
+></TT
+>
+ALTER TEXT SEARCH CONFIGURATION <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+>
+    DROP MAPPING [ IF EXISTS ] FOR <TT
+CLASS="REPLACEABLE"
+><I
+>тип_фрагмента</I
+></TT
+> [, ... ]
+ALTER TEXT SEARCH CONFIGURATION <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> RENAME TO <TT
+CLASS="REPLACEABLE"
+><I
+>новое_имя</I
+></TT
+>
+ALTER TEXT SEARCH CONFIGURATION <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> OWNER TO <TT
+CLASS="REPLACEABLE"
+><I
+>новый_владелец</I
+></TT
+>
+ALTER TEXT SEARCH CONFIGURATION <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> SET SCHEMA <TT
+CLASS="REPLACEABLE"
+><I
+>новая_схема</I
+></TT
+></PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN70196"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>ALTER TEXT SEARCH CONFIGURATION</TT
+> изменяет определение конфигурации текстового поиска. Эта команда позволяет настроить сопоставления типов фрагментов со словарями или сменить владельца или имя конфигурации.</P
+><P
+>Выполнить <TT
+CLASS="COMMAND"
+>ALTER TEXT SEARCH CONFIGURATION</TT
+> может только владелец соответствующей конфигурации.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN70202"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></DT
+><DD
+><P
+>Имя (возможно, дополненное схемой) существующей конфигурации текстового поиска.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>тип_фрагмента</I
+></TT
+></DT
+><DD
+><P
+>Имя типа фрагмента, выдаваемое при разборе конфигурации.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_словаря</I
+></TT
+></DT
+><DD
+><P
+>Имя словаря текстового поиска, в котором будет искаться указанный тип фрагмента. Если указаны несколько словарей, они просматриваются в порядке перечисления.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>старый_словарь</I
+></TT
+></DT
+><DD
+><P
+>Имя словаря текстового поиска, которое будет заменено в сопоставлении.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>новый_словарь</I
+></TT
+></DT
+><DD
+><P
+>Имя словаря текстового поиска, которое будет подставлено там, где был <TT
+CLASS="REPLACEABLE"
+><I
+>старый_словарь</I
+></TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>новое_имя</I
+></TT
+></DT
+><DD
+><P
+>Новое имя конфигурации текстового поиска.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>новый_владелец</I
+></TT
+></DT
+><DD
+><P
+>Новый владелец конфигурации текстового поиска.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>новая_схема</I
+></TT
+></DT
+><DD
+><P
+>Новая схема конфигурации текстового поиска.</P
+></DD
+></DL
+></DIV
+><P
+>Форма <TT
+CLASS="LITERAL"
+>ADD MAPPING FOR</TT
+> настраивает список словарей, которые будут просматриваться в поиске указанных типов фрагментов; если сопоставление для каких-либо типов уже задано, возникнет ошибка. Форма <TT
+CLASS="LITERAL"
+>ALTER MAPPING FOR</TT
+> делает то же самое, но она сначала удаляет существующее сопоставление для этих типов фрагментов. Формы <TT
+CLASS="LITERAL"
+>ALTER MAPPING REPLACE</TT
+> подставляют <TT
+CLASS="REPLACEABLE"
+><I
+>новый_словарь</I
+></TT
+> вместо <TT
+CLASS="REPLACEABLE"
+><I
+>старый_словарь</I
+></TT
+> везде, где упоминается последний. Это выполняется только для указанных типов фрагментов, когда присутствует <TT
+CLASS="LITERAL"
+>FOR</TT
+>, либо для всех сопоставлений в конфигурации в противном случае. Форма <TT
+CLASS="LITERAL"
+>DROP MAPPING</TT
+> удаляет все словари для заданных типов фрагментов, в результате чего фрагменты этих типов будут игнорироваться конфигурацией. Если сопоставлений для заданных типов фрагментов нет, возникает ошибка, если только не добавлено указание <TT
+CLASS="LITERAL"
+>IF EXISTS</TT
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN70255"
+></A
+><H2
+>Примеры</H2
+><P
+>В следующем примере словарь <TT
+CLASS="LITERAL"
+>english</TT
+> заменяется на <TT
+CLASS="LITERAL"
+>swedish</TT
+> везде, где использовался <TT
+CLASS="LITERAL"
+>english</TT
+> в конфигурации <TT
+CLASS="LITERAL"
+>my_config</TT
+>.</P
+><PRE
+CLASS="PROGRAMLISTING"
+>ALTER TEXT SEARCH CONFIGURATION my_config
+  ALTER MAPPING REPLACE english WITH swedish;</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN70263"
+></A
+><H2
+>Совместимость</H2
+><P
+>Оператор <TT
+CLASS="COMMAND"
+>ALTER TEXT SEARCH CONFIGURATION</TT
+> отсутствует в стандарте SQL.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN70267"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-createtsconfig.html"
+>CREATE TEXT SEARCH CONFIGURATION</A
+>, <A
+HREF="sql-droptsconfig.html"
+>DROP TEXT SEARCH CONFIGURATION</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-altertablespace.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-altertsdictionary.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>ALTER TABLESPACE</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>ALTER TEXT SEARCH DICTIONARY</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

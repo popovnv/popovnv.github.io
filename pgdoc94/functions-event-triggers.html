@@ -1,0 +1,346 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Функции событийных триггеров</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Функции и операторы"
+HREF="functions.html"><LINK
+REL="PREVIOUS"
+TITLE="Триггерные функции"
+HREF="functions-trigger.html"><LINK
+REL="NEXT"
+TITLE="Преобразование типов"
+HREF="typeconv.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Триггерные функции"
+HREF="functions-trigger.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 9. Функции и операторы</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Преобразование типов"
+HREF="typeconv.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="FUNCTIONS-EVENT-TRIGGERS"
+>9.28. Функции событийных триггеров</A
+></H1
+><P
+>В текущей версии <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> представлена одна встроенная вспомогательная функция для событийных триггеров, <CODE
+CLASS="FUNCTION"
+>pg_event_trigger_dropped_objects</CODE
+>.</P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>pg_event_trigger_dropped_objects</CODE
+> возвращает список всех объектов, удалённых командой, вызвавшей событие <TT
+CLASS="LITERAL"
+>sql_drop</TT
+>. При вызове в другом контексте <CODE
+CLASS="FUNCTION"
+>pg_event_trigger_dropped_objects</CODE
+> выдаёт ошибку. <CODE
+CLASS="FUNCTION"
+>pg_event_trigger_dropped_objects</CODE
+> возвращает следующие колонки: <DIV
+CLASS="INFORMALTABLE"
+><P
+></P
+><A
+NAME="AEN22576"
+></A
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>classid</TT
+></TD
+><TD
+><TT
+CLASS="TYPE"
+>Oid</TT
+></TD
+><TD
+>OID каталога, к которому относится объект</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>objid</TT
+></TD
+><TD
+><TT
+CLASS="TYPE"
+>Oid</TT
+></TD
+><TD
+>OID объекта в каталоге</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>objsubid</TT
+></TD
+><TD
+><TT
+CLASS="TYPE"
+>int32</TT
+></TD
+><TD
+>Идентификатор подобъекта (например, номер для колонок)</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>object_type</TT
+></TD
+><TD
+><TT
+CLASS="TYPE"
+>text</TT
+></TD
+><TD
+>Тип объекта</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>schema_name</TT
+></TD
+><TD
+><TT
+CLASS="TYPE"
+>text</TT
+></TD
+><TD
+>Имя схемы, к которой относится объект; если объект не относится ни к какой схеме &mdash; <TT
+CLASS="LITERAL"
+>NULL</TT
+>. В кавычки имя не заключается.</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>object_name</TT
+></TD
+><TD
+><TT
+CLASS="TYPE"
+>text</TT
+></TD
+><TD
+>Имя объекта, если сочетание схемы и имени позволяет уникально идентифицировать объект; в противном случае &mdash; <TT
+CLASS="LITERAL"
+>NULL</TT
+>. Имя не заключается в кавычки и не дополняется именем схемы.</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>object_identity</TT
+></TD
+><TD
+><TT
+CLASS="TYPE"
+>text</TT
+></TD
+><TD
+>Текстовое представление идентификатора объекта, дополненного схемой. Компоненты этого идентификаторы могут заключаться в кавычки, если требуется.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></P
+><P
+>Функцию <CODE
+CLASS="FUNCTION"
+>pg_event_trigger_dropped_objects</CODE
+> можно использовать в событийном триггере так: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION test_event_trigger_for_drops()
+        RETURNS event_trigger LANGUAGE plpgsql AS $$
+DECLARE
+    obj record;
+BEGIN
+    FOR obj IN SELECT * FROM pg_event_trigger_dropped_objects()
+    LOOP
+        RAISE NOTICE '% dropped object: % %.% %',
+                     tg_tag,
+                     obj.object_type,
+                     obj.schema_name,
+                     obj.object_name,
+                     obj.object_identity;
+    END LOOP;
+END
+$$;
+CREATE EVENT TRIGGER test_event_trigger_for_drops
+   ON sql_drop
+   EXECUTE PROCEDURE test_event_trigger_for_drops();</PRE
+><P></P
+><P
+>Подробнее о событийных триггерах можно узнать в <A
+HREF="event-triggers.html"
+>Главе 37</A
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions-trigger.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="typeconv.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Триггерные функции</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Преобразование типов</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

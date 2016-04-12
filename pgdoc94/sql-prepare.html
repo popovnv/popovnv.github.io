@@ -1,0 +1,429 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>PREPARE</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="NOTIFY"
+HREF="sql-notify.html"><LINK
+REL="NEXT"
+TITLE="PREPARE TRANSACTION"
+HREF="sql-prepare-transaction.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="NOTIFY"
+HREF="sql-notify.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="PREPARE TRANSACTION"
+HREF="sql-prepare-transaction.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-PREPARE"
+></A
+>PREPARE</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN82039"
+></A
+><H2
+>Название</H2
+>PREPARE&nbsp;--&nbsp;подготовить оператор к выполнению</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN82042"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>PREPARE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> [ ( <TT
+CLASS="REPLACEABLE"
+><I
+>тип_данных</I
+></TT
+> [, ...] ) ] AS <TT
+CLASS="REPLACEABLE"
+><I
+>оператор</I
+></TT
+></PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN82047"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>PREPARE</TT
+> создаёт подготовленный оператор. Подготовленный оператор представляет собой объект на стороне сервера, позволяющий оптимизировать производительность приложений. Когда выполняется <TT
+CLASS="COMMAND"
+>PREPARE</TT
+>, указанный оператор разбирается, анализируется и переписывается. При последующем выполнении команды <TT
+CLASS="COMMAND"
+>EXECUTE</TT
+> подготовленный оператор планируется и исполняется. Такое разделение труда исключает повторный разбор запроса, при этом позволяет выбрать наилучший план выполнения в зависимости от определённых значений параметров.</P
+><P
+>Подготовленные операторы могут принимать параметры — значения, которые подставляются в оператор, когда он собственно выполняется. При создании подготовленного оператора к этим параметрам можно обращаться по порядковому номеру, используя запись <TT
+CLASS="LITERAL"
+>$1</TT
+>, <TT
+CLASS="LITERAL"
+>$2</TT
+> и т. д. Дополнительно можно указать список соответствующих типов данных параметров. Если тип данных параметра не указан или объявлен как <TT
+CLASS="LITERAL"
+>unknown</TT
+> (неизвестный), тип выводится из контекста, в котором используется этот параметр (если это возможно). При выполнении оператора фактические значения параметров передаются команде <TT
+CLASS="COMMAND"
+>EXECUTE</TT
+>. За подробностями обратитесь к <A
+HREF="sql-execute.html"
+>EXECUTE</A
+>.</P
+><P
+>Подготовленные операторы существуют только в рамках текущего сеанса работы с БД. Когда сеанс завершается, система забывает подготовленный оператор, так что его надо будет создать снова, чтобы использовать дальше. Это также означает, что один подготовленный оператор не может использоваться одновременно несколькими клиентами базы данных; но каждый клиент может создать собственный подготовленный оператор и использовать его. Освободить подготовленный оператор можно вручную, выполнив команду <A
+HREF="sql-deallocate.html"
+>DEALLOCATE</A
+>.</P
+><P
+>Подготовленные операторы дают наибольший выигрыш в производительности, когда в одном сеансе выполняется большое число однотипных операторов. Отличие в производительности особенно значительно, если операторы достаточно сложны для планирования или перезаписи, например, когда в запросе объединяется множество таблиц или необходимо применить несколько правил. Если оператор относительно прост в этом плане, но сложен для выполнения, выигрыш от использования подготовленных операторов будет менее заметным.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN82062"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></DT
+><DD
+><P
+>Произвольное имя, назначаемое данному подготовленному оператору. Оно должно быть уникальным в рамках одного сеанса; это имя затем используется для выполнения или освобождения ранее подготовленного оператора.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>тип_данных</I
+></TT
+></DT
+><DD
+><P
+>Тип данных параметра подготовленного оператора. Если тип данных конкретного параметра не задан или задан как <TT
+CLASS="LITERAL"
+>unknown</TT
+>, он будет выводиться из контекста, в котором используется параметр. Для обращения к параметрам в самом подготовленном операторе используется запись <TT
+CLASS="LITERAL"
+>$1</TT
+>, <TT
+CLASS="LITERAL"
+>$2</TT
+> и т. д.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>оператор</I
+></TT
+></DT
+><DD
+><P
+>Любой оператор <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, <TT
+CLASS="COMMAND"
+>INSERT</TT
+>, <TT
+CLASS="COMMAND"
+>UPDATE</TT
+>, <TT
+CLASS="COMMAND"
+>DELETE</TT
+> или <TT
+CLASS="COMMAND"
+>VALUES</TT
+>.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN82088"
+></A
+><H2
+>Замечания</H2
+><P
+>Если подготовленный оператор выполняется много раз, сервер может в итоге решить сохранить и повторно использовать общий план, и не строить план каждый раз заново. Это происходит при первом же выполнении, если подготовленный оператор не имеет параметров; в противном случае, только если общий план окажется ненамного дороже, чем план, зависящий от конкретных значений. Обычно общий план выбирается, только если производительность запроса, предположительно, практически не зависит от передаваемых значений параметров.</P
+><P
+>Узнать, какой план выполнения выбирает <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> для подготовленного оператора, можно, воспользовавшись командой <A
+HREF="sql-explain.html"
+>EXPLAIN</A
+>. Если применяется общий план, он будет содержать символы параметров <TT
+CLASS="LITERAL"
+>$<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+></TT
+>, тогда как в настраиваемом плане будут подставлены фактические значения параметров.</P
+><P
+>Более подробно о планировании запросов и статистике, которую собирает <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> для этих целей, можно узнать в документации <A
+HREF="sql-analyze.html"
+>ANALYZE</A
+>.</P
+><P
+>Хотя основной смысл подготовленных операторов в том, чтобы избежать многократного разбора и планирования оператора, <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> будет принудительно заново анализировать и планировать выполнение оператора всякий раз, когда объекты базы данных, задействованные в операторе, подвергаются изменениям определения (DDL) со времени предыдущего использования подготовленного оператора. Кроме того, если от одного использования оператора к другому меняется значение <A
+HREF="runtime-config-client.html#GUC-SEARCH-PATH"
+>search_path</A
+>, оператор будет так же разобран заново с новым <TT
+CLASS="VARNAME"
+>search_path</TT
+>. (Последнее поведение появилось в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> 9.3.) С этими правилами использование подготовленного оператора по сути почти не отличается от выполнения одного и того же запроса снова и снова, но даёт выигрыш по скорости (если определения объектов не меняются), особенно если оптимальный план от раза к разу не меняется. Однако различия всё же могут проявиться — например, когда оператор обращается к таблице по неполному имени, а затем в схеме, стоящей в пути <TT
+CLASS="VARNAME"
+>search_path</TT
+> раньше, создаётся другая таблица с таким же именем, автоматический пересмотр запроса не происходит, так как никакой объект в определении оператора не изменился. Однако, если автоматический пересмотр произойдёт в результате других изменений, при последующем выполнении запроса будет задействована новая таблица.</P
+><P
+>Получить список всех доступных в сеансе подготовленных операторов можно, обратившись к системному представлению <A
+HREF="view-pg-prepared-statements.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_prepared_statements</TT
+></A
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="SQL-PREPARE-EXAMPLES"
+></A
+><H2
+>Примеры</H2
+><P
+>Создание подготовленного оператора для команды <TT
+CLASS="COMMAND"
+>INSERT</TT
+>, который затем выполняется: </P><PRE
+CLASS="PROGRAMLISTING"
+>PREPARE fooplan (int, text, bool, numeric) AS
+    INSERT INTO foo VALUES($1, $2, $3, $4);
+EXECUTE fooplan(1, 'Hunter Valley', 't', 200.00);</PRE
+><P></P
+><P
+>Создание подготовленного оператора для команды <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, который затем выполняется: </P><PRE
+CLASS="PROGRAMLISTING"
+>PREPARE usrrptplan (int) AS
+    SELECT * FROM users u, logs l WHERE u.usrid=$1 AND u.usrid=l.usrid
+    AND l.date = $2;
+EXECUTE usrrptplan(1, current_date);</PRE
+><P> Заметьте, что тип данных второго параметра не указывается, так что он выводится из контекста, в котором используется <TT
+CLASS="LITERAL"
+>$2</TT
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN82117"
+></A
+><H2
+>Совместимость</H2
+><P
+>В стандарте SQL есть оператор <TT
+CLASS="COMMAND"
+>PREPARE</TT
+>, но он предназначен только для применения во встраиваемом SQL. Эта версия оператора <TT
+CLASS="COMMAND"
+>PREPARE</TT
+> имеет также несколько другой синтаксис.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN82122"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-deallocate.html"
+>DEALLOCATE</A
+>, <A
+HREF="sql-execute.html"
+>EXECUTE</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-notify.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-prepare-transaction.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>NOTIFY</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>PREPARE TRANSACTION</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,303 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Записи каталога для индексов</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Определение интерфейса для методов доступа индекса"
+HREF="indexam.html"><LINK
+REL="PREVIOUS"
+TITLE="Определение интерфейса для методов доступа индекса"
+HREF="indexam.html"><LINK
+REL="NEXT"
+TITLE="Функции для метода доступа индекса"
+HREF="index-functions.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Определение интерфейса для методов доступа индекса"
+HREF="indexam.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="indexam.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 55. Определение интерфейса для методов доступа индекса</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Функции для метода доступа индекса"
+HREF="index-functions.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="INDEX-CATALOG"
+>55.1. Записи каталога для индексов</A
+></H1
+><P
+>Каждый метод доступа индекса описывается строкой в системном каталоге <TT
+CLASS="STRUCTNAME"
+>pg_am</TT
+> (см. <A
+HREF="catalog-pg-am.html"
+>Раздел 48.3</A
+>). Первостепенными полями строки <TT
+CLASS="STRUCTNAME"
+>pg_am</TT
+> являются ссылки на записи в <A
+HREF="catalog-pg-proc.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+></A
+>, описывающие функции доступа к индексу, предоставляемые данным методом доступа. Программный интерфейс этих функций описывается в этой главе далее. Кроме того, в строке в <TT
+CLASS="STRUCTNAME"
+>pg_am</TT
+> задаётся набор фиксированных свойств метода доступа, например отмечается, поддерживает ли он многоколоночные индексы. В настоящее время нет никаких специальных средств для создания или удаления записей из <TT
+CLASS="STRUCTNAME"
+>pg_am</TT
+>; предполагается, что те, кто способны реализовать новый метод доступа, смогут и вставить соответствующую строку.</P
+><P
+>Чтобы метод доступа индекса применялся, необходимо также определить <I
+CLASS="FIRSTTERM"
+>семейства операторов</I
+> и <I
+CLASS="FIRSTTERM"
+>классы операторов</I
+> в <A
+HREF="catalog-pg-opfamily.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_opfamily</TT
+></A
+>, <A
+HREF="catalog-pg-opclass.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_opclass</TT
+></A
+>, <A
+HREF="catalog-pg-amop.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_amop</TT
+></A
+> и <A
+HREF="catalog-pg-amproc.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_amproc</TT
+></A
+>. Эти записи позволяют планировщику понять, для каких видов условий запросов могут применяться индексы с данными методом доступа. Семейства и классы операторов описываются в <A
+HREF="xindex.html"
+>Разделе 35.14</A
+>; этот материал необходимо изучить, прежде чем читать данную главу.</P
+><P
+>Отдельный индекс определяется записью в <A
+HREF="catalog-pg-class.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+></A
+>, описывающей его как физическое отношение, и записью в <A
+HREF="catalog-pg-index.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_index</TT
+></A
+>, представляющей логическое содержание индекса &mdash; то есть, набор колонок индекса и семантическое значение этих колонок, установленное соответствующими классами операторов. Колонками индекса (значениями ключа) могут быть либо простые колонки нижележащей таблицы, либо выражения, вычисляемые по строкам таблицы. Для метода доступа индекса обычно не важно, откуда поступают значения ключа индекса (они всегда поступают в вычисленном виде), но очень важна информация о классе операторов в каталоге <TT
+CLASS="STRUCTNAME"
+>pg_index</TT
+>. Обе эти записи каталогов представлены в составе структуры данных <TT
+CLASS="STRUCTNAME"
+>Relation</TT
+>, которая передаётся всем функциям, реализующим операции с индексом.</P
+><P
+>С некоторыми колонками флагов в <TT
+CLASS="STRUCTNAME"
+>pg_am</TT
+> связаны неочевидные следствия. Требования индексов с <TT
+CLASS="STRUCTFIELD"
+>amcanunique</TT
+> описаны в <A
+HREF="index-unique-checks.html"
+>Разделе 55.5</A
+>. Флаг <TT
+CLASS="STRUCTFIELD"
+>amcanmulticol</TT
+> показывает, что метод доступа поддерживает многоколоночные индексы, а <TT
+CLASS="STRUCTFIELD"
+>amoptionalkey</TT
+> обозначает, что метод позволяет выполнить сканирование при отсутствии индексируемого ограничивающего условия для первой колонки индекса. Когда <TT
+CLASS="STRUCTFIELD"
+>amcanmulticol</TT
+> равен false, <TT
+CLASS="STRUCTFIELD"
+>amoptionalkey</TT
+> по сути говорит, поддерживает ли метод доступа полное сканирование по индексу без ограничивающего условия. Методы доступа, поддерживающие индексы по нескольким колонкам, <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>должны</I
+></SPAN
+> поддерживать сканирования при отсутствии ограничений любых или всех колонок после первой; однако они могут требовать присутствия какого-либо ограничения для первой колонки индекса, и это требование отмечается значением false флага <TT
+CLASS="STRUCTFIELD"
+>amoptionalkey</TT
+>. В <TT
+CLASS="STRUCTFIELD"
+>amoptionalkey</TT
+> для метода доступа может устанавливаться false, например, когда этот метод доступа не индексирует значения NULL. Так как большинство индексируемых операторов — строгие, и поэтому не могут вернуть true для операндов NULL, на первый взгляд кажется заманчивой идея не хранить записи индекса для значений NULL: они всё равно никак не могут быть прочитаны при сканировании индекса. Однако, этот аргумент отпадает, когда при сканировании индекса вовсе отсутствует ограничение данной колонки индекса. На практике это означает, что индексы с установленным флагом <TT
+CLASS="STRUCTFIELD"
+>amoptionalkey</TT
+> должны индексировать значения NULL, так как планировщик может склониться к использованию этого индекса вообще без ключей. С этим связано ещё одно ограничение — метод доступа индекса, поддерживающий многоколоночные индексы, <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>должен</I
+></SPAN
+> поддерживать индексирование значений NULL в колонках после первой, так как планировщик будет полагать, что индекс можно применять для запросов, в которых эти колонки не ограничиваются. Например, рассмотрим индекс по (a,b) и запрос с ограничением <TT
+CLASS="LITERAL"
+>WHERE a = 4</TT
+>. Система будет полагать, что по этому индексу можно просканировать строки с <TT
+CLASS="LITERAL"
+>a = 4</TT
+>, но это будет неверно, если индекс исключит строки, в которых <TT
+CLASS="LITERAL"
+>b</TT
+> равно NULL. Однако, этот индекс вполне может исключить строки, в которых первая колонка содержит NULL. Метод индекса, который индексирует значения NULL, может также установить флаг <TT
+CLASS="STRUCTFIELD"
+>amsearchnulls</TT
+>, отметив тем самым, что он поддерживает в качестве условий поиска <TT
+CLASS="LITERAL"
+>IS NULL</TT
+> и <TT
+CLASS="LITERAL"
+>IS NOT NULL</TT
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="indexam.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="index-functions.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Определение интерфейса для методов доступа индекса</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="indexam.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Функции для метода доступа индекса</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,280 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Пример конфигурации</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Полнотекстовый поиск"
+HREF="textsearch.html"><LINK
+REL="PREVIOUS"
+TITLE="Словари"
+HREF="textsearch-dictionaries.html"><LINK
+REL="NEXT"
+TITLE="Тестирование и отладка текстового поиска"
+HREF="textsearch-debugging.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Словари"
+HREF="textsearch-dictionaries.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="textsearch.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 12. Полнотекстовый поиск</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Тестирование и отладка текстового поиска"
+HREF="textsearch-debugging.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="TEXTSEARCH-CONFIGURATION"
+>12.7. Пример конфигурации</A
+></H1
+><P
+>Конфигурация текстового поиска определяет всё, что необходимо для преобразования документа в формат <TT
+CLASS="TYPE"
+>tsvector</TT
+>: анализатор, который будет разбивать текст на фрагменты, и словари, которые будут преобразовывать фрагменты в лексемы. При каждом вызове <CODE
+CLASS="FUNCTION"
+>to_tsvector</CODE
+> или <CODE
+CLASS="FUNCTION"
+>to_tsquery</CODE
+> обязательно используется конфигурация текстового поиска. В конфигурации сервера есть параметр <A
+HREF="runtime-config-client.html#GUC-DEFAULT-TEXT-SEARCH-CONFIG"
+>default_text_search_config</A
+>, задающий имя конфигурации текстового поиска по умолчанию, которая будет использоваться, когда при вызове функций поиска соответствующий аргумент не определён. Этот параметр можно задать в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+> или установить в рамках отдельного сеанса с помощью команды <TT
+CLASS="COMMAND"
+>SET</TT
+>.</P
+><P
+>В системе есть несколько встроенных конфигураций текстового поиска и вы можете легко дополнить их своими. Для удобства управления объектами текстового поиска в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> реализованы соответствующие <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>-команды и специальные команды в <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>, выводящие информацию об этих объектах (<A
+HREF="textsearch-psql.html"
+>Раздел 12.10</A
+>).</P
+><P
+>В качестве примера использования этих команд мы создадим конфигурацию <TT
+CLASS="LITERAL"
+>pg</TT
+>, взяв за основу встроенную конфигурацию <TT
+CLASS="LITERAL"
+>english</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TEXT SEARCH CONFIGURATION public.pg ( COPY = pg_catalog.english );</PRE
+><P></P
+><P
+>Мы будем использовать список синонимов, связанных с PostgreSQL, в файле <TT
+CLASS="FILENAME"
+>$SHAREDIR/tsearch_data/pg_dict.syn</TT
+>. Этот файл содержит строки: </P><PRE
+CLASS="PROGRAMLISTING"
+>postgres    pg
+pgsql       pg
+postgresql  pg</PRE
+><P> Мы определим словарь синонимов следующим образом: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TEXT SEARCH DICTIONARY pg_dict (
+    TEMPLATE = synonym,
+    SYNONYMS = pg_dict
+);</PRE
+><P> Затем мы зарегистрируем словарь <SPAN
+CLASS="PRODUCTNAME"
+>Ispell</SPAN
+> <TT
+CLASS="LITERAL"
+>english_ispell</TT
+>, у которого есть собственные файлы конфигурации: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TEXT SEARCH DICTIONARY english_ispell (
+    TEMPLATE = ispell,
+    DictFile = english,
+    AffFile = english,
+    StopWords = english
+);</PRE
+><P> Теперь мы можем настроить сопоставления для слов в конфигурации <TT
+CLASS="LITERAL"
+>pg</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER TEXT SEARCH CONFIGURATION pg
+    ALTER MAPPING FOR asciiword, asciihword, hword_asciipart,
+                      word, hword, hword_part
+    WITH pg_dict, english_ispell, english_stem;</PRE
+><P> Мы решили не индексировать и не учитывать при поиске некоторые типы фрагментов, которые не обрабатываются встроенной конфигурацией: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER TEXT SEARCH CONFIGURATION pg
+    DROP MAPPING FOR email, url, url_path, sfloat, float;</PRE
+><P></P
+><P
+>Теперь мы можем протестировать нашу конфигурацию: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT * FROM ts_debug('public.pg', '
+PostgreSQL, the highly scalable, SQL compliant, open source
+object-relational database management system, is now undergoing
+beta testing of the next version of our software.
+');</PRE
+><P></P
+><P
+>И наконец мы выбираем в текущем сеансе эту конфигурацию, созданную в схеме <TT
+CLASS="LITERAL"
+>public</TT
+>: </P><PRE
+CLASS="SCREEN"
+>=&gt; \dF
+   List of text search configurations
+ Schema  | Name | Description
+---------+------+-------------
+ public  | pg   |
+
+SET default_text_search_config = 'public.pg';
+SET
+
+SHOW default_text_search_config;
+ default_text_search_config
+----------------------------
+ public.pg</PRE
+><P></P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="textsearch-dictionaries.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="textsearch-debugging.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Словари</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="textsearch.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Тестирование и отладка текстового поиска</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

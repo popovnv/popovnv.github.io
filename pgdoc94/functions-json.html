@@ -1,0 +1,1610 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Функции и операторы JSON</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Функции и операторы"
+HREF="functions.html"><LINK
+REL="PREVIOUS"
+TITLE="XML-функции"
+HREF="functions-xml.html"><LINK
+REL="NEXT"
+TITLE="Функции для работы с последовательностями"
+HREF="functions-sequence.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="XML-функции"
+HREF="functions-xml.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 9. Функции и операторы</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Функции для работы с последовательностями"
+HREF="functions-sequence.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="FUNCTIONS-JSON"
+>9.15. Функции и операторы JSON</A
+></H1
+><P
+>В <A
+HREF="functions-json.html#FUNCTIONS-JSON-OP-TABLE"
+>Таблице 9-40</A
+> перечислены функции, позволяющие создавать данные в формате JSON (см. <A
+HREF="datatype-json.html"
+>Раздел 8.14</A
+>).</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-JSON-OP-TABLE"
+></A
+><P
+><B
+>Таблица 9-40. Операторы для типов <TT
+CLASS="TYPE"
+>json</TT
+> и <TT
+CLASS="TYPE"
+>jsonb</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Оператор</TH
+><TH
+>Тип правого операнда</TH
+><TH
+>Описание</TH
+><TH
+>Пример</TH
+><TH
+>Результат примера</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>-&gt;</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int</TT
+>
+                </TD
+><TD
+>Выдаёт элемент массива JSON (по индексу с 0)</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'[{"a":"foo"},{"b":"bar"},{"c":"baz"}]'::json-&gt;2</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>{"c":"baz"}</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>-&gt;</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Выдаёт поле объекта JSON по ключу</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'{"a": {"b":"foo"}}'::json-&gt;'a'</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>{"b":"foo"}</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>-&gt;&gt;</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int</TT
+>
+                </TD
+><TD
+>Выдаёт элемент массива JSON в типе <TT
+CLASS="TYPE"
+>text</TT
+></TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'[1,2,3]'::json-&gt;&gt;2</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>3</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>-&gt;&gt;</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Выдаёт поле объекта JSON в типе <TT
+CLASS="TYPE"
+>text</TT
+></TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'{"a":1,"b":2}'::json-&gt;&gt;'b'</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>2</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>#&gt;</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text[]</TT
+>
+                </TD
+><TD
+>Выдаёт объект JSON по заданному пути</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'{"a": {"b":{"c": "foo"}}}'::json#&gt;'{a,b}'</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>{"c": "foo"}</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>#&gt;&gt;</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text[]</TT
+>
+                </TD
+><TD
+>Выдаёт объект JSON по заданному пути в типе <TT
+CLASS="TYPE"
+>text</TT
+></TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'{"a":[1,2,3],"b":[4,5,6]}'::json#&gt;&gt;'{a,2}'</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>3</TT
+>
+                </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Эти операторы существуют в двух вариациях для типов <TT
+CLASS="TYPE"
+>json</TT
+> и <TT
+CLASS="TYPE"
+>jsonb</TT
+>. Операторы извлечения поля/элемента/пути возвращают тот же тип, что у операнда слева (<TT
+CLASS="TYPE"
+>json</TT
+> или <TT
+CLASS="TYPE"
+>jsonb</TT
+>), за исключением тех, что возвращают тип <TT
+CLASS="TYPE"
+>text</TT
+> (они возвращают значение как текстовое). Если входные данные JSON не содержат структуры, удовлетворяющей запросу, например в них нет искомого элемента, то операторы извлечения поля/элемента/пути не выдают ошибку, а возвращают NULL.</P
+></BLOCKQUOTE
+></DIV
+><P
+>Стандартные операторы сравнения, приведённые в <A
+HREF="functions-comparison.html#FUNCTIONS-COMPARISON-TABLE"
+>Таблице 9-1</A
+>, есть для типа <TT
+CLASS="TYPE"
+>jsonb</TT
+>, но не для <TT
+CLASS="TYPE"
+>json</TT
+>. Они следуют правилам сортировки для операций B-дерева, описанным в <A
+HREF="datatype-json.html#JSON-INDEXING"
+>Подразделе 8.14.4</A
+>.</P
+><P
+>Некоторые из следующих операторов существуют только для <TT
+CLASS="TYPE"
+>jsonb</TT
+>, как показано в <A
+HREF="functions-json.html#FUNCTIONS-JSONB-OP-TABLE"
+>Таблице 9-41</A
+>. Многие из этих операторов могут быть проиндексированы с помощью классов операторов <TT
+CLASS="TYPE"
+>jsonb</TT
+>. Полное описание проверок на вхождение и существование для <TT
+CLASS="TYPE"
+>jsonb</TT
+> приведено в <A
+HREF="datatype-json.html#JSON-CONTAINMENT"
+>Подразделе 8.14.3</A
+>. Как эти операторы могут использоваться для эффективного индексирования данных <TT
+CLASS="TYPE"
+>jsonb</TT
+>, описано в <A
+HREF="datatype-json.html#JSON-INDEXING"
+>Подразделе 8.14.4</A
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-JSONB-OP-TABLE"
+></A
+><P
+><B
+>Таблица 9-41. Дополнительные операторы <TT
+CLASS="TYPE"
+>jsonb</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Оператор</TH
+><TH
+>Тип правого операнда</TH
+><TH
+>Описание</TH
+><TH
+>Пример</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>@&gt;</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>jsonb</TT
+>
+                </TD
+><TD
+>Левое значение JSON содержит в себе правое?</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'{"a":1, "b":2}'::jsonb @&gt; '{"b":2}'::jsonb</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>&lt;@</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>jsonb</TT
+>
+                </TD
+><TD
+>Левое значение JSON входит в правое?</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'{"b":2}'::jsonb &lt;@ '{"a":1, "b":2}'::jsonb</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>?</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>В значении JSON есть <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>строковый</I
+></SPAN
+> ключ/элемент?</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'{"a":1, "b":2}'::jsonb ? 'b'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>?|</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text[]</TT
+>
+                </TD
+><TD
+>В данных есть любое из этих <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>строковых</I
+></SPAN
+> ключей/элементов?</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'{"a":1, "b":2, "c":3}'::jsonb ?| array['b', 'c']</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>?&amp;</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text[]</TT
+>
+                </TD
+><TD
+>В данных есть все эти <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>строковые</I
+></SPAN
+> ключи/элементы?</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'["a", "b"]'::jsonb ?&amp; array['a', 'b']</TT
+>
+                </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>В <A
+HREF="functions-json.html#FUNCTIONS-JSON-CREATION-TABLE"
+>Таблице 9-42</A
+> показаны доступные функции для создания значений типа <TT
+CLASS="TYPE"
+>json</TT
+>. (В настоящее время для <TT
+CLASS="TYPE"
+>jsonb</TT
+> подобных функций нет, но вы можете привести результат данных функций к типу <TT
+CLASS="TYPE"
+>jsonb</TT
+>.)</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-JSON-CREATION-TABLE"
+></A
+><P
+><B
+>Таблица 9-42. Функции для создания JSON</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Функция</TH
+><TH
+>Описание</TH
+><TH
+>Пример</TH
+><TH
+>Результат примера</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>         <TT
+CLASS="LITERAL"
+>to_json(anyelement)</TT
+>
+       </TD
+><TD
+>Возвращает значение в виде JSON. Массивы и составные структуры преобразуются (рекурсивно) в массивы и объекты, для других же типов, для которых определено преобразование в <TT
+CLASS="TYPE"
+>json</TT
+>, применяется эта функция приведения и выдаётся скалярное значение JSON. Значения всех скалярных типов, кроме числового, логического и NULL, представляются в виде текста, в кавычках и возможно с экранированием, как того требует формат JSON.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_json(​'Fred said "Hi."'::text)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>"Fred said \"Hi.\""</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>         <TT
+CLASS="LITERAL"
+>array_to_json(​anyarray [, pretty_bool])</TT
+>
+       </TD
+><TD
+>Возвращает массив в виде массива JSON. Многомерный массив PostgreSQL становится массивом массивов JSON. Если параметр <TT
+CLASS="PARAMETER"
+>pretty_bool</TT
+> равен true, между элементами 1-ой размерности вставляются разрывы строк.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>array_to_json(​'{{1,5},{99,100}}'​::int[])</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>[[1,5],[99,100]]</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>         <TT
+CLASS="LITERAL"
+>row_to_json(​record [, pretty_bool])</TT
+>
+       </TD
+><TD
+>Возвращает кортеж в виде объекта JSON. Если параметр <TT
+CLASS="PARAMETER"
+>pretty_bool</TT
+> равен true, между элементами 1-ой размерности вставляются разрывы строк.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>row_to_json(​row(1,'foo'))</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>{"f1":1,​"f2":"foo"}</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>         <TT
+CLASS="LITERAL"
+>json_build_array(​VARIADIC "any")</TT
+>
+       </TD
+><TD
+>Формирует массив JSON (возможно, разнородный) из переменного списка аргументов.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>json_build_array(​1,2,'3',4,5)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>[1, 2, "3", 4, 5]</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>         <TT
+CLASS="LITERAL"
+>json_build_object(​VARIADIC "any")</TT
+>
+       </TD
+><TD
+>Формирует объект JSON из переменного списка аргументов. По соглашению в этом списке перечисляются по очереди ключи и значения.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>json_build_object(​'foo',1,'bar',2)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>{"foo": 1, "bar": 2}</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>         <TT
+CLASS="LITERAL"
+>json_object(​text[])</TT
+>
+       </TD
+><TD
+>Формирует объект JSON из текстового массива. Этот массив должен иметь либо одну размерность с чётным числом элементов (в этом случае они воспринимаются как чередующиеся ключи/значения), либо две размерности и при этом каждый внутренний массив содержит ровно два элемента, которые воспринимаются как пара ключ/значение.</TD
+><TD
+><P
+><TT
+CLASS="LITERAL"
+>json_object(​'{a, 1, b, "def", c, 3.5}')</TT
+></P
+>
+        <P
+><TT
+CLASS="LITERAL"
+>json_object(​'{{a, 1},{b, "def"},{c, 3.5}}')</TT
+></P
+></TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>{"a": "1", "b": "def", "c": "3.5"}</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>         <TT
+CLASS="LITERAL"
+>json_object(​keys text[], values text[])</TT
+>
+       </TD
+><TD
+>Эта форма <CODE
+CLASS="FUNCTION"
+>json_object</CODE
+> принимает ключи и значения по парам из двух отдельных массивов. Во всех остальных отношениях она не отличается от формы с одним аргументом.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>json_object(​'{a, b}', '{1,2}')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>{"a": "1", "b": "2"}</TT
+>
+                </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Функции <CODE
+CLASS="FUNCTION"
+>array_to_json</CODE
+> и <CODE
+CLASS="FUNCTION"
+>row_to_json</CODE
+> подобны <CODE
+CLASS="FUNCTION"
+>to_json</CODE
+>, но предлагают возможность улучшенного вывода. Действие <CODE
+CLASS="FUNCTION"
+>to_json</CODE
+>, описанное выше, распространяется на каждое отдельное значение, преобразуемое этими функциями.</P
+></BLOCKQUOTE
+></DIV
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>В расширении <A
+HREF="hstore.html"
+>hstore</A
+> определено преобразование из <TT
+CLASS="TYPE"
+>hstore</TT
+> в <TT
+CLASS="TYPE"
+>json</TT
+>, так что значения <TT
+CLASS="TYPE"
+>hstore</TT
+>, преобразуемые функциями создания JSON, будут представлены в виде объектов JSON, а не как примитивные строковые значения.</P
+></BLOCKQUOTE
+></DIV
+><P
+>В <A
+HREF="functions-json.html#FUNCTIONS-JSON-PROCESSING-TABLE"
+>Таблице 9-43</A
+> показаны функции, предназначенные для работы со значениями <TT
+CLASS="TYPE"
+>json</TT
+> и <TT
+CLASS="TYPE"
+>jsonb</TT
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-JSON-PROCESSING-TABLE"
+></A
+><P
+><B
+>Таблица 9-43. Функции для обработки JSON</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Функция</TH
+><TH
+>Тип результата</TH
+><TH
+>Описание</TH
+><TH
+>Пример</TH
+><TH
+>Результат примера</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <P
+><TT
+CLASS="LITERAL"
+>json_array_length(json)</TT
+>
+         </P
+>
+                  <P
+><TT
+CLASS="LITERAL"
+>jsonb_array_length(jsonb)</TT
+>
+       </P
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int</TT
+>
+                </TD
+><TD
+>Возвращает число элементов во внешнем массиве JSON.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>json_array_length(​'[1,2,3,{"f1":1,"f2":[5,6]},4]')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>5</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <P
+><TT
+CLASS="LITERAL"
+>json_each(json)</TT
+>
+         </P
+>
+                  <P
+><TT
+CLASS="LITERAL"
+>jsonb_each(jsonb)</TT
+>
+       </P
+>
+                </TD
+><TD
+>                  <P
+><TT
+CLASS="LITERAL"
+>setof key text, value json</TT
+>
+         </P
+>
+                  <P
+><TT
+CLASS="LITERAL"
+>setof key text, value jsonb</TT
+>
+       </P
+>
+                </TD
+><TD
+>Разворачивает внешний объект JSON в набор пар ключ/значение (key/value).</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>select * from json_each('{"a":"foo", "b":"bar"}')</TT
+>
+                </TD
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+> key | value
+-----+-------
+ a   | "foo"
+ b   | "bar"</PRE
+>
+       </TD
+></TR
+><TR
+><TD
+>                  <P
+><TT
+CLASS="LITERAL"
+>json_each_text(json)</TT
+>
+         </P
+>
+                  <P
+><TT
+CLASS="LITERAL"
+>jsonb_each_text(jsonb)</TT
+>
+       </P
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>setof key text, value text</TT
+>
+                </TD
+><TD
+>Разворачивает внешний объект JSON в набор пар ключ/значение (key/value). Возвращаемые значения будут иметь тип <TT
+CLASS="TYPE"
+>text</TT
+>.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>select * from json_each_text('{"a":"foo", "b":"bar"}')</TT
+>
+                </TD
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+> key | value
+-----+-------
+ a   | foo
+ b   | bar</PRE
+>
+       </TD
+></TR
+><TR
+><TD
+>                  <P
+><TT
+CLASS="LITERAL"
+>json_extract_path(​from_json json, VARIADIC path_elems text[])</TT
+>
+        </P
+>
+                  <P
+><TT
+CLASS="LITERAL"
+>jsonb_extract_path(​from_json jsonb, VARIADIC path_elems text[])</TT
+>
+       </P
+>
+                </TD
+><TD
+>                  <P
+>                    <TT
+CLASS="TYPE"
+>json</TT
+>
+                  </P
+>
+                  <P
+><TT
+CLASS="TYPE"
+>jsonb</TT
+>
+       </P
+>
+                </TD
+><TD
+>Возвращает значение JSON по пути, заданному элементами пути (<TT
+CLASS="REPLACEABLE"
+><I
+>path_elems</I
+></TT
+>) (равнозначно оператору <TT
+CLASS="LITERAL"
+>#&gt;</TT
+> operator).</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>json_extract_path(​'{"f2":{"f3":1},"f4":{"f5":99,"f6":"foo"}}','f4')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>{"f5":99,"f6":"foo"}</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <P
+><TT
+CLASS="LITERAL"
+>json_extract_path_text(​from_json json, VARIADIC path_elems text[])</TT
+>
+         </P
+>
+                  <P
+><TT
+CLASS="LITERAL"
+>jsonb_extract_path_text(​from_json jsonb, VARIADIC path_elems text[])</TT
+>
+       </P
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Возвращает значение JSON по пути, заданному элементами пути <TT
+CLASS="REPLACEABLE"
+><I
+>path_elems</I
+></TT
+>, как <TT
+CLASS="TYPE"
+>text</TT
+> (равнозначно оператору <TT
+CLASS="LITERAL"
+>#&gt;&gt;</TT
+>).</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>json_extract_path_text(​'{"f2":{"f3":1},"f4":{"f5":99,"f6":"foo"}}','f4', 'f6')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>foo</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <P
+><TT
+CLASS="LITERAL"
+>json_object_keys(​json)</TT
+>
+         </P
+>
+                  <P
+><TT
+CLASS="LITERAL"
+>jsonb_object_keys(​jsonb)</TT
+>
+       </P
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>setof text</TT
+>
+                </TD
+><TD
+>Возвращает число ключей во внешнем объекте JSON.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>json_object_keys(​'{"f1":"abc","f2":{"f3":"a", "f4":"b"}}')</TT
+>
+                </TD
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+> json_object_keys
+------------------
+ f1
+ f2</PRE
+>
+       </TD
+></TR
+><TR
+><TD
+>                  <P
+><TT
+CLASS="LITERAL"
+>json_populate_record(​base anyelement, from_json json)</TT
+>
+         </P
+>
+                  <P
+><TT
+CLASS="LITERAL"
+>jsonb_populate_record(​base anyelement, from_json jsonb)</TT
+>
+       </P
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>anyelement</TT
+>
+                </TD
+><TD
+>Разворачивает объект из <TT
+CLASS="REPLACEABLE"
+><I
+>from_json</I
+></TT
+> в табличную строку, в которой колонки соответствуют типу строки, заданному параметром <TT
+CLASS="REPLACEABLE"
+><I
+>base</I
+></TT
+> (см. примечания ниже).</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>select * from json_populate_record(null::myrowtype, '{"a":1,"b":2}')</TT
+>
+                </TD
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+> a | b
+---+---
+ 1 | 2</PRE
+>
+       </TD
+></TR
+><TR
+><TD
+>                  <P
+><TT
+CLASS="LITERAL"
+>json_populate_recordset(​base anyelement, from_json json)</TT
+>
+         </P
+>
+                  <P
+><TT
+CLASS="LITERAL"
+>jsonb_populate_recordset(​base anyelement, from_json jsonb)</TT
+>
+       </P
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>setof anyelement</TT
+>
+                </TD
+><TD
+>Разворачивает внешний массив объектов из <TT
+CLASS="REPLACEABLE"
+><I
+>from_json</I
+></TT
+> в набор табличных строк, в котором колонки соответствуют типу строки, заданному параметром <TT
+CLASS="REPLACEABLE"
+><I
+>base</I
+></TT
+> (см. примечания ниже).</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>select * from json_populate_recordset(null::myrowtype, '[{"a":1,"b":2},{"a":3,"b":4}]')</TT
+>
+                </TD
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+> a | b
+---+---
+ 1 | 2
+ 3 | 4</PRE
+>
+       </TD
+></TR
+><TR
+><TD
+>                  <P
+><TT
+CLASS="LITERAL"
+>json_array_elements(​json)</TT
+>
+         </P
+>
+                  <P
+><TT
+CLASS="LITERAL"
+>jsonb_array_elements(​jsonb)</TT
+>
+       </P
+>
+                </TD
+><TD
+>                  <P
+><TT
+CLASS="TYPE"
+>setof json</TT
+>
+         </P
+>
+                  <P
+><TT
+CLASS="TYPE"
+>setof jsonb</TT
+>
+       </P
+>
+                </TD
+><TD
+>Разворачивает массив JSON в набор значений JSON.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>select * from json_array_elements('[1,true, [2,false]]')</TT
+>
+                </TD
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>   value
+-----------
+ 1
+ true
+ [2,false]</PRE
+>
+       </TD
+></TR
+><TR
+><TD
+>                  <P
+><TT
+CLASS="LITERAL"
+>json_array_elements_text(​json)</TT
+>
+         </P
+>
+                  <P
+><TT
+CLASS="LITERAL"
+>jsonb_array_elements_text(​jsonb)</TT
+>
+       </P
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>setof text</TT
+>
+                </TD
+><TD
+>Разворачивает массив JSON в набор значений <TT
+CLASS="TYPE"
+>text</TT
+>.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>select * from json_array_elements_text('["foo", "bar"]')</TT
+>
+                </TD
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>   value
+-----------
+ foo
+ bar</PRE
+>
+       </TD
+></TR
+><TR
+><TD
+>                  <P
+><TT
+CLASS="LITERAL"
+>json_typeof(​json)</TT
+>
+         </P
+>
+                  <P
+><TT
+CLASS="LITERAL"
+>jsonb_typeof(​jsonb)</TT
+>
+       </P
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Возвращает тип внешнего значения JSON в виде текстовой строки. Возможные типы: <TT
+CLASS="LITERAL"
+>object</TT
+>, <TT
+CLASS="LITERAL"
+>array</TT
+>, <TT
+CLASS="LITERAL"
+>string</TT
+>, <TT
+CLASS="LITERAL"
+>number</TT
+>, <TT
+CLASS="LITERAL"
+>boolean</TT
+> и <TT
+CLASS="LITERAL"
+>null</TT
+>.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>json_typeof('-123.4')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>number</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <P
+><TT
+CLASS="LITERAL"
+>json_to_record(​json)</TT
+>
+          </P
+>
+                  <P
+><TT
+CLASS="LITERAL"
+>jsonb_to_record(​jsonb)</TT
+>
+       </P
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>record</TT
+>
+                </TD
+><TD
+>Формирует обычную запись из объекта JSON (см. примечания ниже). Как и со всеми функциями, возвращающими <TT
+CLASS="TYPE"
+>record</TT
+>, при вызове необходимо явно определить структуру записи с помощью предложения <TT
+CLASS="LITERAL"
+>AS</TT
+>.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>select * from json_to_record('{"a":1,"b":[1,2,3],"c":"bar"}') as x(a int, b text, d text)</TT
+>
+                </TD
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+> a |    b    | d
+---+---------+---
+ 1 | [1,2,3] |</PRE
+>
+       </TD
+></TR
+><TR
+><TD
+>                  <P
+><TT
+CLASS="LITERAL"
+>json_to_recordset(​json)</TT
+>
+         </P
+>
+                  <P
+><TT
+CLASS="LITERAL"
+>jsonb_to_recordset(​jsonb)</TT
+>
+       </P
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>setof record</TT
+>
+                </TD
+><TD
+>Формирует обычный набор записей из массива объекта JSON (см. примечания ниже). Как и со всеми функциями, возвращающими <TT
+CLASS="TYPE"
+>record</TT
+>, при вызове необходимо явно определить структуру записи с помощью предложения <TT
+CLASS="LITERAL"
+>AS</TT
+>.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>select * from json_to_recordset('[{"a":1,"b":"foo"},{"a":"2","c":"bar"}]') as x(a int, b text);</TT
+>
+                </TD
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+> a |  b
+---+-----
+ 1 | foo
+ 2 |</PRE
+>
+       </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Многие из этих функций и операторов преобразуют спецпоследовательности Unicode в JSON-строках в соответствующие одиночные символы. Для входных данных типа <TT
+CLASS="TYPE"
+>jsonb</TT
+> это ничем не грозит, так как преобразование уже выполнено; однако для типа <TT
+CLASS="TYPE"
+>json</TT
+> в результате может произойти ошибка, как отмечено в <A
+HREF="datatype-json.html"
+>Разделе 8.14</A
+>.</P
+></BLOCKQUOTE
+></DIV
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>В <CODE
+CLASS="FUNCTION"
+>json_populate_record</CODE
+>, <CODE
+CLASS="FUNCTION"
+>json_populate_recordset</CODE
+>, <CODE
+CLASS="FUNCTION"
+>json_to_record</CODE
+> и <CODE
+CLASS="FUNCTION"
+>json_to_recordset</CODE
+> приведение типов из JSON выполняется <SPAN
+CLASS="QUOTE"
+>"насколько это возможно"</SPAN
+> и его результаты могут быть не вполне ожидаемыми для некоторых типов. Ключи JSON сопоставляются с идентичными именами колонок в целевом типе записей. Поля JSON, отсутствующие в целевом типе, в выходные данные не попадают, а целевые колонки, для которых нет соответствующих полей JSON, будут просто содержать NULL.</P
+></BLOCKQUOTE
+></DIV
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Значение <TT
+CLASS="LITERAL"
+>null</TT
+>, возвращаемое функцией <TT
+CLASS="LITERAL"
+>json_typeof</TT
+>, не следует путать с SQL NULL. Тогда как при вызове <TT
+CLASS="LITERAL"
+>json_typeof('null'::json)</TT
+> возвращается <TT
+CLASS="LITERAL"
+>null</TT
+>, при вызове <TT
+CLASS="LITERAL"
+>json_typeof(NULL::json)</TT
+> будет возвращено значение SQL NULL.</P
+></BLOCKQUOTE
+></DIV
+><P
+>В <A
+HREF="functions-aggregate.html"
+>Разделе 9.20</A
+> вы также можете узнать о агрегатной функции <CODE
+CLASS="FUNCTION"
+>json_agg</CODE
+>, которая агрегирует значения записи в виде JSON, и агрегатной функции <CODE
+CLASS="FUNCTION"
+>json_object_agg</CODE
+>, которая агрегирует пары значений в один объект JSON.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions-xml.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="functions-sequence.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>XML-функции</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Функции для работы с последовательностями</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

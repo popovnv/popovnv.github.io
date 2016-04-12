@@ -1,0 +1,670 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>SET</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="SELECT INTO"
+HREF="sql-selectinto.html"><LINK
+REL="NEXT"
+TITLE="SET CONSTRAINTS"
+HREF="sql-set-constraints.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="SELECT INTO"
+HREF="sql-selectinto.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="SET CONSTRAINTS"
+HREF="sql-set-constraints.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-SET"
+></A
+>SET</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN84300"
+></A
+><H2
+>Название</H2
+>SET&nbsp;--&nbsp;изменить параметр времени выполнения</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN84303"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>SET [ SESSION | LOCAL ] <TT
+CLASS="REPLACEABLE"
+><I
+>параметр_конфигурации</I
+></TT
+> { TO | = } { <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> | '<TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+>' | DEFAULT }
+SET [ SESSION | LOCAL ] TIME ZONE { <TT
+CLASS="REPLACEABLE"
+><I
+>часовой_пояс</I
+></TT
+> | LOCAL | DEFAULT }</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN84309"
+></A
+><H2
+>Описание</H2
+><P
+>Команда <TT
+CLASS="COMMAND"
+>SET</TT
+> изменяет конфигурационные параметры времени выполнения. С помощью <TT
+CLASS="COMMAND"
+>SET</TT
+> можно &laquo;на лету&raquo; изменить многие из параметров, перечисленных в <A
+HREF="runtime-config.html"
+>Главе 18</A
+>. (Но для изменения некоторых могут потребоваться права суперпользователя, а другие нельзя изменять после запуска сервера или сеанса.) <TT
+CLASS="COMMAND"
+>SET</TT
+> влияет на значение параметра только в рамках текущего сеанса.</P
+><P
+>Если команда <TT
+CLASS="COMMAND"
+>SET</TT
+> (или равнозначная <TT
+CLASS="COMMAND"
+>SET SESSION</TT
+>) выполняется внутри транзакции, которая затем прерывается, эффект команды <TT
+CLASS="COMMAND"
+>SET</TT
+> пропадает, когда транзакция откатывается. Если же окружающая транзакция фиксируется, этот эффект сохраняется до конца сеанса, если его не переопределит другая команда <TT
+CLASS="COMMAND"
+>SET</TT
+>.</P
+><P
+>Действие <TT
+CLASS="COMMAND"
+>SET LOCAL</TT
+> продолжается только до конца текущей транзакции, независимо от того, фиксируется она или нет. Особый случай представляет использование <TT
+CLASS="COMMAND"
+>SET</TT
+> с последующей <TT
+CLASS="COMMAND"
+>SET LOCAL</TT
+> в одной транзакции: значение, заданное <TT
+CLASS="COMMAND"
+>SET LOCAL</TT
+>, будет сохраняться до конца транзакции, но после этого (если транзакция фиксируется) восстановится значение, заданное командой <TT
+CLASS="COMMAND"
+>SET</TT
+>.</P
+><P
+>Действия <TT
+CLASS="COMMAND"
+>SET</TT
+> или <TT
+CLASS="COMMAND"
+>SET LOCAL</TT
+> также отменяются при откате к точке сохранения, установленной до выполнения этих команд.</P
+><P
+>Если <TT
+CLASS="COMMAND"
+>SET LOCAL</TT
+> применяется в функции, параметр <TT
+CLASS="LITERAL"
+>SET</TT
+> для которой устанавливает значение той же переменной (см. <A
+HREF="sql-createfunction.html"
+>CREATE FUNCTION</A
+>), действие команды <TT
+CLASS="COMMAND"
+>SET LOCAL</TT
+> прекращается при выходе из функции; то есть, в любом случае восстанавливается значение, существовавшее при вызове функции. Это позволяет использовать <TT
+CLASS="COMMAND"
+>SET LOCAL</TT
+> для динамических и неоднократных изменений параметра в рамках функции, и при этом иметь удобную возможность использовать параметр <TT
+CLASS="LITERAL"
+>SET</TT
+> для сохранения и восстановления значения, полученного извне. Однако обычная команда <TT
+CLASS="COMMAND"
+>SET</TT
+> переопределяет любой параметр <TT
+CLASS="LITERAL"
+>SET</TT
+> окружающей функции; её действие сохраняется, если не происходит откат транзакции.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> с версии 8.0 до 8.2 действие <TT
+CLASS="COMMAND"
+>SET LOCAL</TT
+> могло отменяться при освобождении ранее установленной точки сохранения или при успешном выходе из блока исключения <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+>. Затем это поведение было признано неинтуитивным, и было изменено.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN84344"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>SESSION</TT
+></DT
+><DD
+><P
+>Указывает, что команда действует в рамках текущего сеанса. (Это поведение по умолчанию, если не указано ни <TT
+CLASS="LITERAL"
+>SESSION</TT
+>, ни <TT
+CLASS="LITERAL"
+>LOCAL</TT
+>.)</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>LOCAL</TT
+></DT
+><DD
+><P
+>Указывает, что команда действует только в рамках текущей транзакции. После <TT
+CLASS="COMMAND"
+>COMMIT</TT
+> или <TT
+CLASS="COMMAND"
+>ROLLBACK</TT
+> в силу вновь вступает значение, определённое на уровне сеанса. При выполнении такой команды вне блока транзакции выдаётся предупреждение и больше ничего не происходит.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>параметр_конфигурации</I
+></TT
+></DT
+><DD
+><P
+>Имя устанавливаемого параметра времени выполнения. Доступные параметры описаны в <A
+HREF="runtime-config.html"
+>Главе 18</A
+> и ниже.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+></DT
+><DD
+><P
+>Новое значение параметра. Параметры могут задаваться в виде строковых констант, идентификаторов, чисел или списков перечисленных типов через запятую, в зависимости от конкретного параметра. Указание <TT
+CLASS="LITERAL"
+>DEFAULT</TT
+> в данном контексте позволяет сбросить параметр к значению по умолчанию (то есть, к тому значению, которое он имел бы, если в текущем сеансе не выполнялись бы команды <TT
+CLASS="COMMAND"
+>SET</TT
+>).</P
+></DD
+></DL
+></DIV
+><P
+>Помимо конфигурационных параметров, описанных в <A
+HREF="runtime-config.html"
+>Главе 18</A
+>, есть ещё несколько параметров, которые можно изменить только командой <TT
+CLASS="COMMAND"
+>SET</TT
+> или которые имеют особый синтаксис: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>SCHEMA</TT
+></DT
+><DD
+><P
+><TT
+CLASS="LITERAL"
+>SET SCHEMA '<TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+>'</TT
+> — альтернативное написание команды <TT
+CLASS="LITERAL"
+>SET search_path TO <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+></TT
+>. Такой синтаксис позволяет указать только одну схему.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>NAMES</TT
+></DT
+><DD
+><P
+><TT
+CLASS="LITERAL"
+>SET NAMES <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+></TT
+> — альтернативное написание команды <TT
+CLASS="LITERAL"
+>SET client_encoding TO <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+></TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>SEED</TT
+></DT
+><DD
+><P
+>Устанавливает внутреннее начальное значение для генератора случайных чисел (функции <CODE
+CLASS="FUNCTION"
+>random</CODE
+>). В качестве значения допускаются числа с плавающей точкой от -1 до 1, для внутреннего применения они затем умножаются на 2<SUP
+>31</SUP
+>-1.</P
+><P
+>Это начальное значение также можно установить, вызвав функцию <CODE
+CLASS="FUNCTION"
+>setseed</CODE
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT setseed(<TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+>);</PRE
+><P></P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>TIME ZONE</TT
+></DT
+><DD
+><P
+><TT
+CLASS="LITERAL"
+>SET TIME ZONE <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+></TT
+> — альтернативное написание команды <TT
+CLASS="LITERAL"
+>SET timezone TO <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+></TT
+>. Синтаксис <TT
+CLASS="LITERAL"
+>SET TIME ZONE</TT
+> позволяет указывать часовой пояс в специальном формате. Например, допускаются следующие значения: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>'PST8PDT'</TT
+></DT
+><DD
+><P
+>Часовой пояс Беркли, штат Калифорния.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>'Europe/Rome'</TT
+></DT
+><DD
+><P
+>Часовой пояс Италии.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>-7</TT
+></DT
+><DD
+><P
+>Часовой пояс, сдвинутый от UTC на 7 часов к западу (равнозначен PDT). Положительные значения означают сдвиг от UTC к востоку.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>INTERVAL '-08:00' HOUR TO MINUTE</TT
+></DT
+><DD
+><P
+>Часовой пояс, сдвинутый от UTC на 8 часов к западу (равнозначен PST).</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>LOCAL</TT
+><BR><TT
+CLASS="LITERAL"
+>DEFAULT</TT
+></DT
+><DD
+><P
+>Устанавливает в качестве часового пояса местный часовой пояс (то есть, значение серверного параметра <TT
+CLASS="VARNAME"
+>timezone</TT
+> по умолчанию).</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>Значения часового пояса, заданные в виде чисел или интервалов, внутри переводятся в формат часовых поясов POSIX. Например, после <TT
+CLASS="LITERAL"
+>SET TIME ZONE -7</TT
+>, команда <TT
+CLASS="COMMAND"
+>SHOW TIME ZONE</TT
+> покажет <TT
+CLASS="LITERAL"
+>&lt;-07&gt;+07</TT
+>.</P
+><P
+>Узнать о часовых поясах подробнее можно в <A
+HREF="datatype-datetime.html#DATATYPE-TIMEZONES"
+>Подразделе 8.5.3</A
+>.</P
+></DD
+></DL
+></DIV
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN84452"
+></A
+><H2
+>Замечания</H2
+><P
+>Также изменить значение параметра можно с помощью функции <CODE
+CLASS="FUNCTION"
+>set_config</CODE
+>; см. <A
+HREF="functions-admin.html"
+>Раздел 9.26</A
+>. Кроме того, выполнив UPDATE в системном представлении <A
+HREF="view-pg-settings.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_settings</TT
+></A
+>, можно произвести то же действие, что выполняет <TT
+CLASS="COMMAND"
+>SET</TT
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN84460"
+></A
+><H2
+>Примеры</H2
+><P
+>Установка пути поиска схем: </P><PRE
+CLASS="PROGRAMLISTING"
+>SET search_path TO my_schema, public;</PRE
+><P></P
+><P
+>Установка традиционного стиля даты <SPAN
+CLASS="PRODUCTNAME"
+>POSTGRES</SPAN
+> с форматом ввода <SPAN
+CLASS="QUOTE"
+>"день, месяц, год"</SPAN
+>: </P><PRE
+CLASS="SCREEN"
+>SET datestyle TO postgres, dmy;</PRE
+><P></P
+><P
+>Установка часового пояса для Беркли, штат Калифорния: </P><PRE
+CLASS="SCREEN"
+>SET TIME ZONE 'PST8PDT';</PRE
+><P></P
+><P
+>Установка часового пояса Италии: </P><PRE
+CLASS="SCREEN"
+>SET TIME ZONE 'Europe/Rome';</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN84472"
+></A
+><H2
+>Совместимость</H2
+><P
+><TT
+CLASS="LITERAL"
+>SET TIME ZONE</TT
+> расширяет синтаксис, определённый в стандарте SQL. Стандарт допускает только числовые смещения часовых поясов, тогда как <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> позволяет задавать часовой пояс более гибко. Все другие функции <TT
+CLASS="LITERAL"
+>SET</TT
+> являются расширениями <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN84479"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-reset.html"
+>RESET</A
+>, <A
+HREF="sql-show.html"
+>SHOW</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-selectinto.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-set-constraints.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>SELECT INTO</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>SET CONSTRAINTS</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,548 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Модули вывода логического декодирования</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Логическое декодирование"
+HREF="logicaldecoding.html"><LINK
+REL="PREVIOUS"
+TITLE="Системные каталоги, связанные с логическим декодированием"
+HREF="logicaldecoding-catalogs.html"><LINK
+REL="NEXT"
+TITLE="Запись вывода логического декодирования"
+HREF="logicaldecoding-writer.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Системные каталоги, связанные с логическим декодированием"
+HREF="logicaldecoding-catalogs.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="logicaldecoding.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 46. Логическое декодирование</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Запись вывода логического декодирования"
+HREF="logicaldecoding-writer.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="LOGICALDECODING-OUTPUT-PLUGIN"
+>46.6. Модули вывода логического декодирования</A
+></H1
+><P
+>Пример модуля вывода можно найти в подкаталоге <A
+HREF="test-decoding.html"
+><TT
+CLASS="FILENAME"
+>contrib/test_decoding</TT
+></A
+> в дереве исходного кода PostgreSQL.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="LOGICALDECODING-OUTPUT-INIT"
+>46.6.1. Функция инициализации</A
+></H2
+><P
+>Модуль вывода загружается в результате динамической загрузки разделяемой библиотеки (при этом в качестве имени библиотеки задаётся имя модуля). Для нахождения библиотеки применяется обычный путь поиска библиотек. В этой библиотеке должна быть функция <CODE
+CLASS="FUNCTION"
+>_PG_output_plugin_init</CODE
+>, которая показывает, что библиотека на самом деле представляет собой модуль вывода, и устанавливает требуемые обработчики модуля вывода. Этой функции передаётся структура, в которой должны быть заполнены указатели на функции-обработчики отдельных действий. </P><PRE
+CLASS="PROGRAMLISTING"
+>typedef struct OutputPluginCallbacks
+{
+    LogicalDecodeStartupCB startup_cb;
+    LogicalDecodeBeginCB begin_cb;
+    LogicalDecodeChangeCB change_cb;
+    LogicalDecodeCommitCB commit_cb;
+    LogicalDecodeShutdownCB shutdown_cb;
+} OutputPluginCallbacks;
+
+typedef void (*LogicalOutputPluginInit)(struct OutputPluginCallbacks *cb);</PRE
+><P> Обработчики <CODE
+CLASS="FUNCTION"
+>begin_cb</CODE
+>, <CODE
+CLASS="FUNCTION"
+>change_cb</CODE
+> и <CODE
+CLASS="FUNCTION"
+>commit_cb</CODE
+> должны устанавливаться обязательно, а <CODE
+CLASS="FUNCTION"
+>startup_cb</CODE
+> и <CODE
+CLASS="FUNCTION"
+>shutdown_cb</CODE
+> могут отсутствовать.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="LOGICALDECODING-CAPABILITIES"
+>46.6.2. Возможности</A
+></H2
+><P
+>Для декодирования, форматирования и вывода изменений модули вывода могут использовать практически всю обычную инфраструктуру сервера, включая вызов функций вывода типов. К отношениям разрешается доступ только на чтение, если только эти отношения были созданы программой <TT
+CLASS="COMMAND"
+>initdb</TT
+> в схеме <TT
+CLASS="LITERAL"
+>pg_catalog</TT
+>, либо помечены как пользовательские таблицы каталогов командами </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER TABLE user_catalog_table SET (user_catalog_table = true);
+CREATE TABLE another_catalog_table(data text) WITH (user_catalog_table = true);</PRE
+><P> Любые действия, которые требует присвоения идентификатора транзакции, запрещаются. В частности, к этим действиям относятся операции записи в таблицы, изменения DDL и вызов <TT
+CLASS="LITERAL"
+>txid_current()</TT
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="LOGICALDECODING-OUTPUT-MODE"
+>46.6.3. Режимы вывода</A
+></H2
+><P
+>Обработчики в модуле вывода могут передавать данные потребителю в практически любых форматах. Для некоторых вариантов использования, например, просмотра изменений через SQL, вывод информации в типах, которые могут содержать произвольные данные (например, <TT
+CLASS="TYPE"
+>bytea</TT
+>), может быть неудобоваримым. Если модуль вывода выводит только текстовые данные в кодировке сервера, он может объявить это, установив в <TT
+CLASS="LITERAL"
+>OutputPluginOptions.output_mode</TT
+> значение <TT
+CLASS="LITERAL"
+>OUTPUT_PLUGIN_TEXTUAL_OUTPUT</TT
+> вместо <TT
+CLASS="LITERAL"
+>OUTPUT_PLUGIN_BINARY_OUTPUT</TT
+> в <A
+HREF="logicaldecoding-output-plugin.html#LOGICALDECODING-OUTPUT-PLUGIN-STARTUP"
+>обработчике запуска</A
+>. В этом случае все данные должны быть в кодировке сервера, чтобы их можно было передать в значении типа <TT
+CLASS="TYPE"
+>text</TT
+>. Это контролируется в сборках с включёнными проверочными утверждениями.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="LOGICALDECODING-OUTPUT-PLUGIN-CALLBACKS"
+>46.6.4. Обработчики в модуле вывода</A
+></H2
+><P
+>Модуль вывода уведомляется о происходящих изменениях через различные обработчики, которые он должен установить.</P
+><P
+>Параллельные транзакции декодируются в порядке фиксирования, при этом только изменения, относящиеся к определённой транзакции, декодируются между вызовами обработчиков <TT
+CLASS="LITERAL"
+>begin</TT
+> и <TT
+CLASS="LITERAL"
+>commit</TT
+>. Транзакции, отменённые явно или неявно, никогда не декодируются. Успешные точки сохранения заворачиваются в транзакцию, содержащую их, в том порядке, в како они выполнялись в этой транзакции.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Декодироваться будут только те транзакции, которые уже успешно сброшены на диск. Вследствие этого, <TT
+CLASS="COMMAND"
+>COMMIT</TT
+> может не декодироваться в следующем сразу за ним вызове <TT
+CLASS="LITERAL"
+>pg_logical_slot_get_changes()</TT
+>, когда <TT
+CLASS="VARNAME"
+>synchronous_commit</TT
+> имеет значение <TT
+CLASS="LITERAL"
+>off</TT
+>.</P
+></BLOCKQUOTE
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="LOGICALDECODING-OUTPUT-PLUGIN-STARTUP"
+>46.6.4.1. Обработчик запуска</A
+></H3
+><P
+>Необязательный обработчик <CODE
+CLASS="FUNCTION"
+>startup_cb</CODE
+> вызывается, когда слот репликации создаётся или через него запрашивается передача изменений, независимо от того, в каком количестве изменения готовы к передаче. </P><PRE
+CLASS="PROGRAMLISTING"
+>typedef void (*LogicalDecodeStartupCB) (
+    struct LogicalDecodingContext *ctx,
+    OutputPluginOptions *options,
+    bool is_init
+);</PRE
+><P> Параметр <TT
+CLASS="LITERAL"
+>is_init</TT
+> будет равен true, когда слот репликации создаётся, и false в противном случае. Параметр <TT
+CLASS="PARAMETER"
+>options</TT
+> указывает на структуру параметров, которые могут устанавливать модули вывода: </P><PRE
+CLASS="PROGRAMLISTING"
+>typedef struct OutputPluginOptions
+{
+    OutputPluginOutputType output_type;
+} OutputPluginOptions;</PRE
+><P>
+В поле <TT
+CLASS="LITERAL"
+>output_type</TT
+> должно быть значение <TT
+CLASS="LITERAL"
+>OUTPUT_PLUGIN_TEXTUAL_OUTPUT</TT
+> или <TT
+CLASS="LITERAL"
+>OUTPUT_PLUGIN_BINARY_OUTPUT</TT
+>. См. также <A
+HREF="logicaldecoding-output-plugin.html#LOGICALDECODING-OUTPUT-MODE"
+>Подраздел 46.6.3</A
+>.</P
+><P
+>Обработчик запуска должен проверить параметры, представленные в <TT
+CLASS="LITERAL"
+>ctx-&gt;output_plugin_options</TT
+>. Если модулю вывода требуется поддерживать состояние, он может сохранить его в <TT
+CLASS="LITERAL"
+>ctx-&gt;output_plugin_private</TT
+>.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="LOGICALDECODING-OUTPUT-PLUGIN-SHUTDOWN"
+>46.6.4.2. Обработчик выключения</A
+></H3
+><P
+>Необязательный обработчик <CODE
+CLASS="FUNCTION"
+>shutdown_cb</CODE
+> вызывается, когда ранее активный слот репликации перестаёт использоваться, так что ресурсы, занятые модулем вывода, можно освободить. При этом слот не обязательно удаляется, прекращается только потоковая передача через него. </P><PRE
+CLASS="PROGRAMLISTING"
+>typedef void (*LogicalDecodeShutdownCB) (
+    struct LogicalDecodingContext *ctx
+);</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="LOGICALDECODING-OUTPUT-PLUGIN-BEGIN"
+>46.6.4.3. Обработчик начала транзакции</A
+></H3
+><P
+>Обязательный обработчик <CODE
+CLASS="FUNCTION"
+>begin_cb</CODE
+> вызывается, когда декодируется начало зафиксированной транзакции. Прерванные транзакции и их содержимое никогда не декодируется. </P><PRE
+CLASS="PROGRAMLISTING"
+>typedef void (*LogicalDecodeBeginCB) (
+    struct LogicalDecodingContext *,
+    ReorderBufferTXN *txn
+);</PRE
+><P> Параметр <TT
+CLASS="PARAMETER"
+>txn</TT
+> содержит метаинформацию о транзакции, в частности её идентификатор и время её фиксирования.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="LOGICALDECODING-OUTPUT-PLUGIN-COMMIT"
+>46.6.4.4. Обработчик завершения транзакции</A
+></H3
+><P
+>Обязательный обработчик <CODE
+CLASS="FUNCTION"
+>commit_cb</CODE
+> вызывается, когда декодируется фиксирование транзакции. Перед этим обработчиком будет вызываться обработчик <CODE
+CLASS="FUNCTION"
+>change_cb</CODE
+> для всех изменённых строк (если строки были изменены). </P><PRE
+CLASS="PROGRAMLISTING"
+>typedef void (*LogicalDecodeCommitCB) (
+    struct LogicalDecodingContext *,
+    ReorderBufferTXN *txn
+);</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="LOGICALDECODING-OUTPUT-PLUGIN-CHANGE"
+>46.6.4.5. Обработчик изменения</A
+></H3
+><P
+>Обязательный обработчик <CODE
+CLASS="FUNCTION"
+>change_cb</CODE
+> вызывается для каждого отдельного изменения строки в транзакции, производимого командами <TT
+CLASS="COMMAND"
+>INSERT</TT
+>, <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> или <TT
+CLASS="COMMAND"
+>DELETE</TT
+>. Даже если команда изменила несколько строк сразу, этот обработчик будет вызываться для каждой отдельной строки. </P><PRE
+CLASS="PROGRAMLISTING"
+>typedef void (*LogicalDecodeChangeCB) (
+    struct LogicalDecodingContext *ctx,
+    ReorderBufferTXN *txn,
+    Relation relation,
+    ReorderBufferChange *change
+);</PRE
+><P> Параметры <TT
+CLASS="PARAMETER"
+>ctx</TT
+> и <TT
+CLASS="PARAMETER"
+>txn</TT
+> имеют то же содержимое, что и для обработчиков <CODE
+CLASS="FUNCTION"
+>begin_cb</CODE
+> и <CODE
+CLASS="FUNCTION"
+>commit_cb</CODE
+>; дополнительный дескриптор отношения <TT
+CLASS="PARAMETER"
+>relation</TT
+> указывает на отношение, к которому принадлежит строка, а структура <TT
+CLASS="PARAMETER"
+>change</TT
+> описывает передаваемое изменение строки.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>В процессе логического декодирования могут быть обработаны изменения только в таблицах, не являющихся нежурналируемыми (см. описание <A
+HREF="sql-createtable.html#SQL-CREATETABLE-UNLOGGED"
+><I
+CLASS="TERM"
+>                <TT
+CLASS="LITERAL"
+>UNLOGGED</TT
+>
+              </I
+></A
+>) или временными (см. описание <A
+HREF="sql-createtable.html#SQL-CREATETABLE-TEMPORARY"
+><I
+CLASS="TERM"
+><TT
+CLASS="LITERAL"
+>TEMPORARY</TT
+> или <TT
+CLASS="LITERAL"
+>TEMP</TT
+></I
+></A
+>).</P
+></BLOCKQUOTE
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="LOGICALDECODING-OUTPUT-PLUGIN-OUTPUT"
+>46.6.5. Функции для формирования вывода</A
+></H2
+><P
+>Чтобы действительно вывести данные, модули вывода могут записывать их в буфер <TT
+CLASS="LITERAL"
+>StringInfo</TT
+> через <TT
+CLASS="LITERAL"
+>ctx-&gt;out</TT
+>, внутри обработчиков <CODE
+CLASS="FUNCTION"
+>begin_cb</CODE
+>, <CODE
+CLASS="FUNCTION"
+>commit_cb</CODE
+> или <CODE
+CLASS="FUNCTION"
+>change_cb</CODE
+>. Прежде чем записывать данные в этот буфер, необходимо вызвать <CODE
+CLASS="FUNCTION"
+>OutputPluginPrepareWrite(ctx, last_write)</CODE
+>, а завершив запись в буфер, нужно вызвать <CODE
+CLASS="FUNCTION"
+>OutputPluginWrite(ctx, last_write)</CODE
+>, чтобы собственно произвести запись. Параметр <TT
+CLASS="PARAMETER"
+>last_write</TT
+> указывает, была ли эта определённая операция записи последней в данном обработчике.</P
+><P
+>Следующий пример показывает, как вывести данные для потребителя модуля вывода: </P><PRE
+CLASS="PROGRAMLISTING"
+>OutputPluginPrepareWrite(ctx, true);
+appendStringInfo(ctx-&gt;out, "BEGIN %u", txn-&gt;xid);
+OutputPluginWrite(ctx, true);</PRE
+><P></P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="logicaldecoding-catalogs.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="logicaldecoding-writer.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Системные каталоги, связанные с логическим декодированием</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="logicaldecoding.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Запись вывода логического декодирования</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

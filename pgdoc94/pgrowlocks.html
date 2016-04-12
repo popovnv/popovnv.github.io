@@ -1,0 +1,394 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>pgrowlocks</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Дополнительно поставляемые модули"
+HREF="contrib.html"><LINK
+REL="PREVIOUS"
+TITLE="pg_prewarm"
+HREF="pgprewarm.html"><LINK
+REL="NEXT"
+TITLE="pg_stat_statements"
+HREF="pgstatstatements.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="pg_prewarm"
+HREF="pgprewarm.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Приложение E. Дополнительно поставляемые модули</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="pg_stat_statements"
+HREF="pgstatstatements.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="PGROWLOCKS"
+>E.28. pgrowlocks</A
+></H1
+><P
+>Модуль <TT
+CLASS="FILENAME"
+>pgrowlocks</TT
+> предоставляет функцию, показывающую информацию о блокировке строк для заданной таблицы.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN123572"
+>E.28.1. Обзор</A
+></H2
+><PRE
+CLASS="SYNOPSIS"
+>pgrowlocks(text) returns setof record</PRE
+><P
+>В параметре передаётся имя таблицы. В результате возвращается набор записей, в котором строка соответствует строке, заблокированной в таблице. Колонки результата показаны в <A
+HREF="pgrowlocks.html#PGROWLOCKS-COLUMNS"
+>Таблице E-19</A
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="PGROWLOCKS-COLUMNS"
+></A
+><P
+><B
+>Таблица E-19. Колонки результата <CODE
+CLASS="FUNCTION"
+>pgrowlocks</CODE
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>locked_row</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>tid</TT
+>
+                  </TD
+><TD
+>Идентификатор кортежа (TID) блокированной строки</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>locker</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>xid</TT
+>
+                  </TD
+><TD
+>Идентификатор блокирующей транзакции или идентификатор мультитранзакции, если это мультитранзакция</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>multi</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>True, если блокирующий субъект — мультитранзакция</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>xids</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>xid[]</TT
+>
+                  </TD
+><TD
+>Идентификаторы блокирующих транзакций (больше одной для мультитранзакции)</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>lock_type</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>text[]</TT
+>
+                  </TD
+><TD
+>Режим блокирования (больше одного для мультитранзакции), массив со значениями <TT
+CLASS="LITERAL"
+>Key Share</TT
+>, <TT
+CLASS="LITERAL"
+>Share</TT
+>, <TT
+CLASS="LITERAL"
+>For No Key Update</TT
+>, <TT
+CLASS="LITERAL"
+>No Key Update</TT
+>, <TT
+CLASS="LITERAL"
+>For Update</TT
+>, <TT
+CLASS="LITERAL"
+>Update</TT
+>.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="STRUCTFIELD"
+>pids</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>integer[]</TT
+>
+                  </TD
+><TD
+>Идентификаторы блокирующих обслуживающих процессов (больше одного для мультитранзакции)</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>pgrowlocks</CODE
+> запрашивает блокировку <TT
+CLASS="LITERAL"
+>AccessShareLock</TT
+> для целевой таблицы и считывает строку за строкой для сбора информации о блокировке строк. Это происходит небыстро для большой таблицы. Заметьте, что:</P
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>Если таблица в целом заблокирована кем-то ещё, функция <CODE
+CLASS="FUNCTION"
+>pgrowlocks</CODE
+> будет блокироваться.</P
+></LI
+><LI
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>pgrowlocks</CODE
+> не гарантирует внутреннюю согласованность результатов. В ходе её выполнения могут быть установлены новые блокировки строк, либо освобождены старые.</P
+></LI
+></OL
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>pgrowlocks</CODE
+> не показывает содержимое заблокированных строк. Если вы хотите параллельно взглянуть на содержимое строк, можно проделать примерно следующее: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT * FROM accounts AS a, pgrowlocks('accounts') AS p
+  WHERE p.locked_row = a.ctid;</PRE
+><P> Однако учтите, что такой запрос будет очень неэффективным.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN123644"
+>E.28.2. Пример вывода</A
+></H2
+><PRE
+CLASS="SCREEN"
+>test=# SELECT * FROM pgrowlocks('t1');
+ locked_row | lock_type | locker | multi |   xids    |     pids
+------------+-----------+--------+-------+-----------+---------------
+      (0,1) | Shared    |     19 | t     | {804,805} | {29066,29068}
+      (0,2) | Shared    |     19 | t     | {804,805} | {29066,29068}
+      (0,3) | Exclusive |    804 | f     | {804}     | {29066}
+      (0,4) | Exclusive |    804 | f     | {804}     | {29066}
+(4 rows)</PRE
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN123647"
+>E.28.3. Автор</A
+></H2
+><P
+>Тацуо Исии</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="pgprewarm.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="pgstatstatements.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>pg_prewarm</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>pg_stat_statements</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

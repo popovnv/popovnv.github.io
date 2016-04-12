@@ -1,0 +1,258 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Определение использования диска</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Мониторинг использования диска"
+HREF="diskusage.html"><LINK
+REL="PREVIOUS"
+TITLE="Мониторинг использования диска"
+HREF="diskusage.html"><LINK
+REL="NEXT"
+TITLE="Ошибка переполнения диска"
+HREF="disk-full.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Мониторинг использования диска"
+HREF="diskusage.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="diskusage.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 28. Мониторинг использования диска</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Ошибка переполнения диска"
+HREF="disk-full.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="DISK-USAGE"
+>28.1. Определение использования диска</A
+></H1
+><P
+>Для каждой таблицы создаётся первичный дисковый файл кучи (heap), в котором хранится большая часть данных. Если в таблице есть колонки с потенциально большими значениями, то также может быть и ассоциированный с этой таблицей файл <ACRONYM
+CLASS="ACRONYM"
+>TOAST</ACRONYM
+>, который используется для хранения слишком больших значений, не умещающихся в главной таблице (см. <A
+HREF="storage-toast.html"
+>Раздел 59.2</A
+>). На каждую таблицу <ACRONYM
+CLASS="ACRONYM"
+>TOAST</ACRONYM
+>, если она существует, будет существовать один индекс. Также там могут быть и индексы, ассоциированные с базовой таблицей. Каждая таблица и индекс хранятся в отдельном дисковом файле &mdash; возможно более чем в одном файле, если размер этого файла превышает один гигабайт. Преобразования имён для этих файлов описываются в <A
+HREF="storage-file-layout.html"
+>Разделе 59.1</A
+>.</P
+><P
+>Вы можете осуществлять мониторинг дискового пространства тремя способами: используя SQL-функции, перечисленные в <A
+HREF="functions-admin.html#FUNCTIONS-ADMIN-DBSIZE"
+>Таблице 9-70</A
+>, используя модуль <A
+HREF="oid2name.html"
+>oid2name</A
+> или просматривая системные каталоги вручную. Вышеупомянутые SQL функции являются наиболее простыми и рекомендуются для использования. В продолжении этого раздела рассказывается, как просматривать системные каталоги.</P
+><P
+>Используя <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> после недавнего применения команд VACUUM или ANALYZE, вы можете выполнить такой запрос, чтобы увидеть сколько дискового пространства использует какая-либо таблица: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT pg_relation_filepath(oid), relpages FROM pg_class WHERE relname = 'customer';
+
+ pg_relation_filepath | relpages
+----------------------+----------
+ base/16384/16806     |       60
+(1 row)</PRE
+><P> Каждая страница обычно равна 8kb. (Помните, что <TT
+CLASS="STRUCTFIELD"
+>relpages</TT
+> обновляется только командами <TT
+CLASS="COMMAND"
+>VACUUM</TT
+>, <TT
+CLASS="COMMAND"
+>ANALYZE</TT
+>, и несколькими командами DDL, такими как <TT
+CLASS="COMMAND"
+>CREATE INDEX</TT
+>). Путь к файлу представляет интерес, если вы хотите проанализировать непосредственно файл на диске.</P
+><P
+>Чтобы посмотреть пространство, используемое таблицами <ACRONYM
+CLASS="ACRONYM"
+>TOAST</ACRONYM
+>, используйте следующий запрос: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT relname, relpages
+FROM pg_class,
+     (SELECT reltoastrelid
+      FROM pg_class
+      WHERE relname = 'customer') AS ss
+WHERE oid = ss.reltoastrelid OR
+      oid = (SELECT indexrelid
+             FROM pg_index
+             WHERE indrelid = ss.reltoastrelid)
+ORDER BY relname;
+
+       relname        | relpages
+----------------------+----------
+ pg_toast_16806       |        0
+ pg_toast_16806_index |        1</PRE
+><P></P
+><P
+>Вы можете легко посмотреть размеры индексов: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT c2.relname, c2.relpages
+FROM pg_class c, pg_class c2, pg_index i
+WHERE c.relname = 'customer' AND
+      c.oid = i.indrelid AND
+      c2.oid = i.indexrelid
+ORDER BY c2.relname;
+
+       relname        | relpages
+----------------------+----------
+ customer_id_indexdex |       26</PRE
+><P></P
+><P
+>Также легко найти самые большие таблицы и индексы используя эту информацию: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT relname, relpages
+FROM pg_class
+ORDER BY relpages DESC;
+
+       relname        | relpages
+----------------------+----------
+ bigtable             |     3290
+ customer             |     3144</PRE
+><P></P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="diskusage.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="disk-full.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Мониторинг использования диска</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="diskusage.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Ошибка переполнения диска</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

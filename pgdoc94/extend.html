@@ -1,0 +1,661 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Расширение SQL</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Серверное программирование"
+HREF="server-programming.html"><LINK
+REL="PREVIOUS"
+TITLE="Серверное программирование"
+HREF="server-programming.html"><LINK
+REL="NEXT"
+TITLE="Как реализована расширяемость"
+HREF="extend-how.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="CHAPTER"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Серверное программирование"
+HREF="server-programming.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="server-programming.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Как реализована расширяемость"
+HREF="extend-how.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="EXTEND"
+></A
+>Глава 35. Расширение <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+></H1
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Содержание</B
+></DT
+><DT
+>35.1. <A
+HREF="extend-how.html"
+>Как реализована расширяемость</A
+></DT
+><DT
+>35.2. <A
+HREF="extend-type-system.html"
+>Система типов <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></A
+></DT
+><DD
+><DL
+><DT
+>35.2.1. <A
+HREF="extend-type-system.html#AEN54752"
+>Базовые типы</A
+></DT
+><DT
+>35.2.2. <A
+HREF="extend-type-system.html#AEN54758"
+>Составные типы</A
+></DT
+><DT
+>35.2.3. <A
+HREF="extend-type-system.html#EXTEND-TYPE-SYSTEM-DOMAINS"
+>Домены</A
+></DT
+><DT
+>35.2.4. <A
+HREF="extend-type-system.html#AEN54771"
+>Псевдотипы</A
+></DT
+><DT
+>35.2.5. <A
+HREF="extend-type-system.html#EXTEND-TYPES-POLYMORPHIC"
+>Полиморфные типы</A
+></DT
+></DL
+></DD
+><DT
+>35.3. <A
+HREF="xfunc.html"
+>Пользовательские функции</A
+></DT
+><DT
+>35.4. <A
+HREF="xfunc-sql.html"
+>Функции на языке запросов (<ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>)</A
+></DT
+><DD
+><DL
+><DT
+>35.4.1. <A
+HREF="xfunc-sql.html#XFUNC-SQL-FUNCTION-ARGUMENTS"
+>Аргументы <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>-функций</A
+></DT
+><DT
+>35.4.2. <A
+HREF="xfunc-sql.html#XFUNC-SQL-BASE-FUNCTIONS"
+>Функции <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> с базовыми типами</A
+></DT
+><DT
+>35.4.3. <A
+HREF="xfunc-sql.html#XFUNC-SQL-COMPOSITE-FUNCTIONS"
+>Функции <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> со сложными типами</A
+></DT
+><DT
+>35.4.4. <A
+HREF="xfunc-sql.html#XFUNC-OUTPUT-PARAMETERS"
+>Функции <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> с выходными параметрами</A
+></DT
+><DT
+>35.4.5. <A
+HREF="xfunc-sql.html#XFUNC-SQL-VARIADIC-FUNCTIONS"
+>Функции <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> с переменным числом аргументов</A
+></DT
+><DT
+>35.4.6. <A
+HREF="xfunc-sql.html#XFUNC-SQL-PARAMETER-DEFAULTS"
+>Функции <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> со значениями аргументов по умолчанию</A
+></DT
+><DT
+>35.4.7. <A
+HREF="xfunc-sql.html#XFUNC-SQL-TABLE-FUNCTIONS"
+>Функции <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>, порождающие таблицы</A
+></DT
+><DT
+>35.4.8. <A
+HREF="xfunc-sql.html#XFUNC-SQL-FUNCTIONS-RETURNING-SET"
+>Функции <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>, возвращающие множества</A
+></DT
+><DT
+>35.4.9. <A
+HREF="xfunc-sql.html#XFUNC-SQL-FUNCTIONS-RETURNING-TABLE"
+>Функции <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>, возвращающие таблицы (<TT
+CLASS="LITERAL"
+>TABLE</TT
+>)</A
+></DT
+><DT
+>35.4.10. <A
+HREF="xfunc-sql.html#AEN55160"
+>Полиморфные функции <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+></A
+></DT
+><DT
+>35.4.11. <A
+HREF="xfunc-sql.html#AEN55186"
+>Функции <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> с правилами сортировки</A
+></DT
+></DL
+></DD
+><DT
+>35.5. <A
+HREF="xfunc-overload.html"
+>Перегрузка функций</A
+></DT
+><DT
+>35.6. <A
+HREF="xfunc-volatility.html"
+>Категории изменчивости функций</A
+></DT
+><DT
+>35.7. <A
+HREF="xfunc-pl.html"
+>Функции на процедурных языках</A
+></DT
+><DT
+>35.8. <A
+HREF="xfunc-internal.html"
+>Внутренние функции</A
+></DT
+><DT
+>35.9. <A
+HREF="xfunc-c.html"
+>Функции на языке C</A
+></DT
+><DD
+><DL
+><DT
+>35.9.1. <A
+HREF="xfunc-c.html#XFUNC-C-DYNLOAD"
+>Динамическая загрузка</A
+></DT
+><DT
+>35.9.2. <A
+HREF="xfunc-c.html#XFUNC-C-BASETYPE"
+>Базовые типы в функциях на языке C</A
+></DT
+><DT
+>35.9.3. <A
+HREF="xfunc-c.html#AEN55707"
+>Соглашение о вызовах версии 0</A
+></DT
+><DT
+>35.9.4. <A
+HREF="xfunc-c.html#AEN55734"
+>Соглашение о вызовах версии 1</A
+></DT
+><DT
+>35.9.5. <A
+HREF="xfunc-c.html#AEN55791"
+>Написание кода</A
+></DT
+><DT
+>35.9.6. <A
+HREF="xfunc-c.html#DFUNC"
+>Компиляция и компоновка динамически загружаемых функций</A
+></DT
+><DT
+>35.9.7. <A
+HREF="xfunc-c.html#AEN56006"
+>Аргументы составного типа</A
+></DT
+><DT
+>35.9.8. <A
+HREF="xfunc-c.html#AEN56030"
+>Возврат строк (составных типов)</A
+></DT
+><DT
+>35.9.9. <A
+HREF="xfunc-c.html#XFUNC-C-RETURN-SET"
+>Возврат множеств</A
+></DT
+><DT
+>35.9.10. <A
+HREF="xfunc-c.html#AEN56153"
+>Полиморфные типы аргументов и результата</A
+></DT
+><DT
+>35.9.11. <A
+HREF="xfunc-c.html#XFUNC-TRANSFORM-FUNCTIONS"
+>Функции преобразования</A
+></DT
+><DT
+>35.9.12. <A
+HREF="xfunc-c.html#AEN56204"
+>Разделяемая память и лёгкие блокировки</A
+></DT
+><DT
+>35.9.13. <A
+HREF="xfunc-c.html#EXTEND-CPP"
+>Использование C++ для расширяемости</A
+></DT
+></DL
+></DD
+><DT
+>35.10. <A
+HREF="xaggr.html"
+>Пользовательские агрегатные функции</A
+></DT
+><DD
+><DL
+><DT
+>35.10.1. <A
+HREF="xaggr.html#XAGGR-MOVING-AGGREGATES"
+>Режим движущегося агрегата</A
+></DT
+><DT
+>35.10.2. <A
+HREF="xaggr.html#XAGGR-POLYMORPHIC-AGGREGATES"
+>Агрегатные функции с полиморфными и переменными аргументами</A
+></DT
+><DT
+>35.10.3. <A
+HREF="xaggr.html#XAGGR-ORDERED-SET-AGGREGATES"
+>Сортирующие агрегатные функции</A
+></DT
+><DT
+>35.10.4. <A
+HREF="xaggr.html#XAGGR-SUPPORT-FUNCTIONS"
+>Вспомогательные функции для агрегатов</A
+></DT
+></DL
+></DD
+><DT
+>35.11. <A
+HREF="xtypes.html"
+>Пользовательские типы</A
+></DT
+><DT
+>35.12. <A
+HREF="xoper.html"
+>Пользовательские операторы</A
+></DT
+><DT
+>35.13. <A
+HREF="xoper-optimization.html"
+>Информация для оптимизации операторов</A
+></DT
+><DD
+><DL
+><DT
+>35.13.1. <A
+HREF="xoper-optimization.html#AEN56519"
+><TT
+CLASS="LITERAL"
+>COMMUTATOR</TT
+></A
+></DT
+><DT
+>35.13.2. <A
+HREF="xoper-optimization.html#AEN56554"
+><TT
+CLASS="LITERAL"
+>NEGATOR</TT
+></A
+></DT
+><DT
+>35.13.3. <A
+HREF="xoper-optimization.html#AEN56570"
+><TT
+CLASS="LITERAL"
+>RESTRICT</TT
+></A
+></DT
+><DT
+>35.13.4. <A
+HREF="xoper-optimization.html#AEN56620"
+><TT
+CLASS="LITERAL"
+>JOIN</TT
+></A
+></DT
+><DT
+>35.13.5. <A
+HREF="xoper-optimization.html#AEN56652"
+><TT
+CLASS="LITERAL"
+>HASHES</TT
+></A
+></DT
+><DT
+>35.13.6. <A
+HREF="xoper-optimization.html#AEN56674"
+><TT
+CLASS="LITERAL"
+>MERGES</TT
+></A
+></DT
+></DL
+></DD
+><DT
+>35.14. <A
+HREF="xindex.html"
+>Интерфейсы расширений для индексов</A
+></DT
+><DD
+><DL
+><DT
+>35.14.1. <A
+HREF="xindex.html#XINDEX-OPCLASS"
+>Методы индексов и классы операторов</A
+></DT
+><DT
+>35.14.2. <A
+HREF="xindex.html#XINDEX-STRATEGIES"
+>Стратегии методов индексов</A
+></DT
+><DT
+>35.14.3. <A
+HREF="xindex.html#XINDEX-SUPPORT"
+>Опорные процедуры метода индекса</A
+></DT
+><DT
+>35.14.4. <A
+HREF="xindex.html#XINDEX-EXAMPLE"
+>Пример</A
+></DT
+><DT
+>35.14.5. <A
+HREF="xindex.html#XINDEX-OPFAMILY"
+>Семейства и классы операторов</A
+></DT
+><DT
+>35.14.6. <A
+HREF="xindex.html#XINDEX-OPCLASS-DEPENDENCIES"
+>Системные зависимости от классов операторов</A
+></DT
+><DT
+>35.14.7. <A
+HREF="xindex.html#XINDEX-ORDERING-OPS"
+>Операторы упорядочивания</A
+></DT
+><DT
+>35.14.8. <A
+HREF="xindex.html#XINDEX-OPCLASS-FEATURES"
+>Особенности классов операторов</A
+></DT
+></DL
+></DD
+><DT
+>35.15. <A
+HREF="extend-extensions.html"
+>Упаковывание связанных объектов в расширение</A
+></DT
+><DD
+><DL
+><DT
+>35.15.1. <A
+HREF="extend-extensions.html#AEN57226"
+>Файлы расширений</A
+></DT
+><DT
+>35.15.2. <A
+HREF="extend-extensions.html#AEN57344"
+>Перемещаемость расширений</A
+></DT
+><DT
+>35.15.3. <A
+HREF="extend-extensions.html#AEN57385"
+>Конфигурационные таблицы расширений</A
+></DT
+><DT
+>35.15.4. <A
+HREF="extend-extensions.html#AEN57406"
+>Обновление расширений</A
+></DT
+><DT
+>35.15.5. <A
+HREF="extend-extensions.html#AEN57461"
+>Пример расширения</A
+></DT
+></DL
+></DD
+><DT
+>35.16. <A
+HREF="extend-pgxs.html"
+>Инфраструктура сборки расширений</A
+></DT
+></DL
+></DIV
+><P
+>В следующих разделах мы обсудим, как в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> можно расширять язык запросов SQL,
+добавляя собственные: <P
+></P
+></P><UL
+COMPACT="COMPACT"
+><LI
+STYLE="list-style-type: disc"
+><P
+>функции (начиная с <A
+HREF="xfunc.html"
+>Раздела 35.3</A
+>)</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>агрегатные функции (начиная с <A
+HREF="xaggr.html"
+>Раздела 35.10</A
+>)</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>типы данных (начиная с <A
+HREF="xtypes.html"
+>Раздела 35.11</A
+>)</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>операторы (начиная с <A
+HREF="xoper.html"
+>Раздела 35.12</A
+>)</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>классы операторов для индексов (начиная с <A
+HREF="xindex.html"
+>Раздела 35.14</A
+>)</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>пакеты связанных объектов (начиная с <A
+HREF="extend-extensions.html"
+>Раздела 35.15</A
+>)</P
+></LI
+></UL
+><P></P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="server-programming.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="extend-how.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Серверное программирование</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="server-programming.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Как реализована расширяемость</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

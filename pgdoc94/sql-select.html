@@ -1,0 +1,3919 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>SELECT</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="SECURITY LABEL"
+HREF="sql-security-label.html"><LINK
+REL="NEXT"
+TITLE="SELECT INTO"
+HREF="sql-selectinto.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="SECURITY LABEL"
+HREF="sql-security-label.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="SELECT INTO"
+HREF="sql-selectinto.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-SELECT"
+></A
+>SELECT</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN83089"
+></A
+><H2
+>Название</H2
+>SELECT, TABLE, WITH&nbsp;--&nbsp;получить строки из таблицы или представления</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN83094"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>[ WITH [ RECURSIVE ] <TT
+CLASS="REPLACEABLE"
+><I
+>запрос_WITH</I
+></TT
+> [, ...] ]
+SELECT [ ALL | DISTINCT [ ON ( <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> [, ...] ) ] ]
+    [ * | <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> [ [ AS ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_результата</I
+></TT
+> ] [, ...] ]
+    [ FROM <TT
+CLASS="REPLACEABLE"
+><I
+>элемент_FROM</I
+></TT
+> [, ...] ]
+    [ WHERE <TT
+CLASS="REPLACEABLE"
+><I
+>условие</I
+></TT
+> ]
+    [ GROUP BY <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> [, ...] ]
+    [ HAVING <TT
+CLASS="REPLACEABLE"
+><I
+>условие</I
+></TT
+> [, ...] ]
+    [ WINDOW <TT
+CLASS="REPLACEABLE"
+><I
+>имя_окна</I
+></TT
+> AS ( <TT
+CLASS="REPLACEABLE"
+><I
+>определение_окна</I
+></TT
+> ) [, ...] ]
+    [ { UNION | INTERSECT | EXCEPT } [ ALL | DISTINCT ] <TT
+CLASS="REPLACEABLE"
+><I
+>выборка</I
+></TT
+> ]
+    [ ORDER BY <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> [ ASC | DESC | USING <TT
+CLASS="REPLACEABLE"
+><I
+>оператор</I
+></TT
+> ] [ NULLS { FIRST | LAST } ] [, ...] ]
+    [ LIMIT { <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+> | ALL } ]
+    [ OFFSET <TT
+CLASS="REPLACEABLE"
+><I
+>начало</I
+></TT
+> [ ROW | ROWS ] ]
+    [ FETCH { FIRST | NEXT } [ <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+> ] { ROW | ROWS } ONLY ]
+    [ FOR { UPDATE | NO KEY UPDATE | SHARE | KEY SHARE } [ OF <TT
+CLASS="REPLACEABLE"
+><I
+>table_name</I
+></TT
+> [, ...] ] [ NOWAIT ] [...] ]
+
+<SPAN
+CLASS="phrase"
+><SPAN
+CLASS="PHRASE"
+>Здесь допускается <TT
+CLASS="REPLACEABLE"
+><I
+>элемент_FROM</I
+></TT
+>:</SPAN
+></SPAN
+>
+
+    [ ONLY ] <TT
+CLASS="REPLACEABLE"
+><I
+>table_name</I
+></TT
+> [ * ] [ [ AS ] <TT
+CLASS="REPLACEABLE"
+><I
+>псевдоним</I
+></TT
+> [ ( <TT
+CLASS="REPLACEABLE"
+><I
+>псевдоним_колонки</I
+></TT
+> [, ...] ) ] ]
+    [ LATERAL ] ( <TT
+CLASS="REPLACEABLE"
+><I
+>выборка</I
+></TT
+> ) [ AS ] <TT
+CLASS="REPLACEABLE"
+><I
+>псевдоним</I
+></TT
+> [ ( <TT
+CLASS="REPLACEABLE"
+><I
+>псевдоним_колонки</I
+></TT
+> [, ...] ) ]
+    <TT
+CLASS="REPLACEABLE"
+><I
+>имя_запроса_WITH</I
+></TT
+> [ [ AS ] <TT
+CLASS="REPLACEABLE"
+><I
+>псевдоним</I
+></TT
+> [ ( <TT
+CLASS="REPLACEABLE"
+><I
+>псевдоним_колонки</I
+></TT
+> [, ...] ) ] ]
+    [ LATERAL ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_функции</I
+></TT
+> ( [ <TT
+CLASS="REPLACEABLE"
+><I
+>аргумент</I
+></TT
+> [, ...] ] )
+                [ WITH ORDINALITY ] [ [ AS ] <TT
+CLASS="REPLACEABLE"
+><I
+>псевдоним</I
+></TT
+> [ ( <TT
+CLASS="REPLACEABLE"
+><I
+>псевдоним_колонки</I
+></TT
+> [, ...] ) ] ]
+    [ LATERAL ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_функции</I
+></TT
+> ( [ <TT
+CLASS="REPLACEABLE"
+><I
+>аргумент</I
+></TT
+> [, ...] ] ) [ AS ] <TT
+CLASS="REPLACEABLE"
+><I
+>псевдоним</I
+></TT
+> ( <TT
+CLASS="REPLACEABLE"
+><I
+>определение_колонки</I
+></TT
+> [, ...] )
+    [ LATERAL ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_функции</I
+></TT
+> ( [ <TT
+CLASS="REPLACEABLE"
+><I
+>аргумент</I
+></TT
+> [, ...] ] ) AS ( <TT
+CLASS="REPLACEABLE"
+><I
+>определение_колонки</I
+></TT
+> [, ...] )
+    [ LATERAL ] ROWS FROM( <TT
+CLASS="REPLACEABLE"
+><I
+>имя_функции</I
+></TT
+> ( [ <TT
+CLASS="REPLACEABLE"
+><I
+>аргумент</I
+></TT
+> [, ...] ] ) [ AS ( <TT
+CLASS="REPLACEABLE"
+><I
+>определение_колонки</I
+></TT
+> [, ...] ) ] [, ...] )
+                [ WITH ORDINALITY ] [ [ AS ] <TT
+CLASS="REPLACEABLE"
+><I
+>псевдоним</I
+></TT
+> [ ( <TT
+CLASS="REPLACEABLE"
+><I
+>псевдоним_колонки</I
+></TT
+> [, ...] ) ] ]
+    <TT
+CLASS="REPLACEABLE"
+><I
+>элемент_FROM</I
+></TT
+> [ NATURAL ] <TT
+CLASS="REPLACEABLE"
+><I
+>тип_соединения</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>элемент_FROM</I
+></TT
+> [ ON <TT
+CLASS="REPLACEABLE"
+><I
+>условие_соединения</I
+></TT
+> | USING ( <TT
+CLASS="REPLACEABLE"
+><I
+>колонка_соединения</I
+></TT
+> [, ...] ) ]
+
+<SPAN
+CLASS="phrase"
+><SPAN
+CLASS="PHRASE"
+>и <TT
+CLASS="REPLACEABLE"
+><I
+>запрос_WITH</I
+></TT
+>:</SPAN
+></SPAN
+>
+
+    <TT
+CLASS="REPLACEABLE"
+><I
+>имя_запроса_WITH</I
+></TT
+> [ ( <TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+> [, ...] ) ] AS ( <TT
+CLASS="REPLACEABLE"
+><I
+>выборка</I
+></TT
+> | <TT
+CLASS="REPLACEABLE"
+><I
+>values</I
+></TT
+> | <TT
+CLASS="REPLACEABLE"
+><I
+>insert</I
+></TT
+> | <TT
+CLASS="REPLACEABLE"
+><I
+>update</I
+></TT
+> | <TT
+CLASS="REPLACEABLE"
+><I
+>delete</I
+></TT
+> )
+
+TABLE [ ONLY ] <TT
+CLASS="REPLACEABLE"
+><I
+>table_name</I
+></TT
+> [ * ]</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN83155"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>SELECT</TT
+> получает строки из множества таблиц (возможно, пустого). Общая процедура выполнения <TT
+CLASS="COMMAND"
+>SELECT</TT
+> следующая: <P
+></P
+></P><OL
+TYPE="1"
+><LI
+><P
+>Выполняются все запросы в списке <TT
+CLASS="LITERAL"
+>WITH</TT
+>. По сути они формируют временные таблицы, к которым затем можно обращаться в списке <TT
+CLASS="LITERAL"
+>FROM</TT
+>. Запрос в <TT
+CLASS="LITERAL"
+>WITH</TT
+> выполняется только один раз, даже если он фигурирует в списке <TT
+CLASS="LITERAL"
+>FROM</TT
+> неоднократно. (См. <A
+HREF="sql-select.html#SQL-WITH"
+><I
+>Предложение <I
+>WITH</I
+></I
+></A
+> ниже.)</P
+></LI
+><LI
+><P
+>Вычисляются все элементы в списке <TT
+CLASS="LITERAL"
+>FROM</TT
+>. (Каждый элемент в списке <TT
+CLASS="LITERAL"
+>FROM</TT
+> представляет собой реальную или виртуальную таблицу.) Если список <TT
+CLASS="LITERAL"
+>FROM</TT
+> содержит несколько элементов, они объединяются перекрёстным соединением. (См. <A
+HREF="sql-select.html#SQL-FROM"
+><I
+>Предложение <I
+>FROM</I
+></I
+></A
+> ниже.)</P
+></LI
+><LI
+><P
+>Если указано предложение <TT
+CLASS="LITERAL"
+>WHERE</TT
+>, все строки, не удовлетворяющие условию, исключаются из результата. (См. <A
+HREF="sql-select.html#SQL-WHERE"
+><I
+>Предложение <I
+>WHERE</I
+></I
+></A
+>.)</P
+></LI
+><LI
+><P
+>Если присутствует указание <TT
+CLASS="LITERAL"
+>GROUP BY</TT
+>, либо в запросе вызываются агрегатные функции, вывод разделяется по группам строк, соответствующим одному или нескольким значениям, а затем вычисляются результаты агрегатных функций. Если добавлено предложение <TT
+CLASS="LITERAL"
+>HAVING</TT
+>, оно исключает группы, не удовлетворяющие заданному условию. (См. <A
+HREF="sql-select.html#SQL-GROUPBY"
+><I
+>Предложение <I
+>GROUP BY</I
+></I
+></A
+> и <A
+HREF="sql-select.html#SQL-HAVING"
+><I
+>Предложение <I
+>HAVING</I
+></I
+></A
+> ниже.)</P
+></LI
+><LI
+><P
+>Вычисляются фактические выходные строки по заданным в <TT
+CLASS="COMMAND"
+>SELECT</TT
+> выражениям для каждой выбранной строки или группы строк. (См. <A
+HREF="sql-select.html#SQL-SELECT-LIST"
+><I
+>Список <I
+>SELECT</I
+></I
+></A
+> ниже.)</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>SELECT DISTINCT</TT
+> исключает из результата повторяющиеся строки. <TT
+CLASS="LITERAL"
+>SELECT DISTINCT ON</TT
+> исключает строки, совпадающие по всем указанным выражениям. <TT
+CLASS="LITERAL"
+>SELECT ALL</TT
+> (по умолчанию) возвращает все строки результата, включая дубликаты. (См. <A
+HREF="sql-select.html#SQL-DISTINCT"
+><I
+>Предложение <I
+>DISTINCT</I
+></I
+></A
+> ниже.)</P
+></LI
+><LI
+><P
+>Операторы <TT
+CLASS="LITERAL"
+>UNION</TT
+>, <TT
+CLASS="LITERAL"
+>INTERSECT</TT
+> и <TT
+CLASS="LITERAL"
+>EXCEPT</TT
+> объединяют вывод нескольких операторов <TT
+CLASS="COMMAND"
+>SELECT</TT
+> в один результирующий набор. Оператор <TT
+CLASS="LITERAL"
+>UNION</TT
+> возвращает все строки, представленные в одном, либо обоих наборах результатов. Оператор <TT
+CLASS="LITERAL"
+>INTERSECT</TT
+> возвращает все строки, представленные строго в обоих наборах. Оператор <TT
+CLASS="LITERAL"
+>EXCEPT</TT
+> возвращает все строки, представленные в первом наборе, но не во втором. Во всех трёх случаях повторяющиеся строки исключаются из результата, если явно не указано <TT
+CLASS="LITERAL"
+>ALL</TT
+>. Чтобы явно обозначить, что выдаваться должны только неповторяющиеся строки, можно добавить избыточное слово <TT
+CLASS="LITERAL"
+>DISTINCT</TT
+>. Заметьте, что в данном контексте по умолчанию подразумевается <TT
+CLASS="LITERAL"
+>DISTINCT</TT
+>, хотя в самом <TT
+CLASS="COMMAND"
+>SELECT</TT
+> по умолчанию подразумевается <TT
+CLASS="LITERAL"
+>ALL</TT
+>. (См. <A
+HREF="sql-select.html#SQL-UNION"
+><I
+>Предложение <I
+>UNION</I
+>+</I
+></A
+>, <A
+HREF="sql-select.html#SQL-INTERSECT"
+><I
+>Предложение <I
+>INTERSECT</I
+></I
+></A
+> и <A
+HREF="sql-select.html#SQL-EXCEPT"
+><I
+>Предложение <I
+>EXCEPT</I
+></I
+></A
+>.)</P
+></LI
+><LI
+><P
+>Если присутствует предложение <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+>, возвращаемые строки сортируются в указанном порядке. В отсутствие <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> строки возвращаются в том порядке, в каком системе будет проще их выдать. (См. <A
+HREF="sql-select.html#SQL-ORDERBY"
+><I
+>Предложение <I
+>ORDER BY</I
+></I
+></A
+>.)</P
+></LI
+><LI
+><P
+>Если указано предложение <TT
+CLASS="LITERAL"
+>LIMIT</TT
+> (или <TT
+CLASS="LITERAL"
+>FETCH FIRST</TT
+>), либо <TT
+CLASS="LITERAL"
+>OFFSET</TT
+>, оператор <TT
+CLASS="COMMAND"
+>SELECT</TT
+> возвращает только подмножество строк результата. (См. <A
+HREF="sql-select.html#SQL-LIMIT"
+><I
+>Предложение <I
+>LIMIT</I
+></I
+></A
+>.)</P
+></LI
+><LI
+><P
+>Если указано <TT
+CLASS="LITERAL"
+>FOR UPDATE</TT
+>, <TT
+CLASS="LITERAL"
+>FOR NO KEY UPDATE</TT
+>, <TT
+CLASS="LITERAL"
+>FOR SHARE</TT
+> или <TT
+CLASS="LITERAL"
+>FOR KEY SHARE</TT
+>, оператор <TT
+CLASS="COMMAND"
+>SELECT</TT
+> блокирует выбранные строки, защищая их от одновременных изменений. (См. <A
+HREF="sql-select.html#SQL-FOR-UPDATE-SHARE"
+><I
+>Предложение блокировки</I
+></A
+> ниже.)</P
+></LI
+></OL
+><P></P
+><P
+>Для всех колонок, задействованных в команде <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, необходимо иметь право <TT
+CLASS="LITERAL"
+>SELECT</TT
+>. Применение блокировок <TT
+CLASS="LITERAL"
+>FOR NO KEY UPDATE</TT
+>, <TT
+CLASS="LITERAL"
+>FOR UPDATE</TT
+>, <TT
+CLASS="LITERAL"
+>FOR SHARE</TT
+> или <TT
+CLASS="LITERAL"
+>FOR KEY SHARE</TT
+> требует также права <TT
+CLASS="LITERAL"
+>UPDATE</TT
+> (как минимум для одной колонки в каждой выбранной для блокировки таблице).</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN83239"
+></A
+><H2
+>Параметры</H2
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="SQL-WITH"
+></A
+><H3
+>Предложение <TT
+CLASS="LITERAL"
+>WITH</TT
+></H3
+><P
+>Предложение <TT
+CLASS="LITERAL"
+>WITH</TT
+> позволяет задать один или несколько подзапросов, к которым затем можно обратиться по имени в основном запросе. Эти подзапросы по сути действуют как временные таблицы или представления в процессе выполнения главного запроса. Каждый подзапрос может представлять собой оператор <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, <TT
+CLASS="COMMAND"
+>TABLE</TT
+>, <TT
+CLASS="COMMAND"
+>VALUES</TT
+>, <TT
+CLASS="COMMAND"
+>INSERT</TT
+>, <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> или <TT
+CLASS="COMMAND"
+>DELETE</TT
+>. При использовании в <TT
+CLASS="LITERAL"
+>WITH</TT
+> оператора, изменяющего данные, (<TT
+CLASS="COMMAND"
+>INSERT</TT
+>, <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> или <TT
+CLASS="COMMAND"
+>DELETE</TT
+>) обычно добавляется предложение <TT
+CLASS="LITERAL"
+>RETURNING</TT
+>. Заметьте, что именно результат <TT
+CLASS="LITERAL"
+>RETURNING</TT
+>, а <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>не</I
+></SPAN
+> нижележащая таблица, изменяемая запросом, формирует временную таблицу, которую затем читает основной запрос. Если <TT
+CLASS="LITERAL"
+>RETURNING</TT
+> опущено, оператор, тем не менее, выполняется, но не выдаёт никакого результата, так что на него нельзя сослаться как на таблицу в основном запросе.</P
+><P
+>Имя (без схемы) должно быть указано для каждого запроса <TT
+CLASS="LITERAL"
+>WITH</TT
+>. Также можно задать необязательный список с именами колонок; если он опущен, имена колонок формируются из результата подзапроса.</P
+><P
+>Если указано <TT
+CLASS="LITERAL"
+>RECURSIVE</TT
+>, подзапрос <TT
+CLASS="COMMAND"
+>SELECT</TT
+> может ссылаться сам на себя по имени. Такой подзапрос должен иметь форму </P><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>нерекурсивная_часть</I
+></TT
+> UNION [ ALL | DISTINCT ] <TT
+CLASS="REPLACEABLE"
+><I
+>рекурсивная_часть</I
+></TT
+></PRE
+><P>, где рекурсивная ссылка на сам запрос может находиться только справа от <TT
+CLASS="LITERAL"
+>UNION</TT
+>. Для одного запроса допускается только одна рекурсивная ссылка на него же. Операторы, изменяющие данные, не могут быть рекурсивными, но результат рекурсивного запроса <TT
+CLASS="COMMAND"
+>SELECT</TT
+> в таких операторах можно использовать. За примером обратитесь к <A
+HREF="queries-with.html"
+>Разделу 7.8</A
+>.</P
+><P
+>Ещё одна особенность <TT
+CLASS="LITERAL"
+>RECURSIVE</TT
+> в том, что запросы <TT
+CLASS="LITERAL"
+>WITH</TT
+> могут быть неупорядоченными: запрос может ссылаться на другой, идущий в списке после него. (Однако циклические ссылки или взаимная рекурсия не поддерживаются.) Без <TT
+CLASS="LITERAL"
+>RECURSIVE</TT
+> запрос в <TT
+CLASS="LITERAL"
+>WITH</TT
+> может ссылаться только на запросы того же уровня в <TT
+CLASS="LITERAL"
+>WITH</TT
+>, предшествующие ему в списке <TT
+CLASS="LITERAL"
+>WITH</TT
+>.</P
+><P
+>Ключевое свойство запросов <TT
+CLASS="LITERAL"
+>WITH</TT
+> состоит в том, что они вычисляются один раз для всего основного запроса, даже если в основном запросе содержатся несколько ссылок на них. В частности, гарантируется, что операторы, изменяющие данные, будут выполняться ровно один раз, вне зависимости от того, будет ли их результат прочитан основным запросом и в каком объёме.</P
+><P
+>Основной запрос и все запросы <TT
+CLASS="LITERAL"
+>WITH</TT
+>, условно говоря, выполняются одновременно. Это значит, что действие оператора, изменяющего данные в <TT
+CLASS="LITERAL"
+>WITH</TT
+>, не будут видеть другие части запроса, кроме как прочитав его вывод <TT
+CLASS="LITERAL"
+>RETURNING</TT
+>. Если два таких оператора попытаются изменить одну строку, результат будет неопределённым.</P
+><P
+>За дополнительными сведениями обратитесь к <A
+HREF="queries-with.html"
+>Разделу 7.8</A
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="SQL-FROM"
+></A
+><H3
+>Предложение <TT
+CLASS="LITERAL"
+>FROM</TT
+></H3
+><P
+>В предложении <TT
+CLASS="LITERAL"
+>FROM</TT
+> перечисляются одна или несколько таблиц, служащих источниками данных для <TT
+CLASS="COMMAND"
+>SELECT</TT
+>. Если указано несколько источников, результатом будет декартово произведение (перекрёстное соединение) всех их строк. Но обычно в запрос добавляются уточняющие условия (в предложении <TT
+CLASS="LITERAL"
+>WHERE</TT
+>), которые ограничивают набор строк небольшим подмножеством этого произведения.</P
+><P
+>Предложение <TT
+CLASS="LITERAL"
+>FROM</TT
+> может содержать следующие элементы: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>table_name</I
+></TT
+></DT
+><DD
+><P
+>Имя (возможно, дополненное схемой) существующей таблицы или представления. Если перед именем таблицы указано <TT
+CLASS="LITERAL"
+>ONLY</TT
+>, считывается только заданная таблица. Без <TT
+CLASS="LITERAL"
+>ONLY</TT
+> считывается и заданная таблица, и все её потомки (если таковые есть). После имени таблицы можно также добавить необязательное указание <TT
+CLASS="LITERAL"
+>*</TT
+>, чтобы явно обозначить, что блокировка затрагивает и все дочерние таблицы.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>псевдоним</I
+></TT
+></DT
+><DD
+><P
+>Альтернативное имя для элемента списка <TT
+CLASS="LITERAL"
+>FROM</TT
+>. Этот псевдоним используется для краткости или для исключения неоднозначности с замкнутыми соединениями (когда одна таблица читается неоднократно). Когда задаётся псевдоним, он полностью скрывает настоящее имя таблицы или функции; например, при записи <TT
+CLASS="LITERAL"
+>FROM foo AS f</TT
+>, в продолжении запроса <TT
+CLASS="COMMAND"
+>SELECT</TT
+> к этому элементу <TT
+CLASS="LITERAL"
+>FROM</TT
+> нужно обращаться по имени <TT
+CLASS="LITERAL"
+>f</TT
+>, а не <TT
+CLASS="LITERAL"
+>foo</TT
+>. Если задан псевдоним таблицы, за ним можно также написать список псевдонимов колонок, который определит альтернативные имена для колонок таблицы.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>выборка</I
+></TT
+></DT
+><DD
+><P
+>Предложение <TT
+CLASS="LITERAL"
+>FROM</TT
+> может содержать вложенный запрос <TT
+CLASS="COMMAND"
+>SELECT</TT
+>. Можно считать, что из его результата создаётся временная таблица на время выполнения основной команды <TT
+CLASS="COMMAND"
+>SELECT</TT
+>. Заметьте, что вложенный запрос <TT
+CLASS="COMMAND"
+>SELECT</TT
+> должен заключаться в скобки и для него <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>должен</I
+></SPAN
+> задаваться псевдоним. Здесь также можно использовать команду <A
+HREF="sql-values.html"
+>VALUES</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_запроса_WITH</I
+></TT
+></DT
+><DD
+><P
+>На запрос <TT
+CLASS="LITERAL"
+>WITH</TT
+> можно ссылаться по имени, как если бы имя запроса представляло имя таблицы. (На самом деле запрос <TT
+CLASS="LITERAL"
+>WITH</TT
+> скрывает любую реальную таблицу с тем же именем для основного запроса. Если необходимо обратиться к одноимённой реальной таблице, можно дополнить имя этой таблицы именем схемы.) Для этого имени можно задать псевдоним, так же, как и для имени таблицы.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_функции</I
+></TT
+></DT
+><DD
+><P
+>В предложении <TT
+CLASS="LITERAL"
+>FROM</TT
+> могут содержаться вызовы функций. (Это особенно полезно для функций, возвращающих множества, но в принципе можно использовать любые функции.) Можно считать, что из результата функции создаётся временная таблица на время выполнения основной команды <TT
+CLASS="COMMAND"
+>SELECT</TT
+>. Если вызов функции сопровождается необязательным предложением <TT
+CLASS="COMMAND"
+>WITH ORDINALITY</TT
+>, после всех выдаваемых функцией колонок в вывод добавляется ещё одна колонка с номерами строк.</P
+><P
+>Псевдоним для функции можно задать так же, как и для таблицы. Если этот псевдоним задан, за ним можно также написать список псевдонимов колонок, который определит альтернативные имена для атрибутов составного типа результата функции, включая имя колонки, которая может быть добавлена предложением <TT
+CLASS="LITERAL"
+>ORDINALITY</TT
+>.</P
+><P
+>Несколько вызовов функций можно объединить в одном элементе предложения <TT
+CLASS="LITERAL"
+>FROM</TT
+>, заключив их в конструкцию <TT
+CLASS="LITERAL"
+>ROWS FROM( ... )</TT
+>. Выводом такого элемента будет соединение первых строк всех функций, затем вторых строк и т. д. Если одни функции выдают меньше строк, чем другие, недостающие данные заменяются NULL, так что общее число возвращаемых строк всегда будет равняться максимальному числу строк из возвращённых всеми функциями.</P
+><P
+>Если функция определена как возвращающая тип данных <TT
+CLASS="TYPE"
+>record</TT
+>, для неё нужно указать псевдоним или ключевое слово <TT
+CLASS="LITERAL"
+>AS</TT
+>, за которым должен идти список определений колонок в форме <TT
+CLASS="LITERAL"
+>( <TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>тип_данных</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, ... </SPAN
+>])</TT
+>. Список определений колонок должен соответствовать фактическому количеству и типу колонок, возвращаемых функцией.</P
+><P
+>Если при использовании синтаксиса <TT
+CLASS="LITERAL"
+>ROWS FROM( ... )</TT
+> одна из функций требует наличия списка определений колонок, этот список лучше разместить после вызова функции внутри <TT
+CLASS="LITERAL"
+>ROWS FROM( ... )</TT
+>. Список определений колонок можно поместить после конструкции <TT
+CLASS="LITERAL"
+>ROWS FROM( ... )</TT
+>, только если вызывается всего одна функция, а предложение <TT
+CLASS="LITERAL"
+>WITH ORDINALITY</TT
+> отсутствует.</P
+><P
+>Чтобы использовать <TT
+CLASS="LITERAL"
+>ORDINALITY</TT
+> со списком определений колонок, необходимо применить запись <TT
+CLASS="LITERAL"
+>ROWS FROM( ... )</TT
+> и поместить список с определениями колонок внутрь <TT
+CLASS="LITERAL"
+>ROWS FROM( ... )</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>тип_соединения</I
+></TT
+></DT
+><DD
+><P
+>Один из следующих вариантов: <P
+></P
+></P><UL
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>[ INNER ] JOIN</TT
+></P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>LEFT [ OUTER ] JOIN</TT
+></P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>RIGHT [ OUTER ] JOIN</TT
+></P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>FULL [ OUTER ] JOIN</TT
+></P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>CROSS JOIN</TT
+></P
+></LI
+></UL
+><P> Для типов соединений <TT
+CLASS="LITERAL"
+>INNER</TT
+> и <TT
+CLASS="LITERAL"
+>OUTER</TT
+> необходимо указать условие соединения, а именно одно из предложений <TT
+CLASS="LITERAL"
+>NATURAL</TT
+>, <TT
+CLASS="LITERAL"
+>ON <TT
+CLASS="REPLACEABLE"
+><I
+>условие_соединения</I
+></TT
+></TT
+> или <TT
+CLASS="LITERAL"
+>USING (<TT
+CLASS="REPLACEABLE"
+><I
+>колонка_соединения</I
+></TT
+> [, ...])</TT
+>. Эти предложения описываются ниже. Для <TT
+CLASS="LITERAL"
+>CROSS JOIN</TT
+> ни одно из этих предложений не допускается.</P
+><P
+>Предложение <TT
+CLASS="LITERAL"
+>JOIN</TT
+> объединяет два элемента списка <TT
+CLASS="LITERAL"
+>FROM</TT
+>, которые мы для простоты дальше будем называть <SPAN
+CLASS="QUOTE"
+>"таблицами"</SPAN
+>, хотя на самом деле это может быть любой объект, допустимый в качестве элемента <TT
+CLASS="LITERAL"
+>FROM</TT
+>. Для определения порядка вложенности при необходимости следует использовать скобки. В отсутствие скобок предложения <TT
+CLASS="LITERAL"
+>JOIN</TT
+> обрабатывается слева направо. В любом случае, <TT
+CLASS="LITERAL"
+>JOIN</TT
+> связывает элементы сильнее, чем запятые, разделяющие элементы в списке <TT
+CLASS="LITERAL"
+>FROM</TT
+>.</P
+><P
+><TT
+CLASS="LITERAL"
+>CROSS JOIN</TT
+> и <TT
+CLASS="LITERAL"
+>INNER JOIN</TT
+> формируют простое декартово произведение, то же, что можно получить, указав две таблицы на верхнем уровне <TT
+CLASS="LITERAL"
+>FROM</TT
+>, но ограниченное возможным условием соединения. Предложение <TT
+CLASS="LITERAL"
+>CROSS JOIN</TT
+> равнозначно <TT
+CLASS="LITERAL"
+>INNER JOIN ON (TRUE)</TT
+>, то есть, никакие строки по условию не удаляются. Эти типы соединений введены исключительно для удобства записи, они не дают ничего такого, что нельзя было бы получить, используя просто <TT
+CLASS="LITERAL"
+>FROM</TT
+> и <TT
+CLASS="LITERAL"
+>WHERE</TT
+>.</P
+><P
+><TT
+CLASS="LITERAL"
+>LEFT OUTER JOIN</TT
+> возвращает все строки ограниченного декартова произведения (т. е. все объединённые строки, удовлетворяющие условию соединения) плюс все строки в таблице слева, для которых не находится строк в таблице справа, удовлетворяющих условию. Строка, взятая из таблицы слева, дополняется до полной ширины объединённой таблицы значениями NULL в колонках таблицы справа. Заметьте, что для определения, какие строки двух таблиц соответствуют друг другу, проверяется только условие самого предложения <TT
+CLASS="LITERAL"
+>JOIN</TT
+>. Внешние условия проверяются позже.</P
+><P
+><TT
+CLASS="LITERAL"
+>RIGHT OUTER JOIN</TT
+>, напротив, возвращает все соединённые строки плюс одну строку для каждой строки справа, не имеющей соответствия слева (эта строка дополняется значениями NULL влево). Это предложение введено исключительно для удобства записи, так как его можно легко свести к <TT
+CLASS="LITERAL"
+>LEFT OUTER JOIN</TT
+>, поменяв левую и правую таблицы местами.</P
+><P
+><TT
+CLASS="LITERAL"
+>FULL OUTER JOIN</TT
+> возвращает все соединённые строки плюс все строки слева, не имеющие соответствия справа, (дополненные значениями NULL вправо) плюс все строки справа, не имеющие соответствия слева (дополненные значениями NULL влево).</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>ON <TT
+CLASS="REPLACEABLE"
+><I
+>условие_соединения</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Задаваемое <TT
+CLASS="REPLACEABLE"
+><I
+>условие_соединения</I
+></TT
+> представляет собой выражение, выдающее значение типа <TT
+CLASS="TYPE"
+>boolean</TT
+> (как в предложении <TT
+CLASS="LITERAL"
+>WHERE</TT
+>), которое определяет, какие строки считаются соответствующими при соединении.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>USING ( <TT
+CLASS="REPLACEABLE"
+><I
+>колонка_соединения</I
+></TT
+> [, ...] )</TT
+></DT
+><DD
+><P
+>Предложение вида <TT
+CLASS="LITERAL"
+>USING ( a, b, ... )</TT
+> представляет собой сокращённую форму записи <TT
+CLASS="LITERAL"
+>ON таблица_слева.a = таблица_справа.a AND таблица_слева.b = таблица_справа.b ...</TT
+>. Кроме того, <TT
+CLASS="LITERAL"
+>USING</TT
+> подразумевает, что в результат соединения будет включена только одна из пары равных колонок, но не обе.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>NATURAL</TT
+></DT
+><DD
+><P
+><TT
+CLASS="LITERAL"
+>NATURAL</TT
+> представляет собой краткую запись <TT
+CLASS="LITERAL"
+>USING</TT
+> со списком, в котором перечисляются все колонки двух таблиц, имеющие одинаковые имена.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>LATERAL</TT
+></DT
+><DD
+><P
+>Ключевое слово <TT
+CLASS="LITERAL"
+>LATERAL</TT
+> может предварять вложенный запрос <TT
+CLASS="COMMAND"
+>SELECT</TT
+> в списке <TT
+CLASS="LITERAL"
+>FROM</TT
+>. Оно позволяет обращаться в этом вложенном <TT
+CLASS="COMMAND"
+>SELECT</TT
+> к колонкам элементов <TT
+CLASS="LITERAL"
+>FROM</TT
+>, предшествующим ему в списке <TT
+CLASS="LITERAL"
+>FROM</TT
+>. (Без <TT
+CLASS="LITERAL"
+>LATERAL</TT
+> все вложенные подзапросы <TT
+CLASS="COMMAND"
+>SELECT</TT
+> обрабатываются независимо и не могут ссылаться на другие элементы списка <TT
+CLASS="LITERAL"
+>FROM</TT
+>.)</P
+><P
+>Слово <TT
+CLASS="LITERAL"
+>LATERAL</TT
+> можно также добавить перед вызовом функции в списке <TT
+CLASS="LITERAL"
+>FROM</TT
+>, но в этом случае оно будет избыточным, так как выражения с функциями могут ссылаться на предыдущие элементы списка <TT
+CLASS="LITERAL"
+>FROM</TT
+> в любом случае.</P
+><P
+>Элемент <TT
+CLASS="LITERAL"
+>LATERAL</TT
+> может находиться на верхнем уровне списка <TT
+CLASS="LITERAL"
+>FROM</TT
+> или в дереве <TT
+CLASS="LITERAL"
+>JOIN</TT
+>. В последнем случае он может также ссылаться на любые элементы в левой части <TT
+CLASS="LITERAL"
+>JOIN</TT
+>, справа от которого он находится.</P
+><P
+>Когда элемент <TT
+CLASS="LITERAL"
+>FROM</TT
+> содержит ссылки <TT
+CLASS="LITERAL"
+>LATERAL</TT
+>, запрос выполняется следующим образом: сначала для строки элемента <TT
+CLASS="LITERAL"
+>FROM</TT
+> с целевыми колонками, или набора строк из нескольких элементов <TT
+CLASS="LITERAL"
+>FROM</TT
+>, содержащих целевые колонки, вычисляется элемент <TT
+CLASS="LITERAL"
+>LATERAL</TT
+> со значениями этих колонок. Затем результирующие строки обычным образом соединяются со строками, из которых они были вычислены. Эта процедура повторяется для всех строк исходных таблиц.</P
+><P
+>Таблица, служащая источником колонок, должна быть связана с элементом <TT
+CLASS="LITERAL"
+>LATERAL</TT
+> соединением <TT
+CLASS="LITERAL"
+>INNER</TT
+> или <TT
+CLASS="LITERAL"
+>LEFT</TT
+>, в противном случае не образуется однозначно определяемый набор строк, из которого можно будет получать наборы строк для элемента <TT
+CLASS="LITERAL"
+>LATERAL</TT
+>. Таким образом, хотя конструкция <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>X</I
+></TT
+> RIGHT JOIN LATERAL <TT
+CLASS="REPLACEABLE"
+><I
+>Y</I
+></TT
+></TT
+> синтаксически правильная, <TT
+CLASS="REPLACEABLE"
+><I
+>Y</I
+></TT
+> в ней не может обращаться к <TT
+CLASS="REPLACEABLE"
+><I
+>X</I
+></TT
+>.</P
+></DD
+></DL
+></DIV
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="SQL-WHERE"
+></A
+><H3
+>Предложение <TT
+CLASS="LITERAL"
+>WHERE</TT
+></H3
+><P
+>Необязательное предложение <TT
+CLASS="LITERAL"
+>WHERE</TT
+> имеет общую форму </P><PRE
+CLASS="SYNOPSIS"
+>WHERE <TT
+CLASS="REPLACEABLE"
+><I
+>условие</I
+></TT
+></PRE
+><P>, где <TT
+CLASS="REPLACEABLE"
+><I
+>условие</I
+></TT
+> — любое выражение, выдающее результат типа <TT
+CLASS="TYPE"
+>boolean</TT
+>. Любая строка, не удовлетворяющая этому условию, исключается из результата. Строка удовлетворяет условию, если оно возвращает true при подстановке вместо ссылок на переменные фактических значений из этой строки.</P
+></DIV
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="SQL-GROUPBY"
+></A
+><H3
+>Предложение <TT
+CLASS="LITERAL"
+>GROUP BY</TT
+></H3
+><P
+>Необязательное предложение <TT
+CLASS="LITERAL"
+>GROUP BY</TT
+> имеет общую форму </P><PRE
+CLASS="SYNOPSIS"
+>GROUP BY <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> [, ...]</PRE
+><P></P
+><P
+><TT
+CLASS="LITERAL"
+>GROUP BY</TT
+> собирает в одну строку все выбранные строки, выдающие одинаковые значения для выражений группировки. В нём <TT
+CLASS="REPLACEABLE"
+><I
+>выражением</I
+></TT
+> может быть имя входной колонки, либо имя или порядковый номер выходной колонки (из списка элементов <TT
+CLASS="COMMAND"
+>SELECT</TT
+>), либо произвольное выражение, вычисляемое по значениям входных колонок. В случае неоднозначности имя в <TT
+CLASS="LITERAL"
+>GROUP BY</TT
+> будет восприниматься как имя входной, а не выходной колонки.</P
+><P
+>Агрегатные функции, если они используются, вычисляются по всем строкам, составляющим каждую группу, и в итоге выдают отдельное значение для каждой группы. (Если агрегатные функции используются без предложения <TT
+CLASS="LITERAL"
+>GROUP BY</TT
+>, запрос выполняется как с одной группой, включающей все выбранные строки.) Набор строк, поступающих в каждую агрегатную функцию, можно дополнительно отфильтровать, добавив предложение <TT
+CLASS="LITERAL"
+>FILTER</TT
+> к вызову агрегатной функции; за дополнительными сведениями обратитесь к <A
+HREF="sql-expressions.html#SYNTAX-AGGREGATES"
+>Подразделу 4.2.7</A
+>. С предложением <TT
+CLASS="LITERAL"
+>FILTER</TT
+> на вход агрегатной функции поступают только те строки, которые соответствуют заданному фильтру.</P
+><P
+>Когда в запросе присутствует предложение <TT
+CLASS="LITERAL"
+>GROUP BY</TT
+> или какая-либо агрегатная функция, выражения в списке <TT
+CLASS="COMMAND"
+>SELECT</TT
+> не могут обращаться к негруппируемым колонкам, кроме как в агрегатных функциях или в случае функциональной зависимости, так как иначе в негруппируемой колонке нужно было бы вернуть более одного возможного значения. Функциональная зависимость образуется, если группируемые колонки (или их подмножество) составляют первичный ключ таблицы, содержащей негруппируемую колонку.</P
+><P
+>Имейте в виду, что все агрегатные функции вычисляются перед <SPAN
+CLASS="QUOTE"
+>"скалярными"</SPAN
+> выражениями в предложении <TT
+CLASS="LITERAL"
+>HAVING</TT
+> или списке <TT
+CLASS="LITERAL"
+>SELECT</TT
+>. Это значит, что например, с помощью выражения <TT
+CLASS="LITERAL"
+>CASE</TT
+> нельзя обойти вычисление агрегатной функции; см. <A
+HREF="sql-expressions.html#SYNTAX-EXPRESS-EVAL"
+>Подраздел 4.2.14</A
+>.</P
+><P
+>В настоящее время указания <TT
+CLASS="LITERAL"
+>FOR NO KEY UPDATE</TT
+>, <TT
+CLASS="LITERAL"
+>FOR UPDATE</TT
+>, <TT
+CLASS="LITERAL"
+>FOR SHARE</TT
+> и <TT
+CLASS="LITERAL"
+>FOR KEY SHARE</TT
+> нельзя задать вместе с <TT
+CLASS="LITERAL"
+>GROUP BY</TT
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="SQL-HAVING"
+></A
+><H3
+>Предложение <TT
+CLASS="LITERAL"
+>HAVING</TT
+></H3
+><P
+>Необязательное предложение <TT
+CLASS="LITERAL"
+>HAVING</TT
+> имеет общую форму </P><PRE
+CLASS="SYNOPSIS"
+>HAVING <TT
+CLASS="REPLACEABLE"
+><I
+>условие</I
+></TT
+></PRE
+><P> Здесь <TT
+CLASS="REPLACEABLE"
+><I
+>условие</I
+></TT
+> задаётся так же, как и для предложения <TT
+CLASS="LITERAL"
+>WHERE</TT
+>.</P
+><P
+><TT
+CLASS="LITERAL"
+>HAVING</TT
+> исключает из результата строки групп, не удовлетворяющих условию. <TT
+CLASS="LITERAL"
+>HAVING</TT
+> отличается от <TT
+CLASS="LITERAL"
+>WHERE</TT
+>: <TT
+CLASS="LITERAL"
+>WHERE</TT
+> фильтрует отдельные строки до применения <TT
+CLASS="LITERAL"
+>GROUP BY</TT
+>, а <TT
+CLASS="LITERAL"
+>HAVING</TT
+> фильтрует строки групп, созданных предложением <TT
+CLASS="LITERAL"
+>GROUP BY</TT
+>. Каждая колонка, фигурирующая в <TT
+CLASS="REPLACEABLE"
+><I
+>условии</I
+></TT
+>, должна однозначно ссылаться на группируемую колонку, за исключением случаев, когда эта ссылка находится внутри агрегатной функции или негруппируемая колонка функционально зависит от группируемых.</P
+><P
+>В присутствие <TT
+CLASS="LITERAL"
+>HAVING</TT
+> запрос превращается в группируемый, даже если <TT
+CLASS="LITERAL"
+>GROUP BY</TT
+> отсутствует. То же самое происходит, когда запрос содержит агрегатные функции, но не предложение <TT
+CLASS="LITERAL"
+>GROUP BY</TT
+>. Все выбранные строки считаются формирующими одну группу, а в списке <TT
+CLASS="COMMAND"
+>SELECT</TT
+> и предложении <TT
+CLASS="LITERAL"
+>HAVING</TT
+> можно обращаться к колонкам таблицы только из агрегатных функций. Такой запрос будет выдавать единственную строку, если результат условия <TT
+CLASS="LITERAL"
+>HAVING</TT
+> — true, и ноль строк в противном случае.</P
+><P
+>В настоящее время указания <TT
+CLASS="LITERAL"
+>FOR NO KEY UPDATE</TT
+>, <TT
+CLASS="LITERAL"
+>FOR UPDATE</TT
+>, <TT
+CLASS="LITERAL"
+>FOR SHARE</TT
+> и <TT
+CLASS="LITERAL"
+>FOR KEY SHARE</TT
+> нельзя задать вместе с <TT
+CLASS="LITERAL"
+>HAVING</TT
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="SQL-WINDOW"
+></A
+><H3
+>Предложение <TT
+CLASS="LITERAL"
+>WINDOW</TT
+></H3
+><P
+>Необязательное предложение <TT
+CLASS="LITERAL"
+>WINDOW</TT
+> имеет общую форму </P><PRE
+CLASS="SYNOPSIS"
+>WINDOW <TT
+CLASS="REPLACEABLE"
+><I
+>имя_окна</I
+></TT
+> AS ( <TT
+CLASS="REPLACEABLE"
+><I
+>определение_окна</I
+></TT
+> ) [, ...]</PRE
+><P> Здесь <TT
+CLASS="REPLACEABLE"
+><I
+>имя_окна</I
+></TT
+> — это имя, на которое можно ссылаться из предложений <TT
+CLASS="LITERAL"
+>OVER</TT
+> или последующих определений окон, а <TT
+CLASS="REPLACEABLE"
+><I
+>определение_окна</I
+></TT
+> имеет следующий вид: </P><PRE
+CLASS="SYNOPSIS"
+>[ <TT
+CLASS="REPLACEABLE"
+><I
+>имя_существующего_окна</I
+></TT
+> ]
+[ PARTITION BY <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> [, ...] ]
+[ ORDER BY <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> [ ASC | DESC | USING <TT
+CLASS="REPLACEABLE"
+><I
+>оператор</I
+></TT
+> ] [ NULLS { FIRST | LAST } ] [, ...] ]
+[ <TT
+CLASS="REPLACEABLE"
+><I
+>предложение_рамки</I
+></TT
+> ]</PRE
+><P></P
+><P
+>Если указано <TT
+CLASS="REPLACEABLE"
+><I
+>имя_существующего_окна</I
+></TT
+>, оно должно ссылаться на предшествующую запись в списке <TT
+CLASS="LITERAL"
+>WINDOW</TT
+>; новое окно копирует предложение разбиения из этой записи, а также предложение сортировки, если оно присутствует. В этом случае для нового окна нельзя задать собственное предложение <TT
+CLASS="LITERAL"
+>PARTITION BY</TT
+>, а <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> можно указать, только если его не было у копируемого окна. Новое окно всегда использует собственное предложение рамки; в копируемом окне оно задаваться не должно.</P
+><P
+>Элементы списка <TT
+CLASS="LITERAL"
+>PARTITION BY</TT
+> интерпретируется во многом так же, как и элементы <A
+HREF="sql-select.html#SQL-GROUPBY"
+><I
+>Предложение <I
+>GROUP BY</I
+></I
+></A
+>, за исключением того, что это всегда простые выражения, но не имя или номер выходной колонки. Другое различие состоит в том, что эти выражения могут содержать вызовы агрегатных функций, которые не допускаются в обычном предложении <TT
+CLASS="LITERAL"
+>GROUP BY</TT
+>. Здесь они допускаются потому, что формирование окна происходит после группировки и агрегирования.</P
+><P
+>Подобным образом, элементы списка <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> интерпретируются во многом так же, как и элементы <A
+HREF="sql-select.html#SQL-ORDERBY"
+><I
+>Предложение <I
+>ORDER BY</I
+></I
+></A
+>, за исключением того, что выражения в нём всегда принимаются как простые выражения, но не имя или номер выходной колонки.</P
+><P
+>Необязательное <TT
+CLASS="REPLACEABLE"
+><I
+>предложение_рамки</I
+></TT
+> определяет <I
+CLASS="FIRSTTERM"
+>рамку окна</I
+> для оконных функций, которые зависят от рамки (не все функции таковы). Рамка окна — это набор связанных строк для каждой строки запроса (называемой <I
+CLASS="FIRSTTERM"
+>текущей строкой</I
+>). В качестве <TT
+CLASS="REPLACEABLE"
+><I
+>предложения_рамки</I
+></TT
+> может задаваться </P><PRE
+CLASS="SYNOPSIS"
+>{ RANGE | ROWS } <TT
+CLASS="REPLACEABLE"
+><I
+>начало_рамки</I
+></TT
+>
+{ RANGE | ROWS } BETWEEN <TT
+CLASS="REPLACEABLE"
+><I
+>начало_рамки</I
+></TT
+> AND <TT
+CLASS="REPLACEABLE"
+><I
+>конец_рамки</I
+></TT
+></PRE
+><P> Здесь <TT
+CLASS="REPLACEABLE"
+><I
+>начало_рамки</I
+></TT
+> и <TT
+CLASS="REPLACEABLE"
+><I
+>конец_рамки</I
+></TT
+> может задаваться как </P><PRE
+CLASS="SYNOPSIS"
+>UNBOUNDED PRECEDING
+<TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> PRECEDING
+CURRENT ROW
+<TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> FOLLOWING
+UNBOUNDED FOLLOWING</PRE
+><P> Если <TT
+CLASS="REPLACEABLE"
+><I
+>конец_рамки</I
+></TT
+> опущен, по умолчанию подразумевается <TT
+CLASS="LITERAL"
+>CURRENT ROW</TT
+>. В качестве <TT
+CLASS="REPLACEABLE"
+><I
+>начала_рамки</I
+></TT
+> нельзя задать <TT
+CLASS="LITERAL"
+>UNBOUNDED FOLLOWING</TT
+>, а в качестве <TT
+CLASS="REPLACEABLE"
+><I
+>конца_рамки</I
+></TT
+> — <TT
+CLASS="LITERAL"
+>UNBOUNDED PRECEDING</TT
+>, к тому же выбранный вариант <TT
+CLASS="REPLACEABLE"
+><I
+>конца_рамки</I
+></TT
+> не может стоять в приведённом списке выше варианта <TT
+CLASS="REPLACEABLE"
+><I
+>начала_рамки</I
+></TT
+> &mdash; например, комбинация <TT
+CLASS="LITERAL"
+>RANGE BETWEEN CURRENT ROW AND <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> PRECEDING</TT
+> не допускается.</P
+><P
+>По умолчанию рамка образуется предложением <TT
+CLASS="LITERAL"
+>RANGE UNBOUNDED PRECEDING</TT
+>, что по сути то же, что <TT
+CLASS="LITERAL"
+>RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</TT
+>; оно устанавливает рамку так, что она включает все строки от начала раздела до последней строки, родственной текущей (строки, которую <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> считает равной текущей), либо все строки раздела, если <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> отсутствует. Вообще <TT
+CLASS="LITERAL"
+>UNBOUNDED PRECEDING</TT
+> означает, что рамка начинается с первой строки раздела, а <TT
+CLASS="LITERAL"
+>UNBOUNDED FOLLOWING</TT
+> означает, что рамка заканчивается на последней строке раздела (вне зависимости от режима <TT
+CLASS="LITERAL"
+>RANGE</TT
+> или <TT
+CLASS="LITERAL"
+>ROWS</TT
+>). В режиме <TT
+CLASS="LITERAL"
+>ROWS</TT
+> указание <TT
+CLASS="LITERAL"
+>CURRENT ROW</TT
+> означает, что рамка начинается или заканчивается текущей строкой; но в режиме <TT
+CLASS="LITERAL"
+>RANGE</TT
+> оно означает, что рамка начинается или заканчивается первой или последней строкой, родственной текущей, согласно порядку <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+>. Варианты <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> <TT
+CLASS="LITERAL"
+>PRECEDING</TT
+> и <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> <TT
+CLASS="LITERAL"
+>FOLLOWING</TT
+> в настоящее время допускаются только в режиме <TT
+CLASS="LITERAL"
+>ROWS</TT
+>. Они показывают, что рамка начинается или заканчивается со сдвигом на заданное количество строк назад или вперёд от текущей. Здесь <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> должно быть целочисленным выражением, не содержащим никакие переменные, агрегатные или оконные функции. Это значение не может быть отрицательным или равным NULL, но может быть равно 0 (при этом выбирается текущая строка).</P
+><P
+>Учтите, что варианты <TT
+CLASS="LITERAL"
+>ROWS</TT
+> могут выдавать непредсказуемые результаты, если согласно порядку, заданному в <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+>, строки сортируются неоднозначно. Варианты <TT
+CLASS="LITERAL"
+>RANGE</TT
+> предусмотрены для того, чтобы строки, являющиеся родственными в порядке <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+>, обрабатывались одинаково; все родственные строки будут находиться в одной рамке.</P
+><P
+>Предложение <TT
+CLASS="LITERAL"
+>WINDOW</TT
+> применяется для управления поведением <I
+CLASS="FIRSTTERM"
+>оконных функций</I
+>, фигурирующих в запросе, в <A
+HREF="sql-select.html#SQL-SELECT-LIST"
+><I
+>Список <I
+>SELECT</I
+></I
+></A
+> или <A
+HREF="sql-select.html#SQL-ORDERBY"
+><I
+>Предложение <I
+>ORDER BY</I
+></I
+></A
+>. Эти функции могут обращаться к элементам <TT
+CLASS="LITERAL"
+>WINDOW</TT
+> по именам в своих предложениях <TT
+CLASS="LITERAL"
+>OVER</TT
+>. При этом элементы <TT
+CLASS="LITERAL"
+>WINDOW</TT
+> не обязательно задействовать в запросе; если они не используется, они просто игнорируется. Оконные функции можно использовать вовсе без элементов <TT
+CLASS="LITERAL"
+>WINDOW</TT
+>, так как в вызове оконной функции можно задать определение окна непосредственно в предложении <TT
+CLASS="LITERAL"
+>OVER</TT
+>. Однако предложение <TT
+CLASS="LITERAL"
+>WINDOW</TT
+> позволяет сократить текст запроса, когда одно и то же определение окна применяется при вызове нескольких оконных функций.</P
+><P
+>В настоящее время указания <TT
+CLASS="LITERAL"
+>FOR NO KEY UPDATE</TT
+>, <TT
+CLASS="LITERAL"
+>FOR UPDATE</TT
+>, <TT
+CLASS="LITERAL"
+>FOR SHARE</TT
+> и <TT
+CLASS="LITERAL"
+>FOR KEY SHARE</TT
+> нельзя задать вместе с <TT
+CLASS="LITERAL"
+>WINDOW</TT
+>.</P
+><P
+>Оконные функции подробно описываются в <A
+HREF="tutorial-window.html"
+>Разделе 3.5</A
+>, <A
+HREF="sql-expressions.html#SYNTAX-WINDOW-FUNCTIONS"
+>Подразделе 4.2.8</A
+> и <A
+HREF="queries-table-expressions.html#QUERIES-WINDOW"
+>Подразделе 7.2.4</A
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="SQL-SELECT-LIST"
+></A
+><H3
+>Список <TT
+CLASS="COMMAND"
+>SELECT</TT
+></H3
+><P
+>Список <TT
+CLASS="COMMAND"
+>SELECT</TT
+> (между ключевыми словами <TT
+CLASS="LITERAL"
+>SELECT</TT
+> и <TT
+CLASS="LITERAL"
+>FROM</TT
+>) содержит выражения, которые формируют выходные строки оператора <TT
+CLASS="COMMAND"
+>SELECT</TT
+>. Эти выражения могут обращаться (и обычно обращаются) к колонкам, вычисленным в предложении <TT
+CLASS="LITERAL"
+>FROM</TT
+>.</P
+><P
+>Так же, как в таблице, каждая выходная колонка <TT
+CLASS="COMMAND"
+>SELECT</TT
+> имеет имя. В простом предложении <TT
+CLASS="COMMAND"
+>SELECT</TT
+> это имя просто помечает колонку при выводе, но когда <TT
+CLASS="COMMAND"
+>SELECT</TT
+> представляет собой подзапрос большого запроса, это имя большой запрос видит как имя колонки виртуальной таблицы, созданной подзапросом. Чтобы задать имя для выходной колонки, нужно написать <TT
+CLASS="LITERAL"
+>AS</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>выходное_имя</I
+></TT
+> после выражения колонки. (Слово <TT
+CLASS="LITERAL"
+>AS</TT
+> можно опустить, но только если желаемое выходное имя не совпадает с каким-либо ключевым словом <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> (см. <A
+HREF="sql-keywords-appendix.html"
+>Приложение C</A
+>). Чтобы не зависеть от появления новых ключевых слов в будущем, рекомендуется всегда писать <TT
+CLASS="LITERAL"
+>AS</TT
+>, либо заключать имя в двойные кавычки.) Если имя колонки не задать, <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> выберет его автоматически. Если выражение колонки представляет собой просто ссылку на колонку, то выбранное таким образом имя будет совпадать с именем колонки. В более сложных случаях может использоваться имя функции или типа, либо в отсутствие других вариантов система может сгенерировать имя вроде <TT
+CLASS="LITERAL"
+>?column?</TT
+>.</P
+><P
+>По имени выходной колонки можно обратиться к её значению в предложениях <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> и <TT
+CLASS="LITERAL"
+>GROUP BY</TT
+>, но не в <TT
+CLASS="LITERAL"
+>WHERE</TT
+> или <TT
+CLASS="LITERAL"
+>HAVING</TT
+>; в них вместо имени надо записывать всё выражение.</P
+><P
+>Вместо выражения в выходном списке можно указать <TT
+CLASS="LITERAL"
+>*</TT
+>, что будет обозначать все колонки выбранных строк. Кроме того, можно записать <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_таблицы</I
+></TT
+>.*</TT
+> как краткое обозначение всех колонок, получаемых из данной таблицы. В этих случаях нельзя задать новые имена колонок с помощью <TT
+CLASS="LITERAL"
+>AS</TT
+>; именами выходных колонок будут имена колонок в таблице.</P
+></DIV
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="SQL-DISTINCT"
+></A
+><H3
+>Предложение <TT
+CLASS="LITERAL"
+>DISTINCT</TT
+></H3
+><P
+>Если указано <TT
+CLASS="LITERAL"
+>SELECT DISTINCT</TT
+>, все повторяющиеся строки исключаются из результирующего набора (из каждой группы дубликатов остаётся одна строка). <TT
+CLASS="LITERAL"
+>SELECT ALL</TT
+> делает противоположное: сохраняет все строки; это поведение по умолчанию.</P
+><P
+><TT
+CLASS="LITERAL"
+>SELECT DISTINCT ON ( <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> [, ...] )</TT
+> сохраняет только первую строку из каждого набора строк, для которого данное выражение даёт одинаковые значения. Выражения <TT
+CLASS="LITERAL"
+>DISTINCT ON</TT
+> обрабатываются по тем же правилам, что и выражения <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> (см. выше). Заметьте, что <SPAN
+CLASS="QUOTE"
+>"первая строка"</SPAN
+> каждого набора непредсказуема, если только не применяется предложение <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+>, определяющее, какие строки должны быть первыми. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT DISTINCT ON (location) location, time, report
+    FROM weather_reports
+    ORDER BY location, time DESC;</PRE
+><P> возвращает самую последнюю сводку погоды для каждого местоположения. Но если бы мы не добавили <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+>, чтобы значения времени убывали, мы бы получили сводки по местоположениям от непредсказуемого времени.</P
+><P
+>Выражения <TT
+CLASS="LITERAL"
+>DISTINCT ON</TT
+> должны соответствовать самым левым выражениям в <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+>. Предложение <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> обычно содержит и другие выражения, которые определяют желаемый порядок строк в каждой группе <TT
+CLASS="LITERAL"
+>DISTINCT ON</TT
+>.</P
+><P
+>В настоящее время указания <TT
+CLASS="LITERAL"
+>FOR NO KEY UPDATE</TT
+>, <TT
+CLASS="LITERAL"
+>FOR UPDATE</TT
+>, <TT
+CLASS="LITERAL"
+>FOR SHARE</TT
+> и <TT
+CLASS="LITERAL"
+>FOR KEY SHARE</TT
+> нельзя задать вместе с <TT
+CLASS="LITERAL"
+>DISTINCT</TT
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="SQL-UNION"
+></A
+><H3
+>Предложение <TT
+CLASS="LITERAL"
+>UNION</TT
+>+</H3
+><P
+>Предложение <TT
+CLASS="LITERAL"
+>UNION</TT
+> имеет следующую общую форму: </P><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>оператор_SELECT</I
+></TT
+> UNION [ ALL | DISTINCT ] <TT
+CLASS="REPLACEABLE"
+><I
+>оператор_SELECT</I
+></TT
+></PRE
+><P> Здесь <TT
+CLASS="REPLACEABLE"
+><I
+>оператор_SELECT</I
+></TT
+> — это любой подзапрос <TT
+CLASS="COMMAND"
+>SELECT</TT
+> без предложений <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+>, <TT
+CLASS="LITERAL"
+>LIMIT</TT
+>, <TT
+CLASS="LITERAL"
+>FOR NO KEY UPDATE</TT
+>, <TT
+CLASS="LITERAL"
+>FOR UPDATE</TT
+>, <TT
+CLASS="LITERAL"
+>FOR SHARE</TT
+> и <TT
+CLASS="LITERAL"
+>FOR KEY SHARE</TT
+>. (<TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> и <TT
+CLASS="LITERAL"
+>LIMIT</TT
+> можно добавить к вложенному выражению, если оно заключено в скобки. Без скобок эти предложения будут восприняты как применяемые к результату <TT
+CLASS="LITERAL"
+>UNION</TT
+>, а не к выражению в его правой части.)</P
+><P
+>Оператор <TT
+CLASS="LITERAL"
+>UNION</TT
+> вычисляет объединение множеств всех строк, возвращённых заданными запросами <TT
+CLASS="COMMAND"
+>SELECT</TT
+>. Строка оказывается в объединении двух наборов результатов, если она присутствует минимум в одном наборе. Два оператора <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, представляющие прямые операнды <TT
+CLASS="LITERAL"
+>UNION</TT
+>, должны выдавать одинаковое число колонок, а типы соответствующих колонок должны быть совместимыми.</P
+><P
+>Результат <TT
+CLASS="LITERAL"
+>UNION</TT
+> не будет содержать повторяющихся строк, если не указан параметр <TT
+CLASS="LITERAL"
+>ALL</TT
+>. <TT
+CLASS="LITERAL"
+>ALL</TT
+> предотвращает исключение дубликатов. (Таким образом, <TT
+CLASS="LITERAL"
+>UNION ALL</TT
+> обычно работает значительно быстрее, чем <TT
+CLASS="LITERAL"
+>UNION</TT
+>; поэтому, везде, где возможно, следует указывать <TT
+CLASS="LITERAL"
+>ALL</TT
+>.) <TT
+CLASS="LITERAL"
+>DISTINCT</TT
+> можно записать явно, чтобы обозначить, что дублирующиеся строки должны удаляться (это поведение по умолчанию).</P
+><P
+>При использовании в одном запросе <TT
+CLASS="COMMAND"
+>SELECT</TT
+> нескольких операторов <TT
+CLASS="LITERAL"
+>UNION</TT
+> они вычисляются слева направо, если иной порядок не определяется скобками.</P
+><P
+>В настоящее время указания <TT
+CLASS="LITERAL"
+>FOR NO KEY UPDATE</TT
+>, <TT
+CLASS="LITERAL"
+>FOR UPDATE</TT
+>, <TT
+CLASS="LITERAL"
+>FOR SHARE</TT
+> и <TT
+CLASS="LITERAL"
+>FOR KEY SHARE</TT
+> нельзя задать ни для результата <TT
+CLASS="LITERAL"
+>UNION</TT
+>, ни для любого из подзапросов <TT
+CLASS="LITERAL"
+>UNION</TT
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="SQL-INTERSECT"
+></A
+><H3
+>Предложение <TT
+CLASS="LITERAL"
+>INTERSECT</TT
+></H3
+><P
+>Предложение <TT
+CLASS="LITERAL"
+>INTERSECT</TT
+> имеет следующую общую форму: </P><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>оператор_SELECT</I
+></TT
+> INTERSECT [ ALL | DISTINCT ] <TT
+CLASS="REPLACEABLE"
+><I
+>оператор_SELECT</I
+></TT
+></PRE
+><P> Здесь <TT
+CLASS="REPLACEABLE"
+><I
+>оператор_SELECT</I
+></TT
+> — это любой подзапрос <TT
+CLASS="COMMAND"
+>SELECT</TT
+> без предложений <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+>, <TT
+CLASS="LITERAL"
+>LIMIT</TT
+>, <TT
+CLASS="LITERAL"
+>FOR NO KEY UPDATE</TT
+>, <TT
+CLASS="LITERAL"
+>FOR UPDATE</TT
+>, <TT
+CLASS="LITERAL"
+>FOR SHARE</TT
+> и <TT
+CLASS="LITERAL"
+>FOR KEY SHARE</TT
+>.</P
+><P
+>Оператор <TT
+CLASS="LITERAL"
+>INTERSECT</TT
+> вычисляет пересечение множеств всех строк, возвращённых заданными запросами <TT
+CLASS="COMMAND"
+>SELECT</TT
+>. Строка оказывается в пересечении двух наборов результатов, если она присутствует в обоих наборах.</P
+><P
+>Результат <TT
+CLASS="LITERAL"
+>INTERSECT</TT
+> не будет содержать повторяющихся строк, если не указан параметр <TT
+CLASS="LITERAL"
+>ALL</TT
+>. С параметром <TT
+CLASS="LITERAL"
+>ALL</TT
+> строка, повторяющаяся <TT
+CLASS="REPLACEABLE"
+><I
+>m</I
+></TT
+> раз в левой таблице и <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+> раз в правой, будет выдана в результирующем наборе min(<TT
+CLASS="REPLACEABLE"
+><I
+>m</I
+></TT
+>,<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>) раз. <TT
+CLASS="LITERAL"
+>DISTINCT</TT
+> можно записать явно, чтобы обозначить, что дублирующиеся строки должны удаляться (это поведение по умолчанию).</P
+><P
+>При использовании в одном запросе <TT
+CLASS="COMMAND"
+>SELECT</TT
+> нескольких операторов <TT
+CLASS="LITERAL"
+>INTERSECT</TT
+> они вычисляются слева направо, если иной порядок не диктуется скобками. <TT
+CLASS="LITERAL"
+>INTERSECT</TT
+> связывает свои подзапросы сильнее, чем <TT
+CLASS="LITERAL"
+>UNION</TT
+>. Другими словами, <TT
+CLASS="LITERAL"
+>A UNION B INTERSECT C</TT
+> будет восприниматься как <TT
+CLASS="LITERAL"
+>A UNION (B INTERSECT C)</TT
+>.</P
+><P
+>В настоящее время указания <TT
+CLASS="LITERAL"
+>FOR NO KEY UPDATE</TT
+>, <TT
+CLASS="LITERAL"
+>FOR UPDATE</TT
+>, <TT
+CLASS="LITERAL"
+>FOR SHARE</TT
+> и <TT
+CLASS="LITERAL"
+>FOR KEY SHARE</TT
+> нельзя задать ни для результата <TT
+CLASS="LITERAL"
+>INTERSECT</TT
+>, ни для любого из подзапросов <TT
+CLASS="LITERAL"
+>INTERSECT</TT
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="SQL-EXCEPT"
+></A
+><H3
+>Предложение <TT
+CLASS="LITERAL"
+>EXCEPT</TT
+></H3
+><P
+>Предложение <TT
+CLASS="LITERAL"
+>EXCEPT</TT
+> имеет следующую общую форму: </P><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>оператор_SELECT</I
+></TT
+> EXCEPT [ ALL | DISTINCT ] <TT
+CLASS="REPLACEABLE"
+><I
+>оператор_SELECT</I
+></TT
+></PRE
+><P> Здесь <TT
+CLASS="REPLACEABLE"
+><I
+>оператор_SELECT</I
+></TT
+> — это любой подзапрос <TT
+CLASS="COMMAND"
+>SELECT</TT
+> без предложений <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+>, <TT
+CLASS="LITERAL"
+>LIMIT</TT
+>, <TT
+CLASS="LITERAL"
+>FOR NO KEY UPDATE</TT
+>, <TT
+CLASS="LITERAL"
+>FOR UPDATE</TT
+>, <TT
+CLASS="LITERAL"
+>FOR SHARE</TT
+> и <TT
+CLASS="LITERAL"
+>FOR KEY SHARE</TT
+>.</P
+><P
+>Оператор <TT
+CLASS="LITERAL"
+>EXCEPT</TT
+> вычисляет набор строк, которые присутствуют в результате левого запроса <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, но отсутствуют в результате правого.</P
+><P
+>Результат <TT
+CLASS="LITERAL"
+>EXCEPT</TT
+> не будет содержать повторяющихся строк, если не указан параметр <TT
+CLASS="LITERAL"
+>ALL</TT
+>. С параметром <TT
+CLASS="LITERAL"
+>ALL</TT
+> строка, повторяющаяся <TT
+CLASS="REPLACEABLE"
+><I
+>m</I
+></TT
+> раз в левой таблице и <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+> раз в правой, будет выдана в результирующем наборе max(<TT
+CLASS="REPLACEABLE"
+><I
+>m</I
+></TT
+>-<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>,0) раз. <TT
+CLASS="LITERAL"
+>DISTINCT</TT
+> можно записать явно, чтобы обозначить, что дублирующиеся строки должны удаляться (это поведение по умолчанию).</P
+><P
+>При использовании в одном запросе <TT
+CLASS="COMMAND"
+>SELECT</TT
+> нескольких операторов <TT
+CLASS="LITERAL"
+>EXCEPT</TT
+> они вычисляются слева направо, если иной порядок не диктуется скобками. <TT
+CLASS="LITERAL"
+>EXCEPT</TT
+> связывает свои подзапросы так же сильно, как <TT
+CLASS="LITERAL"
+>UNION</TT
+>.</P
+><P
+>В настоящее время указания <TT
+CLASS="LITERAL"
+>FOR NO KEY UPDATE</TT
+>, <TT
+CLASS="LITERAL"
+>FOR UPDATE</TT
+>, <TT
+CLASS="LITERAL"
+>FOR SHARE</TT
+> и <TT
+CLASS="LITERAL"
+>FOR KEY SHARE</TT
+> нельзя задать ни для результата <TT
+CLASS="LITERAL"
+>EXCEPT</TT
+>, ни для любого из подзапросов <TT
+CLASS="LITERAL"
+>EXCEPT</TT
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="SQL-ORDERBY"
+></A
+><H3
+>Предложение <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+></H3
+><P
+>Необязательное предложение <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> имеет следующую общую форму: </P><PRE
+CLASS="SYNOPSIS"
+>ORDER BY <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> [ ASC | DESC | USING <TT
+CLASS="REPLACEABLE"
+><I
+>оператор</I
+></TT
+> ] [ NULLS { FIRST | LAST } ] [, ...]</PRE
+><P> Предложение <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> указывает, что строки результата должны сортироваться согласно заданным выражениям. Если две строки дают равные значения для самого левого выражения, проверяется следующее выражение и т. д. Если их значения оказываются равными для всех заданных выражений, строки возвращаются в порядке, определяемом реализацией.</P
+><P
+>В качестве <TT
+CLASS="REPLACEABLE"
+><I
+>выражения</I
+></TT
+> может задаваться имя или порядковый номер выходной колонки (элемента списка <TT
+CLASS="COMMAND"
+>SELECT</TT
+>), либо произвольное выражение со значениями входных колонок.</P
+><P
+>Порядковым номером в данном случае считается последовательный номер (при нумерации слева направо) позиции выходной колонки. Возможность указать порядковый номер позволяет выполнить сортировку по колонке, не имеющей уникального имени. В принципе это не абсолютно необходимо, так как выходной колонке всегда можно присвоить имя, воспользовавшись предложением <TT
+CLASS="LITERAL"
+>AS</TT
+>.</P
+><P
+>В предложении <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> также можно использовать произвольные выражения, в том числе, и с колонками, отсутствующими в списке результатов <TT
+CLASS="COMMAND"
+>SELECT</TT
+>. Таким образом, следующий оператор вполне корректен: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT name FROM distributors ORDER BY code;</PRE
+><P> Однако, если <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> применяется к результату <TT
+CLASS="LITERAL"
+>UNION</TT
+>, <TT
+CLASS="LITERAL"
+>INTERSECT</TT
+> или <TT
+CLASS="LITERAL"
+>EXCEPT</TT
+>, в нём можно задать только имя или номер выходной колонки, но не выражение.</P
+><P
+>Если в качестве выражения <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> задано простое имя, которому соответствует и выходная, и входная колонка, то <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> будет воспринимать его как имя выходной колонки. Этот выбор противоположен тому, что делает <TT
+CLASS="LITERAL"
+>GROUP BY</TT
+> в такой же ситуации. Такая несогласованность допущена для соответствия стандарту SQL.</P
+><P
+>Дополнительно после любого выражения в предложении <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> можно добавить ключевое слово <TT
+CLASS="LITERAL"
+>ASC</TT
+> (по возрастанию) или <TT
+CLASS="LITERAL"
+>DESC</TT
+> (по убыванию). По умолчанию подразумевается <TT
+CLASS="LITERAL"
+>ASC</TT
+>. Кроме того, можно задать имя специфического оператора сортировки в предложении <TT
+CLASS="LITERAL"
+>USING</TT
+>. Оператор сортировки должен быть членом &laquo;меньше&raquo; или &laquo;больше&raquo; некоторого семейства операторов B-дерева. <TT
+CLASS="LITERAL"
+>ASC</TT
+> обычно равнозначно <TT
+CLASS="LITERAL"
+>USING &lt;</TT
+> и <TT
+CLASS="LITERAL"
+>DESC</TT
+> обычно равнозначно <TT
+CLASS="LITERAL"
+>USING &gt;</TT
+>. (Хотя создатель нестандартного типа данных может определить по-другому порядок сортировки по умолчанию и поставить ему в соответствие операторы с другими именами.)</P
+><P
+>Если указано <TT
+CLASS="LITERAL"
+>NULLS LAST</TT
+>, значения NULL при сортировке оказываются после значений не NULL; с указанием <TT
+CLASS="LITERAL"
+>NULLS FIRST</TT
+> значения NULL оказываются перед значениями не NULL. Если не указано ни то, ни другое, по умолчанию подразумевается <TT
+CLASS="LITERAL"
+>NULLS LAST</TT
+> при явно или неявно выбранном порядке <TT
+CLASS="LITERAL"
+>ASC</TT
+>, либо <TT
+CLASS="LITERAL"
+>NULLS FIRST</TT
+> при порядке <TT
+CLASS="LITERAL"
+>DESC</TT
+> (то есть по умолчанию считается, что значения NULL больше значений не NULL). С предложением <TT
+CLASS="LITERAL"
+>USING</TT
+> порядок NULL по умолчанию зависит от того, является ли указанный оператор оператором &laquo;меньше&raquo; или &laquo;больше&raquo;.</P
+><P
+>Заметьте, что параметры сортировки применяются только к тому выражению, за которым они следуют; в частности, <TT
+CLASS="LITERAL"
+>ORDER BY x, y DESC</TT
+> означает не то же самое, что <TT
+CLASS="LITERAL"
+>ORDER BY x DESC, y DESC</TT
+>.</P
+><P
+>Данные символьных строк сортируются согласно правилу сортировки, установленному для сортируемой колонки. При необходимости это правило можно переопределить, добавив предложение <TT
+CLASS="LITERAL"
+>COLLATE</TT
+> в <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+>, например так: <TT
+CLASS="LITERAL"
+>ORDER BY mycolumn COLLATE "en_US"</TT
+>. За дополнительными сведениями обратитесь к <A
+HREF="sql-expressions.html#SQL-SYNTAX-COLLATE-EXPRS"
+>Подразделу 4.2.10</A
+> и <A
+HREF="collation.html"
+>Разделу 22.2</A
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="SQL-LIMIT"
+></A
+><H3
+>Предложение <TT
+CLASS="LITERAL"
+>LIMIT</TT
+></H3
+><P
+>Предложение <TT
+CLASS="LITERAL"
+>LIMIT</TT
+> состоит из двух независимых вложенных предложений: </P><PRE
+CLASS="SYNOPSIS"
+>LIMIT { <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+> | ALL }
+OFFSET <TT
+CLASS="REPLACEABLE"
+><I
+>начало</I
+></TT
+></PRE
+><P>
+    Здесь <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+> определяет максимальное количество строк, которое должно быть выдано, тогда как <TT
+CLASS="REPLACEABLE"
+><I
+>начало</I
+></TT
+> определяет, сколько строк нужно пропустить, прежде чем начать выдавать строки. Когда указаны оба значения, сначала строки пропускаются в количестве, заданном значением <TT
+CLASS="REPLACEABLE"
+><I
+>начало</I
+></TT
+>, а затем следующие строки выдаются в количестве, не превышающем значения <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+>.</P
+><P
+>Если результатом выражения <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+> оказывается NULL, предложение воспринимается как <TT
+CLASS="LITERAL"
+>LIMIT ALL</TT
+>, т. е. число строк не ограничивается. Если <TT
+CLASS="REPLACEABLE"
+><I
+>начало</I
+></TT
+> принимает значение NULL, предложение воспринимается как <TT
+CLASS="LITERAL"
+>OFFSET 0</TT
+>.</P
+><P
+>SQL:2008 вводит другой синтаксис для получения того же результата, и его так же поддерживает <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Он выглядит так: </P><PRE
+CLASS="SYNOPSIS"
+>OFFSET <TT
+CLASS="REPLACEABLE"
+><I
+>начало</I
+></TT
+> { ROW | ROWS }
+FETCH { FIRST | NEXT } [ <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+> ] { ROW | ROWS } ONLY</PRE
+><P> В этом синтаксисе, чтобы подставить в <TT
+CLASS="REPLACEABLE"
+><I
+>начало</I
+></TT
+> или <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+> что-либо сложнее простой целочисленной константы, необходимо заключить это выражение в скобки. Если <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+> опускается в предложении <TT
+CLASS="LITERAL"
+>FETCH</TT
+>, оно принимает значение 1. <TT
+CLASS="LITERAL"
+>ROW</TT
+> и <TT
+CLASS="LITERAL"
+>ROWS</TT
+> так же, как и <TT
+CLASS="LITERAL"
+>FIRST</TT
+> и <TT
+CLASS="LITERAL"
+>NEXT</TT
+> являются избыточными словами, которые не влияют не действие этих предложений. Согласно стандарту, предложение <TT
+CLASS="LITERAL"
+>OFFSET</TT
+> должно предшествовать предложению <TT
+CLASS="LITERAL"
+>FETCH</TT
+>, если присутствуют они оба; но <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> менее строг и допускает любой порядок.</P
+><P
+>Применяя <TT
+CLASS="LITERAL"
+>LIMIT</TT
+>, имеет смысл использовать также предложение <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+>, чтобы строки результата выдавались в определённом порядке. Иначе будут возвращаться непредсказуемые подмножества строк запроса &mdash; вы можете запросить строки с десятой по двадцатую, но какой порядок вы имеете в виду? Порядок будет неизвестен, если не добавить <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+>.</P
+><P
+>Планировщик запроса учитывает ограничение <TT
+CLASS="LITERAL"
+>LIMIT</TT
+>, строя план выполнения запроса, поэтому, вероятнее всего, планы (а значит и порядок строк) будут меняться при разных <TT
+CLASS="LITERAL"
+>LIMIT</TT
+> и <TT
+CLASS="LITERAL"
+>OFFSET</TT
+>. Таким образом, различные значения <TT
+CLASS="LITERAL"
+>LIMIT</TT
+>/<TT
+CLASS="LITERAL"
+>OFFSET</TT
+>, выбирающие разные подмножества результатов запроса, <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>приведут к несогласованности результатов</I
+></SPAN
+>, если не установить предсказуемую сортировку с помощью <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+>. Это не ошибка, а неизбежное следствие того, что SQL не гарантирует вывод результатов запроса в некотором порядке, если порядок не определён явно предложением <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+>.</P
+><P
+>Возможно даже, что при повторном выполнении одного и того же запроса с <TT
+CLASS="LITERAL"
+>LIMIT</TT
+> будут получены разные подмножества строк таблицы, если предложение <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> не диктует выбор определённого подмножества. Опять же, это не ошибка; в данном случае детерминированность результата просто не гарантируется.</P
+></DIV
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="SQL-FOR-UPDATE-SHARE"
+></A
+><H3
+>Предложение блокировки</H3
+><P
+><I
+CLASS="FIRSTTERM"
+>Предложения блокировки</I
+> включают в себя <TT
+CLASS="LITERAL"
+>FOR UPDATE</TT
+>, <TT
+CLASS="LITERAL"
+>FOR NO KEY UPDATE</TT
+>, <TT
+CLASS="LITERAL"
+>FOR SHARE</TT
+> и <TT
+CLASS="LITERAL"
+>FOR KEY SHARE</TT
+>; они влияют на то, как <TT
+CLASS="LITERAL"
+>SELECT</TT
+> блокирует строки, получаемые из таблицы.</P
+><P
+>Предложение блокировки имеет следующую общую форму: </P><PRE
+CLASS="SYNOPSIS"
+>FOR <TT
+CLASS="REPLACEABLE"
+><I
+>вариант_блокировки</I
+></TT
+> [ OF <TT
+CLASS="REPLACEABLE"
+><I
+>имя_таблицы</I
+></TT
+> [, ...] ] [ NOWAIT ]</PRE
+><P> Здесь <TT
+CLASS="REPLACEABLE"
+><I
+>вариант_блокировки</I
+></TT
+> может быть следующим: </P><PRE
+CLASS="SYNOPSIS"
+>UPDATE
+NO KEY UPDATE
+SHARE
+KEY SHARE</PRE
+><P></P
+><P
+>Подробнее о каждом режиме блокировки на уровне строк можно узнать в <A
+HREF="explicit-locking.html#LOCKING-ROWS"
+>Подразделе 13.3.2</A
+>.</P
+><P
+>Чтобы операция не ждала завершения других транзакций, к блокировке можно добавить указание <TT
+CLASS="LITERAL"
+>NOWAIT</TT
+>. С <TT
+CLASS="LITERAL"
+>NOWAIT</TT
+> оператор выдаёт ошибку, а не ждёт, если выбранную строку нельзя заблокировать немедленно. Учтите, что <TT
+CLASS="LITERAL"
+>NOWAIT</TT
+> применяется только к блокировкам на уровне строк &mdash; необходимая блокировка <TT
+CLASS="LITERAL"
+>ROW SHARE</TT
+> уровня таблицы запрашивается обычным способом (см. <A
+HREF="mvcc.html"
+>Главу 13</A
+>). Если требуется запросить блокировку уровня таблицы без ожидания, можно сначала выполнить команду <A
+HREF="sql-lock.html"
+>LOCK</A
+> с указанием <TT
+CLASS="LITERAL"
+>NOWAIT</TT
+>.</P
+><P
+>Если в предложении блокировки указаны определённые таблицы, блокироваться будут только строки, получаемые из этих таблиц; другие таблицы, задействованные в <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, будут прочитаны как обычно. Предложение блокировки без списка таблиц затрагивает все таблицы, задействованные в этом операторе. Если предложение блокировки применяется к представлению или подзапросу, оно затрагивает все таблицы, которые используются в представлении или подзапросе. Однако эти предложения не применяются к запросам <TT
+CLASS="LITERAL"
+>WITH</TT
+>, к которым обращается основной запрос. Если требуется установить блокировку строк в запросе <TT
+CLASS="LITERAL"
+>WITH</TT
+>, предложение блокировки нужно указать непосредственно в этом запросе <TT
+CLASS="LITERAL"
+>WITH</TT
+>.</P
+><P
+>В случае необходимости задать для разных таблиц разное поведение блокировки, в запрос можно добавить несколько предложений. Если при этом одна и та же таблица упоминается (или неявно затрагивается) в нескольких предложениях блокировки, блокировка устанавливается так, как если бы была указана только одна, самая сильная из них. Подобным образом, если в одном из предложений указано <TT
+CLASS="LITERAL"
+>NOWAIT</TT
+>, для этой таблицы блокировка будет запрашиваться без ожидания.</P
+><P
+>Предложения блокировки не могут применяться в контекстах, где возвращаемые строки нельзя чётко связать с отдельными строками таблицы; например, блокировка неприменима при агрегировании.</P
+><P
+>Когда предложение блокировки находится на верхнем уровне запроса <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, блокируются именно те строки, которые возвращаются запросом; в случае с запросом объединения, блокировке подлежат строки, из которых составляются возвращаемые строки объединения. В дополнение к этому, заблокированы будут строки, удовлетворяющие условиям запроса на момент создания снимка запроса, хотя они не будут возвращены, если с момента снимка они изменятся и перестанут удовлетворять условиям. Если применяется <TT
+CLASS="LITERAL"
+>LIMIT</TT
+>, блокировка прекращается, как только будет получено достаточное количество строк для удовлетворения лимита (но заметьте, что строки, пропускаемые указанием <TT
+CLASS="LITERAL"
+>OFFSET</TT
+>, будут блокироваться). Подобным образом, если предложение блокировки применяется в запросе курсора, блокироваться будут только строки, фактически полученные или пройденные курсором.</P
+><P
+>Когда предложение блокировки находится в подзапросе <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, блокировке подлежат те строки, которые будет получены внешним запросом от подзапроса. Таких строк может оказаться меньше, чем можно было бы предположить, проанализировав только сам подзапрос, так как условия из внешнего запроса могут способствовать оптимизации выполнения подзапроса. Например, запрос </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT * FROM (SELECT * FROM mytable FOR UPDATE) ss WHERE col1 = 5;</PRE
+><P> заблокирует только строки, в которых <TT
+CLASS="LITERAL"
+>col1 = 5</TT
+>, при том, что в такой записи условие не относится к подзапросу.</P
+><P
+>Предыдущие версии не могли сохранить блокировку, которая была повышена последующей точкой сохранения. Например, этот код: </P><PRE
+CLASS="PROGRAMLISTING"
+>BEGIN;
+SELECT * FROM mytable WHERE key = 1 FOR UPDATE;
+SAVEPOINT s;
+UPDATE mytable SET ... WHERE key = 1;
+ROLLBACK TO s;</PRE
+><P> не мог сохранить блокировку <TT
+CLASS="LITERAL"
+>FOR UPDATE</TT
+> после <TT
+CLASS="COMMAND"
+>ROLLBACK TO</TT
+>. Это было исправлено в версии 9.3.</P
+><DIV
+CLASS="CAUTION"
+><P
+></P
+><TABLE
+CLASS="CAUTION"
+BORDER="1"
+WIDTH="100%"
+><TR
+><TD
+ALIGN="CENTER"
+><B
+>Предостережение</B
+></TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+><P
+>Возможно, что команда <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, работающая на уровне изоляции <TT
+CLASS="LITERAL"
+>READ COMMITTED</TT
+> и применяющая предложение <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> вместе с блокировкой, будет возвращать строки не по порядку. Это связано с тем, что <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> выполняется в первую очередь. Эта команда отсортирует результат, но затем может быть заблокирована, пытаясь получить блокировку одной или нескольких строк. К моменту, когда блокировка <TT
+CLASS="LITERAL"
+>SELECT</TT
+> будет снята, некоторые из сортируемых колонок могут уже измениться, в результате чего их порядок может быть нарушен (хотя они были упорядочены для исходных значений). При необходимости обойти эту проблему, можно поместить <TT
+CLASS="LITERAL"
+>FOR UPDATE/SHARE</TT
+> в подзапрос, например так: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT * FROM (SELECT * FROM mytable FOR UPDATE) ss ORDER BY column1;</PRE
+><P> Заметьте, что в результате это приведёт к блокированию всех строк в <TT
+CLASS="STRUCTNAME"
+>mytable</TT
+>, тогда как указание <TT
+CLASS="LITERAL"
+>FOR UPDATE</TT
+> на верхнем уровне могло бы заблокировать только фактически возвращаемые строки. Это может значительно повлиять на производительность, особенно в сочетании <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> с <TT
+CLASS="LITERAL"
+>LIMIT</TT
+> или другими ограничениями. Таким образом, этот приём рекомендуется, только если ожидается параллельное изменение сортируемых колонок, а результат должен быть строго отсортирован.</P
+><P
+>На уровнях изоляции <TT
+CLASS="LITERAL"
+>REPEATABLE READ</TT
+> и <TT
+CLASS="LITERAL"
+>SERIALIZABLE</TT
+> это приведёт к ошибке сериализации (с <TT
+CLASS="LITERAL"
+>SQLSTATE</TT
+> равным <TT
+CLASS="LITERAL"
+>'40001'</TT
+>), так что на этих уровнях получить строки не по порядку невозможно.</P
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="SQL-TABLE"
+></A
+><H3
+>Команда <TT
+CLASS="LITERAL"
+>TABLE</TT
+></H3
+><P
+>Команда </P><PRE
+CLASS="PROGRAMLISTING"
+>TABLE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></PRE
+><P> равнозначна </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT * FROM <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></PRE
+><P> Её можно применять в качестве команды верхнего уровня или как более краткую запись внутри сложных запросов. С командой <TT
+CLASS="COMMAND"
+>TABLE</TT
+> могут использоваться только предложения <TT
+CLASS="LITERAL"
+>WITH</TT
+>, <TT
+CLASS="LITERAL"
+>UNION</TT
+>, <TT
+CLASS="LITERAL"
+>INTERSECT</TT
+>, <TT
+CLASS="LITERAL"
+>EXCEPT</TT
+>, <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+>, <TT
+CLASS="LITERAL"
+>LIMIT</TT
+>, <TT
+CLASS="LITERAL"
+>OFFSET</TT
+>, <TT
+CLASS="LITERAL"
+>FETCH</TT
+> и предложения блокировки <TT
+CLASS="LITERAL"
+>FOR</TT
+>; предложение <TT
+CLASS="LITERAL"
+>WHERE</TT
+> и какие-либо формы агрегирования не поддерживаются.</P
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN84014"
+></A
+><H2
+>Примеры</H2
+><P
+>Соединение таблицы <TT
+CLASS="LITERAL"
+>films</TT
+> с таблицей <TT
+CLASS="LITERAL"
+>distributors</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT f.title, f.did, d.name, f.date_prod, f.kind
+    FROM distributors d, films f
+    WHERE f.did = d.did
+
+       title       | did |     name     | date_prod  |   kind
+-------------------+-----+--------------+------------+----------
+ The Third Man     | 101 | British Lion | 1949-12-23 | Drama
+ The African Queen | 101 | British Lion | 1951-08-11 | Romantic
+ ...</PRE
+><P></P
+><P
+>Суммирование значений колонки <TT
+CLASS="LITERAL"
+>len</TT
+> (продолжительность) для всех фильмов и группирование результатов по колонке <TT
+CLASS="LITERAL"
+>kind</TT
+> (типу фильма): </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT kind, sum(len) AS total FROM films GROUP BY kind;
+
+   kind   | total
+----------+-------
+ Action   | 07:34
+ Comedy   | 02:58
+ Drama    | 14:28
+ Musical  | 06:42
+ Romantic | 04:38</PRE
+><P></P
+><P
+>Суммирование значений колонки <TT
+CLASS="LITERAL"
+>len</TT
+> для всех фильмов, группирование результатов по колонке <TT
+CLASS="LITERAL"
+>kind</TT
+> и вывод только тех групп, общая продолжительность которых меньше 5 часов: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT kind, sum(len) AS total
+    FROM films
+    GROUP BY kind
+    HAVING sum(len) &lt; interval '5 hours';
+
+   kind   | total
+----------+-------
+ Comedy   | 02:58
+ Romantic | 04:38</PRE
+><P></P
+><P
+>Следующие два запроса демонстрируют равнозначные способы сортировки результатов по содержимому второй колонки (<TT
+CLASS="LITERAL"
+>name</TT
+>): </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT * FROM distributors ORDER BY name;
+SELECT * FROM distributors ORDER BY 2;
+
+ did |       name
+-----+------------------
+ 109 | 20th Century Fox
+ 110 | Bavaria Atelier
+ 101 | British Lion
+ 107 | Columbia
+ 102 | Jean Luc Godard
+ 113 | Luso films
+ 104 | Mosfilm
+ 103 | Paramount
+ 106 | Toho
+ 105 | United Artists
+ 111 | Walt Disney
+ 112 | Warner Bros.
+ 108 | Westward</PRE
+><P></P
+><P
+>Следующий пример показывает объединение таблиц <TT
+CLASS="LITERAL"
+>distributors</TT
+> и <TT
+CLASS="LITERAL"
+>actors</TT
+>, ограниченное именами, начинающимися с буквы W в каждой таблице. Интерес представляют только неповторяющиеся строки, поэтому ключевое слово <TT
+CLASS="LITERAL"
+>ALL</TT
+> опущено. </P><PRE
+CLASS="PROGRAMLISTING"
+>distributors:               actors:
+ did |     name              id |     name
+-----+--------------        ----+----------------
+ 108 | Westward               1 | Woody Allen
+ 111 | Walt Disney            2 | Warren Beatty
+ 112 | Warner Bros.           3 | Walter Matthau
+ ...                         ...
+
+SELECT distributors.name
+    FROM distributors
+    WHERE distributors.name LIKE 'W%'
+UNION
+SELECT actors.name
+    FROM actors
+    WHERE actors.name LIKE 'W%';
+
+      name
+----------------
+ Walt Disney
+ Walter Matthau
+ Warner Bros.
+ Warren Beatty
+ Westward
+ Woody Allen</PRE
+><P></P
+><P
+>Этот пример показывает, как использовать функцию в предложении <TT
+CLASS="LITERAL"
+>FROM</TT
+>, со списком определений колонок и без него: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION distributors(int) RETURNS SETOF distributors AS $$
+    SELECT * FROM distributors WHERE did = $1;
+$$ LANGUAGE SQL;
+
+SELECT * FROM distributors(111);
+ did |    name
+-----+-------------
+ 111 | Walt Disney
+
+CREATE FUNCTION distributors_2(int) RETURNS SETOF record AS $$
+    SELECT * FROM distributors WHERE did = $1;
+$$ LANGUAGE SQL;
+
+SELECT * FROM distributors_2(111) AS (f1 int, f2 text);
+ f1  |     f2
+-----+-------------
+ 111 | Walt Disney</PRE
+><P></P
+><P
+>Пример функции с добавленной колонкой нумерации: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT * FROM unnest(ARRAY['a','b','c','d','e','f']) WITH ORDINALITY;
+ unnest | ordinality
+--------+----------
+ a      |        1
+ b      |        2
+ c      |        3
+ d      |        4
+ e      |        5
+ f      |        6
+(6 rows)</PRE
+><P></P
+><P
+>Этот пример показывает, как использовать простое предложение <TT
+CLASS="LITERAL"
+>WITH</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>WITH t AS (
+    SELECT random() as x FROM generate_series(1, 3)
+  )
+SELECT * FROM t
+UNION ALL
+SELECT * FROM t
+
+         x          
+--------------------
+  0.534150459803641
+  0.520092216785997
+ 0.0735620250925422
+  0.534150459803641
+  0.520092216785997
+ 0.0735620250925422</PRE
+><P> Заметьте, что запрос <TT
+CLASS="LITERAL"
+>WITH</TT
+> выполняется всего один раз, поэтому мы получаем два одинаковых набора по три случайных значения.</P
+><P
+>В этом примере <TT
+CLASS="LITERAL"
+>WITH RECURSIVE</TT
+> применяется для поиска всех подчинённых Мери (непосредственных или косвенных) и вывода их уровня косвенности в таблице с информацией только о непосредственных подчинённых: </P><PRE
+CLASS="PROGRAMLISTING"
+>WITH RECURSIVE employee_recursive(distance, employee_name, manager_name) AS (
+    SELECT 1, employee_name, manager_name
+    FROM employee
+    WHERE manager_name = 'Mary'
+  UNION ALL
+    SELECT er.distance + 1, e.employee_name, e.manager_name
+    FROM employee_recursive er, employee e
+    WHERE er.employee_name = e.manager_name
+  )
+SELECT distance, employee_name FROM employee_recursive;</PRE
+><P> Заметьте, что это типичная форма рекурсивных запросов: начальное условие, последующий <TT
+CLASS="LITERAL"
+>UNION</TT
+>, а затем рекурсивная часть запроса. Убедитесь в том, что рекурсивная часть запроса в конце концов перестанет возвращать строки, иначе запрос окажется в бесконечном цикле. (За другими примерами обратитесь к <A
+HREF="queries-with.html"
+>Разделу 7.8</A
+>.)</P
+><P
+>В этом примере используется <TT
+CLASS="LITERAL"
+>LATERAL</TT
+> для применения функции <CODE
+CLASS="FUNCTION"
+>get_product_names()</CODE
+>, возвращающей множество, для каждой строки таблицы <TT
+CLASS="STRUCTNAME"
+>manufacturers</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT m.name AS mname, pname
+FROM manufacturers m, LATERAL get_product_names(m.id) pname;</PRE
+><P> Производители, с которыми в данный момент не связаны никакие продукты, не попадут в результат, так как это внутреннее соединение. Если бы мы захотели включить названия и этих производителей, мы могли бы сделать так: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT m.name AS mname, pname
+FROM manufacturers m LEFT JOIN LATERAL get_product_names(m.id) pname ON true;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN84056"
+></A
+><H2
+>Совместимость</H2
+><P
+>Разумеется, оператор <TT
+CLASS="COMMAND"
+>SELECT</TT
+> совместим со стандартом SQL. Однако не все описанные в стандарте возможности реализованы, а некоторые, наоборот, являются расширениями.</P
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN84060"
+></A
+><H3
+>Необязательное предложение <TT
+CLASS="LITERAL"
+>FROM</TT
+></H3
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> разрешает опустить предложение <TT
+CLASS="LITERAL"
+>FROM</TT
+>. Это позволяет очень легко вычислять результаты простых выражений: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT 2+2;
+
+ ?column?
+----------
+        4</PRE
+><P> Некоторые другие базы данных <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> не допускают этого, требуя задействовать в <TT
+CLASS="COMMAND"
+>SELECT</TT
+> фиктивную таблицу с одной строкой.</P
+><P
+>Заметьте, что если предложение <TT
+CLASS="LITERAL"
+>FROM</TT
+> не указано, запрос не может обращаться ни к каким таблицам базы данных. Например, следующий запрос недопустим: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT distributors.* WHERE distributors.name = 'Westward';</PRE
+><P>
+    До версии 8.1 <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> мог принимать запросы такого вида, неявно добавляя каждую таблицу, задействованную в запросе, в предложение <TT
+CLASS="LITERAL"
+>FROM</TT
+> этого запроса. Теперь это не допускается.</P
+></DIV
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN84074"
+></A
+><H3
+>Пустые списки <TT
+CLASS="LITERAL"
+>SELECT</TT
+></H3
+><P
+>Список выходных выражений после <TT
+CLASS="LITERAL"
+>SELECT</TT
+> может быть пустым, что в результате даст таблицу без колонок. Стандарт SQL не считает такой синтаксис допустимым, но <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> допускает его, так как это согласуется с возможностью иметь таблицы с нулём колонок. Однако, когда используется <TT
+CLASS="LITERAL"
+>DISTINCT</TT
+>, пустой список не допускается.</P
+></DIV
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN84081"
+></A
+><H3
+>Необязательное ключевое слово <TT
+CLASS="LITERAL"
+>AS</TT
+></H3
+><P
+>В стандарте SQL необязательное ключевое слово <TT
+CLASS="LITERAL"
+>AS</TT
+> можно опустить перед именем выходной колонки, если это имя является допустимым именем колонки (то есть не совпадает с каким-либо зарезервированным ключевым словом). <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> несколько более строг: <TT
+CLASS="LITERAL"
+>AS</TT
+> требуется, если имя колонки совпадает с любым ключевым словом, зарезервированным или нет. Тем не менее, рекомендуется использовать <TT
+CLASS="LITERAL"
+>AS</TT
+> или заключать имена выходных колонок в кавычки, во избежание конфликтов, возможных при появлении в будущем новых ключевых слов.</P
+><P
+>В списке <TT
+CLASS="LITERAL"
+>FROM</TT
+> и стандарт, и <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> позволяют опускать <TT
+CLASS="LITERAL"
+>AS</TT
+> перед псевдонимом, который является незарезервированным ключевым словом. Но для имён выходных колонок это не подходит из-за синтаксической неоднозначности.</P
+></DIV
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN84093"
+></A
+><H3
+><TT
+CLASS="LITERAL"
+>ONLY</TT
+> и наследование</H3
+><P
+>Стандарт SQL требует заключать в скобки имя таблицы после <TT
+CLASS="LITERAL"
+>ONLY</TT
+>, например <TT
+CLASS="LITERAL"
+>SELECT * FROM ONLY (tab1), ONLY (tab2) WHERE ...</TT
+>. <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> считает эти скобки необязательными.</P
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> позволяет добавлять в конце <TT
+CLASS="LITERAL"
+>*</TT
+>, чтобы явно обозначить, что дочерние таблицы включаются в рассмотрение, в отличие от поведения с <TT
+CLASS="LITERAL"
+>ONLY</TT
+>. Стандарт не позволяет этого.</P
+><P
+>(Эти соображения в равной степени касаются всех SQL-команд, поддерживающих параметр <TT
+CLASS="LITERAL"
+>ONLY</TT
+>.)</P
+></DIV
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN84106"
+></A
+><H3
+>Вызовы функций в предложении <TT
+CLASS="LITERAL"
+>FROM</TT
+></H3
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> позволяет записать вызов функции непосредственно в виде элемента списка <TT
+CLASS="LITERAL"
+>FROM</TT
+>. В стандарте SQL такой вызов функции требуется помещать во вложенный <TT
+CLASS="COMMAND"
+>SELECT</TT
+>; то есть, запись <TT
+CLASS="LITERAL"
+>FROM <TT
+CLASS="REPLACEABLE"
+><I
+>функция</I
+></TT
+>(...) <TT
+CLASS="REPLACEABLE"
+><I
+>псевдоним</I
+></TT
+></TT
+> примерно равнозначна записи <TT
+CLASS="LITERAL"
+>FROM LATERAL (SELECT <TT
+CLASS="REPLACEABLE"
+><I
+>функция</I
+></TT
+>(...)) <TT
+CLASS="REPLACEABLE"
+><I
+>псевдоним</I
+></TT
+></TT
+>. Заметьте, что указание <TT
+CLASS="LITERAL"
+>LATERAL</TT
+> считается неявным; это связано с тем, что стандарт требует поведения <TT
+CLASS="LITERAL"
+>LATERAL</TT
+> для элемента <TT
+CLASS="LITERAL"
+>UNNEST()</TT
+> в предложении <TT
+CLASS="LITERAL"
+>FROM</TT
+>. <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> обрабатывает <TT
+CLASS="LITERAL"
+>UNNEST()</TT
+> так же, как и другие функции, возвращающие множества.</P
+></DIV
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN84125"
+></A
+><H3
+>Пространства имён в <TT
+CLASS="LITERAL"
+>GROUP BY</TT
+> и <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+></H3
+><P
+>В стандарте SQL-92 предложение <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> может содержать ссылки только на выходные колонки по именам или номерам, тогда как <TT
+CLASS="LITERAL"
+>GROUP BY</TT
+> может содержать выражения с именами только входных колонок. <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> расширяет оба эти предложения, позволяя также применять другие варианты (но если возникает неоднозначность, он разрешает её согласно стандарту). <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> также позволяет задавать произвольные выражения в обоих предложениях. Заметьте, что имена, фигурирующие в выражениях, всегда будут восприниматься как имена входных, а не выходных колонок.</P
+><P
+>В SQL:1999 и более поздних стандартах введено несколько другое определение, которое не полностью совместимо с SQL-92. Однако в большинстве случаев <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> будет интерпретировать выражение <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> или <TT
+CLASS="LITERAL"
+>GROUP BY</TT
+> так, как требует SQL:1999.</P
+></DIV
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN84138"
+></A
+><H3
+>Функциональные зависимости</H3
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> распознаёт функциональную зависимость (что позволяет опускать колонки в <TT
+CLASS="LITERAL"
+>GROUP BY</TT
+>), только когда первичный ключ таблицы присутствует в списке <TT
+CLASS="LITERAL"
+>GROUP BY</TT
+>. В стандарте SQL оговариваются дополнительные условия, которые следует учитывать.</P
+></DIV
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN84144"
+></A
+><H3
+>Ограничения предложения <TT
+CLASS="LITERAL"
+>WINDOW</TT
+></H3
+><P
+>Стандарт SQL предоставляет дополнительные возможности для указания <TT
+CLASS="REPLACEABLE"
+><I
+>предложения_рамки</I
+></TT
+> окна. <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> в настоящее время поддерживает только варианты, описанные выше.</P
+></DIV
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN84150"
+></A
+><H3
+><TT
+CLASS="LITERAL"
+>LIMIT</TT
+> и <TT
+CLASS="LITERAL"
+>OFFSET</TT
+></H3
+><P
+>Предложения <TT
+CLASS="LITERAL"
+>LIMIT</TT
+> и <TT
+CLASS="LITERAL"
+>OFFSET</TT
+> относятся к специфическим особенностям <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> и поддерживаются также в <SPAN
+CLASS="PRODUCTNAME"
+>MySQL</SPAN
+>. В стандарте SQL:2008 для той же цели вводятся предложения <TT
+CLASS="LITERAL"
+>OFFSET ... FETCH {FIRST|NEXT} ...</TT
+>, рассмотренные ранее в <A
+HREF="sql-select.html#SQL-LIMIT"
+><I
+>Предложение <I
+>LIMIT</I
+></I
+></A
+>. Этот синтаксис также используется в <SPAN
+CLASS="PRODUCTNAME"
+>IBM DB2</SPAN
+>. (Приложения, написанные для <SPAN
+CLASS="PRODUCTNAME"
+>Oracle</SPAN
+>, часто применяют обходной способ и получают эффект этих предложений, задействуя автоматически генерируемую колонку <TT
+CLASS="LITERAL"
+>rownum</TT
+>, которая отсутствует в PostgreSQL.)</P
+></DIV
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN84164"
+></A
+><H3
+><TT
+CLASS="LITERAL"
+>FOR NO KEY UPDATE</TT
+>, <TT
+CLASS="LITERAL"
+>FOR UPDATE</TT
+>, <TT
+CLASS="LITERAL"
+>FOR SHARE</TT
+>, <TT
+CLASS="LITERAL"
+>FOR KEY SHARE</TT
+></H3
+><P
+>Хотя указание <TT
+CLASS="LITERAL"
+>FOR UPDATE</TT
+> есть в стандарте SQL, стандарт позволяет использовать его только в предложении <TT
+CLASS="COMMAND"
+>DECLARE CURSOR</TT
+>. <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> допускает его использование в любом запросе <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, а также в любых подзапросах <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, но это является расширением. Варианты <TT
+CLASS="LITERAL"
+>FOR NO KEY UPDATE</TT
+>, <TT
+CLASS="LITERAL"
+>FOR SHARE</TT
+> и <TT
+CLASS="LITERAL"
+>FOR KEY SHARE</TT
+>, а также указание <TT
+CLASS="LITERAL"
+>NOWAIT</TT
+> в стандарте отсутствуют.</P
+></DIV
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN84180"
+></A
+><H3
+>Изменение данных в <TT
+CLASS="LITERAL"
+>WITH</TT
+></H3
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> разрешает использовать <TT
+CLASS="COMMAND"
+>INSERT</TT
+>, <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> и <TT
+CLASS="COMMAND"
+>DELETE</TT
+> в качестве запросов <TT
+CLASS="LITERAL"
+>WITH</TT
+>. Стандарт SQL этого не предусматривает.</P
+></DIV
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN84189"
+></A
+><H3
+>Нестандартные предложения</H3
+><P
+><TT
+CLASS="LITERAL"
+>DISTINCT ON ( ... )</TT
+> — расширение стандарта SQL.</P
+><P
+><TT
+CLASS="LITERAL"
+>ROWS FROM( ... )</TT
+> — расширение стандарта SQL.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-security-label.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-selectinto.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>SECURITY LABEL</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>SELECT INTO</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

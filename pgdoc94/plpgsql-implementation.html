@@ -1,0 +1,617 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>PL/pgSQL изнутри</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="PL/pgSQL — процедурный язык SQL"
+HREF="plpgsql.html"><LINK
+REL="PREVIOUS"
+TITLE="Триггерные процедуры"
+HREF="plpgsql-trigger.html"><LINK
+REL="NEXT"
+TITLE="Советы по разработке на PL/pgSQL"
+HREF="plpgsql-development-tips.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Триггерные процедуры"
+HREF="plpgsql-trigger.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="plpgsql.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 40. <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> — процедурный язык <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Советы по разработке на PL/pgSQL"
+HREF="plpgsql-development-tips.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="PLPGSQL-IMPLEMENTATION"
+>40.10. <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> изнутри</A
+></H1
+><P
+>В этом разделе обсуждаются некоторые детали реализации, которые пользователям <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> важно знать.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="PLPGSQL-VAR-SUBST"
+>40.10.1. Подстановка переменных</A
+></H2
+><P
+>SQL-операторы и выражения внутри функции на <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> могут ссылаться на переменные и параметры этой функции. За кулисами <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> заменяет параметры запросов для таких ссылок. Параметры будут заменены только в местах, где параметр или ссылка на столбец синтаксически допустимы. Как крайний случай, рассмотрим следующий пример плохого стиля программирования: </P><PRE
+CLASS="PROGRAMLISTING"
+>INSERT INTO foo (foo) VALUES (foo);</PRE
+><P> Первый раз <TT
+CLASS="LITERAL"
+>foo</TT
+> появляется на том месте, где синтаксически должно быть имя таблицы, поэтому замены не будет, даже если функция имеет переменную <TT
+CLASS="LITERAL"
+>foo</TT
+>. Второй раз <TT
+CLASS="LITERAL"
+>foo</TT
+> встречается там, где должно быть имя столбца таблицы, поэтому замены не будет и здесь. Только третье вхождение <TT
+CLASS="LITERAL"
+>foo</TT
+> является кандидатом на то, чтобы быть ссылкой на переменную функции.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Версии <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> до 9.0 пытаются заменить переменную во всех трёх случаях, что приводит к синтаксической ошибке.</P
+></BLOCKQUOTE
+></DIV
+><P
+>Если имена переменных синтаксически не отличаются от названий столбцов таблицы, то возможна двусмысленность и в ссылках на таблицы. Является ли данное имя ссылкой на столбец таблицы или ссылкой на переменную? Изменим предыдущий пример: </P><PRE
+CLASS="PROGRAMLISTING"
+>INSERT INTO dest (col) SELECT foo + bar FROM src;</PRE
+><P> Здесь <TT
+CLASS="LITERAL"
+>dest</TT
+> и <TT
+CLASS="LITERAL"
+>src</TT
+> должны быть именами таблиц, <TT
+CLASS="LITERAL"
+>col</TT
+> должен быть столбцом <TT
+CLASS="LITERAL"
+>dest</TT
+>. Однако, <TT
+CLASS="LITERAL"
+>foo</TT
+> и <TT
+CLASS="LITERAL"
+>bar</TT
+> могут быть как переменными функции, так и столбцами <TT
+CLASS="LITERAL"
+>src</TT
+>.</P
+><P
+>По умолчанию, <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> выдаст ошибку, если имя в операторе SQL может относиться как к переменной, так и к столбцу таблицы. Ситуацию можно исправить переименованием переменной, переименованием столбца, точной квалификацией неоднозначной ссылки или указанием <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> машине, какую интерпретацию предпочесть.</P
+><P
+>Самое простое решение — переименовать переменную или столбец. Общее правило кодирования предполагает использование различных соглашений о наименовании для переменных <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> и столбцов таблиц. Например, если имена переменных всегда имеют вид <TT
+CLASS="LITERAL"
+>v_<TT
+CLASS="REPLACEABLE"
+><I
+>something</I
+></TT
+></TT
+>, а имена столбцов никогда не начинаются на <TT
+CLASS="LITERAL"
+>v_</TT
+>, то конфликты исключены.</P
+><P
+>В качестве альтернативы можно дополнить имена неоднозначных ссылок, чтобы сделать их точными. В приведённом выше примере <TT
+CLASS="LITERAL"
+>src.foo</TT
+> однозначно бы определялась, как ссылка на столбец таблицы. Чтобы сделать однозначной ссылку на переменную, переменная должна быть объявлена в блоке с меткой, и далее нужно использовать эту метку. (см. <A
+HREF="plpgsql-structure.html"
+>Раздел 40.2</A
+>). Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>&lt;&lt;block&gt;&gt;
+DECLARE
+    foo int;
+BEGIN
+    foo := ...;
+    INSERT INTO dest (col) SELECT block.foo + bar FROM src;</PRE
+><P> Здесь <TT
+CLASS="LITERAL"
+>block.foo</TT
+> ссылается на переменную, даже если в таблице <TT
+CLASS="LITERAL"
+>src</TT
+> есть колонка <TT
+CLASS="LITERAL"
+>foo</TT
+>. Параметры функции, а также специальные переменные, такие как <TT
+CLASS="LITERAL"
+>FOUND</TT
+>, могут быть дополнены именем функции, потому что они неявно объявлены во внешнем блоке, метка которого совпадает с именем функции.</P
+><P
+>Иногда может быть не очень практичным исправлять таким способом все неоднозначные ссылки в большом куске <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> кода. В таких случаях можно указать, чтобы <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> разрешал неоднозначные ссылки в пользу переменных (это совместимо с <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> до версии <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> 9.0), или в пользу столбцов таблицы (совместимо с некоторыми другими системами, такими как <SPAN
+CLASS="PRODUCTNAME"
+>Oracle</SPAN
+>).</P
+><P
+>На уровне всей системы поведение <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> регулируется установкой конфигурационного параметра <TT
+CLASS="LITERAL"
+>plpgsql.variable_conflict</TT
+>, имеющего значения: <TT
+CLASS="LITERAL"
+>error</TT
+>, <TT
+CLASS="LITERAL"
+>use_variable</TT
+> или <TT
+CLASS="LITERAL"
+>use_column</TT
+> (<TT
+CLASS="LITERAL"
+>error</TT
+> устанавливается по умолчанию при установке системы). Изменение этого параметра влияет на все последующие компиляции операторов в функциях на <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+>, но не на операторы уже скомпилированные в текущей сессии. Так как изменение этого параметра может привести к неожиданным изменениям в поведении функций на <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+>, он может быть изменён только суперпользователем.</P
+><P
+>Поведение <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> можно изменять для каждой отдельной функции, если добавить в начало функции одну из этих специальных команд: </P><PRE
+CLASS="PROGRAMLISTING"
+>#variable_conflict error
+#variable_conflict use_variable
+#variable_conflict use_column</PRE
+><P> Эти команды влияют только на функцию, в которой они записаны и перекрывают действие <TT
+CLASS="LITERAL"
+>plpgsql.variable_conflict</TT
+>. Пример: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION stamp_user(id int, comment text) RETURNS void AS $$
+    #variable_conflict use_variable
+    DECLARE
+        curtime timestamp := now();
+    BEGIN
+        UPDATE users SET last_modified = curtime, comment = comment
+          WHERE users.id = id;
+    END;
+$$ LANGUAGE plpgsql;</PRE
+><P> В команде <TT
+CLASS="LITERAL"
+>UPDATE</TT
+>, <TT
+CLASS="LITERAL"
+>curtime</TT
+>, <TT
+CLASS="LITERAL"
+>comment</TT
+> и <TT
+CLASS="LITERAL"
+>id</TT
+> будут ссылаться на переменные и параметры функции вне зависимости от того, есть ли столбцы с такими именами в таблице <TT
+CLASS="LITERAL"
+>users</TT
+>. Обратите внимание, что нужно дополнить именем таблицы ссылку на <TT
+CLASS="LITERAL"
+>users.id</TT
+> в предложении <TT
+CLASS="LITERAL"
+>WHERE</TT
+>, чтобы она ссылалась на столбец таблицы. При этом необязательно дополнять ссылку на <TT
+CLASS="LITERAL"
+>comment</TT
+> в левой части списка <TT
+CLASS="LITERAL"
+>UPDATE</TT
+>, так как синтаксически в этом месте должно быть имя столбца таблицы <TT
+CLASS="LITERAL"
+>users</TT
+>. Эту функцию можно было бы записать и без зависимости от значения <TT
+CLASS="LITERAL"
+>variable_conflict</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION stamp_user(id int, comment text) RETURNS void AS $$
+    &lt;&lt;fn&gt;&gt;
+    DECLARE
+        curtime timestamp := now();
+    BEGIN
+        UPDATE users SET last_modified = fn.curtime, comment = stamp_user.comment
+          WHERE users.id = stamp_user.id;
+    END;
+$$ LANGUAGE plpgsql;</PRE
+><P></P
+><P
+>Замена переменных не происходит в строке, исполняемой командой <TT
+CLASS="COMMAND"
+>EXECUTE</TT
+> или её вариантом. Если нужно вставлять изменяющиеся значения в такую команду, то это делается либо при построении самой командной строки или с использованием <TT
+CLASS="LITERAL"
+>USING</TT
+>, как показано в <A
+HREF="plpgsql-statements.html#PLPGSQL-STATEMENTS-EXECUTING-DYN"
+>Подразделе 40.5.4</A
+>.</P
+><P
+>Замена переменных в настоящее время работает только в командах <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, <TT
+CLASS="COMMAND"
+>INSERT</TT
+>, <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> и <TT
+CLASS="COMMAND"
+>DELETE</TT
+>, потому что основная SQL машина допускает использование параметров запроса только в этих командах. Чтобы использовать изменяемые имена или значения в других типах операторов (обычно называются утилиты), необходимо построить текст команды в виде строки и выполнить её в <TT
+CLASS="COMMAND"
+>EXECUTE</TT
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="PLPGSQL-PLAN-CACHING"
+>40.10.2. Кеширование плана</A
+></H2
+><P
+>Интерпретатор <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> анализирует исходный текст функции и строит внутреннее бинарное дерево инструкций при первом вызове функции (для каждой сессии). В дерево инструкций полностью переводится вся структура операторов <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+>, но для выражений и команд <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>, используемых в функции, это происходит не сразу.</P
+><P
+> При первом выполнении в функции каждого выражения или команды <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> интерпретатор <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> разбирает и анализирует команду для создания подготовленного к выполнению оператора с помощью функции <CODE
+CLASS="FUNCTION"
+>SPI_prepare</CODE
+> менеджера интерфейса программирования сервера. Последующие обращения к этому выражению или команде повторно используют подготовленный к выполнению оператор. Таким образом, <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>-команды, находящиеся в редко посещаемой ветке кода условного оператора, не несут накладных расходов на разбор команд, если они так и не будут выполнены в текущей сессии. Здесь есть недостаток, заключающийся в том, что ошибки в определённом выражении или команде не могут быть обнаружены, пока выполнение не дойдёт до этой части функции. (Тривиальные синтаксические ошибки обнаружатся в ходе первоначального разбора, но ничего более серьёзного не будет обнаружено до исполнения.)</P
+><P
+>Кроме того, <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> (точнее, менеджер интерфейса программирования сервера) будет пытаться кешировать план выполнения для любого подготовленного к исполнению оператора. При каждом вызове оператора, если не используется план из кеша, генерируется новый план выполнения, и текущие значения параметров (то есть значения переменных <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+>) могут быть использованы для оптимизации нового плана. Если оператор не имеет параметров или выполняется много раз, менеджер интерфейса программирования сервера рассмотрит вопрос о создании и кешировании (для повторного использования) общего плана, не зависящего от значений параметров. Как правило, это происходит в тех случаях, когда план выполнения не очень чувствителен к имеющимся ссылкам на значения переменных <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+>. В противном случае, выгоднее каждый раз формировать новый план. Более подробно поведение подготовленных операторов рассматривается в <A
+HREF="sql-prepare.html"
+>PREPARE</A
+>.</P
+><P
+>Чтобы <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> мог сохранять подготовленные операторы и планы выполнения, команды SQL в коде <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+>, должны использовать одни и те же таблицы и столбцы при каждом исполнении. А это значит, что в SQL-командах нельзя использовать названия таблиц и столбцов в качестве параметров. Чтобы обойти это ограничение, нужно построить динамическую команду для оператора <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> <TT
+CLASS="COMMAND"
+>EXECUTE</TT
+> &mdash; ценой будет разбор и построение нового плана выполнения при каждом вызове.</P
+><P
+>Изменчивая природа переменных типа <TT
+CLASS="TYPE"
+>record</TT
+> представляет ещё одну проблему в этой связи. Когда поля переменной типа <TT
+CLASS="TYPE"
+>record</TT
+> используются в выражениях или операторах, типы данных полей не должны меняться от одного вызова функции к другому, так как при анализе каждого выражения будет использоваться тот тип данных, который присутствовал при первом вызове. При необходимости можно использовать <TT
+CLASS="COMMAND"
+>EXECUTE</TT
+> для решения этой проблемы.</P
+><P
+>Если функция используется в качестве триггера более чем для одной таблицы, <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> независимо подготавливает и кеширует операторы для каждой такой таблицы. То есть создаётся кеш для каждой комбинации триггерная функция + таблица, а не только для каждой функции. Это устраняет некоторые проблемы, связанные с различными типами данных. Например, триггерная функция сможет успешно работать со столбцом <TT
+CLASS="LITERAL"
+>key</TT
+>, даже если в разных таблицах этот столбец имеет разные типы данных.</P
+><P
+>Таким же образом, функции с полиморфными типами аргументов имеют отдельный кеш для каждой комбинации фактических типов аргументов, так что различия типов данных не вызывают неожиданных сбоев.</P
+><P
+>Кеширование операторов иногда приводит к неожиданным эффектам при интерпретации чувствительных ко времени значений. Например, есть разница между тем, что делают эти две функции: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION logfunc1(logtxt text) RETURNS void AS $$
+    BEGIN
+        INSERT INTO logtable VALUES (logtxt, 'now');
+    END;
+$$ LANGUAGE plpgsql;</PRE
+><P> и </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION logfunc2(logtxt text) RETURNS void AS $$
+    DECLARE
+        curtime timestamp;
+    BEGIN
+        curtime := 'now';
+        INSERT INTO logtable VALUES (logtxt, curtime);
+    END;
+$$ LANGUAGE plpgsql;</PRE
+><P></P
+><P
+>В случае <CODE
+CLASS="FUNCTION"
+>logfunc1</CODE
+>, при анализе <TT
+CLASS="COMMAND"
+>INSERT</TT
+>, основной анализатор <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> знает, что строку <TT
+CLASS="LITERAL"
+>'now'</TT
+> следует толковать как <TT
+CLASS="TYPE"
+>timestamp</TT
+>, потому что целевой столбец таблицы <CODE
+CLASS="CLASSNAME"
+>logtable</CODE
+> имеет такой тип данных. Таким образом, <TT
+CLASS="LITERAL"
+>'now'</TT
+> будет преобразовано в константу <TT
+CLASS="TYPE"
+>timestamp</TT
+> при анализе <TT
+CLASS="COMMAND"
+>INSERT</TT
+>, а затем эта константа будет использоваться в последующих вызовах <CODE
+CLASS="FUNCTION"
+>logfunc1</CODE
+> в течение всей сессии. Разумеется, это не то, что хотел программист. Лучше было бы использовать функцию <TT
+CLASS="LITERAL"
+>now()</TT
+> или <TT
+CLASS="LITERAL"
+>current_timestamp</TT
+>.</P
+><P
+>В случае <CODE
+CLASS="FUNCTION"
+>logfunc2</CODE
+>, основной анализатор <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> не знает, какого типа будет <TT
+CLASS="LITERAL"
+>'now'</TT
+> и поэтому возвращает значение типа <TT
+CLASS="TYPE"
+>text</TT
+>, содержащее строку <TT
+CLASS="LITERAL"
+>now</TT
+>. При последующем присвоении локальной переменной <TT
+CLASS="VARNAME"
+>curtime</TT
+> интерпретатор <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> приводит эту строку к типу <TT
+CLASS="TYPE"
+>timestamp</TT
+>, вызывая функции <CODE
+CLASS="FUNCTION"
+>text_out</CODE
+> и <CODE
+CLASS="FUNCTION"
+>timestamp_in</CODE
+>. Таким образом, метка времени будет обновляться при каждом выполнении, как и ожидается программистом. И хотя всё работает как ожидалось, это ужасно неэффективно, поэтому использование функции <TT
+CLASS="LITERAL"
+>now()</TT
+> по-прежнему значительно лучше.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="plpgsql-trigger.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="plpgsql-development-tips.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Триггерные процедуры</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="plpgsql.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Советы по разработке на <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

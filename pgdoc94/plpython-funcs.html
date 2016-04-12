@@ -1,0 +1,264 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Функции на PL/Python</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="PL/Python — процедурный язык Python"
+HREF="plpython.html"><LINK
+REL="PREVIOUS"
+TITLE="Python 2 и Python 3"
+HREF="plpython-python23.html"><LINK
+REL="NEXT"
+TITLE="Значения данных"
+HREF="plpython-data.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Python 2 и Python 3"
+HREF="plpython-python23.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="plpython.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 43. PL/Python — процедурный язык Python</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Значения данных"
+HREF="plpython-data.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="PLPYTHON-FUNCS"
+>43.2. Функции на PL/Python</A
+></H1
+><P
+>Функции на PL/Python объявляются стандартным образом с помощью команды <A
+HREF="sql-createfunction.html"
+>CREATE FUNCTION</A
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION <TT
+CLASS="REPLACEABLE"
+><I
+>funcname</I
+></TT
+> (<TT
+CLASS="REPLACEABLE"
+><I
+>argument-list</I
+></TT
+>)
+  RETURNS <TT
+CLASS="REPLACEABLE"
+><I
+>return-type</I
+></TT
+>
+AS $$
+  # Тело функции на PL/Python
+$$ LANGUAGE plpythonu;</PRE
+><P></P
+><P
+>Тело функции содержит просто скрипт на языке Python. Когда вызывается функция, её аргументы передаются в виде элементов списка <TT
+CLASS="VARNAME"
+>args</TT
+>; именованные аргументы также передаются скрипту Python как обычные переменные. С применением именованных аргументов скрипт обычно лучше читается. Результат из кода Python возвращается обычным способом, командой <TT
+CLASS="LITERAL"
+>return</TT
+> или <TT
+CLASS="LITERAL"
+>yield</TT
+> (в случае функции, возвращающей множество). Если возвращаемое значение не определено, Python возвращает <TT
+CLASS="SYMBOL"
+>None</TT
+>. Исполнитель <SPAN
+CLASS="APPLICATION"
+>PL/Python</SPAN
+> преобразует <TT
+CLASS="SYMBOL"
+>None</TT
+> языка Python в значение NULL языка SQL.</P
+><P
+>Например, функцию, возвращающее большее из двух целых чисел, можно определить так: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION pymax (a integer, b integer)
+  RETURNS integer
+AS $$
+  if a &gt; b:
+    return a
+  return b
+$$ LANGUAGE plpythonu;</PRE
+><P> Код на Python, заданный в качестве тела объявляемой функции, становится телом функции Python. Например, для показанного выше объявления получается функция: </P><PRE
+CLASS="PROGRAMLISTING"
+>def __plpython_procedure_pymax_23456():
+  if a &gt; b:
+    return a
+  return b</PRE
+><P> Здесь 23456 — это OID, который <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> присвоил данной функции.</P
+><P
+>Значения аргументов задаются в глобальных переменных. Согласно правилам видимости в Python, тонким следствием этого является то, что переменной аргумента нельзя присвоить внутри функции выражение, включающее имя самой этой переменной, если только эта переменная не объявлена глобальной в текущем блоке. Например, следующий код не будет работать: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION pystrip(x text)
+  RETURNS text
+AS $$
+  x = x.strip()  # ошибка
+  return x
+$$ LANGUAGE plpythonu;</PRE
+><P> так как присвоение <TT
+CLASS="VARNAME"
+>x</TT
+> значения делает <TT
+CLASS="VARNAME"
+>x</TT
+> локальной переменной для всего блока, и при этом <TT
+CLASS="VARNAME"
+>x</TT
+> в правой части присваивания оказывается ещё не определённой локальной переменной <TT
+CLASS="VARNAME"
+>x</TT
+>, а не параметром функции PL/Python. Добавив оператор <TT
+CLASS="LITERAL"
+>global</TT
+>, это можно исправить: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION pystrip(x text)
+  RETURNS text
+AS $$
+  global x
+  x = x.strip()  # теперь всё в порядке
+  return x
+$$ LANGUAGE plpythonu;</PRE
+><P> Однако рекомендуется не полагаться на такие особенности реализации PL/Python, а принять, что параметры функции предназначены только для чтения.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="plpython-python23.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="plpython-data.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Python 2 и Python 3</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="plpython.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Значения данных</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,878 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Объявления</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="PL/pgSQL — процедурный язык SQL"
+HREF="plpgsql.html"><LINK
+REL="PREVIOUS"
+TITLE="Структура PL/pgSQL"
+HREF="plpgsql-structure.html"><LINK
+REL="NEXT"
+TITLE="Выражения"
+HREF="plpgsql-expressions.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Структура PL/pgSQL"
+HREF="plpgsql-structure.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="plpgsql.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 40. <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> — процедурный язык <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Выражения"
+HREF="plpgsql-expressions.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="PLPGSQL-DECLARATIONS"
+>40.3. Объявления</A
+></H1
+><P
+>Все переменные, используемые в блоке, должны быть определены в секции объявления. (За исключением переменной-счётчика цикла <TT
+CLASS="LITERAL"
+>FOR</TT
+>, которая объявляется автоматически. Для цикла по диапазону чисел автоматически объявляется целочисленная переменная, а для цикла по результатам курсора - переменная типа <TT
+CLASS="LITERAL"
+>record</TT
+>.)</P
+><P
+>Переменные <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> могут иметь любой тип данных SQL, такой как <TT
+CLASS="TYPE"
+>integer</TT
+>, <TT
+CLASS="TYPE"
+>varchar</TT
+>, <TT
+CLASS="TYPE"
+>char</TT
+>.</P
+><P
+>Примеры объявления переменных: </P><PRE
+CLASS="PROGRAMLISTING"
+>user_id integer;
+quantity numeric(5);
+url varchar;
+myrow tablename%ROWTYPE;
+myfield tablename.columnname%TYPE;
+arow RECORD;</PRE
+><P></P
+><P
+>Общий синтаксис объявления переменной: </P><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>name</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+> CONSTANT </SPAN
+>] <TT
+CLASS="REPLACEABLE"
+><I
+>type</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+> COLLATE <TT
+CLASS="REPLACEABLE"
+><I
+>collation_name</I
+></TT
+> </SPAN
+>] [<SPAN
+CLASS="OPTIONAL"
+> NOT NULL </SPAN
+>] [<SPAN
+CLASS="OPTIONAL"
+> { DEFAULT | := | = } <TT
+CLASS="REPLACEABLE"
+><I
+>expression</I
+></TT
+> </SPAN
+>];</PRE
+><P> Предложение <TT
+CLASS="LITERAL"
+>DEFAULT</TT
+>, если присутствует, задаёт начальное значение, которое присваивается переменной при входе в блок. Если отсутствует, то переменная инициализируется SQL значением <TT
+CLASS="LITERAL"
+>NULL</TT
+>. Указание <TT
+CLASS="LITERAL"
+>CONSTANT</TT
+> предотвращает изменение значения переменной после инициализации, таким образом, значение остаётся постоянным в течение всего блока. Параметр <TT
+CLASS="LITERAL"
+>COLLATE</TT
+> определяет правило сортировки, которое будет использоваться для этой переменной (см. <A
+HREF="plpgsql-declarations.html#PLPGSQL-DECLARATION-COLLATION"
+>Подраздел 40.3.6</A
+>). Если указано <TT
+CLASS="LITERAL"
+>NOT NULL</TT
+>, то попытка присвоить <TT
+CLASS="LITERAL"
+>NULL</TT
+> во время выполнения приведёт к ошибке. Все переменные, объявленные как <TT
+CLASS="LITERAL"
+>NOT NULL</TT
+>, должны иметь непустые значения по умолчанию. Можно использовать знак равенства (<TT
+CLASS="LITERAL"
+>=</TT
+>) вместо совместимого с PL/SQL <TT
+CLASS="LITERAL"
+>:=</TT
+>.</P
+><P
+>Значение по умолчанию вычисляется и присваивается переменной каждый раз при входе в блок (не только при первом вызове функции). Так, например, если переменная типа <TT
+CLASS="TYPE"
+>timestamp</TT
+> имеет функцию <TT
+CLASS="LITERAL"
+>now()</TT
+> в качестве значения по умолчанию, это приведёт к тому, что переменная всегда будет содержать время текущего вызова функции, а не время, когда функция была предварительно скомпилирована.</P
+><P
+>Примеры: </P><PRE
+CLASS="PROGRAMLISTING"
+>quantity integer DEFAULT 32;
+url varchar := 'http://mysite.com';
+user_id CONSTANT integer := 10;</PRE
+><P></P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="PLPGSQL-DECLARATION-PARAMETERS"
+>40.3.1. Объявление параметров функции</A
+></H2
+><P
+>Переданные в функцию параметры именуются идентификаторами <TT
+CLASS="LITERAL"
+>$1</TT
+>, <TT
+CLASS="LITERAL"
+>$2</TT
+> и т. д. Дополнительно, для улучшения читаемости, можно объявить псевдонимы для параметров <TT
+CLASS="LITERAL"
+>$<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+></TT
+>. Либо псевдоним, либо цифровой идентификатор используются для обозначения параметра.</P
+><P
+>Создать псевдоним можно двумя способами. Предпочтительный способ это дать имя параметру в команде <TT
+CLASS="COMMAND"
+>CREATE FUNCTION</TT
+>, например: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION sales_tax(subtotal real) RETURNS real AS $$
+BEGIN
+    RETURN subtotal * 0.06;
+END;
+$$ LANGUAGE plpgsql;</PRE
+><P> Другой способ это явное объявление псевдонима при помощи синтаксиса: </P><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>name</I
+></TT
+> ALIAS FOR $<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>;</PRE
+><P> Предыдущий пример для этого стиля выглядит так: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION sales_tax(real) RETURNS real AS $$
+DECLARE
+    subtotal ALIAS FOR $1;
+BEGIN
+    RETURN subtotal * 0.06;
+END;
+$$ LANGUAGE plpgsql;</PRE
+><P></P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Эти два примера не полностью эквивалентны. В первом случае, на <TT
+CLASS="LITERAL"
+>subtotal</TT
+> можно ссылаться как <TT
+CLASS="LITERAL"
+>sales_tax.subtotal</TT
+>, а во втором случае такая ссылка невозможна. (Если бы к внутреннему блоку была добавлена метка, то <TT
+CLASS="LITERAL"
+>subtotal</TT
+> можно было бы дополнить этой меткой.)</P
+></BLOCKQUOTE
+></DIV
+><P
+>Ещё несколько примеров: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION instr(varchar, integer) RETURNS integer AS $$
+DECLARE
+    v_string ALIAS FOR $1;
+    index ALIAS FOR $2;
+BEGIN
+    -- здесь вычисления, использующие v_string и index
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE FUNCTION concat_selected_fields(in_t sometablename) RETURNS text AS $$
+BEGIN
+    RETURN in_t.f1 || in_t.f3 || in_t.f5 || in_t.f7;
+END;
+$$ LANGUAGE plpgsql;</PRE
+><P></P
+><P
+>Когда функция на <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> объявляется с выходными параметрами, им выдаются цифровые идентификаторы <TT
+CLASS="LITERAL"
+>$<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+></TT
+> и для них можно создавать псевдонимы точно таким же способом, как и для обычных входных параметров. Выходной параметр это фактически переменная, стартующая с NULL и которой присваивается значение во время выполнения функции. Возвращается последнее присвоенное значение. Например, функция sales_tax может быть переписана так: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION sales_tax(subtotal real, OUT tax real) AS $$
+BEGIN
+    tax := subtotal * 0.06;
+END;
+$$ LANGUAGE plpgsql;</PRE
+><P> Обратите внимание, что мы опустили <TT
+CLASS="LITERAL"
+>RETURNS real</TT
+> &mdash; хотя можно было и включить, но это было бы излишним.</P
+><P
+>Выходные параметры наиболее полезны для возвращения нескольких значений. Простейший пример: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION sum_n_product(x int, y int, OUT sum int, OUT prod int) AS $$
+BEGIN
+    sum := x + y;
+    prod := x * y;
+END;
+$$ LANGUAGE plpgsql;</PRE
+><P> Как обсуждалось в <A
+HREF="xfunc-sql.html#XFUNC-OUTPUT-PARAMETERS"
+>Подразделе 35.4.4</A
+>, здесь фактически создаётся анонимный тип <TT
+CLASS="LITERAL"
+>record</TT
+> для возвращения результата функции. Если используется предложение <TT
+CLASS="LITERAL"
+>RETURNS</TT
+>, то оно должна выглядеть как <TT
+CLASS="LITERAL"
+>RETURNS record</TT
+>.</P
+><P
+>Есть ещё способ объявить функцию на <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> с использованием <TT
+CLASS="LITERAL"
+>RETURNS TABLE</TT
+>, например: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION extended_sales(p_itemno int)
+RETURNS TABLE(quantity int, total numeric) AS $$
+BEGIN
+    RETURN QUERY SELECT s.quantity, s.quantity * s.price FROM sales s
+                 WHERE s.itemno = p_itemno;
+END;
+$$ LANGUAGE plpgsql;</PRE
+><P> Это в точности соответствует объявлению одного или нескольких параметров <TT
+CLASS="LITERAL"
+>OUT</TT
+> и указанию <TT
+CLASS="LITERAL"
+>RETURNS SETOF <TT
+CLASS="REPLACEABLE"
+><I
+>sometype</I
+></TT
+></TT
+>.</P
+><P
+>Для функции на <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+>, возвращающей полиморфный тип (<TT
+CLASS="TYPE"
+>anyelement</TT
+>, <TT
+CLASS="TYPE"
+>anyarray</TT
+>, <TT
+CLASS="TYPE"
+>anynonarray</TT
+>, <TT
+CLASS="TYPE"
+>anyenum</TT
+>, <TT
+CLASS="TYPE"
+>anyrange</TT
+>), создаётся специальный параметр <TT
+CLASS="LITERAL"
+>$0</TT
+>. Его тип данных соответствует типу, фактически возвращаемому функцией, и который устанавливается на основании фактических типов входных параметров (см. <A
+HREF="extend-type-system.html#EXTEND-TYPES-POLYMORPHIC"
+>Подраздел 35.2.5</A
+>). Это позволяет функции получить доступ к фактически возвращаемому типу данных, как показано в <A
+HREF="plpgsql-declarations.html#PLPGSQL-DECLARATION-TYPE"
+>Подразделе 40.3.3</A
+>. Параметр <TT
+CLASS="LITERAL"
+>$0</TT
+> инициализируется в <TT
+CLASS="LITERAL"
+>NULL</TT
+> и его можно изменять внутри функции. Таким образом, его можно использовать для хранения возвращаемого значения, хотя это необязательно. Параметру <TT
+CLASS="LITERAL"
+>$0</TT
+> можно дать псевдоним. В следующем примере функция работает с любым типом данных, поддерживающим оператор <TT
+CLASS="LITERAL"
+>+</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION add_three_values(v1 anyelement, v2 anyelement, v3 anyelement)
+RETURNS anyelement AS $$
+DECLARE
+    result ALIAS FOR $0;
+BEGIN
+    result := v1 + v2 + v3;
+    RETURN result;
+END;
+$$ LANGUAGE plpgsql;</PRE
+><P></P
+><P
+>Такой же эффект получается при объявлении одного или нескольких выходных параметров полиморфного типа. При этом <TT
+CLASS="LITERAL"
+>$0</TT
+> не создаётся; выходные параметры сами используются для этой цели. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION add_three_values(v1 anyelement, v2 anyelement, v3 anyelement,
+                                 OUT sum anyelement)
+AS $$
+BEGIN
+    sum := v1 + v2 + v3;
+END;
+$$ LANGUAGE plpgsql;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="PLPGSQL-DECLARATION-ALIAS"
+>40.3.2. <TT
+CLASS="LITERAL"
+>ALIAS</TT
+></A
+></H2
+><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>newname</I
+></TT
+> ALIAS FOR <TT
+CLASS="REPLACEABLE"
+><I
+>oldname</I
+></TT
+>;</PRE
+><P
+>Синтаксис <TT
+CLASS="LITERAL"
+>ALIAS</TT
+> более общий, чем предполагалось в предыдущем разделе: псевдонимы можно объявлять для любых переменных, а не только для параметров функции. Основная практическая польза в том, чтобы назначить другие имена переменным с предопределёнными названиями, таким как <TT
+CLASS="VARNAME"
+>NEW</TT
+> или <TT
+CLASS="VARNAME"
+>OLD</TT
+> в триггерной процедуре.</P
+><P
+>Примеры: </P><PRE
+CLASS="PROGRAMLISTING"
+>DECLARE
+  prior ALIAS FOR old;
+  updated ALIAS FOR new;</PRE
+><P></P
+><P
+>Поскольку <TT
+CLASS="LITERAL"
+>ALIAS</TT
+> даёт два различных способа именования одних и тех же объектов, то его неограниченное использование может привести к путанице. Лучше всего использовать <TT
+CLASS="LITERAL"
+>ALIAS</TT
+> для переименования предопределённых имён.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="PLPGSQL-DECLARATION-TYPE"
+>40.3.3. Наследование типов данных</A
+></H2
+><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>variable</I
+></TT
+>%TYPE</PRE
+><P
+>Конструкция <TT
+CLASS="LITERAL"
+>%TYPE</TT
+> предоставляет тип данных переменной или столбца таблицы. Её можно использовать для объявления переменных, содержащих значения из базы данных. Например, для объявления переменной с таким же типом, как и столбец <TT
+CLASS="LITERAL"
+>user_id</TT
+> в таблице <TT
+CLASS="LITERAL"
+>users</TT
+> нужно написать: </P><PRE
+CLASS="PROGRAMLISTING"
+>user_id users.user_id%TYPE;</PRE
+><P></P
+><P
+>Используя <TT
+CLASS="LITERAL"
+>%TYPE</TT
+> не нужно знать тип данных структуры, на которую ссылаетесь. И самое главное, если в будущем тип данных изменится (например: тип данных для <TT
+CLASS="LITERAL"
+>user_id</TT
+> поменяется с <TT
+CLASS="TYPE"
+>integer</TT
+> на <TT
+CLASS="TYPE"
+>real</TT
+>), то вам может не понадобиться изменять определение функции.</P
+><P
+>Использование <TT
+CLASS="LITERAL"
+>%TYPE</TT
+> особенно полезно в полиморфных функциях, поскольку типы данных, необходимые для внутренних переменных, могут меняться от одного вызова к другому. Соответствующие переменные могут быть созданы с применением <TT
+CLASS="LITERAL"
+>%TYPE</TT
+> к аргументам и возвращаемому значению функции.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="PLPGSQL-DECLARATION-ROWTYPES"
+>40.3.4. Строковый тип</A
+></H2
+><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>table_name</I
+></TT
+><TT
+CLASS="LITERAL"
+>%ROWTYPE</TT
+>;
+<TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>composite_type_name</I
+></TT
+>;</PRE
+><P
+>Переменная составного типа называется строковой (<I
+CLASS="FIRSTTERM"
+>row</I
+>) переменной или переменной строкового типа (<I
+CLASS="FIRSTTERM"
+>row-type</I
+>). Значением такой переменной может быть целая строка, полученная в результате выполнения запроса <TT
+CLASS="COMMAND"
+>SELECT</TT
+> или <TT
+CLASS="COMMAND"
+>FOR</TT
+>, при условии, что набор столбцов запроса соответствует заявленному типу переменной. Доступ к отдельным значениям полей строковой переменной осуществляется, как обычно, через точку, например <TT
+CLASS="LITERAL"
+>rowvar.field</TT
+>.</P
+><P
+>Строковая переменная может быть объявлена с таким же типом, как и строка в существующей таблице или представлении, используя нотацию <TT
+CLASS="REPLACEABLE"
+><I
+>table_name</I
+></TT
+><TT
+CLASS="LITERAL"
+>%ROWTYPE</TT
+>; или при объявлении указывается имя составного типа. (Поскольку каждая таблица имеет соответствующий составной тип с таким же именем, то на самом деле, в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> не имеет значения, пишете ли вы <TT
+CLASS="LITERAL"
+>%ROWTYPE</TT
+> или нет. Но использование <TT
+CLASS="LITERAL"
+>%ROWTYPE</TT
+> более переносимо.)</P
+><P
+>Параметры функции могут быть составного типа (строки таблицы). В этом случае соответствующий идентификатор <TT
+CLASS="LITERAL"
+>$<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+></TT
+> будет строковой переменной, поля которой можно выбирать, например <TT
+CLASS="LITERAL"
+>$1.user_id</TT
+>.</P
+><P
+>Только определённые пользователем столбцы таблицы доступны в переменной строкового типа, но не OID или другие системные столбцы (потому что это может быть строка представления). Поля строкового типа наследуют размер и точность от типов данных столбцов таблицы, таких как <TT
+CLASS="TYPE"
+>char(<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>)</TT
+>.</P
+><P
+>Ниже приведён пример использования составных типов. <TT
+CLASS="STRUCTNAME"
+>table1</TT
+> и <TT
+CLASS="STRUCTNAME"
+>table2</TT
+> это существующие таблицы, имеющие, по меньшей мере, перечисленные столбцы: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION merge_fields(t_row table1) RETURNS text AS $$
+DECLARE
+    t2_row table2%ROWTYPE;
+BEGIN
+    SELECT * INTO t2_row FROM table2 WHERE ... ;
+    RETURN t_row.f1 || t2_row.f3 || t_row.f5 || t2_row.f7;
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT merge_fields(t.*) FROM table1 t WHERE ... ;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="PLPGSQL-DECLARATION-RECORDS"
+>40.3.5. Тип <TT
+CLASS="TYPE"
+>record</TT
+></A
+></H2
+><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> RECORD;</PRE
+><P
+>Переменные типа <TT
+CLASS="TYPE"
+>record</TT
+> похожи на переменные строкового типа, но они не имеют предопределённой структуры. Они приобретают фактическую структуру от строки, которая им присваивается командами <TT
+CLASS="COMMAND"
+>SELECT</TT
+> или <TT
+CLASS="COMMAND"
+>FOR</TT
+>. Структура переменной типа <TT
+CLASS="TYPE"
+>record</TT
+> может меняться каждый раз при присвоении значения. Следствием этого является то, что пока значение не присвоено первый раз, переменная типа <TT
+CLASS="TYPE"
+>record</TT
+> не имеет структуры и любая попытка получить доступ к отдельному полю приведёт к ошибке во время исполнения.</P
+><P
+>Обратите внимание, что <TT
+CLASS="LITERAL"
+>RECORD</TT
+> это не подлинный тип данных, а только лишь заполнитель. Также следует понимать, что функция на <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+>, имеющая тип возвращаемого значения <TT
+CLASS="TYPE"
+>record</TT
+>, это не то же самое, что и переменная типа <TT
+CLASS="TYPE"
+>record</TT
+>, хотя такая функция может использовать переменную типа <TT
+CLASS="TYPE"
+>record</TT
+> для хранения своего результата. В обоих случаях фактическая структура строки неизвестна во время создания функции, но для функции, возвращающей <TT
+CLASS="TYPE"
+>record</TT
+>, фактическая структура определяется во время разбора вызывающего запроса, в то время как переменная типа <TT
+CLASS="TYPE"
+>record</TT
+> может менять свою структуру на лету.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="PLPGSQL-DECLARATION-COLLATION"
+>40.3.6. Упорядочение переменных <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+></A
+></H2
+><P
+>Когда функция на <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> имеет один или несколько параметров сортируемых типов данных, правило сортировки определяется при каждом вызове функции в зависимости от правил сортировки фактических аргументов, как описано в <A
+HREF="collation.html"
+>Разделе 22.2</A
+>. Если оно определено успешно (т. е. среди аргументов нет конфликтов между неявными правилами сортировки), то все соответствующие параметры неявно трактуются как имеющее это правило сортировки. Внутри функции это будет влиять на поведение операторов, зависящих от используемого правила сортировки. Рассмотрим пример: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION less_than(a text, b text) RETURNS boolean AS $$
+BEGIN
+    RETURN a &lt; b;
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT less_than(text_field_1, text_field_2) FROM table1;
+SELECT less_than(text_field_1, text_field_2 COLLATE "C") FROM table1;</PRE
+><P> В первом случае <CODE
+CLASS="FUNCTION"
+>less_than</CODE
+> будет использовать для сравнения общее правило сортировки для <TT
+CLASS="STRUCTFIELD"
+>text_field_1</TT
+> и <TT
+CLASS="STRUCTFIELD"
+>text_field_2</TT
+>, в то время как во втором случае будет использоваться правило <TT
+CLASS="LITERAL"
+>C</TT
+>.</P
+><P
+>Кроме того, определённое для вызова функции правило сортировки также будет использоваться для любых локальных переменных соответствующего типа. Таким образом, функция не станет работать по-другому, если её переписать так: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION less_than(a text, b text) RETURNS boolean AS $$
+DECLARE
+    local_a text := a;
+    local_b text := b;
+BEGIN
+    RETURN local_a &lt; local_b;
+END;
+$$ LANGUAGE plpgsql;</PRE
+><P></P
+><P
+>Если параметров с типами данных, поддерживающими сортировку, нет, или для параметров невозможно определить общее правило сортировки, тогда для параметров и локальных переменных применяются правила, принятые для их типа данных по умолчанию (которые обычно совпадают с правилами сортировки по умолчанию, принятыми для базы данных, но могут отличаться для переменных доменных типов).</P
+><P
+>Локальная переменная может иметь правило сортировки, отличное от правила по умолчанию. Для этого используется параметр <TT
+CLASS="LITERAL"
+>COLLATE</TT
+> в объявлении переменной, например: </P><PRE
+CLASS="PROGRAMLISTING"
+>DECLARE
+    local_a text COLLATE "en_US";</PRE
+><P> Этот параметр переопределяет правило сортировки, которое получила бы переменная в соответствии с вышеуказанными правилами.</P
+><P
+>И, конечно же, можно явно указывать параметр <TT
+CLASS="LITERAL"
+>COLLATE</TT
+> для конкретных операций внутри функции, если к ним требуется применить конкретное правило сортировки. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION less_than_c(a text, b text) RETURNS boolean AS $$
+BEGIN
+    RETURN a &lt; b COLLATE "C";
+END;
+$$ LANGUAGE plpgsql;</PRE
+><P> Как и в обычной SQL-команде, это переопределяет правила сортировки, связанные с полями таблицы, параметрами и локальными переменными, которые используются в данном выражении.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="plpgsql-structure.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="plpgsql-expressions.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Структура <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="plpgsql.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Выражения</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

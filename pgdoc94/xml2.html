@@ -1,0 +1,744 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>xml2</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Дополнительно поставляемые модули"
+HREF="contrib.html"><LINK
+REL="PREVIOUS"
+TITLE="uuid-ossp"
+HREF="uuid-ossp.html"><LINK
+REL="NEXT"
+TITLE="Дополнительно поставляемые программы"
+HREF="contrib-prog.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="uuid-ossp"
+HREF="uuid-ossp.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Приложение E. Дополнительно поставляемые модули</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Дополнительно поставляемые программы"
+HREF="contrib-prog.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="XML2"
+>E.45. xml2</A
+></H1
+><P
+>Модуль <TT
+CLASS="FILENAME"
+>xml2</TT
+> предоставляет функции для выполнения запросов XPath и преобразований XSLT.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN125936"
+>E.45.1. Уведомление об актуальности</A
+></H2
+><P
+>Начиная с <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> 8.3, функциональность, связанная с XML, основана на стандарте SQL/XML и включена в ядро сервера. Эта функциональность охватывает проверку синтаксиса XML и запросы XPath, что в частности делает и этот модуль, но он имеет абсолютно несовместимый API. Этот модуль планируется удалить в будущей версии PostgreSQL в пользу нового стандартного API, так что мы рекомендуем вам попробовать перевести свои приложения на новый API. Если вы обнаружите, что какая-то функциональность этого модуля не представлена новым API в подходящей форме, пожалуйста, напишите о вашем затруднении в <CODE
+CLASS="EMAIL"
+>&#60;<A
+HREF="mailto:pgsql-hackers@postgresql.org"
+>pgsql-hackers@postgresql.org</A
+>&#62;</CODE
+>, чтобы этот недостаток был рассмотрен и, возможно, устранён.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN125941"
+>E.45.2. Описание функций</A
+></H2
+><P
+>Функции, предоставляемые этим модулем, перечислены в <A
+HREF="xml2.html#XML2-FUNCTIONS-TABLE"
+>Таблице E-32</A
+>. Эти функции позволяют выполнять простой разбор XML и запросы XPath. Все их аргументы имеют тип <TT
+CLASS="TYPE"
+>text</TT
+>, поэтому для краткости типы опущены.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="XML2-FUNCTIONS-TABLE"
+></A
+><P
+><B
+>Таблица E-32. Функции</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Функция</TH
+><TH
+>Возвращает</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>       <CODE
+CLASS="FUNCTION"
+>xml_is_well_formed(document)</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>bool</TT
+>
+      </TD
+><TD
+>       <P
+>Эта функция разбирает текст документа, переданный в параметре, и возвращает true, если это правильно сформированный XML. (Замечание: до PostgreSQL 8.2 эта функция называлась <CODE
+CLASS="FUNCTION"
+>xml_valid()</CODE
+>. Это имя было некорректным, так как понятия правильности формата (well-formed) и допустимости (valid) в XML различаются. Старое имя по-прежнему сохраняется, но считается устаревшим.)</P
+>
+      </TD
+></TR
+><TR
+><TD
+>        <CODE
+CLASS="FUNCTION"
+>xpath_string(document, query)</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>text</TT
+>
+      </TD
+><TD
+ROWSPAN="3"
+>       <P
+>Эти функции обрабатывают запрос XPath для переданного документа и приводят результат к указанному типу.</P
+>
+      </TD
+></TR
+><TR
+><TD
+>       <CODE
+CLASS="FUNCTION"
+>xpath_number(document, query)</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>float4</TT
+>
+      </TD
+></TR
+><TR
+><TD
+>       <CODE
+CLASS="FUNCTION"
+>xpath_bool(document, query)</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>bool</TT
+>
+      </TD
+></TR
+><TR
+><TD
+>        <CODE
+CLASS="FUNCTION"
+>xpath_nodeset(document, query, toptag, itemtag)</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>text</TT
+>
+      </TD
+><TD
+>       <P
+>Эта функция обрабатывает запрос для документа и помещает результат внутрь XML-тегов. Если результат содержит несколько значений, она выдаст: </P><PRE
+CLASS="SYNOPSIS"
+>&lt;toptag&gt;
+&lt;itemtag&gt;Значение 1, которое может быть фрагментом XML&lt;/itemtag&gt;
+&lt;itemtag&gt;Значение 2....&lt;/itemtag&gt;
+&lt;/toptag&gt;</PRE
+><P> Если <TT
+CLASS="LITERAL"
+>toptag</TT
+> или <TT
+CLASS="LITERAL"
+>itemtag</TT
+> — пустая строка, соответствующий тег опускается.</P
+>
+      </TD
+></TR
+><TR
+><TD
+>        <CODE
+CLASS="FUNCTION"
+>xpath_nodeset(document, query)</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>text</TT
+>
+      </TD
+><TD
+>       <P
+>Подобна <CODE
+CLASS="FUNCTION"
+>xpath_nodeset(document, query, toptag, itemtag)</CODE
+>, но выводит результат без обоих тегов.</P
+>
+      </TD
+></TR
+><TR
+><TD
+>        <CODE
+CLASS="FUNCTION"
+>xpath_nodeset(document, query, itemtag)</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>text</TT
+>
+      </TD
+><TD
+>       <P
+>Подобна <CODE
+CLASS="FUNCTION"
+>xpath_nodeset(document, query, toptag, itemtag)</CODE
+>, но выводит результат без <TT
+CLASS="LITERAL"
+>toptag</TT
+>.</P
+>
+      </TD
+></TR
+><TR
+><TD
+>        <CODE
+CLASS="FUNCTION"
+>xpath_list(document, query, separator)</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>text</TT
+>
+      </TD
+><TD
+>       <P
+>Эта функция возвращает несколько значений, вставляя между ними заданный разделитель, например: <TT
+CLASS="LITERAL"
+>Значение 1,Значение 2,Значение 3</TT
+>, если разделитель — знак <TT
+CLASS="LITERAL"
+>,</TT
+>.</P
+>
+      </TD
+></TR
+><TR
+><TD
+>        <CODE
+CLASS="FUNCTION"
+>xpath_list(document, query)</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>text</TT
+>
+      </TD
+><TD
+>Это обёртка предыдущей функции, устанавливающая в качестве разделителя знак <TT
+CLASS="LITERAL"
+>,</TT
+>.</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN126023"
+>E.45.3. <TT
+CLASS="LITERAL"
+>xpath_table</TT
+></A
+></H2
+><PRE
+CLASS="SYNOPSIS"
+>xpath_table(text key, text document, text relation, text xpaths, text criteria) returns setof record</PRE
+><P
+>Табличная функция <CODE
+CLASS="FUNCTION"
+>xpath_table</CODE
+> выполняет набор запросов XPath для каждого из набора документов и возвращает результаты в виде таблицы. В первой колонке результата возвращается первичный ключ из таблицы документов, так что результат оказывается готовым к применению в соединениях. Параметры функции описаны в <A
+HREF="xml2.html#XML2-XPATH-TABLE-PARAMETERS"
+>Таблице E-33</A
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="XML2-XPATH-TABLE-PARAMETERS"
+></A
+><P
+><B
+>Таблица E-33. Параметры <CODE
+CLASS="FUNCTION"
+>xpath_table</CODE
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+>Параметр</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                    <TT
+CLASS="PARAMETER"
+>key</TT
+>
+                  </TD
+><TD
+>       <P
+>имя <SPAN
+CLASS="QUOTE"
+>"ключевого"</SPAN
+> поля &mdash; содержимое этого поля просто окажется в первой колонке выходной таблицы, то есть оно указывает на запись, из которой была получена определённая выходная строка (см. замечание о нескольких значениях ниже)</P
+>
+      </TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="PARAMETER"
+>document</TT
+>
+                  </TD
+><TD
+>       <P
+>имя поля, содержащего XML-документ</P
+>
+      </TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="PARAMETER"
+>relation</TT
+>
+                  </TD
+><TD
+>       <P
+>имя таблицы (или представления), содержащей документы</P
+>
+      </TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="PARAMETER"
+>xpaths</TT
+>
+                  </TD
+><TD
+>       <P
+>одно или несколько выражений XPath, разделённых символом <TT
+CLASS="LITERAL"
+>|</TT
+></P
+>
+      </TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="PARAMETER"
+>criteria</TT
+>
+                  </TD
+><TD
+>       <P
+>содержимое предложения WHERE. Оно не может быть пустым, так что если вам нужно обработать все строки в отношении, напишите <TT
+CLASS="LITERAL"
+>true</TT
+> или <TT
+CLASS="LITERAL"
+>1=1</TT
+></P
+>
+      </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Эти параметры (за исключением строк XPath) просто подставляются в обычный оператор SQL SELECT, так что у вас есть определённая гибкость &mdash; оператор выглядит так:</P
+><P
+>   <TT
+CLASS="LITERAL"
+>SELECT &lt;key&gt;, &lt;document&gt; FROM &lt;relation&gt; WHERE &lt;criteria&gt;</TT
+>
+  </P
+><P
+>поэтому в этих параметрах можно передать <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>всё</I
+></SPAN
+>, что будет корректно воспринято в этих позициях. Этот SELECT должен возвращать ровно две колонки (что и будет иметь место, если только вы не перечислите несколько полей в параметрах key или document). Будьте осторожны — при таком примитивном подходе обязательно нужно проверять все значения, получаемые от пользователя, во избежание атак с инъекцией SQL.</P
+><P
+>Эта функция предназначена для использования в выражении <TT
+CLASS="LITERAL"
+>FROM</TT
+>, с предложением <TT
+CLASS="LITERAL"
+>AS</TT
+>, задающим выходные колонки; например: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT * FROM
+xpath_table('article_id',
+            'article_xml',
+            'articles',
+            '/article/author|/article/pages|/article/title',
+            'date_entered &gt; ''2003-01-01'' ')
+AS t(article_id integer, author text, page_count integer, title text);</PRE
+><P> Предложение <TT
+CLASS="LITERAL"
+>AS</TT
+> определяет имена и типы колонок в выходной таблице. Первым определяется <SPAN
+CLASS="QUOTE"
+>"ключевое"</SPAN
+> поле, а за ним поля, соответствующие запросам XPath. Если запросов XPath больше, чем колонок в результате, лишние запросы будут игнорироваться. Если же результирующих колонок больше, чем запросов XPath, дополнительные колонки принимают значение NULL.</P
+><P
+>Заметьте, что в этом примере колонка результата <TT
+CLASS="STRUCTNAME"
+>page_count</TT
+> определена как целочисленная. Данная функция внутри имеет дело со строковыми значениями, так что, когда вы указываете, что в результате нужно получить целое число, она берёт текстовое представление результата XPath и, применяя функции ввода PostgreSQL, преобразует её в целое число (или в тот тип, который указан в предложении <TT
+CLASS="TYPE"
+>AS</TT
+>). Если она не сможет сделать это, произойдёт ошибка &mdash; например, если результат пустой &mdash; так что если вы допускаете возможность таких проблем с данными, возможно, будет лучше просто оставить для колонки тип <TT
+CLASS="TYPE"
+>text</TT
+>.</P
+><P
+>Вызывающий оператор <TT
+CLASS="COMMAND"
+>SELECT</TT
+> не обязательно должен быть простым <TT
+CLASS="LITERAL"
+>SELECT *</TT
+> &mdash; он может обращаться к выходным колонкам по именам или соединять их с другими таблицами. Эта функция формирует виртуальную таблицу, с которой вы можете выполнять любые операции, какие пожелаете (например, агрегировать, соединять, сортировать данные и т. д.). Поэтому возможен и такой запрос: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT t.title, p.fullname, p.email
+FROM xpath_table('article_id', 'article_xml', 'articles',
+                 '/article/title|/article/author/@id',
+                 'xpath_string(article_xml,''/article/@date'') &gt; ''2003-03-20'' ')
+       AS t(article_id integer, title text, author_id integer),
+     tblPeopleInfo AS p
+WHERE t.author_id = p.person_id;</PRE
+><P> в качестве более сложного примера. Разумеется, для удобства вы можете завернуть весь этот запрос в представление.</P
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN126089"
+>E.45.3.1. Результаты с набором значений</A
+></H3
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>xpath_table</CODE
+> рассчитана на то, что результатом каждого запроса XPath может быть набор данных, так что количество возвращённых этой функцией строк может не совпадать с количеством входных документов. В первой строке возвращается первый результат каждого запроса, во второй — второй результат и т. д. Если один из запросов возвращает меньше значений, чем другие, вместо недостающих значений будет возвращаться NULL.</P
+><P
+>В некоторых случаях пользователь знает, что некоторый запрос XPath будет возвращать только один результат (возможно, уникальный идентификатор документа) &mdash; если он используется рядом с запросом XPath, возвращающим несколько результатов, результат с одним значением будет выведен только в первой выходной строке. Чтобы исправить это, можно воспользоваться полем ключа и соединить результат с более простым запросом XPath. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE test (
+    id int PRIMARY KEY,
+    xml text
+);
+
+INSERT INTO test VALUES (1, '&lt;doc num="C1"&gt;
+&lt;line num="L1"&gt;&lt;a&gt;1&lt;/a&gt;&lt;b&gt;2&lt;/b&gt;&lt;c&gt;3&lt;/c&gt;&lt;/line&gt;
+&lt;line num="L2"&gt;&lt;a&gt;11&lt;/a&gt;&lt;b&gt;22&lt;/b&gt;&lt;c&gt;33&lt;/c&gt;&lt;/line&gt;
+&lt;/doc&gt;');
+
+INSERT INTO test VALUES (2, '&lt;doc num="C2"&gt;
+&lt;line num="L1"&gt;&lt;a&gt;111&lt;/a&gt;&lt;b&gt;222&lt;/b&gt;&lt;c&gt;333&lt;/c&gt;&lt;/line&gt;
+&lt;line num="L2"&gt;&lt;a&gt;111&lt;/a&gt;&lt;b&gt;222&lt;/b&gt;&lt;c&gt;333&lt;/c&gt;&lt;/line&gt;
+&lt;/doc&gt;');
+
+SELECT * FROM
+  xpath_table('id','xml','test',
+              '/doc/@num|/doc/line/@num|/doc/line/a|/doc/line/b|/doc/line/c',
+              'true')
+  AS t(id int, doc_num varchar(10), line_num varchar(10), val1 int, val2 int, val3 int)
+WHERE id = 1 ORDER BY doc_num, line_num
+
+ id | doc_num | line_num | val1 | val2 | val3
+----+---------+----------+------+------+------
+  1 | C1      | L1       |    1 |    2 |    3
+  1 |         | L2       |   11 |   22 |   33</PRE
+><P></P
+><P
+>Чтобы получить <TT
+CLASS="LITERAL"
+>doc_num</TT
+> в каждой строке, можно вызывать <CODE
+CLASS="FUNCTION"
+>xpath_table</CODE
+> дважды и соединить результаты: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT t.*,i.doc_num FROM
+  xpath_table('id', 'xml', 'test',
+              '/doc/line/@num|/doc/line/a|/doc/line/b|/doc/line/c',
+              'true')
+    AS t(id int, line_num varchar(10), val1 int, val2 int, val3 int),
+  xpath_table('id', 'xml', 'test', '/doc/@num', 'true')
+    AS i(id int, doc_num varchar(10))
+WHERE i.id=t.id AND i.id=1
+ORDER BY doc_num, line_num;
+
+ id | line_num | val1 | val2 | val3 | doc_num
+----+----------+------+------+------+---------
+  1 | L1       |    1 |    2 |    3 | C1
+  1 | L2       |   11 |   22 |   33 | C1
+(2 rows)</PRE
+><P></P
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN126099"
+>E.45.4. Функции XSLT</A
+></H2
+><P
+>Если установлена libxslt, доступны следующие функции:</P
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN126102"
+>E.45.4.1. <TT
+CLASS="LITERAL"
+>xslt_process</TT
+></A
+></H3
+><PRE
+CLASS="SYNOPSIS"
+>xslt_process(text document, text stylesheet, text paramlist) returns text</PRE
+><P
+>Эта функция применяет стиль XSL к документу и возвращает результат преобразования. В <TT
+CLASS="LITERAL"
+>paramlist</TT
+> передаётся список присвоений значений параметрам, которые будут использоваться в преобразовании, в форме <TT
+CLASS="LITERAL"
+>a=1,b=2</TT
+>. Учтите, что разбор параметров выполнен очень просто: значения параметров не могут содержать запятые!</P
+><P
+>Есть также версия <CODE
+CLASS="FUNCTION"
+>xslt_process</CODE
+> с двумя аргументами, которая не передаёт никакие параметры преобразованию.</P
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN126113"
+>E.45.5. Автор</A
+></H2
+><P
+>Джон Грей <CODE
+CLASS="EMAIL"
+>&#60;<A
+HREF="mailto:jgray@azuli.co.uk"
+>jgray@azuli.co.uk</A
+>&#62;</CODE
+></P
+><P
+>Разработку этого модуля спонсировала компания Torchbox Ltd. (www.torchbox.com). Этот модуль выпускается под той же лицензией BSD, что и PostgreSQL.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="uuid-ossp.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="contrib-prog.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>uuid-ossp</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Дополнительно поставляемые программы</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

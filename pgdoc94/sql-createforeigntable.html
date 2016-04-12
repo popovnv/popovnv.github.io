@@ -1,0 +1,502 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>CREATE FOREIGN TABLE</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="CREATE FOREIGN DATA WRAPPER"
+HREF="sql-createforeigndatawrapper.html"><LINK
+REL="NEXT"
+TITLE="CREATE FUNCTION"
+HREF="sql-createfunction.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="CREATE FOREIGN DATA WRAPPER"
+HREF="sql-createforeigndatawrapper.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="CREATE FUNCTION"
+HREF="sql-createfunction.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-CREATEFOREIGNTABLE"
+></A
+>CREATE FOREIGN TABLE</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN73337"
+></A
+><H2
+>Название</H2
+>CREATE FOREIGN TABLE&nbsp;--&nbsp;создать стороннюю таблицу</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN73340"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>CREATE FOREIGN TABLE [ IF NOT EXISTS ] <TT
+CLASS="REPLACEABLE"
+><I
+>table_name</I
+></TT
+> ( [
+    <TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>тип_данных</I
+></TT
+> [ OPTIONS ( <TT
+CLASS="REPLACEABLE"
+><I
+>параметр</I
+></TT
+> '<TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+>' [, ... ] ) ] [ COLLATE <TT
+CLASS="REPLACEABLE"
+><I
+>правило_сортировки</I
+></TT
+> ] [ <TT
+CLASS="REPLACEABLE"
+><I
+>ограничение_колонки</I
+></TT
+> [ ... ] ]
+    [, ... ]
+] )
+  SERVER <TT
+CLASS="REPLACEABLE"
+><I
+>имя_сервера</I
+></TT
+>
+[ OPTIONS ( <TT
+CLASS="REPLACEABLE"
+><I
+>параметр</I
+></TT
+> '<TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+>' [, ... ] ) ]
+
+<SPAN
+CLASS="phrase"
+><SPAN
+CLASS="PHRASE"
+>Здесь <TT
+CLASS="REPLACEABLE"
+><I
+>ограничение_колонки</I
+></TT
+>:</SPAN
+></SPAN
+>
+
+[ CONSTRAINT <TT
+CLASS="REPLACEABLE"
+><I
+>имя_ограничения</I
+></TT
+> ]
+{ NOT NULL |
+  NULL |
+  DEFAULT <TT
+CLASS="REPLACEABLE"
+><I
+>выражение_по_умолчанию</I
+></TT
+> }</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="SQL-CREATEFOREIGNTABLE-DESCRIPTION"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>CREATE FOREIGN TABLE</TT
+> создаёт новую стороннюю таблицу в текущей базе данных. Владельцем таблицы будет пользователь, выполнивший эту команду.</P
+><P
+>Если указано имя схемы (например, <TT
+CLASS="LITERAL"
+>CREATE FOREIGN TABLE myschema.mytable ...</TT
+>), таблица будет создана в этой схеме. В противном случае она создаётся в текущей схеме. Имя сторонней таблицы должно отличаться от имён других сторонних и обычных таблиц, последовательностей, индексов, представлений и материализованных представлений, существующих в этой схеме.</P
+><P
+><TT
+CLASS="COMMAND"
+>CREATE FOREIGN TABLE</TT
+> также автоматически создаёт составной тип данных, соответствующий одной строке сторонней таблицы. Таким образом, имя сторонней таблицы не может совпадать с именем существующего типа в этой же схеме.</P
+><P
+>Чтобы создать стороннюю таблицу, необходимо иметь право <TT
+CLASS="LITERAL"
+>USAGE</TT
+> для стороннего сервера, а также право <TT
+CLASS="LITERAL"
+>USAGE</TT
+> для всех типов колонок, содержащихся в таблице.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN73367"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>IF NOT EXISTS</TT
+></DT
+><DD
+><P
+>Не считать ошибкой, если отношение с таким именем уже существует. В этом случае будет выдано замечание. Заметьте, что нет никакой гарантии, что существующее отношение как-то соотносится с тем, которое могло бы быть создано.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>table_name</I
+></TT
+></DT
+><DD
+><P
+>Имя (возможно, дополненное схемой) создаваемой таблицы.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+></DT
+><DD
+><P
+>Имя колонки, создаваемой в новой таблице.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>тип_данных</I
+></TT
+></DT
+><DD
+><P
+>Тип данных колонки (может включать определение массива с этим типом). За дополнительными сведениями о типах данных, которые поддерживает <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, обратитесь к <A
+HREF="datatype.html"
+>Главе 8</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>NOT NULL</TT
+></DT
+><DD
+><P
+>Данная колонка не принимает значения NULL.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>NULL</TT
+></DT
+><DD
+><P
+>Данная колонка может содержать значения NULL (по умолчанию).</P
+><P
+>Это предложение предназначено только для совместимости с нестандартными базами данных SQL. Использовать его в новых приложениях не рекомендуется.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>DEFAULT <TT
+CLASS="REPLACEABLE"
+><I
+>выражение_по_умолчанию</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Предложение <TT
+CLASS="LITERAL"
+>DEFAULT</TT
+> задаёт значение по умолчанию для колонки, в определении которой оно присутствует. Значение задаётся выражением без переменных (подзапросы и перекрёстные ссылки на другие колонки текущей таблицы в нём не допускаются). Тип данных выражения, задающего значение по умолчанию, должен соответствовать типу данных колонки.</P
+><P
+>Это выражение будет использоваться во всех операциях добавления данных, в которых не задаётся значение данной колонки. Если значение по умолчанию не определено, таким значением будет NULL.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_сервера</I
+></TT
+></DT
+><DD
+><P
+>Имя существующего стороннего сервера, предоставляющего данную стороннюю таблицу. О создании сервера можно узнать в <A
+HREF="sql-createserver.html"
+>CREATE SERVER</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>OPTIONS ( <TT
+CLASS="REPLACEABLE"
+><I
+>параметр</I
+></TT
+> '<TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+>' [, ...] )</TT
+></DT
+><DD
+><P
+>Параметры, связываемые с новой сторонней таблицей или одной из её колонок. Допустимые имена и значения параметров у каждой обёртки сторонних данных свои; они контролируются функцией проверки, связанной с этой обёрткой. Имена параметров не должны повторяться (хотя параметр таблицы и параметр колонки вполне могут иметь одно имя).</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="SQL-CREATEFOREIGNTABLE-EXAMPLES"
+></A
+><H2
+>Примеры</H2
+><P
+>Создание сторонней таблицы <TT
+CLASS="STRUCTNAME"
+>films</TT
+>, которая будет доступна через сервер <TT
+CLASS="STRUCTNAME"
+>film_server</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FOREIGN TABLE films (
+    code        char(5) NOT NULL,
+    title       varchar(40) NOT NULL,
+    did         integer NOT NULL,
+    date_prod   date,
+    kind        varchar(10),
+    len         interval hour to minute
+)
+SERVER film_server;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="SQL-CREATEFOREIGNTABLE-COMPATIBILITY"
+></A
+><H2
+>Совместимость</H2
+><P
+>Команда <TT
+CLASS="COMMAND"
+>CREATE FOREIGN TABLE</TT
+> в основном соответствует стандарту <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>; однако, как и <A
+HREF="sql-createtable.html"
+><TT
+CLASS="COMMAND"
+>CREATE TABLE</TT
+></A
+>, она допускает ограничения <TT
+CLASS="LITERAL"
+>NULL</TT
+> и таблицы с нулём колонок. Возможность задавать значение по умолчанию также является расширением <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN73439"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-alterforeigntable.html"
+>ALTER FOREIGN TABLE</A
+>, <A
+HREF="sql-dropforeigntable.html"
+>DROP FOREIGN TABLE</A
+>, <A
+HREF="sql-createtable.html"
+>CREATE TABLE</A
+>, <A
+HREF="sql-createserver.html"
+>CREATE SERVER</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-createforeigndatawrapper.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-createfunction.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>CREATE FOREIGN DATA WRAPPER</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>CREATE FUNCTION</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

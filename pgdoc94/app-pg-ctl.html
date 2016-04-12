@@ -1,0 +1,1367 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>            pg_ctl
+          </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Серверные утилиты PostgreSQL"
+HREF="reference-server.html"><LINK
+REL="PREVIOUS"
+TITLE="            pg_controldata
+          "
+HREF="app-pgcontroldata.html"><LINK
+REL="NEXT"
+TITLE="            pg_resetxlog
+          "
+HREF="app-pgresetxlog.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="            pg_controldata
+          "
+HREF="app-pgcontroldata.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="reference-server.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="            pg_resetxlog
+          "
+HREF="app-pgresetxlog.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="APP-PG-CTL"
+></A
+><SPAN
+CLASS="APPLICATION"
+>pg_ctl</SPAN
+></H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN93275"
+></A
+><H2
+>Название</H2
+>pg_ctl&nbsp;--&nbsp;инициализация, запуск, останов и управление сервером <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN93279"
+></A
+><H2
+>Синтаксис</H2
+><P
+><TT
+CLASS="COMMAND"
+>pg_ctl</TT
+>                <TT
+CLASS="OPTION"
+>init[db]</TT
+>
+              [              <TT
+CLASS="OPTION"
+>-s</TT
+>
+            ] [<TT
+CLASS="OPTION"
+>-D</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>datadir</I
+></TT
+>] [<TT
+CLASS="OPTION"
+>-o</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>initdb-options</I
+></TT
+>]</P
+><P
+><TT
+CLASS="COMMAND"
+>pg_ctl</TT
+>                <TT
+CLASS="OPTION"
+>start</TT
+>
+              [              <TT
+CLASS="OPTION"
+>-w</TT
+>
+            ] [<TT
+CLASS="OPTION"
+>-t</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>секунды</I
+></TT
+>] [              <TT
+CLASS="OPTION"
+>-s</TT
+>
+            ] [<TT
+CLASS="OPTION"
+>-D</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>datadir</I
+></TT
+>] [<TT
+CLASS="OPTION"
+>-l</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+>] [<TT
+CLASS="OPTION"
+>-o</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>параметры</I
+></TT
+>] [<TT
+CLASS="OPTION"
+>-p</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>path</I
+></TT
+>] [              <TT
+CLASS="OPTION"
+>-c</TT
+>
+            ]</P
+><P
+><TT
+CLASS="COMMAND"
+>pg_ctl</TT
+>                <TT
+CLASS="OPTION"
+>stop</TT
+>
+              [              <TT
+CLASS="OPTION"
+>-W</TT
+>
+            ] [<TT
+CLASS="OPTION"
+>-t</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>секунды</I
+></TT
+>] [              <TT
+CLASS="OPTION"
+>-s</TT
+>
+            ] [<TT
+CLASS="OPTION"
+>-D</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>datadir</I
+></TT
+>] [<TT
+CLASS="OPTION"
+>-m</TT
+>
+       <TT
+CLASS="OPTION"
+>s[mart]</TT
+> | <TT
+CLASS="OPTION"
+>f[ast]</TT
+> | <TT
+CLASS="OPTION"
+>i[mmediate]</TT
+> 
+   ]</P
+><P
+><TT
+CLASS="COMMAND"
+>pg_ctl</TT
+>                <TT
+CLASS="OPTION"
+>restart</TT
+>
+              [              <TT
+CLASS="OPTION"
+>-w</TT
+>
+            ] [<TT
+CLASS="OPTION"
+>-t</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>секунды</I
+></TT
+>] [              <TT
+CLASS="OPTION"
+>-s</TT
+>
+            ] [<TT
+CLASS="OPTION"
+>-D</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>datadir</I
+></TT
+>] [              <TT
+CLASS="OPTION"
+>-c</TT
+>
+            ] [<TT
+CLASS="OPTION"
+>-m</TT
+>
+       <TT
+CLASS="OPTION"
+>s[mart]</TT
+> | <TT
+CLASS="OPTION"
+>f[ast]</TT
+> | <TT
+CLASS="OPTION"
+>i[mmediate]</TT
+> 
+   ] [<TT
+CLASS="OPTION"
+>-o</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>параметры</I
+></TT
+>]</P
+><P
+><TT
+CLASS="COMMAND"
+>pg_ctl</TT
+>                <TT
+CLASS="OPTION"
+>reload</TT
+>
+              [              <TT
+CLASS="OPTION"
+>-s</TT
+>
+            ] [<TT
+CLASS="OPTION"
+>-D</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>datadir</I
+></TT
+>]</P
+><P
+><TT
+CLASS="COMMAND"
+>pg_ctl</TT
+>                <TT
+CLASS="OPTION"
+>status</TT
+>
+              [<TT
+CLASS="OPTION"
+>-D</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>datadir</I
+></TT
+>]</P
+><P
+><TT
+CLASS="COMMAND"
+>pg_ctl</TT
+>                <TT
+CLASS="OPTION"
+>promote</TT
+>
+              [              <TT
+CLASS="OPTION"
+>-s</TT
+>
+            ] [<TT
+CLASS="OPTION"
+>-D</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>datadir</I
+></TT
+>]</P
+><P
+><TT
+CLASS="COMMAND"
+>pg_ctl</TT
+>                <TT
+CLASS="OPTION"
+>kill</TT
+>
+                             <TT
+CLASS="REPLACEABLE"
+><I
+>signal_name</I
+></TT
+>
+                             <TT
+CLASS="REPLACEABLE"
+><I
+>process_id</I
+></TT
+>
+             </P
+><P
+><TT
+CLASS="COMMAND"
+>pg_ctl</TT
+>                <TT
+CLASS="OPTION"
+>register</TT
+>
+              [<TT
+CLASS="OPTION"
+>-N</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>servicename</I
+></TT
+>] [<TT
+CLASS="OPTION"
+>-U</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+>] [<TT
+CLASS="OPTION"
+>-P</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>пароль</I
+></TT
+>] [<TT
+CLASS="OPTION"
+>-D</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>datadir</I
+></TT
+>] [<TT
+CLASS="OPTION"
+>-S</TT
+>
+       <TT
+CLASS="OPTION"
+>a[uto]</TT
+> | <TT
+CLASS="OPTION"
+>d[emand]</TT
+> 
+   ] [              <TT
+CLASS="OPTION"
+>-w</TT
+>
+            ] [<TT
+CLASS="OPTION"
+>-t</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>секунды</I
+></TT
+>] [              <TT
+CLASS="OPTION"
+>-s</TT
+>
+            ] [<TT
+CLASS="OPTION"
+>-o</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>параметры</I
+></TT
+>]</P
+><P
+><TT
+CLASS="COMMAND"
+>pg_ctl</TT
+>                <TT
+CLASS="OPTION"
+>unregister</TT
+>
+              [<TT
+CLASS="OPTION"
+>-N</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>servicename</I
+></TT
+>]</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="APP-PG-CTL-DESCRIPTION"
+></A
+><H2
+>Описание</H2
+><P
+><SPAN
+CLASS="APPLICATION"
+>pg_ctl</SPAN
+> — это утилита для начальной инициализации, запуска, остановки, повторного запуска и управления кластером баз данных <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> (<A
+HREF="app-postgres.html"
+>            <SPAN
+CLASS="APPLICATION"
+>postgres</SPAN
+>
+          </A
+>). Сервер можно стартовать в ручном режиме, но <SPAN
+CLASS="APPLICATION"
+>pg_ctl</SPAN
+> реализует задачи направления вывода в журнал и отсоединения от терминала и группы процессов, а также предоставляет удобный интерфейс остановки кластера.</P
+><P
+>Для инициализации нового кластера <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> используются режимы <TT
+CLASS="OPTION"
+>init</TT
+> или <TT
+CLASS="OPTION"
+>initdb</TT
+>. Кластер — это коллекция баз данных под управлением единого сервера. По факту вызывается команда <TT
+CLASS="COMMAND"
+>initdb</TT
+>. За подробностями обратитесь к <A
+HREF="app-initdb.html"
+>initdb</A
+>.</P
+><P
+>Сервер запускается в режиме <TT
+CLASS="OPTION"
+>start</TT
+>. Процесс работает в фоновом режиме, а стандартный ввод связывается с <TT
+CLASS="FILENAME"
+>/dev/null</TT
+> (или <TT
+CLASS="LITERAL"
+>nul</TT
+> под управлением Windows). По умолчанию в Unix-подобных системах вывод и ошибки сервера пишутся в устройство стандартного вывода (не ошибок) <SPAN
+CLASS="APPLICATION"
+>pg_ctl</SPAN
+>. Вывод <SPAN
+CLASS="APPLICATION"
+>pg_ctl</SPAN
+> следует перенаправить в файл или процесс, например, приложение ротации журналов <SPAN
+CLASS="APPLICATION"
+>rotatelogs</SPAN
+>; в ином случае, <TT
+CLASS="COMMAND"
+>postgres</TT
+> будет писать вывод в управляющий терминал (в фоновом режиме) и останется в группе процессов оболочки. В Windows вывод и ошибки сервера по умолчанию перенаправляются в терминал. Это поведение можно изменить и направить вывод сервера в файл, добавив ключ <TT
+CLASS="OPTION"
+>-l</TT
+>. Мы рекомендуем использовать ключ <TT
+CLASS="OPTION"
+>-l</TT
+> или перенаправлять вывод.</P
+><P
+>Чтобы остановить сервер, используется <TT
+CLASS="OPTION"
+>stop</TT
+>. Остановить можно в трёх режимах, задаваемых флагом <TT
+CLASS="OPTION"
+>-m</TT
+>. По умолчанию используется режим <SPAN
+CLASS="QUOTE"
+>"Smart"</SPAN
+>, который ожидает завершения всех активных клиентских соединений и удалённых процессов резервирования. Если сервер работает в режиме горячего резервирования, то восстановление и потоковая репликация будут остановлены, как только все клиентские сессии завершаться. Режим <SPAN
+CLASS="QUOTE"
+>"Fast"</SPAN
+> не ожидает закрытия клиентских сессий и прерывает удалённые процессы резервирования. Все активные транзакции откатываются, а клиенты принудительно отсоединяются, после чего сервер останавливается. Режим <SPAN
+CLASS="QUOTE"
+>"Immediate"</SPAN
+> незамедлительно прерывает все процессы и останавливает сервер, что приводит на следующем старте к необходимости восстановления после сбоя.</P
+><P
+>Для остановки с последующим стартом сервера используется <TT
+CLASS="OPTION"
+>restart</TT
+>. При этом доступны флаги команды <TT
+CLASS="COMMAND"
+>postgres</TT
+>. <TT
+CLASS="OPTION"
+>restart</TT
+> может не отработать, если при старте сервера в командной строке был указан относительный путь к каталогу хранения данных.</P
+><P
+>Чтобы перечитать конфигурацию (<TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+>, <TT
+CLASS="FILENAME"
+>pg_hba.conf</TT
+> и т. д.), используется <TT
+CLASS="OPTION"
+>reload</TT
+>, при этом процесс <TT
+CLASS="COMMAND"
+>postgres</TT
+> получает системный сигнал <SPAN
+CLASS="SYSTEMITEM"
+>SIGHUP</SPAN
+>. Это позволяет применить изменения без полного рестарта сервера.</P
+><P
+>Чтобы проверить статус кластера, используется <TT
+CLASS="OPTION"
+>status</TT
+>. Если кластер запущен, то будет выведен <ACRONYM
+CLASS="ACRONYM"
+>PID</ACRONYM
+> процесса, а также команда с использованными при запуске аргументами. Если кластер остановлен, то процесс вернёт статус завершения 3. Если не указан каталог хранения данных, то процесс вернёт статус завершения 4.</P
+><P
+>Чтобы перевести резервный сервер в режим основного, используется <TT
+CLASS="OPTION"
+>promote</TT
+>. При этом сервер прекращает работу в режиме восстановления и начинает работать в режиме чтения-записи.</P
+><P
+>Чтобы послать сигнал процессу, используется <TT
+CLASS="OPTION"
+>kill</TT
+>. Это особенно применимо в среде <SPAN
+CLASS="PRODUCTNAME"
+>Microsoft Windows</SPAN
+>, которая не имеет в оснастке команды <SPAN
+CLASS="APPLICATION"
+>kill</SPAN
+>. Чтобы посмотреть список доступных сигналов, обратитесь к справке <TT
+CLASS="LITERAL"
+>--help</TT
+>.</P
+><P
+>Для регистрации в качестве системной службы под управлением <SPAN
+CLASS="PRODUCTNAME"
+>Microsoft Windows</SPAN
+>, используется <TT
+CLASS="OPTION"
+>register</TT
+>. Флаг <TT
+CLASS="OPTION"
+>-S</TT
+> устанавливает режим запуска службы, либо <SPAN
+CLASS="QUOTE"
+>"auto"</SPAN
+> (на старте ОС), либо <SPAN
+CLASS="QUOTE"
+>"demand"</SPAN
+> (по запросу).</P
+><P
+>Чтобы удалить зарегистрированную службу в <SPAN
+CLASS="PRODUCTNAME"
+>Microsoft Windows</SPAN
+>, используется <TT
+CLASS="OPTION"
+>unregister</TT
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="APP-PG-CTL-OPTIONS"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="OPTION"
+>-c</TT
+><BR><TT
+CLASS="OPTION"
+>--core-file</TT
+></DT
+><DD
+><P
+>На платформах, где это поддерживается, сервер будет пытаться фиксировать снимки памяти при авариях. Это позволяет диагностировать и предотвращать потенциальные проблемы в будущем.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-D <TT
+CLASS="REPLACEABLE"
+><I
+>datadir</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--pgdata <TT
+CLASS="REPLACEABLE"
+><I
+>datadir</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Указывает размещение конфигурационных файлов кластера. Если не указано, используется значение переменной окружения <TT
+CLASS="ENVAR"
+>PGDATA</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-l <TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--log <TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Выводит данные журнала в <TT
+CLASS="REPLACEABLE"
+><I
+>filename</I
+></TT
+>. Файл создаётся, если он ещё не существует. При этом <SPAN
+CLASS="SYSTEMITEM"
+>umask</SPAN
+> выставляется в 077, что предотвращает доступ других пользователей к этому файлу.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-m <TT
+CLASS="REPLACEABLE"
+><I
+>режим</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--mode <TT
+CLASS="REPLACEABLE"
+><I
+>режим</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Устанавливает режим остановки кластера. <TT
+CLASS="REPLACEABLE"
+><I
+>mode</I
+></TT
+> принимает значения <TT
+CLASS="LITERAL"
+>smart</TT
+>, <TT
+CLASS="LITERAL"
+>fast</TT
+>, или <TT
+CLASS="LITERAL"
+>immediate</TT
+>, либо по первой букве каждого из доступных значений, например, <TT
+CLASS="LITERAL"
+>s[mart]</TT
+>. Если флаг опущен, то используется <TT
+CLASS="LITERAL"
+>smart</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-o <TT
+CLASS="REPLACEABLE"
+><I
+>параметры</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Указывает флаги, которые будут переданы в <TT
+CLASS="COMMAND"
+>postgres</TT
+>.</P
+><P
+>Значение необходимо обрамлять одинарными или двойными кавычками, чтобы гарантировать целостность группы.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-o <TT
+CLASS="REPLACEABLE"
+><I
+>initdb-options</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Указывает флаги, которые будут переданы в <TT
+CLASS="COMMAND"
+>initdb</TT
+>.</P
+><P
+>Значение необходимо обрамлять одинарными или двойными кавычками, чтобы гарантировать целостность группы.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-p <TT
+CLASS="REPLACEABLE"
+><I
+>path</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Указывает размещение приложения <TT
+CLASS="FILENAME"
+>postgres</TT
+>. По умолчанию используется тот же путь, по которому находится <TT
+CLASS="COMMAND"
+>pg_ctl</TT
+>, либо, если это не удалось, то берётся путь инсталляции. Применять этот параметр чаще всего необходимости нет, кроме нестандартных ситуаций.</P
+><P
+><TT
+CLASS="LITERAL"
+>init</TT
+> принимает параметры аналогично <TT
+CLASS="FILENAME"
+>initdb</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-s</TT
+><BR><TT
+CLASS="OPTION"
+>--silent</TT
+></DT
+><DD
+><P
+>Выводить лишь ошибки, без сообщений информационного характера.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-t</TT
+><BR><TT
+CLASS="OPTION"
+>--timeout</TT
+></DT
+><DD
+><P
+>Максимальное время (в секундах) ожидания запуска или остановки сервера. По умолчанию это 60 секунд.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-V</TT
+><BR><TT
+CLASS="OPTION"
+>--version</TT
+></DT
+><DD
+><P
+>Выводит версию <SPAN
+CLASS="APPLICATION"
+>pg_ctl</SPAN
+> и прерывает выполнение.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-w</TT
+></DT
+><DD
+><P
+>Ожидает завершения запуска или остановки. Это является режимом по умолчанию для операций остановки, но не запуска. На этапе запуска <TT
+CLASS="COMMAND"
+>pg_ctl</TT
+> непрерывно пытается подключиться к серверу. На этапе остановки <TT
+CLASS="COMMAND"
+>pg_ctl</TT
+> проверяет наличие <ACRONYM
+CLASS="ACRONYM"
+>PID</ACRONYM
+> файла. Этот параметр позволяет установить ввод контрольного слова для <ACRONYM
+CLASS="ACRONYM"
+>SSL</ACRONYM
+> на старте сервера. <TT
+CLASS="COMMAND"
+>pg_ctl</TT
+> возвращает код завершения, основываясь на результате операций запуска или остановки.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-W</TT
+></DT
+><DD
+><P
+>Игнорировать ожидание завершения запуска или остановки сервера. Это поведение используется по умолчанию для режимов запуска и повторного запуска.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-?</TT
+><BR><TT
+CLASS="OPTION"
+>--help</TT
+></DT
+><DD
+><P
+>Вывести справку по команде <SPAN
+CLASS="APPLICATION"
+>pg_ctl</SPAN
+> и прервать выполнение.</P
+></DD
+></DL
+></DIV
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="APP-PG-CTL-WINDOWS-OPTIONS"
+></A
+><H3
+>Параметры, специфичные для Windows</H3
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="OPTION"
+>-N <TT
+CLASS="REPLACEABLE"
+><I
+>servicename</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Имя регистрируемой системной службы. Оно используется в качестве системного и отображаемого значения.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-P <TT
+CLASS="REPLACEABLE"
+><I
+>пароль</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Пароль пользователя, стартующего службу.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-S <TT
+CLASS="REPLACEABLE"
+><I
+>тип запуска</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Тип запуска системной службы. Может принимать значения: <TT
+CLASS="LITERAL"
+>auto</TT
+>, или <TT
+CLASS="LITERAL"
+>demand</TT
+>, либо быть представлен первой буквой названия каждого приведённого значения. По умолчанию используется <TT
+CLASS="LITERAL"
+>auto</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-U <TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Имя пользователя, от имени которого будут запущена служба. Для доменных пользователей необходимо использовать нотацию <TT
+CLASS="LITERAL"
+>DOMAIN\username</TT
+>.</P
+></DD
+></DL
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN93648"
+></A
+><H2
+>Переменные окружения</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="ENVAR"
+>PGDATA</TT
+></DT
+><DD
+><P
+>Размещение каталога хранения данных по умолчанию.</P
+></DD
+></DL
+></DIV
+><P
+><TT
+CLASS="COMMAND"
+>pg_ctl</TT
+>, как и большинство других утилит <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, также использует переменные окружения, поддерживаемые <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> (см. <A
+HREF="libpq-envars.html"
+>Раздел 31.14</A
+>). Другие переменные сервера описаны в <A
+HREF="app-postgres.html"
+>            <SPAN
+CLASS="APPLICATION"
+>postgres</SPAN
+>
+          </A
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN93662"
+></A
+><H2
+>Files</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="FILENAME"
+>postmaster.pid</TT
+></DT
+><DD
+><P
+>Наличие файла в каталоге хранения данных помогает <SPAN
+CLASS="APPLICATION"
+>pg_ctl</SPAN
+> определить, работает ли сервер в настоящий момент.</P
+></DD
+><DT
+><TT
+CLASS="FILENAME"
+>postmaster.opts</TT
+></DT
+><DD
+><P
+>Если файл существует в каталоге хранения данных, то <SPAN
+CLASS="APPLICATION"
+>pg_ctl</SPAN
+> (при <TT
+CLASS="OPTION"
+>restart</TT
+>) передаст его содержимое в качестве аргументов <SPAN
+CLASS="APPLICATION"
+>postgres</SPAN
+>, если не указаны иные значения в <TT
+CLASS="OPTION"
+>-o</TT
+>. Содержимое файла также отображается при вызове в режиме <TT
+CLASS="OPTION"
+>status</TT
+>.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="R1-APP-PGCTL-2"
+></A
+><H2
+>Примеры</H2
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="R2-APP-PGCTL-3"
+></A
+><H3
+>Запуск сервера</H3
+><P
+>Для запуска сервера: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>pg_ctl start</KBD
+></PRE
+><P></P
+><P
+>Для запуска сервера с ожиданием готовности к приему подключений: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>pg_ctl -w start</KBD
+></PRE
+><P></P
+><P
+>Для старта сервера на 5433 порту без использования <CODE
+CLASS="FUNCTION"
+>fsync</CODE
+>: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>pg_ctl -o "-F -p 5433" start</KBD
+></PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="R2-APP-PGCTL-4"
+></A
+><H3
+>Остановка сервера</H3
+><P
+>Для остановки сервера: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>pg_ctl stop</KBD
+></PRE
+><P> Параметр <TT
+CLASS="OPTION"
+>-m</TT
+> указывает <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>режим</I
+></SPAN
+> остановки: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>pg_ctl stop -m fast</KBD
+></PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="R2-APP-PGCTL-5"
+></A
+><H3
+>Повторный запуск сервера</H3
+><P
+>Повторный запуск сервера производится аналогично остановке с дальнейшим его запуском, за исключением того, что <TT
+CLASS="COMMAND"
+>pg_ctl</TT
+> использует аргументы, которые были переданы при предыдущем запуске кластера. В простейшем случае повторный запуск выглядит так: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>pg_ctl restart</KBD
+></PRE
+><P></P
+><P
+>Для повторного запуска сервера с ожиданием полной остановки и последующего запуска: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>pg_ctl -w restart</KBD
+></PRE
+><P></P
+><P
+>Для повторного запуска на 5433 порту с выключенным <CODE
+CLASS="FUNCTION"
+>fsync</CODE
+> после старта: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>pg_ctl -o "-F -p 5433" restart</KBD
+></PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="R2-APP-PGCTL-6"
+></A
+><H3
+>Вывод статуса работы сервера</H3
+><P
+>Ниже представлен простейший вывод статуса <SPAN
+CLASS="APPLICATION"
+>pg_ctl</SPAN
+>: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>pg_ctl status</KBD
+>
+<SAMP
+CLASS="COMPUTEROUTPUT"
+>pg_ctl: server is running (PID: 13718)
+/usr/local/pgsql/bin/postgres "-D" "/usr/local/pgsql/data" "-p" "5433" "-B" "128"</SAMP
+></PRE
+><P> Эта командная строка будет использоваться в режиме повторного запуска.</P
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN93733"
+></A
+><H2
+>См. также</H2
+><A
+HREF="app-initdb.html"
+>initdb</A
+>, <A
+HREF="app-postgres.html"
+>            <SPAN
+CLASS="APPLICATION"
+>postgres</SPAN
+>
+          </A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="app-pgcontroldata.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="app-pgresetxlog.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><SPAN
+CLASS="APPLICATION"
+>pg_controldata</SPAN
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="reference-server.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><SPAN
+CLASS="APPLICATION"
+>pg_resetxlog</SPAN
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

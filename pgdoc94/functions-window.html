@@ -1,0 +1,722 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Оконные функции</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Функции и операторы"
+HREF="functions.html"><LINK
+REL="PREVIOUS"
+TITLE="Агрегатные функции"
+HREF="functions-aggregate.html"><LINK
+REL="NEXT"
+TITLE="Выражения подзапросов"
+HREF="functions-subquery.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Агрегатные функции"
+HREF="functions-aggregate.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 9. Функции и операторы</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Выражения подзапросов"
+HREF="functions-subquery.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="FUNCTIONS-WINDOW"
+>9.21. Оконные функции</A
+></H1
+><P
+><I
+CLASS="FIRSTTERM"
+>Оконные функции</I
+> дают возможность выполнять вычисления с набором строк, каким-либо образом связанным с текущей строкой запроса. Вводную информацию об этом можно получить в <A
+HREF="tutorial-window.html"
+>Разделе 3.5</A
+>, а подробнее узнать о синтаксисе можно в <A
+HREF="sql-expressions.html#SYNTAX-WINDOW-FUNCTIONS"
+>Подразделе 4.2.8</A
+>.</P
+><P
+>Встроенные оконные функции перечислены в <A
+HREF="functions-window.html#FUNCTIONS-WINDOW-TABLE"
+>Таблице 9-53</A
+>. Заметьте, что эти функции <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>должны</I
+></SPAN
+> вызываться именно как оконные, т. е. при вызове необходимо использовать предложение <TT
+CLASS="LITERAL"
+>OVER</TT
+>.</P
+><P
+>В дополнение к этим функциям в качестве оконных можно использовать любые встроенные или пользовательские обычные (но не сортирующие и не гипотезирующие) агрегатные функции (встроенные функции перечислены в <A
+HREF="functions-aggregate.html"
+>Разделе 9.20</A
+>). Агрегатные функции работают как оконные, только когда за их вызовом следует предложение <TT
+CLASS="LITERAL"
+>OVER</TT
+>; в противном случае они останутся обычными агрегатными.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-WINDOW-TABLE"
+></A
+><P
+><B
+>Таблица 9-53. Оконные функции общего назначения</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Функция</TH
+><TH
+>Тип результата</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>row_number()</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>bigint</TT
+>
+      </TD
+><TD
+>номер текущей строки в её разделе, начиная с 1</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>rank()</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>bigint</TT
+>
+      </TD
+><TD
+>ранг текущей строки с пропусками; то же, что и <CODE
+CLASS="FUNCTION"
+>row_number</CODE
+> для первой родственной ей строки</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>dense_rank()</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>bigint</TT
+>
+      </TD
+><TD
+>ранг текущей строки без пропусков; эта функция считает группы родственных строк</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>percent_rank()</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>double precision</TT
+>
+      </TD
+><TD
+>относительный ранг текущей строки: (<CODE
+CLASS="FUNCTION"
+>rank</CODE
+> - 1) / (общее число строк - 1)</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>cume_dist()</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>double precision</TT
+>
+      </TD
+><TD
+>относительный ранг текущей строки: (число строк, предшествующих или родственных текущей) / (общее число строк)</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>ntile(<TT
+CLASS="REPLACEABLE"
+><I
+>число_групп</I
+></TT
+> <TT
+CLASS="TYPE"
+>integer</TT
+>)</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>integer</TT
+>
+      </TD
+><TD
+>ранжирование по целым числам от 1 до значения аргумента так, чтобы размеры групп были максимально близки</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>lag(<TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> <TT
+CLASS="TYPE"
+>any</TT
+> [, <TT
+CLASS="REPLACEABLE"
+><I
+>смещение</I
+></TT
+> <TT
+CLASS="TYPE"
+>integer</TT
+> [, <TT
+CLASS="REPLACEABLE"
+><I
+>по_умолчанию</I
+></TT
+> <TT
+CLASS="TYPE"
+>any</TT
+> ]])</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>тип аргумента <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+></TT
+>
+      </TD
+><TD
+>возвращает <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> для строки, положение которой задаётся <TT
+CLASS="REPLACEABLE"
+><I
+>смещением</I
+></TT
+> от текущей строки к началу раздела; если такой строки нет, возвращается значение <TT
+CLASS="REPLACEABLE"
+><I
+>по_умолчанию</I
+></TT
+>. Оба параметра <TT
+CLASS="REPLACEABLE"
+><I
+>смещение</I
+></TT
+> и <TT
+CLASS="REPLACEABLE"
+><I
+>по_умолчанию</I
+></TT
+> вычисляются для текущей строки. Если они не указываются, то <TT
+CLASS="REPLACEABLE"
+><I
+>смещение</I
+></TT
+> считается равным 1, а <TT
+CLASS="REPLACEABLE"
+><I
+>по_умолчанию</I
+></TT
+> &mdash; NULL</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>lead(<TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> <TT
+CLASS="TYPE"
+>any</TT
+> [, <TT
+CLASS="REPLACEABLE"
+><I
+>смещение</I
+></TT
+> <TT
+CLASS="TYPE"
+>integer</TT
+> [, <TT
+CLASS="REPLACEABLE"
+><I
+>по_умолчанию</I
+></TT
+> <TT
+CLASS="TYPE"
+>any</TT
+> ]])</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>тип аргумента <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+></TT
+>
+      </TD
+><TD
+>возвращает <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> для строки, положение которой задаётся <TT
+CLASS="REPLACEABLE"
+><I
+>смещением</I
+></TT
+> от текущей строки к концу раздела; если такой строки нет, возвращается значение <TT
+CLASS="REPLACEABLE"
+><I
+>по_умолчанию</I
+></TT
+>. Оба параметра <TT
+CLASS="REPLACEABLE"
+><I
+>смещение</I
+></TT
+> и <TT
+CLASS="REPLACEABLE"
+><I
+>по_умолчанию</I
+></TT
+> вычисляются для текущей строки. Если они не указываются, то <TT
+CLASS="REPLACEABLE"
+><I
+>смещение</I
+></TT
+> считается равным 1, а <TT
+CLASS="REPLACEABLE"
+><I
+>по_умолчанию</I
+></TT
+> &mdash; NULL</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>first_value(<TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> <TT
+CLASS="TYPE"
+>any</TT
+>)</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>тип аргумента <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+></TT
+>
+      </TD
+><TD
+>возвращает <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+>, вычисленное для первой строки в рамке окна</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>last_value(<TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> <TT
+CLASS="TYPE"
+>any</TT
+>)</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>тип аргумента <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+></TT
+>
+      </TD
+><TD
+>возвращает <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+>, вычисленное для последней строки в рамке окна</TD
+></TR
+><TR
+><TD
+><CODE
+CLASS="FUNCTION"
+>nth_value(<TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> <TT
+CLASS="TYPE"
+>any</TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+> <TT
+CLASS="TYPE"
+>integer</TT
+>)</CODE
+>
+      </TD
+><TD
+>       <TT
+CLASS="TYPE"
+>тип аргумента <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+></TT
+>
+      </TD
+><TD
+>возвращает <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+>, вычисленное в <TT
+CLASS="REPLACEABLE"
+><I
+>н-ой</I
+></TT
+> строке в рамке окна (считая с 1), или NULL, если такой строки нет</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Результат всех функций, перечисленных в <A
+HREF="functions-window.html#FUNCTIONS-WINDOW-TABLE"
+>Таблице 9-53</A
+>, зависит от порядка сортировки, заданного предложением <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> в определении соответствующего окна. Строки, которые являются одинаковыми с точки зрения сортировки <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+>, считаются <I
+CLASS="FIRSTTERM"
+>родственными</I
+>; четыре функции, вычисляющие ранг, реализованы так, что их результат будет одинаковым для любых двух родственных строк.</P
+><P
+>Заметьте, что функции <CODE
+CLASS="FUNCTION"
+>first_value</CODE
+>, <CODE
+CLASS="FUNCTION"
+>last_value</CODE
+> и <CODE
+CLASS="FUNCTION"
+>nth_value</CODE
+> рассматривают только строки в <SPAN
+CLASS="QUOTE"
+>"рамке окна"</SPAN
+>, которая по умолчанию содержит строки от начала раздела до последней родственной строки для текущей. Поэтому результаты <CODE
+CLASS="FUNCTION"
+>last_value</CODE
+> и иногда <CODE
+CLASS="FUNCTION"
+>nth_value</CODE
+> могут быть не очень полезны. В таких случаях можно переопределить рамку, добавив в предложение <TT
+CLASS="LITERAL"
+>OVER</TT
+> подходящее указание (<TT
+CLASS="LITERAL"
+>RANGE</TT
+> или <TT
+CLASS="LITERAL"
+>ROWS</TT
+>). Подробнее эти указания описаны в <A
+HREF="sql-expressions.html#SYNTAX-WINDOW-FUNCTIONS"
+>Подразделе 4.2.8</A
+>.</P
+><P
+>Когда в качестве оконной функции используется агрегатная, она обрабатывает строки в рамке текущей строки. Агрегатная функция с <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> и определением рамки окна по умолчанию будет вычисляться как <SPAN
+CLASS="QUOTE"
+>"бегущая сумма"</SPAN
+>, что может не соответствовать желаемому результату. Чтобы агрегатная функция работала со всем разделом, следует опустить <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> или использовать <TT
+CLASS="LITERAL"
+>ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING</TT
+>. Используя другие указания в определении рамки, можно получить и другие эффекты.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>В стандарте SQL определены параметры <TT
+CLASS="LITERAL"
+>RESPECT NULLS</TT
+> или <TT
+CLASS="LITERAL"
+>IGNORE NULLS</TT
+> для функций <CODE
+CLASS="FUNCTION"
+>lead</CODE
+>, <CODE
+CLASS="FUNCTION"
+>lag</CODE
+>, <CODE
+CLASS="FUNCTION"
+>first_value</CODE
+>, <CODE
+CLASS="FUNCTION"
+>last_value</CODE
+> и <CODE
+CLASS="FUNCTION"
+>nth_value</CODE
+>. В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> такие параметры не реализованы: эти функции ведут себя так, как положено в стандарте по умолчанию (или с подразумеваемым параметром <TT
+CLASS="LITERAL"
+>RESPECT NULLS</TT
+>). Также функция <CODE
+CLASS="FUNCTION"
+>nth_value</CODE
+> не поддерживает предусмотренные стандартом параметры <TT
+CLASS="LITERAL"
+>FROM FIRST</TT
+> и <TT
+CLASS="LITERAL"
+>FROM LAST</TT
+>: реализовано только поведение по умолчанию (с подразумеваемым параметром <TT
+CLASS="LITERAL"
+>FROM FIRST</TT
+>). (Получить эффект параметра <TT
+CLASS="LITERAL"
+>FROM LAST</TT
+> можно, изменив порядок <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> на обратный.)</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions-aggregate.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="functions-subquery.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Агрегатные функции</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Выражения подзапросов</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

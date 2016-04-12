@@ -1,0 +1,368 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Подключение к базе данных</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Начало"
+HREF="tutorial-start.html"><LINK
+REL="PREVIOUS"
+TITLE="Создание базы данных"
+HREF="tutorial-createdb.html"><LINK
+REL="NEXT"
+TITLE="Язык SQL"
+HREF="tutorial-sql.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Создание базы данных"
+HREF="tutorial-createdb.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="tutorial-start.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 1. Начало</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Язык SQL"
+HREF="tutorial-sql.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="TUTORIAL-ACCESSDB"
+>1.4. Подключение к базе данных</A
+></H1
+><P
+>Создав базу данных, вы можете обратиться к ней: <P
+></P
+></P><UL
+COMPACT="COMPACT"
+><LI
+STYLE="list-style-type: disc"
+><P
+>Запустив терминальную программу <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> под названием <SPAN
+CLASS="APPLICATION"
+><I
+CLASS="FIRSTTERM"
+>psql</I
+></SPAN
+>, в которой можно интерактивно вводить, редактировать и выполнять команды <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>.</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Используя существующие графические инструменты, например, <SPAN
+CLASS="APPLICATION"
+>pgAdmin</SPAN
+> или офисный пакет с поддержкой <ACRONYM
+CLASS="ACRONYM"
+>ODBC</ACRONYM
+> или <ACRONYM
+CLASS="ACRONYM"
+>JDBC</ACRONYM
+>, позволяющий создавать и управлять базой данных. Эти возможности здесь не рассматриваются.</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Написав собственное приложение, используя один из множества доступных языковых интерфейсов. Подробнее это рассматривается в <A
+HREF="client-interfaces.html"
+>Части IV</A
+>.</P
+></LI
+></UL
+><P> Чтобы работать с примерами этого введения, начните с <TT
+CLASS="COMMAND"
+>psql</TT
+>. Подключиться с его помощью к базе данных <TT
+CLASS="LITERAL"
+>mydb</TT
+> можно, введя команду: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>psql mydb</KBD
+></PRE
+><P> Если имя базы данных не указать, она будет выбрана по имени пользователя. Об этом уже рассказывалось в предыдущем разделе, посвящённом команде <TT
+CLASS="COMMAND"
+>createdb</TT
+>.</P
+><P
+>В <TT
+CLASS="COMMAND"
+>psql</TT
+> вы увидите следующее сообщение: </P><PRE
+CLASS="SCREEN"
+>psql (9.4.1)
+Type "help" for help.
+
+mydb=&gt;</PRE
+><P> Последняя строка может выглядеть и так: </P><PRE
+CLASS="SCREEN"
+>mydb=#</PRE
+><P> Что показывает, что вы являетесь суперпользователем, и так скорее всего будет, если вы устанавливали <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> сами. В этом случае на вас не будут распространяться никакие ограничения доступа, но для целей данного введения это не важно.</P
+><P
+>Если вы столкнулись с проблемами при запуске <TT
+CLASS="COMMAND"
+>psql</TT
+>, вернитесь к предыдущему разделу. Команды <TT
+CLASS="COMMAND"
+>createdb</TT
+> и <TT
+CLASS="COMMAND"
+>psql</TT
+> подключаются к серверу одинаково, так что если первая работает, должна работать и вторая.</P
+><P
+>Последняя строка в выводе <TT
+CLASS="COMMAND"
+>psql</TT
+> &mdash; это приглашение, которое показывает, что <TT
+CLASS="COMMAND"
+>psql</TT
+> ждёт ваших команд и вы можете вводить <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>-запросы в рабочей среде <TT
+CLASS="COMMAND"
+>psql</TT
+>. Попробуйте эти команды: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>mydb=&gt;</SAMP
+> <KBD
+CLASS="USERINPUT"
+>SELECT version();</KBD
+>
+                               version
+ -----------------------------------------------------------------------
+ PostgreSQL 9.4.1 on i586-pc-linux-gnu, compiled by GCC 2.96, 32-bit
+(1 row)
+
+<SAMP
+CLASS="PROMPT"
+>mydb=&gt;</SAMP
+> <KBD
+CLASS="USERINPUT"
+>SELECT current_date;</KBD
+>
+    date
+------------
+ 2002-08-31
+(1 row)
+
+<SAMP
+CLASS="PROMPT"
+>mydb=&gt;</SAMP
+> <KBD
+CLASS="USERINPUT"
+>SELECT 2 + 2;</KBD
+>
+ ?column?
+----------
+        4
+(1 row)</PRE
+><P></P
+><P
+>В программе <TT
+CLASS="COMMAND"
+>psql</TT
+> есть множество внутренних команд, которые не являются SQL-операторами. Они начинаются с обратной косой черты, <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>\</TT
+>"</SPAN
+>. Например, вы можете получить справку по различным <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>-командам <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, введя: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>mydb=&gt;</SAMP
+> <KBD
+CLASS="USERINPUT"
+>\h</KBD
+></PRE
+><P></P
+><P
+>Чтобы выйти из <TT
+CLASS="COMMAND"
+>psql</TT
+>, введите: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>mydb=&gt;</SAMP
+> <KBD
+CLASS="USERINPUT"
+>\q</KBD
+></PRE
+><P> и <TT
+CLASS="COMMAND"
+>psql</TT
+> завершит свою работу, а вы вернётесь в командную оболочку операционной системы. (Чтобы узнать о внутренних командах, введите <TT
+CLASS="LITERAL"
+>\?</TT
+> в приглашении командной строки <TT
+CLASS="COMMAND"
+>psql</TT
+>.) Все возможности <TT
+CLASS="COMMAND"
+>psql</TT
+> документированы в справке <A
+HREF="app-psql.html"
+>            <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>
+          </A
+>. В этом руководстве мы не будем использовать эти возможности явно, но вы можете изучить их и применять при удобном случае.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="tutorial-createdb.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="tutorial-sql.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Создание базы данных</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="tutorial-start.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Язык <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

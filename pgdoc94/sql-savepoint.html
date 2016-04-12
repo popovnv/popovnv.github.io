@@ -1,0 +1,319 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>SAVEPOINT</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="ROLLBACK TO SAVEPOINT"
+HREF="sql-rollback-to.html"><LINK
+REL="NEXT"
+TITLE="SECURITY LABEL"
+HREF="sql-security-label.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="ROLLBACK TO SAVEPOINT"
+HREF="sql-rollback-to.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="SECURITY LABEL"
+HREF="sql-security-label.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-SAVEPOINT"
+></A
+>SAVEPOINT</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN82891"
+></A
+><H2
+>Название</H2
+>SAVEPOINT&nbsp;--&nbsp;определить новую точку сохранения в текущей транзакции</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN82894"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>SAVEPOINT <TT
+CLASS="REPLACEABLE"
+><I
+>имя_точки_сохранения</I
+></TT
+></PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN82897"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>SAVEPOINT</TT
+> устанавливает новую точку сохранения в текущей транзакции.</P
+><P
+>Точка сохранения — это специальная отметка внутри транзакции, которая позволяет откатить все команды, выполненные после неё, и восстановить таким образом состояние на момент установки этой точки.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN82902"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_точки_сохранения</I
+></TT
+></DT
+><DD
+><P
+>Имя, назначаемое новой точке сохранения.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN82910"
+></A
+><H2
+>Замечания</H2
+><P
+>Для отката к установленной точке сохранения предназначена команда <A
+HREF="sql-rollback-to.html"
+>ROLLBACK TO SAVEPOINT</A
+>. Чтобы уничтожить точку сохранения, сохраняя изменения, произведённые после того, как она была установлена, применяется команда <A
+HREF="sql-release-savepoint.html"
+>RELEASE SAVEPOINT</A
+>.</P
+><P
+>Точки сохранения могут быть установлены только внутри блока транзакции. В одной транзакции можно определить несколько точек сохранения.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN82916"
+></A
+><H2
+>Примеры</H2
+><P
+>Установление точки сохранения и затем отмена действия всех команд, выполненных после установленной точки: </P><PRE
+CLASS="PROGRAMLISTING"
+>BEGIN;
+    INSERT INTO table1 VALUES (1);
+    SAVEPOINT my_savepoint;
+    INSERT INTO table1 VALUES (2);
+    ROLLBACK TO SAVEPOINT my_savepoint;
+    INSERT INTO table1 VALUES (3);
+COMMIT;</PRE
+><P> Показанная транзакция вставит в таблицу значения 1 и 3, но не 2.</P
+><P
+>Этот пример показывает, как установить и затем уничтожить точку сохранения: </P><PRE
+CLASS="PROGRAMLISTING"
+>BEGIN;
+    INSERT INTO table1 VALUES (3);
+    SAVEPOINT my_savepoint;
+    INSERT INTO table1 VALUES (4);
+    RELEASE SAVEPOINT my_savepoint;
+COMMIT;</PRE
+><P> Данная транзакция вставит значения 3 и 4.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN82922"
+></A
+><H2
+>Совместимость</H2
+><P
+>Стандарт SQL требует, чтобы точка сохранения уничтожалась автоматически, когда устанавливается другая точка сохранения с тем же именем. В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> старая точка сохранения остаётся, хотя при откате или уничтожении будет выбираться только самая последняя. (После уничтожения последней точки командой <TT
+CLASS="COMMAND"
+>RELEASE SAVEPOINT</TT
+> доступной для команд <TT
+CLASS="COMMAND"
+>ROLLBACK TO SAVEPOINT</TT
+> и <TT
+CLASS="COMMAND"
+>RELEASE SAVEPOINT</TT
+> становится следующая.) В остальном оператор <TT
+CLASS="COMMAND"
+>SAVEPOINT</TT
+> полностью соответствует стандарту.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN82930"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-begin.html"
+>BEGIN</A
+>, <A
+HREF="sql-commit.html"
+>COMMIT</A
+>, <A
+HREF="sql-release-savepoint.html"
+>RELEASE SAVEPOINT</A
+>, <A
+HREF="sql-rollback.html"
+>ROLLBACK</A
+>, <A
+HREF="sql-rollback-to.html"
+>ROLLBACK TO SAVEPOINT</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-rollback-to.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-security-label.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>ROLLBACK TO SAVEPOINT</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>SECURITY LABEL</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,316 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Типы индексов GiST и GIN</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Полнотекстовый поиск"
+HREF="textsearch.html"><LINK
+REL="PREVIOUS"
+TITLE="Тестирование и отладка текстового поиска"
+HREF="textsearch-debugging.html"><LINK
+REL="NEXT"
+TITLE="Поддержка psql"
+HREF="textsearch-psql.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Тестирование и отладка текстового поиска"
+HREF="textsearch-debugging.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="textsearch.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 12. Полнотекстовый поиск</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Поддержка psql"
+HREF="textsearch-psql.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="TEXTSEARCH-INDEXES"
+>12.9. Типы индексов GiST и GIN</A
+></H1
+><P
+>Для ускорения полнотекстового поиска можно использовать индексы двух видов. Заметьте, что эти индексы не требуются для поиска, но если по какой-то колонке поиск выполняется регулярно, обычно желательно её индексировать. <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>CREATE INDEX <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> ON <TT
+CLASS="REPLACEABLE"
+><I
+>таблица</I
+></TT
+> USING gist(<TT
+CLASS="REPLACEABLE"
+><I
+>колонка</I
+></TT
+>);</TT
+></DT
+><DD
+><P
+>Создаёт индекс на базе GiST (Generalized Search Tree, Обобщённое дерево поиска). Здесь <TT
+CLASS="REPLACEABLE"
+><I
+>колонка</I
+></TT
+> может иметь тип <TT
+CLASS="TYPE"
+>tsvector</TT
+> или <TT
+CLASS="TYPE"
+>tsquery</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>CREATE INDEX <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> ON <TT
+CLASS="REPLACEABLE"
+><I
+>таблица</I
+></TT
+> USING gin(<TT
+CLASS="REPLACEABLE"
+><I
+>колонка</I
+></TT
+>);</TT
+></DT
+><DD
+><P
+>Создаёт индекс на базе GIN (Generalized Inverted Index, Обобщённый Инвертированный Индекс). <TT
+CLASS="REPLACEABLE"
+><I
+>Колонка</I
+></TT
+> должна иметь тип <TT
+CLASS="TYPE"
+>tsvector</TT
+>.</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>Индексы этих двух видов значительно различаются по быстродействию, поэтому важно понимать их особенности.</P
+><P
+>Индекс GiST допускает <I
+CLASS="FIRSTTERM"
+>неточности</I
+>, то есть он допускает ложные попадания и поэтому их нужно исключать дополнительно, сверяя результат с фактическими данными таблицы. (<SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> делает это автоматически.) Индексы GiST являются неточными, так как все документы в них представляются сигнатурой фиксированной длины. Эта сигнатура создаётся в результате представления присутствия каждого слова как одного бита в строке из n-бит, а затем логического объединения этих битовых строк. Если двум словам будет соответствовать одна битовая позиция, попадание оказывается ложным. Если для всех слов оказались установлены соответствующие биты (в случае фактического или ложного попадания), для проверки правильности предположения о совпадении слов необходимо прочитать строку таблицы.</P
+><P
+>Неточность индекса приводит к снижению производительности из-за дополнительных обращений к записям таблицы, для которых предположение о совпадении оказывается ложным. Так как произвольный доступ к таблице обычно не бывает быстрым, это ограничивает применимость индексов GiST. Вероятность ложных попаданий зависит от ряда факторов, например от количества уникальных слов, так что его рекомендуется сокращать, применяя словари.</P
+><P
+>Индексы GIN не являются неточными для стандартных запросов, но их производительность логарифмически зависит от числа уникальных слов. (Однако индексы GIN хранят только слова (лексемы) значений <TT
+CLASS="TYPE"
+>tsvector</TT
+>, но теряют информацию об их весах. Таким образом для выполнения запроса с весами потребуется перепроверить данные в таблице.)</P
+><P
+>Выбирая между индексами GiST и GIN, учтите следующие их отличия с точки зрения производительности: <P
+></P
+></P><UL
+COMPACT="COMPACT"
+><LI
+STYLE="list-style-type: disc"
+><P
+>Поиск по индексу GIN примерно втрое быстрее, чем по GiST</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Индексы GIN строятся примерно втрое дольше, чем GiST</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Индексы GIN обновляются несколько медленнее, чем GiST, но если отключено быстрое обновление (см. <A
+HREF="gin-implementation.html#GIN-FAST-UPDATE"
+>Подраздел 58.4.1</A
+>) разница может достигать 10 раз</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Индексы GIN обычно в два-три раза больше индексов GiST</P
+></LI
+></UL
+><P></P
+><P
+>Как правило, индексы <ACRONYM
+CLASS="ACRONYM"
+>GIN</ACRONYM
+> лучше подходят для статических данных, так как поиск с ними выполняется быстрее. Для динамических данных лучше использовать индексы GiST, так как они быстрее обновляются. Точнее, индексы <ACRONYM
+CLASS="ACRONYM"
+>GiST</ACRONYM
+> очень хороши для динамических данных и работают быстро, если число уникальных слов (лексем) не превышает 100 000, а <ACRONYM
+CLASS="ACRONYM"
+>GIN</ACRONYM
+> лучше справятся с большим количеством лексем, но обновляться будут медленнее.</P
+><P
+>Заметьте, что построение индекса <ACRONYM
+CLASS="ACRONYM"
+>GIN</ACRONYM
+> часто можно ускорить, увеличив <A
+HREF="runtime-config-resource.html#GUC-MAINTENANCE-WORK-MEM"
+>maintenance_work_mem</A
+>, тогда как время построения индекса <ACRONYM
+CLASS="ACRONYM"
+>GiST</ACRONYM
+> не зависит от этого параметра.</P
+><P
+>Есть два направления увеличения скорости поиска с возможностью обновления &laquo;на лету&raquo;: секционировать большие коллекции документов и эффективно применять индексы GiST и GIN. Секционировать данные можно как на уровне базы, с использованием наследования таблиц, так и распределив документы по разным серверам и затем собирая результаты с помощью модуля <A
+HREF="dblink.html"
+>dblink</A
+>. Последний вариант возможен благодаря тому, что функции ранжирования используют только локальную информацию.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="textsearch-debugging.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="textsearch-psql.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Тестирование и отладка текстового поиска</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="textsearch.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Поддержка <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

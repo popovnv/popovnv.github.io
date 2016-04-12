@@ -1,0 +1,458 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>              pg_test_timing
+            </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Серверные приложения"
+HREF="contrib-prog-server.html"><LINK
+REL="PREVIOUS"
+TITLE="              pg_test_fsync
+            "
+HREF="pgtestfsync.html"><LINK
+REL="NEXT"
+TITLE="              pg_upgrade
+            "
+HREF="pgupgrade.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="              pg_test_fsync
+            "
+HREF="pgtestfsync.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="contrib-prog-server.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="              pg_upgrade
+            "
+HREF="pgupgrade.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="PGTESTTIMING"
+></A
+><SPAN
+CLASS="APPLICATION"
+>pg_test_timing</SPAN
+></H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN127487"
+></A
+><H2
+>Название</H2
+>pg_test_timing&nbsp;--&nbsp;определить издержки замера времени</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN127490"
+></A
+><H2
+>Синтаксис</H2
+><P
+><TT
+CLASS="COMMAND"
+>pg_test_timing</TT
+> [                <TT
+CLASS="REPLACEABLE"
+><I
+>параметр</I
+></TT
+>
+              ...]</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN127495"
+></A
+><H2
+>Описание</H2
+><P
+>Программа <SPAN
+CLASS="APPLICATION"
+>pg_test_timing</SPAN
+> позволяет оценить издержки замера времени в вашей системе и убедиться в том, что системное время никогда не идёт назад. Системы, в которых замер времени является длительной операцией, дают менее точные результаты <TT
+CLASS="COMMAND"
+>EXPLAIN ANALYZE</TT
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN127500"
+></A
+><H2
+>Параметры</H2
+><P
+><SPAN
+CLASS="APPLICATION"
+>pg_test_timing</SPAN
+> принимает следующие аргументы командной строки: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="OPTION"
+>-d <TT
+CLASS="REPLACEABLE"
+><I
+>длительность</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--duration=<TT
+CLASS="REPLACEABLE"
+><I
+>длительность</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Задаёт продолжительность теста (в секундах). Чем больше эта продолжительность, тем выше точность и больше вероятность обнаружить аномалию с обратным ходом системных часов. По умолчанию время тестирования — 3 секунды.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-V</TT
+><BR><TT
+CLASS="OPTION"
+>--version</TT
+></DT
+><DD
+><P
+>Вывести версию <SPAN
+CLASS="APPLICATION"
+>pg_test_timing</SPAN
+> и завершиться.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-?</TT
+><BR><TT
+CLASS="OPTION"
+>--help</TT
+></DT
+><DD
+><P
+>Вывести справку об аргументах командной строки <SPAN
+CLASS="APPLICATION"
+>pg_test_timing</SPAN
+> и завершиться.</P
+></DD
+></DL
+></DIV
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN127530"
+></A
+><H2
+>Usage</H2
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN127532"
+></A
+><H3
+>Интерпретация результатов</H3
+><P
+>В благоприятном случае практически все (&gt;90%) отдельные вызовы замеров времени должны выполняться быстрее одной микросекунды. Средние издержки замера на цикл должны быть ещё меньше, в пределах 100 наносекунд. Эта проба, взятая в системе Intel i7-860 через источник времени TSC, показывает отличную производительность: </P><PRE
+CLASS="SCREEN"
+>Testing timing overhead for 3 seconds.
+Per loop time including overhead: 35.96 nsec
+Histogram of timing durations:
+&lt; usec   % of total      count
+     1     96.40465   80435604 
+     2      3.59518    2999652  
+     4      0.00015        126  
+     8      0.00002         13  
+    16      0.00000          2  </PRE
+><P></P
+><P
+>Заметьте, что время вызова в цикле и время в гистограмме выражается в разных единицах. Время в цикле может определяться с точностью до наносекунд (nsec), а длительность отдельного вызова замера времени — только с точностью до микросекунд (usec).</P
+></DIV
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN127537"
+></A
+><H3
+>Измерение издержек исполнителя на замер времени</H3
+><P
+>Когда исполнитель запроса выполняет запрос под контролем <TT
+CLASS="COMMAND"
+>EXPLAIN ANALYZE</TT
+>, замеряется не только общее время, но и время отдельных операций. Каковы издержки этих операций в вашей системе, можно узнать, подсчитав строки тестовой таблицы в программе <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>: </P><PRE
+CLASS="SCREEN"
+>CREATE TABLE t AS SELECT * FROM generate_series(1,100000);
+\timing
+SELECT COUNT(*) FROM t;
+EXPLAIN ANALYZE SELECT COUNT(*) FROM t;</PRE
+><P></P
+><P
+>В системе i7-860 этот запрос выполняется 9.8 мс, а версия с <TT
+CLASS="COMMAND"
+>EXPLAIN ANALYZE</TT
+> — 16.6 мс, при этом обрабатывается около 100&nbsp;000 строк. Это различие в 6.8 мс означает, что издержки замера времени для одной строки составляют около 68 нс, примерно вдвое больше, чем предсказала pg_test_timing. Даже с такими относительно небольшими издержками операция COUNT с полным подсчётом времени выполняется почти на 70% дольше. На более сложных запросах издержки замера времени могут быть не так важны.</P
+></DIV
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN127545"
+></A
+><H3
+>Смена источника времени</H3
+><P
+>В некоторых современных системах Linux можно в любой момент сменить источник времени, который используется для замера времени. Второй пример иллюстрирует возможное замедление от переключения на более медленный источник времени acpi_pm time в той же системе, в которой были получены показанные выше хорошие результаты: </P><PRE
+CLASS="SCREEN"
+># cat /sys/devices/system/clocksource/clocksource0/available_clocksource
+tsc hpet acpi_pm
+# echo acpi_pm &gt; /sys/devices/system/clocksource/clocksource0/current_clocksource
+# pg_test_timing
+Per loop time including overhead: 722.92 nsec
+Histogram of timing durations:
+&lt; usec   % of total      count
+     1     27.84870    1155682 
+     2     72.05956    2990371 
+     4      0.07810       3241  
+     8      0.01357        563  
+    16      0.00007          3  </PRE
+><P></P
+><P
+>В этой конфигурации тот же <TT
+CLASS="COMMAND"
+>EXPLAIN ANALYZE</TT
+> выполняется 115.9 мс. Таким образом издержки составили 106.1 мс, что соответствует непосредственному результату этой утилиты с небольшим коэффициентом. Такие большие издержки означают, что сам запрос выполняется лишь небольшой процент всего времени, а основное время уходит на замеры времени. В такой конфигурации временные показатели <TT
+CLASS="COMMAND"
+>EXPLAIN ANALYZE</TT
+> для запросов со множеством замеряемых операций значительно увеличатся за счёт издержек замера времени.</P
+><P
+>FreeBSD так же позволяет сменять источник времени &laquo;на лету&raquo; и выводит информацию о выбранном таймере при загрузке: </P><PRE
+CLASS="SCREEN"
+># dmesg | grep "Timecounter"
+Timecounter "ACPI-fast" frequency 3579545 Hz quality 900
+Timecounter "i8254" frequency 1193182 Hz quality 0
+Timecounters tick every 10.000 msec
+Timecounter "TSC" frequency 2531787134 Hz quality 800
+# sysctl kern.timecounter.hardware=TSC
+kern.timecounter.hardware: ACPI-fast -&gt; TSC</PRE
+><P></P
+><P
+>Другие системы могут допускать смену источника времени только при загрузке. В старых системах Linux это можно было сделать только с помощью параметра ядра &laquo;clock&raquo;. И даже в некоторых самых последних системах можно увидеть только один источник времени — jiffies. Это старая программная реализация часов в Linux, которая может давать хорошее разрешение, когда поддерживается достаточно хорошим оборудованием, как в этом примере: </P><PRE
+CLASS="SCREEN"
+>$ cat /sys/devices/system/clocksource/clocksource0/available_clocksource
+jiffies
+$ dmesg | grep time.c
+time.c: Using 3.579545 MHz WALL PM GTOD PIT/TSC timer.
+time.c: Detected 2400.153 MHz processor.
+$ pg_test_timing
+Testing timing overhead for 3 seconds.
+Per timing duration including loop overhead: 97.75 ns
+Histogram of timing durations:
+&lt; usec   % of total      count
+     1     90.23734   27694571 
+     2      9.75277    2993204  
+     4      0.00981       3010  
+     8      0.00007         22  
+    16      0.00000          1  
+    32      0.00000          1  </PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN127556"
+></A
+><H3
+>Аппаратные часы и точность замера времени</H3
+><P
+>Измерение времени обычно осуществляется на компьютерах по аппаратным часам, точность которых может быть разного уровня. С некоторым оборудованием операционные системы могут передавать время системных часов непосредственно программам. Также системное время может поступать с чипа, который просто генерирует прерывания по времени, с заведомо известным периодом. В любом случае ядра операционных систем предоставляют источник времени, который скрывает эти детали. Но точность этого источника и возможная скорость получения результатов от него зависит от нижележащего оборудования.</P
+><P
+>Неточность в замерах времени может приводить к нестабильности системы. Поэтому стоит очень тщательно протестировать выбранный источник времени. Иногда по умолчанию в ОС выбирается источник не более точный, а более надёжный. И если вы используете виртуальную машину, поинтересуйтесь, какие источники времени рекомендуется использовать с ней. Имитация таймеров на виртуальном оборудовании связана с дополнительными сложностями, и производители средств виртуализации часто рекомендуют определённые параметры для операционных систем.</P
+><P
+>Источник времени TSC (Time Stamp Counter, Счётчик отметки времени) наиболее точный из всех для процессоров текущего поколения. Его рекомендуется использовать для получения системного времени, когда он поддерживается операционной системой и показания TSC надёжны. Возможны ситуации, когда TSC не является точным источником времени, и таким образом, оказывается ненадёжным. Например, в старых системах показания TSC могут зависеть от температуры процессора, что не годится для точного замера времени. При попытке использовать TSC в некоторых старых многоядерных процессорах можно получить разное время на различных ядрах. В результате может оказаться, что время идёт назад (эту аномалию выявляет данная программа). И даже на самых современных системах не всегда можно получить точное время через TSC в режимах очень агрессивного энергосбережения.</P
+><P
+>Новые операционные системы могут проверять наличие известных проблем TSC и переключаться на более медленный, но более стабильный источник времени, если они проявляются. Если ваша система поддерживает источник TSC, но не выбирает его по умолчанию, возможно, он отключён обоснованно. С другой стороны, некоторые операционные системы могут не выявлять все возможные проблемы, либо разрешают использовать TSC даже в ситуациях, когда он определённо неточен.</P
+><P
+>HPET (High Precision Event Timer, Таймер событий высокой точности) рекомендуется использовать в системах, где он имеется, а TSC неточен. Сам этот чип можно запрограммировать для получения точности до 100 наносекунд, но системное время с такой точностью вы не получите.</P
+><P
+>ACPI (Advanced Configuration and Power Interface, Расширенный интерфейс конфигурации и питания) обеспечивает таймер PM (Управления питанием), который в Linux называется acpi_pm. Время, поступающее из acpi_pm, в лучшем случае будет иметь разрешение 300 наносекунд.</P
+><P
+>На старом оборудовании PC применялись таймеры 8254 PIT (Programmable Interval Timer, Программируемый интервальный таймер), RTC (Real-Time Clock, Часы реального времени), таймер APIC (Advanced Programmable Interrupt Controller, Расширенный программируемый контроллер прерываний) и Cyclone. Все эти таймеры обеспечивали точность до миллисекунд.</P
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN127565"
+></A
+><H2
+>Автор</H2
+><P
+>Антс Аасма <CODE
+CLASS="EMAIL"
+>&#60;<A
+HREF="mailto:ants.aasma@eesti.ee"
+>ants.aasma@eesti.ee</A
+>&#62;</CODE
+></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN127569"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-explain.html"
+>EXPLAIN</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="pgtestfsync.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="pgupgrade.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><SPAN
+CLASS="APPLICATION"
+>pg_test_fsync</SPAN
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="contrib-prog-server.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><SPAN
+CLASS="APPLICATION"
+>pg_upgrade</SPAN
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

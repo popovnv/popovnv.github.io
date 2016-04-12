@@ -1,0 +1,329 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>CLOSE</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="CHECKPOINT"
+HREF="sql-checkpoint.html"><LINK
+REL="NEXT"
+TITLE="CLUSTER"
+HREF="sql-cluster.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="CHECKPOINT"
+HREF="sql-checkpoint.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="CLUSTER"
+HREF="sql-cluster.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-CLOSE"
+></A
+>CLOSE</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN71165"
+></A
+><H2
+>Название</H2
+>CLOSE&nbsp;--&nbsp;закрыть курсор</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN71168"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>CLOSE { <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> | ALL }</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN71171"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>CLOSE</TT
+> освобождает ресурсы, связанные с открытым курсором. Когда курсор закрыт, никакие операции с ним невозможны. Закрывать курсор следует, когда он становится ненужным.</P
+><P
+>Все не удерживаемые открытые курсоры закрываются неявно при завершении транзакции командами <TT
+CLASS="COMMAND"
+>COMMIT</TT
+> или <TT
+CLASS="COMMAND"
+>ROLLBACK</TT
+>. Удерживаемый курсор закрывается неявно, если транзакция, его создавшая, прерывается командой <TT
+CLASS="COMMAND"
+>ROLLBACK</TT
+>. Если создавшая его транзакция завершается успешной фиксацией, удерживаемый курсор остаётся открытым до явного вызова команды <TT
+CLASS="COMMAND"
+>CLOSE</TT
+> или отключения клиента.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN71180"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></DT
+><DD
+><P
+>Имя открытого курсора, который будет закрыт.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>ALL</TT
+></DT
+><DD
+><P
+>Закрывает все открытые курсоры.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN71193"
+></A
+><H2
+>Замечания</H2
+><P
+>В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> нет явной команды <TT
+CLASS="COMMAND"
+>OPEN</TT
+> для курсора; курсор считается открытым при объявлении. Чтобы объявить курсор, используйте оператор <A
+HREF="sql-declare.html"
+>DECLARE</A
+>.</P
+><P
+>Получить список всех доступных курсоров можно, обратившись к системному представлению <A
+HREF="view-pg-cursors.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_cursors</TT
+></A
+>.</P
+><P
+>Если курсор был закрыт после точки сохранения, а затем произошёл откат к этой точке, действие команды <TT
+CLASS="COMMAND"
+>CLOSE</TT
+> не отменяется; то есть курсор остаётся закрытым.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN71204"
+></A
+><H2
+>Примеры</H2
+><P
+>Следующая команда закрывает курсор <TT
+CLASS="LITERAL"
+>liahona</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>CLOSE liahona;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN71209"
+></A
+><H2
+>Совместимость</H2
+><P
+>Оператор <TT
+CLASS="COMMAND"
+>CLOSE</TT
+> полностью соответствует стандарту SQL. <TT
+CLASS="COMMAND"
+>CLOSE ALL</TT
+> является расширением <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN71215"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-declare.html"
+>DECLARE</A
+>, <A
+HREF="sql-fetch.html"
+>FETCH</A
+>, <A
+HREF="sql-move.html"
+>MOVE</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-checkpoint.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-cluster.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>CHECKPOINT</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>CLUSTER</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

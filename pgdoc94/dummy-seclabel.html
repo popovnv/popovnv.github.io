@@ -1,0 +1,250 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>dummy_seclabel</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Дополнительно поставляемые модули"
+HREF="contrib.html"><LINK
+REL="PREVIOUS"
+TITLE="dict_xsyn"
+HREF="dict-xsyn.html"><LINK
+REL="NEXT"
+TITLE="earthdistance"
+HREF="earthdistance.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="dict_xsyn"
+HREF="dict-xsyn.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Приложение E. Дополнительно поставляемые модули</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="earthdistance"
+HREF="earthdistance.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="DUMMY-SECLABEL"
+>E.12. dummy_seclabel</A
+></H1
+><P
+>Модуль <TT
+CLASS="FILENAME"
+>dummy_seclabel</TT
+> создан исключительно для поддержки регрессионного тестирования оператора <TT
+CLASS="COMMAND"
+>SECURITY LABEL</TT
+>. Он не предназначен для производственного применения.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN120453"
+>E.12.1. Обоснование</A
+></H2
+><P
+>Оператор <TT
+CLASS="COMMAND"
+>SECURITY LABEL</TT
+> позволяет пользователю назначать метки безопасности объектам базы данных; однако метки безопасности могут назначаться, только если необходимую функциональность реализует загружаемый модуль, так что для регрессионного тестирования этого оператора предоставляется данный модуль.</P
+><P
+>Провайдеры меток безопасности, рассчитанные на производственное применение, обычно зависят от системной функциональности, например <SPAN
+CLASS="PRODUCTNAME"
+>SE-Linux</SPAN
+>. Но так как данный модуль не привязан к платформе, он лучше подходит для регрессионного тестирования.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN120459"
+>E.12.2. Usage</A
+></H2
+><P
+>Пример его использования:</P
+><PRE
+CLASS="PROGRAMLISTING"
+># postgresql.conf
+shared_preload_libraries = 'dummy_seclabel'</PRE
+><PRE
+CLASS="PROGRAMLISTING"
+>postgres=# CREATE TABLE t (a int, b text);
+CREATE TABLE
+postgres=# SECURITY LABEL ON TABLE t IS 'classified';
+SECURITY LABEL</PRE
+><P
+>Модуль <TT
+CLASS="FILENAME"
+>dummy_seclabel</TT
+> предоставляет только четыре жёстко заданных метки информации: <TT
+CLASS="LITERAL"
+>unclassified</TT
+> (публичная), <TT
+CLASS="LITERAL"
+>classified</TT
+> (закрытая), <TT
+CLASS="LITERAL"
+>secret</TT
+> (секретная) и <TT
+CLASS="LITERAL"
+>top secret</TT
+> (совершенно секретная). Другие строки в метках безопасности не принимаются.</P
+><P
+>Эти метки никак не связаны с ограничениями доступа. Они применяются, только чтобы проверить, работает ли оператор <TT
+CLASS="COMMAND"
+>SECURITY LABEL</TT
+> должным образом, или нет.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN120472"
+>E.12.3. Автор</A
+></H2
+><P
+>КайГай Кохей <CODE
+CLASS="EMAIL"
+>&#60;<A
+HREF="mailto:kaigai@ak.jp.nec.com"
+>kaigai@ak.jp.nec.com</A
+>&#62;</CODE
+></P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="dict-xsyn.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="earthdistance.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>dict_xsyn</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>earthdistance</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

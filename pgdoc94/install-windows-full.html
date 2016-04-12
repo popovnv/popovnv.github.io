@@ -1,0 +1,863 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Сборка с помощью Visual C++ или Microsoft Windows SDK</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Установка из исходного кода в Windows"
+HREF="install-windows.html"><LINK
+REL="PREVIOUS"
+TITLE="Установка из исходного кода в Windows"
+HREF="install-windows.html"><LINK
+REL="NEXT"
+TITLE="Сборка libpq с помощью Visual C++ или Borland C++"
+HREF="install-windows-libpq.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Установка из исходного кода в Windows"
+HREF="install-windows.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="install-windows.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 16. Установка из исходного кода в <SPAN
+CLASS="PRODUCTNAME"
+>Windows</SPAN
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Сборка libpq с помощью Visual C++ или Borland C++"
+HREF="install-windows-libpq.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="INSTALL-WINDOWS-FULL"
+>16.1. Сборка с помощью <SPAN
+CLASS="PRODUCTNAME"
+>Visual C++</SPAN
+> или <SPAN
+CLASS="PRODUCTNAME"
+>Microsoft Windows SDK</SPAN
+></A
+></H1
+><P
+>PostgreSQL может быть собран с помощью компилятора Visual C++ от Microsoft. Этот компилятор есть в пакетах <SPAN
+CLASS="PRODUCTNAME"
+>Visual Studio</SPAN
+>, <SPAN
+CLASS="PRODUCTNAME"
+>Visual Studio Express</SPAN
+> или в некоторых версиях <SPAN
+CLASS="PRODUCTNAME"
+>Microsoft Windows SDK</SPAN
+>. Если у вас ещё не установлена среда <SPAN
+CLASS="PRODUCTNAME"
+>Visual Studio</SPAN
+>, проще всего будет использовать компиляторы из <SPAN
+CLASS="PRODUCTNAME"
+>Visual Studio Express 2013 для Windows Desktop</SPAN
+> или из <SPAN
+CLASS="PRODUCTNAME"
+>Windows SDK 7.1</SPAN
+>, которые Microsoft распространяет бесплатно.</P
+><P
+>PostgreSQL поддерживает компиляторы с версии <SPAN
+CLASS="PRODUCTNAME"
+>Visual Studio 2005</SPAN
+> по версию <SPAN
+CLASS="PRODUCTNAME"
+>Visual Studio 2013</SPAN
+> (в том числе редакции Express), а также выпуски Windows SDK с 6.0 по 7.1. Сборка 64-битной версии для Windows поддерживается только с <SPAN
+CLASS="PRODUCTNAME"
+>Microsoft Windows SDK</SPAN
+> версий с 6.0a по 7.1 или с <SPAN
+CLASS="PRODUCTNAME"
+>Visual Studio 2008</SPAN
+> и новее.</P
+><P
+>Инструменты для компиляции с помощью <SPAN
+CLASS="PRODUCTNAME"
+>Visual C++</SPAN
+> или <SPAN
+CLASS="PRODUCTNAME"
+>Platform SDK</SPAN
+> находятся в каталоге <TT
+CLASS="FILENAME"
+>src/tools/msvc</TT
+>. При сборке убедитесь, что в системном пути PATH не подключаются инструменты из набора <SPAN
+CLASS="PRODUCTNAME"
+>MinGW</SPAN
+> или <SPAN
+CLASS="PRODUCTNAME"
+>Cygwin</SPAN
+>. Также убедитесь, что в пути PATH указаны каталоги всех необходимых инструментов Visual C++. Если вы используете <SPAN
+CLASS="PRODUCTNAME"
+>Visual Studio</SPAN
+>, запустите <SPAN
+CLASS="APPLICATION"
+>Visual Studio Command Prompt</SPAN
+>. Если вы хотите собрать 64-битную версию, вы должны выбрать 64-битную версию данной оболочки, и наоборот. Если вы используете <SPAN
+CLASS="PRODUCTNAME"
+>Microsoft Windows SDK</SPAN
+>, запустите через стартовое меню, подменю SDK оболочку <SPAN
+CLASS="APPLICATION"
+>CMD shell</SPAN
+>. В последних версиях SDK можно изменить целевую архитектуру процессора, вариант сборки и целевую ОС с помощью команды <TT
+CLASS="COMMAND"
+>setenv</TT
+>, например после <TT
+CLASS="COMMAND"
+>setenv /x86 /release /xp</TT
+> будет получена выпускаемая 32-битная сборка для Windows XP. О других параметрах <TT
+CLASS="COMMAND"
+>setenv</TT
+> можно узнать с ключом <TT
+CLASS="COMMAND"
+>/?</TT
+>. Все команды должны запускаться из каталога <TT
+CLASS="FILENAME"
+>src\tools\msvc</TT
+>.</P
+><P
+>До начала сборки может потребоваться отредактировать файл <TT
+CLASS="FILENAME"
+>config.pl</TT
+> и изменить в нём желаемые параметры конфигурации или пути к сторонним библиотекам, которые будут использоваться. Для получения конфигурации сначала считывается и разбирается файл <TT
+CLASS="FILENAME"
+>config_default.pl</TT
+>, а затем применяются все изменения из <TT
+CLASS="FILENAME"
+>config.pl</TT
+>. Например, чтобы указать, куда установлен <SPAN
+CLASS="PRODUCTNAME"
+>Python</SPAN
+>, следует добавить в <TT
+CLASS="FILENAME"
+>config.pl</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>$config-&gt;{python} = 'c:\python26';</PRE
+><P> Вам нужно задать только те параметры, которые отличаются от заданных в <TT
+CLASS="FILENAME"
+>config_default.pl</TT
+>.</P
+><P
+>Если вам необходимо установить какие-либо другие переменные окружения, создайте файл с именем <TT
+CLASS="FILENAME"
+>buildenv.pl</TT
+> и поместите в него требуемые команды. Например, чтобы добавить путь к bison, которого нет в PATH, создайте файл следующего содержания: </P><PRE
+CLASS="PROGRAMLISTING"
+>$ENV{PATH}=$ENV{PATH} . ';c:\some\where\bison\bin';</PRE
+><P></P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN27845"
+>16.1.1. Требования</A
+></H2
+><P
+>Для сборки <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> требуется следующее дополнительное ПО. Укажите каталоги, в которых находятся соответствующие библиотеки, в файле конфигурации <TT
+CLASS="FILENAME"
+>config.pl</TT
+>. <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><SPAN
+CLASS="PRODUCTNAME"
+>Microsoft Windows SDK</SPAN
+></DT
+><DD
+><P
+>Если с вашим инструментарием для разработки не поставляется поддерживаемая версия <SPAN
+CLASS="PRODUCTNAME"
+>Microsoft Windows SDK</SPAN
+>, рекомендуется установить последнюю версию SDK (в настоящее время 7.1), которую можно загрузить с <A
+HREF="http://www.microsoft.com/downloads/"
+TARGET="_top"
+>http://www.microsoft.com/downloads/</A
+>.</P
+><P
+>Устанавливая SDK, вы всегда должны выбирать для установки пункт <SPAN
+CLASS="APPLICATION"
+>Windows Headers and Libraries</SPAN
+> (Заголовочные файлы и библиотеки Windows). Если вы установили <SPAN
+CLASS="PRODUCTNAME"
+>Windows SDK</SPAN
+>, включая <SPAN
+CLASS="APPLICATION"
+>Visual C++ Compilers</SPAN
+>, <SPAN
+CLASS="PRODUCTNAME"
+>Visual Studio</SPAN
+> для сборки вам не нужна. Обратите внимание, что с версии 8.0a в SDK для Windows не включается полное окружение для сборки в командной строке.</P
+></DD
+><DT
+><SPAN
+CLASS="PRODUCTNAME"
+>ActiveState Perl</SPAN
+></DT
+><DD
+><P
+>ActiveState Perl требуется для запуска скриптов, управляющих сборкой. Perl из MinGW или Cygwin работать не будет. ActiveState Perl также должен находиться по пути в PATH. Готовый двоичный пакет можно загрузить с <A
+HREF="http://www.activestate.com"
+TARGET="_top"
+>http://www.activestate.com</A
+> (Заметьте, что требуется версия 5.8 или выше, при этом достаточно бесплатного стандартного дистрибутива (Standard Distribution).)</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>Следующее дополнительное ПО не требуется для базовой сборки, но требуется для сборки полного пакета. Укажите каталоги, в которых находятся соответствующие библиотеки, в файле конфигурации <TT
+CLASS="FILENAME"
+>config.pl</TT
+>. <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><SPAN
+CLASS="PRODUCTNAME"
+>ActiveState TCL</SPAN
+></DT
+><DD
+><P
+>Требуется для компиляции <SPAN
+CLASS="APPLICATION"
+>PL/TCL</SPAN
+> (Заметьте, что требуется версия 8.4 или выше, при этом достаточно бесплатного стандартного дистрибутива (Standard Distribution).</P
+></DD
+><DT
+><SPAN
+CLASS="PRODUCTNAME"
+>Bison</SPAN
+> и <SPAN
+CLASS="PRODUCTNAME"
+>Flex</SPAN
+></DT
+><DD
+><P
+>Для компиляции из Git требуются <SPAN
+CLASS="PRODUCTNAME"
+>Bison</SPAN
+> и <SPAN
+CLASS="PRODUCTNAME"
+>Flex</SPAN
+>, хотя они не нужны для компиляции из дистрибутивного пакета исходного кода. <SPAN
+CLASS="PRODUCTNAME"
+>Bison</SPAN
+> должен быть версии 1.875 или 2.2, либо новее, а <SPAN
+CLASS="PRODUCTNAME"
+>Flex</SPAN
+> — версии 2.5.31 или новее.</P
+><P
+>И <SPAN
+CLASS="PRODUCTNAME"
+>Bison</SPAN
+>, и <SPAN
+CLASS="PRODUCTNAME"
+>Flex</SPAN
+> входят в комплект утилит <SPAN
+CLASS="PRODUCTNAME"
+>msys</SPAN
+>, который можно загрузить с <A
+HREF="http://www.mingw.org/wiki/MSYS"
+TARGET="_top"
+>http://www.mingw.org/wiki/MSYS</A
+> в качестве компонента набора <SPAN
+CLASS="PRODUCTNAME"
+>MinGW</SPAN
+>. Вы также можете получить <SPAN
+CLASS="PRODUCTNAME"
+>msys</SPAN
+> в составе <SPAN
+CLASS="PRODUCTNAME"
+>msysGit</SPAN
+> с сайта <A
+HREF="http://git-scm.com/"
+TARGET="_top"
+>http://git-scm.com/</A
+>.</P
+><P
+>Вам потребуется добавить каталог, содержащий <TT
+CLASS="FILENAME"
+>flex.exe</TT
+> и <TT
+CLASS="FILENAME"
+>bison.exe</TT
+>, в путь, задаваемый переменной PATH, в <TT
+CLASS="FILENAME"
+>buildenv.pl</TT
+>, если она его ещё не включает. В случае с MinGW, это будет подкаталог <TT
+CLASS="FILENAME"
+>\msys\1.0\bin</TT
+> в каталоге вашей инсталляции MinGW. Для msysGit это подкаталог <TT
+CLASS="FILENAME"
+>bin</TT
+> в каталоге вашей инсталляции Git. Сами средства компилятора MinGW в путь PATH включать не нужно.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Bison, поставляемый в составе GnuWin32, может работать некорректно, когда он установлен в каталог с именем, содержащим пробелы, например, <TT
+CLASS="FILENAME"
+>C:\Program Files\GnuWin32</TT
+> (целевой каталог по умолчанию в англоязычной системе). В таком случае, возможно, стоит установить его в <TT
+CLASS="FILENAME"
+>C:\GnuWin32</TT
+> или задать в переменной окружения PATH короткий путь NTFS к GnuWin32 (например, <TT
+CLASS="FILENAME"
+>C:\PROGRA~1\GnuWin32</TT
+>).</P
+></BLOCKQUOTE
+></DIV
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Старые программы "winflex", которые раньше размещались на FTP-сайте PostgreSQL и упоминались в старой документации, не будут работать в 64-битной системе, выдавая ошибку: "flex: fatal internal error, exec failed" (flex: фатальная внутренняя ошибка, сбой в exec). Используйте flex из набора msys.</P
+></BLOCKQUOTE
+></DIV
+></DD
+><DT
+><SPAN
+CLASS="PRODUCTNAME"
+>Diff</SPAN
+></DT
+><DD
+><P
+>Diff требуется для запуска регрессионных тестов, его можно загрузить с <A
+HREF="http://gnuwin32.sourceforge.net"
+TARGET="_top"
+>http://gnuwin32.sourceforge.net</A
+>.</P
+></DD
+><DT
+><SPAN
+CLASS="PRODUCTNAME"
+>Gettext</SPAN
+></DT
+><DD
+><P
+>Gettext требуется для сборки с поддержкой NLS, его можно загрузить с <A
+HREF="http://gnuwin32.sourceforge.net"
+TARGET="_top"
+>http://gnuwin32.sourceforge.net</A
+>. Заметьте, что для сборки потребуются и исполняемые файлы, и зависимости, и файлы для разработки.</P
+></DD
+><DT
+><SPAN
+CLASS="PRODUCTNAME"
+>MIT Kerberos</SPAN
+></DT
+><DD
+><P
+>Требуется для поддержки проверки подлинности GSSAPI. MIT Kerberos можно загрузить с <A
+HREF="http://web.mit.edu/Kerberos/dist/index.html"
+TARGET="_top"
+>http://web.mit.edu/Kerberos/dist/index.html</A
+>.</P
+></DD
+><DT
+><SPAN
+CLASS="PRODUCTNAME"
+>libxml2</SPAN
+> и <SPAN
+CLASS="PRODUCTNAME"
+>libxslt</SPAN
+></DT
+><DD
+><P
+>Требуется для поддержки XML. Двоичный пакет можно загрузить с <A
+HREF="http://zlatkovic.com/pub/libxml"
+TARGET="_top"
+>http://zlatkovic.com/pub/libxml</A
+>, а исходный код с <A
+HREF="http://xmlsoft.org"
+TARGET="_top"
+>http://xmlsoft.org</A
+>. Учтите, что для libxml2 требуется iconv, который можно загрузить там же.</P
+></DD
+><DT
+><SPAN
+CLASS="PRODUCTNAME"
+>openssl</SPAN
+></DT
+><DD
+><P
+>Требуется для поддержки SSL. Двоичные пакеты можно загрузить с <A
+HREF="http://www.slproweb.com/products/Win32OpenSSL.html"
+TARGET="_top"
+>http://www.slproweb.com/products/Win32OpenSSL.html</A
+>, а исходный код с <A
+HREF="http://www.openssl.org"
+TARGET="_top"
+>http://www.openssl.org</A
+>.</P
+></DD
+><DT
+><SPAN
+CLASS="PRODUCTNAME"
+>ossp-uuid</SPAN
+></DT
+><DD
+><P
+>Требуется для поддержки UUID-OSSP (только для contrib). Исходный код можно загрузить с <A
+HREF="http://www.ossp.org/pkg/lib/uuid/"
+TARGET="_top"
+>http://www.ossp.org/pkg/lib/uuid/</A
+>.</P
+></DD
+><DT
+><SPAN
+CLASS="PRODUCTNAME"
+>Python</SPAN
+></DT
+><DD
+><P
+>Требуется для сборки <SPAN
+CLASS="APPLICATION"
+>PL/Python</SPAN
+>. Двоичные пакеты можно загрузить с <A
+HREF="http://www.python.org"
+TARGET="_top"
+>http://www.python.org</A
+>.</P
+></DD
+><DT
+><SPAN
+CLASS="PRODUCTNAME"
+>zlib</SPAN
+></DT
+><DD
+><P
+>Требуется для поддержки сжатия в <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+> и <SPAN
+CLASS="APPLICATION"
+>pg_restore</SPAN
+>. Двоичные пакеты можно загрузить с <A
+HREF="http://www.zlib.net"
+TARGET="_top"
+>http://www.zlib.net</A
+>.</P
+></DD
+></DL
+></DIV
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN27964"
+>16.1.2. Специальные замечания для 64-битной Windows</A
+></H2
+><P
+>PostgreSQL для архитектуры x64 можно собрать только в 64-битной Windows, процессоры Itanium не поддерживаются.</P
+><P
+>Совместная сборка 32- и 64-битных версий в одном дереве не поддерживается. Система сборки автоматически определит, в каком окружении (32- или 64-битном) она запущена, и соберёт соответствующий вариант PostgreSQL. Поэтому перед сборкой важно запустить требуемую версию командного интерпретатора.</P
+><P
+>Для использования на стороне сервера сторонних библиотек, таких как <SPAN
+CLASS="PRODUCTNAME"
+>python</SPAN
+> или <SPAN
+CLASS="PRODUCTNAME"
+>openssl</SPAN
+>, эти библиотеки также <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>должны быть</I
+></SPAN
+> 64-битными. 64-битный сервер не поддерживает загрузку 32-битных библиотек. Некоторые библиотеки сторонних разработчиков, предназначенные для PostgreSQL, могут быть доступны только в 32-битных версиях и в таком случае их нельзя будет использовать с 64-битной версией PostgreSQL.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN27972"
+>16.1.3. Сборка</A
+></H2
+><P
+>Чтобы собрать весь PostgreSQL в конфигурации выпуска (по умолчанию), запустите команду: </P><PRE
+CLASS="SCREEN"
+><KBD
+CLASS="USERINPUT"
+>build</KBD
+></PRE
+><P> Чтобы собрать весь PostgreSQL в конфигурации отладки, запустите команду: </P><PRE
+CLASS="SCREEN"
+><KBD
+CLASS="USERINPUT"
+>build DEBUG</KBD
+></PRE
+><P> Для сборки отдельного проекта, например psql, выполните, соответственно: </P><PRE
+CLASS="SCREEN"
+><KBD
+CLASS="USERINPUT"
+>build psql</KBD
+>
+<KBD
+CLASS="USERINPUT"
+>build DEBUG psql</KBD
+></PRE
+><P> Чтобы сменить конфигурацию по умолчанию на отладочную, поместите в файл <TT
+CLASS="FILENAME"
+>buildenv.pl</TT
+> следующую строку: </P><PRE
+CLASS="PROGRAMLISTING"
+>$ENV{CONFIG}="Debug";</PRE
+><P></P
+><P
+>Также возможна сборка из графической среды Visual Studio. В этом случае вам нужно запустить в командной строке: </P><PRE
+CLASS="SCREEN"
+><KBD
+CLASS="USERINPUT"
+>perl mkvcbuild.pl</KBD
+></PRE
+><P> и затем открыть в Visual Studio полученный <TT
+CLASS="FILENAME"
+>pgsql.sln</TT
+> в корневом каталоге дерева исходных кодов.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN27988"
+>16.1.4. Очистка и установка</A
+></H2
+><P
+>В большинстве случаев за изменением файлов будет следить автоматическая система отслеживания зависимостей в Visual Studio. Но если изменений было слишком много, может понадобиться очистка установки. Чтобы её выполнить, просто запустите команду <TT
+CLASS="FILENAME"
+>clean.bat</TT
+>, которая автоматически очистит все сгенерированные файлы. Вы также можете запустить эту команду с параметром <TT
+CLASS="PARAMETER"
+>dist</TT
+>, в этом случае она отработает подобно <KBD
+CLASS="USERINPUT"
+>make distclean</KBD
+> и удалит также выходные файлы flex/bison.</P
+><P
+>По умолчанию все файлы сохраняются в подкаталогах <TT
+CLASS="FILENAME"
+>debug</TT
+> или <TT
+CLASS="FILENAME"
+>release</TT
+>. Чтобы установить эти файлы стандартным образом, а также сгенерировать файлы, требуемые для инициализации и использования базы данных, запустите команду: </P><PRE
+CLASS="SCREEN"
+><KBD
+CLASS="USERINPUT"
+>install c:\destination\directory</KBD
+></PRE
+><P></P
+><P
+>Если вы хотите установить только клиентские приложения и интерфейсные библиотеки, выполните команду: </P><PRE
+CLASS="SCREEN"
+><KBD
+CLASS="USERINPUT"
+>install c:\destination\directory client</KBD
+></PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN28002"
+>16.1.5. Запуск регрессионных тестов</A
+></H2
+><P
+>Чтобы запустить регрессионные тесты, важно сначала собрать все необходимые для них компоненты. Также убедитесь, что в системном пути могут быть найдены все DLL, требуемые для загрузки всех подсистем СУБД (например, DLL Perl и Python для процедурных языков). Если их каталоги в пути поиска отсутствуют, задайте их в файле <TT
+CLASS="FILENAME"
+>buildenv.pl</TT
+>. Чтобы запустить тесты, выполните одну из следующих команд в каталоге <TT
+CLASS="FILENAME"
+>src\tools\msvc</TT
+>: </P><PRE
+CLASS="SCREEN"
+><KBD
+CLASS="USERINPUT"
+>vcregress check</KBD
+>
+<KBD
+CLASS="USERINPUT"
+>vcregress installcheck</KBD
+>
+<KBD
+CLASS="USERINPUT"
+>vcregress plcheck</KBD
+>
+<KBD
+CLASS="USERINPUT"
+>vcregress contribcheck</KBD
+>
+<KBD
+CLASS="USERINPUT"
+>vcregress ecpgcheck</KBD
+>
+<KBD
+CLASS="USERINPUT"
+>vcregress isolationcheck</KBD
+>
+<KBD
+CLASS="USERINPUT"
+>vcregress upgradecheck</KBD
+></PRE
+><P>Чтобы выбрать другой планировщик выполнения тестов (по умолчанию выбран параллельный), укажите его в командной строке: </P><PRE
+CLASS="SCREEN"
+><KBD
+CLASS="USERINPUT"
+>vcregress check serial</KBD
+></PRE
+><P> За дополнительными сведениями о регрессионных тестах обратитесь к <A
+HREF="regress.html"
+>Главе 30</A
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN28018"
+>16.1.6. Сборка документации</A
+></H2
+><P
+>Для сборки документации PostgreSQL в формате HTML требуются дополнительные инструменты и файлы. Создайте общий каталог для всех этих файлов и сохраните их в названные подкаталоги. <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+>OpenJade 1.3.1-2</DT
+><DD
+><P
+>Загрузите архив <A
+HREF="http://sourceforge.net/projects/openjade/files/openjade/1.3.1/openjade-1_3_1-2-bin.zip/download"
+TARGET="_top"
+>http://sourceforge.net/projects/openjade/files/openjade/1.3.1/openjade-1_3_1-2-bin.zip/download</A
+> и распакуйте его в подкаталог <TT
+CLASS="FILENAME"
+>openjade-1.3.1</TT
+>.</P
+></DD
+><DT
+>DocBook DTD 4.2</DT
+><DD
+><P
+>Загрузите архив с <A
+HREF="http://www.oasis-open.org/docbook/sgml/4.2/docbook-4.2.zip"
+TARGET="_top"
+>http://www.oasis-open.org/docbook/sgml/4.2/docbook-4.2.zip</A
+> и распакуйте его в подкаталог <TT
+CLASS="FILENAME"
+>docbook</TT
+>.</P
+></DD
+><DT
+>DocBook DSSSL 1.79</DT
+><DD
+><P
+>Загрузите архив с <A
+HREF="http://sourceforge.net/projects/docbook/files/docbook-dsssl/1.79/docbook-dsssl-1.79.zip/download"
+TARGET="_top"
+>http://sourceforge.net/projects/docbook/files/docbook-dsssl/1.79/docbook-dsssl-1.79.zip/download</A
+> и распакуйте его в подкаталог <TT
+CLASS="FILENAME"
+>docbook-dsssl-1.79</TT
+>.</P
+></DD
+><DT
+>Сущности символов ISO</DT
+><DD
+><P
+>Загрузите архив с <A
+HREF="http://www.oasis-open.org/cover/ISOEnts.zip"
+TARGET="_top"
+>http://www.oasis-open.org/cover/ISOEnts.zip</A
+> и распакуйте его в подкаталог <TT
+CLASS="FILENAME"
+>docbook</TT
+>.</P
+></DD
+></DL
+></DIV
+><P> Добавьте в <TT
+CLASS="FILENAME"
+>buildenv.pl</TT
+> переменную, задающую местоположение ранее созданного общего каталога, например: </P><PRE
+CLASS="PROGRAMLISTING"
+>$ENV{DOCROOT}='c:\docbook';</PRE
+><P> Чтобы собрать документацию, запустите <TT
+CLASS="FILENAME"
+>builddoc.bat</TT
+>. Обратите внимание, что при этом сборка фактически будет запущена дважды; это нужно для построения индексов. Сгенерированные HTML-файлы окажутся в каталоге <TT
+CLASS="FILENAME"
+>doc\src\sgml</TT
+>.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="install-windows.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="install-windows-libpq.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Установка из исходного кода в <SPAN
+CLASS="PRODUCTNAME"
+>Windows</SPAN
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="install-windows.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Сборка <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> с помощью <SPAN
+CLASS="PRODUCTNAME"
+>Visual C++</SPAN
+> или <SPAN
+CLASS="PRODUCTNAME"
+>Borland C++</SPAN
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,353 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Соединения таблиц</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Язык SQL"
+HREF="tutorial-sql.html"><LINK
+REL="PREVIOUS"
+TITLE="Выполнение запроса"
+HREF="tutorial-select.html"><LINK
+REL="NEXT"
+TITLE="Агрегатные функции"
+HREF="tutorial-agg.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Выполнение запроса"
+HREF="tutorial-select.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="tutorial-sql.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 2. Язык <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Агрегатные функции"
+HREF="tutorial-agg.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="TUTORIAL-JOIN"
+>2.6. Соединения таблиц</A
+></H1
+><P
+>До этого все наши запросы обращались только к одной таблице. Однако запросы могут также обращаться сразу к нескольким таблицам или обращаться к той же таблице так, что одновременно будут обрабатываться разные наборы её строк. Запрос, обращающийся к разным наборам строк одной или нескольких таблиц, называется <I
+CLASS="FIRSTTERM"
+>соединением</I
+> (JOIN). Например, мы захотели перечислить все погодные события вместе с координатами соответствующих городов. Для этого мы должны сравнить колонку <TT
+CLASS="STRUCTFIELD"
+>city</TT
+> каждой строки таблицы <TT
+CLASS="STRUCTNAME"
+>weather</TT
+> с колонкой <TT
+CLASS="STRUCTFIELD"
+>name</TT
+> всех строк таблицы <TT
+CLASS="STRUCTNAME"
+>cities</TT
+> и выбрать пары строк, для которых эти значения совпадают. </P><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Это не совсем точная модель. Обычно соединения выполняются эффективнее (сравниваются не все возможные пары строк), но это скрыто от пользователя.</P
+></BLOCKQUOTE
+></DIV
+><P>Это можно сделать с помощью следующего запроса: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT *
+    FROM weather, cities
+    WHERE city = name;</PRE
+><P>
+
+</P><PRE
+CLASS="SCREEN"
+>     city     |temp_lo|temp_hi| prcp|    date   |     name     | location
+--------------+-------+-------+-----+-----------+--------------+----------
+ San Francisco|     46|     50| 0.25| 1994-11-27| San Francisco| (-194,53)
+ San Francisco|     43|     57|    0| 1994-11-29| San Francisco| (-194,53)
+(2 rows)</PRE
+><P></P
+><P
+>Обратите внимание на две особенности полученных данных: <P
+></P
+></P><UL
+><LI
+><P
+>В результате нет строки с городом Хейуорд (Hayward). Так получилось потому, что в таблице <TT
+CLASS="STRUCTNAME"
+>cities</TT
+> нет строки для данного города, а при соединении все строки таблицы <TT
+CLASS="STRUCTNAME"
+>weather</TT
+>, для которых не нашлось соответствие, опускаются. Вскоре мы увидим, как это можно исправить.</P
+></LI
+><LI
+><P
+>Название города оказалось в двух колонках. Это правильно и объясняется тем, что колонки таблиц <TT
+CLASS="STRUCTNAME"
+>weather</TT
+> и <TT
+CLASS="STRUCTNAME"
+>cities</TT
+> были объединены. Хотя на практике это нежелательно, поэтому лучше перечислить нужные колонки явно, а не использовать <TT
+CLASS="LITERAL"
+>*</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT city, temp_lo, temp_hi, prcp, date, location
+    FROM weather, cities
+    WHERE city = name;</PRE
+><P></P
+></LI
+></UL
+><P></P
+><DIV
+CLASS="FORMALPARA"
+><P
+><B
+>Упражнение: </B
+>Попробуйте определить, что будет делать этот запрос без предложения <TT
+CLASS="LITERAL"
+>WHERE</TT
+>.</P
+></DIV
+><P
+>Так как все колонки имеют разные имена, анализатор запроса автоматически понимает, к какой таблице они относятся. Если бы имена колонок в двух таблицах повторялись, вам пришлось бы <I
+CLASS="FIRSTTERM"
+>дополнить</I
+> имена колонок, конкретизируя, что именно вы имели в виду: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT weather.city, weather.temp_lo, weather.temp_hi,
+       weather.prcp, weather.date, cities.location
+    FROM weather, cities
+    WHERE cities.name = weather.city;</PRE
+><P> Вообще хорошим стилем считается указывать полные имена колонок в запросе соединения, чтобы запрос не поломался, если позже в таблицы будут добавлены колонки с повторяющимися именами.</P
+><P
+>Запросы соединения, которые вы видели до этого, можно также записать в другом виде: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT *
+    FROM weather INNER JOIN cities ON (weather.city = cities.name);</PRE
+><P> Эта запись не так распространена, как первый вариант, но мы показываем её, чтобы вам было проще понять следующие темы.</P
+><P
+> Сейчас мы выясним, как вернуть записи о погоде в городе Хейуорд. Мы хотим, чтобы запрос просканировал таблицу <TT
+CLASS="STRUCTNAME"
+>weather</TT
+> и для каждой её строки нашёл соответствующую строку в таблице <TT
+CLASS="STRUCTNAME"
+>cities</TT
+>. Если же такая строка не будет найдена, мы хотим, чтобы вместо значений колонок из таблицы <TT
+CLASS="STRUCTNAME"
+>cities</TT
+> были подставлены <SPAN
+CLASS="QUOTE"
+>"пустые значения"</SPAN
+>. Запросы такого типа называются <I
+CLASS="FIRSTTERM"
+>внешними соединениями</I
+>. (Соединения, которые мы видели до этого, называются внутренними.) Эта команда будет выглядеть так: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT *
+    FROM weather LEFT OUTER JOIN cities ON (weather.city = cities.name);
+
+     city     |temp_lo|temp_hi| prcp|    date   |     name     | location
+--------------+-------+-------+-----+-----------+--------------+----------
+ Hayward      |     37|     54|     | 1994-11-29|              |
+ San Francisco|     46|     50| 0.25| 1994-11-27| San Francisco| (-194,53)
+ San Francisco|     43|     57|    0| 1994-11-29| San Francisco| (-194,53)
+(3 rows)</PRE
+><P> Этот запрос называется <I
+CLASS="FIRSTTERM"
+>левым внешним соединением</I
+>, потому что из таблицы в левой части оператора будут выбраны все строки, а из таблицы справа только те, которые удалось сопоставить каким-нибудь строкам из левой. При выводе строк левой таблицы, для которых не удалось найти соответствия в правой, вместо колонок правой таблицы подставляются пустые значения (NULL).</P
+><DIV
+CLASS="FORMALPARA"
+><P
+><B
+>Упражнение: </B
+>Существуют также правые внешние соединения и полные внешние соединения. Попробуйте выяснить, что они собой представляют.</P
+></DIV
+><P
+> В соединении мы также можем замкнуть таблицу на себя. Это называется <I
+CLASS="FIRSTTERM"
+>замкнутым соединением</I
+>. Например, представьте, что мы хотим найти все записи погоды, в которых температура лежит в диапазоне температур других записей. Для этого мы должны сравнить колонки <TT
+CLASS="STRUCTFIELD"
+>temp_lo</TT
+> и <TT
+CLASS="STRUCTFIELD"
+>temp_hi</TT
+> каждой строки таблицы <TT
+CLASS="STRUCTNAME"
+>weather</TT
+> с колонками <TT
+CLASS="STRUCTFIELD"
+>temp_lo</TT
+> и <TT
+CLASS="STRUCTFIELD"
+>temp_hi</TT
+> другого набора строк <TT
+CLASS="STRUCTNAME"
+>weather</TT
+>. Это можно сделать с помощью следующего запроса: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT W1.city, W1.temp_lo AS low, W1.temp_hi AS high,
+    W2.city, W2.temp_lo AS low, W2.temp_hi AS high
+    FROM weather W1, weather W2
+    WHERE W1.temp_lo &lt; W2.temp_lo
+    AND W1.temp_hi &gt; W2.temp_hi;
+
+     city      | low | high |     city      | low | high
+---------------+-----+------+---------------+-----+------
+ San Francisco |  43 |   57 | San Francisco |  46 |   50
+ Hayward       |  37 |   54 | San Francisco |  46 |   50
+(2 rows)</PRE
+><P> Здесь мы ввели новые обозначения таблицы weather: <TT
+CLASS="LITERAL"
+>W1</TT
+> и <TT
+CLASS="LITERAL"
+>W2</TT
+>, чтобы можно было различить левую и правую стороны соединения. Вы можете использовать подобные псевдонимы и в других запросах для сокращения: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT *
+    FROM weather w, cities c
+    WHERE w.city = c.name;</PRE
+><P> Вы будете встречать сокращения такого рода довольно часто.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="tutorial-select.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="tutorial-agg.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Выполнение запроса</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="tutorial-sql.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Агрегатные функции</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

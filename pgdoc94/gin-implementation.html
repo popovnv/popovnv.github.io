@@ -1,0 +1,258 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Реализация</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Индексы GIN"
+HREF="gin.html"><LINK
+REL="PREVIOUS"
+TITLE="Расширяемость"
+HREF="gin-extensibility.html"><LINK
+REL="NEXT"
+TITLE="Приёмы и советы по применению GIN"
+HREF="gin-tips.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Расширяемость"
+HREF="gin-extensibility.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="gin.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 58. Индексы GIN</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Приёмы и советы по применению GIN"
+HREF="gin-tips.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="GIN-IMPLEMENTATION"
+>58.4. Реализация</A
+></H1
+><P
+>Внутри индекс <ACRONYM
+CLASS="ACRONYM"
+>GIN</ACRONYM
+> содержит B-дерево, построенное по ключам, где каждый ключ является элементом одного или нескольких индексированных объектов (например, членом массива) и где каждый кортеж на страницах листьев содержит либо указатель на B-дерево указателей на данные (<SPAN
+CLASS="QUOTE"
+>"дерево идентификаторов"</SPAN
+>), либо простой список указателей на данные (<SPAN
+CLASS="QUOTE"
+>"список идентификаторов"</SPAN
+>), когда этот список достаточно мал, чтобы уместиться в одном кортеже индекса вместе со значением ключа.</P
+><P
+>Начиная с <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> версии 9.1, в индекс могут быть включены значения ключей, равные NULL. Кроме того, в индекс вставляются NULL для индексируемых объектов, равных NULL или не содержащих ключей, согласно функции <CODE
+CLASS="FUNCTION"
+>extractValue</CODE
+>. Это позволяет находить при поиске пустые объекты, когда они должны быть найдены.</P
+><P
+>Многоколоночные индексы <ACRONYM
+CLASS="ACRONYM"
+>GIN</ACRONYM
+> реализуются в виде одного B-дерева по составным значениям (номер колонки, значение ключа). Значения ключей для различных колонок могут быть разных типов.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="GIN-FAST-UPDATE"
+>58.4.1. Методика быстрого обновления GIN</A
+></H2
+><P
+>Природа инверсированного индекса такова, что его обновление обычно медленная операция: при добавлении или изменении одной строки данных может потребоваться выполнить множество добавлений записей в индекс (для каждого ключа, извлечённого из индексируемого объекта). Начиная с <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> версии 8.4, <ACRONYM
+CLASS="ACRONYM"
+>GIN</ACRONYM
+> может отложить большой объём этой работы, вставляя новые кортежи во временный, несортированный список записей, ожидающих индексации. Когда таблица очищается или размер этого списка становится слишком большим (превышает <A
+HREF="runtime-config-resource.html#GUC-WORK-MEM"
+>work_mem</A
+>), записи переносятся в основную структуру данных <ACRONYM
+CLASS="ACRONYM"
+>GIN</ACRONYM
+> теми же методами массового добавления данных, что и при начальном создании индекса. Это значительно увеличивает скорость обновления индекса <ACRONYM
+CLASS="ACRONYM"
+>GIN</ACRONYM
+>, даже с учётом дополнительных издержек при очистке. К тому же эту дополнительную работу можно выполнить в фоновом процессе, а не в процессе, непосредственно выполняющем запросы.</P
+><P
+>Основной недостаток такого подхода состоит в том, что при поиске необходимо не только проверить обычный индекс, но и просканировать список ожидающих записей, так что если этот список большой, поиск значительно замедляется. Ещё один недостаток состоит в том, что хотя в основном изменения производятся быстро, изменение, при котором этот список оказывается <SPAN
+CLASS="QUOTE"
+>"слишком большим"</SPAN
+>, влечёт необходимость немедленной очистки и поэтому выполняется гораздо дольше остальных изменений. Минимизировать эти недостатки можно, правильно организовав автоочистку.</P
+><P
+>Если выдержанность времени операций важнее скорости обновления, применение списка ожидающих записей можно отключить, выключив параметр хранения <TT
+CLASS="LITERAL"
+>FASTUPDATE</TT
+> для индекса <ACRONYM
+CLASS="ACRONYM"
+>GIN</ACRONYM
+>. За подробностями обратитесь к <A
+HREF="sql-createindex.html"
+>CREATE INDEX</A
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="GIN-PARTIAL-MATCH"
+>58.4.2. Алгоритм частичного соответствия</A
+></H2
+><P
+>GIN может поддерживать проверки <SPAN
+CLASS="QUOTE"
+>"частичного соответствия"</SPAN
+>, когда запрос выявляет не точное соответствие одному или нескольким ключам, а возможные соответствия, попадающие в достаточно узкий диапазон значений ключей (при порядке сортировки ключей, определённым опорным методом <CODE
+CLASS="FUNCTION"
+>compare</CODE
+>). В этом случае метод <CODE
+CLASS="FUNCTION"
+>extractQuery</CODE
+> возвращает не значение ключа, которое должно соответствовать точно, а значение, определяющее нижнюю границу искомого диапазона, и устанавливает флаг <TT
+CLASS="LITERAL"
+>pmatch</TT
+>. Затем диапазон ключей сканируется методом <CODE
+CLASS="FUNCTION"
+>comparePartial</CODE
+>. Метод <CODE
+CLASS="FUNCTION"
+>comparePartial</CODE
+> должен вернуть ноль при соответствии ключа индекса, отрицательное значение, если соответствия нет, но нужно продолжать проверку диапазона, и положительное значение, если ключ индекса оказался за искомым диапазоном.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="gin-extensibility.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="gin-tips.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Расширяемость</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="gin.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Приёмы и советы по применению GIN</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

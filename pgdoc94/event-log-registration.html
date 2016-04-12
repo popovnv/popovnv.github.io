@@ -1,0 +1,261 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Регистрация журнала событий в Windows</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Подготовка к работе и сопровождение сервера"
+HREF="runtime.html"><LINK
+REL="PREVIOUS"
+TITLE="Защита соединений TCP/IP с применением туннелей SSH"
+HREF="ssh-tunnels.html"><LINK
+REL="NEXT"
+TITLE="Настройка сервера"
+HREF="runtime-config.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Защита соединений TCP/IP с применением туннелей SSH"
+HREF="ssh-tunnels.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="runtime.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 17. Подготовка к работе и сопровождение сервера</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Настройка сервера"
+HREF="runtime-config.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="EVENT-LOG-REGISTRATION"
+>17.11. Регистрация <SPAN
+CLASS="APPLICATION"
+>журнала событий</SPAN
+> в <SPAN
+CLASS="SYSTEMITEM"
+>Windows</SPAN
+></A
+></H1
+><P
+>Чтобы зарегистрировать библиотеку <SPAN
+CLASS="APPLICATION"
+>журнала событий</SPAN
+> в <SPAN
+CLASS="SYSTEMITEM"
+>Windows</SPAN
+>, выполните следующую команду: </P><PRE
+CLASS="SCREEN"
+><KBD
+CLASS="USERINPUT"
+>regsvr32 <TT
+CLASS="REPLACEABLE"
+><I
+>каталог_библиотек_pgsql</I
+></TT
+>/pgevent.dll</KBD
+></PRE
+><P> При этом в реестре будут созданы необходимые записи для средства просмотра событий, относящиеся к источнику событий по умолчанию с именем <TT
+CLASS="LITERAL"
+>PostgreSQL</TT
+>.</P
+><P
+>Чтобы задать другое имя источника событий (см. <A
+HREF="runtime-config-logging.html#GUC-EVENT-SOURCE"
+>event_source</A
+>), укажите ключи <TT
+CLASS="LITERAL"
+>/n</TT
+> и <TT
+CLASS="LITERAL"
+>/i</TT
+>: </P><PRE
+CLASS="SCREEN"
+><KBD
+CLASS="USERINPUT"
+>regsvr32 /n /i:<TT
+CLASS="REPLACEABLE"
+><I
+>имя_источника_событий</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>каталог_библиотек_pgsql</I
+></TT
+>/pgevent.dll</KBD
+></PRE
+><P></P
+><P
+>Чтобы разрегистрировать библиотеку <SPAN
+CLASS="APPLICATION"
+>журнала событий</SPAN
+> в операционной системе, выполните команду: </P><PRE
+CLASS="SCREEN"
+><KBD
+CLASS="USERINPUT"
+>regsvr32 /u [/i:<TT
+CLASS="REPLACEABLE"
+><I
+>имя_источника_событий</I
+></TT
+>] <TT
+CLASS="REPLACEABLE"
+><I
+>каталог_библиотек_pgsql</I
+></TT
+>/pgevent.dll</KBD
+></PRE
+><P></P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Чтобы сервер баз данных записывал сообщения в журнал событий, добавьте <TT
+CLASS="LITERAL"
+>eventlog</TT
+> в параметр <A
+HREF="runtime-config-logging.html#GUC-LOG-DESTINATION"
+>log_destination</A
+> в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+>.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ssh-tunnels.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="runtime-config.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Защита соединений TCP/IP с применением туннелей <SPAN
+CLASS="APPLICATION"
+>SSH</SPAN
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="runtime.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Настройка сервера</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,846 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>FETCH</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="EXPLAIN"
+HREF="sql-explain.html"><LINK
+REL="NEXT"
+TITLE="GRANT"
+HREF="sql-grant.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="EXPLAIN"
+HREF="sql-explain.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="GRANT"
+HREF="sql-grant.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-FETCH"
+></A
+>FETCH</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN80966"
+></A
+><H2
+>Название</H2
+>FETCH&nbsp;--&nbsp;получить результат запроса через курсор</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN80969"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>FETCH [ <TT
+CLASS="REPLACEABLE"
+><I
+>direction</I
+></TT
+> [ FROM | IN ] ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_курсора</I
+></TT
+>
+
+<SPAN
+CLASS="phrase"
+><SPAN
+CLASS="PHRASE"
+>Здесь <TT
+CLASS="REPLACEABLE"
+><I
+>direction</I
+></TT
+> может быть пустым или принимать следующее значение:</SPAN
+></SPAN
+>
+
+    NEXT
+    PRIOR
+    FIRST
+    LAST
+    ABSOLUTE <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+>
+    RELATIVE <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+>
+    <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+>
+    ALL
+    FORWARD
+    FORWARD <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+>
+    FORWARD ALL
+    BACKWARD
+    BACKWARD <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+>
+    BACKWARD ALL</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN80980"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>FETCH</TT
+> получает строки через ранее созданный курсор.</P
+><P
+>Курсор связан с определённым положением, что и использует команда <TT
+CLASS="COMMAND"
+>FETCH</TT
+>. Курсор может располагаться перед первой строкой результата запроса, на любой строке этого результата, либо после последней строки. При создании курсор оказывается перед первой строкой. Когда <TT
+CLASS="COMMAND"
+>FETCH</TT
+> доходит до конца набора строк, курсор остаётся в положении после последней строки, либо перед первой, при движении назад. После команд <TT
+CLASS="COMMAND"
+>FETCH ALL</TT
+> и <TT
+CLASS="COMMAND"
+>FETCH BACKWARD ALL</TT
+> курсор всегда оказывается после последней строки или перед первой, соответственно.</P
+><P
+>Формы <TT
+CLASS="LITERAL"
+>NEXT</TT
+>, <TT
+CLASS="LITERAL"
+>PRIOR</TT
+>, <TT
+CLASS="LITERAL"
+>FIRST</TT
+>, <TT
+CLASS="LITERAL"
+>LAST</TT
+>, <TT
+CLASS="LITERAL"
+>ABSOLUTE</TT
+> и <TT
+CLASS="LITERAL"
+>RELATIVE</TT
+> выбирают одну строку после соответствущего перемещения курсора. Если в этом положении строки не оказывается, возвращается пустой результат, а курсор остаётся в достигнутом положении перед первой строкой или после последней.</P
+><P
+>Формы <TT
+CLASS="LITERAL"
+>FORWARD</TT
+> и <TT
+CLASS="LITERAL"
+>BACKWARD</TT
+> получают указанное число строк, сдвигаясь соответственно вперёд или назад; в результате курсор оказывается на последней выданной строке (или перед/после всех строк, если <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+> превышает количество доступных строк).</P
+><P
+>Формы <TT
+CLASS="LITERAL"
+>RELATIVE 0</TT
+>, <TT
+CLASS="LITERAL"
+>FORWARD 0</TT
+> и <TT
+CLASS="LITERAL"
+>BACKWARD 0</TT
+> действуют одинаково — они считывают текущую строку, не перемещая курсор, то есть, повторно выбирая строку, выбранную последней. Эта операция будет успешна, только если курсор не расположен до первой или после последней строки; в этом случае строка возвращена не будет.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>На этой странице описывается применение курсоров на уровне команд SQL. Если вы попытаетесь использовать курсоры внутри функции <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+>, правила будут другими &mdash; см. <A
+HREF="plpgsql-cursors.html"
+>Раздел 40.7</A
+>.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN81008"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>direction</I
+></TT
+></DT
+><DD
+><P
+>Параметр <TT
+CLASS="REPLACEABLE"
+><I
+>направление</I
+></TT
+> задаёт направление движения и число выбираемых строк. Он может принимать одно из следующих значений: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>NEXT</TT
+></DT
+><DD
+><P
+>Выбрать следующую строку. Это действие подразумевается по умолчанию, если <TT
+CLASS="REPLACEABLE"
+><I
+>направление</I
+></TT
+> опущено.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>PRIOR</TT
+></DT
+><DD
+><P
+>Выбрать предыдущую строку.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>FIRST</TT
+></DT
+><DD
+><P
+>Выбрать первую строку запроса (аналогично указанию <TT
+CLASS="LITERAL"
+>ABSOLUTE 1</TT
+>).</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>LAST</TT
+></DT
+><DD
+><P
+>Выбрать последнюю строку запроса (аналогично <TT
+CLASS="LITERAL"
+>ABSOLUTE -1</TT
+>).</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>ABSOLUTE <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Выбрать строку под номером <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+> с начала, либо под номером <TT
+CLASS="LITERAL"
+>abs(<TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+>)</TT
+> с конца, если <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+> отрицательно. Если <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+> выходит за границы набора строк, курсор размещается перед первой или после последней строки; в частности, с <TT
+CLASS="LITERAL"
+>ABSOLUTE 0</TT
+> курсор оказывается перед первой строкой.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>RELATIVE <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Выбрать строку под номером <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+>, считая со следующей вперёд, либо под номером <TT
+CLASS="LITERAL"
+>abs(<TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+>)</TT
+>, считая с предыдущей назад, если <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+> отрицательно. <TT
+CLASS="LITERAL"
+>RELATIVE 0</TT
+> повторно считывает текущую строку, если таковая имеется.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+></DT
+><DD
+><P
+>Выбрать следующее <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+> строк (аналогично <TT
+CLASS="LITERAL"
+>FORWARD <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+></TT
+>).</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>ALL</TT
+></DT
+><DD
+><P
+>Выбрать все оставшиеся строки (аналогично <TT
+CLASS="LITERAL"
+>FORWARD ALL</TT
+>).</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>FORWARD</TT
+></DT
+><DD
+><P
+>Выбрать следующую строку (аналогично <TT
+CLASS="LITERAL"
+>NEXT</TT
+>).</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>FORWARD <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Выбрать следующее <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+> строк. <TT
+CLASS="LITERAL"
+>FORWARD 0</TT
+> повторно выбирает текущую строку.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>FORWARD ALL</TT
+></DT
+><DD
+><P
+>Выбрать все оставшиеся строки.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>BACKWARD</TT
+></DT
+><DD
+><P
+>Выбрать предыдущую строку (аналогично <TT
+CLASS="LITERAL"
+>PRIOR</TT
+>).</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>BACKWARD <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Выбрать предыдущее <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+> строк (с перемещением назад). <TT
+CLASS="LITERAL"
+>BACKWARD 0</TT
+> повторно выбирает текущую строку.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>BACKWARD ALL</TT
+></DT
+><DD
+><P
+>Выбрать все предыдущие строки (с перемещением назад).</P
+></DD
+></DL
+></DIV
+><P></P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+></DT
+><DD
+><P
+>Здесь <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+> — целочисленная константа, возможно со знаком, определяющая смещение или количество выбираемых строк. Для вариантов <TT
+CLASS="LITERAL"
+>FORWARD</TT
+> и <TT
+CLASS="LITERAL"
+>BACKWARD</TT
+> указание отрицательного <TT
+CLASS="REPLACEABLE"
+><I
+>числа</I
+></TT
+> равнозначно смене направления <TT
+CLASS="LITERAL"
+>FORWARD</TT
+> на <TT
+CLASS="LITERAL"
+>BACKWARD</TT
+> и наоборот.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_курсора</I
+></TT
+></DT
+><DD
+><P
+>Имя открытого курсора.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN81132"
+></A
+><H2
+>Выводимая информация</H2
+><P
+>При успешном выполнении <TT
+CLASS="COMMAND"
+>FETCH</TT
+> возвращает метку команды вида </P><PRE
+CLASS="SCREEN"
+>FETCH <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+></PRE
+><P> Здесь <TT
+CLASS="REPLACEABLE"
+><I
+>count</I
+></TT
+> — количество выбранных строк (может быть и нулевым). Заметьте, что в <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> метка команды не выдаётся, так как вместо неё <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> выводит выбранные строки.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN81141"
+></A
+><H2
+>Замечания</H2
+><P
+>Если перемещение курсора в <TT
+CLASS="COMMAND"
+>FETCH</TT
+> не ограничивается вариантами <TT
+CLASS="COMMAND"
+>FETCH NEXT</TT
+> или <TT
+CLASS="COMMAND"
+>FETCH FORWARD</TT
+> с положительным числом, курсор должен быть объявлен с указанием <TT
+CLASS="LITERAL"
+>SCROLL</TT
+>. Для простых запросов <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> допускает обратное перемещение курсора, объявленного без <TT
+CLASS="LITERAL"
+>SCROLL</TT
+>, но на это поведение лучше не рассчитывать. Если курсор объявлен с указанием <TT
+CLASS="LITERAL"
+>NO SCROLL</TT
+>, перемещение назад запрещается.</P
+><P
+>Вариант <TT
+CLASS="LITERAL"
+>ABSOLUTE</TT
+> нисколько не быстрее, чем перемещение к требуемой строке с относительным сдвигом: нижележащий механизм всё равно должен прочитать все промежуточные строки. Выборки по абсолютному отрицательному положению ещё хуже: сначала запрос необходимо прочитать до конца и найти последнюю строку, а затем вернуться назад к указанной строке. Однако перемотка к началу запроса (<TT
+CLASS="LITERAL"
+>FETCH ABSOLUTE 0</TT
+>) выполняется быстро.</P
+><P
+>Определить курсор позволяет команда <A
+HREF="sql-declare.html"
+>DECLARE</A
+>, а переместить его, не читая данные, — команда <A
+HREF="sql-move.html"
+>MOVE</A
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN81157"
+></A
+><H2
+>Примеры</H2
+><P
+>Следующий пример демонстрирует перемещение курсора в таблице: </P><PRE
+CLASS="PROGRAMLISTING"
+>BEGIN WORK;
+
+-- Создание курсора:
+DECLARE liahona SCROLL CURSOR FOR SELECT * FROM films;
+
+-- Получение первых 5 строк через курсор liahona:
+FETCH FORWARD 5 FROM liahona;
+
+ code  |          title          | did | date_prod  |   kind   |  len
+-------+-------------------------+-----+------------+----------+-------
+ BL101 | The Third Man           | 101 | 1949-12-23 | Drama    | 01:44
+ BL102 | The African Queen       | 101 | 1951-08-11 | Romantic | 01:43
+ JL201 | Une Femme est une Femme | 102 | 1961-03-12 | Romantic | 01:25
+ P_301 | Vertigo                 | 103 | 1958-11-14 | Action   | 02:08
+ P_302 | Becket                  | 103 | 1964-02-03 | Drama    | 02:28
+
+-- Получение предыдущей строки:
+FETCH PRIOR FROM liahona;
+
+ code  |  title  | did | date_prod  |  kind  |  len
+-------+---------+-----+------------+--------+-------
+ P_301 | Vertigo | 103 | 1958-11-14 | Action | 02:08
+
+-- Закрытие курсора и завершение транзакции:
+CLOSE liahona;
+COMMIT WORK;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN81161"
+></A
+><H2
+>Совместимость</H2
+><P
+>В стандарте SQL команда <TT
+CLASS="COMMAND"
+>FETCH</TT
+> определена только для встраиваемого SQL. Описанная здесь реализация <TT
+CLASS="COMMAND"
+>FETCH</TT
+> возвращает данные подобно оператору <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, а не помещает их в переменные исполняющей среды. В остальном, <TT
+CLASS="COMMAND"
+>FETCH</TT
+> полностью прямо-совместима со стандартом SQL.</P
+><P
+>Формы <TT
+CLASS="COMMAND"
+>FETCH</TT
+> с <TT
+CLASS="LITERAL"
+>FORWARD</TT
+> и <TT
+CLASS="LITERAL"
+>BACKWARD</TT
+>, а также формы <TT
+CLASS="LITERAL"
+>FETCH <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+></TT
+> и <TT
+CLASS="LITERAL"
+>FETCH ALL</TT
+> (в которых <TT
+CLASS="LITERAL"
+>FORWARD</TT
+> подразумевается) являются расширениями <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+><P
+>В стандарте SQL перед именем курсора допускается только указание <TT
+CLASS="LITERAL"
+>FROM</TT
+>; возможность указать <TT
+CLASS="LITERAL"
+>IN</TT
+> или опустить оба указания относится к расширениям.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN81180"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-close.html"
+>CLOSE</A
+>, <A
+HREF="sql-declare.html"
+>DECLARE</A
+>, <A
+HREF="sql-move.html"
+>MOVE</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-explain.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-grant.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>EXPLAIN</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>GRANT</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,203 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Файл соединений служб</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="libpq — библиотека для языка C"
+HREF="libpq.html"><LINK
+REL="PREVIOUS"
+TITLE="Файл паролей"
+HREF="libpq-pgpass.html"><LINK
+REL="NEXT"
+TITLE="Получение параметров соединения через LDAP"
+HREF="libpq-ldap.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Файл паролей"
+HREF="libpq-pgpass.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="libpq.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 31. <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> — библиотека для языка C</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Получение параметров соединения через LDAP"
+HREF="libpq-ldap.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="LIBPQ-PGSERVICE"
+>31.16. Файл соединений служб</A
+></H1
+><P
+>Файл соединений служб позволяет связать параметры соединений libpq с одним именем службы. Затем это имя службы можно задать при подключении через libpq и будут применены все связанные с ним параметры. Это позволяет модифицировать параметры соединений, обходясь без перекомпиляции приложения libpq. Имя службы можно также задать в переменной окружения <TT
+CLASS="ENVAR"
+>PGSERVICE</TT
+>.</P
+><P
+>Файл соединений служб может быть личным файлом пользователя с путём <TT
+CLASS="FILENAME"
+>~/.pg_service.conf</TT
+> или задаваться переменной окружения <TT
+CLASS="ENVAR"
+>PGSERVICEFILE</TT
+>, либо это может быть системный файл с путём <TT
+CLASS="FILENAME"
+>`pg_config --sysconfdir`/pg_service.conf</TT
+> или в каталоге, задаваемом переменной окружения <TT
+CLASS="ENVAR"
+>PGSYSCONFDIR</TT
+>. Если для одного имени службы существует определение и в системном файле, и в файле пользователя, определение пользователя имеет приоритет.</P
+><P
+>В этом файле используется формат <SPAN
+CLASS="QUOTE"
+>"INI-файлов"</SPAN
+>, в котором имя раздела задаёт имя службы, а параметры внутри — параметры соединения; их список приведён в <A
+HREF="libpq-connect.html#LIBPQ-PARAMKEYWORDS"
+>Подразделе 31.1.2</A
+>. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+># комментарий
+[mydb]
+host=somehost
+port=5433
+user=admin</PRE
+><P> Пример такого файла можно найти в <TT
+CLASS="FILENAME"
+>share/pg_service.conf.sample</TT
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="libpq-pgpass.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="libpq-ldap.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Файл паролей</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="libpq.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Получение параметров соединения через LDAP</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

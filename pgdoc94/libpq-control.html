@@ -1,0 +1,343 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Функции управления</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="libpq — библиотека для языка C"
+HREF="libpq.html"><LINK
+REL="PREVIOUS"
+TITLE="Функции, связанные с командой COPY"
+HREF="libpq-copy.html"><LINK
+REL="NEXT"
+TITLE="Функции разного назначения"
+HREF="libpq-misc.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Функции, связанные с командой COPY"
+HREF="libpq-copy.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="libpq.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 31. <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> — библиотека для языка C</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Функции разного назначения"
+HREF="libpq-misc.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="LIBPQ-CONTROL"
+>31.10. Функции управления</A
+></H1
+><P
+>Эти функции управляют различными аспектами поведения <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>.</P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="LIBPQ-PQCLIENTENCODING"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQclientEncoding</CODE
+></DT
+><DD
+><P
+>Возвращает кодировку клиента. </P><PRE
+CLASS="SYNOPSIS"
+>int PQclientEncoding(const PGconn *<TT
+CLASS="REPLACEABLE"
+><I
+>conn</I
+></TT
+>);</PRE
+><P> Заметьте, что она возвращает идентификатор кодировки, а не символьную строку вида <TT
+CLASS="LITERAL"
+>EUC_JP</TT
+>. В случае ошибки она возвращает -1. Преобразовать идентификатор кодировки в имя можно, воспользовавшись следующей функцией: </P><PRE
+CLASS="SYNOPSIS"
+>char *pg_encoding_to_char(int <TT
+CLASS="REPLACEABLE"
+><I
+>encoding_id</I
+></TT
+>);</PRE
+><P></P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQSETCLIENTENCODING"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQsetClientEncoding</CODE
+></DT
+><DD
+><P
+>Устанавливает кодировку клиента. </P><PRE
+CLASS="SYNOPSIS"
+>int PQsetClientEncoding(PGconn *<TT
+CLASS="REPLACEABLE"
+><I
+>conn</I
+></TT
+>, const char *<TT
+CLASS="REPLACEABLE"
+><I
+>encoding</I
+></TT
+>);</PRE
+><P>
+
+      В <TT
+CLASS="REPLACEABLE"
+><I
+>conn</I
+></TT
+> передаётся соединение с сервером, а в <TT
+CLASS="REPLACEABLE"
+><I
+>encoding</I
+></TT
+> — имя требуемой кодировки. Если функция устанавливает кодировку успешно, она возвращает 0, или -1 в противном случае. Определить текущую кодировку для соединения можно, воспользовавшись функцией <CODE
+CLASS="FUNCTION"
+>PQclientEncoding</CODE
+>.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQSETERRORVERBOSITY"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQsetErrorVerbosity</CODE
+></DT
+><DD
+><P
+>Определяет уровень детализации сообщений, возвращаемых функциями <CODE
+CLASS="FUNCTION"
+>PQerrorMessage</CODE
+> и <CODE
+CLASS="FUNCTION"
+>PQresultErrorMessage</CODE
+>. </P><PRE
+CLASS="SYNOPSIS"
+>typedef enum
+{
+    PQERRORS_TERSE,
+    PQERRORS_DEFAULT,
+    PQERRORS_VERBOSE
+} PGVerbosity;
+
+PGVerbosity PQsetErrorVerbosity(PGconn *conn, PGVerbosity verbosity);</PRE
+><P>
+
+      <CODE
+CLASS="FUNCTION"
+>PQsetErrorVerbosity</CODE
+> устанавливает уровень детализации и возвращает предыдущее значение для соединения. В &laquo;лаконичном&raquo; режиме (<I
+CLASS="FIRSTTERM"
+>TERSE</I
+>) возвращаемые сообщения содержат только уровень серьёзности, основной текст и позицию; всё это обычно умещается в одной строке. В режиме по умолчанию выдаваемые сообщения дополнительно содержат поля подробного описания, подсказки или контекста (они могут занимать несколько строк). В &laquo;многословном&raquo; режиме (<I
+CLASS="FIRSTTERM"
+>VERBOSE</I
+>) передаются все доступные поля сообщения. Изменение уровня детализации не влияет на сообщения, уже сформированные в существующих объектах <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+>, а затрагивает только последующие сообщения.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQTRACE"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQtrace</CODE
+></DT
+><DD
+><P
+>Включает трассировку клиент-серверного взаимодействия с выводом в поток отладочных сообщений. </P><PRE
+CLASS="SYNOPSIS"
+>void PQtrace(PGconn *conn, FILE *stream);</PRE
+><P></P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>В Windows, если библиотека <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> и приложение скомпилированы с разными флагами, эта функция может вызвать крах приложения из-за различий внутреннего представления указателей <TT
+CLASS="LITERAL"
+>FILE</TT
+>. В частности, флаги многопоточной/однопоточной, выпускаемой/отладочной или статической/динамической сборки должны быть одинаковыми для библиотеки и всех использующих её приложений.</P
+></BLOCKQUOTE
+></DIV
+></DD
+><DT
+><A
+NAME="LIBPQ-PQUNTRACE"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQuntrace</CODE
+></DT
+><DD
+><P
+>Выключает трассировку, запущенную функцией <CODE
+CLASS="FUNCTION"
+>PQtrace</CODE
+>. </P><PRE
+CLASS="SYNOPSIS"
+>void PQuntrace(PGconn *conn);</PRE
+><P></P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="libpq-copy.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="libpq-misc.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Функции, связанные с командой <TT
+CLASS="COMMAND"
+>COPY</TT
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="libpq.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Функции разного назначения</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

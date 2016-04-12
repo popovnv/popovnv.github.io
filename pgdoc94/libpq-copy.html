@@ -1,0 +1,874 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Функции, связанные с командой COPY</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="libpq — библиотека для языка C"
+HREF="libpq.html"><LINK
+REL="PREVIOUS"
+TITLE="Асинхронное уведомление"
+HREF="libpq-notify.html"><LINK
+REL="NEXT"
+TITLE="Функции управления"
+HREF="libpq-control.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Асинхронное уведомление"
+HREF="libpq-notify.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="libpq.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 31. <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> — библиотека для языка C</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Функции управления"
+HREF="libpq-control.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="LIBPQ-COPY"
+>31.9. Функции, связанные с командой <TT
+CLASS="COMMAND"
+>COPY</TT
+></A
+></H1
+><P
+>Команда <TT
+CLASS="COMMAND"
+>COPY</TT
+> в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> имеет возможность читать и записывать данные через сетевое подключение, установленное <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>. Описанные в этом разделе функции позволяют приложениям воспользоваться этой возможностью для передачи или приёма копируемых данных.</P
+><P
+>Общая процедура такова: сначала приложение выдаёт SQL-команду <TT
+CLASS="COMMAND"
+>COPY</TT
+>, вызывая <CODE
+CLASS="FUNCTION"
+>PQexec</CODE
+> или одну из подобных функций. В ответ оно должно получить (если не возникла ошибка) объект <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+> с кодом состояния <TT
+CLASS="LITERAL"
+>PGRES_COPY_OUT</TT
+> или <TT
+CLASS="LITERAL"
+>PGRES_COPY_IN</TT
+> (в зависимости от направления копирования). Затем приложение должно использовать функции, описанные в этом разделе, и принимать или передавать строки данных. По завершении передачи возвращается ещё один объект <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+>, сообщающий о состоянии завершения передачи. В случае успеха он содержит код состояния <TT
+CLASS="LITERAL"
+>PGRES_COMMAND_OK</TT
+>, а если возникает какая-то проблема — <TT
+CLASS="LITERAL"
+>PGRES_FATAL_ERROR</TT
+>. После этого можно продолжать выполнять SQL-команды через <CODE
+CLASS="FUNCTION"
+>PQexec</CODE
+>. (Пока операция <TT
+CLASS="COMMAND"
+>COPY</TT
+> не завершена, выполнять другие SQL-команды через то же подключение нельзя.)</P
+><P
+>Если команда <TT
+CLASS="COMMAND"
+>COPY</TT
+> была выполнена через <CODE
+CLASS="FUNCTION"
+>PQexec</CODE
+> в строке, содержащей дополнительные команды, приложение должно продолжить получать результаты через <CODE
+CLASS="FUNCTION"
+>PQgetResult</CODE
+> после завершения последовательности <TT
+CLASS="COMMAND"
+>COPY</TT
+>. Только когда <CODE
+CLASS="FUNCTION"
+>PQgetResult</CODE
+> возвращает <TT
+CLASS="SYMBOL"
+>NULL</TT
+>, можно с уверенностью считать, что командная строка <CODE
+CLASS="FUNCTION"
+>PQexec</CODE
+> выполнена полностью, и безопасно передавать другие команды.</P
+><P
+>Функции, описанные в этом разделе, должны выполняться только после получения кода состояния <TT
+CLASS="LITERAL"
+>PGRES_COPY_OUT</TT
+> или <TT
+CLASS="LITERAL"
+>PGRES_COPY_IN</TT
+> от функции <CODE
+CLASS="FUNCTION"
+>PQexec</CODE
+> или <CODE
+CLASS="FUNCTION"
+>PQgetResult</CODE
+>.</P
+><P
+>Объект <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+> с таким кодом состояния содержит дополнительные данные о начавшейся операции <TT
+CLASS="COMMAND"
+>COPY</TT
+>. Эти данные можно получить функциями, также применяющимися при обработке результатов запроса: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="LIBPQ-PQNFIELDS-1"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQnfields</CODE
+></DT
+><DD
+><P
+>Возвращает число копируемых колонок (полей).</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQBINARYTUPLES-1"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQbinaryTuples</CODE
+></DT
+><DD
+><P
+>Значение 0 указывает, что для всей операции копирования применяется текстовый формат (строки разделяются символами новой строки, колонки разделяются символами-разделителями и т. д.). Значение 1 указывает, что для всей операции копирования применяется двоичный формат. За дополнительными сведениями обратитесь к <A
+HREF="sql-copy.html"
+>COPY</A
+>.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQFFORMAT-1"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQfformat</CODE
+></DT
+><DD
+><P
+>Возвращает код формата (0 — текстовый, 1 — двоичный), связанный с каждой копируемой колонкой. Коды форматов колонок всегда будут нулевыми, если общий формат копирования — текстовый, но с двоичным форматом поддерживаются и текстовые, и двоичные колонки. (Однако в текущей реализации <TT
+CLASS="COMMAND"
+>COPY</TT
+> при двоичном копировании колонки могут быть только двоичными, так что форматы колонок должны всегда соответствовать общему формату.)</P
+></DD
+></DL
+></DIV
+><P></P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Эти дополнительные значения данных доступны только при использовании протокола 3.0. С протоколом 2.0 все эти функции возвращают 0.</P
+></BLOCKQUOTE
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="LIBPQ-COPY-SEND"
+>31.9.1. Функции для передачи данных <TT
+CLASS="COMMAND"
+>COPY</TT
+></A
+></H2
+><P
+>Эти функции применяются для передачи данных при операции <TT
+CLASS="LITERAL"
+>COPY FROM STDIN</TT
+>. Они не будут работать, если подключение находится не в состоянии <TT
+CLASS="LITERAL"
+>COPY_IN</TT
+>.</P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="LIBPQ-PQPUTCOPYDATA"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQputCopyData</CODE
+></DT
+><DD
+><P
+>Отправляет данные на сервер, когда активно состояние <TT
+CLASS="LITERAL"
+>COPY_IN</TT
+>. </P><PRE
+CLASS="SYNOPSIS"
+>int PQputCopyData(PGconn *conn,
+                  const char *buffer,
+                  int nbytes);</PRE
+><P></P
+><P
+>Передаёт серверу данные <TT
+CLASS="COMMAND"
+>COPY</TT
+> из указанного буфера (<TT
+CLASS="PARAMETER"
+>buffer</TT
+>), длиной <TT
+CLASS="PARAMETER"
+>nbytes</TT
+> байт. Она возвращает 1, если данные были переданы, 0, если они не передавались во избежание блокировки (это возможно, только если подключение находится в неблокирующем режиме), или -1, если произошла ошибка. (Если возвращено -1, подробности ошибки можно узнать, вызвав <CODE
+CLASS="FUNCTION"
+>PQerrorMessage</CODE
+>. Если получен 0, дождитесь состояния готовности к записи и повторите попытку.)</P
+><P
+>Приложение может разделять поток данных <TT
+CLASS="COMMAND"
+>COPY</TT
+> на буферизуемые блоки любого удобного размера. Границы буфера не имеют семантического значения при передаче. Содержимое потока данных должно соответствовать формату данных, ожидаемому командой <TT
+CLASS="COMMAND"
+>COPY</TT
+>; за подробностями обратитесь к <A
+HREF="sql-copy.html"
+>COPY</A
+>.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQPUTCOPYEND"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQputCopyEnd</CODE
+></DT
+><DD
+><P
+>Отправляет признак конца данных на сервер, когда активно состояние <TT
+CLASS="LITERAL"
+>COPY_IN</TT
+>. </P><PRE
+CLASS="SYNOPSIS"
+>int PQputCopyEnd(PGconn *conn,
+                 const char *errormsg);</PRE
+><P></P
+><P
+>Завершает операцию <TT
+CLASS="LITERAL"
+>COPY_IN</TT
+> с успешным результатом, если в <TT
+CLASS="PARAMETER"
+>errormsg</TT
+> передаётся <TT
+CLASS="SYMBOL"
+>NULL</TT
+>. Если <TT
+CLASS="PARAMETER"
+>errormsg</TT
+> не <TT
+CLASS="SYMBOL"
+>NULL</TT
+>, команда <TT
+CLASS="COMMAND"
+>COPY</TT
+> будет завершена с ошибкой, а сообщением об ошибке будет строка, переданная в <TT
+CLASS="PARAMETER"
+>errormsg</TT
+>. (Однако не следует полагать, что именно это сообщение будет получено от сервера назад, так как сервер мог уже прервать операцию <TT
+CLASS="COMMAND"
+>COPY</TT
+> по своим причинам. Также заметьте, что принудительный вызов ошибки не работает с соединениями по протоколу версии до 3.0.)</P
+><P
+>Эта функция возвращает 1, если признак завершения был передан, 0, если он не передавался во избежание блокировки (это возможно, только если соединение находится в неблокирующем режиме), или -1, если произошла ошибка. (Если возвращено -1, подробности ошибки можно узнать, вызвав <CODE
+CLASS="FUNCTION"
+>PQerrorMessage</CODE
+>. Если получен 0, дождитесь состояния готовности к записи и повторите попытку.)</P
+><P
+>После успешного вызова <CODE
+CLASS="FUNCTION"
+>PQputCopyEnd</CODE
+> вызовите <CODE
+CLASS="FUNCTION"
+>PQgetResult</CODE
+>, чтобы узнать окончательный результат команды <TT
+CLASS="COMMAND"
+>COPY</TT
+>. Ожидать появления этого результата можно обычным образом. Затем вернитесь к обычным операциям.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="LIBPQ-COPY-RECEIVE"
+>31.9.2. Функции для приёма данных <TT
+CLASS="COMMAND"
+>COPY</TT
+></A
+></H2
+><P
+>Эти функции применяются для получения данных при операции <TT
+CLASS="LITERAL"
+>COPY TO STDOUT</TT
+>. Они не будут работать, если подключение находится не в состоянии <TT
+CLASS="LITERAL"
+>COPY_OUT</TT
+>.</P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="LIBPQ-PQGETCOPYDATA"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQgetCopyData</CODE
+></DT
+><DD
+><P
+>Принимает данные от сервера, когда активно состояние <TT
+CLASS="LITERAL"
+>COPY_OUT</TT
+>. </P><PRE
+CLASS="SYNOPSIS"
+>int PQgetCopyData(PGconn *conn,
+                  char **buffer,
+                  int async);</PRE
+><P></P
+><P
+>Запрашивает следующую строку данных с сервера в процессе операции <TT
+CLASS="COMMAND"
+>COPY</TT
+>. Данные всегда возвращаются строка за строкой; если поступила только часть строки, она не возвращается. Успешное получение строки данных подразумевает выделение блока памяти для этих данных. В параметре <TT
+CLASS="PARAMETER"
+>buffer</TT
+> ей передаётся указатель, отличный от <TT
+CLASS="SYMBOL"
+>NULL</TT
+>. По адресу <TT
+CLASS="PARAMETER"
+>*buffer</TT
+> записывается указатель на выделенную память, либо <TT
+CLASS="SYMBOL"
+>NULL</TT
+>, когда буфер не возвращается. Если буфер результата отличен от <TT
+CLASS="SYMBOL"
+>NULL</TT
+>, его следует освободить, когда он станет не нужен, вызвав <CODE
+CLASS="FUNCTION"
+>PQfreemem</CODE
+>.</P
+><P
+>Когда строка получена успешно, возвращается число байт данных в этой строке (это число всегда больше нуля). Возвращаемое строковое значение всегда завершается нулём, хотя это полезно, вероятно, только для текстовой <TT
+CLASS="COMMAND"
+>COPY</TT
+>. Нулевой результат означает, что операция <TT
+CLASS="COMMAND"
+>COPY</TT
+> продолжает выполняться, но строка ещё не готова (это возможно, только когда параметр <TT
+CLASS="PARAMETER"
+>async</TT
+> равен true). Возвращённое значение -1 означает, что команда <TT
+CLASS="COMMAND"
+>COPY</TT
+> завершена, а -2 показывает, что произошла ошибка (её причину можно узнать с помощью <CODE
+CLASS="FUNCTION"
+>PQerrorMessage</CODE
+>).</P
+><P
+>Когда параметр <TT
+CLASS="PARAMETER"
+>async</TT
+> равен true (отличен от нуля), функция <CODE
+CLASS="FUNCTION"
+>PQgetCopyData</CODE
+> не будет блокироваться, ожидая данных; она возвратит ноль, если выполнение <TT
+CLASS="COMMAND"
+>COPY</TT
+> продолжается, но полная строка ещё не получена. (В этом случае нужно дождаться готовности к чтению и затем вызвать <CODE
+CLASS="FUNCTION"
+>PQconsumeInput</CODE
+>, прежде чем вызывать <CODE
+CLASS="FUNCTION"
+>PQgetCopyData</CODE
+> ещё раз.) Когда <TT
+CLASS="PARAMETER"
+>async</TT
+> равен false (нулю), <CODE
+CLASS="FUNCTION"
+>PQgetCopyData</CODE
+> будет заблокирована до поступления данных или окончания операции.</P
+><P
+>Когда <CODE
+CLASS="FUNCTION"
+>PQgetCopyData</CODE
+> возвращает -1, вызовите <CODE
+CLASS="FUNCTION"
+>PQgetResult</CODE
+>, чтобы узнать окончательный результат команды <TT
+CLASS="COMMAND"
+>COPY</TT
+>. Ожидать появления этого результата можно обычным образом. Затем вернитесь к обычным операциям.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="LIBPQ-COPY-DEPRECATED"
+>31.9.3. Устаревшие функции для <TT
+CLASS="COMMAND"
+>COPY</TT
+></A
+></H2
+><P
+>Эти функции представляют старые методы выполнения операции <TT
+CLASS="COMMAND"
+>COPY</TT
+>. Хотя они продолжают работать, они признаны устаревшими из-за плохой обработки ошибок, неудобных способов обнаружения конца данных и отсутствия поддержки двоичных или неблокирующих передач.</P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="LIBPQ-PQGETLINE"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQgetline</CODE
+></DT
+><DD
+><P
+>Читает передаваемую сервером строку символов, завершающуюся символом новой строки, в буфер (buffer) размера <TT
+CLASS="PARAMETER"
+>length</TT
+>. </P><PRE
+CLASS="SYNOPSIS"
+>int PQgetline(PGconn *conn,
+              char *buffer,
+              int length);</PRE
+><P></P
+><P
+>Эта функция копирует <TT
+CLASS="PARAMETER"
+>length</TT
+>-1 символов в буфер и преобразует символ конца строки в нулевой байт. <CODE
+CLASS="FUNCTION"
+>PQgetline</CODE
+> возвращает <TT
+CLASS="SYMBOL"
+>EOF</TT
+> в конце ввода, 0, если была прочитана вся строка, и 1, если буфер заполнен, но завершающий символ конца строки ещё не прочитан.</P
+><P
+>Заметьте, что приложение должно проверить, не состоит ли новая строка в точности из двух символов <TT
+CLASS="LITERAL"
+>\.</TT
+>, что будет означать, что сервер завершил передачу результатов команды <TT
+CLASS="COMMAND"
+>COPY</TT
+>. Если приложение может принимать строки длиннее <TT
+CLASS="PARAMETER"
+>length</TT
+>-1 символов, необходимо позаботиться о том, чтобы оно корректно распознавало строку <TT
+CLASS="LITERAL"
+>\.</TT
+> (а не воспринимало, например, конец длинной строки данных как завершающую строку).</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQGETLINEASYNC"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQgetlineAsync</CODE
+></DT
+><DD
+><P
+>Читает передаваемую сервером строку данных <TT
+CLASS="COMMAND"
+>COPY</TT
+> в буфер без блокировки. </P><PRE
+CLASS="SYNOPSIS"
+>int PQgetlineAsync(PGconn *conn,
+                   char *buffer,
+                   int bufsize);</PRE
+><P></P
+><P
+>Эта функция похожа на <CODE
+CLASS="FUNCTION"
+>PQgetline</CODE
+>, но может применяться в приложениях, которые должны читать данные <TT
+CLASS="COMMAND"
+>COPY</TT
+> асинхронно, то есть, без блокировки. Запустив команду <TT
+CLASS="COMMAND"
+>COPY</TT
+> и получив ответ <TT
+CLASS="LITERAL"
+>PGRES_COPY_OUT</TT
+>, приложение должно вызывать <CODE
+CLASS="FUNCTION"
+>PQconsumeInput</CODE
+> и <CODE
+CLASS="FUNCTION"
+>PQgetlineAsync</CODE
+>, пока не будет получен сигнал конца данных.</P
+><P
+>В отличие от <CODE
+CLASS="FUNCTION"
+>PQgetline</CODE
+>, эта функция сама отвечает за обнаружение конца данных.</P
+><P
+>При каждом вызове <CODE
+CLASS="FUNCTION"
+>PQgetlineAsync</CODE
+> будет возвращать данные, если во входном буфере <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> оказывается полная строка данных. В противном случае никакие данные не возвращаются до поступления остального содержимого строки. Эта функция возвращает -1, если обнаруживается признак завершения копирования, или 0, если данные не получены, или положительное количество возвращённых байт данных. Если возвращается -1, вызывающий код должен затем вызвать <CODE
+CLASS="FUNCTION"
+>PQendcopy</CODE
+> и после этого перейти в обычный режим работы.</P
+><P
+>Возвращаемые данные не будут пересекать границы строк данных. При этом может быть возвращена одна строка целиком. Но если буфер, выделенный вызывающим кодом, оказывается слишком мал для строки, передаваемой сервером, возвращена будет часть строки. Когда передаются текстовые данные, это можно выявить, проверив, содержит ли последний возвращаемый байт символ <TT
+CLASS="LITERAL"
+>\n</TT
+>. (Для <TT
+CLASS="COMMAND"
+>COPY</TT
+> в двоичном формате потребуется собственно разобрать формат данных <TT
+CLASS="COMMAND"
+>COPY</TT
+>, чтобы выявить подобную ситуацию.) Возвращаемая строка не завершается нулём. (Если вы хотите получить строку с нулём в конце, передайте в <TT
+CLASS="PARAMETER"
+>bufsize</TT
+> число на единицу меньше фактического размера блока.)</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQPUTLINE"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQputline</CODE
+></DT
+><DD
+><P
+>Передаёт серверу строку, завершённую нулём. Возвращает 0 в случае успеха, либо <TT
+CLASS="SYMBOL"
+>EOF</TT
+>, если передать строку не удаётся. </P><PRE
+CLASS="SYNOPSIS"
+>int PQputline(PGconn *conn,
+              const char *string);</PRE
+><P></P
+><P
+>Поток данных <TT
+CLASS="COMMAND"
+>COPY</TT
+>, передаваемых последовательностью вызовов <CODE
+CLASS="FUNCTION"
+>PQputline</CODE
+>, имеет тот же формат, что возвращает <CODE
+CLASS="FUNCTION"
+>PQgetlineAsync</CODE
+>, за исключением того, что приложения не обязательно должны передавать по одной строке данных за вызов <CODE
+CLASS="FUNCTION"
+>PQputline</CODE
+>; они могут посылать части строк или сразу несколько строк.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>До версии 3.0 протокола <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> приложение должно было явно отправлять два символа <TT
+CLASS="LITERAL"
+>\.</TT
+> последней строкой, чтобы сообщить серверу, что оно закончило передачу данных <TT
+CLASS="COMMAND"
+>COPY</TT
+>. Хотя это по-прежнему работает, такое поведение считается устаревшим и ожидается, что особое значение <TT
+CLASS="LITERAL"
+>\.</TT
+> будет исключено в будущих версиях. Передав собственно данные, сейчас достаточно вызвать <CODE
+CLASS="FUNCTION"
+>PQendcopy</CODE
+>.</P
+></BLOCKQUOTE
+></DIV
+></DD
+><DT
+><A
+NAME="LIBPQ-PQPUTNBYTES"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQputnbytes</CODE
+></DT
+><DD
+><P
+>Передаёт серверу строку, не завершённую нулём. Возвращает 0 в случае успеха, либо <TT
+CLASS="SYMBOL"
+>EOF</TT
+>, если передать строку не удаётся. </P><PRE
+CLASS="SYNOPSIS"
+>int PQputnbytes(PGconn *conn,
+                const char *buffer,
+                int nbytes);</PRE
+><P></P
+><P
+>Поведение этой функции не отличается от <CODE
+CLASS="FUNCTION"
+>PQputline</CODE
+>, но её буфер данных не должен содержать завершающий ноль, так как для неё число передаваемых байт задаётся непосредственно. Используйте эту функцию для передачи двоичных данных.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQENDCOPY"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQendcopy</CODE
+></DT
+><DD
+><P
+>Производит синхронизацию с сервером. </P><PRE
+CLASS="SYNOPSIS"
+>int PQendcopy(PGconn *conn);</PRE
+><P> Эта функция ожидает завершения копирования сервером. Её следует вызывать, либо когда серверу была передана последняя строка функцией <CODE
+CLASS="FUNCTION"
+>PQputline</CODE
+>, либо когда от сервера была получена последняя строка функцией <CODE
+CLASS="FUNCTION"
+>PGgetline</CODE
+>. Если её не вызвать, сервер <SPAN
+CLASS="QUOTE"
+>"потеряет синхронизацию"</SPAN
+> с клиентом. После завершения этой функции сервер готов принимать следующую команду SQL. В случае успешного завершения возвращается 0, в противном случае — ненулевое значение. (Чтобы получить подробности ошибки при ненулевом значении, вызовите <CODE
+CLASS="FUNCTION"
+>PQerrorMessage</CODE
+>.)</P
+><P
+>Вызывая <CODE
+CLASS="FUNCTION"
+>PQgetResult</CODE
+>, приложение должно обрабатывать результат <TT
+CLASS="LITERAL"
+>PGRES_COPY_OUT</TT
+>, в цикле выполняя <CODE
+CLASS="FUNCTION"
+>PQgetline</CODE
+>, а обнаружив завершающую строку, вызвать <CODE
+CLASS="FUNCTION"
+>PQendcopy</CODE
+>. Затем оно должно вернуться к циклу <CODE
+CLASS="FUNCTION"
+>PQgetResult</CODE
+>, и выйти из него, когда <CODE
+CLASS="FUNCTION"
+>PQgetResult</CODE
+> возвратит нулевой указатель. Подобным образом, получив результат <TT
+CLASS="LITERAL"
+>PGRES_COPY_IN</TT
+>, приложение должно выполнить серию вызовов <CODE
+CLASS="FUNCTION"
+>PQputline</CODE
+>, завершить её, вызвав <CODE
+CLASS="FUNCTION"
+>PQendcopy</CODE
+>, а затем вернуться к циклу <CODE
+CLASS="FUNCTION"
+>PQgetResult</CODE
+>. При такой организации обработки команда <TT
+CLASS="COMMAND"
+>COPY</TT
+> будет корректно выполняться и в составе последовательности команд <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>.</P
+><P
+>Старые приложения обычно передают команду <TT
+CLASS="COMMAND"
+>COPY</TT
+> через <CODE
+CLASS="FUNCTION"
+>PQexec</CODE
+> и рассчитывают, что транзакция будет завершена после <CODE
+CLASS="FUNCTION"
+>PQendcopy</CODE
+>. Это будет работать, только если команда <TT
+CLASS="COMMAND"
+>COPY</TT
+> является единственной <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>-командой в строке команд.</P
+></DD
+></DL
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="libpq-notify.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="libpq-control.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Асинхронное уведомление</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="libpq.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Функции управления</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

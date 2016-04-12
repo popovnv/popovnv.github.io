@@ -1,0 +1,671 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>INSERT</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="GRANT"
+HREF="sql-grant.html"><LINK
+REL="NEXT"
+TITLE="LISTEN"
+HREF="sql-listen.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="GRANT"
+HREF="sql-grant.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="LISTEN"
+HREF="sql-listen.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-INSERT"
+></A
+>INSERT</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN81487"
+></A
+><H2
+>Название</H2
+>INSERT&nbsp;--&nbsp;добавить строки в таблицу</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN81490"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>[ WITH [ RECURSIVE ] <TT
+CLASS="REPLACEABLE"
+><I
+>запрос_WITH</I
+></TT
+> [, ...] ]
+INSERT INTO <TT
+CLASS="REPLACEABLE"
+><I
+>table_name</I
+></TT
+> [ ( <TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+> [, ...] ) ]
+    { DEFAULT VALUES | VALUES ( { <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> | DEFAULT } [, ...] ) [, ...] | <TT
+CLASS="REPLACEABLE"
+><I
+>запрос</I
+></TT
+> }
+    [ RETURNING * | <TT
+CLASS="REPLACEABLE"
+><I
+>выражение_результата</I
+></TT
+> [ [ AS ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_результата</I
+></TT
+> ] [, ...] ]</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN81499"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>INSERT</TT
+> добавляет строки в таблицу. Эта команда может добавить одну или несколько строк, сформированных выражениями значений, либо ноль или более строк, выданных дополнительным запросом.</P
+><P
+>Имена целевых колонок могут перечисляться в любом порядке. Если список с именами колонок отсутствует, по умолчанию целевыми колонками становятся все колонки заданной таблицы; либо первые <TT
+CLASS="REPLACEABLE"
+><I
+>N</I
+></TT
+> из них, если только <TT
+CLASS="REPLACEABLE"
+><I
+>N</I
+></TT
+> колонок поступает от предложения <TT
+CLASS="LITERAL"
+>VALUES</TT
+> или <TT
+CLASS="REPLACEABLE"
+><I
+>запроса</I
+></TT
+>. Значения, получаемые от предложения <TT
+CLASS="LITERAL"
+>VALUES</TT
+> или <TT
+CLASS="REPLACEABLE"
+><I
+>запроса</I
+></TT
+>, связываются с явно или неявно определённым списком колонок слева направо.</P
+><P
+>Все колонки, не представленные в явном или неявном списке колонок, получат значения по умолчанию, если для них заданы эти значения, либо NULL в противном случае.</P
+><P
+>Если выражение для любой колонки выдаёт другой тип данных, система попытается автоматически привести его к нужному.</P
+><P
+>С необязательным предложением <TT
+CLASS="LITERAL"
+>RETURNING</TT
+> команда <TT
+CLASS="COMMAND"
+>INSERT</TT
+> вычислит и возвратит значения для каждой фактически добавленной строки. В основном это полезно для получения значений, присвоенных по умолчанию, например, последовательного номера записи. Однако в этом предложении можно задать любое выражение с колонками таблицы. Список <TT
+CLASS="LITERAL"
+>RETURNING</TT
+> имеет тот же синтаксис, что и список результатов <TT
+CLASS="COMMAND"
+>SELECT</TT
+>.</P
+><P
+>Чтобы вставить строки в таблицу, необходимо иметь право <TT
+CLASS="LITERAL"
+>INSERT</TT
+> для этой таблицы. Если указывается список колонок, достаточно иметь право <TT
+CLASS="LITERAL"
+>INSERT</TT
+> для перечисленных колонок. Для применения предложения <TT
+CLASS="LITERAL"
+>RETURNING</TT
+> требуется право <TT
+CLASS="LITERAL"
+>SELECT</TT
+> для всех колонок, перечисленных в <TT
+CLASS="LITERAL"
+>RETURNING</TT
+>. Если для добавления строк применяется <TT
+CLASS="REPLACEABLE"
+><I
+>запрос</I
+></TT
+>, для всех таблиц или колонок, задействованных в этом запросе, разумеется, необходимо иметь право <TT
+CLASS="LITERAL"
+>SELECT</TT
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN81525"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>запрос_WITH</I
+></TT
+></DT
+><DD
+><P
+>Предложение <TT
+CLASS="LITERAL"
+>WITH</TT
+> позволяет задать один или несколько подзапросов, на которые затем можно ссылаться по имени в запросе <TT
+CLASS="COMMAND"
+>INSERT</TT
+>. Подробнее об этом см. <A
+HREF="queries-with.html"
+>Раздел 7.8</A
+> и <A
+HREF="sql-select.html"
+>SELECT</A
+>.</P
+><P
+>Заданный <TT
+CLASS="REPLACEABLE"
+><I
+>запрос</I
+></TT
+> (оператор <TT
+CLASS="COMMAND"
+>SELECT</TT
+>) также может содержать предложение <TT
+CLASS="LITERAL"
+>WITH</TT
+>. В этом случае в <TT
+CLASS="REPLACEABLE"
+><I
+>запросе</I
+></TT
+> можно обращаться к обоим <TT
+CLASS="REPLACEABLE"
+><I
+>запросам_WITH</I
+></TT
+>, но второй будет иметь приоритет, так как он вложен ближе.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>table_name</I
+></TT
+></DT
+><DD
+><P
+>Имя (возможно, дополненное схемой) существующей таблицы.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+></DT
+><DD
+><P
+>Имя колонки в таблице <TT
+CLASS="REPLACEABLE"
+><I
+>имя_таблицы</I
+></TT
+>. Имя колонки может быть дополнено именем вложенного поля или индексом массива, если требуется. (При заполнении только некоторых полей составной колонки остальные поля получают значения NULL.)</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>DEFAULT VALUES</TT
+></DT
+><DD
+><P
+>Все колонки получат значения по умолчанию.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+></DT
+><DD
+><P
+>Выражение или значение, которое будет присвоено соответствующей колонке.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>DEFAULT</TT
+></DT
+><DD
+><P
+>Соответствующая колонка получит значение по умолчанию.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>запрос</I
+></TT
+></DT
+><DD
+><P
+>Запрос (оператор <TT
+CLASS="COMMAND"
+>SELECT</TT
+>), который выдаст строки для добавления в таблицу. Его синтаксис описан в справке оператора <A
+HREF="sql-select.html"
+>SELECT</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>выражение_результата</I
+></TT
+></DT
+><DD
+><P
+>Выражение, которое будет вычисляться и возвращаться командой <TT
+CLASS="COMMAND"
+>INSERT</TT
+> после добавления каждой строки. В этом выражении можно использовать имена любых колонок таблицы <TT
+CLASS="REPLACEABLE"
+><I
+>имя_таблицы</I
+></TT
+>. Чтобы получить все колонки, достаточно написать <TT
+CLASS="LITERAL"
+>*</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_результата</I
+></TT
+></DT
+><DD
+><P
+>Имя, назначаемое возвращаемой колонке.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN81589"
+></A
+><H2
+>Выводимая информация</H2
+><P
+>В случае успешного завершения, <TT
+CLASS="COMMAND"
+>INSERT</TT
+> возвращает метку команды в виде </P><PRE
+CLASS="SCREEN"
+>INSERT <TT
+CLASS="REPLACEABLE"
+><I
+>oid</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+></PRE
+><P> Здесь <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+> представляет количество добавленных строк. Если <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+> равняется одному, а целевая таблица содержит oid, то вместо <TT
+CLASS="REPLACEABLE"
+><I
+>oid</I
+></TT
+> выводится <ACRONYM
+CLASS="ACRONYM"
+>OID</ACRONYM
+>, назначенный добавленной строке. В противном случае вместо <TT
+CLASS="REPLACEABLE"
+><I
+>oid</I
+></TT
+> выводится ноль.</P
+><P
+>Если команда <TT
+CLASS="COMMAND"
+>INSERT</TT
+> содержит предложение <TT
+CLASS="LITERAL"
+>RETURNING</TT
+>, её результат будет похож на результат оператора <TT
+CLASS="COMMAND"
+>SELECT</TT
+> (с теми же колонками и значениями, что содержатся в списке <TT
+CLASS="LITERAL"
+>RETURNING</TT
+>), полученный для строк, добавленных этой командой.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN81606"
+></A
+><H2
+>Примеры</H2
+><P
+>Добавление одной строки в таблицу <TT
+CLASS="LITERAL"
+>films</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>INSERT INTO films VALUES
+    ('UA502', 'Bananas', 105, '1971-07-13', 'Comedy', '82 minutes');</PRE
+><P></P
+><P
+>В этом примере колонка <TT
+CLASS="LITERAL"
+>len</TT
+> опускается и, таким образом, получает значение по умолчанию: </P><PRE
+CLASS="PROGRAMLISTING"
+>INSERT INTO films (code, title, did, date_prod, kind)
+    VALUES ('T_601', 'Yojimbo', 106, '1961-06-16', 'Drama');</PRE
+><P></P
+><P
+>В этом примере для колонки с датой задаётся указание <TT
+CLASS="LITERAL"
+>DEFAULT</TT
+>, а не явное значение: </P><PRE
+CLASS="PROGRAMLISTING"
+>INSERT INTO films VALUES
+    ('UA502', 'Bananas', 105, DEFAULT, 'Comedy', '82 minutes');
+INSERT INTO films (code, title, did, date_prod, kind)
+    VALUES ('T_601', 'Yojimbo', 106, DEFAULT, 'Drama');</PRE
+><P></P
+><P
+>Добавление строки, полностью состоящей из значений по умолчанию: </P><PRE
+CLASS="PROGRAMLISTING"
+>INSERT INTO films DEFAULT VALUES;</PRE
+><P></P
+><P
+>Добавление нескольких строк с использованием многострочного синтаксиса <TT
+CLASS="COMMAND"
+>VALUES</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>INSERT INTO films (code, title, did, date_prod, kind) VALUES
+    ('B6717', 'Tampopo', 110, '1985-02-10', 'Comedy'),
+    ('HG120', 'The Dinner Game', 140, DEFAULT, 'Comedy');</PRE
+><P></P
+><P
+>В этом примере в таблицу <TT
+CLASS="LITERAL"
+>films</TT
+> вставляются некоторые строки из таблицы <TT
+CLASS="LITERAL"
+>tmp_films</TT
+>, имеющей ту же структуру колонок, что и <TT
+CLASS="LITERAL"
+>films</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>INSERT INTO films SELECT * FROM tmp_films WHERE date_prod &lt; '2004-05-07';</PRE
+><P></P
+><P
+>Этот пример демонстрирует добавление данных в колонки с типом массива: </P><PRE
+CLASS="PROGRAMLISTING"
+>-- Создание пустого поля 3x3 для игры в крестики-нолики
+INSERT INTO tictactoe (game, board[1:3][1:3])
+    VALUES (1, '{{" "," "," "},{" "," "," "},{" "," "," "}}');
+-- Указания индексов в предыдущей команда могут быть опущены
+INSERT INTO tictactoe (game, board)
+    VALUES (2, '{{X," "," "},{" ",O," "},{" ",X," "}}');</PRE
+><P></P
+><P
+>Добавление одной строки в таблицу <TT
+CLASS="LITERAL"
+>distributors</TT
+> и получение последовательного номера, сгенерированного благодаря указанию <TT
+CLASS="LITERAL"
+>DEFAULT</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>INSERT INTO distributors (did, dname) VALUES (DEFAULT, 'XYZ Widgets')
+   RETURNING did;</PRE
+><P></P
+><P
+>Увеличение счётчика продаж для продавца, занимающегося компанией Acme Corporation, и сохранение всей изменённой строки вместе с текущим временем в таблице журнала: </P><PRE
+CLASS="PROGRAMLISTING"
+>WITH upd AS (
+  UPDATE employees SET sales_count = sales_count + 1 WHERE id =
+    (SELECT sales_person FROM accounts WHERE name = 'Acme Corporation')
+    RETURNING *
+)
+INSERT INTO employees_log SELECT *, current_timestamp FROM upd;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN81635"
+></A
+><H2
+>Совместимость</H2
+><P
+><TT
+CLASS="COMMAND"
+>INSERT</TT
+> соответствует стандарту SQL, но предложение <TT
+CLASS="LITERAL"
+>RETURNING</TT
+> относится к расширениям <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, как и возможность применять <TT
+CLASS="LITERAL"
+>WITH</TT
+> с <TT
+CLASS="COMMAND"
+>INSERT</TT
+>. Кроме того, ситуация, когда список колонок опущен, но не все колонки получают значения из предложения <TT
+CLASS="LITERAL"
+>VALUES</TT
+> или <TT
+CLASS="REPLACEABLE"
+><I
+>запроса</I
+></TT
+>, стандартом не допускается.</P
+><P
+>Возможные ограничения предложения <TT
+CLASS="REPLACEABLE"
+><I
+>запрос</I
+></TT
+> описаны в справке <A
+HREF="sql-select.html"
+>SELECT</A
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-grant.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-listen.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>GRANT</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>LISTEN</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

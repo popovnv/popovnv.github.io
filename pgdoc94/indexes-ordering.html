@@ -1,0 +1,275 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Индексы и предложения ORDER BY</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Индексы"
+HREF="indexes.html"><LINK
+REL="PREVIOUS"
+TITLE="Составные индексы"
+HREF="indexes-multicolumn.html"><LINK
+REL="NEXT"
+TITLE="Объединение нескольких индексов"
+HREF="indexes-bitmap-scans.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Составные индексы"
+HREF="indexes-multicolumn.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="indexes.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 11. Индексы</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Объединение нескольких индексов"
+HREF="indexes-bitmap-scans.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="INDEXES-ORDERING"
+>11.4. Индексы и предложения <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+></A
+></H1
+><P
+>Помимо простого поиска строк для выдачи в результате запроса, индексы также могут применяться для сортировки строк в определённом порядке. Это позволяет учесть предложение <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> в запросе, не выполняя сортировку дополнительно. Из всех типов индексов, которые поддерживает <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, сортировать данные могут только B-деревья &mdash; индексы других типов возвращают строки в неопределённом, зависящем от реализации порядке.</P
+><P
+>Планировщик может выполнить указание <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+>, либо просканировав существующий индекс, подходящий этому указанию, либо просканировав таблицу в физическом порядке и выполнив сортировку явно. Для запроса, требующего сканирования большой части таблицы, явная сортировка скорее всего будет быстрее, чем применение индекса, так как при последовательном чтении она потребует меньше операций ввода/вывода. Важный особый случай представляет <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> в сочетании с <TT
+CLASS="LITERAL"
+>LIMIT</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>: при явной сортировке системе потребуется обработать все данные, чтобы выбрать первые <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+> строк, но при наличии индекса, соответствующего колонкам в <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+>, первые <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+> строк можно получить сразу, не просматривая остальные вовсе.</P
+><P
+>По умолчанию элементы B-дерева хранятся в порядке возрастания, при этом значения NULL идут в конце. Это означает, что при прямом сканировании индекса по колонке <TT
+CLASS="LITERAL"
+>x</TT
+> порядок оказывается соответствующим указанию <TT
+CLASS="LITERAL"
+>ORDER BY x</TT
+> (или точнее, <TT
+CLASS="LITERAL"
+>ORDER BY x ASC NULLS LAST</TT
+>). Индекс также может сканироваться в обратную сторону, и тогда порядок соответствует указанию <TT
+CLASS="LITERAL"
+>ORDER BY x DESC</TT
+> (или точнее, <TT
+CLASS="LITERAL"
+>ORDER BY x DESC NULLS FIRST</TT
+>, так как для <TT
+CLASS="LITERAL"
+>ORDER BY DESC</TT
+> подразумевается <TT
+CLASS="LITERAL"
+>NULLS FIRST</TT
+>).</P
+><P
+>Вы можете изменить порядок сортировки элементов B-дерева, добавив уточнения <TT
+CLASS="LITERAL"
+>ASC</TT
+>, <TT
+CLASS="LITERAL"
+>DESC</TT
+>, <TT
+CLASS="LITERAL"
+>NULLS FIRST</TT
+> и/или <TT
+CLASS="LITERAL"
+>NULLS LAST</TT
+> при создании индекса; например: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE INDEX test2_info_nulls_low ON test2 (info NULLS FIRST);
+CREATE INDEX test3_desc_index ON test3 (id DESC NULLS LAST);</PRE
+><P> Индекс, в котором элементы хранятся в порядке возрастания и значения NULL идут первыми, может удовлетворять указаниям <TT
+CLASS="LITERAL"
+>ORDER BY x ASC NULLS FIRST</TT
+> или <TT
+CLASS="LITERAL"
+>ORDER BY x DESC NULLS LAST</TT
+>, в зависимости от направления просмотра.</P
+><P
+>У вас может возникнуть вопрос, зачем нужны все четыре варианта при создании индексов, когда и два варианта с учётом обратного просмотра покрывают все виды <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+>. Для индексов по одной колонке это и в самом деле излишне, но для индексов по многим колонкам это может быть полезно. Рассмотрим индекс по двум колонкам <TT
+CLASS="LITERAL"
+>(x, y)</TT
+>: он может удовлетворять указанию <TT
+CLASS="LITERAL"
+>ORDER BY x, y</TT
+> при прямом сканировании или <TT
+CLASS="LITERAL"
+>ORDER BY x DESC, y DESC</TT
+> при обратном. Но вполне возможно, что приложение будет часто выполнять <TT
+CLASS="LITERAL"
+>ORDER BY x ASC, y DESC</TT
+>. В этом случае получить такую сортировку от простого индекса нельзя, но можно получить подходящий индекс, определив его как <TT
+CLASS="LITERAL"
+>(x ASC, y DESC)</TT
+> или <TT
+CLASS="LITERAL"
+>(x DESC, y ASC)</TT
+>.</P
+><P
+>Очевидно, что индексы с нестандартными правилами сортировки весьма специфичны, но иногда они могут кардинально ускорить определённые запросы. Стоит ли вводить такие индексы, зависит от того, как часто выполняются запросы с необычным порядком сортировки.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="indexes-multicolumn.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="indexes-bitmap-scans.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Составные индексы</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="indexes.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Объединение нескольких индексов</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

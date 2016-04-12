@@ -1,0 +1,810 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>          parameters
+        </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Информационная схема"
+HREF="information-schema.html"><LINK
+REL="PREVIOUS"
+TITLE="          key_column_usage
+        "
+HREF="infoschema-key-column-usage.html"><LINK
+REL="NEXT"
+TITLE="          referential_constraints
+        "
+HREF="infoschema-referential-constraints.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="          key_column_usage
+        "
+HREF="infoschema-key-column-usage.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="information-schema.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 34. Информационная схема</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="          referential_constraints
+        "
+HREF="infoschema-referential-constraints.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="INFOSCHEMA-PARAMETERS"
+>34.32. <TT
+CLASS="LITERAL"
+>parameters</TT
+></A
+></H1
+><P
+>Представление <TT
+CLASS="LITERAL"
+>parameters</TT
+> содержит информацию о параметрах (аргументах) всех функций в текущей базе данных. В нём отражаются только функции, к которым имеет доступ текущий пользователь (являясь владельцем или имея некоторые права).</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="AEN51626"
+></A
+><P
+><B
+>Таблица 34-30. Колонки <TT
+CLASS="LITERAL"
+>parameters</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип данных</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>specific_catalog</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Имя базы данных, содержащей функцию (всегда текущая база)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>specific_schema</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Имя схемы, содержащей функцию</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>specific_name</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+><SPAN
+CLASS="QUOTE"
+>"Однозначное имя"</SPAN
+> функции. Подробнее оно описано в <A
+HREF="infoschema-routines.html"
+>Разделе 34.40</A
+>.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>ordinal_position</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>cardinal_number</TT
+>
+                </TD
+><TD
+>Порядковый номер параметра в списке аргументов функции (нумерация начинается с 1)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>parameter_mode</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>character_data</TT
+>
+                </TD
+><TD
+><TT
+CLASS="LITERAL"
+>IN</TT
+> для входного параметра, <TT
+CLASS="LITERAL"
+>OUT</TT
+> для выходного, <TT
+CLASS="LITERAL"
+>INOUT</TT
+> — для входного и выходного параметра.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>is_result</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>yes_or_no</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>as_locator</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>yes_or_no</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>parameter_name</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Имя параметра, либо NULL, если параметр безымянный</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>data_type</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>character_data</TT
+>
+                </TD
+><TD
+>Тип данных параметра, если это встроенный тип, либо <TT
+CLASS="LITERAL"
+>ARRAY</TT
+>, если это массив (в этом случае обратитесь к представлению <TT
+CLASS="LITERAL"
+>element_types</TT
+>), иначе — <TT
+CLASS="LITERAL"
+>USER-DEFINED</TT
+> (в этом случае тип определяется в <TT
+CLASS="LITERAL"
+>udt_name</TT
+> и связанных колонках).</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>character_maximum_length</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>cardinal_number</TT
+>
+                </TD
+><TD
+>Всегда NULL, так как эта информация не применима к типам параметров в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>character_octet_length</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>cardinal_number</TT
+>
+                </TD
+><TD
+>Всегда NULL, так как эта информация не применима к типам параметров в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>character_set_catalog</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>character_set_schema</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>character_set_name</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>collation_catalog</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Всегда NULL, так как эта информация не применима к типам параметров в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>collation_schema</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Всегда NULL, так как эта информация не применима к типам параметров в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>collation_name</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Всегда NULL, так как эта информация не применима к типам параметров в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>numeric_precision</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>cardinal_number</TT
+>
+                </TD
+><TD
+>Всегда NULL, так как эта информация не применима к типам параметров в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>numeric_precision_radix</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>cardinal_number</TT
+>
+                </TD
+><TD
+>Всегда NULL, так как эта информация не применима к типам параметров в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>numeric_scale</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>cardinal_number</TT
+>
+                </TD
+><TD
+>Всегда NULL, так как эта информация не применима к типам параметров в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>datetime_precision</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>cardinal_number</TT
+>
+                </TD
+><TD
+>Всегда NULL, так как эта информация не применима к типам параметров в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>interval_type</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>character_data</TT
+>
+                </TD
+><TD
+>Всегда NULL, так как эта информация не применима к типам параметров в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>interval_precision</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>cardinal_number</TT
+>
+                </TD
+><TD
+>Всегда NULL, так как эта информация не применима к типам параметров в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>udt_catalog</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Имя базы данных, в которой определён тип данных параметра (всегда текущая база)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>udt_schema</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Имя схемы, в которой определён тип данных параметра</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>udt_name</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Имя типа данных параметра</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>scope_catalog</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>scope_schema</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>scope_name</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>maximum_cardinality</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>cardinal_number</TT
+>
+                </TD
+><TD
+>Всегда NULL, так как массивы имеют неограниченную максимальную ёмкость в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>dtd_identifier</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Идентификатор дескриптора типа данных параметра, уникальный среди всех дескрипторов типов, относящихся к функции. Он в основном полезен для соединения с другими экземплярами таких идентификаторов. (Конкретный формат идентификатора не определён и не гарантируется, что он останется неизменным в будущих версиях.)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>parameter_default</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>character_data</TT
+>
+                </TD
+><TD
+>Выражение параметра по умолчанию, либо NULL, если такого выражения нет или функция не принадлежит текущей активной роли.</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="infoschema-key-column-usage.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="infoschema-referential-constraints.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><TT
+CLASS="LITERAL"
+>key_column_usage</TT
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="information-schema.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><TT
+CLASS="LITERAL"
+>referential_constraints</TT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

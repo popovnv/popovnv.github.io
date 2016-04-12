@@ -1,0 +1,493 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>            pg_resetxlog
+          </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Серверные утилиты PostgreSQL"
+HREF="reference-server.html"><LINK
+REL="PREVIOUS"
+TITLE="            pg_ctl
+          "
+HREF="app-pg-ctl.html"><LINK
+REL="NEXT"
+TITLE="            postgres
+          "
+HREF="app-postgres.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="            pg_ctl
+          "
+HREF="app-pg-ctl.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="reference-server.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="            postgres
+          "
+HREF="app-postgres.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="APP-PGRESETXLOG"
+></A
+><SPAN
+CLASS="APPLICATION"
+>pg_resetxlog</SPAN
+></H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN93748"
+></A
+><H2
+>Название</H2
+>pg_resetxlog&nbsp;--&nbsp;очистка журнала упреждающей записи и другой управляющей информацию кластера <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN93752"
+></A
+><H2
+>Синтаксис</H2
+><P
+><TT
+CLASS="COMMAND"
+>pg_resetxlog</TT
+> [              <TT
+CLASS="OPTION"
+>-f</TT
+>
+            ] [              <TT
+CLASS="OPTION"
+>-n</TT
+>
+            ] [<TT
+CLASS="OPTION"
+>-o</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>oid</I
+></TT
+>] [<TT
+CLASS="OPTION"
+>-x</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>xid</I
+></TT
+>] [<TT
+CLASS="OPTION"
+>-e</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>xid_epoch</I
+></TT
+>] [<TT
+CLASS="OPTION"
+>-m</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>mxid</I
+></TT
+>,<TT
+CLASS="REPLACEABLE"
+><I
+>mxid</I
+></TT
+>] [<TT
+CLASS="OPTION"
+>-O</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>mxoff</I
+></TT
+>] [<TT
+CLASS="OPTION"
+>-l</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>xlogfile</I
+></TT
+>]                <TT
+CLASS="REPLACEABLE"
+><I
+>datadir</I
+></TT
+>
+             </P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="R1-APP-PGRESETXLOG-1"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>pg_resetxlog</TT
+> очищает журнал упреждающей записи (WAL) и может сбросить некоторую другую управляющую информацию, хранящуюся в файле <TT
+CLASS="FILENAME"
+>pg_control</TT
+>. Это необходимо в случае повреждения этих файлов, и должно использоваться лишь при крайних мерах.</P
+><P
+>После запуска этой команды, старт сервера, скорее всего, будет возможен, однако, стоит учитывать, что сервер может оказаться не в целостном состоянии. Требуется немедленно выгрузить данные (dump), выполнить <TT
+CLASS="COMMAND"
+>initdb</TT
+> и загрузить данные. После чего проверить целостность и при необходимости восстановить.</P
+><P
+>Утилита может запускаться лишь от пользователя, установившего сервер, так как требуются права записи/чтения в каталоге хранения данных кластера. В целях безопасности каталог необходимо указывать в командной строке. <TT
+CLASS="COMMAND"
+>pg_resetxlog</TT
+> не поддерживает переменную окружения <TT
+CLASS="ENVAR"
+>PGDATA</TT
+>.</P
+><P
+>Если <TT
+CLASS="COMMAND"
+>pg_resetxlog</TT
+> выводит сообщение о невозможности определить данные из <TT
+CLASS="FILENAME"
+>pg_control</TT
+>, то команду можно запустить принудительно, указав <TT
+CLASS="OPTION"
+>-f</TT
+>. В этом случае будут использованы наиболее вероятные значения. Для большинства полей это нормально, но для некоторых может потребоваться явное указание: следующее значение OID, следующее значение ID транзакции и времени, ID мультитранзакции и смещение, начальный адрес WAL. Эти значения можно указать с помощью далее описанных параметров. Если их невозможно определить, то флаг <TT
+CLASS="OPTION"
+>f</TT
+> позволяет это обойти, однако, достоверность данных восстановленной базы останется под сомнением: незамедлительная выгрузка с последующим восстановлением данных крайне необходимы. <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>Не</I
+></SPAN
+> выполняйте никаких операций модификации до создания дампа данных, так как это может привести к ещё более печальным последствиям.</P
+><P
+>Чтобы указать значения следующих OID, ID транзакции, времени транзакции, ID мультитранзакции, смещения мультитранзакции и начального адреса WAL, используются соответствующие параметры <TT
+CLASS="OPTION"
+>-o</TT
+>, <TT
+CLASS="OPTION"
+>-x</TT
+>, <TT
+CLASS="OPTION"
+>-e</TT
+>, <TT
+CLASS="OPTION"
+>-m</TT
+>, <TT
+CLASS="OPTION"
+>-O</TT
+>, и <TT
+CLASS="OPTION"
+>-l</TT
+>. Это требуется, когда <TT
+CLASS="COMMAND"
+>pg_resetxlog</TT
+> не может самостоятельно определить значения из файла <TT
+CLASS="FILENAME"
+>pg_control</TT
+>. Безопасные значения вычисляются, как описано далее: <P
+></P
+></P><UL
+><LI
+><P
+>Чтобы определить следующее безопасное значение идентификатора транзакции (<TT
+CLASS="OPTION"
+>-x</TT
+>), необходимо в каталоге <TT
+CLASS="FILENAME"
+>pg_clog</TT
+> найти файл, имя которого представляет наибольшее числовое значение, добавить к нему один и затем умножить на 1048576. Имена файлов представлены в шестнадцатеричном формате, и значение параметра проще указывать в нём же. Например, если в <TT
+CLASS="FILENAME"
+>pg_clog</TT
+> найден файл <TT
+CLASS="FILENAME"
+>0011</TT
+>, будет корректным значение <TT
+CLASS="LITERAL"
+>-x 0x1200000</TT
+> (пять замыкающих нулей представляют требуемый множитель).</P
+></LI
+><LI
+><P
+>Безопасное значение следующего идентификатора мультитранзакции (первый аргумент параметра <TT
+CLASS="OPTION"
+>-m</TT
+>) можно вычислить, найдя наибольшее числовое значение среди имён файлов, расположенных в каталоге <TT
+CLASS="FILENAME"
+>pg_multixact/offsets</TT
+>. К найденному значению необходимо прибавить один, затем умножить на 65536. Для вычисления же наиболее старшего ID мультитранзакции (второй аргумент параметра <TT
+CLASS="OPTION"
+>-m</TT
+>), необходимо найти наименьшее числовое значение среди тех же файлов, и умножить его на 65536. Как было описано ранее, имена представлены в шестнадцатеричном формате, поэтому значения аргументов лучше указывать в нём же, приписав четыре замыкающих нуля.</P
+></LI
+><LI
+><P
+>Чтобы определить безопасное значение следующего смещения (<TT
+CLASS="OPTION"
+>-O</TT
+>), необходимо найти наибольшее числовое значение в имени файла в каталоге <TT
+CLASS="FILENAME"
+>pg_multixact/members</TT
+>, прибавить один, а затем умножить на 52352. Имена файлов также представлены в шестнадцатеричном формате, однако не существует однозначного решения в добавлении замыкающих нулей, аналогично ранее описанным.</P
+></LI
+><LI
+><P
+>Начальный адрес журнала WAL (<TT
+CLASS="OPTION"
+>-l</TT
+>) должен превышать наибольшее значение сегмента в имени файла, расположенного в каталоге <TT
+CLASS="FILENAME"
+>pg_xlog</TT
+>. Имена также представлены в шестнадцатеричном формате и состоят из трёх частей. Первая из них это <SPAN
+CLASS="QUOTE"
+>"ID временного интервала"</SPAN
+> (обычно оставляют неизменным), например, если <TT
+CLASS="FILENAME"
+>00000001000000320000004A</TT
+> имеет наибольшее значение в <TT
+CLASS="FILENAME"
+>pg_xlog</TT
+>, то можно использовать <TT
+CLASS="LITERAL"
+>-l 00000001000000320000004B</TT
+>, либо выше.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+><TT
+CLASS="COMMAND"
+>pg_resetxlog</TT
+> ищет среди файлов каталога <TT
+CLASS="FILENAME"
+>pg_xlog</TT
+>, и по умолчанию выбирает значение для флага <TT
+CLASS="OPTION"
+>-l</TT
+>, идущее следующим после найденного. Корректировка значения параметра <TT
+CLASS="OPTION"
+>-l</TT
+> требуется лишь в ситуации, когда известно о существовании других сегментов WAL, отсутствующих на момент в каталоге <TT
+CLASS="FILENAME"
+>pg_xlog</TT
+>, например, из архивного файла, или при полной потере данных в <TT
+CLASS="FILENAME"
+>pg_xlog</TT
+>.</P
+></BLOCKQUOTE
+></DIV
+></LI
+><LI
+><P
+>Не существует относительно простого пути вычисления следующего за наибольшим из существующих значением OID, однако, это не критично.</P
+></LI
+><LI
+><P
+>Время ID транзакции не хранится в базе данных кроме поля, устанавливаемого командой <TT
+CLASS="COMMAND"
+>pg_resetxlog</TT
+>, поэтому принимается любая допустимая величина. Возможно, понадобиться поправить значение для обеспечения работоспособности репликации, например, <SPAN
+CLASS="APPLICATION"
+>Slony-I</SPAN
+>. Значение должно соответствовать состоянию реплицируемой базы данных.</P
+></LI
+></UL
+><P></P
+><P
+>С флагом <TT
+CLASS="OPTION"
+>-n</TT
+> (без выполнения) команда <TT
+CLASS="COMMAND"
+>pg_resetxlog</TT
+> отображает извлечённые из <TT
+CLASS="FILENAME"
+>pg_control</TT
+> данные, а также значения, которые можно изменить. Режим полезен для отладки и тестирования предстоящей операции без реального применения изменений.</P
+><P
+>Флаги <TT
+CLASS="OPTION"
+>-V</TT
+> и <TT
+CLASS="OPTION"
+>--version</TT
+> выводят версию <SPAN
+CLASS="APPLICATION"
+>pg_resetxlog</SPAN
+> и прерывают дальнейшее выполнение. Ключи <TT
+CLASS="OPTION"
+>-?</TT
+> и <TT
+CLASS="OPTION"
+>--help</TT
+> выводят справку по поддерживаемым аргументам.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN93854"
+></A
+><H2
+>Замечания</H2
+><P
+>Команду нельзя выполнять на работающем сервере. <TT
+CLASS="COMMAND"
+>pg_resetxlog</TT
+> отклонит выполнение при обнаруженном блокирующем файле в каталоге хранения данных. Иногда при аварии сервера блокирующий файл может остаться в системе. В этом случае необходимо самостоятельно удалить его, чтобы дать возможность <TT
+CLASS="COMMAND"
+>pg_resetxlog</TT
+> отработать. Перед выполнением операции дважды убедитесь, что сервер остановлен.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="app-pg-ctl.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="app-postgres.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><SPAN
+CLASS="APPLICATION"
+>pg_ctl</SPAN
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="reference-server.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><SPAN
+CLASS="APPLICATION"
+>postgres</SPAN
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

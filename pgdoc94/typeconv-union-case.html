@@ -1,0 +1,398 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>UNION, CASE и связанные конструкции</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Преобразование типов"
+HREF="typeconv.html"><LINK
+REL="PREVIOUS"
+TITLE="Хранимое значение"
+HREF="typeconv-query.html"><LINK
+REL="NEXT"
+TITLE="Индексы"
+HREF="indexes.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Хранимое значение"
+HREF="typeconv-query.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="typeconv.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 10. Преобразование типов</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Индексы"
+HREF="indexes.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="TYPECONV-UNION-CASE"
+>10.5. <TT
+CLASS="LITERAL"
+>UNION</TT
+>, <TT
+CLASS="LITERAL"
+>CASE</TT
+> и связанные конструкции</A
+></H1
+><P
+>SQL-конструкция <TT
+CLASS="LITERAL"
+>UNION</TT
+> взаимодействует с системой типов, так как ей приходится объединять значения возможно различных типов в единый результирующий набор. Алгоритм разрешения типов при этом применяется независимо к каждой отдельной колонке запроса. Подобным образом различные типы сопоставляются при выполнении <TT
+CLASS="LITERAL"
+>INTERSECT</TT
+> и <TT
+CLASS="LITERAL"
+>EXCEPT</TT
+> сопоставляют различные типы подобно <TT
+CLASS="LITERAL"
+>UNION</TT
+>. По такому же алгоритму сопоставляют типы выражений и определяют тип своего результата конструкции <TT
+CLASS="LITERAL"
+>CASE</TT
+>, <TT
+CLASS="LITERAL"
+>ARRAY</TT
+>, <TT
+CLASS="LITERAL"
+>VALUES</TT
+>, <CODE
+CLASS="FUNCTION"
+>GREATEST</CODE
+> и <CODE
+CLASS="FUNCTION"
+>LEAST</CODE
+>.</P
+><DIV
+CLASS="PROCEDURE"
+><P
+><B
+>Разрешение типов для <TT
+CLASS="LITERAL"
+>UNION</TT
+>, <TT
+CLASS="LITERAL"
+>CASE</TT
+> и связанных конструкций</B
+></P
+><OL
+TYPE="1"
+><LI
+CLASS="STEP"
+><P
+>Если все данные одного типа и это не тип <TT
+CLASS="TYPE"
+>unknown</TT
+>, выбрать его.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Если тип данных &mdash; домен, далее считать их типом базовый тип домена. <A
+NAME="AEN23021"
+HREF="#FTN.AEN23021"
+><SPAN
+CLASS="footnote"
+>[1]</SPAN
+></A
+></P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Если все данные типа <TT
+CLASS="TYPE"
+>unknown</TT
+>, выбрать для результата тип <TT
+CLASS="TYPE"
+>text</TT
+> (предпочитаемый для категории string). В противном случае игнорировать значения <TT
+CLASS="TYPE"
+>unknown</TT
+>.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Если известные типы входных данных оказываются не из одной категории, констатировать неудачу.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Выбрать первый известный предпочитаемый тип из этой категории, если такой есть.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>В противном случае выбрать последний известный тип, в который можно неявно преобразовать все данные предшествующих известных типов. (Такой тип есть всегда, в крайнем случае этому условию удовлетворяет первый тип.)</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Привести все данные к выбранном типу. Констатировать неудачу, если для каких-либо данных преобразование в этот тип невозможно.</P
+></LI
+></OL
+></DIV
+><P
+>Ниже это проиллюстрировано на примерах.</P
+><DIV
+CLASS="EXAMPLE"
+><A
+NAME="AEN23038"
+></A
+><P
+><B
+>Пример 10-9. Разрешение типов с частичным определением в Union</B
+></P
+><P
+></P><PRE
+CLASS="SCREEN"
+>SELECT text 'a' AS "text" UNION SELECT 'b';
+
+ text
+------
+ a
+ b
+(2 rows)</PRE
+><P> В данном случае константа <TT
+CLASS="LITERAL"
+>'b'</TT
+> неизвестного типа будет преобразована в тип <TT
+CLASS="TYPE"
+>text</TT
+>.</P
+></DIV
+><DIV
+CLASS="EXAMPLE"
+><A
+NAME="AEN23044"
+></A
+><P
+><B
+>Пример 10-10. Разрешение типов в простом объединении</B
+></P
+><P
+></P><PRE
+CLASS="SCREEN"
+>SELECT 1.2 AS "numeric" UNION SELECT 1;
+
+ numeric
+---------
+       1
+     1.2
+(2 rows)</PRE
+><P> Константа <TT
+CLASS="LITERAL"
+>1.2</TT
+> имеет тип <TT
+CLASS="TYPE"
+>numeric</TT
+> и целочисленное значение <TT
+CLASS="LITERAL"
+>1</TT
+> может быть неявно приведено к типу <TT
+CLASS="TYPE"
+>numeric</TT
+>, так что используется этот тип.</P
+></DIV
+><DIV
+CLASS="EXAMPLE"
+><A
+NAME="AEN23052"
+></A
+><P
+><B
+>Пример 10-11. Разрешение типов в противоположном объединении</B
+></P
+><P
+></P><PRE
+CLASS="SCREEN"
+>SELECT 1 AS "real" UNION SELECT CAST('2.2' AS REAL);
+
+ real
+------
+    1
+  2.2
+(2 rows)</PRE
+><P> Здесь значение типа <TT
+CLASS="TYPE"
+>real</TT
+> нельзя неявно привести к <TT
+CLASS="TYPE"
+>integer</TT
+>, но <TT
+CLASS="TYPE"
+>integer</TT
+> можно неявно привести к <TT
+CLASS="TYPE"
+>real</TT
+>, поэтому типом результата объединения будет <TT
+CLASS="TYPE"
+>real</TT
+>.</P
+></DIV
+></DIV
+><H3
+CLASS="FOOTNOTES"
+>Примечания</H3
+><TABLE
+BORDER="0"
+CLASS="FOOTNOTES"
+WIDTH="100%"
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+WIDTH="5%"
+><A
+NAME="FTN.AEN23021"
+HREF="typeconv-union-case.html#AEN23021"
+><SPAN
+CLASS="footnote"
+>[1]</SPAN
+></A
+></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+WIDTH="95%"
+><P
+>Так же, как домены воспринимаются при выборе операторов и функций, доменные типы могут сохраняться в конструкции <TT
+CLASS="LITERAL"
+>UNION</TT
+> или подобной, если пользователь позаботится о том, чтобы все входные данные приводились к этому типу явно или неявно. В противном случае предпочтение будет отдано базовому типу домена.</P
+></TD
+></TR
+></TABLE
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="typeconv-query.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="indexes.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Хранимое значение</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="typeconv.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Индексы</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

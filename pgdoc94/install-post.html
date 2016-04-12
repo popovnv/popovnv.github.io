@@ -1,0 +1,390 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Действия после установки</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Установка из исходного кода"
+HREF="installation.html"><LINK
+REL="PREVIOUS"
+TITLE="Процедура установки"
+HREF="install-procedure.html"><LINK
+REL="NEXT"
+TITLE="Поддерживаемые платформы"
+HREF="supported-platforms.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Процедура установки"
+HREF="install-procedure.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="installation.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 15. Установка из исходного кода</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Поддерживаемые платформы"
+HREF="supported-platforms.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="INSTALL-POST"
+>15.5. Действия после установки</A
+></H1
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN27294"
+>15.5.1. Разделяемые библиотеки</A
+></H2
+><P
+>В некоторых системах с разделяемыми библиотеками необходимо указать системе, как найти недавно установленные разделяемые библиотеки. К числу систем, где это <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>не</I
+></SPAN
+> требуется, относятся <SPAN
+CLASS="SYSTEMITEM"
+>FreeBSD</SPAN
+>, <SPAN
+CLASS="SYSTEMITEM"
+>HP-UX</SPAN
+>, <SPAN
+CLASS="SYSTEMITEM"
+>Linux</SPAN
+>, <SPAN
+CLASS="SYSTEMITEM"
+>NetBSD</SPAN
+>, <SPAN
+CLASS="SYSTEMITEM"
+>OpenBSD</SPAN
+>, <SPAN
+CLASS="SYSTEMITEM"
+>Tru64 UNIX</SPAN
+> (ранее <SPAN
+CLASS="SYSTEMITEM"
+>Digital UNIX</SPAN
+>) и <SPAN
+CLASS="SYSTEMITEM"
+>Solaris</SPAN
+>.</P
+><P
+>Путь поиска разделяемых библиотек на разных платформах может устанавливаться по-разному, но наиболее распространённый способ — установить переменную окружения <TT
+CLASS="ENVAR"
+>LD_LIBRARY_PATH</TT
+>, например так: в оболочках Bourne (<TT
+CLASS="COMMAND"
+>sh</TT
+>, <TT
+CLASS="COMMAND"
+>ksh</TT
+>, <TT
+CLASS="COMMAND"
+>bash</TT
+>, <TT
+CLASS="COMMAND"
+>zsh</TT
+>): </P><PRE
+CLASS="PROGRAMLISTING"
+>LD_LIBRARY_PATH=/usr/local/pgsql/lib
+export LD_LIBRARY_PATH</PRE
+><P> или в <TT
+CLASS="COMMAND"
+>csh</TT
+>, <TT
+CLASS="COMMAND"
+>tcsh</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>setenv LD_LIBRARY_PATH /usr/local/pgsql/lib</PRE
+><P> Замените <TT
+CLASS="LITERAL"
+>/usr/local/pgsql/lib</TT
+> значением, переданным <A
+HREF="install-procedure.html#CONFIGURE"
+>шаг 1</A
+> в <TT
+CLASS="OPTION"
+><TT
+CLASS="LITERAL"
+>--libdir</TT
+></TT
+>. Эти команды следует поместить в стартовый файл оболочки, например, в <TT
+CLASS="FILENAME"
+>/etc/profile</TT
+> или <TT
+CLASS="FILENAME"
+>~/.bash_profile</TT
+>. Полезные предостережения об использовании этого метода приведены на странице <A
+HREF="http://xahlee.org/UnixResource_dir/_/ldpath.html"
+TARGET="_top"
+>http://xahlee.org/UnixResource_dir/_/ldpath.html</A
+>.</P
+><P
+>В некоторых системах предпочтительнее установить переменную окружения <TT
+CLASS="ENVAR"
+>LD_RUN_PATH</TT
+> <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>до</I
+></SPAN
+> сборки.</P
+><P
+>В <SPAN
+CLASS="SYSTEMITEM"
+>Cygwin</SPAN
+> добавьте каталог с библиотеками в <TT
+CLASS="ENVAR"
+>PATH</TT
+> или переместите файлы <TT
+CLASS="FILENAME"
+>.dll</TT
+> в каталог <TT
+CLASS="FILENAME"
+>bin</TT
+>.</P
+><P
+>В случае сомнений обратитесь к страницам руководства по вашей системе (возможно, к справке по <TT
+CLASS="COMMAND"
+>ld.so</TT
+> или <TT
+CLASS="COMMAND"
+>rld</TT
+>). Если вы позже получаете сообщение: </P><PRE
+CLASS="SCREEN"
+>psql: error in loading shared libraries
+libpq.so.2.1: cannot open shared object file: No such file or directory</PRE
+><P> (psql: ошибка при загрузке разделяемых библиотек
+libpq.so.2.1: не удалось открыть разделяемый объектный файл: Нет такого файла или каталога), значит этот шаг был необходим. Тогда вам просто нужно вернуться к нему.</P
+><P
+> Если вы используете <SPAN
+CLASS="SYSTEMITEM"
+>Linux</SPAN
+> и имеете права root, вы можете запустить: </P><PRE
+CLASS="PROGRAMLISTING"
+>/sbin/ldconfig /usr/local/pgsql/lib</PRE
+><P> (возможно, с другим каталогом) после установки, чтобы механизм связывания во время выполнения мог найти разделяемые библиотеки быстрее. За дополнительными сведениями обратитесь к странице руководства по <TT
+CLASS="COMMAND"
+>ldconfig</TT
+>. Во <SPAN
+CLASS="SYSTEMITEM"
+>FreeBSD</SPAN
+>, <SPAN
+CLASS="SYSTEMITEM"
+>NetBSD</SPAN
+> и <SPAN
+CLASS="SYSTEMITEM"
+>OpenBSD</SPAN
+> команда будет такой: </P><PRE
+CLASS="PROGRAMLISTING"
+>/sbin/ldconfig -m /usr/local/pgsql/lib</PRE
+><P> В других системах подобной команды может не быть.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN27347"
+>15.5.2. Переменные окружения</A
+></H2
+><P
+>Если целевым каталогом был выбран <TT
+CLASS="FILENAME"
+>/usr/local/pgsql</TT
+> или какой-то другой, по умолчанию отсутствующий в пути поиска, вам следует добавить <TT
+CLASS="FILENAME"
+>/usr/local/pgsql/bin</TT
+> (или другой путь, переданный <A
+HREF="install-procedure.html#CONFIGURE"
+>шаг 1</A
+> в указании <TT
+CLASS="OPTION"
+><TT
+CLASS="LITERAL"
+>--bindir</TT
+></TT
+>) в вашу переменную <TT
+CLASS="ENVAR"
+>PATH</TT
+>. Строго говоря, это не обязательно, но при этом использовать <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> будет гораздо удобнее.</P
+><P
+>Для этого добавьте в ваш скрипт запуска оболочки, например <TT
+CLASS="FILENAME"
+>~/.bash_profile</TT
+> (или в <TT
+CLASS="FILENAME"
+>/etc/profile</TT
+>, если это нужно всем пользователям): </P><PRE
+CLASS="PROGRAMLISTING"
+>PATH=/usr/local/pgsql/bin:$PATH
+export PATH</PRE
+><P> Для оболочек <TT
+CLASS="COMMAND"
+>csh</TT
+> или <TT
+CLASS="COMMAND"
+>tcsh</TT
+> команда должна быть такой: </P><PRE
+CLASS="PROGRAMLISTING"
+>set path = ( /usr/local/pgsql/bin $path )</PRE
+><P></P
+><P
+> Чтобы ваша система могла найти документацию <SPAN
+CLASS="APPLICATION"
+>man</SPAN
+>, вам нужно добавить в скрипт запуска оболочки примерно следующие строки, если только она не установлена в размещение, просматриваемое по умолчанию: </P><PRE
+CLASS="PROGRAMLISTING"
+>MANPATH=/usr/local/pgsql/man:$MANPATH
+export MANPATH</PRE
+><P></P
+><P
+>Переменные окружения <TT
+CLASS="ENVAR"
+>PGHOST</TT
+> и <TT
+CLASS="ENVAR"
+>PGPORT</TT
+> задают для клиентских приложений адрес компьютера и порт сервера базы данных, переопределяя стандартные значения. Если планируется запускать клиентские приложения удалённо, пользователям, которые будут использовать определённый сервер, будет удобно, если они установят <TT
+CLASS="ENVAR"
+>PGHOST</TT
+>. Однако это не обязательно, так как большинство клиентских программ могут принять эти параметры через аргументы командной строки.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="install-procedure.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="supported-platforms.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Процедура установки</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="installation.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Поддерживаемые платформы</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

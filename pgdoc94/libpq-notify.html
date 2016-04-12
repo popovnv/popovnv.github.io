@@ -1,0 +1,314 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Асинхронное уведомление</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="libpq — библиотека для языка C"
+HREF="libpq.html"><LINK
+REL="PREVIOUS"
+TITLE="Интерфейс быстрого пути"
+HREF="libpq-fastpath.html"><LINK
+REL="NEXT"
+TITLE="Функции, связанные с командой COPY"
+HREF="libpq-copy.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Интерфейс быстрого пути"
+HREF="libpq-fastpath.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="libpq.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 31. <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> — библиотека для языка C</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Функции, связанные с командой COPY"
+HREF="libpq-copy.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="LIBPQ-NOTIFY"
+>31.8. Асинхронное уведомление</A
+></H1
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> предлагает асинхронное уведомление посредством команд <TT
+CLASS="COMMAND"
+>LISTEN</TT
+> и <TT
+CLASS="COMMAND"
+>NOTIFY</TT
+>. Клиентский сеанс работы регистрирует свою заинтересованность в конкретном канале уведомлений с помощью команды <TT
+CLASS="COMMAND"
+>LISTEN</TT
+> (и может остановить прослушивание с помощью команды <TT
+CLASS="COMMAND"
+>UNLISTEN</TT
+>). Все сеансы, прослушивающие конкретный канал, будут уведомляться в асинхронном режиме, когда в рамках любого сеанса команда <TT
+CLASS="COMMAND"
+>NOTIFY</TT
+> выполняется с параметром, указывающим имя этого канала. Для передачи дополнительных данных прослушивающим сеансам может использоваться строка <SPAN
+CLASS="QUOTE"
+>"payload"</SPAN
+>.</P
+><P
+>Приложения, использующие <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>, отправляют серверу команды <TT
+CLASS="COMMAND"
+>LISTEN</TT
+>, <TT
+CLASS="COMMAND"
+>UNLISTEN</TT
+> и <TT
+CLASS="COMMAND"
+>NOTIFY</TT
+>, как обычные SQL-команды. Прибытие сообщений от команды <TT
+CLASS="COMMAND"
+>NOTIFY</TT
+> можно впоследствии обнаружить с помощью вызова функции <CODE
+CLASS="FUNCTION"
+>PQnotifies</CODE
+>.</P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>PQnotifies</CODE
+> возвращает следующее уведомление из списка необработанных уведомительных сообщений, полученных от сервера. Она возвращает нулевой указатель, если нет уведомлений, ожидающих обработки. Как только уведомление возвращено из функции <CODE
+CLASS="FUNCTION"
+>PQnotifies</CODE
+>, оно считается обработанным и будет удалено из списка уведомлений. </P><PRE
+CLASS="SYNOPSIS"
+>PGnotify *PQnotifies(PGconn *conn);
+
+typedef struct pgNotify
+{
+    char *relname;              /* имя канала уведомлений */
+    int  be_pid;                /* ID серверного процесса, посылающего уведомление */
+    char *extra;                /* строка сообщения в уведомлении */
+} PGnotify;</PRE
+><P> После обработки объекта <TT
+CLASS="STRUCTNAME"
+>PGnotify</TT
+>, возвращённого функцией <CODE
+CLASS="FUNCTION"
+>PQnotifies</CODE
+>, обязательно освободите память, занимаемую им, с помощью функции <CODE
+CLASS="FUNCTION"
+>PQfreemem</CODE
+>. Достаточно освободить указатель на <TT
+CLASS="STRUCTNAME"
+>PGnotify</TT
+>; поля <TT
+CLASS="STRUCTFIELD"
+>relname</TT
+> и <TT
+CLASS="STRUCTFIELD"
+>extra</TT
+> не представляют отдельных областей памяти. (Имена этих полей являются таковыми по историческим причинам; в частности, имена каналов не обязаны иметь ничего общего с именами реляционных отношений.)</P
+><P
+><A
+HREF="libpq-example.html#LIBPQ-EXAMPLE-2"
+>Пример 31-2</A
+> представляет пример программы, иллюстрирующей использование асинхронного уведомления.</P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>PQnotifies</CODE
+> в действительности не читает данные с сервера; она просто возвращает сообщения, предварительно собранные другой функцией библиотеки <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>. В предшествующих выпусках <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> единственным способом обеспечения своевременного получения сообщений от команды <TT
+CLASS="COMMAND"
+>NOTIFY</TT
+> была постоянная отправка команд, даже пустых, а затем проверка <CODE
+CLASS="FUNCTION"
+>PQnotifies</CODE
+> после каждого вызова <CODE
+CLASS="FUNCTION"
+>PQexec</CODE
+>. Хотя этот метод все ещё работает, он не рекомендуется, поскольку растрачивает впустую процессорное время.</P
+><P
+>Более хорошим способом проверки наличия сообщений от команды <TT
+CLASS="COMMAND"
+>NOTIFY</TT
+>, когда у вас нет полезных команд для выполнения, является вызов функции <CODE
+CLASS="FUNCTION"
+>PQconsumeInput</CODE
+> с последующей проверкой <CODE
+CLASS="FUNCTION"
+>PQnotifies</CODE
+>. Вы можете использовать <CODE
+CLASS="FUNCTION"
+>select()</CODE
+>, чтобы подождать прибытия данных с сервера, тем самым не используя мощности <ACRONYM
+CLASS="ACRONYM"
+>CPU</ACRONYM
+>, если нет полезной работы. (См. <CODE
+CLASS="FUNCTION"
+>PQsocket</CODE
+> насчёт получения номера файлового дескриптора для использования его с <CODE
+CLASS="FUNCTION"
+>select()</CODE
+>.) Обратите внимание, что это будет хорошо работать, независимо от того, отправляете ли вы команды с помощью <CODE
+CLASS="FUNCTION"
+>PQsendQuery</CODE
+>/<CODE
+CLASS="FUNCTION"
+>PQgetResult</CODE
+> или просто используете <CODE
+CLASS="FUNCTION"
+>PQexec</CODE
+>. Следует, однако, не забывать проверять <CODE
+CLASS="FUNCTION"
+>PQnotifies</CODE
+> после каждого вызова <CODE
+CLASS="FUNCTION"
+>PQgetResult</CODE
+> или <CODE
+CLASS="FUNCTION"
+>PQexec</CODE
+>, чтобы увидеть, не прибыли ли какие-либо уведомления в процессе обработки команды.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="libpq-fastpath.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="libpq-copy.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Интерфейс быстрого пути</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="libpq.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Функции, связанные с командой <TT
+CLASS="COMMAND"
+>COPY</TT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

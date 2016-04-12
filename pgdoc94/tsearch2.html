@@ -1,0 +1,423 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>tsearch2</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Дополнительно поставляемые модули"
+HREF="contrib.html"><LINK
+REL="PREVIOUS"
+TITLE="test_shm_mq"
+HREF="test-shm-mq.html"><LINK
+REL="NEXT"
+TITLE="unaccent"
+HREF="unaccent.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="test_shm_mq"
+HREF="test-shm-mq.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Приложение E. Дополнительно поставляемые модули</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="unaccent"
+HREF="unaccent.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="TSEARCH2"
+>E.42. tsearch2</A
+></H1
+><P
+>Модуль <SPAN
+CLASS="APPLICATION"
+>tsearch2</SPAN
+> предоставляет функциональность текстового поиска для обратной совместимости с приложениями, которые использовали <SPAN
+CLASS="APPLICATION"
+>tsearch2</SPAN
+> до того, как текстовый поиск был интегрирован в ядро <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> в версии 8.3.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN125678"
+>E.42.1. Вопросы переносимости</A
+></H2
+><P
+>Хотя встроенные функции текстового поиска были основаны на функциях <SPAN
+CLASS="APPLICATION"
+>tsearch2</SPAN
+> и во многом похожи, есть ряд небольших различий, из-за которых возникают вопросы переносимости с существующими приложениями:</P
+><P
+></P
+><UL
+><LI
+STYLE="list-style-type: disc"
+><P
+>Были изменены имена некоторых функций, например функция <CODE
+CLASS="FUNCTION"
+>rank</CODE
+> стала <CODE
+CLASS="FUNCTION"
+>ts_rank</CODE
+>. Модуль замены <TT
+CLASS="LITERAL"
+>tsearch2</TT
+> предоставляет псевдонимы для старых имён.</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Все типы данных и функции встроенного текстового поиска существуют в системной схеме <TT
+CLASS="LITERAL"
+>pg_catalog</TT
+>. При установке из <SPAN
+CLASS="APPLICATION"
+>tsearch2</SPAN
+> эти объекты обычно помещались в схему <TT
+CLASS="LITERAL"
+>public</TT
+>, хотя некоторые пользователи могли поместить их в специальную отдельную схему. Таким образом, ссылки на объекты, дополненные схемой, окажутся нерабочими в любом случае. Модуль замены <TT
+CLASS="LITERAL"
+>tsearch2</TT
+> предоставляет для этих объектов псевдонимы, которые помещаются в схему <TT
+CLASS="LITERAL"
+>public</TT
+> (или другую, если это требуется), чтобы такие ссылки продолжали работать.</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Для встроенных функций текстового поиска отсутствуют понятия <SPAN
+CLASS="QUOTE"
+>"текущий анализатор"</SPAN
+> и <SPAN
+CLASS="QUOTE"
+>"текущий словарь"</SPAN
+>, есть только текущая конфигурация поиска (она задаётся параметром <TT
+CLASS="VARNAME"
+>default_text_search_config</TT
+>). Хотя текущий анализатор и текущий словарь использовались раньше только функциями, предназначенными для отладки, это всё же может мешать переносимости в некоторых случаях. Модуль замены <TT
+CLASS="LITERAL"
+>tsearch2</TT
+> имитирует эти дополнительные переменные состояния и предоставляет обратно-совместимые функции, позволяющие задать и прочитать их.</P
+></LI
+></UL
+><P
+>Есть ряд проблем, решения которых не предлагает модуль <TT
+CLASS="LITERAL"
+>tsearch2</TT
+>, так что код приложения придётся корректировать в любом случае:</P
+><P
+></P
+><UL
+><LI
+STYLE="list-style-type: disc"
+><P
+>Старая триггерная функция <CODE
+CLASS="FUNCTION"
+>tsearch2</CODE
+> могла принимать в списке аргументов имена функций, вызываемых с текстовыми данными до того, как они были преобразованы в формат <TT
+CLASS="TYPE"
+>tsvector</TT
+>. Эта возможность была ликвидирована как угроза безопасности, так как нельзя гарантировать, что вызываться будет именно запланированная функция. Если данные нужно как-то обработать перед индексацией, рекомендуется написать дополнительный триггер, который будет делать это сам.</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Информация о конфигурации текстового поиска была перенесена в системные каталоги, которые значительно отличаются от таблиц аналогичного предназначения в <SPAN
+CLASS="APPLICATION"
+>tsearch2</SPAN
+>. Все приложения, анализирующие или модифицирующие эти таблицы, нуждаются в корректировке.</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Ели приложение использует какие-либо нестандартные конфигурации текстового поиска, их нужно будет настроить в системных каталогах, применив новые SQL-команды конфигурирования текстового поиска. Модуль замены <TT
+CLASS="LITERAL"
+>tsearch2</TT
+> предлагает небольшую помощь в этом, позволяя загружать старый набор конфигурационных таблиц <SPAN
+CLASS="APPLICATION"
+>tsearch2</SPAN
+> в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> 8.3. (Без этого модуля загрузить данные конфигурации невозможно, так как значения в колонках <TT
+CLASS="TYPE"
+>regprocedure</TT
+> нельзя сопоставить с функциями.) Эти таблицы конфигурации на самом деле не будут ничего <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>делать</I
+></SPAN
+>, но их содержимое будет полезно хотя бы для того, чтобы получить аналогичную конфигурацию в 8.3.</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Старые функции <CODE
+CLASS="FUNCTION"
+>reset_tsearch()</CODE
+> и <CODE
+CLASS="FUNCTION"
+>get_covers()</CODE
+> не поддерживаются.</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Модуль замены <TT
+CLASS="LITERAL"
+>tsearch2</TT
+> не определяет никакие псевдонимы операторов, полностью рассчитывая на встроенные. Это может вызвать проблемы, если в приложении использовались имена операторов с явным указанием схемы, что встречается очень редко.</P
+></LI
+></UL
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN125725"
+>E.42.2. Преобразование инсталляции версии до 8.3</A
+></H2
+><P
+>Обновлять инсталляцию версии до 8.3, в которой использовалось расширение <SPAN
+CLASS="APPLICATION"
+>tsearch2</SPAN
+>, рекомендуется следующим образом:</P
+><DIV
+CLASS="PROCEDURE"
+><OL
+TYPE="1"
+><LI
+CLASS="STEP"
+><P
+>Выгрузите данные старой инсталляции обычным способом, не используя ключ <TT
+CLASS="LITERAL"
+>-c</TT
+> (<TT
+CLASS="LITERAL"
+>--clean</TT
+>) программы <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+> или <SPAN
+CLASS="APPLICATION"
+>pg_dumpall</SPAN
+>.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>В новой инсталляции создайте пустые базы данных и установите модуль замены <TT
+CLASS="LITERAL"
+>tsearch2</TT
+> в каждую базу, где будет использоваться текстовый поиск. Это нужно сделать <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>до</I
+></SPAN
+> загрузки данных в базу! Если в старой инсталляции объекты <SPAN
+CLASS="APPLICATION"
+>tsearch2</SPAN
+> содержались в схеме, отличной от <TT
+CLASS="LITERAL"
+>public</TT
+>, обязательно отразите это в команде <TT
+CLASS="COMMAND"
+>CREATE EXTENSION</TT
+>, чтобы заменяющие объекты создавались в той же схеме.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Загрузите выгруженные данные. При этом могут возникнуть ошибки из-за невозможности воссоздать первоначальные объекты <SPAN
+CLASS="APPLICATION"
+>tsearch2</SPAN
+>. Хотя их можно игнорировать, это значит, что вы не сможете восстановить выгруженные данные в одной транзакции (то есть, нельзя использовать ключ <TT
+CLASS="OPTION"
+>-1</TT
+> команды <SPAN
+CLASS="APPLICATION"
+>pg_restore</SPAN
+>).</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Изучите содержимое восстановленных конфигурационных таблиц <SPAN
+CLASS="APPLICATION"
+>tsearch2</SPAN
+> (<TT
+CLASS="STRUCTNAME"
+>pg_ts_cfg</TT
+> и т. д.) и создайте аналогичные конфигурации текстового поиска по потребности. Получив из старых конфигурационных таблиц всю полезную информацию, вы можете удалить их.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Протестируйте работу приложения.</P
+></LI
+></OL
+></DIV
+><P
+>Позже вы можете поменять ссылки в приложении на псевдонимы объектов текстового поиска, что позволит в конце концов удалить модуль замены <TT
+CLASS="LITERAL"
+>tsearch2</TT
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN125756"
+>E.42.3. Ссылки</A
+></H2
+><P
+>Сайт разработки Tsearch2 <A
+HREF="http://www.sai.msu.su/~megera/postgres/gist/tsearch/V2/"
+TARGET="_top"
+>http://www.sai.msu.su/~megera/postgres/gist/tsearch/V2/</A
+></P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="test-shm-mq.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="unaccent.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>test_shm_mq</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>unaccent</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

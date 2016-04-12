@@ -1,0 +1,294 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Большие объекты</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="ECPG — встраиваемый SQL в C"
+HREF="ecpg.html"><LINK
+REL="PREVIOUS"
+TITLE="Библиотечные функции"
+HREF="ecpg-library.html"><LINK
+REL="NEXT"
+TITLE="Приложения на C++"
+HREF="ecpg-cpp.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Библиотечные функции"
+HREF="ecpg-library.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ecpg.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 33. <SPAN
+CLASS="APPLICATION"
+>ECPG</SPAN
+> — встраиваемый <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> в C</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Приложения на C++"
+HREF="ecpg-cpp.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="ECPG-LO"
+>33.12. Большие объекты</A
+></H1
+><P
+>ECPG не поддерживает большие объекты напрямую, но приложение на базе ECPG может работать с большими объектами, используя предназначенные для этого функции, получив необходимый объект <TT
+CLASS="TYPE"
+>PGconn</TT
+> в результате вызова <CODE
+CLASS="FUNCTION"
+>ECPGget_PGconn()</CODE
+>. (Однако использовать функцию <CODE
+CLASS="FUNCTION"
+>ECPGget_PGconn()</CODE
+> и напрямую воздействовать на объекты <TT
+CLASS="TYPE"
+>PGconn</TT
+> следует очень осторожно; в идеале стоит исключить при этом другие обращения к базе данных через ECPG.)</P
+><P
+>Подробнее функция <CODE
+CLASS="FUNCTION"
+>ECPGget_PGconn()</CODE
+> описана в <A
+HREF="ecpg-library.html"
+>Разделе 33.11</A
+>. Интерфейс функций для работы с большими объектами рассмотрен в <A
+HREF="largeobjects.html"
+>Главе 32</A
+>.</P
+><P
+>Функции для работы с большими объектами должны вызываться в блоке транзакций, поэтому если режим автофиксации отключён, необходимо явно выдавать команды <TT
+CLASS="COMMAND"
+>BEGIN</TT
+>.</P
+><P
+>В <A
+HREF="ecpg-lo.html#ECPG-LO-EXAMPLE"
+>Примере 33-2</A
+> приведён пример программы, показывающий, как создать, записать и прочитать большой объект в приложении ECPG.</P
+><DIV
+CLASS="EXAMPLE"
+><A
+NAME="ECPG-LO-EXAMPLE"
+></A
+><P
+><B
+>Пример 33-2. Программа на базе ECPG, работающая с большими объектами</B
+></P
+><PRE
+CLASS="PROGRAMLISTING"
+>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;libpq-fe.h&gt;
+#include &lt;libpq/libpq-fs.h&gt;
+
+EXEC SQL WHENEVER SQLERROR STOP;
+
+int
+main(void)
+{
+    PGconn     *conn;
+    Oid         loid;
+    int         fd;
+    char        buf[256];
+    int         buflen = 256;
+    char        buf2[256];
+    int         rc;
+
+    memset(buf, 1, buflen);
+
+    EXEC SQL CONNECT TO testdb AS con1;
+
+    conn = ECPGget_PGconn("con1");
+    printf("conn = %p\n", conn);
+
+    /* создание */
+    loid = lo_create(conn, 0);
+    if (loid &amp;lt; 0)
+        printf("lo_create() failed: %s", PQerrorMessage(conn));
+
+    printf("loid = %d\n", loid);
+
+    /* проверка записи */
+    fd = lo_open(conn, loid, INV_READ|INV_WRITE);
+    if (fd &amp;lt; 0)
+        printf("lo_open() failed: %s", PQerrorMessage(conn));
+
+    printf("fd = %d\n", fd);
+
+    rc = lo_write(conn, fd, buf, buflen);
+    if (rc &amp;lt; 0)
+        printf("lo_write() failed\n");
+
+    rc = lo_close(conn, fd);
+    if (rc &amp;lt; 0)
+        printf("lo_close() failed: %s", PQerrorMessage(conn));
+
+    /* проверка чтения */
+    fd = lo_open(conn, loid, INV_READ);
+    if (fd &amp;lt; 0)
+        printf("lo_open() failed: %s", PQerrorMessage(conn));
+
+    printf("fd = %d\n", fd);
+
+    rc = lo_read(conn, fd, buf2, buflen);
+    if (rc &amp;lt; 0)
+        printf("lo_read() failed\n");
+
+    rc = lo_close(conn, fd);
+    if (rc &amp;lt; 0)
+        printf("lo_close() failed: %s", PQerrorMessage(conn));
+
+    /* проверка идентичности */
+    rc = memcmp(buf, buf2, buflen);
+    printf("memcmp() = %d\n", rc);
+
+    /* очистка */
+    rc = lo_unlink(conn, loid);
+    if (rc &amp;lt; 0)
+        printf("lo_unlink() failed: %s", PQerrorMessage(conn));
+
+    EXEC SQL COMMIT;
+    EXEC SQL DISCONNECT ALL;
+    return 0;
+}</PRE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ecpg-library.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ecpg-cpp.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Библиотечные функции</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ecpg.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Приложения на <ACRONYM
+CLASS="ACRONYM"
+>C++</ACRONYM
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

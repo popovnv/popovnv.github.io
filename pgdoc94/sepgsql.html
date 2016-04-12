@@ -1,0 +1,1143 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>sepgsql</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Дополнительно поставляемые модули"
+HREF="contrib.html"><LINK
+REL="PREVIOUS"
+TITLE="seg"
+HREF="seg.html"><LINK
+REL="NEXT"
+TITLE="spi"
+HREF="contrib-spi.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="seg"
+HREF="seg.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Приложение E. Дополнительно поставляемые модули</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="spi"
+HREF="contrib-spi.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="SEPGSQL"
+>E.34. sepgsql</A
+></H1
+><P
+>Загружаемый модуль <TT
+CLASS="FILENAME"
+>sepgsql</TT
+> поддерживает мандатное управление доступом (MAC, Mandatory Access Control) с метками, построенное на базе политик безопасности <SPAN
+CLASS="PRODUCTNAME"
+>SELinux</SPAN
+>.</P
+><DIV
+CLASS="WARNING"
+><P
+></P
+><TABLE
+CLASS="WARNING"
+BORDER="1"
+WIDTH="100%"
+><TR
+><TD
+ALIGN="CENTER"
+><B
+>Внимание</B
+></TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+><P
+>Текущая реализация имеет существенные ограничения и контролирует не все действия. См. <A
+HREF="sepgsql.html#SEPGSQL-LIMITATIONS"
+>Подраздел E.34.7</A
+>.</P
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="SEPGSQL-OVERVIEW"
+>E.34.1. Обзор</A
+></H2
+><P
+>Этот модуль интегрируется в <SPAN
+CLASS="PRODUCTNAME"
+>SELinux</SPAN
+> и обеспечивает дополнительный уровень проверок безопасности, расширяющий и дополняющий обычные средства <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. С точки зрения <SPAN
+CLASS="PRODUCTNAME"
+>SELinux</SPAN
+>, данный модуль позволяет <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> выполнять роль менеджера объектов в пространстве пользователя. При выполнении запроса DML обращение к каждой таблице или функции в нём будет контролироваться согласно системной политике безопасности. Эта проверка дополняет штатную проверку разрешений SQL, которую производит <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+><P
+>Механизм <SPAN
+CLASS="PRODUCTNAME"
+>SELinux</SPAN
+> принимает решения о разрешении доступа на основе меток безопасности, представляемых строками вида <TT
+CLASS="LITERAL"
+>system_u:object_r:sepgsql_table_t:s0</TT
+>. В каждом решении учитываются две метки: метка субъекта, пытающегося выполнить действие, и метка объекта, над которым должно совершаться это действие. Так как эти метки могут применяться к объекту любого вида, решения о разрешении доступа к объектам внутри базы данных могут подчиняться (и с этим модулем фактически подчиняются) общим критериям, применяемым к объектам любого другого типа, например, к файлам. Эта схема позволяет организовать централизованную политику безопасности для защиты информационных активов, не зависящую от того, как именно хранятся эти активы.</P
+><P
+>Назначить метку безопасности объекту баз данных позволяет команда <A
+HREF="sql-security-label.html"
+>SECURITY LABEL</A
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="SEPGSQL-INSTALLATION"
+>E.34.2. Установка</A
+></H2
+><P
+>Модуль <TT
+CLASS="FILENAME"
+>sepgsql</TT
+> может работать только в <SPAN
+CLASS="PRODUCTNAME"
+>Linux</SPAN
+> 2.6.28 и новее с включённым <SPAN
+CLASS="PRODUCTNAME"
+>SELinux</SPAN
+>. На остальных платформах он не поддерживается. Вам также понадобится <SPAN
+CLASS="PRODUCTNAME"
+>libselinux</SPAN
+> 2.1.10 или новее и <SPAN
+CLASS="PRODUCTNAME"
+>selinux-policy</SPAN
+> 3.9.13 или новее (хотя в некоторых дистрибутивах необходимые правила могут быть адаптированы к политике старой версии).</P
+><P
+>Команда <TT
+CLASS="COMMAND"
+>sestatus</TT
+> позволяет проверить состояние <SPAN
+CLASS="PRODUCTNAME"
+>SELinux</SPAN
+>. Типичный её вывод выглядит так: </P><PRE
+CLASS="SCREEN"
+>$ sestatus
+SELinux status:                 enabled
+SELinuxfs mount:                /selinux
+Current mode:                   enforcing
+Mode from config file:          enforcing
+Policy version:                 24
+Policy from config file:        targeted</PRE
+><P> Если <SPAN
+CLASS="PRODUCTNAME"
+>SELinux</SPAN
+> отключён или не установлен, его необходимо привести в рабочее состояние, прежде чем устанавливать этот модуль.</P
+><P
+>Чтобы собрать этот модуль, добавьте параметр <TT
+CLASS="LITERAL"
+>--with-selinux</TT
+> в команду PostgreSQL <TT
+CLASS="LITERAL"
+>configure</TT
+>. Убедитесь в том, что в момент сборки установлен RPM-пакет <TT
+CLASS="FILENAME"
+>libselinux-devel</TT
+>.</P
+><P
+>Чтобы использовать этот модуль, вы должны включить <TT
+CLASS="LITERAL"
+>sepgsql</TT
+> в <A
+HREF="runtime-config-client.html#GUC-SHARED-PRELOAD-LIBRARIES"
+>shared_preload_libraries</A
+> в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+>. Этот модуль не будет корректно работать, если загрузить его каким-либо другим способом. Загрузив его, нужно выполнить <TT
+CLASS="FILENAME"
+>sepgsql.sql</TT
+> в каждой базе данных. Этот скрипт установит функции, необходимые для управления метками безопасности, и назначит начальные метки безопасности.</P
+><P
+>Следующий пример показывает, как инициализировать новый кластер баз данных и установить в него функции и метки безопасности <TT
+CLASS="FILENAME"
+>sepgsql</TT
+>. Измените пути в соответствии с размещением вашей инсталляции:</P
+><PRE
+CLASS="SCREEN"
+>$ export PGDATA=/path/to/data/directory
+$ initdb
+$ vi $PGDATA/postgresql.conf
+  изменить
+    #shared_preload_libraries = ''                # (после изменения требуется перезапуск)
+  на
+    shared_preload_libraries = 'sepgsql'          # (после изменения требуется перезапуск)
+$ for DBNAME in template0 template1 postgres; do
+    postgres --single -F -c exit_on_error=true $DBNAME \
+      &lt;/usr/local/pgsql/share/contrib/sepgsql.sql &gt;/dev/null
+  done</PRE
+><P
+>Заметьте, что вы можете увидеть следующие уведомления, в зависимости от конкретных установленных версий <SPAN
+CLASS="PRODUCTNAME"
+>libselinux</SPAN
+> и <SPAN
+CLASS="PRODUCTNAME"
+>selinux-policy</SPAN
+>: </P><PRE
+CLASS="SCREEN"
+>/etc/selinux/targeted/contexts/sepgsql_contexts:  line 33 has invalid object type db_blobs
+/etc/selinux/targeted/contexts/sepgsql_contexts:  line 36 has invalid object type db_language
+/etc/selinux/targeted/contexts/sepgsql_contexts:  line 37 has invalid object type db_language
+/etc/selinux/targeted/contexts/sepgsql_contexts:  line 38 has invalid object type db_language
+/etc/selinux/targeted/contexts/sepgsql_contexts:  line 39 has invalid object type db_language
+/etc/selinux/targeted/contexts/sepgsql_contexts:  line 40 has invalid object type db_language</PRE
+><P> Эти сообщения не критичны и их можно игнорировать.</P
+><P
+>Если процесс установки завершается без ошибок, вы можете запустить сервер обычным образом.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="SEPGSQL-REGRESSION"
+>E.34.3. Регрессионные тесты</A
+></H2
+><P
+>Природа <SPAN
+CLASS="PRODUCTNAME"
+>SELinux</SPAN
+> такова, что для проведения регрессионных тестов <TT
+CLASS="FILENAME"
+>sepgsql</TT
+> требуются дополнительные действия по настройке и некоторые из них должен выполнять root. Регрессионные тесты не будут запускаться обычной командой <TT
+CLASS="LITERAL"
+>make check</TT
+> или <TT
+CLASS="LITERAL"
+>make installcheck</TT
+>; вы должны настроить конфигурацию и затем вызвать тестовый скрипт вручную. Тесты должны запускаться в каталоге <TT
+CLASS="FILENAME"
+>contrib/sepgsql</TT
+> настроенного дерева сборки PostgreSQL. Хотя им требуется дерево сборки, эти тесты рассчитаны на использование установленного сервера, то есть они примерно соответствуют <TT
+CLASS="LITERAL"
+>make installcheck</TT
+>, но не <TT
+CLASS="LITERAL"
+>make check</TT
+>.</P
+><P
+>Сначала установите <TT
+CLASS="FILENAME"
+>sepgsql</TT
+> в рабочую базу данных по инструкциям, приведённым в <A
+HREF="sepgsql.html#SEPGSQL-INSTALLATION"
+>Подразделе E.34.2</A
+>. Заметьте, что для этого текущий пользователь операционной системы должен подключаться к базе данных как суперпользователь без аутентификации по паролю.</P
+><P
+>На втором шаге соберите и установите пакет политики для регрессионного теста. Политика <TT
+CLASS="FILENAME"
+>sepgsql-regtest</TT
+> представляет собой политику особого назначения, предоставляющую набор правил, включаемых во время регрессионных тестов. Её следует скомпилировать из исходного файла <TT
+CLASS="FILENAME"
+>sepgsql-regtest.te</TT
+>, что можно сделать командой <TT
+CLASS="COMMAND"
+>make</TT
+> со скриптом Makefile, поставляемым с SELinux. Вам нужно будет найти нужный Makefile в своей системе; путь, показанный ниже, приведён только в качестве примера. Скомпилировав пакет политики, его нужно установить с помощью команды <TT
+CLASS="COMMAND"
+>semodule</TT
+>, которая загружает переданные ей пакеты в ядро. Если пакет установлен корректно, команда <TT
+CLASS="LITERAL"
+><TT
+CLASS="COMMAND"
+>semodule</TT
+> -l</TT
+> должна вывести <TT
+CLASS="LITERAL"
+>sepgsql-regtest</TT
+> в списке доступных пакетов политик:</P
+><PRE
+CLASS="SCREEN"
+>$ cd .../contrib/sepgsql
+$ make -f /usr/share/selinux/devel/Makefile
+$ sudo semodule -u sepgsql-regtest.pp
+$ sudo semodule -l | grep sepgsql
+sepgsql-regtest 1.07</PRE
+><P
+>На третьем шаге включите параметр <TT
+CLASS="LITERAL"
+>sepgsql_regression_test_mode</TT
+>. По соображениям безопасности, правила в <TT
+CLASS="FILENAME"
+>sepgsql-regtest</TT
+> по умолчанию неактивны; параметр <TT
+CLASS="LITERAL"
+>sepgsql_regression_test_mode</TT
+> активирует правила, необходимые для проведения регрессионных тестов. Включить этот параметр можно командой <TT
+CLASS="COMMAND"
+>setsebool</TT
+>:</P
+><PRE
+CLASS="SCREEN"
+>$ sudo setsebool sepgsql_regression_test_mode on
+$ getsebool sepgsql_regression_test_mode
+sepgsql_regression_test_mode --&gt; on</PRE
+><P
+>На четвёртом шаге убедитесь в том, что ваша оболочка работает в домене <TT
+CLASS="LITERAL"
+>unconfined_t</TT
+>:</P
+><PRE
+CLASS="SCREEN"
+>$ id -Z
+unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023</PRE
+><P
+>Если необходимо сменить рабочий домен, в подробностях это описывается в <A
+HREF="sepgsql.html#SEPGSQL-RESOURCES"
+>Подразделе E.34.8</A
+>.</P
+><P
+>Наконец, запустите скрипт регрессионного теста:</P
+><PRE
+CLASS="SCREEN"
+>$ ./test_sepgsql</PRE
+><P
+>Этот скрипт попытается проверить, все ли шаги по настройке конфигурации выполнены корректно, а затем запустит регрессионные тесты для модуля <TT
+CLASS="FILENAME"
+>sepgsql</TT
+>.</P
+><P
+>Завершив тесты, рекомендуется отключить параметр <TT
+CLASS="LITERAL"
+>sepgsql_regression_test_mode</TT
+>:</P
+><PRE
+CLASS="SCREEN"
+>$ sudo setsebool sepgsql_regression_test_mode off</PRE
+><P
+>Другой, возможно, более предпочтительный вариант — удалить политику <TT
+CLASS="FILENAME"
+>sepgsql-regtest</TT
+> полностью:</P
+><PRE
+CLASS="SCREEN"
+>$ sudo semodule -r sepgsql-regtest</PRE
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="SEPGSQL-PARAMETERS"
+>E.34.4. Параметры GUC</A
+></H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="GUC-SEPGSQL-PERMISSIVE"
+></A
+><TT
+CLASS="VARNAME"
+>sepgsql.permissive</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Этот параметр переводит <TT
+CLASS="FILENAME"
+>sepgsql</TT
+> в разрешительный режим, вне зависимости от режима системы. По умолчанию он имеет значение off (отключён). Задать этот параметр можно только в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+> или в командной строке при запуске сервера.</P
+><P
+>Когда этот параметр включён, <TT
+CLASS="FILENAME"
+>sepgsql</TT
+> действует в разрешительном режиме, даже если SELinux в целом находится в ограничительном режиме. Этот параметр полезен в первую очередь для тестирования.</P
+></DD
+><DT
+><A
+NAME="GUC-SEPGSQL-DEBUG-AUDIT"
+></A
+><TT
+CLASS="VARNAME"
+>sepgsql.debug_audit</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Этот параметр включает вывод сообщений аудита вне зависимости от параметров системной политики. По умолчанию он отключён (имеет значение off), что означает, что сообщения будут выводиться согласно параметрам системы.</P
+><P
+>Политики безопасности <SPAN
+CLASS="PRODUCTNAME"
+>SELinux</SPAN
+> также содержит правила, определяющие, будут ли фиксироваться в журнале определённые события. По умолчанию фиксируются нарушения доступа, а успешный доступ — нет.</P
+><P
+>Этот параметр принудительно включает фиксирование в журнале всех возможных событий, вне зависимости от системной политики.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="SEPGSQL-FEATURES"
+>E.34.5. Функциональные возможности</A
+></H2
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN124910"
+>E.34.5.1. Управляемые классы объектов</A
+></H3
+><P
+>Модель безопасности <SPAN
+CLASS="PRODUCTNAME"
+>SELinux</SPAN
+> описывает все правила доступа в виде отношений между сущностью субъекта (обычно, это клиент базы данных) и сущностью объекта (например, объектом базы данных), каждая из которых определяется меткой безопасности. Если осуществляется попытка доступа к непомеченному объекту, он обрабатывается как объект, имеющий метку <TT
+CLASS="LITERAL"
+>unlabeled_t</TT
+>.</P
+><P
+>В настоящее время <TT
+CLASS="FILENAME"
+>sepgsql</TT
+> позволяет назначать метки безопасности схемам, таблицам, колонкам, последовательностям, представлениям и функциям. Когда <TT
+CLASS="FILENAME"
+>sepgsql</TT
+> активен, метки безопасности автоматически назначаются поддерживаемым объектам базы в момент создания. Такая метка называется меткой безопасности по умолчанию и устанавливается согласно политике безопасности системы, которая учитывает метку создателя, метку, назначенную родительскому объекту создаваемого объекта и, возможно, имя создаваемого объекта.</P
+><P
+>Новый объект базы, как правило, наследует метку безопасности, назначенную родительскому объекту, если только в политике безопасности не заданы специальные правила, называемые правилами перехода типов (в этом случае может быть назначена другая метка). Для схем родительским объектом является текущая база данных; для таблиц, последовательностей, представлений и функций — схема, содержащая эти объекты; для колонок — таблица.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN124919"
+>E.34.5.2. Разрешения для DML</A
+></H3
+><P
+>Для таблиц, задействованных в запросе в качестве целевых, проверяются разрешения <TT
+CLASS="LITERAL"
+>db_table:select</TT
+>, <TT
+CLASS="LITERAL"
+>db_table:insert</TT
+>, <TT
+CLASS="LITERAL"
+>db_table:update</TT
+> или <TT
+CLASS="LITERAL"
+>db_table:delete</TT
+> в зависимости от типа оператора; кроме того, для всех таблиц, содержащих колонки, фигурирующие в предложении <TT
+CLASS="LITERAL"
+>WHERE</TT
+> или <TT
+CLASS="LITERAL"
+>RETURNING</TT
+>, или служащих источником данных для <TT
+CLASS="LITERAL"
+>UPDATE</TT
+> и т. п., также проверяется разрешение <TT
+CLASS="LITERAL"
+>db_table:select</TT
+>.</P
+><P
+>Для всех задействованных колонок также проверяются разрешения на уровне колонок. Разрешение <TT
+CLASS="LITERAL"
+>db_column:select</TT
+> проверяется не только для колонок, которые считываются оператором <TT
+CLASS="LITERAL"
+>SELECT</TT
+>, но и для тех, к которым обращаются другие операторы DML; <TT
+CLASS="LITERAL"
+>db_column:update</TT
+> или <TT
+CLASS="LITERAL"
+>db_column:insert</TT
+> также проверяется для колонок, изменяемых операторами <TT
+CLASS="LITERAL"
+>UPDATE</TT
+> или <TT
+CLASS="LITERAL"
+>INSERT</TT
+>.</P
+><P
+>Например, рассмотрим запрос: </P><PRE
+CLASS="SYNOPSIS"
+>UPDATE t1 SET x = 2, y = md5sum(y) WHERE z = 100;</PRE
+><P> В данном случае <TT
+CLASS="LITERAL"
+>db_column:update</TT
+> будет проверяться для колонки <TT
+CLASS="LITERAL"
+>t1.x</TT
+>, так как она изменяется, <TT
+CLASS="LITERAL"
+>db_column:{select update}</TT
+> будет проверяться для <TT
+CLASS="LITERAL"
+>t1.y</TT
+>, так как она и считывается, и изменяется, а <TT
+CLASS="LITERAL"
+>db_column:select</TT
+> — для колонки <TT
+CLASS="LITERAL"
+>t1.z</TT
+>, так как она только считывается. На уровне таблицы также будет проверяться разрешение <TT
+CLASS="LITERAL"
+>db_table:{select update}</TT
+>.</P
+><P
+>Для последовательностей проверяется разрешение <TT
+CLASS="LITERAL"
+>db_sequence:get_value</TT
+>, когда имеет место обращение к объекту последовательности в <TT
+CLASS="LITERAL"
+>SELECT</TT
+>; заметьте, однако, что в настоящее время разрешения на выполнение связанных функций, таких как, <TT
+CLASS="LITERAL"
+>lastval()</TT
+>, не проверяются.</P
+><P
+>Для представлений проверяется <TT
+CLASS="LITERAL"
+>db_view:expand</TT
+>, а затем все другие соответствующие разрешения для объектов, развёрнутых из определения представления, в индивидуальном порядке.</P
+><P
+>Для функций проверяется <TT
+CLASS="LITERAL"
+>db_procedure:{execute}</TT
+>, когда пользователь пытается выполнить функцию в составе запроса, либо при вызове по быстрому пути. Если эта функция является доверенной процедурой, также проверяется разрешение <TT
+CLASS="LITERAL"
+>db_procedure:{entrypoint}</TT
+>, чтобы удостовериться, что эта функция может быть точкой входа в доверенную процедуру.</P
+><P
+>При обращении к любому объекту схемы необходимо иметь разрешение <TT
+CLASS="LITERAL"
+>db_schema:search</TT
+> для содержащей его схемы. Когда имя целевого объекта не дополняется схемой, схемы, для которых данное разрешение отсутствует, не будут просматриваться (то же происходит, если у пользователя нет права <TT
+CLASS="LITERAL"
+>USAGE</TT
+> для этой схемы). Когда схема указывается явно, пользователь получит ошибку, если он не имеет требуемого разрешения для доступа к указанной схеме.</P
+><P
+>Клиенту должен быть разрешён доступ ко всем задействованным в запросе таблицам и колонкам, даже если они проявились в нём в результате разворачивания представлений, так что правила применяются согласованно вне зависимости от варианта обращения к содержимому таблиц.</P
+><P
+>Стандартная система привилегий позволяет суперпользователям баз данных изменять системные каталоги с помощью команд DML и обращаться к таблицам TOAST или модифицировать их. Когда модуль <TT
+CLASS="FILENAME"
+>sepgsql</TT
+> активен, эти операции запрещаются.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN124961"
+>E.34.5.3. Разрешения для DDL</A
+></H3
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>SELinux</SPAN
+> определяет набор разрешений для управления стандартными операциями для каждого типа объекта: создание, изменение определения, удаление и смена метки безопасности. В дополнение к ним для некоторых типов объектов предусмотрены специальные разрешения для управления их специфическими операциями, как например, добавление или удаление объектов в определённой схеме.</P
+><P
+>Для создания нового объекта базы данных требуется разрешение <TT
+CLASS="LITERAL"
+>create</TT
+>. <SPAN
+CLASS="PRODUCTNAME"
+>SELinux</SPAN
+> разрешает или запрещает выполнение этой операции в зависимости от метки безопасности клиента и предполагаемой метки безопасности нового объекта. В некоторых случаях требуются дополнительные разрешения:</P
+><P
+></P
+><UL
+><LI
+><P
+><A
+HREF="sql-createdatabase.html"
+>CREATE DATABASE</A
+> дополнительно требует разрешения <TT
+CLASS="LITERAL"
+>getattr</TT
+> в исходной или шаблонной базе данных.</P
+></LI
+><LI
+><P
+>Создание объекта схемы дополнительно требует разрешения <TT
+CLASS="LITERAL"
+>add_name</TT
+> в родительской схеме.</P
+></LI
+><LI
+><P
+>Создание таблицы дополнительно требует разрешения на создание каждой отдельной колонки таблицы, как если бы каждая колонка таблицы была отдельным объектом верхнего уровня.</P
+></LI
+><LI
+><P
+>Создание функции с атрибутом <TT
+CLASS="LITERAL"
+>LEAKPROOF</TT
+> дополнительно требует разрешения <TT
+CLASS="LITERAL"
+>install</TT
+>. (Это разрешение также проверяется, когда атрибут <TT
+CLASS="LITERAL"
+>LEAKPROOF</TT
+> устанавливается для существующей функции.)</P
+></LI
+></UL
+><P
+>Когда выполняется команда <TT
+CLASS="LITERAL"
+>DROP</TT
+>, для удаляемого объекта будет проверяться разрешение <TT
+CLASS="LITERAL"
+>drop</TT
+>. Разрешения будут также проверяться и для объектов, удаляемых косвенно, вследствие указания <TT
+CLASS="LITERAL"
+>CASCADE</TT
+>. Для удаления объектов, содержащихся в определённой схеме, (таблиц, представления, последовательностей и процедур) дополнительно нужно иметь разрешение <TT
+CLASS="LITERAL"
+>remove_name</TT
+> в этой схеме.</P
+><P
+>Когда выполняется команда <TT
+CLASS="LITERAL"
+>ALTER</TT
+>, для каждого модифицируемого объекта проверяется разрешение <TT
+CLASS="LITERAL"
+>setattr</TT
+>, кроме подчинённых объектов, таких как индексы или триггеры таблиц (на них распространяются разрешения родительского объекта). В некоторых случаях требуются дополнительные разрешения:</P
+><P
+></P
+><UL
+><LI
+><P
+>При перемещении объекта в новую схему дополнительно требуется разрешение <TT
+CLASS="LITERAL"
+>remove_name</TT
+> в старой схеме и <TT
+CLASS="LITERAL"
+>add_name</TT
+> в новой.</P
+></LI
+><LI
+><P
+>Для установки атрибута <TT
+CLASS="LITERAL"
+>LEAKPROOF</TT
+> для функции требуется разрешение <TT
+CLASS="LITERAL"
+>install</TT
+>.</P
+></LI
+><LI
+><P
+>Для использования <A
+HREF="sql-security-label.html"
+>SECURITY LABEL</A
+> дополнительно требуется разрешение <TT
+CLASS="LITERAL"
+>relabelfrom</TT
+> для объекта с его старой меткой безопасности и <TT
+CLASS="LITERAL"
+>relabelto</TT
+> для этого объекта с новой меткой безопасности. (В случаях, когда установлено несколько поставщиков меток и пользователь пытается задать метку, неподконтрольную <SPAN
+CLASS="PRODUCTNAME"
+>SELinux</SPAN
+>, должно проверяться только разрешение <TT
+CLASS="LITERAL"
+>setattr</TT
+>. В настоящее время этого не происходит из-за ограничений реализации.)</P
+></LI
+></UL
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN125007"
+>E.34.5.4. Доверенные процедуры</A
+></H3
+><P
+>Доверенные процедуры похожи на функции, определяющие контекст безопасности, или команды setuid. В <SPAN
+CLASS="PRODUCTNAME"
+>SELinux</SPAN
+> реализована возможность запускать доверенный код с меткой безопасности, отличной от метки клиента, как правило, для предоставления чётко контролируемого доступа к важным данным (при этом например, могут отсеиваться строки или хранимые значения могут выводиться с меньшей точностью). Будет ли функция вызываться как доверенная процедура, определяется её меткой безопасности и политикой операционной системы. Например:</P
+><PRE
+CLASS="SCREEN"
+>postgres=# CREATE TABLE customer (
+               cid     int primary key,
+               cname   text,
+               credit  text
+           );
+CREATE TABLE
+postgres=# SECURITY LABEL ON COLUMN customer.credit
+               IS 'system_u:object_r:sepgsql_secret_table_t:s0';
+SECURITY LABEL
+postgres=# CREATE FUNCTION show_credit(int) RETURNS text
+             AS 'SELECT regexp_replace(credit, ''-[0-9]+$'', ''-xxxx'', ''g'')
+                        FROM customer WHERE cid = $1'
+           LANGUAGE sql;
+CREATE FUNCTION
+postgres=# SECURITY LABEL ON FUNCTION show_credit(int)
+               IS 'system_u:object_r:sepgsql_trusted_proc_exec_t:s0';
+SECURITY LABEL</PRE
+><P
+>Показанные выше операции должен выполнять пользователь с правами администратора.</P
+><PRE
+CLASS="SCREEN"
+>postgres=# SELECT * FROM customer;
+ERROR:  SELinux: security policy violation
+postgres=# SELECT cid, cname, show_credit(cid) FROM customer;
+ cid | cname  |     show_credit
+-----+--------+---------------------
+   1 | taro   | 1111-2222-3333-xxxx
+   2 | hanako | 5555-6666-7777-xxxx
+(2 rows)</PRE
+><P
+>В данном случае обычный пользователь не может обращаться к <TT
+CLASS="LITERAL"
+>customer.credit</TT
+> напрямую, но доверенная процедура <TT
+CLASS="LITERAL"
+>show_credit</TT
+> позволяет ему получить номера кредитных карт клиентов, в которых будут скрыты некоторые цифры.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN125017"
+>E.34.5.5. Динамические переключения домена</A
+></H3
+><P
+>Возможность динамического перехода из домена в домен SELinux позволяет переводить метку безопасности клиентского процесса, клиентский домен в новый контекст, если это допускается политикой безопасности. Для этого клиент должен иметь разрешение <TT
+CLASS="LITERAL"
+>setcurrent</TT
+>, а также разрешение <TT
+CLASS="LITERAL"
+>dyntransition</TT
+> для перехода из старого в новый домен.</P
+><P
+>Динамические переключения домена следует тщательно продумывать, так как таким образом пользователи могут менять свои метки, а значит и привилегии, по собственному желанию, а не (как в случае с доверенными процедурами) по правилам, диктуемым системой. Таким образом, разрешение <TT
+CLASS="LITERAL"
+>dyntransition</TT
+> считается безопасным, только когда применяется для переключения в домен с более ограниченным набором привилегий, чем текущий. Например:</P
+><PRE
+CLASS="SCREEN"
+>regression=# select sepgsql_getcon();
+                    sepgsql_getcon
+-------------------------------------------------------
+ unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023
+(1 row)
+
+regression=# SELECT sepgsql_setcon('unconfined_u:unconfined_r:unconfined_t:s0-s0:c1.c4');
+ sepgsql_setcon 
+----------------
+ t
+(1 row)
+
+regression=# SELECT sepgsql_setcon('unconfined_u:unconfined_r:unconfined_t:s0-s0:c1.c1023');
+ERROR:  SELinux: security policy violation</PRE
+><P
+>В показанном выше примере мы смогли переключиться из более широкого диапазона MCS <TT
+CLASS="LITERAL"
+>c1.c1023</TT
+> в более узкий <TT
+CLASS="LITERAL"
+>c1.c4</TT
+>, но переключение в обратную сторону было запрещено.</P
+><P
+>Сочетание динамического переключения домена с доверенными процедурами позволяет получить интересное решение, подходящее для реализации жизненного цикла процессов с пулом соединений. Даже если вашему менеджеру пула соединений не разрешается запускать многие команды SQL, вы можете разрешить ему сменить метку безопасности клиента, вызвав функцию <TT
+CLASS="LITERAL"
+>sepgsql_setcon()</TT
+> из доверенной процедуры; для этого может передаваться удостоверение для авторизации запроса на смену метки клиента. После этого сеанс получит привилегии целевого пользователя, а не пользователя пула соединений. Позднее менеджер пула может отменить смену контекста безопасности, вызвав <TT
+CLASS="LITERAL"
+>sepgsql_setcon()</TT
+> с аргументом <TT
+CLASS="LITERAL"
+>NULL</TT
+>, так же из доверенной процедуры с необходимыми проверками разрешений. Идея этого подхода в том, что только этой доверенной процедуре будет разрешено менять действующую метку безопасности и только в том случае, когда ей передаётся правильное удостоверение. Разумеется, чтобы это решение было безопасным, хранилище удостоверений (таблица, определение процедуры или что-то другое) не должно быть общедоступным.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN125032"
+>E.34.5.6. Разное</A
+></H3
+><P
+>Выполнение команды <A
+HREF="sql-load.html"
+>LOAD</A
+> в активном режиме запрещается, так как любой загруженный модуль может легко обойти ограничения политики безопасности.</P
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="SEPGSQL-FUNCTIONS"
+>E.34.6. Функции sepgsql</A
+></H2
+><P
+>В <A
+HREF="sepgsql.html#SEPGSQL-FUNCTIONS-TABLE"
+>Таблице E-27</A
+> перечислены все доступные функции.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="SEPGSQL-FUNCTIONS-TABLE"
+></A
+><P
+><B
+>Таблица E-27. Функции sepgsql</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><TBODY
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>sepgsql_getcon() returns text</TT
+>
+                  </TD
+><TD
+>Возвращает клиентский домен, текущую метку безопасности клиента.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>sepgsql_setcon(text) returns bool</TT
+>
+                  </TD
+><TD
+>Переключает домен клиента текущего сеанса в новый домен, если это допускает политика безопасности. Эта функция также принимает в аргументе <TT
+CLASS="LITERAL"
+>NULL</TT
+> как запрос на переход в начальный домен клиента.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>sepgsql_mcstrans_in(text) returns text</TT
+>
+                  </TD
+><TD
+>Переводит заданный диапазон MLS/MCS из полной записи в низкоуровневый формат, если работает демон mcstrans.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>sepgsql_mcstrans_out(text) returns text</TT
+>
+                  </TD
+><TD
+>Переводит заданный диапазон MLS/MCS из низкоуровневого формата в полную запись, если работает демон mcstrans.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>sepgsql_restorecon(text) returns bool</TT
+>
+                  </TD
+><TD
+>Устанавливает начальные метки безопасности для всех объектов в текущей базе данных. В аргументе может передаваться NULL или имя файла со спецификациями контекстов, который будет применяться вместо стандартного системного.</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="SEPGSQL-LIMITATIONS"
+>E.34.7. Ограничения</A
+></H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+>Разрешения для языка определения данных (DDL, Data Definition Language)</DT
+><DD
+><P
+>Вследствие ограничений реализации, для некоторых операций DDL разрешения не проверяются.</P
+></DD
+><DT
+>Разрешения для языка управления данными (DCL, Data Control Language)</DT
+><DD
+><P
+>Вследствие ограничений реализации, для операций DCL разрешения не проверяются.</P
+></DD
+><DT
+>Управление доступом на уровне строк</DT
+><DD
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> не поддерживает ограничение доступа на уровне строк; как следствие, это не поддерживает и <TT
+CLASS="FILENAME"
+>sepgsql</TT
+>.</P
+></DD
+><DT
+>Скрытые каналы</DT
+><DD
+><P
+>Модуль <TT
+CLASS="FILENAME"
+>sepgsql</TT
+> не пытается скрыть существование определённого объекта, даже если пользователю не разрешено обращаться к нему. Например, возможно догадаться о существовании невидимого объекта по конфликтам первичного ключа, нарушениям внешних ключей и т. д., даже когда нельзя получить содержимое этого объекта. Существование совершенно секретной таблицы невозможно скрыть; надеяться можно только на то, что будет защищено её содержимое.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="SEPGSQL-RESOURCES"
+>E.34.8. Внешние ресурсы</A
+></H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+HREF="http://wiki.postgresql.org/wiki/SEPostgreSQL"
+TARGET="_top"
+>Введение в SE-PostgreSQL</A
+></DT
+><DD
+><P
+>На этой вики-странице даётся краткий обзор этого решения и рассказывается об архитектуре и конструкции безопасности, администрировании и ожидаемых в будущем возможностях.</P
+></DD
+><DT
+><A
+HREF="http://docs.fedoraproject.org/selinux-user-guide/"
+TARGET="_top"
+>Руководство пользователя SELinux в ОС Fedora</A
+></DT
+><DD
+><P
+>В этом документе представлен широкий спектр знаний по администрированию <SPAN
+CLASS="PRODUCTNAME"
+>SELinux</SPAN
+> в системе. В первую очередь он ориентирован на ОС Fedora, но его область применения не ограничена ей.</P
+></DD
+><DT
+><A
+HREF="http://docs.fedoraproject.org/selinux-faq"
+TARGET="_top"
+>Часто задаваемые вопросы по SELinux в ОС Fedora</A
+></DT
+><DD
+><P
+>В этом документе даются ответы на часто задаваемые вопросы по <SPAN
+CLASS="PRODUCTNAME"
+>SELinux</SPAN
+>. В первую очередь он ориентирован на ОС Fedora, но его область применения не ограничена ей.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="SEPGSQL-AUTHOR"
+>E.34.9. Автор</A
+></H2
+><P
+>КайГай Кохей <CODE
+CLASS="EMAIL"
+>&#60;<A
+HREF="mailto:kaigai@ak.jp.nec.com"
+>kaigai@ak.jp.nec.com</A
+>&#62;</CODE
+></P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="seg.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="contrib-spi.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>seg</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>spi</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,274 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Роли базы данных</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Роли базы данных"
+HREF="user-manag.html"><LINK
+REL="PREVIOUS"
+TITLE="Роли базы данных"
+HREF="user-manag.html"><LINK
+REL="NEXT"
+TITLE="Атрибуты ролей"
+HREF="role-attributes.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Роли базы данных"
+HREF="user-manag.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="user-manag.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 20. Роли базы данных</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Атрибуты ролей"
+HREF="role-attributes.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="DATABASE-ROLES"
+>20.1. Роли базы данных</A
+></H1
+><P
+>Роли базы данных концептуально полностью отличаются от пользователей операционной системы. На практике поддержание соответствия между ними может быть удобным, но не является обязательным. Роли базы данных являются глобальными для всей установки кластера базы данных (не для отдельной базы данных). Для создания роли используется команда SQL <A
+HREF="sql-createrole.html"
+>CREATE ROLE</A
+>: </P><PRE
+CLASS="SYNOPSIS"
+>CREATE ROLE <TT
+CLASS="REPLACEABLE"
+><I
+>name</I
+></TT
+>;</PRE
+><P>
+   <TT
+CLASS="REPLACEABLE"
+><I
+>name</I
+></TT
+> соответствует правилам именования идентификаторов SQL: либо обычное, без специальных символов, либо в двойных кавычках. (На практике, к команде обычно добавляются другие указания, такие как <TT
+CLASS="LITERAL"
+>LOGIN</TT
+>. Подробнее об этом ниже.) Для удаления роли используется команда <A
+HREF="sql-droprole.html"
+>DROP ROLE</A
+> : </P><PRE
+CLASS="SYNOPSIS"
+>DROP ROLE <TT
+CLASS="REPLACEABLE"
+><I
+>name</I
+></TT
+>;</PRE
+><P></P
+><P
+>Для удобства поставляются программы <A
+HREF="app-createuser.html"
+>            <SPAN
+CLASS="APPLICATION"
+>createuser</SPAN
+>
+          </A
+> и <A
+HREF="app-dropuser.html"
+>            <SPAN
+CLASS="APPLICATION"
+>dropuser</SPAN
+>
+          </A
+>, которые являются обёртками для этих команд SQL и вызываются из командной строки оболочки ОС: </P><PRE
+CLASS="SYNOPSIS"
+>createuser <TT
+CLASS="REPLACEABLE"
+><I
+>name</I
+></TT
+>
+dropuser <TT
+CLASS="REPLACEABLE"
+><I
+>name</I
+></TT
+></PRE
+><P></P
+><P
+>Для получения списка существующих ролей, рассмотрите <TT
+CLASS="STRUCTNAME"
+>pg_roles</TT
+> системного каталога, например: </P><PRE
+CLASS="SYNOPSIS"
+>SELECT rolname FROM pg_roles;</PRE
+><P> Метакоманда <TT
+CLASS="LITERAL"
+>\du</TT
+> программы <A
+HREF="app-psql.html"
+>            <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>
+          </A
+> также полезна для получения списка существующих ролей.</P
+><P
+>Для начальной настройки кластера базы данных, система сразу после инициализации всегда содержит одну предопределённую роль. Эта роль является суперпользователем (<SPAN
+CLASS="QUOTE"
+>"superuser"</SPAN
+>) и по умолчанию (если не изменено при запуске <TT
+CLASS="COMMAND"
+>initdb</TT
+>) имеет такое же имя, как и пользователь операционной системы, инициализирующий кластер баз данных. Обычно эта роль называется <TT
+CLASS="LITERAL"
+>postgres</TT
+>. Для создания других ролей, вначале нужно подключиться с этой ролью.</P
+><P
+>Каждое подключение к серверу базы данных выполняется под именем конкретной роли и эта роль определяет начальные привилегии доступа для команд выполняемых в этом соединении. Имя роли для конкретного подключения к базе данных указывается клиентской программой характерным для неё способом, таким образом инициируя запрос на подключение. Например, программа <TT
+CLASS="COMMAND"
+>psql</TT
+> для указания роли использует аргумент командной строки <TT
+CLASS="OPTION"
+>-U</TT
+>. Многие приложения предполагают, что по умолчанию нужно использовать имя пользователя операционной системы (включая <TT
+CLASS="COMMAND"
+>createuser</TT
+> и <TT
+CLASS="COMMAND"
+>psql</TT
+>). Поэтому часто бывает удобным поддерживать соответствие между именами ролей и именами пользователей операционной системы.</P
+><P
+>Список доступных для подключения ролей, который могут использовать клиенты, определяется конфигурацией аутентификации, как описывалось в <A
+HREF="client-authentication.html"
+>Главе 19</A
+>. (Поэтому, клиент не ограничен только ролью, соответствующей имени пользователя операционной системы, также как и имя для входа может не соответствовать реальному имени.) Так как роль определяет набор доступных привилегий, очень важно тщательно настраивать привилегии в многопользовательской среде.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="user-manag.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="role-attributes.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Роли базы данных</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="user-manag.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Атрибуты ролей</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

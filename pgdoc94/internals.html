@@ -1,0 +1,1227 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Внутреннее устройство</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="PREVIOUS"
+TITLE="            postmaster
+          "
+HREF="app-postmaster.html"><LINK
+REL="NEXT"
+TITLE="Обзор внутреннего устройства PostgreSQL"
+HREF="overview.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="PART"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="            postmaster
+          "
+HREF="app-postmaster.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Обзор внутреннего устройства PostgreSQL"
+HREF="overview.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="PART"
+><A
+NAME="INTERNALS"
+></A
+><DIV
+CLASS="TITLEPAGE"
+><H1
+CLASS="TITLE"
+>VII. Внутреннее устройство</H1
+><DIV
+CLASS="PARTINTRO"
+><A
+NAME="AEN94357"
+></A
+><P
+>Содержит разнообразную информацию, полезную для разработчиков <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+></DIV
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Содержание</B
+></DT
+><DT
+>47. <A
+HREF="overview.html"
+>Обзор внутреннего устройства PostgreSQL</A
+></DT
+><DD
+><DL
+><DT
+>47.1. <A
+HREF="query-path.html"
+>Путь запроса</A
+></DT
+><DT
+>47.2. <A
+HREF="connect-estab.html"
+>Как устанавливаются соединения</A
+></DT
+><DT
+>47.3. <A
+HREF="parser-stage.html"
+>Этап разбора</A
+></DT
+><DT
+>47.4. <A
+HREF="rule-system.html"
+>Система правил <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></A
+></DT
+><DT
+>47.5. <A
+HREF="planner-optimizer.html"
+>Планировщик/оптимизатор</A
+></DT
+><DT
+>47.6. <A
+HREF="executor.html"
+>Исполнитель</A
+></DT
+></DL
+></DD
+><DT
+>48. <A
+HREF="catalogs.html"
+>Системные каталоги</A
+></DT
+><DD
+><DL
+><DT
+>48.1. <A
+HREF="catalogs-overview.html"
+>Обзор</A
+></DT
+><DT
+>48.2. <A
+HREF="catalog-pg-aggregate.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_aggregate</TT
+></A
+></DT
+><DT
+>48.3. <A
+HREF="catalog-pg-am.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_am</TT
+></A
+></DT
+><DT
+>48.4. <A
+HREF="catalog-pg-amop.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_amop</TT
+></A
+></DT
+><DT
+>48.5. <A
+HREF="catalog-pg-amproc.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_amproc</TT
+></A
+></DT
+><DT
+>48.6. <A
+HREF="catalog-pg-attrdef.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_attrdef</TT
+></A
+></DT
+><DT
+>48.7. <A
+HREF="catalog-pg-attribute.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_attribute</TT
+></A
+></DT
+><DT
+>48.8. <A
+HREF="catalog-pg-authid.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_authid</TT
+></A
+></DT
+><DT
+>48.9. <A
+HREF="catalog-pg-auth-members.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_auth_members</TT
+></A
+></DT
+><DT
+>48.10. <A
+HREF="catalog-pg-cast.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_cast</TT
+></A
+></DT
+><DT
+>48.11. <A
+HREF="catalog-pg-class.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+></A
+></DT
+><DT
+>48.12. <A
+HREF="catalog-pg-collation.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_collation</TT
+></A
+></DT
+><DT
+>48.13. <A
+HREF="catalog-pg-constraint.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_constraint</TT
+></A
+></DT
+><DT
+>48.14. <A
+HREF="catalog-pg-conversion.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_conversion</TT
+></A
+></DT
+><DT
+>48.15. <A
+HREF="catalog-pg-database.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_database</TT
+></A
+></DT
+><DT
+>48.16. <A
+HREF="catalog-pg-db-role-setting.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_db_role_setting</TT
+></A
+></DT
+><DT
+>48.17. <A
+HREF="catalog-pg-default-acl.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_default_acl</TT
+></A
+></DT
+><DT
+>48.18. <A
+HREF="catalog-pg-depend.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_depend</TT
+></A
+></DT
+><DT
+>48.19. <A
+HREF="catalog-pg-description.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_description</TT
+></A
+></DT
+><DT
+>48.20. <A
+HREF="catalog-pg-enum.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_enum</TT
+></A
+></DT
+><DT
+>48.21. <A
+HREF="catalog-pg-event-trigger.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_event_trigger</TT
+></A
+></DT
+><DT
+>48.22. <A
+HREF="catalog-pg-extension.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_extension</TT
+></A
+></DT
+><DT
+>48.23. <A
+HREF="catalog-pg-foreign-data-wrapper.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_foreign_data_wrapper</TT
+></A
+></DT
+><DT
+>48.24. <A
+HREF="catalog-pg-foreign-server.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_foreign_server</TT
+></A
+></DT
+><DT
+>48.25. <A
+HREF="catalog-pg-foreign-table.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_foreign_table</TT
+></A
+></DT
+><DT
+>48.26. <A
+HREF="catalog-pg-index.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_index</TT
+></A
+></DT
+><DT
+>48.27. <A
+HREF="catalog-pg-inherits.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_inherits</TT
+></A
+></DT
+><DT
+>48.28. <A
+HREF="catalog-pg-language.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_language</TT
+></A
+></DT
+><DT
+>48.29. <A
+HREF="catalog-pg-largeobject.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_largeobject</TT
+></A
+></DT
+><DT
+>48.30. <A
+HREF="catalog-pg-largeobject-metadata.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_largeobject_metadata</TT
+></A
+></DT
+><DT
+>48.31. <A
+HREF="catalog-pg-namespace.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_namespace</TT
+></A
+></DT
+><DT
+>48.32. <A
+HREF="catalog-pg-opclass.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_opclass</TT
+></A
+></DT
+><DT
+>48.33. <A
+HREF="catalog-pg-operator.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_operator</TT
+></A
+></DT
+><DT
+>48.34. <A
+HREF="catalog-pg-opfamily.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_opfamily</TT
+></A
+></DT
+><DT
+>48.35. <A
+HREF="catalog-pg-pltemplate.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_pltemplate</TT
+></A
+></DT
+><DT
+>48.36. <A
+HREF="catalog-pg-proc.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+></A
+></DT
+><DT
+>48.37. <A
+HREF="catalog-pg-range.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_range</TT
+></A
+></DT
+><DT
+>48.38. <A
+HREF="catalog-pg-rewrite.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_rewrite</TT
+></A
+></DT
+><DT
+>48.39. <A
+HREF="catalog-pg-replication-slots.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_replication_slots</TT
+></A
+></DT
+><DT
+>48.40. <A
+HREF="catalog-pg-seclabel.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_seclabel</TT
+></A
+></DT
+><DT
+>48.41. <A
+HREF="catalog-pg-shdepend.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_shdepend</TT
+></A
+></DT
+><DT
+>48.42. <A
+HREF="catalog-pg-shdescription.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_shdescription</TT
+></A
+></DT
+><DT
+>48.43. <A
+HREF="catalog-pg-shseclabel.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_shseclabel</TT
+></A
+></DT
+><DT
+>48.44. <A
+HREF="catalog-pg-statistic.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_statistic</TT
+></A
+></DT
+><DT
+>48.45. <A
+HREF="catalog-pg-tablespace.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_tablespace</TT
+></A
+></DT
+><DT
+>48.46. <A
+HREF="catalog-pg-trigger.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_trigger</TT
+></A
+></DT
+><DT
+>48.47. <A
+HREF="catalog-pg-ts-config.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_ts_config</TT
+></A
+></DT
+><DT
+>48.48. <A
+HREF="catalog-pg-ts-config-map.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_ts_config_map</TT
+></A
+></DT
+><DT
+>48.49. <A
+HREF="catalog-pg-ts-dict.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_ts_dict</TT
+></A
+></DT
+><DT
+>48.50. <A
+HREF="catalog-pg-ts-parser.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_ts_parser</TT
+></A
+></DT
+><DT
+>48.51. <A
+HREF="catalog-pg-ts-template.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_ts_template</TT
+></A
+></DT
+><DT
+>48.52. <A
+HREF="catalog-pg-type.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_type</TT
+></A
+></DT
+><DT
+>48.53. <A
+HREF="catalog-pg-user-mapping.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_user_mapping</TT
+></A
+></DT
+><DT
+>48.54. <A
+HREF="views-overview.html"
+>Системные представления</A
+></DT
+><DT
+>48.55. <A
+HREF="view-pg-available-extensions.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_available_extensions</TT
+></A
+></DT
+><DT
+>48.56. <A
+HREF="view-pg-available-extension-versions.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_available_extension_versions</TT
+></A
+></DT
+><DT
+>48.57. <A
+HREF="view-pg-cursors.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_cursors</TT
+></A
+></DT
+><DT
+>48.58. <A
+HREF="view-pg-group.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_group</TT
+></A
+></DT
+><DT
+>48.59. <A
+HREF="view-pg-indexes.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_indexes</TT
+></A
+></DT
+><DT
+>48.60. <A
+HREF="view-pg-locks.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_locks</TT
+></A
+></DT
+><DT
+>48.61. <A
+HREF="view-pg-matviews.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_matviews</TT
+></A
+></DT
+><DT
+>48.62. <A
+HREF="view-pg-prepared-statements.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_prepared_statements</TT
+></A
+></DT
+><DT
+>48.63. <A
+HREF="view-pg-prepared-xacts.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_prepared_xacts</TT
+></A
+></DT
+><DT
+>48.64. <A
+HREF="view-pg-roles.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_roles</TT
+></A
+></DT
+><DT
+>48.65. <A
+HREF="view-pg-rules.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_rules</TT
+></A
+></DT
+><DT
+>48.66. <A
+HREF="view-pg-seclabels.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_seclabels</TT
+></A
+></DT
+><DT
+>48.67. <A
+HREF="view-pg-settings.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_settings</TT
+></A
+></DT
+><DT
+>48.68. <A
+HREF="view-pg-shadow.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_shadow</TT
+></A
+></DT
+><DT
+>48.69. <A
+HREF="view-pg-stats.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_stats</TT
+></A
+></DT
+><DT
+>48.70. <A
+HREF="view-pg-tables.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_tables</TT
+></A
+></DT
+><DT
+>48.71. <A
+HREF="view-pg-timezone-abbrevs.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_timezone_abbrevs</TT
+></A
+></DT
+><DT
+>48.72. <A
+HREF="view-pg-timezone-names.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_timezone_names</TT
+></A
+></DT
+><DT
+>48.73. <A
+HREF="view-pg-user.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_user</TT
+></A
+></DT
+><DT
+>48.74. <A
+HREF="view-pg-user-mappings.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_user_mappings</TT
+></A
+></DT
+><DT
+>48.75. <A
+HREF="view-pg-views.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_views</TT
+></A
+></DT
+></DL
+></DD
+><DT
+>49. <A
+HREF="protocol.html"
+>Клиент-серверный протокол</A
+></DT
+><DD
+><DL
+><DT
+>49.1. <A
+HREF="protocol-overview.html"
+>Обзор</A
+></DT
+><DT
+>49.2. <A
+HREF="protocol-flow.html"
+>Поток сообщений</A
+></DT
+><DT
+>49.3. <A
+HREF="protocol-replication.html"
+>Протокол потоковой репликации</A
+></DT
+><DT
+>49.4. <A
+HREF="protocol-message-types.html"
+>Типы данных в сообщениях</A
+></DT
+><DT
+>49.5. <A
+HREF="protocol-message-formats.html"
+>Форматы сообщений</A
+></DT
+><DT
+>49.6. <A
+HREF="protocol-error-fields.html"
+>Поля сообщений с ошибками и замечаниями</A
+></DT
+><DT
+>49.7. <A
+HREF="protocol-changes.html"
+>Сводка изменений по сравнению с протоколом версии 2.0</A
+></DT
+></DL
+></DD
+><DT
+>50. <A
+HREF="source.html"
+>Соглашения по оформлению кода PostgreSQL</A
+></DT
+><DD
+><DL
+><DT
+>50.1. <A
+HREF="source-format.html"
+>Форматирование</A
+></DT
+><DT
+>50.2. <A
+HREF="error-message-reporting.html"
+>Вывод сообщений об ошибках в коде сервера</A
+></DT
+><DT
+>50.3. <A
+HREF="error-style-guide.html"
+>Руководство по стилю сообщений об ошибках</A
+></DT
+></DL
+></DD
+><DT
+>51. <A
+HREF="nls.html"
+>Языковая поддержка</A
+></DT
+><DD
+><DL
+><DT
+>51.1. <A
+HREF="nls-translator.html"
+>Переводчику</A
+></DT
+><DT
+>51.2. <A
+HREF="nls-programmer.html"
+>Программисту</A
+></DT
+></DL
+></DD
+><DT
+>52. <A
+HREF="plhandler.html"
+>Написание обработчика процедурного языка</A
+></DT
+><DT
+>53. <A
+HREF="fdwhandler.html"
+>Написание обёртки сторонних данных</A
+></DT
+><DD
+><DL
+><DT
+>53.1. <A
+HREF="fdw-functions.html"
+>Функции обёрток сторонних данных</A
+></DT
+><DT
+>53.2. <A
+HREF="fdw-callbacks.html"
+>Подпрограммы обёртки сторонних данных</A
+></DT
+><DT
+>53.3. <A
+HREF="fdw-helpers.html"
+>Вспомогательные функции для обёрток сторонних данных</A
+></DT
+><DT
+>53.4. <A
+HREF="fdw-planning.html"
+>Планирование запросов с обёртками сторонних данных</A
+></DT
+></DL
+></DD
+><DT
+>54. <A
+HREF="geqo.html"
+>Генетический оптимизатор запросов</A
+></DT
+><DD
+><DL
+><DT
+>54.1. <A
+HREF="geqo-intro.html"
+>Обработка запроса как сложная задача оптимизации</A
+></DT
+><DT
+>54.2. <A
+HREF="geqo-intro2.html"
+>Генетические алгоритмы</A
+></DT
+><DT
+>54.3. <A
+HREF="geqo-pg-intro.html"
+>Генетическая оптимизация запросов (<ACRONYM
+CLASS="ACRONYM"
+>GEQO</ACRONYM
+>) в PostgreSQL</A
+></DT
+><DT
+>54.4. <A
+HREF="geqo-biblio.html"
+>Дополнительные источники информации</A
+></DT
+></DL
+></DD
+><DT
+>55. <A
+HREF="indexam.html"
+>Определение интерфейса для методов доступа индекса</A
+></DT
+><DD
+><DL
+><DT
+>55.1. <A
+HREF="index-catalog.html"
+>Записи каталога для индексов</A
+></DT
+><DT
+>55.2. <A
+HREF="index-functions.html"
+>Функции для метода доступа индекса</A
+></DT
+><DT
+>55.3. <A
+HREF="index-scanning.html"
+>Сканирование индекса</A
+></DT
+><DT
+>55.4. <A
+HREF="index-locking.html"
+>Замечания о блокировке с индексами</A
+></DT
+><DT
+>55.5. <A
+HREF="index-unique-checks.html"
+>Проверки уникальности в индексе</A
+></DT
+><DT
+>55.6. <A
+HREF="index-cost-estimation.html"
+>Функции оценки стоимости индекса</A
+></DT
+></DL
+></DD
+><DT
+>56. <A
+HREF="gist.html"
+>Индексы GiST</A
+></DT
+><DD
+><DL
+><DT
+>56.1. <A
+HREF="gist-intro.html"
+>Введение</A
+></DT
+><DT
+>56.2. <A
+HREF="gist-builtin-opclasses.html"
+>Встроенные классы операторов</A
+></DT
+><DT
+>56.3. <A
+HREF="gist-extensibility.html"
+>Расширяемость</A
+></DT
+><DT
+>56.4. <A
+HREF="gist-implementation.html"
+>Реализация</A
+></DT
+><DT
+>56.5. <A
+HREF="gist-examples.html"
+>Примеры</A
+></DT
+></DL
+></DD
+><DT
+>57. <A
+HREF="spgist.html"
+>Индексы SP-GiST</A
+></DT
+><DD
+><DL
+><DT
+>57.1. <A
+HREF="spgist-intro.html"
+>Введение</A
+></DT
+><DT
+>57.2. <A
+HREF="spgist-builtin-opclasses.html"
+>Встроенные классы операторов</A
+></DT
+><DT
+>57.3. <A
+HREF="spgist-extensibility.html"
+>Расширяемость</A
+></DT
+><DT
+>57.4. <A
+HREF="spgist-implementation.html"
+>Реализация</A
+></DT
+><DT
+>57.5. <A
+HREF="spgist-examples.html"
+>Примеры</A
+></DT
+></DL
+></DD
+><DT
+>58. <A
+HREF="gin.html"
+>Индексы GIN</A
+></DT
+><DD
+><DL
+><DT
+>58.1. <A
+HREF="gin-intro.html"
+>Введение</A
+></DT
+><DT
+>58.2. <A
+HREF="gin-builtin-opclasses.html"
+>Встроенные классы операторов</A
+></DT
+><DT
+>58.3. <A
+HREF="gin-extensibility.html"
+>Расширяемость</A
+></DT
+><DT
+>58.4. <A
+HREF="gin-implementation.html"
+>Реализация</A
+></DT
+><DT
+>58.5. <A
+HREF="gin-tips.html"
+>Приёмы и советы по применению GIN</A
+></DT
+><DT
+>58.6. <A
+HREF="gin-limit.html"
+>Ограничения</A
+></DT
+><DT
+>58.7. <A
+HREF="gin-examples.html"
+>Примеры</A
+></DT
+></DL
+></DD
+><DT
+>59. <A
+HREF="storage.html"
+>Физическое хранение базы данных</A
+></DT
+><DD
+><DL
+><DT
+>59.1. <A
+HREF="storage-file-layout.html"
+>Размещение файлов базы данных</A
+></DT
+><DT
+>59.2. <A
+HREF="storage-toast.html"
+>TOAST</A
+></DT
+><DT
+>59.3. <A
+HREF="storage-fsm.html"
+>Карта свободного пространства</A
+></DT
+><DT
+>59.4. <A
+HREF="storage-vm.html"
+>Карта видимости</A
+></DT
+><DT
+>59.5. <A
+HREF="storage-init.html"
+>Слой инициализации</A
+></DT
+><DT
+>59.6. <A
+HREF="storage-page-layout.html"
+>Компоновка страницы базы данных</A
+></DT
+></DL
+></DD
+><DT
+>60. <A
+HREF="bki.html"
+>Внутренний интерфейс <ACRONYM
+CLASS="ACRONYM"
+>BKI</ACRONYM
+></A
+></DT
+><DD
+><DL
+><DT
+>60.1. <A
+HREF="bki-format.html"
+>Формат файла <ACRONYM
+CLASS="ACRONYM"
+>BKI</ACRONYM
+></A
+></DT
+><DT
+>60.2. <A
+HREF="bki-commands.html"
+>Команды <ACRONYM
+CLASS="ACRONYM"
+>BKI</ACRONYM
+></A
+></DT
+><DT
+>60.3. <A
+HREF="bki-structure.html"
+>Структура файла <ACRONYM
+CLASS="ACRONYM"
+>BKI</ACRONYM
+></A
+></DT
+><DT
+>60.4. <A
+HREF="bki-example.html"
+>Пример</A
+></DT
+></DL
+></DD
+><DT
+>61. <A
+HREF="planner-stats-details.html"
+>Как планировщик использует статистику</A
+></DT
+><DD
+><DL
+><DT
+>61.1. <A
+HREF="row-estimation-examples.html"
+>Примеры оценки количества строк</A
+></DT
+></DL
+></DD
+></DL
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="app-postmaster.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="overview.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><SPAN
+CLASS="APPLICATION"
+>postmaster</SPAN
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Обзор внутреннего устройства PostgreSQL</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

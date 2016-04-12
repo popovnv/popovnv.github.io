@@ -1,0 +1,994 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Подключения и аутентификация</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Настройка сервера"
+HREF="runtime-config.html"><LINK
+REL="PREVIOUS"
+TITLE="Расположения файлов"
+HREF="runtime-config-file-locations.html"><LINK
+REL="NEXT"
+TITLE="Потребление ресурсов"
+HREF="runtime-config-resource.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Расположения файлов"
+HREF="runtime-config-file-locations.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="runtime-config.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 18. Настройка сервера</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Потребление ресурсов"
+HREF="runtime-config-resource.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="RUNTIME-CONFIG-CONNECTION"
+>18.3. Подключения и аутентификация</A
+></H1
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="RUNTIME-CONFIG-CONNECTION-SETTINGS"
+>18.3.1. Параметры подключений</A
+></H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="GUC-LISTEN-ADDRESSES"
+></A
+><TT
+CLASS="VARNAME"
+>listen_addresses</TT
+> (<TT
+CLASS="TYPE"
+>string</TT
+>) </DT
+><DD
+><P
+>Задаёт адреса TCP/IP, по которым сервер будет принимать подключения клиентских приложений. Это значение принимает форму списка, разделённого запятыми, из имён и/или числовых IP-адресов компьютеров. Особый элемент, <TT
+CLASS="LITERAL"
+>*</TT
+>, обозначает все имеющиеся IP-интерфейсы. Запись <TT
+CLASS="LITERAL"
+>0.0.0.0</TT
+> позволяет задействовать все адреса IPv4, а <TT
+CLASS="LITERAL"
+>::</TT
+> — все адреса IPv6. Если список пуст, сервер не будет привязываться ни к какому IP-интерфейсу, а значит, подключиться к нему можно будет только через доменные сокеты Unix. По умолчанию этот параметр содержит <SPAN
+CLASS="SYSTEMITEM"
+>localhost</SPAN
+>, что допускает подключение к серверу по TCP/IP только через локальный интерфейс <SPAN
+CLASS="QUOTE"
+>"замыкания"</SPAN
+>. Хотя механизм аутентификации клиентов (см. <A
+HREF="client-authentication.html"
+>Главу 19</A
+>) позволяет гибко управлять доступом пользователей к серверу, параметр <TT
+CLASS="VARNAME"
+>listen_addresses</TT
+> может ограничить интерфейсы, через которые будут приниматься соединения, что бывает полезно для предотвращения злонамеренных попыток подключения через незащищённые сетевые интерфейсы. Этот параметр можно задать только при запуске сервера.</P
+></DD
+><DT
+><A
+NAME="GUC-PORT"
+></A
+><TT
+CLASS="VARNAME"
+>port</TT
+> (<TT
+CLASS="TYPE"
+>integer</TT
+>) </DT
+><DD
+><P
+>TCP-порт, открываемый сервером; по умолчанию, 5432. Заметьте, что этот порт используется для всех IP-адресов, через которые сервер принимает подключения. Этот параметр можно задать только при запуске сервера.</P
+></DD
+><DT
+><A
+NAME="GUC-MAX-CONNECTIONS"
+></A
+><TT
+CLASS="VARNAME"
+>max_connections</TT
+> (<TT
+CLASS="TYPE"
+>integer</TT
+>) </DT
+><DD
+><P
+>Определяет максимальное число одновременных подключений к серверу БД. По умолчанию обычно это 100 подключений, но это число может быть меньше, если ядро накладывает свои ограничения (это определяется в процессе <SPAN
+CLASS="APPLICATION"
+>initdb</SPAN
+>). Этот параметр можно задать только при запуске сервера.</P
+><P
+>Для сервера, работающего в режиме резерва, значение этого параметра должно быть больше или равно значению на главном. В противном случае на резервном сервере не будут разрешены запросы.</P
+></DD
+><DT
+><A
+NAME="GUC-SUPERUSER-RESERVED-CONNECTIONS"
+></A
+><TT
+CLASS="VARNAME"
+>superuser_reserved_connections</TT
+> (<TT
+CLASS="TYPE"
+>integer</TT
+>) </DT
+><DD
+><P
+>Определяет количество <SPAN
+CLASS="QUOTE"
+>"слотов"</SPAN
+> подключений, которые <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> будет резервировать для суперпользователей. При этом всего одновременно активными могут быть максимум <A
+HREF="runtime-config-connection.html#GUC-MAX-CONNECTIONS"
+>max_connections</A
+> подключений. Когда число активных одновременных подключений больше или равно <TT
+CLASS="VARNAME"
+>max_connections</TT
+> минус <TT
+CLASS="VARNAME"
+>superuser_reserved_connections</TT
+>, принимаются только подключения суперпользователей, а все другие подключения, в том числе подключения для репликации, запрещаются.</P
+><P
+>По умолчанию резервируются три соединения. Это значение должно быть меньше значения <TT
+CLASS="VARNAME"
+>max_connections</TT
+>. Задать этот параметр можно только при запуске сервера.</P
+></DD
+><DT
+><A
+NAME="GUC-UNIX-SOCKET-DIRECTORIES"
+></A
+><TT
+CLASS="VARNAME"
+>unix_socket_directories</TT
+> (<TT
+CLASS="TYPE"
+>string</TT
+>) </DT
+><DD
+><P
+>Задаёт каталог доменного сокета Unix, через который сервер будет принимать подключения клиентских приложений. Создать несколько сокетов можно, перечислив в этом значении несколько каталогов через запятую. Пробелы между элементами этого списка игнорируются; если в пути каталога содержатся пробелы, его нужно заключать в двойные кавычки. При пустом значении сервер не будет работать с доменными сокетами Unix, в этом случае к нему можно будет подключиться только по TCP/IP. Значение по умолчанию обычно <TT
+CLASS="FILENAME"
+>/tmp</TT
+>, но его можно изменить во время сборки. Задать этот параметр можно только при запуске сервера.</P
+><P
+>Помимо самого файла сокета, который называется <TT
+CLASS="LITERAL"
+>.s.PGSQL.<TT
+CLASS="REPLACEABLE"
+><I
+>nnnn</I
+></TT
+></TT
+> (где <TT
+CLASS="REPLACEABLE"
+><I
+>nnnn</I
+></TT
+> — номер порта сервера), в каждом каталоге <TT
+CLASS="VARNAME"
+>unix_socket_directories</TT
+> создаётся обычный файл <TT
+CLASS="LITERAL"
+>.s.PGSQL.<TT
+CLASS="REPLACEABLE"
+><I
+>nnnn</I
+></TT
+>.lock</TT
+>. Ни в коем случае не удаляйте эти файлы вручную.</P
+><P
+>Этот параметр не действует в системе Windows, так как в ней нет доменных сокетов Unix.</P
+></DD
+><DT
+><A
+NAME="GUC-UNIX-SOCKET-GROUP"
+></A
+><TT
+CLASS="VARNAME"
+>unix_socket_group</TT
+> (<TT
+CLASS="TYPE"
+>string</TT
+>) </DT
+><DD
+><P
+>Задаёт группу-владельца доменных сокетов Unix. (Пользователем-владельцем сокетов всегда будет пользователь, запускающий сервер.) В сочетании с <TT
+CLASS="VARNAME"
+>unix_socket_permissions</TT
+> данный параметр можно использовать как дополнительный механизм управления доступом к доменным сокетам. По умолчанию он содержит пустую строку, то есть группой-владельцем становится основная группа пользователя, запускающего сервер. Задать этот параметр можно только при запуске сервера.</P
+><P
+>Этот параметр не действует в системе Windows, так как в ней нет доменных сокетов Unix.</P
+></DD
+><DT
+><A
+NAME="GUC-UNIX-SOCKET-PERMISSIONS"
+></A
+><TT
+CLASS="VARNAME"
+>unix_socket_permissions</TT
+> (<TT
+CLASS="TYPE"
+>integer</TT
+>) </DT
+><DD
+><P
+>Задаёт права доступа к доменным сокетам Unix. Для доменных сокетов применяется обычный набор разрешений Unix. Значение параметра ожидается в числовом виде, который принимают функции <CODE
+CLASS="FUNCTION"
+>chmod</CODE
+> и <CODE
+CLASS="FUNCTION"
+>umask</CODE
+>. (Для применения обычного восьмеричного формата число должно начинаться с 0 (<TT
+CLASS="LITERAL"
+>нуля</TT
+>).)</P
+><P
+>По умолчанию действуют разрешения <TT
+CLASS="LITERAL"
+>0777</TT
+>, при которых подключаться к сокету могут все. Другие разумные варианты — <TT
+CLASS="LITERAL"
+>0770</TT
+> (доступ имеет только пользователь и группа, см. также <TT
+CLASS="VARNAME"
+>unix_socket_group</TT
+>) и <TT
+CLASS="LITERAL"
+>0700</TT
+> (только пользователь). (Заметьте, что для доменных сокетов требуется только право на запись, так что добавлять или отзывать права на чтение/выполнение не имеет смысла.)</P
+><P
+>Этот механизм управления доступом не зависит от описанного в <A
+HREF="client-authentication.html"
+>Главе 19</A
+>.</P
+><P
+>Этот параметр можно задать только при запуске сервера.</P
+><P
+>Данный параметр неприменим для некоторых систем, в частности, Solaris (а именно Solaris 10), которые полностью игнорируют разрешения для сокетов. В таких системах примерно тот же эффект можно получить, указав в параметре <TT
+CLASS="VARNAME"
+>unix_socket_directories</TT
+> каталог, доступ к которому ограничен должным образом. Этот параметр также неприменим в Windows, где нет доменных сокетов Unix.</P
+></DD
+><DT
+><A
+NAME="GUC-BONJOUR"
+></A
+><TT
+CLASS="VARNAME"
+>bonjour</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Включает объявления о существовании сервера посредством <SPAN
+CLASS="PRODUCTNAME"
+>Bonjour</SPAN
+>. По умолчанию выключен. Задать этот параметр можно только при запуске сервера.</P
+></DD
+><DT
+><A
+NAME="GUC-BONJOUR-NAME"
+></A
+><TT
+CLASS="VARNAME"
+>bonjour_name</TT
+> (<TT
+CLASS="TYPE"
+>string</TT
+>) </DT
+><DD
+><P
+>Задаёт имя службы в среде <SPAN
+CLASS="PRODUCTNAME"
+>Bonjour</SPAN
+>. Если значение этого параметра — пустая строка (<TT
+CLASS="LITERAL"
+>''</TT
+>) (это значение по умолчанию), в качестве этого имени используется имя компьютера. Этот параметр игнорируется, если сервер был скомпилирован без поддержки <SPAN
+CLASS="PRODUCTNAME"
+>Bonjour</SPAN
+>. Задать этот параметр можно только при запуске сервера.</P
+></DD
+><DT
+><A
+NAME="GUC-TCP-KEEPALIVES-IDLE"
+></A
+><TT
+CLASS="VARNAME"
+>tcp_keepalives_idle</TT
+> (<TT
+CLASS="TYPE"
+>integer</TT
+>) </DT
+><DD
+><P
+>Задаёт период неактивности (в секундах), после которого по TCP клиенту должен отправляться сигнал сохранения соединения. При значении 0 применяется системная величина. Этот параметр поддерживается только в системах, где определён символ <TT
+CLASS="SYMBOL"
+>TCP_KEEPIDLE</TT
+> или <TT
+CLASS="SYMBOL"
+>TCP_KEEPALIVE</TT
+>, а также в Windows; в других системах он должен быть равен нулю. В сеансах, подключённых через доменные сокеты Unix, он игнорируется и всегда считается равным 0.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>В Windows при нулевом значении этот период устанавливается равным 2 часам, так как Windows не позволяет прочитать системное значение по умолчанию.</P
+></BLOCKQUOTE
+></DIV
+></DD
+><DT
+><A
+NAME="GUC-TCP-KEEPALIVES-INTERVAL"
+></A
+><TT
+CLASS="VARNAME"
+>tcp_keepalives_interval</TT
+> (<TT
+CLASS="TYPE"
+>integer</TT
+>) </DT
+><DD
+><P
+>Задаёт интервал (в секундах), по истечении которого следует повторять сигнал сохранения соединения, если ответ от клиента не был получен. При значении 0 применяется системная величина. Этот параметр поддерживается только в системах, где определён символ <TT
+CLASS="SYMBOL"
+>TCP_KEEPINTVL</TT
+>, и в Windows; в других системах он должен быть равен нулю. В сеансах, подключённых через доменные сокеты Unix, он игнорируется и всегда считается равным 0.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>В Windows при нулевом значении этот интервал устанавливается равным 1 секунде, так как Windows не позволяет прочитать системное значение по умолчанию.</P
+></BLOCKQUOTE
+></DIV
+></DD
+><DT
+><A
+NAME="GUC-TCP-KEEPALIVES-COUNT"
+></A
+><TT
+CLASS="VARNAME"
+>tcp_keepalives_count</TT
+> (<TT
+CLASS="TYPE"
+>integer</TT
+>) </DT
+><DD
+><P
+>Задаёт число TCP-сигналов сохранения соединения, которые могут быть потеряны, до того как соединение сервера с клиентом будет признано прерванным. При значении 0 применяется системная величина. Этот параметр поддерживается только в системах, где определён символ <TT
+CLASS="SYMBOL"
+>TCP_KEEPCNT</TT
+>; в других системах он должен быть равен нулю. В сеансах, подключённых через доменные сокеты Unix, он игнорируется и всегда считается равным 0.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>В Windows данный параметр не поддерживается и должен быть равен нулю.</P
+></BLOCKQUOTE
+></DIV
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="RUNTIME-CONFIG-CONNECTION-SECURITY"
+>18.3.2. Безопасность и аутентификация</A
+></H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="GUC-AUTHENTICATION-TIMEOUT"
+></A
+><TT
+CLASS="VARNAME"
+>authentication_timeout</TT
+> (<TT
+CLASS="TYPE"
+>integer</TT
+>) </DT
+><DD
+><P
+>Максимальное время, за которое должна произойти аутентификация (в секундах). Если потенциальный клиент не сможет пройти проверку подлинности за это время, сервер закроет соединение. Благодаря этому, зависшие при подключении клиенты не будут занимать соединения неограниченно долго. Значение этого параметра по умолчанию — одна минута (<TT
+CLASS="LITERAL"
+>1m</TT
+>). Задать этот параметр можно только в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+> или в командной строке при запуске сервера.</P
+></DD
+><DT
+><A
+NAME="GUC-SSL"
+></A
+><TT
+CLASS="VARNAME"
+>ssl</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Разрешает <ACRONYM
+CLASS="ACRONYM"
+>SSL</ACRONYM
+>-подключения. Прежде чем включать SSL, прочитайте <A
+HREF="ssl-tcp.html"
+>Раздел 17.9</A
+>. По умолчанию он выключен (<TT
+CLASS="LITERAL"
+>off</TT
+>). Этот параметр можно задать только при запуске сервера. <ACRONYM
+CLASS="ACRONYM"
+>SSL</ACRONYM
+>-подключения поддерживаются только для соединений по TCP/IP.</P
+></DD
+><DT
+><A
+NAME="GUC-SSL-CA-FILE"
+></A
+><TT
+CLASS="VARNAME"
+>ssl_ca_file</TT
+> (<TT
+CLASS="TYPE"
+>string</TT
+>) </DT
+><DD
+><P
+>Задаёт имя файла, содержащего сертификаты центров сертификации (ЦС) для SSL-сервера. По умолчанию этот параметр пуст; то есть информация о ЦС не загружается и проверка клиентских сертификатов не выполняется. (В предыдущих выпусках PostgreSQL это имя было фиксированным: <TT
+CLASS="FILENAME"
+>root.crt</TT
+>.) При указании относительного пути он рассматривается от каталога данных. Задать этот параметр можно только при запуске сервера.</P
+></DD
+><DT
+><A
+NAME="GUC-SSL-CERT-FILE"
+></A
+><TT
+CLASS="VARNAME"
+>ssl_cert_file</TT
+> (<TT
+CLASS="TYPE"
+>string</TT
+>) </DT
+><DD
+><P
+>Задаёт имя файла, содержащего сертификат SSL-сервера. Имя по умолчанию — <TT
+CLASS="FILENAME"
+>server.crt</TT
+>. Относительные пути рассматриваются от каталога данных. Задать этот параметр можно только при запуске сервера.</P
+></DD
+><DT
+><A
+NAME="GUC-SSL-CRL-FILE"
+></A
+><TT
+CLASS="VARNAME"
+>ssl_crl_file</TT
+> (<TT
+CLASS="TYPE"
+>string</TT
+>) </DT
+><DD
+><P
+>Задаёт имя файла, содержащего список отзыва сертификатов (CRL) для SSL-сервера. По умолчанию не определён, то есть файл CRL не загружается. (В предыдущих выпусках PostgreSQL это имя было фиксированным: <TT
+CLASS="FILENAME"
+>root.crl</TT
+>.) При указании относительного пути он рассматривается от каталога данных. Задать этот параметр можно только при запуске сервера.</P
+></DD
+><DT
+><A
+NAME="GUC-SSL-KEY-FILE"
+></A
+><TT
+CLASS="VARNAME"
+>ssl_key_file</TT
+> (<TT
+CLASS="TYPE"
+>string</TT
+>) </DT
+><DD
+><P
+>Задаёт имя файла, содержащего закрытый ключ SSL-сервера. По умолчанию имеет значение <TT
+CLASS="FILENAME"
+>server.key</TT
+>. При указании относительного пути он рассматривается от каталога данных. Задать этот параметр можно только при запуске сервера.</P
+></DD
+><DT
+><A
+NAME="GUC-SSL-RENEGOTIATION-LIMIT"
+></A
+><TT
+CLASS="VARNAME"
+>ssl_renegotiation_limit</TT
+> (<TT
+CLASS="TYPE"
+>integer</TT
+>) </DT
+><DD
+><P
+>Определяет, какой объём данных может передаваться через соединение с шифрованием <ACRONYM
+CLASS="ACRONYM"
+>SSL</ACRONYM
+> до смены/повторного согласования сеансовых ключей. Периодическая смена ключей уменьшает шансы взломщиков провести результативный криптоанализ, для которого требуется большой объём данных. С другой стороны, частая смена ключей отрицательно сказывается на быстродействии. Для проверки установленного предела суммируется объём переданного и полученного трафика. Если этот параметр равен 0, повторное согласование отключается. По умолчанию его значение <TT
+CLASS="LITERAL"
+>512MB</TT
+>.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Библиотеки SSL до ноября 2009 были подвержены атакам при повторном согласовании SSL из-за уязвимости в протоколе SSL. В качестве кардинального исправления этой уязвимости некоторые производители выпускали библиотеки SSL, неспособные выполнять повторное согласование. Если одна из таких библиотек применяется на клиенте или сервере, повторное согласование SSL следует отключать.</P
+></BLOCKQUOTE
+></DIV
+></DD
+><DT
+><A
+NAME="GUC-SSL-CIPHERS"
+></A
+><TT
+CLASS="VARNAME"
+>ssl_ciphers</TT
+> (<TT
+CLASS="TYPE"
+>string</TT
+>) </DT
+><DD
+><P
+>Задаёт список наборов шифров <ACRONYM
+CLASS="ACRONYM"
+>SSL</ACRONYM
+>, которые могут применяться для защиты соединений. Синтаксис этого параметра и список поддерживаемых значений можно найти на странице <SPAN
+CLASS="CITEREFENTRY"
+><SPAN
+CLASS="REFENTRYTITLE"
+>ciphers</SPAN
+></SPAN
+> руководства по <SPAN
+CLASS="APPLICATION"
+>OpenSSL</SPAN
+>. По умолчанию этот параметр имеет значение <TT
+CLASS="LITERAL"
+>HIGH:MEDIUM:+3DES:!aNULL</TT
+>. Обычно оно вполне приемлемо при отсутствии особых требований по безопасности.</P
+><P
+>Объяснение значения по умолчанию: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>HIGH</TT
+></DT
+><DD
+><P
+>Наборы шифров, в которых используются шифры из группы высокого уровня (<TT
+CLASS="LITERAL"
+>HIGH</TT
+>), (например: AES, Camellia, 3DES)</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>MEDIUM</TT
+></DT
+><DD
+><P
+>Наборы шифров, в которых используются шифры из группы среднего уровня (<TT
+CLASS="LITERAL"
+>MEDIUM</TT
+>) (например, RC4, SEED)</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>+3DES</TT
+></DT
+><DD
+><P
+>Порядок шифров для группы <TT
+CLASS="LITERAL"
+>HIGH</TT
+> по умолчанию в OpenSSL определён некорректно. В нём 3DES оказывается выше AES128, что неправильно, так как он считается менее безопасным, чем AES128, и работает гораздо медленнее. Включение <TT
+CLASS="LITERAL"
+>+3DES</TT
+> меняет этот порядок, чтобы данный алгоритм следовал после всех шифров групп <TT
+CLASS="LITERAL"
+>HIGH</TT
+> и <TT
+CLASS="LITERAL"
+>MEDIUM</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>!aNULL</TT
+></DT
+><DD
+><P
+>Отключает наборы анонимных шифров, не требующие проверки подлинности. Такие наборы уязвимы для атак с посредником, поэтому использовать их не следует.</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>Конкретные наборы шифров и их свойства очень различаются от версии к версии OpenSSL. Чтобы получить фактическую информацию о них для текущей установленной версии <SPAN
+CLASS="APPLICATION"
+>OpenSSL</SPAN
+>, выполните команду <TT
+CLASS="LITERAL"
+>openssl ciphers -v 'HIGH:MEDIUM:+3DES:!aNULL'</TT
+>. Учтите, что этот список фильтруется во время выполнения, в зависимости от типа ключа сервера.</P
+></DD
+><DT
+><A
+NAME="GUC-SSL-PREFER-SERVER-CIPHERS"
+></A
+><TT
+CLASS="VARNAME"
+>ssl_prefer_server_ciphers</TT
+> (<TT
+CLASS="TYPE"
+>bool</TT
+>) </DT
+><DD
+><P
+>Определяет, должны ли шифры SSL сервера предпочитаться клиентским. По умолчанию предпочтение отдаётся шифрам сервера.</P
+><P
+>В старых версиях PostgreSQL этот параметр отсутствовал и предпочтение отдавалось выбору клиента. Введён этот параметр в основном для обеспечения совместимости с этими версиями. Вообще же обычно лучше использовать конфигурацию сервера, так как в конфигурации на стороне клиента более вероятны ошибки.</P
+></DD
+><DT
+><A
+NAME="GUC-SSL-ECDH-CURVE"
+></A
+><TT
+CLASS="VARNAME"
+>ssl_ecdh_curve</TT
+> (<TT
+CLASS="TYPE"
+>string</TT
+>) </DT
+><DD
+><P
+>Задаёт имя кривой для использования при обмене ключами <ACRONYM
+CLASS="ACRONYM"
+>ECDH</ACRONYM
+>. Эту кривую должны поддерживать все подключающиеся клиенты. Это не обязательно должна быть кривая, с которой был получен ключ сервера. По умолчанию выбирается кривая <TT
+CLASS="LITERAL"
+>prime256v1</TT
+>.</P
+><P
+>Наиболее популярные кривые OpenSSL: <TT
+CLASS="LITERAL"
+>prime256v1</TT
+> (NIST P-256), <TT
+CLASS="LITERAL"
+>secp384r1</TT
+> (NIST P-384) и <TT
+CLASS="LITERAL"
+>secp521r1</TT
+> (NIST P-521).</P
+><P
+>Полный список доступных кривых можно получить командой <TT
+CLASS="COMMAND"
+>openssl ecparam -list_curves</TT
+>. Однако не все из них пригодны для <ACRONYM
+CLASS="ACRONYM"
+>TLS</ACRONYM
+>.</P
+></DD
+><DT
+><A
+NAME="GUC-PASSWORD-ENCRYPTION"
+></A
+><TT
+CLASS="VARNAME"
+>password_encryption</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Этот параметр определяет, будет ли пароль шифроваться, когда он передаётся в <A
+HREF="sql-createuser.html"
+>CREATE USER</A
+> или <A
+HREF="sql-alterrole.html"
+>ALTER ROLE</A
+> без указания <TT
+CLASS="LITERAL"
+>ENCRYPTED</TT
+> или <TT
+CLASS="LITERAL"
+>UNENCRYPTED</TT
+>. По умолчанию этот параметр установлен (<TT
+CLASS="LITERAL"
+>on</TT
+>), то есть пароль шифруется.</P
+></DD
+><DT
+><A
+NAME="GUC-KRB-SERVER-KEYFILE"
+></A
+><TT
+CLASS="VARNAME"
+>krb_server_keyfile</TT
+> (<TT
+CLASS="TYPE"
+>string</TT
+>) </DT
+><DD
+><P
+>Задаёт размещение файла ключей для сервера Kerberos. За подробностями обратитесь к <A
+HREF="auth-methods.html#GSSAPI-AUTH"
+>Подразделу 19.3.3</A
+>. Задать этот параметр можно только в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+> или в командной строке при запуске сервера.</P
+></DD
+><DT
+><A
+NAME="GUC-KRB-CASEINS-USERS"
+></A
+><TT
+CLASS="VARNAME"
+>krb_caseins_users</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Определяет, должны ли имена пользователей GSSAPI обрабатываться без учёта регистра. По умолчанию значение этого параметра — <TT
+CLASS="LITERAL"
+>off</TT
+> (регистр учитывается). Задать этот параметр можно только в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+> или в командной строке при запуске сервера.</P
+></DD
+><DT
+><A
+NAME="GUC-DB-USER-NAMESPACE"
+></A
+><TT
+CLASS="VARNAME"
+>db_user_namespace</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Этот параметр позволяет относить имена пользователей к базам данных. По умолчанию он имеет значение off (выключен). Задать этот параметр можно только в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+> или в командной строке при запуске сервера.</P
+><P
+>Если он включён, имена создаваемых пользователей должны иметь вид <TT
+CLASS="LITERAL"
+>пользователь@база_данных</TT
+>. Когда подключающийся клиент передаёт имя <TT
+CLASS="LITERAL"
+>пользователь</TT
+>, к этому имени добавляется <TT
+CLASS="LITERAL"
+>@</TT
+> с именем базы данных, и сервер идентифицирует пользователя по этому полному имени. Заметьте, что для создания пользователя с именем, содержащим <TT
+CLASS="LITERAL"
+>@</TT
+>, в среде SQL потребуется заключить это имя в кавычки.</P
+><P
+>Когда этот параметр включён, он не мешает создавать и использовать обычных глобальных пользователей. Чтобы подключиться с таким именем пользователя, достаточно добавить к имени <TT
+CLASS="LITERAL"
+>@</TT
+>, например так: <TT
+CLASS="LITERAL"
+>joe@</TT
+>. Получив такое имя, сервер отбросит <TT
+CLASS="LITERAL"
+>@</TT
+>, и будет идентифицировать пользователя по начальному имени.</P
+><P
+>Параметр <TT
+CLASS="VARNAME"
+>db_user_namespace</TT
+> порождает расхождение между именами пользователей на стороне сервера и клиента. Но проверки подлинности всегда выполняются с именем с точки зрения сервера, так что, настраивая аутентификацию, следует указывать серверное представление имени, а не клиентское. Так как метод аутентификации <TT
+CLASS="LITERAL"
+>md5</TT
+> подмешивает имя пользователя в качестве соли и на стороне сервера, и на стороне клиента, при включённом параметре <TT
+CLASS="VARNAME"
+>db_user_namespace</TT
+> использовать <TT
+CLASS="LITERAL"
+>md5</TT
+> невозможно.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Эта возможность предлагается в качестве временной меры, пока не будет найдено полноценное решение. Тогда этот параметр будет ликвидирован.</P
+></BLOCKQUOTE
+></DIV
+></DD
+></DL
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="runtime-config-file-locations.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="runtime-config-resource.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Расположения файлов</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="runtime-config.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Потребление ресурсов</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

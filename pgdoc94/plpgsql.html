@@ -1,0 +1,467 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>PL/pgSQL — процедурный язык SQL</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Серверное программирование"
+HREF="server-programming.html"><LINK
+REL="PREVIOUS"
+TITLE="Установка процедурных языков"
+HREF="xplang-install.html"><LINK
+REL="NEXT"
+TITLE="Обзор"
+HREF="plpgsql-overview.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="CHAPTER"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Установка процедурных языков"
+HREF="xplang-install.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="server-programming.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Обзор"
+HREF="plpgsql-overview.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="PLPGSQL"
+></A
+>Глава 40. <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> — процедурный язык <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+></H1
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Содержание</B
+></DT
+><DT
+>40.1. <A
+HREF="plpgsql-overview.html"
+>Обзор</A
+></DT
+><DD
+><DL
+><DT
+>40.1.1. <A
+HREF="plpgsql-overview.html#PLPGSQL-ADVANTAGES"
+>Преимущества использования <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+></A
+></DT
+><DT
+>40.1.2. <A
+HREF="plpgsql-overview.html#PLPGSQL-ARGS-RESULTS"
+>Поддерживаемые типы данных аргументов и возвращаемых значений</A
+></DT
+></DL
+></DD
+><DT
+>40.2. <A
+HREF="plpgsql-structure.html"
+>Структура <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+></A
+></DT
+><DT
+>40.3. <A
+HREF="plpgsql-declarations.html"
+>Объявления</A
+></DT
+><DD
+><DL
+><DT
+>40.3.1. <A
+HREF="plpgsql-declarations.html#PLPGSQL-DECLARATION-PARAMETERS"
+>Объявление параметров функции</A
+></DT
+><DT
+>40.3.2. <A
+HREF="plpgsql-declarations.html#PLPGSQL-DECLARATION-ALIAS"
+><TT
+CLASS="LITERAL"
+>ALIAS</TT
+></A
+></DT
+><DT
+>40.3.3. <A
+HREF="plpgsql-declarations.html#PLPGSQL-DECLARATION-TYPE"
+>Наследование типов данных</A
+></DT
+><DT
+>40.3.4. <A
+HREF="plpgsql-declarations.html#PLPGSQL-DECLARATION-ROWTYPES"
+>Строковый тип</A
+></DT
+><DT
+>40.3.5. <A
+HREF="plpgsql-declarations.html#PLPGSQL-DECLARATION-RECORDS"
+>Тип <TT
+CLASS="TYPE"
+>record</TT
+></A
+></DT
+><DT
+>40.3.6. <A
+HREF="plpgsql-declarations.html#PLPGSQL-DECLARATION-COLLATION"
+>Упорядочение переменных <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+></A
+></DT
+></DL
+></DD
+><DT
+>40.4. <A
+HREF="plpgsql-expressions.html"
+>Выражения</A
+></DT
+><DT
+>40.5. <A
+HREF="plpgsql-statements.html"
+>Основные операторы</A
+></DT
+><DD
+><DL
+><DT
+>40.5.1. <A
+HREF="plpgsql-statements.html#PLPGSQL-STATEMENTS-ASSIGNMENT"
+>Присваивания</A
+></DT
+><DT
+>40.5.2. <A
+HREF="plpgsql-statements.html#PLPGSQL-STATEMENTS-SQL-NORESULT"
+>Выполнение команды, не возвращающей результат</A
+></DT
+><DT
+>40.5.3. <A
+HREF="plpgsql-statements.html#PLPGSQL-STATEMENTS-SQL-ONEROW"
+>Выполнение запроса, возвращающего одну строку</A
+></DT
+><DT
+>40.5.4. <A
+HREF="plpgsql-statements.html#PLPGSQL-STATEMENTS-EXECUTING-DYN"
+>Выполнение динамически формируемых команд</A
+></DT
+><DT
+>40.5.5. <A
+HREF="plpgsql-statements.html#PLPGSQL-STATEMENTS-DIAGNOSTICS"
+>Статус выполнения команды</A
+></DT
+><DT
+>40.5.6. <A
+HREF="plpgsql-statements.html#PLPGSQL-STATEMENTS-NULL"
+>Не делать ничего</A
+></DT
+></DL
+></DD
+><DT
+>40.6. <A
+HREF="plpgsql-control-structures.html"
+>Управляющие структуры</A
+></DT
+><DD
+><DL
+><DT
+>40.6.1. <A
+HREF="plpgsql-control-structures.html#PLPGSQL-STATEMENTS-RETURNING"
+>Команды для возврата значения из функции</A
+></DT
+><DT
+>40.6.2. <A
+HREF="plpgsql-control-structures.html#PLPGSQL-CONDITIONALS"
+>Условные операторы</A
+></DT
+><DT
+>40.6.3. <A
+HREF="plpgsql-control-structures.html#PLPGSQL-CONTROL-STRUCTURES-LOOPS"
+>Простые циклы</A
+></DT
+><DT
+>40.6.4. <A
+HREF="plpgsql-control-structures.html#PLPGSQL-RECORDS-ITERATING"
+>Цикл по результатам запроса</A
+></DT
+><DT
+>40.6.5. <A
+HREF="plpgsql-control-structures.html#PLPGSQL-FOREACH-ARRAY"
+>Цикл по элементам массива</A
+></DT
+><DT
+>40.6.6. <A
+HREF="plpgsql-control-structures.html#PLPGSQL-ERROR-TRAPPING"
+>Обработка ошибок</A
+></DT
+><DT
+>40.6.7. <A
+HREF="plpgsql-control-structures.html#PLPGSQL-GET-DIAGNOSTICS-CONTEXT"
+>Получение информации о выполнении в текущий момент</A
+></DT
+></DL
+></DD
+><DT
+>40.7. <A
+HREF="plpgsql-cursors.html"
+>Курсоры</A
+></DT
+><DD
+><DL
+><DT
+>40.7.1. <A
+HREF="plpgsql-cursors.html#PLPGSQL-CURSOR-DECLARATIONS"
+>Объявление курсорных переменных</A
+></DT
+><DT
+>40.7.2. <A
+HREF="plpgsql-cursors.html#PLPGSQL-CURSOR-OPENING"
+>Открытие курсора</A
+></DT
+><DT
+>40.7.3. <A
+HREF="plpgsql-cursors.html#PLPGSQL-CURSOR-USING"
+>Использование курсоров</A
+></DT
+><DT
+>40.7.4. <A
+HREF="plpgsql-cursors.html#PLPGSQL-CURSOR-FOR-LOOP"
+>Обработка курсора в цикле</A
+></DT
+></DL
+></DD
+><DT
+>40.8. <A
+HREF="plpgsql-errors-and-messages.html"
+>Сообщения и ошибки</A
+></DT
+><DT
+>40.9. <A
+HREF="plpgsql-trigger.html"
+>Триггерные процедуры</A
+></DT
+><DD
+><DL
+><DT
+>40.9.1. <A
+HREF="plpgsql-trigger.html#PLPGSQL-DML-TRIGGER"
+>Триггеры на изменение данных</A
+></DT
+><DT
+>40.9.2. <A
+HREF="plpgsql-trigger.html#PLPGSQL-EVENT-TRIGGER"
+>Триггеры событий</A
+></DT
+></DL
+></DD
+><DT
+>40.10. <A
+HREF="plpgsql-implementation.html"
+><SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> изнутри</A
+></DT
+><DD
+><DL
+><DT
+>40.10.1. <A
+HREF="plpgsql-implementation.html#PLPGSQL-VAR-SUBST"
+>Подстановка переменных</A
+></DT
+><DT
+>40.10.2. <A
+HREF="plpgsql-implementation.html#PLPGSQL-PLAN-CACHING"
+>Кеширование плана</A
+></DT
+></DL
+></DD
+><DT
+>40.11. <A
+HREF="plpgsql-development-tips.html"
+>Советы по разработке на <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+></A
+></DT
+><DD
+><DL
+><DT
+>40.11.1. <A
+HREF="plpgsql-development-tips.html#PLPGSQL-QUOTE-TIPS"
+>Обработка кавычек</A
+></DT
+><DT
+>40.11.2. <A
+HREF="plpgsql-development-tips.html#PLPGSQL-EXTRA-CHECKS"
+>Дополнительные проверки во время компиляции</A
+></DT
+></DL
+></DD
+><DT
+>40.12. <A
+HREF="plpgsql-porting.html"
+>Портирование из <SPAN
+CLASS="PRODUCTNAME"
+>Oracle</SPAN
+> PL/SQL</A
+></DT
+><DD
+><DL
+><DT
+>40.12.1. <A
+HREF="plpgsql-porting.html#AEN61966"
+>Примеры портирования</A
+></DT
+><DT
+>40.12.2. <A
+HREF="plpgsql-porting.html#PLPGSQL-PORTING-OTHER"
+>На что ещё обратить внимание</A
+></DT
+><DT
+>40.12.3. <A
+HREF="plpgsql-porting.html#PLPGSQL-PORTING-APPENDIX"
+>Приложение</A
+></DT
+></DL
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="xplang-install.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="plpgsql-overview.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Установка процедурных языков</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="server-programming.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Обзор</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

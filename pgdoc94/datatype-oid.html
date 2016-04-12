@@ -1,0 +1,545 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Идентификаторы объектов</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Типы данных"
+HREF="datatype.html"><LINK
+REL="PREVIOUS"
+TITLE="Диапазонные типы"
+HREF="rangetypes.html"><LINK
+REL="NEXT"
+TITLE="          Тип pg_lsn
+        "
+HREF="datatype-pg-lsn.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Диапазонные типы"
+HREF="rangetypes.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="datatype.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 8. Типы данных</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="          Тип pg_lsn
+        "
+HREF="datatype-pg-lsn.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="DATATYPE-OID"
+>8.18. Идентификаторы объектов</A
+></H1
+><P
+>Идентификатор объекта (Object Identifier, OID) используется внутри <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> в качестве первичного ключа различных системных таблиц. В пользовательские таблицы колонка OID добавляется, только если при создании таблицы указывается <TT
+CLASS="LITERAL"
+>WITH OIDS</TT
+> или включён параметр конфигурации <A
+HREF="runtime-config-compatible.html#GUC-DEFAULT-WITH-OIDS"
+>default_with_oids</A
+>. Идентификатор объекта представляется в типе <TT
+CLASS="TYPE"
+>oid</TT
+>. Также для типа <TT
+CLASS="TYPE"
+>oid</TT
+> определены следующие псевдонимы: <TT
+CLASS="TYPE"
+>regproc</TT
+>, <TT
+CLASS="TYPE"
+>regprocedure</TT
+>, <TT
+CLASS="TYPE"
+>regoper</TT
+>, <TT
+CLASS="TYPE"
+>regoperator</TT
+>, <TT
+CLASS="TYPE"
+>regclass</TT
+>, <TT
+CLASS="TYPE"
+>regtype</TT
+>, <TT
+CLASS="TYPE"
+>regconfig</TT
+> и <TT
+CLASS="TYPE"
+>regdictionary</TT
+>. Обзор этих типов приведён в <A
+HREF="datatype-oid.html#DATATYPE-OID-TABLE"
+>Таблице 8-24</A
+>.</P
+><P
+>В настоящее время тип <TT
+CLASS="TYPE"
+>oid</TT
+> реализован как четырёхбайтное целое. Таким образом оно может быть недостаточно большим для обеспечения уникальности в базе данных или даже в отдельных больших таблицах. Поэтому в пользовательских таблицах использовать колонку типа OID в качестве первичного ключа не рекомендуется. Лучше всего ограничить применение этого типа обращениями к системным таблицами.</P
+><P
+>Для самого типа <TT
+CLASS="TYPE"
+>oid</TT
+> помимо сравнения определены всего несколько операторов. Однако его можно привести к целому и затем задействовать в обычных целочисленных вычислениях. (При этом следует опасаться путаницы со знаковыми/беззнаковыми значениями.)</P
+><P
+>Типы-псевдонимы OID сами по себе не вводят новых операций и отличаются только специализированными функциями ввода/вывода. Эти функции могут принимать и выводить не просто числовые значения, как тип <TT
+CLASS="TYPE"
+>oid</TT
+>, а символические имена системных объектов. Эти типы позволяют упростить поиск объектов по значениям OID. Например, чтобы выбрать из <TT
+CLASS="STRUCTNAME"
+>pg_attribute</TT
+> строки, относящиеся к таблице <TT
+CLASS="LITERAL"
+>mytable</TT
+>, можно написать: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT * FROM pg_attribute WHERE attrelid = 'mytable'::regclass;</PRE
+><P> вместо: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT * FROM pg_attribute
+  WHERE attrelid = (SELECT oid FROM pg_class WHERE relname = 'mytable');</PRE
+><P> Хотя второй вариант выглядит не таким уж плохим, но это лишь очень простой запрос. Если же потребуется выбрать правильный OID, когда таблица <TT
+CLASS="LITERAL"
+>mytable</TT
+> есть в нескольких схемах, вложенный подзапрос будет гораздо сложнее. Преобразователь вводимого значения типа <TT
+CLASS="TYPE"
+>regclass</TT
+> находит таблицу согласно заданному пути поиска схем, так что он делает <SPAN
+CLASS="QUOTE"
+>"всё правильно"</SPAN
+> автоматически. Аналогично, приведя идентификатор таблицы к типу <TT
+CLASS="TYPE"
+>regclass</TT
+>, можно получить символическое представление числового кода.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="DATATYPE-OID-TABLE"
+></A
+><P
+><B
+>Таблица 8-24. Идентификаторы объектов</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Ссылки</TH
+><TH
+>Описание</TH
+><TH
+>Пример значения</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>any</TD
+><TD
+>числовой идентификатор объекта</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>564182</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>regproc</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+>
+                </TD
+><TD
+>имя функции</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>sum</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>regprocedure</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+>
+                </TD
+><TD
+>функция с типами аргументов</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>sum(int4)</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>regoper</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="STRUCTNAME"
+>pg_operator</TT
+>
+                </TD
+><TD
+>имя оператора</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>+</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>regoperator</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="STRUCTNAME"
+>pg_operator</TT
+>
+                </TD
+><TD
+>оператор с типами аргументов</TD
+><TD
+><TT
+CLASS="LITERAL"
+>*(integer,integer)</TT
+> или <TT
+CLASS="LITERAL"
+>-(NONE,integer)</TT
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>regclass</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+>
+                </TD
+><TD
+>имя отношения</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>pg_type</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>regtype</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="STRUCTNAME"
+>pg_type</TT
+>
+                </TD
+><TD
+>имя типа данных</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>integer</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>regconfig</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="STRUCTNAME"
+>pg_ts_config</TT
+>
+                </TD
+><TD
+>конфигурация текстового поиска</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>english</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>regdictionary</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="STRUCTNAME"
+>pg_ts_dict</TT
+>
+                </TD
+><TD
+>словарь текстового поиска</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>simple</TT
+>
+                </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Все типы псевдонимов OID принимают имена, дополненные именем схемы, и выводят имена со схемой, если данный объект нельзя будет найти в текущем пути поиска без имени схемы. Типы <TT
+CLASS="TYPE"
+>regproc</TT
+> и <TT
+CLASS="TYPE"
+>regoper</TT
+> принимают только уникальные вводимые имена (не перегруженные), что ограничивать их применимость; в большинстве случаев лучше использовать <TT
+CLASS="TYPE"
+>regprocedure</TT
+> или <TT
+CLASS="TYPE"
+>regoperator</TT
+>. Для типа <TT
+CLASS="TYPE"
+>regoperator</TT
+> в записи унарного оператора неиспользуемый операнд заменяется словом <TT
+CLASS="LITERAL"
+>NONE</TT
+>.</P
+><P
+>Дополнительным свойством типов псевдонимов OID является образование зависимостей. Когда в сохранённом выражении фигурирует константа одного из этих типов (например, в представлении или в значении колонки по умолчанию), это создаёт зависимость от целевого объекта. Например, если значение по умолчанию определяется выражением <TT
+CLASS="LITERAL"
+>nextval('my_seq'::regclass)</TT
+>, <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> понимает, что это выражение зависит от последовательности <TT
+CLASS="LITERAL"
+>my_seq</TT
+>, и не позволит удалить последовательность раньше, чем будет удалено это выражение.</P
+><P
+>Есть ещё один тип системных идентификаторов, <TT
+CLASS="TYPE"
+>xid</TT
+>, представляющий идентификатор транзакции (сокращённо <ABBR
+CLASS="ABBREV"
+>xact</ABBR
+>). Этот тип имеют системные колонки <TT
+CLASS="STRUCTFIELD"
+>xmin</TT
+> и <TT
+CLASS="STRUCTFIELD"
+>xmax</TT
+>. Идентификаторы транзакций определяются 32-битными числами.</P
+><P
+>Третий тип идентификаторов, используемых в системе, &mdash; <TT
+CLASS="TYPE"
+>cid</TT
+>, идентификатор команды (command identifier). Этот тип данных имеют системные колонки <TT
+CLASS="STRUCTFIELD"
+>cmin</TT
+> и <TT
+CLASS="STRUCTFIELD"
+>cmax</TT
+>. Идентификаторы команд &mdash; это тоже 32-битные числа.</P
+><P
+>И наконец, последний тип системных идентификаторов &mdash; <TT
+CLASS="TYPE"
+>tid</TT
+>, идентификатор строки/кортежа (tuple identifier). Этот тип данных имеет системная колонка <TT
+CLASS="STRUCTFIELD"
+>ctid</TT
+>. Идентификатор кортежа представляет собой пару (из номера блока и индекса кортежа в блоке), идентифицирующую физическое расположение строки в таблице.</P
+><P
+>(Подробнее о системных колонках рассказывается в <A
+HREF="ddl-system-columns.html"
+>Разделе 5.4</A
+>.)</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="rangetypes.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="datatype-pg-lsn.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Диапазонные типы</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="datatype.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><ACRONYM
+CLASS="ACRONYM"
+>Тип pg_lsn</ACRONYM
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

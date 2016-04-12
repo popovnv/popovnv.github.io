@@ -1,0 +1,335 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>dblink_open</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="dblink"
+HREF="dblink.html"><LINK
+REL="PREVIOUS"
+TITLE="dblink_exec"
+HREF="contrib-dblink-exec.html"><LINK
+REL="NEXT"
+TITLE="dblink_fetch"
+HREF="contrib-dblink-fetch.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="dblink_exec"
+HREF="contrib-dblink-exec.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="dblink.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="dblink_fetch"
+HREF="contrib-dblink-fetch.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="CONTRIB-DBLINK-OPEN"
+></A
+>dblink_open</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN119749"
+></A
+><H2
+>Название</H2
+>dblink_open&nbsp;--&nbsp;открывает курсор в удалённой базе данных</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN119752"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>dblink_open(text cursorname, text sql [, bool fail_on_error]) returns text
+dblink_open(text connname, text cursorname, text sql [, bool fail_on_error]) returns text</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN119754"
+></A
+><H2
+>Описание</H2
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>dblink_open()</CODE
+> открывает курсор в удалённой базе данных. Открытым курсором можно будет манипулировать функциями <CODE
+CLASS="FUNCTION"
+>dblink_fetch()</CODE
+> и <CODE
+CLASS="FUNCTION"
+>dblink_close()</CODE
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN119760"
+></A
+><H2
+>Аргументы</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="PARAMETER"
+>conname</TT
+></DT
+><DD
+><P
+>Имя используемого подключения; опустите этот параметр, чтобы использовать безымянное подключение.</P
+></DD
+><DT
+><TT
+CLASS="PARAMETER"
+>cursorname</TT
+></DT
+><DD
+><P
+>Имя, назначаемое курсору.</P
+></DD
+><DT
+><TT
+CLASS="PARAMETER"
+>sql</TT
+></DT
+><DD
+><P
+>Оператор <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, который вы хотите выполнять в удалённой базе данных, например <TT
+CLASS="LITERAL"
+>select * from pg_class</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="PARAMETER"
+>fail_on_error</TT
+></DT
+><DD
+><P
+>Если равен true (это значение по умолчанию), в случае ошибки, выданной на удалённой стороне соединения, ошибка также выдаётся локально. Если равен false, удалённая ошибка выдаётся локально как ЗАМЕЧАНИЕ, и возвращаемым значением функции будет <TT
+CLASS="LITERAL"
+>ERROR</TT
+>.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN119786"
+></A
+><H2
+>Возвращаемое значение</H2
+><P
+>Возвращает состояние, <TT
+CLASS="LITERAL"
+>OK</TT
+> или <TT
+CLASS="LITERAL"
+>ERROR</TT
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN119791"
+></A
+><H2
+>Замечания</H2
+><P
+>Так как курсор может существовать только в рамках транзакции, функция <CODE
+CLASS="FUNCTION"
+>dblink_open</CODE
+> начинает явный блок транзакции (командой <TT
+CLASS="COMMAND"
+>BEGIN</TT
+>) на удалённой стороне, если транзакция там ещё не открыта. Эта транзакция будет снова закрыта при соответствующем вызове <CODE
+CLASS="FUNCTION"
+>dblink_close</CODE
+>. Заметьте, что если вы с помощью <CODE
+CLASS="FUNCTION"
+>dblink_exec</CODE
+> изменяете данные между вызовами <CODE
+CLASS="FUNCTION"
+>dblink_open</CODE
+> и <CODE
+CLASS="FUNCTION"
+>dblink_close</CODE
+>, а затем происходит ошибка, либо если вы вызываете <CODE
+CLASS="FUNCTION"
+>dblink_disconnect</CODE
+> перед <CODE
+CLASS="FUNCTION"
+>dblink_close</CODE
+>, ваши изменения <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>будут потеряны</I
+></SPAN
+>, так как транзакция будет прервана.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN119803"
+></A
+><H2
+>Примеры</H2
+><PRE
+CLASS="SCREEN"
+>SELECT dblink_connect('dbname=postgres');
+ dblink_connect
+----------------
+ OK
+(1 row)
+
+SELECT dblink_open('foo', 'select proname, prosrc from pg_proc');
+ dblink_open
+-------------
+ OK
+(1 row)</PRE
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="contrib-dblink-exec.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="contrib-dblink-fetch.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>dblink_exec</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="dblink.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>dblink_fetch</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,253 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>LOAD</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="LISTEN"
+HREF="sql-listen.html"><LINK
+REL="NEXT"
+TITLE="LOCK"
+HREF="sql-lock.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="LISTEN"
+HREF="sql-listen.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="LOCK"
+HREF="sql-lock.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-LOAD"
+></A
+>LOAD</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN81723"
+></A
+><H2
+>Название</H2
+>LOAD&nbsp;--&nbsp;загрузить файл разделяемой библиотеки</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN81726"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>LOAD '<TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+>'</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="SQL-LOAD-DESCRIPTION"
+></A
+><H2
+>Описание</H2
+><P
+>Эта команда загружает файл разделяемой библиотеки в адресное пространство сервера <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Если указанный файл был загружен ранее, эта команда не делает ничего. Файлы библиотек, содержащие функции на C, загружаются автоматически при первом вызове любой из этих функций. Поэтому явно выполнять <TT
+CLASS="COMMAND"
+>LOAD</TT
+> обычно требуется только для загрузки библиотек, которые изменяют поведение сервера, внедряя свои обработчики, а не предоставляют некоторый набор функций.</P
+><P
+>Имя файла указывается так же, как и имя разделяемой библиотеки в <A
+HREF="sql-createfunction.html"
+>CREATE FUNCTION</A
+>; в частности, можно полагаться на путь поиска и автоматическое добавление расширения, принятого в системе для файлов разделяемых библиотек. Дополнительную информацию по этой теме можно найти в <A
+HREF="xfunc-c.html"
+>Разделе 35.9</A
+>.</P
+><P
+>Обычные пользователи (не суперпользователи) могут использовать <TT
+CLASS="COMMAND"
+>LOAD</TT
+> только для загрузки файлов библиотек, расположенных в <TT
+CLASS="FILENAME"
+>$libdir/plugins/</TT
+> &mdash; заданное <TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+> должно начинаться именно с этой строки. (Ответственность за то, чтобы в этом каталоге находились только <SPAN
+CLASS="QUOTE"
+>"безопасные"</SPAN
+> библиотеки, лежит на администраторе баз данных.)</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="SQL-LOAD-COMPAT"
+></A
+><H2
+>Совместимость</H2
+><P
+><TT
+CLASS="COMMAND"
+>LOAD</TT
+> является расширением <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN81750"
+></A
+><H2
+>См. также</H2
+><P
+>   <A
+HREF="sql-createfunction.html"
+>CREATE FUNCTION</A
+>
+  </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-listen.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-lock.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>LISTEN</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>LOCK</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

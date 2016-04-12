@@ -1,0 +1,544 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>          pg_database
+        </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Системные каталоги"
+HREF="catalogs.html"><LINK
+REL="PREVIOUS"
+TITLE="          pg_conversion
+        "
+HREF="catalog-pg-conversion.html"><LINK
+REL="NEXT"
+TITLE="          pg_db_role_setting
+        "
+HREF="catalog-pg-db-role-setting.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="          pg_conversion
+        "
+HREF="catalog-pg-conversion.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 48. Системные каталоги</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="          pg_db_role_setting
+        "
+HREF="catalog-pg-db-role-setting.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CATALOG-PG-DATABASE"
+>48.15. <TT
+CLASS="STRUCTNAME"
+>pg_database</TT
+></A
+></H1
+><P
+>В каталоге <TT
+CLASS="STRUCTNAME"
+>pg_database</TT
+> хранится информация о доступных базах данных. Базы данных создаются командой <A
+HREF="sql-createdatabase.html"
+>CREATE DATABASE</A
+>. Подробнее о предназначении некоторых свойств баз можно узнать в <A
+HREF="managing-databases.html"
+>Главе 21</A
+>.</P
+><P
+>В отличие от большинства системных каталогов, <TT
+CLASS="STRUCTNAME"
+>pg_database</TT
+> разделяется всеми базами данных кластера: есть только один экземпляр <TT
+CLASS="STRUCTNAME"
+>pg_database</TT
+> в кластере, а не отдельные в каждой базе данных.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="AEN96852"
+></A
+><P
+><B
+>Таблица 48-15. Колонки <TT
+CLASS="STRUCTNAME"
+>pg_database</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип</TH
+><TH
+>Ссылки</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Идентификатор строки (скрытый атрибут; должен выбираться явно)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>datname</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>name</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Имя базы данных</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>datdba</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-authid.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_authid</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Владелец базы данных, обычно пользователь, создавший её</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>кодировка</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int4</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Кодировка символов для этой базы данных (<CODE
+CLASS="FUNCTION"
+>pg_encoding_to_char()</CODE
+> может преобразовать этот номер в имя кодировки)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>datcollate</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>name</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>LC_COLLATE для этой базы данных</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>datctype</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>name</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>LC_CTYPE для этой базы данных</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>datistemplate</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Если true, базу данных сможет клонировать любой пользователь с правами <TT
+CLASS="LITERAL"
+>CREATEDB</TT
+>; в противном случае, клонировать эту базу смогут только суперпользователи и её владелец.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>datallowconn</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Если false, никто не сможет подключаться к этой базе данных. Это позволяет защитить базу данных <TT
+CLASS="LITERAL"
+>template0</TT
+> от модификаций.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>datconnlimit</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int4</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Задаёт максимально допустимое число одновременных подключений к этой базе данных. С -1 ограничения нет.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>datlastsysoid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Последний системный OID в базе данных; в частности, полезен для <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>datfrozenxid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>xid</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Все идентификаторы транзакций, предшествующие данному, в этой базе данных заменены постоянным (<SPAN
+CLASS="QUOTE"
+>"замороженным"</SPAN
+>) идентификатором транзакции. Это нужно для определения, когда требуется очищать базу данных для предотвращения зацикливания идентификаторов или для сокращения объёма <TT
+CLASS="LITERAL"
+>pg_clog</TT
+>. Это значение вычисляется как минимум значений <TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+>.<TT
+CLASS="STRUCTFIELD"
+>relfrozenxid</TT
+> для всех таблиц.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>datminmxid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>xid</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Идентификаторы мультитранзакций, предшествующие данному, в этой базе данных заменены другим идентификатором транзакции. Это нужно для определения, когда требуется очищать базу данных для предотвращения зацикливания идентификаторов мультитранзакций или для сокращения объёма <TT
+CLASS="LITERAL"
+>pg_multixact</TT
+>. Это значение вычисляется как минимум значений <TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+>.<TT
+CLASS="STRUCTFIELD"
+>relminmxid</TT
+> для всех таблиц.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>dattablespace</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-tablespace.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_tablespace</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Табличное пространство по умолчанию для данной базы данных. Если таблица базы находится в этом пространстве, для неё значение <TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+>.<TT
+CLASS="STRUCTFIELD"
+>reltablespace</TT
+> будет нулевым; в частности, в нём окажутся все частные системные каталоги этой базы.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>datacl</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>aclitem[]</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Права доступа; за подробностями обратитесь к описанию <A
+HREF="sql-grant.html"
+>GRANT</A
+> и <A
+HREF="sql-revoke.html"
+>REVOKE</A
+></TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="catalog-pg-conversion.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="catalog-pg-db-role-setting.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_conversion</TT
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_db_role_setting</TT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

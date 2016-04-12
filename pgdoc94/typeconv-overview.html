@@ -1,0 +1,353 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Обзор</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Преобразование типов"
+HREF="typeconv.html"><LINK
+REL="PREVIOUS"
+TITLE="Преобразование типов"
+HREF="typeconv.html"><LINK
+REL="NEXT"
+TITLE="Операторы"
+HREF="typeconv-oper.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Преобразование типов"
+HREF="typeconv.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="typeconv.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 10. Преобразование типов</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Операторы"
+HREF="typeconv-oper.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="TYPECONV-OVERVIEW"
+>10.1. Обзор</A
+></H1
+><P
+><ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> &mdash; язык со строгой типизацией. То есть каждый элемент данных в нём имеет некоторый тип, определяющий его поведение и допустимое использование. <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> наделён расширяемой системой типов, более универсальной и гибкой по сравнению с другими реализациями <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>. При этом преобразования типов в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> в основном подчиняются определённым общим правилам, для их понимания не нужен <I
+CLASS="FOREIGNPHRASE"
+>эвристический</I
+> анализ. Благодаря этому в выражениях со смешанными типами можно использовать даже типы, определённые пользователями.</P
+><P
+>Анализатор выражений <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> разделяет их лексические элементы на пять основных категорий: целые числа, другие числовые значения, текстовые строки, идентификаторы и ключевые слова. Константы большинства не числовых типов сначала классифицируются как строки. В определении языка <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> допускается указывать имена типов в строках и это можно использовать в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, чтобы направить анализатор по верному пути. Например, запрос: </P><PRE
+CLASS="SCREEN"
+>SELECT text 'Origin' AS "label", point '(0,0)' AS "value";
+
+ label  | value
+--------+-------
+ Origin | (0,0)
+(1 row)</PRE
+><P> содержит две строковых константы, типа <TT
+CLASS="TYPE"
+>text</TT
+> и типа <TT
+CLASS="TYPE"
+>point</TT
+>. Если для такой константы не указан тип, для неё первоначально предполагается тип <TT
+CLASS="TYPE"
+>unknown</TT
+>, который затем может быть уточнён, как описано ниже.</P
+><P
+>В <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> есть четыре фундаментальных фактора, определяющих правила преобразования типов для анализатора выражений <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+>Вызовы функций</DT
+><DD
+><P
+>Система типов <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> во многом построена как дополнение к богатым возможностям функций. Функции могут иметь один или несколько аргументов, и при этом <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> разрешает перегружать имена функций, так что имя функции само по себе не идентифицирует вызываемую функцию; анализатор выбирает правильную функцию в зависимости от типов переданных аргументов.</P
+></DD
+><DT
+>Операторы</DT
+><DD
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> позволяет использовать в выражениях префиксные и постфиксные операторы с одним аргументом, а также операторы с двумя аргументами. Как и функции, операторы можно перегружать, так что и с ними существует проблема выбора правильного оператора.</P
+></DD
+><DT
+>Сохранение значений</DT
+><DD
+><P
+><ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>-операторы <TT
+CLASS="COMMAND"
+>INSERT</TT
+> и <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> помещают результаты выражений в таблицы. При этом получаемые значения должны соответствовать типам целевых колонок или, возможно, приводиться к ним.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>UNION</TT
+>, <TT
+CLASS="LITERAL"
+>CASE</TT
+> и связанные конструкции</DT
+><DD
+><P
+>Так как все результаты запроса объединяющего оператора <TT
+CLASS="COMMAND"
+>SELECT</TT
+> должны оказаться в одном наборе колонок, результаты каждого подзапроса <TT
+CLASS="COMMAND"
+>SELECT</TT
+> должны приводиться к одному набору типов. Подобным образом, результирующие выражения конструкции <TT
+CLASS="LITERAL"
+>CASE</TT
+> должны приводиться к общему типу, так как выражение <TT
+CLASS="LITERAL"
+>CASE</TT
+> в целом должно иметь определённый выходной тип. То же справедливо в отношении конструкций <TT
+CLASS="LITERAL"
+>ARRAY</TT
+> и функций <CODE
+CLASS="FUNCTION"
+>GREATEST</CODE
+> и <CODE
+CLASS="FUNCTION"
+>LEAST</CODE
+>.</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>Информация о существующих преобразованиях или <I
+CLASS="FIRSTTERM"
+>приведениях</I
+> типов, для каких типов они определены и как их выполнять, хранится в системных каталогах. Пользователь также может добавить дополнительные преобразования с помощью команды <A
+HREF="sql-createcast.html"
+>CREATE CAST</A
+>. (Обычно это делается, когда определяются новые типы данных. Набор приведений для встроенных типов достаточно хорошо проработан, так что его лучше не менять.)</P
+><P
+>Дополнительная логика анализа помогает выбрать оптимальное приведение в группах типов, допускающих неявные преобразования. Для этого типы данных разделяются на несколько базовых <I
+CLASS="FIRSTTERM"
+>категорий</I
+>, которые включают: <TT
+CLASS="TYPE"
+>boolean</TT
+>, <TT
+CLASS="TYPE"
+>numeric</TT
+>, <TT
+CLASS="TYPE"
+>string</TT
+>, <TT
+CLASS="TYPE"
+>bitstring</TT
+>, <TT
+CLASS="TYPE"
+>datetime</TT
+>, <TT
+CLASS="TYPE"
+>timespan</TT
+>, <TT
+CLASS="TYPE"
+>geometric</TT
+>, <TT
+CLASS="TYPE"
+>network</TT
+> и пользовательские типы. (Полный список категорий приведён в <A
+HREF="catalog-pg-type.html#CATALOG-TYPCATEGORY-TABLE"
+>Таблице 48-53</A
+>; хотя его тоже можно расширить, определив свои категории.) В каждой категории могут быть выбраны один или несколько <I
+CLASS="FIRSTTERM"
+>предпочитаемых типов</I
+>, которые будут считаться наиболее подходящими при рассмотрении нескольких вариантов. Аккуратно выбирая предпочитаемые типы и допустимые неявные преобразования, можно добиться того, что выражения с неоднозначностями (в которых возможны разные решения задачи преобразования) будут разрешаться наилучшим образом.</P
+><P
+>Все правила преобразования типов разработаны с учётом следующих принципов: <P
+></P
+></P><UL
+><LI
+><P
+>Результат неявных преобразованиях всегда должен быть предсказуемым и понятным.</P
+></LI
+><LI
+><P
+>Если в неявном преобразовании нет нужды, анализатор и исполнитель запроса не должны тратить лишнее время на это. То есть, если запрос хорошо сформулирован и типы значений совпадают, он должен выполняться без дополнительной обработки в анализаторе и без лишних вызовов неявных преобразований.</P
+></LI
+><LI
+><P
+>Кроме того, если запрос изначально требовал неявного преобразования для функции, а пользователь определил новую функцию с точно совпадающими типами аргументов, анализатор должен переключиться на новую функцию и больше не выполнять преобразование для вызова старой.</P
+></LI
+></UL
+><P></P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="typeconv.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="typeconv-oper.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Преобразование типов</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="typeconv.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Операторы</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

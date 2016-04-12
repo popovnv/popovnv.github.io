@@ -1,0 +1,427 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Процедуры триггеров на PL/Tcl</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="PL/Tcl — процедурный язык Tcl"
+HREF="pltcl.html"><LINK
+REL="PREVIOUS"
+TITLE="Обращение к базе данных из PL/Tcl"
+HREF="pltcl-dbaccess.html"><LINK
+REL="NEXT"
+TITLE="Процедуры событийных триггеров в PL/Tcl"
+HREF="pltcl-event-trigger.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Обращение к базе данных из PL/Tcl"
+HREF="pltcl-dbaccess.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="pltcl.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 41. PL/Tcl — процедурный язык Tcl</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Процедуры событийных триггеров в PL/Tcl"
+HREF="pltcl-event-trigger.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="PLTCL-TRIGGER"
+>41.6. Процедуры триггеров на PL/Tcl</A
+></H1
+><P
+>На PL/Tcl можно написать триггерные процедуры. <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> требует, чтобы процедура, которая будет вызываться как триггерная, была объявлена как функция без аргументов и возвращала тип <TT
+CLASS="LITERAL"
+>trigger</TT
+>.</P
+><P
+>Информация от менеджера триггеров передаётся в тело процедуры в следующих переменных: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="VARNAME"
+>$TG_name</TT
+></DT
+><DD
+><P
+>Имя триггера из оператора <TT
+CLASS="COMMAND"
+>CREATE TRIGGER</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>$TG_relid</TT
+></DT
+><DD
+><P
+>Идентификатор объекта таблицы, для которой будет вызываться триггерная процедура.</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>$TG_table_name</TT
+></DT
+><DD
+><P
+>Имя таблицы, для которой будет вызываться триггерная процедура.</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>$TG_table_schema</TT
+></DT
+><DD
+><P
+>Схема таблицы, для которой будет вызываться триггерная процедура.</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>$TG_relatts</TT
+></DT
+><DD
+><P
+>Список языка Tcl, содержащий имена колонок таблицы. В начало списка добавлен пустой элемент, поэтому при поиске в этом списке имени колонки с помощью стандартной в <SPAN
+CLASS="APPLICATION"
+>Tcl</SPAN
+> команды <CODE
+CLASS="FUNCTION"
+>lsearch</CODE
+> будет возвращён номер элемента, начиная с 1, так же, как нумеруются колонки в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. (В позициях удалённых колонок также содержатся пустые элементы, так что нумерация следующих за ними атрибутов не нарушается.)</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>$TG_when</TT
+></DT
+><DD
+><P
+>Строка <TT
+CLASS="LITERAL"
+>BEFORE</TT
+>, <TT
+CLASS="LITERAL"
+>AFTER</TT
+> или <TT
+CLASS="LITERAL"
+>INSTEAD OF</TT
+>, в зависимости от типа события триггера.</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>$TG_level</TT
+></DT
+><DD
+><P
+>Строка <TT
+CLASS="LITERAL"
+>ROW</TT
+> или <TT
+CLASS="LITERAL"
+>STATEMENT</TT
+>, в зависимости от уровня события триггера.</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>$TG_op</TT
+></DT
+><DD
+><P
+>Строка <TT
+CLASS="LITERAL"
+>INSERT</TT
+>, <TT
+CLASS="LITERAL"
+>UPDATE</TT
+>, <TT
+CLASS="LITERAL"
+>DELETE</TT
+> или <TT
+CLASS="LITERAL"
+>TRUNCATE</TT
+>, в зависимости от действия события триггера.</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>$NEW</TT
+></DT
+><DD
+><P
+>Ассоциативный массив, содержащий значения новой строки таблицы для действий <TT
+CLASS="COMMAND"
+>INSERT</TT
+> или <TT
+CLASS="COMMAND"
+>UPDATE</TT
+>, либо пустой массив для <TT
+CLASS="COMMAND"
+>DELETE</TT
+>. Индексами в массиве являются имена колонок. Колонки со значениями NULL в нём отсутствуют. Для триггеров уровня оператора этот массив не определяется.</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>$OLD</TT
+></DT
+><DD
+><P
+>Ассоциативный массив, содержащий значения старой строки таблицы для действий <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> или <TT
+CLASS="COMMAND"
+>DELETE</TT
+>, либо пустой массив для <TT
+CLASS="COMMAND"
+>INSERT</TT
+>. Индексами в массиве являются имена колонок. Колонки со значениями NULL в нём отсутствуют. Для триггеров уровня оператора этот массив не определяется.</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>$args</TT
+></DT
+><DD
+><P
+>Список на языке Tcl аргументов процедуры, заданных в операторе <TT
+CLASS="COMMAND"
+>CREATE TRIGGER</TT
+>. Эти аргументы также доступны под обозначениями <TT
+CLASS="LITERAL"
+>$1</TT
+> ... <TT
+CLASS="LITERAL"
+>$<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+></TT
+> в теле процедуры.</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>Возвращаемым значением триггерной процедуры может быть строка <TT
+CLASS="LITERAL"
+>OK</TT
+> или <TT
+CLASS="LITERAL"
+>SKIP</TT
+>, либо список, в виде, возвращаемом командой языка Tcl <TT
+CLASS="LITERAL"
+>array get</TT
+>. Если возвращается значение <TT
+CLASS="LITERAL"
+>OK</TT
+>, операция (<TT
+CLASS="COMMAND"
+>INSERT</TT
+>/<TT
+CLASS="COMMAND"
+>UPDATE</TT
+>/<TT
+CLASS="COMMAND"
+>DELETE</TT
+>), которая привела к срабатыванию триггера, выполняется нормально. Значение <TT
+CLASS="LITERAL"
+>SKIP</TT
+> указывает менеджеру триггеров просто пропустить эту операцию с текущей строкой данных. Если возвращается список, через него PL/Tcl передаёт менеджеру триггеров изменённую строку. Это имеет смысл только для триггеров уровня строки с порядком <TT
+CLASS="LITERAL"
+>BEFORE</TT
+> команд <TT
+CLASS="COMMAND"
+>INSERT</TT
+> и <TT
+CLASS="COMMAND"
+>UPDATE</TT
+>, в которых вместо заданной в <TT
+CLASS="VARNAME"
+>$NEW</TT
+> будет записываться изменённая строка; либо с порядком <TT
+CLASS="LITERAL"
+>INSTEAD OF</TT
+> команд <TT
+CLASS="COMMAND"
+>INSERT</TT
+> или <TT
+CLASS="COMMAND"
+>UPDATE</TT
+>, в которых возвращаемая строка задействована в <TT
+CLASS="COMMAND"
+>INSERT RETURNING</TT
+> или <TT
+CLASS="COMMAND"
+>UPDATE RETURNING</TT
+>. Для других типов триггеров возвращаемое значение игнорируется.</P
+><P
+>Следующий небольшой пример показывает триггерную процедуру, которая ведёт в таблице целочисленный счётчик числа изменений, выполненных в строке. Для новых строк счётчик инициализируется нулевым значением, а затем увеличивается на единицу при каждом изменении. </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION trigfunc_modcount() RETURNS trigger AS $$
+    switch $TG_op {
+        INSERT {
+            set NEW($1) 0
+        }
+        UPDATE {
+            set NEW($1) $OLD($1)
+            incr NEW($1)
+        }
+        default {
+            return OK
+        }
+    }
+    return [array get NEW]
+$$ LANGUAGE pltcl;
+
+CREATE TABLE mytab (num integer, description text, modcnt integer);
+
+CREATE TRIGGER trig_mytab_modcount BEFORE INSERT OR UPDATE ON mytab
+    FOR EACH ROW EXECUTE PROCEDURE trigfunc_modcount('modcnt');</PRE
+><P> Заметьте, что сама триггерная процедура не знает имени колонки; оно передаётся в аргументах триггера. Это позволяет применять эту триггерную процедуру для различных таблиц.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="pltcl-dbaccess.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="pltcl-event-trigger.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Обращение к базе данных из PL/Tcl</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="pltcl.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Процедуры событийных триггеров в PL/Tcl</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

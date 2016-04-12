@@ -1,0 +1,636 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Вывод сообщений об ошибках в коде сервера</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Соглашения по оформлению кода PostgreSQL"
+HREF="source.html"><LINK
+REL="PREVIOUS"
+TITLE="Форматирование"
+HREF="source-format.html"><LINK
+REL="NEXT"
+TITLE="Руководство по стилю сообщений об ошибках"
+HREF="error-style-guide.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Форматирование"
+HREF="source-format.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="source.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 50. Соглашения по оформлению кода PostgreSQL</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Руководство по стилю сообщений об ошибках"
+HREF="error-style-guide.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="ERROR-MESSAGE-REPORTING"
+>50.2. Вывод сообщений об ошибках в коде сервера</A
+></H1
+><P
+>Сообщения об ошибках, предупреждения и обычные сообщения, выдаваемые в коде сервера должны создаваться функцией <CODE
+CLASS="FUNCTION"
+>ereport</CODE
+> или родственной её предшественницей <CODE
+CLASS="FUNCTION"
+>elog</CODE
+>. Использование этой функции достаточно сложно и требует дополнительного объяснения.</P
+><P
+>У каждого сообщения есть два обязательных элемента: уровень важности (от <TT
+CLASS="LITERAL"
+>DEBUG</TT
+> до <TT
+CLASS="LITERAL"
+>PANIC</TT
+>) и основной текст сообщения. В дополнение к ним есть необязательные элементы, из которых часто используется код идентификатора ошибки, соответствующий определению SQLSTATE в спецификации SQL. Функция <CODE
+CLASS="FUNCTION"
+>ereport</CODE
+> сама по себе является просто оболочкой, которая существует в основном для синтаксического удобства, чтобы выдача сообщения выглядела как вызов функции в коде C. Единственный параметр, который принимает непосредственно функция <CODE
+CLASS="FUNCTION"
+>ereport</CODE
+>, это уровень важности. Основной текст и любые дополнительные элементы сообщения генерируются в результате вызова вспомогательных функций, таких как <CODE
+CLASS="FUNCTION"
+>errmsg</CODE
+>, в вызове <CODE
+CLASS="FUNCTION"
+>ereport</CODE
+>.</P
+><P
+>Типичный вызов <CODE
+CLASS="FUNCTION"
+>ereport</CODE
+> выглядит примерно так: </P><PRE
+CLASS="PROGRAMLISTING"
+>ereport(ERROR,
+        (errcode(ERRCODE_DIVISION_BY_ZERO),
+         errmsg("division by zero")));</PRE
+><P> В нём задаётся уровень важности <TT
+CLASS="LITERAL"
+>ERROR</TT
+> (заурядная ошибка). В вызове <CODE
+CLASS="FUNCTION"
+>errcode</CODE
+> указывается код ошибки SQLSTATE по макросу, определённому в <TT
+CLASS="FILENAME"
+>src/include/utils/errcodes.h</TT
+>. Вызов <CODE
+CLASS="FUNCTION"
+>errmsg</CODE
+> даёт текст основного сообщения. Обратите внимание на дополнительный набор скобок, окружающих вызовы вспомогательных функций &mdash; они загромождают код, но требуются синтаксисом.</P
+><P
+>Более сложный пример: </P><PRE
+CLASS="PROGRAMLISTING"
+>ereport(ERROR,
+        (errcode(ERRCODE_AMBIGUOUS_FUNCTION),
+         errmsg("function %s is not unique",
+                func_signature_string(funcname, nargs,
+                                      NIL, actual_arg_types)),
+         errhint("Unable to choose a best candidate function. "
+                 "You might need to add explicit typecasts.")));</PRE
+><P> В нём демонстрируется использование кодов форматирования для включения значений времени выполнения в текст сообщения. Также в нём добавляется дополнительное сообщение <SPAN
+CLASS="QUOTE"
+>"подсказки"</SPAN
+>.</P
+><P
+>При уровне важности <TT
+CLASS="LITERAL"
+>ERROR</TT
+> или более высоком, <CODE
+CLASS="FUNCTION"
+>ereport</CODE
+> прерывает выполнение пользовательской функции и не возвращает управление в вызывающий код. Если уровень важности ниже <TT
+CLASS="LITERAL"
+>ERROR</TT
+>, <CODE
+CLASS="FUNCTION"
+>ereport</CODE
+> завершается обычным способом.</P
+><P
+>Для <CODE
+CLASS="FUNCTION"
+>ereport</CODE
+> предлагаются следующие вспомогательные функции: <P
+></P
+></P><UL
+><LI
+><P
+><CODE
+CLASS="FUNCTION"
+>errcode(sqlerrcode)</CODE
+> задаёт код идентификатора ошибки SQLSTATE для данной ошибки. Если эта функция не вызывается, подразумевается идентификатор ошибки <TT
+CLASS="LITERAL"
+>ERRCODE_INTERNAL_ERROR</TT
+> при уровне важности <TT
+CLASS="LITERAL"
+>ERROR</TT
+> или выше, либо <TT
+CLASS="LITERAL"
+>ERRCODE_WARNING</TT
+> при уровне важности <TT
+CLASS="LITERAL"
+>WARNING</TT
+>, иначе (при уровне <TT
+CLASS="LITERAL"
+>NOTICE</TT
+> или ниже) — <TT
+CLASS="LITERAL"
+>ERRCODE_SUCCESSFUL_COMPLETION</TT
+>. Хотя эти значения по умолчанию довольно разумны, всегда стоит подумать, насколько они уместны, прежде чем опустить вызов <CODE
+CLASS="FUNCTION"
+>errcode()</CODE
+>.</P
+></LI
+><LI
+><P
+><CODE
+CLASS="FUNCTION"
+>errmsg(const char *msg, ...)</CODE
+> задаёт основной текст сообщения об ошибке и, возможно, значения времени выполнения, которые будут в него включаться. Эти включения записываются кодами формата в стиле <CODE
+CLASS="FUNCTION"
+>sprintf</CODE
+>. В дополнение к стандартным кодам формата, принимаемым функцией <CODE
+CLASS="FUNCTION"
+>sprintf</CODE
+>, можно использовать код формата <TT
+CLASS="LITERAL"
+>%m</TT
+>, который вставит сообщение об ошибке, возвращённое строкой <CODE
+CLASS="FUNCTION"
+>strerror</CODE
+> для текущего значения <TT
+CLASS="LITERAL"
+>errno</TT
+>. <A
+NAME="AEN104683"
+HREF="#FTN.AEN104683"
+><SPAN
+CLASS="footnote"
+>[1]</SPAN
+></A
+>
+     Для <TT
+CLASS="LITERAL"
+>%m</TT
+> не требуется соответствующая запись в списке параметров <CODE
+CLASS="FUNCTION"
+>errmsg</CODE
+>. Заметьте, что эта строка будет пропущена через <CODE
+CLASS="FUNCTION"
+>gettext</CODE
+>, то есть может быть локализована, до обработки кодов формата.</P
+></LI
+><LI
+><P
+><CODE
+CLASS="FUNCTION"
+>errmsg_internal(const char *msg, ...)</CODE
+> действует как <CODE
+CLASS="FUNCTION"
+>errmsg</CODE
+>, но её строка сообщения не будет переводиться и включаться в словарь сообщений для интернационализации. Это следует использовать для случаев, которые <SPAN
+CLASS="QUOTE"
+>"не происходят никогда"</SPAN
+>, так что тратить силы на их перевод не стоит.</P
+></LI
+><LI
+><P
+><CODE
+CLASS="FUNCTION"
+>errmsg_plural(const char *fmt_singular, const char *fmt_plural, unsigned long n, ...)</CODE
+> действует подобно <CODE
+CLASS="FUNCTION"
+>errmsg</CODE
+>, но поддерживает различные формы сообщения с множественными числами. Параметр <TT
+CLASS="REPLACEABLE"
+><I
+>fmt_singular</I
+></TT
+> задаёт строку формата на английском для единственного числа, <TT
+CLASS="REPLACEABLE"
+><I
+>fmt_plural</I
+></TT
+> — формат для множественного числа, <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+> задаёт целое число, определяющее, какая именно форма множественного числа требуется, а остальные аргументы форматируются согласно выбранной строке формата. За дополнительными сведениями обратитесь к <A
+HREF="nls-programmer.html#NLS-GUIDELINES"
+>Подразделу 51.2.2</A
+>.</P
+></LI
+><LI
+><P
+><CODE
+CLASS="FUNCTION"
+>errdetail(const char *msg, ...)</CODE
+> задаёт дополнительное <SPAN
+CLASS="QUOTE"
+>"подробное"</SPAN
+> сообщение; оно должно использоваться, когда есть дополнительная информация, которую неуместно включать в основное сообщение. Строка сообщения обрабатывается так же, как и для <CODE
+CLASS="FUNCTION"
+>errmsg</CODE
+>.</P
+></LI
+><LI
+><P
+><CODE
+CLASS="FUNCTION"
+>errdetail_internal(const char *msg, ...)</CODE
+> действует как <CODE
+CLASS="FUNCTION"
+>errdetail</CODE
+>, но её строка сообщения не будет переводиться и включаться в словарь сообщений для интернационализации. Это следует использовать для подробных сообщений, на перевод которых не стоит тратить силы, например, когда это техническая информация, непонятная большинству пользователей.</P
+></LI
+><LI
+><P
+><CODE
+CLASS="FUNCTION"
+>errdetail_plural(const char *fmt_singular, const char *fmt_plural, unsigned long n, ...)</CODE
+> действует подобно <CODE
+CLASS="FUNCTION"
+>errdetail</CODE
+>, но поддерживает различные формы сообщения с множественными числами. За дополнительными сведениями обратитесь к <A
+HREF="nls-programmer.html#NLS-GUIDELINES"
+>Подразделу 51.2.2</A
+>.</P
+></LI
+><LI
+><P
+><CODE
+CLASS="FUNCTION"
+>errdetail_log(const char *msg, ...)</CODE
+> подобна <CODE
+CLASS="FUNCTION"
+>errdetail</CODE
+>, но выводимая строка попадает только в журнал сервера, и никогда не передаётся клиенту. Если используется и <CODE
+CLASS="FUNCTION"
+>errdetail</CODE
+> (или один из её эквивалентов), и <CODE
+CLASS="FUNCTION"
+>errdetail_log</CODE
+>, тогда одна строка передаётся клиенту, а другая отправляется в журнал. Это полезно для вывода подробных сообщений, имеющих конфиденциальный характер или большой размер, так что передавать их клиенту нежелательно.</P
+></LI
+><LI
+><P
+><CODE
+CLASS="FUNCTION"
+>errdetail_log_plural(const char *fmt_singuar, const char *fmt_plural, unsigned long n, ...)</CODE
+> действует подобно <CODE
+CLASS="FUNCTION"
+>errdetail_log</CODE
+>, но поддерживает различные формы сообщения с множественными числами. За дополнительными сведениями обратитесь к <A
+HREF="nls-programmer.html#NLS-GUIDELINES"
+>Подразделу 51.2.2</A
+>.</P
+></LI
+><LI
+><P
+><CODE
+CLASS="FUNCTION"
+>errhint(const char *msg, ...)</CODE
+> передаёт дополнительное сообщение <SPAN
+CLASS="QUOTE"
+>"подсказки"</SPAN
+>; это позволяет предложить решение проблемы, а не просто сообщить факты, связанные с ней. Строка сообщения обрабатывается так же, как и для <CODE
+CLASS="FUNCTION"
+>errmsg</CODE
+>.</P
+></LI
+><LI
+><P
+><CODE
+CLASS="FUNCTION"
+>errcontext(const char *msg, ...)</CODE
+> обычно не вызывается непосредственно с места вызова <CODE
+CLASS="FUNCTION"
+>ereport</CODE
+>, а используется в функциях обратного вызова <TT
+CLASS="LITERAL"
+>error_context_stack</TT
+> и выдаёт информацию о контексте, в котором произошла ошибка, например, о текущем положении в функции PL. Строка сообщения обрабатывается так же, как и для <CODE
+CLASS="FUNCTION"
+>errmsg</CODE
+>. В отличие от других вспомогательных функций, внутри вызова <CODE
+CLASS="FUNCTION"
+>ereport</CODE
+> её можно вызывать неоднократно; добавляемые таким образом последовательные сообщения складываются через символы перевода строк.</P
+></LI
+><LI
+><P
+><CODE
+CLASS="FUNCTION"
+>errposition(int cursorpos)</CODE
+> задаёт положение ошибки в тексте запроса. В настоящее время это полезно только для ошибок, выявляемых на этапах лексического и синтаксического анализа запроса.</P
+></LI
+><LI
+><P
+><CODE
+CLASS="FUNCTION"
+>errtable(Relation rel)</CODE
+> определяет отношение, имя и схема которого должны быть включены во вспомогательные поля сообщения об ошибке.</P
+></LI
+><LI
+><P
+><CODE
+CLASS="FUNCTION"
+>errtablecol(Relation rel, int attnum)</CODE
+> определяет колонку, имя которой, вместе с именем таблицы и схемы, должно быть включено во вспомогательные поля сообщения об ошибке.</P
+></LI
+><LI
+><P
+><CODE
+CLASS="FUNCTION"
+>errtableconstraint(Relation rel, const char *conname)</CODE
+> задаёт имя ограничения таблицы, которое вместе с именем таблицы и схемы должно быть включено во вспомогательные поля сообщения об ошибке. В данном контексте индекс считается ограничением, независимо от того, имеется ли для него запись в <TT
+CLASS="STRUCTNAME"
+>pg_constraint</TT
+>. Заметьте, что при этом в качестве <TT
+CLASS="LITERAL"
+>rel</TT
+> нужно передавать нижележащее отношение, а не сам индекс.</P
+></LI
+><LI
+><P
+><CODE
+CLASS="FUNCTION"
+>errdatatype(Oid datatypeOid)</CODE
+> задаёт тип данных, имя которого, вместе с именем схемы, должно включаться во вспомогательные поля сообщения об ошибке.</P
+></LI
+><LI
+><P
+><CODE
+CLASS="FUNCTION"
+>errdomainconstraint(Oid datatypeOid, const char *conname)</CODE
+> задаёт имя ограничения домена, которое вместе с именем домена и схемы должно включаться во вспомогательные поля сообщения об ошибке.</P
+></LI
+><LI
+><P
+><CODE
+CLASS="FUNCTION"
+>errcode_for_file_access()</CODE
+> — вспомогательная функция, выбирающая подходящий идентификатор SQLSTATE при сбое в системном вызове, в котором происходит обращение к файловой системе. Какой код ошибки генерировать, она определяет по сохранённому значению <TT
+CLASS="LITERAL"
+>errno</TT
+>. Обычно это используется в сочетании с <TT
+CLASS="LITERAL"
+>%m</TT
+> в основном сообщении об ошибке.</P
+></LI
+><LI
+><P
+><CODE
+CLASS="FUNCTION"
+>errcode_for_socket_access()</CODE
+> — вспомогательная функция, выбирающая подходящий идентификатор SQLSTATE при сбое в системном вызове, в котором происходит обращение к сокетам.</P
+></LI
+><LI
+><P
+><CODE
+CLASS="FUNCTION"
+>errhidestmt(bool hide_stmt)</CODE
+> может быть вызвана для подавления вывода подстроки <TT
+CLASS="LITERAL"
+>STATEMENT:</TT
+> в журнал главного процесса. Обычно это уместно, когда само сообщение включает текст текущего оператора.</P
+></LI
+></UL
+><P></P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>В вызове <CODE
+CLASS="FUNCTION"
+>ereport</CODE
+> следует использовать максимум одну из функций <CODE
+CLASS="FUNCTION"
+>errtable</CODE
+>, <CODE
+CLASS="FUNCTION"
+>errtablecol</CODE
+>, <CODE
+CLASS="FUNCTION"
+>errtableconstraint</CODE
+>, <CODE
+CLASS="FUNCTION"
+>errdatatype</CODE
+> или <CODE
+CLASS="FUNCTION"
+>errdomainconstraint</CODE
+>. Данные функции существуют для того, чтобы приложения могли извлечь имя объекта базы данных, связанного с условием ошибки, так, чтобы для этого им не требовалось разбирать текст ошибки, возможно локализованный. Эти функции должны использоваться в случае ошибок, для которых может быть желательной автоматическая обработка. Для версии <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> 9.3 этот подход распространяется полностью только на ошибки класса SQLSTATE 23 (нарушение целостности ограничения), но в будущем область его применения может быть расширена.</P
+></BLOCKQUOTE
+></DIV
+><P
+>Существует также более старая, но тем не менее активно используемая функция <CODE
+CLASS="FUNCTION"
+>elog</CODE
+>. Вызов <CODE
+CLASS="FUNCTION"
+>elog</CODE
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>elog(level, "format string", ...);</PRE
+><P> полностью равнозначен вызову: </P><PRE
+CLASS="PROGRAMLISTING"
+>ereport(level, (errmsg_internal("format string", ...)));</PRE
+><P> Заметьте, что код ошибки SQLSTATE всегда определяется неявно, а строка сообщения не подлежит переводу. Таким образом, <CODE
+CLASS="FUNCTION"
+>elog</CODE
+> следует использовать только для внутренних ошибок и отладки на низком уровне. Любое сообщение, которое может представлять интерес для обычных пользователей, должно проходить через <CODE
+CLASS="FUNCTION"
+>ereport</CODE
+>. Тем не менее, в системе есть достаточно много внутренних проверок для случаев, <SPAN
+CLASS="QUOTE"
+>"которые не должны происходить"</SPAN
+>, и в них по-прежнему широко используется <CODE
+CLASS="FUNCTION"
+>elog</CODE
+>; для таких сообщений эта функция предпочитается из-за простоты записи.</P
+><P
+>Советы по написанию хороших сообщений об ошибках можно найти в <A
+HREF="error-style-guide.html"
+>Разделе 50.3</A
+>.</P
+></DIV
+><H3
+CLASS="FOOTNOTES"
+>Примечания</H3
+><TABLE
+BORDER="0"
+CLASS="FOOTNOTES"
+WIDTH="100%"
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+WIDTH="5%"
+><A
+NAME="FTN.AEN104683"
+HREF="error-message-reporting.html#AEN104683"
+><SPAN
+CLASS="footnote"
+>[1]</SPAN
+></A
+></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+WIDTH="95%"
+><P
+>То есть значение, которое было текущим, когда была вызвана <CODE
+CLASS="FUNCTION"
+>ereport</CODE
+>; изменения <TT
+CLASS="LITERAL"
+>errno</TT
+> во вспомогательных функциях выдачи сообщений на него не повлияют. Это будет не так, если вы запишете <TT
+CLASS="LITERAL"
+>strerror(errno)</TT
+> явно в списке параметров <CODE
+CLASS="FUNCTION"
+>errmsg</CODE
+>; поэтому делать так не нужно.</P
+></TD
+></TR
+></TABLE
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="source-format.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="error-style-guide.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Форматирование</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="source.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Руководство по стилю сообщений об ошибках</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

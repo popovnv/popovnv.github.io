@@ -1,0 +1,714 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>isn</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Дополнительно поставляемые модули"
+HREF="contrib.html"><LINK
+REL="PREVIOUS"
+TITLE="intarray"
+HREF="intarray.html"><LINK
+REL="NEXT"
+TITLE="lo"
+HREF="lo.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="intarray"
+HREF="intarray.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Приложение E. Дополнительно поставляемые модули</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="lo"
+HREF="lo.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="ISN"
+>E.19. isn</A
+></H1
+><P
+>Модуль <TT
+CLASS="FILENAME"
+>isn</TT
+> предоставляет типы данных для следующих международных стандартов нумерации товаров: EAN13, UPC, ISBN (книги), ISMN (музыка) и ISSN (серийные номера). Номера проверяются на входе согласно жёстко заданному списку префиксов: этот список префиксов также применяется для группирования цифр при выводе. Так как время от времени появляются новые префиксы, этот список префиксов может устаревать. Ожидается, что будущая версия этого модуля будет получать список префиксов из одной или нескольких таблиц, благодаря чему его при необходимости смогут легко обновлять пользователи; однако в настоящее время этот список можно изменить, только модифицировав исходный код и перекомпилировав его. Также есть вероятность, что в будущем этот модуль лишится функций проверки префиксов и группирования цифр.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN121684"
+>E.19.1. Типы данных</A
+></H2
+><P
+>В <A
+HREF="isn.html#ISN-DATATYPES"
+>Таблице E-10</A
+> перечислены типы данных, реализованные модулем <TT
+CLASS="FILENAME"
+>isn</TT
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="ISN-DATATYPES"
+></A
+><P
+><B
+>Таблица E-10. Типы данных <TT
+CLASS="FILENAME"
+>isn</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+>Тип данных</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                    <TT
+CLASS="TYPE"
+>EAN13</TT
+>
+                  </TD
+><TD
+>European Article Number (Европейский номер товара), всегда выводится в формате EAN13</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="TYPE"
+>ISBN13</TT
+>
+                  </TD
+><TD
+>International Standard Book Number (Международный стандартный книжный номер), выводимый в новом формате EAN13</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="TYPE"
+>ISMN13</TT
+>
+                  </TD
+><TD
+>International Standard Music Number (Международный стандартный музыкальный номер), выводимый в новом формате EAN13</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="TYPE"
+>ISSN13</TT
+>
+                  </TD
+><TD
+>International Standard Serial Number (Международный стандартный серийный номер), выводимый в новом формате EAN13</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="TYPE"
+>ISBN</TT
+>
+                  </TD
+><TD
+>Международный стандартный книжный номер, выводимый в старом коротком формате</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="TYPE"
+>ISMN</TT
+>
+                  </TD
+><TD
+>Международный стандартный музыкальный номер, выводимый в старом коротком формате</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="TYPE"
+>ISSN</TT
+>
+                  </TD
+><TD
+>Международный стандартный серийный номер, выводимый в старом коротком формате</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="TYPE"
+>UPC</TT
+>
+                  </TD
+><TD
+>Universal Product Code (Универсальный код товара)</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Замечания:</P
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>Номера ISBN13, ISMN13, ISSN13 являются номерами EAN13.</P
+></LI
+><LI
+><P
+>Не все номера EAN13 (только их подмножество) представляют ISBN13, ISMN13 или ISSN13.</P
+></LI
+><LI
+><P
+>Некоторые номера ISBN13 можно вывести в формате ISBN.</P
+></LI
+><LI
+><P
+>Некоторые номера ISMN13 можно вывести в формате ISMN.</P
+></LI
+><LI
+><P
+>Некоторые номера ISSN13 можно вывести в формате ISSN.</P
+></LI
+><LI
+><P
+>Номера UPC являются подмножеством номеров EAN13 (по сути они являются номерами EAN13 без первой цифры <TT
+CLASS="LITERAL"
+>0</TT
+>).</P
+></LI
+><LI
+><P
+>Любые номера UPC, ISBN, ISMN и ISSN можно представить как номера EAN13.</P
+></LI
+></OL
+><P
+>Внутри все эти типы представляются одинаково (64-битными целыми числами) и все они взаимозаменяемы. Различные типы введены для управления форматированием при выводе и для строгой проверки правильности ввода, что и определяет конкретный тип номера.</P
+><P
+>Типы <TT
+CLASS="TYPE"
+>ISBN</TT
+>, <TT
+CLASS="TYPE"
+>ISMN</TT
+> и <TT
+CLASS="TYPE"
+>ISSN</TT
+> выводят короткую версию числа (ISxN 10), когда это возможно, либо выбирают формат ISxN 13 для чисел, не умещающихся в короткую версию. Типы <TT
+CLASS="TYPE"
+>EAN13</TT
+>, <TT
+CLASS="TYPE"
+>ISBN13</TT
+>, <TT
+CLASS="TYPE"
+>ISMN13</TT
+> и <TT
+CLASS="TYPE"
+>ISSN13</TT
+> всегда выводят длинную версию ISxN (EAN13).</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN121756"
+>E.19.2. Приведения</A
+></H2
+><P
+>Модуль <TT
+CLASS="FILENAME"
+>isn</TT
+> предоставляет следующие пары приведений типов:</P
+><P
+></P
+><UL
+><LI
+><P
+>ISBN13 &lt;=&gt; EAN13</P
+></LI
+><LI
+><P
+>ISMN13 &lt;=&gt; EAN13</P
+></LI
+><LI
+><P
+>ISSN13 &lt;=&gt; EAN13</P
+></LI
+><LI
+><P
+>ISBN &lt;=&gt; EAN13</P
+></LI
+><LI
+><P
+>ISMN &lt;=&gt; EAN13</P
+></LI
+><LI
+><P
+>ISSN &lt;=&gt; EAN13</P
+></LI
+><LI
+><P
+>UPC &lt;=&gt; EAN13</P
+></LI
+><LI
+><P
+>ISBN &lt;=&gt; ISBN13</P
+></LI
+><LI
+><P
+>ISMN &lt;=&gt; ISMN13</P
+></LI
+><LI
+><P
+>ISSN &lt;=&gt; ISSN13</P
+></LI
+></UL
+><P
+>При приведении <TT
+CLASS="TYPE"
+>EAN13</TT
+> к другому типу выполняется проверка времени выполнения, соответствует ли исходное значение целевому типу, и если это не так, выдаётся ошибка. При других приведениях значения просто перемечаются, так что они успешно выполняются всегда.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN121783"
+>E.19.3. Функции и операторы</A
+></H2
+><P
+>Модуль <TT
+CLASS="FILENAME"
+>isn</TT
+> предоставляет стандартные операторы сравнения плюс поддержку индексов по хешу и B-деревьев для этих типов данных. Кроме того, он реализует ряд специализированных функций; они перечислены в <A
+HREF="isn.html#ISN-FUNCTIONS"
+>Таблице E-11</A
+>. В этой таблице под <TT
+CLASS="TYPE"
+>isn</TT
+> понимается один из типов данных модуля.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="ISN-FUNCTIONS"
+></A
+><P
+><B
+>Таблица E-11. Функции <TT
+CLASS="FILENAME"
+>isn</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Функция</TH
+><TH
+>Возвращает</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                    <CODE
+CLASS="FUNCTION"
+>isn_weak(boolean)</CODE
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>Устанавливает ослабленный режим проверки ввода (возвращает новое состояние)</TD
+></TR
+><TR
+><TD
+>                    <CODE
+CLASS="FUNCTION"
+>isn_weak()</CODE
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>Выдаёт текущее состояние ослабленного режима</TD
+></TR
+><TR
+><TD
+>                    <CODE
+CLASS="FUNCTION"
+>make_valid(isn)</CODE
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>isn</TT
+>
+                  </TD
+><TD
+>Делает неверный номер верным (сбрасывает флаг ошибки)</TD
+></TR
+><TR
+><TD
+>                    <CODE
+CLASS="FUNCTION"
+>is_valid(isn)</CODE
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>Проверяет присутствие флага ошибки</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+><I
+CLASS="FIRSTTERM"
+>Ослабленный</I
+> режим позволяет вставлять в таблицу неверные значения. Под неверным значением понимается номер, в котором не сходится проверочная цифра, а не номер отсутствует вовсе.</P
+><P
+>Зачем может понадобиться ослабленный режим? Ну например, у вас может быть большой набор номеров ISBN, и очень многие из них по каким-то странным причинам содержат неверную контрольную цифру (возможно, номера были отсканированы с печатного листа и были распознаны неправильно, или они вводились вручную, кто знает...). В любом случае, суть в том, что вы хотите с этим разобраться, но вам нужно загрузить все эти номера в базу данных, а затем, возможно, использовать дополнительное средство поиска неверных номеров в базе данных с тем, чтобы проверить и исправить данные; так что, например, вам нужно будет выбрать все неверные номера в таблице.</P
+><P
+>Если попытаться вставить в таблицу неверный номер в ослабленном режиме проверки, номер будет вставлен с исправленной проверочной цифрой, но выводиться будет с восклицательным знаком (<TT
+CLASS="LITERAL"
+>!</TT
+>) в конце, например <TT
+CLASS="LITERAL"
+>0-11-000322-5!</TT
+>. Этот маркер ошибки можно проверить с помощью функции <CODE
+CLASS="FUNCTION"
+>is_valid</CODE
+> и очистить функцией <CODE
+CLASS="FUNCTION"
+>make_valid</CODE
+>.</P
+><P
+>Вы также можете принудительно вставить числа даже не в ослабленном режиме, добавив символ <TT
+CLASS="LITERAL"
+>!</TT
+> в конце номера.</P
+><P
+>Есть ещё одна особенность — во вводимом номере вместо проверочной цифры можно указать <TT
+CLASS="LITERAL"
+>?</TT
+> и нужная проверочная цифра будет вставлена автоматически.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN121841"
+>E.19.4. Примеры</A
+></H2
+><PRE
+CLASS="PROGRAMLISTING"
+>-- Использование типов напрямую:
+SELECT isbn('978-0-393-04002-9');
+SELECT isbn13('0901690546');
+SELECT issn('1436-4522');
+
+-- Приведение типов:
+--  заметьте, что номер ean13 можно привести к другому типу, только когда
+--  этот номер будет допустимым для целевого типа;
+--  таким образом, это НЕ будет работать: select isbn(ean13('0220356483481'));
+--  а это будет:
+SELECT upc(ean13('0220356483481'));
+SELECT ean13(upc('220356483481'));
+
+-- Создание таблицы с одной колонкой, которая будет содержать номера ISBN:
+CREATE TABLE test (id isbn);
+INSERT INTO test VALUES('9780393040029');
+
+-- Автоматическое вычисление проверочных цифр (обратите внимание на '?'):
+INSERT INTO test VALUES('220500896?');
+INSERT INTO test VALUES('978055215372?');
+
+SELECT issn('3251231?');
+SELECT ismn('979047213542?');
+
+-- Использование ослабленного режима:
+SELECT isn_weak(true);
+INSERT INTO test VALUES('978-0-11-000533-4');
+INSERT INTO test VALUES('9780141219307');
+INSERT INTO test VALUES('2-205-00876-X');
+SELECT isn_weak(false);
+
+SELECT id FROM test WHERE NOT is_valid(id);
+UPDATE test SET id = make_valid(id) WHERE id = '2-205-00876-X!';
+
+SELECT * FROM test;
+
+SELECT isbn13(id) FROM test;</PRE
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN121844"
+>E.19.5. Библиография</A
+></H2
+><P
+>Информация, на основе которой реализован этот модуль, была собрана с нескольких сайтов, включая: <P
+></P
+></P><UL
+><LI
+><P
+><A
+HREF="http://www.isbn-international.org/"
+TARGET="_top"
+>http://www.isbn-international.org/</A
+></P
+></LI
+><LI
+><P
+><A
+HREF="http://www.issn.org/"
+TARGET="_top"
+>http://www.issn.org/</A
+></P
+></LI
+><LI
+><P
+><A
+HREF="http://www.ismn-international.org/"
+TARGET="_top"
+>http://www.ismn-international.org/</A
+></P
+></LI
+><LI
+><P
+><A
+HREF="http://www.wikipedia.org/"
+TARGET="_top"
+>http://www.wikipedia.org/</A
+></P
+></LI
+></UL
+><P> Префиксы, используемые для группирования цифр, были также взяты с: <P
+></P
+></P><UL
+><LI
+><P
+><A
+HREF="http://www.gs1.org/productssolutions/idkeys/support/prefix_list.html"
+TARGET="_top"
+>http://www.gs1.org/productssolutions/idkeys/support/prefix_list.html</A
+></P
+></LI
+><LI
+><P
+><A
+HREF="http://en.wikipedia.org/wiki/List_of_ISBN_identifier_groups"
+TARGET="_top"
+>http://en.wikipedia.org/wiki/List_of_ISBN_identifier_groups</A
+></P
+></LI
+><LI
+><P
+><A
+HREF="https://www.isbn-international.org/content/isbn-users-manual"
+TARGET="_top"
+>https://www.isbn-international.org/content/isbn-users-manual</A
+></P
+></LI
+><LI
+><P
+><A
+HREF="http://en.wikipedia.org/wiki/International_Standard_Music_Number"
+TARGET="_top"
+>http://en.wikipedia.org/wiki/International_Standard_Music_Number</A
+></P
+></LI
+><LI
+><P
+><A
+HREF="http://www.ismn-international.org/ranges.html"
+TARGET="_top"
+>http://www.ismn-international.org/ranges.html</A
+></P
+></LI
+></UL
+><P> Алгоритмы реализованы со всей тщательностью и скрупулёзно сверены с алгоритмами, предлагаемыми в официальных руководствах ISBN, ISMN, ISSN.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN121876"
+>E.19.6. Автор</A
+></H2
+><P
+>Герман Мендез Браво (Kronuz), 2004 — 2006</P
+><P
+>Этот модуль написан под влиянием кода <TT
+CLASS="FILENAME"
+>isbn_issn</TT
+> Гаретта А. Уоллмена.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="intarray.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="lo.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>intarray</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>lo</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

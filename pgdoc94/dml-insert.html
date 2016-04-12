@@ -1,0 +1,231 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Добавление данных</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Модификация данных"
+HREF="dml.html"><LINK
+REL="PREVIOUS"
+TITLE="Модификация данных"
+HREF="dml.html"><LINK
+REL="NEXT"
+TITLE="Изменение данных"
+HREF="dml-update.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Модификация данных"
+HREF="dml.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="dml.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 6. Модификация данных</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Изменение данных"
+HREF="dml-update.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="DML-INSERT"
+>6.1. Добавление данных</A
+></H1
+><P
+>Сразу после создания таблицы она не содержит никаких данных. Поэтому, чтобы она была полезна, в неё прежде всего нужно добавить данные. По сути данные добавляются в таблицу по одной строке. И хотя вы конечно можете добавить в таблицу несколько строк, добавить в неё меньше, чем строку, невозможно. Даже если вы указываете значения только некоторых колонок, создаётся полная строка.</P
+><P
+>Чтобы создать строку, вы будете использовать команду <A
+HREF="sql-insert.html"
+>INSERT</A
+>. В этой команде необходимо указать имя таблицы и значения колонок. Например, рассмотрим таблицу товаров из <A
+HREF="ddl.html"
+>Главы 5</A
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE products (
+    product_no integer,
+    name text,
+    price numeric
+);</PRE
+><P> Добавить в неё строку можно было бы так: </P><PRE
+CLASS="PROGRAMLISTING"
+>INSERT INTO products VALUES (1, 'Cheese', 9.99);</PRE
+><P> Значения данных перечисляются в порядке колонок в таблице и разделяются запятыми. Обычно в качестве значений указываются константы, но это могут быть и скалярные выражения.</P
+><P
+>Показанная выше запись имеет один недостаток &mdash; вам необходимо знать порядок колонок в таблице. Чтобы избежать этого, можно перечислить колонки явно. Например, следующие две команды дадут тот же результат, что и показанная выше: </P><PRE
+CLASS="PROGRAMLISTING"
+>INSERT INTO products (product_no, name, price) VALUES (1, 'Cheese', 9.99);
+INSERT INTO products (name, price, product_no) VALUES ('Cheese', 9.99, 1);</PRE
+><P> Многие считают, что лучше всегда явно указывать имена колонок.</P
+><P
+>Если значения определяются не для всех колонок, лишние колонки можно опустить. В таком случае эти колонки получат значения по умолчанию. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>INSERT INTO products (product_no, name) VALUES (1, 'Cheese');
+INSERT INTO products VALUES (1, 'Cheese');</PRE
+><P> Вторая форма является расширением <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Она заполняет колонки слева по числу переданных значений, а все остальные колонки принимают значения по умолчанию.</P
+><P
+>Для ясности можно также явно указать значения по умолчанию для отдельных колонок или всей строки: </P><PRE
+CLASS="PROGRAMLISTING"
+>INSERT INTO products (product_no, name, price) VALUES (1, 'Cheese', DEFAULT);
+INSERT INTO products DEFAULT VALUES;</PRE
+><P></P
+><P
+>Одна команда может вставить сразу несколько строк: </P><PRE
+CLASS="PROGRAMLISTING"
+>INSERT INTO products (product_no, name, price) VALUES
+    (1, 'Cheese', 9.99),
+    (2, 'Bread', 1.99),
+    (3, 'Milk', 2.99);</PRE
+><P></P
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>Когда нужно добавить сразу множество строк, возможно будет лучше использовать команду <A
+HREF="sql-copy.html"
+>COPY</A
+>. Она не такая гибкая, как <A
+HREF="sql-insert.html"
+>INSERT</A
+>, но гораздо эффективнее. Дополнительно об ускорении массовой загрузки данных можно узнать в <A
+HREF="populate.html"
+>Разделе 14.4</A
+>.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="dml.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="dml-update.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Модификация данных</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="dml.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Изменение данных</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

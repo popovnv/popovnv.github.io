@@ -1,0 +1,475 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Предопределённые параметры</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Настройка сервера"
+HREF="runtime-config.html"><LINK
+REL="PREVIOUS"
+TITLE="Обработка ошибок"
+HREF="runtime-config-error-handling.html"><LINK
+REL="NEXT"
+TITLE="Внесистемные параметры"
+HREF="runtime-config-custom.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Обработка ошибок"
+HREF="runtime-config-error-handling.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="runtime-config.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 18. Настройка сервера</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Внесистемные параметры"
+HREF="runtime-config-custom.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="RUNTIME-CONFIG-PRESET"
+>18.15. Предопределённые параметры</A
+></H1
+><P
+>Следующие <SPAN
+CLASS="QUOTE"
+>"параметры"</SPAN
+> доступны только для чтения, их значения задаются при компиляции или при установке <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. По этой причине они исключены из примера файла <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+>. Эти параметры сообщают различные аспекты поведения <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, которые могут быть интересны для определённых приложений, например, средств администрирования.</P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="GUC-BLOCK-SIZE"
+></A
+><TT
+CLASS="VARNAME"
+>block_size</TT
+> (<TT
+CLASS="TYPE"
+>integer</TT
+>) </DT
+><DD
+><P
+>Сообщает размер блока на диске. Он определяется значением <TT
+CLASS="LITERAL"
+>BLCKSZ</TT
+> при сборке сервера. Значение по умолчанию — 8192 байта. Значение <TT
+CLASS="VARNAME"
+>block_size</TT
+> влияет на некоторые другие переменные конфигурации (например, <A
+HREF="runtime-config-resource.html#GUC-SHARED-BUFFERS"
+>shared_buffers</A
+>). Об этом говорится в <A
+HREF="runtime-config-resource.html"
+>Разделе 18.4</A
+>.</P
+></DD
+><DT
+><A
+NAME="GUC-DATA-CHECKSUMS"
+></A
+><TT
+CLASS="VARNAME"
+>data_checksums</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Сообщает, включён ли в этом кластере контроль целостности данных. За дополнительными сведениями обратитесь к <A
+HREF="app-initdb.html#APP-INITDB-DATA-CHECKSUMS"
+>data checksums</A
+>.</P
+></DD
+><DT
+><A
+NAME="GUC-INTEGER-DATETIMES"
+></A
+><TT
+CLASS="VARNAME"
+>integer_datetimes</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Сообщает, был ли <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> собран с поддержкой даты и времени в 64-битных целых. Эта поддержка отключается аргументом <TT
+CLASS="LITERAL"
+>--disable-integer-datetimes</TT
+> при конфигурировании в процессе сборки <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Значение по умолчанию — <TT
+CLASS="LITERAL"
+>on</TT
+>.</P
+></DD
+><DT
+><A
+NAME="GUC-LC-COLLATE"
+></A
+><TT
+CLASS="VARNAME"
+>lc_collate</TT
+> (<TT
+CLASS="TYPE"
+>string</TT
+>) </DT
+><DD
+><P
+>Сообщает локаль, по правилам которой выполняется сортировка текстовых данных. За дополнительными сведениями обратитесь к <A
+HREF="locale.html"
+>Разделу 22.1</A
+>. Это значение определяется при создании базы данных.</P
+></DD
+><DT
+><A
+NAME="GUC-LC-CTYPE"
+></A
+><TT
+CLASS="VARNAME"
+>lc_ctype</TT
+> (<TT
+CLASS="TYPE"
+>string</TT
+>) </DT
+><DD
+><P
+>Сообщает локаль, определяющую классификацию символов. За дополнительными сведениями обратитесь к <A
+HREF="locale.html"
+>Разделу 22.1</A
+>. Это значение определяется при создании базы данных. Обычно оно не отличается от <TT
+CLASS="VARNAME"
+>lc_collate</TT
+>, но для некоторых приложений оно может быть определено по-другому.</P
+></DD
+><DT
+><A
+NAME="GUC-MAX-FUNCTION-ARGS"
+></A
+><TT
+CLASS="VARNAME"
+>max_function_args</TT
+> (<TT
+CLASS="TYPE"
+>integer</TT
+>) </DT
+><DD
+><P
+>Сообщает верхний предел для числа аргументов функции. Он определяется константой <TT
+CLASS="LITERAL"
+>FUNC_MAX_ARGS</TT
+> при сборке сервера. По умолчанию установлен предел в 100 аргументов.</P
+></DD
+><DT
+><A
+NAME="GUC-MAX-IDENTIFIER-LENGTH"
+></A
+><TT
+CLASS="VARNAME"
+>max_identifier_length</TT
+> (<TT
+CLASS="TYPE"
+>integer</TT
+>) </DT
+><DD
+><P
+>Сообщает максимальную длину идентификатора. Она определяется числом на 1 меньше, чем <TT
+CLASS="LITERAL"
+>NAMEDATALEN</TT
+>, при сборке сервера. По умолчанию константа <TT
+CLASS="LITERAL"
+>NAMEDATALEN</TT
+> равна 64; следовательно <TT
+CLASS="VARNAME"
+>max_identifier_length</TT
+> по умолчанию равна 63 байтам, но число символов в многобайтной кодировке будет меньше.</P
+></DD
+><DT
+><A
+NAME="GUC-MAX-INDEX-KEYS"
+></A
+><TT
+CLASS="VARNAME"
+>max_index_keys</TT
+> (<TT
+CLASS="TYPE"
+>integer</TT
+>) </DT
+><DD
+><P
+>Сообщает верхний предел для числа ключей индекса. Он определяется константой <TT
+CLASS="LITERAL"
+>INDEX_MAX_KEYS</TT
+> при сборке сервера. По умолчанию установлен предел в 32 ключа.</P
+></DD
+><DT
+><A
+NAME="GUC-SEGMENT-SIZE"
+></A
+><TT
+CLASS="VARNAME"
+>segment_size</TT
+> (<TT
+CLASS="TYPE"
+>integer</TT
+>) </DT
+><DD
+><P
+>Сообщает, сколько блоков (страниц) можно сохранить в одном файловом сегменте. Это число определяется константой <TT
+CLASS="LITERAL"
+>RELSEG_SIZE</TT
+> при сборке сервера. Максимальный размер сегмента в файлах равен произведению <TT
+CLASS="VARNAME"
+>segment_size</TT
+> и <TT
+CLASS="VARNAME"
+>block_size</TT
+>; по умолчанию это 1 гигабайт.</P
+></DD
+><DT
+><A
+NAME="GUC-SERVER-ENCODING"
+></A
+><TT
+CLASS="VARNAME"
+>server_encoding</TT
+> (<TT
+CLASS="TYPE"
+>string</TT
+>) </DT
+><DD
+><P
+>Сообщает кодировку базы данных (набор символов). Она определяется при создании базы данных. Обычно клиентов должно интересовать только значение <A
+HREF="runtime-config-client.html#GUC-CLIENT-ENCODING"
+>client_encoding</A
+>.</P
+></DD
+><DT
+><A
+NAME="GUC-SERVER-VERSION"
+></A
+><TT
+CLASS="VARNAME"
+>server_version</TT
+> (<TT
+CLASS="TYPE"
+>string</TT
+>) </DT
+><DD
+><P
+>Сообщает номер версии сервера. Она определяется константой <TT
+CLASS="LITERAL"
+>PG_VERSION</TT
+> при сборке сервера.</P
+></DD
+><DT
+><A
+NAME="GUC-SERVER-VERSION-NUM"
+></A
+><TT
+CLASS="VARNAME"
+>server_version_num</TT
+> (<TT
+CLASS="TYPE"
+>integer</TT
+>) </DT
+><DD
+><P
+>Сообщает номер версии сервера в виде целого числа. Она определяется константой <TT
+CLASS="LITERAL"
+>PG_VERSION_NUM</TT
+> при сборке сервера.</P
+></DD
+><DT
+><A
+NAME="GUC-WAL-BLOCK-SIZE"
+></A
+><TT
+CLASS="VARNAME"
+>wal_block_size</TT
+> (<TT
+CLASS="TYPE"
+>integer</TT
+>) </DT
+><DD
+><P
+>Сообщает размер блока WAL на диске. Он определяется константой <TT
+CLASS="LITERAL"
+>XLOG_BLCKSZ</TT
+> при сборке сервера. Значение по умолчанию — 8192 байта.</P
+></DD
+><DT
+><A
+NAME="GUC-WAL-SEGMENT-SIZE"
+></A
+><TT
+CLASS="VARNAME"
+>wal_segment_size</TT
+> (<TT
+CLASS="TYPE"
+>integer</TT
+>) </DT
+><DD
+><P
+>Сообщает число блоков (страниц) в файле сегмента WAL. Общий размер файла сегмента WAL равняется произведению <TT
+CLASS="VARNAME"
+>wal_segment_size</TT
+> и <TT
+CLASS="VARNAME"
+>wal_block_size</TT
+>; по умолчанию это 16 мегабайт. За дополнительными сведениями обратитесь к <A
+HREF="wal-configuration.html"
+>Разделу 29.4</A
+>.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="runtime-config-error-handling.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="runtime-config-custom.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Обработка ошибок</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="runtime-config.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Внесистемные параметры</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,444 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>CREATE EXTENSION</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="CREATE EVENT TRIGGER"
+HREF="sql-createeventtrigger.html"><LINK
+REL="NEXT"
+TITLE="CREATE FOREIGN DATA WRAPPER"
+HREF="sql-createforeigndatawrapper.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="CREATE EVENT TRIGGER"
+HREF="sql-createeventtrigger.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="CREATE FOREIGN DATA WRAPPER"
+HREF="sql-createforeigndatawrapper.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-CREATEEXTENSION"
+></A
+>CREATE EXTENSION</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN73137"
+></A
+><H2
+>Название</H2
+>CREATE EXTENSION&nbsp;--&nbsp;установить расширение</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN73140"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>CREATE EXTENSION [ IF NOT EXISTS ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_расширения</I
+></TT
+>
+    [ WITH ] [ SCHEMA <TT
+CLASS="REPLACEABLE"
+><I
+>имя_схемы</I
+></TT
+> ]
+             [ VERSION <TT
+CLASS="REPLACEABLE"
+><I
+>версия</I
+></TT
+> ]
+             [ FROM <TT
+CLASS="REPLACEABLE"
+><I
+>старая_версия</I
+></TT
+> ]</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN73146"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>CREATE EXTENSION</TT
+> загружает в текущую базу данных новое расширение. Расширение с таким именем не должно быть уже загружено.</P
+><P
+>Загрузка расширения по сути сводится к запуску скрипта расширения. Этот скрипт обычно создаёт новые <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>-объекты, такие как функции, типы данных, операторы и методы поддержки индексов. <TT
+CLASS="COMMAND"
+>CREATE EXTENSION</TT
+> дополнительно записывает идентификаторы всех добавляемых объектов, так что впоследствии их можно удалить, выполнив команду <TT
+CLASS="COMMAND"
+>DROP EXTENSION</TT
+>.</P
+><P
+>Для загрузки расширения требуются те же права, что необходимы для создания составляющих его объектов. Для большинства расширений это означает, что необходимы права владельца базы данных или суперпользователя. Пользователь, запускающий <TT
+CLASS="COMMAND"
+>CREATE EXTENSION</TT
+>, становится владельцем самого расширения (это требуется для последующих проверок доступа), а также владельцем всех объектов, созданных скриптом расширения.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN73156"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>IF NOT EXISTS</TT
+></DT
+><DD
+><P
+>Не считать ошибкой, если расширение с таким именем уже существует. В этом случае будет выдано замечание. Заметьте, что нет никакой гарантии, что существующее расширение как-то соотносится с тем, которое могло бы быть создано из указанного скрипта.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_расширения</I
+></TT
+></DT
+><DD
+><P
+>Имя устанавливаемого расширения. <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> создаст расширение, используя инструкции из файла <TT
+CLASS="LITERAL"
+>SHAREDIR/extension/</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_расширения</I
+></TT
+><TT
+CLASS="LITERAL"
+>.control</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_схемы</I
+></TT
+></DT
+><DD
+><P
+>Имя схемы, в которую будут установлены объекты расширения (подразумевается, что расширение позволяет управлять размещением своих объектов). Указанная схема должна уже существовать. Если имя не указано и в управляющем файле расширения оно так же не задано, для создания объектов используется текущая схема.</P
+><P
+>Помните, что само расширение не считается принадлежащим какой-либо схеме; имена расширений не дополняются схемой и потому должны быть уникальными во всей базе данных. Однако объекты, принадлежащие расширениям, могут относиться к схемам.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>версия</I
+></TT
+></DT
+><DD
+><P
+>Версия устанавливаемого расширения. Её можно записать в виде идентификатора или строкового значения. По умолчанию версия считывается из управляющего файла расширения.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>старая_версия</I
+></TT
+></DT
+><DD
+><P
+>Указание <TT
+CLASS="LITERAL"
+>FROM</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>старая_версия</I
+></TT
+> может быть добавлено тогда и только тогда, когда устанавливаемое расширение заменяет модуль <SPAN
+CLASS="QUOTE"
+>"старого стиля"</SPAN
+>, представляющий собой просто набор объектов, не упакованный в расширение. С этим указанием <TT
+CLASS="COMMAND"
+>CREATE EXTENSION</TT
+> запускает альтернативный установочный скрипт, собирающий все существующие объекты в расширение, а не создающий новые. Учтите, что <TT
+CLASS="LITERAL"
+>SCHEMA</TT
+> при этом определяет схему, содержащую эти существующие объекты.</P
+><P
+>Значение, задаваемое в качестве <TT
+CLASS="REPLACEABLE"
+><I
+>старой_версии</I
+></TT
+>, определяется автором расширения и может меняться, если в расширение нужно преобразовать не одну версию модуля в старом стиле. Для стандартных дополнительных модулей, поставляемых в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> до версии 9.1, при преобразовании модуля в расширение <TT
+CLASS="REPLACEABLE"
+><I
+>старая_версия</I
+></TT
+> должна содержать значение <TT
+CLASS="LITERAL"
+>unpackaged</TT
+>.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN73199"
+></A
+><H2
+>Замечания</H2
+><P
+>Прежде чем вы сможете выполнить <TT
+CLASS="COMMAND"
+>CREATE EXTENSION</TT
+> и загрузить расширение в базу данных, необходимо правильно установить сопутствующие файлы расширения. Информацию об установке расширений, поставляемых в составе <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, можно найти по ссылке <A
+HREF="contrib.html"
+>Дополнительные поставляемые модули</A
+>.</P
+><P
+>Расширения, доступные для установки в данный момент, можно найти в системном представлении <A
+HREF="view-pg-available-extensions.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_available_extensions</TT
+></A
+> или <A
+HREF="view-pg-available-extension-versions.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_available_extension_versions</TT
+></A
+>.</P
+><P
+>За информацией для разработчиков расширений обратитесь к <A
+HREF="extend-extensions.html"
+>Разделу 35.15</A
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN73212"
+></A
+><H2
+>Примеры</H2
+><P
+>Установка расширения <A
+HREF="hstore.html"
+>hstore</A
+> в текущую базу данных: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE EXTENSION hstore;</PRE
+><P></P
+><P
+>Преобразование установленного до версии 9.1 модуля <TT
+CLASS="LITERAL"
+>hstore</TT
+> в расширение: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE EXTENSION hstore SCHEMA public FROM unpackaged;</PRE
+><P> Будьте внимательны — здесь нужно указать схему, в которую ранее были установлены существующие объекты <TT
+CLASS="LITERAL"
+>hstore</TT
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN73221"
+></A
+><H2
+>Совместимость</H2
+><P
+><TT
+CLASS="COMMAND"
+>CREATE EXTENSION</TT
+> является расширением <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN73226"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-alterextension.html"
+>ALTER EXTENSION</A
+>, <A
+HREF="sql-dropextension.html"
+>DROP EXTENSION</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-createeventtrigger.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-createforeigndatawrapper.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>CREATE EVENT TRIGGER</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>CREATE FOREIGN DATA WRAPPER</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

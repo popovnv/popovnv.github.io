@@ -1,0 +1,417 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>SPI_modifytuple</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Управление памятью"
+HREF="spi-memory.html"><LINK
+REL="PREVIOUS"
+TITLE="SPI_returntuple"
+HREF="spi-spi-returntuple.html"><LINK
+REL="NEXT"
+TITLE="SPI_freetuple"
+HREF="spi-spi-freetuple.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="SPI_returntuple"
+HREF="spi-spi-returntuple.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="spi-memory.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="SPI_freetuple"
+HREF="spi-spi-freetuple.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SPI-SPI-MODIFYTUPLE"
+></A
+>SPI_modifytuple</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN66017"
+></A
+><H2
+>Название</H2
+>SPI_modifytuple&nbsp;--&nbsp;создать строку, заменяя отдельные поля в данной</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN66020"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>HeapTuple SPI_modifytuple(Relation <TT
+CLASS="PARAMETER"
+>rel</TT
+>, HeapTuple <TT
+CLASS="PARAMETER"
+>row</TT
+>, int <TT
+CLASS="PARAMETER"
+>ncols</TT
+>,
+                          int * <TT
+CLASS="PARAMETER"
+>colnum</TT
+>, Datum * <TT
+CLASS="PARAMETER"
+>values</TT
+>, const char * <TT
+CLASS="PARAMETER"
+>nulls</TT
+>)</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN66028"
+></A
+><H2
+>Описание</H2
+><P
+><CODE
+CLASS="FUNCTION"
+>SPI_modifytuple</CODE
+> создаёт новую строку, подставляя новые значения для указанных колонок и копируя исходное содержимое остальных колонок. Исходная строка не изменяется.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN66032"
+></A
+><H2
+>Аргументы</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>Relation <TT
+CLASS="PARAMETER"
+>rel</TT
+></TT
+></DT
+><DD
+><P
+>Используется только в качестве дескриптора строки. (Передача отношения вместо собственно дескриптора строки — нехорошая особенность.)</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>HeapTuple <TT
+CLASS="PARAMETER"
+>row</TT
+></TT
+></DT
+><DD
+><P
+>строка, подлежащая изменению</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>int <TT
+CLASS="PARAMETER"
+>ncols</TT
+></TT
+></DT
+><DD
+><P
+>число изменяемых колонок</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>int * <TT
+CLASS="PARAMETER"
+>colnum</TT
+></TT
+></DT
+><DD
+><P
+>массив длины <TT
+CLASS="PARAMETER"
+>ncols</TT
+>, содержащий номера изменяемых колонок (начиная с 1)</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>Datum * <TT
+CLASS="PARAMETER"
+>values</TT
+></TT
+></DT
+><DD
+><P
+>массив длины <TT
+CLASS="PARAMETER"
+>ncols</TT
+>, содержащий новые значения указанных колонок</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>const char * <TT
+CLASS="PARAMETER"
+>nulls</TT
+></TT
+></DT
+><DD
+><P
+>массив длины <TT
+CLASS="PARAMETER"
+>ncols</TT
+>, описывающий, в каких колонках передаётся NULL</P
+><P
+>Если в <TT
+CLASS="PARAMETER"
+>nulls</TT
+> передаётся <TT
+CLASS="SYMBOL"
+>NULL</TT
+>, <CODE
+CLASS="FUNCTION"
+>SPI_modifytuple</CODE
+> считает, что ни один из параметров не равен NULL. В противном случае элемент массива <TT
+CLASS="PARAMETER"
+>nulls</TT
+> должен содержать <TT
+CLASS="LITERAL"
+>'&nbsp;'</TT
+>, если значение соответствующего параметра не NULL, либо <TT
+CLASS="LITERAL"
+>'n'</TT
+>, если это значение — NULL. (В последнем случае значение, переданное в соответствующем элементе <TT
+CLASS="PARAMETER"
+>values</TT
+>, не учитывается.) Заметьте, что <TT
+CLASS="PARAMETER"
+>nulls</TT
+> — это не текстовая строка, а просто массив: ноль <TT
+CLASS="LITERAL"
+>'\0'</TT
+> в конце не нужен.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN66084"
+></A
+><H2
+>Возвращаемое значение</H2
+><P
+>новая строка с изменениями, размещённая в верхнем контексте исполнителя; <TT
+CLASS="SYMBOL"
+>NULL</TT
+>, только если <TT
+CLASS="PARAMETER"
+>row</TT
+> — <TT
+CLASS="SYMBOL"
+>NULL</TT
+></P
+><P
+>В случае ошибки в <TT
+CLASS="VARNAME"
+>SPI_result</TT
+> устанавливается: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="SYMBOL"
+>SPI_ERROR_ARGUMENT</TT
+></DT
+><DD
+><P
+>если <TT
+CLASS="PARAMETER"
+>rel</TT
+> — <TT
+CLASS="SYMBOL"
+>NULL</TT
+>, либо <TT
+CLASS="PARAMETER"
+>row</TT
+> — <TT
+CLASS="SYMBOL"
+>NULL</TT
+>, либо <TT
+CLASS="PARAMETER"
+>ncols</TT
+> меньше или равно 0, либо <TT
+CLASS="PARAMETER"
+>colnum</TT
+> — <TT
+CLASS="SYMBOL"
+>NULL</TT
+>, либо <TT
+CLASS="PARAMETER"
+>values</TT
+> — <TT
+CLASS="SYMBOL"
+>NULL</TT
+></P
+></DD
+><DT
+><TT
+CLASS="SYMBOL"
+>SPI_ERROR_NOATTRIBUTE</TT
+></DT
+><DD
+><P
+>если <TT
+CLASS="PARAMETER"
+>colnum</TT
+> содержит недопустимый номер колонки (меньше или равен 0, либо больше числа колонок в строке <TT
+CLASS="PARAMETER"
+>row</TT
+>)</P
+></DD
+></DL
+></DIV
+><P></P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="spi-spi-returntuple.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="spi-spi-freetuple.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>SPI_returntuple</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="spi-memory.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>SPI_freetuple</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,355 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Атрибуты ролей</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Роли базы данных"
+HREF="user-manag.html"><LINK
+REL="PREVIOUS"
+TITLE="Роли базы данных"
+HREF="database-roles.html"><LINK
+REL="NEXT"
+TITLE="Членство в роли"
+HREF="role-membership.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Роли базы данных"
+HREF="database-roles.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="user-manag.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 20. Роли базы данных</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Членство в роли"
+HREF="role-membership.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="ROLE-ATTRIBUTES"
+>20.2. Атрибуты ролей</A
+></H1
+><P
+>Роль базы данных может иметь атрибуты, определяющие её полномочия и взаимодействие с системой аутентификации клиентов. <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+>Право подключения</DT
+><DD
+><P
+>Только роли с атрибутом <TT
+CLASS="LITERAL"
+>LOGIN</TT
+> могут использоваться для начального подключения к базе данных. Роль с атрибутом <TT
+CLASS="LITERAL"
+>LOGIN</TT
+> можно рассматривать как пользователя базы данных. Для создания роли такой роли можно использовать любой из вариантов: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE ROLE <TT
+CLASS="REPLACEABLE"
+><I
+>name</I
+></TT
+> LOGIN;
+CREATE USER <TT
+CLASS="REPLACEABLE"
+><I
+>name</I
+></TT
+>;</PRE
+><P> (Команда <TT
+CLASS="COMMAND"
+>CREATE USER</TT
+> эквивалентна <TT
+CLASS="COMMAND"
+>CREATE ROLE</TT
+> за исключением того, что <TT
+CLASS="COMMAND"
+>CREATE USER</TT
+> по умолчанию предполагает атрибут <TT
+CLASS="LITERAL"
+>LOGIN</TT
+>, в то время как <TT
+CLASS="COMMAND"
+>CREATE ROLE</TT
+> нет.)</P
+></DD
+><DT
+>Статус суперпользователя</DT
+><DD
+><P
+>Суперпользователь базы данных обходит все проверки прав доступа, за исключением права на вход в систему. Это опасная привилегия и она не должна использоваться небрежно. Лучше всего выполнять большую часть работы не как суперпользователь. Для создания нового суперпользователя используется <TT
+CLASS="LITERAL"
+>CREATE ROLE <TT
+CLASS="REPLACEABLE"
+><I
+>name</I
+></TT
+> SUPERUSER</TT
+>. Это нужно выполнить из под роли, которая также является суперпользователем.</P
+></DD
+><DT
+>Создание базы данных</DT
+><DD
+><P
+>Роль должна явно иметь разрешение на создание базы данных (за исключением суперпользователей, которые пропускают все проверки). Для создания такой роли используется <TT
+CLASS="LITERAL"
+>CREATE ROLE <TT
+CLASS="REPLACEABLE"
+><I
+>name</I
+></TT
+> CREATEDB</TT
+>.</P
+></DD
+><DT
+>Создание роли</DT
+><DD
+><P
+>Роль должна явно иметь разрешение на создание других ролей (за исключением суперпользователей, которые пропускают все проверки). Для создания такой роли используется <TT
+CLASS="LITERAL"
+>CREATE ROLE <TT
+CLASS="REPLACEABLE"
+><I
+>name</I
+></TT
+> CREATEROLE</TT
+>. Роль с привилегией <TT
+CLASS="LITERAL"
+>CREATEROLE</TT
+> может также изменять и удалять другие роли, а также выдавать и отзывать членство в ролях. Однако, для создания, изменения, удаления суперпользовательских ролей, а также изменения в них членства, требуется иметь статус суперпользователя; привилегии <TT
+CLASS="LITERAL"
+>CREATEROLE</TT
+> в таких случаях недостаточно.</P
+></DD
+><DT
+>Запуск репликации</DT
+><DD
+><P
+>Роль должна явно иметь разрешение на запуск потоковой репликации (за исключением суперпользователей, которые пропускают все проверки). Роль, используемая для потоковой репликации также должна иметь атрибут <TT
+CLASS="LITERAL"
+>LOGIN</TT
+>. Для создания такой роли используется <TT
+CLASS="LITERAL"
+>CREATE ROLE <TT
+CLASS="REPLACEABLE"
+><I
+>name</I
+></TT
+>REPLICATION LOGIN</TT
+>.</P
+></DD
+><DT
+>Пароль</DT
+><DD
+><P
+>Пароль имеет значение, если метод аутентификации клиентов требует, чтобы пользователи предоставляли пароль при подключении к базе данных. Методы аутентификации <TT
+CLASS="OPTION"
+>password</TT
+> и <TT
+CLASS="OPTION"
+>md5</TT
+> используют пароли. База данных и операционная система используют раздельные пароли. Пароль указывается при создании роли: <TT
+CLASS="LITERAL"
+>CREATE ROLE <TT
+CLASS="REPLACEABLE"
+><I
+>name</I
+></TT
+> PASSWORD '<TT
+CLASS="REPLACEABLE"
+><I
+>string</I
+></TT
+>'</TT
+>.</P
+></DD
+></DL
+></DIV
+><P> Атрибуты ролей могут быть изменены после создания командой <TT
+CLASS="COMMAND"
+>ALTER ROLE</TT
+>. Более детальная информация в справке по командам <A
+HREF="sql-createrole.html"
+>CREATE ROLE</A
+> и <A
+HREF="sql-alterrole.html"
+>ALTER ROLE</A
+>.</P
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>Рекомендуется создать роль с привилегиями <TT
+CLASS="LITERAL"
+>CREATEDB</TT
+> и <TT
+CLASS="LITERAL"
+>CREATEROLE</TT
+>, но не суперпользователя и в последующем использовать её для управления базами данных и ролями. Такой подход позволит избежать опасностей, связанных с использованием полномочий суперпользователя для задач, которые их не требуют.</P
+></BLOCKQUOTE
+></DIV
+><P
+>На уровне ролей можно устанавливать многие конфигурационные параметры времени выполнения, описанные в <A
+HREF="runtime-config.html"
+>Главе 18</A
+>. Например, если по некоторым причинам всякий раз при подключении к базе данных требуется отключить использование индексов (подсказка: плохая идея) можно выполнить: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER ROLE myname SET enable_indexscan TO off;</PRE
+><P> Установленное значение параметра будет сохранено (но не будет применено сразу). Для последующих подключений с этой ролью это будет выглядеть как выполнение команды <TT
+CLASS="LITERAL"
+>SET enable_indexscan TO off</TT
+> перед началом сессии. Но это только значение по умолчанию, в течение сессии эту установку можно изменить. Для удаления установок на уровне ролей для параметров конфигурации используется <TT
+CLASS="LITERAL"
+>ALTER ROLE <TT
+CLASS="REPLACEABLE"
+><I
+>rolename</I
+></TT
+> RESET <TT
+CLASS="REPLACEABLE"
+><I
+>varname</I
+></TT
+></TT
+>. Обратите внимание, что установка параметров конфигурации на уровне роли без привилегии <TT
+CLASS="LITERAL"
+>LOGIN</TT
+> лишено смысла, т. к. они никогда не будут применены,</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="database-roles.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="role-membership.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Роли базы данных</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="user-manag.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Членство в роли</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

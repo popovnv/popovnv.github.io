@@ -1,0 +1,590 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Управление подключениями к базе данных</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="ECPG — встраиваемый SQL в C"
+HREF="ecpg.html"><LINK
+REL="PREVIOUS"
+TITLE="Концепция"
+HREF="ecpg-concept.html"><LINK
+REL="NEXT"
+TITLE="Запуск команд SQL"
+HREF="ecpg-commands.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Концепция"
+HREF="ecpg-concept.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ecpg.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 33. <SPAN
+CLASS="APPLICATION"
+>ECPG</SPAN
+> — встраиваемый <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> в C</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Запуск команд SQL"
+HREF="ecpg-commands.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="ECPG-CONNECT"
+>33.2. Управление подключениями к базе данных</A
+></H1
+><P
+>В этом разделе описывается, как открывать, закрывать и переключать подключения к базам данных.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="ECPG-CONNECTING"
+>33.2.1. Подключение к серверу баз данных</A
+></H2
+><P
+>Подключение к базе данных выполняется следующим оператором: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL CONNECT TO <TT
+CLASS="REPLACEABLE"
+><I
+>цель-подключения</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>AS <TT
+CLASS="REPLACEABLE"
+><I
+>имя-подключения</I
+></TT
+></SPAN
+>] [<SPAN
+CLASS="OPTIONAL"
+>USER <TT
+CLASS="REPLACEABLE"
+><I
+>имя-пользователя</I
+></TT
+></SPAN
+>];</PRE
+><P> <TT
+CLASS="REPLACEABLE"
+><I
+>Цель</I
+></TT
+> может задаваться следующими способами: <P
+></P
+></P><UL
+><LI
+><P
+>      <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>база_данных</I
+></TT
+>[<SPAN
+CLASS="OPTIONAL"
+>@<TT
+CLASS="REPLACEABLE"
+><I
+>компьютер</I
+></TT
+></SPAN
+>][<SPAN
+CLASS="OPTIONAL"
+>:<TT
+CLASS="REPLACEABLE"
+><I
+>порт</I
+></TT
+></SPAN
+>]</TT
+>
+     </P
+></LI
+><LI
+><P
+>      <TT
+CLASS="LITERAL"
+>tcp:postgresql://<TT
+CLASS="REPLACEABLE"
+><I
+>компьютер</I
+></TT
+>[<SPAN
+CLASS="OPTIONAL"
+>:<TT
+CLASS="REPLACEABLE"
+><I
+>порт</I
+></TT
+></SPAN
+>][<SPAN
+CLASS="OPTIONAL"
+>/<TT
+CLASS="REPLACEABLE"
+><I
+>база_данных</I
+></TT
+></SPAN
+>][<SPAN
+CLASS="OPTIONAL"
+>?<TT
+CLASS="REPLACEABLE"
+><I
+>параметры</I
+></TT
+></SPAN
+>]</TT
+>
+     </P
+></LI
+><LI
+><P
+>      <TT
+CLASS="LITERAL"
+>unix:postgresql://<TT
+CLASS="REPLACEABLE"
+><I
+>компьютер</I
+></TT
+>[<SPAN
+CLASS="OPTIONAL"
+>:<TT
+CLASS="REPLACEABLE"
+><I
+>порт</I
+></TT
+></SPAN
+>][<SPAN
+CLASS="OPTIONAL"
+>/<TT
+CLASS="REPLACEABLE"
+><I
+>база_данных</I
+></TT
+></SPAN
+>][<SPAN
+CLASS="OPTIONAL"
+>?<TT
+CLASS="REPLACEABLE"
+><I
+>параметры</I
+></TT
+></SPAN
+>]</TT
+>
+     </P
+></LI
+><LI
+><P
+>строковая константа SQL, содержащая одну из вышеприведённых записей</P
+></LI
+><LI
+><P
+>ссылка на символьную переменную, содержащую одну из вышеприведённых записей (см. примеры)</P
+></LI
+><LI
+><P
+>      <TT
+CLASS="LITERAL"
+>DEFAULT</TT
+>
+     </P
+></LI
+></UL
+><P> Если цель подключения задаётся буквально (то есть не через переменную) и значение не заключается в кавычки, регистр в этой строке не учитывается, как в обычном SQL. В этом случае при необходимости также можно заключить в двойные кавычки отдельные параметры. На практике, чтобы не провоцировать ошибки, лучше заключать строку в апострофы, либо передавать её в переменной. С целью подключения <TT
+CLASS="LITERAL"
+>DEFAULT</TT
+> устанавливается подключение к базе данных по умолчанию с именем пользователя по умолчанию. Другое имя пользователя или имя подключения в этом случае указать нельзя.</P
+><P
+>Также разными способами можно указать имя пользователя: <P
+></P
+></P><UL
+><LI
+><P
+>      <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+></TT
+>
+     </P
+></LI
+><LI
+><P
+>      <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+>/<TT
+CLASS="REPLACEABLE"
+><I
+>пароль</I
+></TT
+></TT
+>
+     </P
+></LI
+><LI
+><P
+>      <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+> IDENTIFIED BY <TT
+CLASS="REPLACEABLE"
+><I
+>пароль</I
+></TT
+></TT
+>
+     </P
+></LI
+><LI
+><P
+>      <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+> USING <TT
+CLASS="REPLACEABLE"
+><I
+>пароль</I
+></TT
+></TT
+>
+     </P
+></LI
+></UL
+><P> В показанных выше строках <TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+> и <TT
+CLASS="REPLACEABLE"
+><I
+>пароль</I
+></TT
+> могут задаваться идентификатором или строковой константой SQL, либо ссылкой на символьную переменную.</P
+><P
+>Указание <TT
+CLASS="REPLACEABLE"
+><I
+>имя-подключения</I
+></TT
+> применяется, когда в одной программе нужно использовать несколько подключений. Его можно опустить, если программа работает только с одним подключением. Соединение, открытое последним, становится текущим и будет использоваться по умолчанию при выполнении операторов SQL (это описывается далее в этой главе).</P
+><P
+>Вот некоторые примеры оператора <TT
+CLASS="COMMAND"
+>CONNECT</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL CONNECT TO mydb@sql.mydomain.com;
+
+EXEC SQL CONNECT TO unix:postgresql://sql.mydomain.com/mydb AS myconnection USER john;
+
+EXEC SQL BEGIN DECLARE SECTION;
+const char *target = "mydb@sql.mydomain.com";
+const char *user = "john";
+const char *passwd = "secret";
+EXEC SQL END DECLARE SECTION;
+ ...
+EXEC SQL CONNECT TO :target USER :user USING :passwd;
+/* или EXEC SQL CONNECT TO :target USER :user/:passwd; */</PRE
+><P> В последней форме используется вариант, названный выше ссылкой на символьную переменную. В последующих разделах вы узнаете, как в SQL-операторах можно использовать переменные C, приставляя перед именем двоеточие.</P
+><P
+>Учтите, что формат цели подключения не описывается в стандарте SQL. Поэтому, если вы хотите разрабатывать переносимые приложения, имеет смысл применить подход, показанный в последнем примере, и сформировать строку подключения отдельно.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="ECPG-SET-CONNECTION"
+>33.2.2. Выбор подключения</A
+></H2
+><P
+>SQL-операторы в программах со встраиваемым SQL по умолчанию выполняются с текущим подключением, то есть с подключением, которое было открыто последним. Если приложению нужно управлять несколькими подключениями, это можно сделать двумя способами.</P
+><P
+>Первый вариант — явно выбирать подключение для каждого SQL-оператора, например, так: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL AT <TT
+CLASS="REPLACEABLE"
+><I
+>имя-подключения</I
+></TT
+> SELECT ...;</PRE
+><P> Этот вариант хорошо подходит для случаев, когда приложению нужно использовать несколько подключений в смешанном порядке.</P
+><P
+>Если ваше приложение выполняется в нескольких потоках, они не могут использовать подключение одновременно. Поэтому вы должны либо явно управлять доступом (используя мьютексы), либо использовать отдельные подключения для каждого потока. Если для потока выделяется отдельное подключение, вам нужно будет добавить предложение AT и указать в нём подключение этого потока.</P
+><P
+>Второй вариант — выполнять оператор, переключающий текущее подключение. Этот оператор записывается так: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL SET CONNECTION <TT
+CLASS="REPLACEABLE"
+><I
+>имя-подключения</I
+></TT
+>;</PRE
+><P> Этот вариант особенно удобен, когда с одним подключением нужно выполнить несколько операторов. Он не является потокобезопасным.</P
+><P
+>Следующий пример программы демонстрирует управление несколькими подключениями к базам данных: </P><PRE
+CLASS="PROGRAMLISTING"
+>#include &lt;stdio.h&gt;
+
+EXEC SQL BEGIN DECLARE SECTION;
+    char dbname[1024];
+EXEC SQL END DECLARE SECTION;
+
+int
+main()
+{
+    EXEC SQL CONNECT TO testdb1 AS con1 USER testuser;
+    EXEC SQL CONNECT TO testdb2 AS con2 USER testuser;
+    EXEC SQL CONNECT TO testdb3 AS con3 USER testuser;
+
+    /* Этот запрос будет выполняться в последней открытой базе данных "testdb3". */
+    EXEC SQL SELECT current_database() INTO :dbname;
+    printf("current=%s (should be testdb3)\n", dbname);
+
+    /* Добавляется "AT" для запуска запроса в "testdb2" */
+    EXEC SQL AT con2 SELECT current_database() INTO :dbname;
+    printf("current=%s (should be testdb2)\n", dbname);
+
+    /* Сменить текущее подключение на "testdb1". */
+    EXEC SQL SET CONNECTION con1;
+
+    EXEC SQL SELECT current_database() INTO :dbname;
+    printf("current=%s (should be testdb1)\n", dbname);
+
+    EXEC SQL DISCONNECT ALL;
+    return 0;
+}</PRE
+><P> Этот пример должен вывести следующее: </P><PRE
+CLASS="SCREEN"
+>current=testdb3 (should be testdb3)
+current=testdb2 (should be testdb2)
+current=testdb1 (should be testdb1)</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="ECPG-DISCONNECT"
+>33.2.3. Закрытие подключения</A
+></H2
+><P
+>Чтобы закрыть подключение, примените следующий оператор: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL DISCONNECT [<SPAN
+CLASS="OPTIONAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>подключение</I
+></TT
+></SPAN
+>];</PRE
+><P> <TT
+CLASS="REPLACEABLE"
+><I
+>Подключение</I
+></TT
+> можно задать следующими способами: <P
+></P
+></P><UL
+><LI
+><P
+>      <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя-подключения</I
+></TT
+></TT
+>
+     </P
+></LI
+><LI
+><P
+>      <TT
+CLASS="LITERAL"
+>DEFAULT</TT
+>
+     </P
+></LI
+><LI
+><P
+>      <TT
+CLASS="LITERAL"
+>CURRENT</TT
+>
+     </P
+></LI
+><LI
+><P
+>      <TT
+CLASS="LITERAL"
+>ALL</TT
+>
+     </P
+></LI
+></UL
+><P> Если имя подключения не задано, закрывается текущее подключение.</P
+><P
+>Хорошим стилем считается, когда приложение явно закрывает каждое подключение, которое оно открыло.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ecpg-concept.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ecpg-commands.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Концепция</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ecpg.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Запуск команд SQL</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,338 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Триггерные функции</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="PL/Python — процедурный язык Python"
+HREF="plpython.html"><LINK
+REL="PREVIOUS"
+TITLE="Анонимные блоки кода"
+HREF="plpython-do.html"><LINK
+REL="NEXT"
+TITLE="Обращение к базе данных"
+HREF="plpython-database.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Анонимные блоки кода"
+HREF="plpython-do.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="plpython.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 43. PL/Python — процедурный язык Python</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Обращение к базе данных"
+HREF="plpython-database.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="PLPYTHON-TRIGGER"
+>43.6. Триггерные функции</A
+></H1
+><P
+>Когда функция используется как триггер, словарь <TT
+CLASS="LITERAL"
+>TD</TT
+> содержит значения, связанные с работой триггера: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>TD["event"]</TT
+></DT
+><DD
+><P
+>содержит название события в виде строки: <TT
+CLASS="LITERAL"
+>INSERT</TT
+>, <TT
+CLASS="LITERAL"
+>UPDATE</TT
+>, <TT
+CLASS="LITERAL"
+>DELETE</TT
+> или <TT
+CLASS="LITERAL"
+>TRUNCATE</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>TD["when"]</TT
+></DT
+><DD
+><P
+>содержит одну из строк: <TT
+CLASS="LITERAL"
+>BEFORE</TT
+>, <TT
+CLASS="LITERAL"
+>AFTER</TT
+> или <TT
+CLASS="LITERAL"
+>INSTEAD OF</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>TD["level"]</TT
+></DT
+><DD
+><P
+>содержит <TT
+CLASS="LITERAL"
+>ROW</TT
+> или <TT
+CLASS="LITERAL"
+>STATEMENT</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>TD["new"]</TT
+><BR><TT
+CLASS="LITERAL"
+>TD["old"]</TT
+></DT
+><DD
+><P
+>Для триггера уровня строки одно или оба этих поля содержат соответствующие строки триггера, в зависимости от события триггера.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>TD["name"]</TT
+></DT
+><DD
+><P
+>содержит имя триггера.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>TD["table_name"]</TT
+></DT
+><DD
+><P
+>содержит имя таблицы, для которой сработал триггер.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>TD["table_schema"]</TT
+></DT
+><DD
+><P
+>содержит схему таблицы, для которой сработал триггер.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>TD["relid"]</TT
+></DT
+><DD
+><P
+>содержит OID таблицы, для которой сработал триггер.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>TD["args"]</TT
+></DT
+><DD
+><P
+>Если в команде <TT
+CLASS="COMMAND"
+>CREATE TRIGGER</TT
+> задавались аргументы, их можно получить как элементы массива с <TT
+CLASS="LITERAL"
+>TD["args"][0]</TT
+> по <TT
+CLASS="LITERAL"
+>TD["args"][<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>-1]</TT
+>.</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>Если в <TT
+CLASS="LITERAL"
+>TD["when"]</TT
+> передано <TT
+CLASS="LITERAL"
+>BEFORE</TT
+> или <TT
+CLASS="LITERAL"
+>INSTEAD OF</TT
+>, а в <TT
+CLASS="LITERAL"
+>TD["level"]</TT
+> — <TT
+CLASS="LITERAL"
+>ROW</TT
+>, вы можете вернуть значение <TT
+CLASS="LITERAL"
+>None</TT
+> или <TT
+CLASS="LITERAL"
+>"OK"</TT
+> из функции Python, чтобы показать, что строка не была изменена, значение <TT
+CLASS="LITERAL"
+>"SKIP"</TT
+>, чтобы прервать событие, либо, если в <TT
+CLASS="LITERAL"
+>TD["event"]</TT
+> передана команда <TT
+CLASS="COMMAND"
+>INSERT</TT
+> или <TT
+CLASS="COMMAND"
+>UPDATE</TT
+>, вы можете вернуть <TT
+CLASS="LITERAL"
+>"MODIFY"</TT
+>, чтобы показать, что новая строка была изменена. Во всех других случаях возвращаемое значение игнорируется.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="plpython-do.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="plpython-database.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Анонимные блоки кода</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="plpython.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Обращение к базе данных</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

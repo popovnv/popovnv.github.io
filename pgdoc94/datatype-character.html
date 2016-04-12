@@ -1,0 +1,616 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Символьные типы</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Типы данных"
+HREF="datatype.html"><LINK
+REL="PREVIOUS"
+TITLE="Денежные типы"
+HREF="datatype-money.html"><LINK
+REL="NEXT"
+TITLE="Двоичные типы данных"
+HREF="datatype-binary.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Денежные типы"
+HREF="datatype-money.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="datatype.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 8. Типы данных</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Двоичные типы данных"
+HREF="datatype-binary.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="DATATYPE-CHARACTER"
+>8.3. Символьные типы</A
+></H1
+><DIV
+CLASS="TABLE"
+><A
+NAME="DATATYPE-CHARACTER-TABLE"
+></A
+><P
+><B
+>Таблица 8-4. Символьные типы</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+><TT
+CLASS="TYPE"
+>character varying(<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>)</TT
+>, <TT
+CLASS="TYPE"
+>varchar(<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>)</TT
+></TD
+><TD
+>строка ограниченной переменной длины</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="TYPE"
+>character(<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>)</TT
+>, <TT
+CLASS="TYPE"
+>char(<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>)</TT
+></TD
+><TD
+>строка фиксированной длины, дополненная пробелами</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>строка неограниченной переменной длины</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>В <A
+HREF="datatype-character.html#DATATYPE-CHARACTER-TABLE"
+>Таблице 8-4</A
+> перечислены символьные типы общего назначения, доступные в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+><P
+><ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> определяет два основных символьных типа: <TT
+CLASS="TYPE"
+>character varying(<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>)</TT
+> и <TT
+CLASS="TYPE"
+>character(<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>)</TT
+>, где <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+> &mdash; положительное число. Оба эти типа могут хранить текстовые строки длиной до <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+> символов (не байт). Попытка сохранить в колонке такого типа более длинную строку приведёт к ошибке, если только все лишние символы не являются пробелами (тогда они будут усечены до максимально допустимой длины). (Это несколько странное исключение продиктовано стандартом <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>.) Если длина сохраняемой строки оказывается меньше объявленной, значения типа <TT
+CLASS="TYPE"
+>character</TT
+> будут дополнятся пробелами; а тип <TT
+CLASS="TYPE"
+>character varying</TT
+> просто сохранит короткую строку.</P
+><P
+>При попытке явно привести значение к типу <TT
+CLASS="TYPE"
+>character varying(<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>)</TT
+> или <TT
+CLASS="TYPE"
+>character(<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>)</TT
+>, часть строки, выходящая за границу в <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+> символов, удаляется, не вызывая ошибки. (Это также продиктовано стандартом <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>.)</P
+><P
+>Записи <TT
+CLASS="TYPE"
+>varchar(<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>)</TT
+> и <TT
+CLASS="TYPE"
+>char(<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>)</TT
+> являются синонимами <TT
+CLASS="TYPE"
+>character varying(<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>)</TT
+> и <TT
+CLASS="TYPE"
+>character(<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>)</TT
+>, соответственно. Записи <TT
+CLASS="TYPE"
+>character</TT
+> без указания длины соответствует <TT
+CLASS="TYPE"
+>character(1)</TT
+>. Если же длина не указывается для <TT
+CLASS="TYPE"
+>character varying</TT
+>, этот тип будет принимать строки любого размера. Это поведение является расширением <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+><P
+>Помимо этого, <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> предлагает тип <TT
+CLASS="TYPE"
+>text</TT
+>, в котором можно хранить строки произвольной длины. Хотя тип <TT
+CLASS="TYPE"
+>text</TT
+> не описан в стандарте <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>, его поддерживают и некоторые другие СУБД SQL.</P
+><P
+>Значения типа <TT
+CLASS="TYPE"
+>character</TT
+> физически дополняются пробелами до <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+> символов и хранятся, а затем отображаются в таком виде. Однако при сравнении двух значений типа <TT
+CLASS="TYPE"
+>character</TT
+> дополняющие пробелы считаются незначащими и игнорируются. С правилами сортировки, где пробельные символы являются значащими, это поведение может приводить к неожиданным результатам, например <TT
+CLASS="COMMAND"
+>SELECT 'a '::CHAR(2) collate "C" &lt; 'a\n'::CHAR(2)</TT
+> вернёт true (условие будет истинным). При преобразовании значения <TT
+CLASS="TYPE"
+>character</TT
+> к другому символьному типу дополняющие пробелы отбрасываются. Заметьте, что эти пробелы <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>несут</I
+></SPAN
+> смысловую нагрузку в типах <TT
+CLASS="TYPE"
+>character varying</TT
+> и <TT
+CLASS="TYPE"
+>text</TT
+>, а также для проверок по шаблонам <TT
+CLASS="LITERAL"
+>LIKE</TT
+> и регулярным выражениям.</P
+><P
+>Для хранения короткой строки (до 126 байт) требуется дополнительный 1 байт плюс размер самой строки, включая дополняющие пробелы для типа <TT
+CLASS="TYPE"
+>character</TT
+>. Для строк длиннее требуется не 1, а 4 дополнительных байта. Система может автоматически сжимать длинные строки, так что физический размер на диске может быть меньше. Очень длинные текстовые строки переносятся в отдельные таблицы, чтобы они не замедляли работу с другими колонками. В любом случае, максимально возможный размер строки составляет около 1 ГБ. (Допустимое значение <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+> в объявлении типа данных меньше этого числа. Это объясняется тем, что в зависимости от кодировки каждый символ может занимать несколько байт. Если вы желаете сохранять строки без определённого предела длины, используйте типы <TT
+CLASS="TYPE"
+>text</TT
+> или <TT
+CLASS="TYPE"
+>character varying</TT
+> без указания длины, а не задавайте какое-либо большое максимальное значение.)</P
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>По быстродействию эти три типа практически не отличаются друг от друга, не считая большего размера хранения для типа с дополняющими пробелами и нескольких машинных операций для проверки длины при сохранении строк в колонке с ограниченной длиной. Хотя в некоторых СУБД тип <TT
+CLASS="TYPE"
+>character(<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>)</TT
+> работает быстрее других, в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> это не так; на деле <TT
+CLASS="TYPE"
+>character(<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>)</TT
+> обычно оказывается медленнее остальных типов из-за большего размера данных. В большинстве случаев вместо него лучше применять <TT
+CLASS="TYPE"
+>text</TT
+> или <TT
+CLASS="TYPE"
+>character varying</TT
+>.</P
+></BLOCKQUOTE
+></DIV
+><P
+>Подробнее синтаксис текстовых строк описан в <A
+HREF="sql-syntax-lexical.html#SQL-SYNTAX-STRINGS"
+>Подразделе 4.1.2.1</A
+>, а доступные операторы и функции перечисляются в <A
+HREF="functions.html"
+>Главе 9</A
+>. Кодировка, используемая для хранения текстовых строк, определяется набором символов, выбранным для базы данных. Подробнее это описано в <A
+HREF="multibyte.html"
+>Разделе 22.3</A
+>.</P
+><DIV
+CLASS="EXAMPLE"
+><A
+NAME="AEN5403"
+></A
+><P
+><B
+>Пример 8-1. Использование символьных типов</B
+></P
+><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE test1 (a character(4));
+INSERT INTO test1 VALUES ('ok');
+SELECT a, char_length(a) FROM test1; -- <A
+NAME="CO.DATATYPE-CHAR"
+><B
+>(1)</B
+></A
+>
+<SAMP
+CLASS="COMPUTEROUTPUT"
+>  a   | char_length
+------+-------------
+ ok   |           2</SAMP
+>
+
+CREATE TABLE test2 (b varchar(5));
+INSERT INTO test2 VALUES ('ok');
+INSERT INTO test2 VALUES ('good      ');
+INSERT INTO test2 VALUES ('too long');
+<SAMP
+CLASS="COMPUTEROUTPUT"
+>ОШИБКА:  значение не умещается в тип character varying(5)</SAMP
+>
+INSERT INTO test2 VALUES ('too long'::varchar(5)); -- явное усечение
+SELECT b, char_length(b) FROM test2;
+<SAMP
+CLASS="COMPUTEROUTPUT"
+>   b   | char_length
+-------+-------------
+ ok    |           2
+ good  |           5
+ too l |           5</SAMP
+></PRE
+><DIV
+CLASS="CALLOUTLIST"
+><DL
+COMPACT="COMPACT"
+><DT
+><A
+HREF="datatype-character.html#CO.DATATYPE-CHAR"
+><B
+>(1)</B
+></A
+></DT
+><DD
+>Функция <CODE
+CLASS="FUNCTION"
+>char_length</CODE
+> рассматривается в <A
+HREF="functions-string.html"
+>Разделе 9.4</A
+>.</DD
+></DL
+></DIV
+></DIV
+><P
+>В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> есть ещё два символьных типа фиксированной длины, приведённые в <A
+HREF="datatype-character.html#DATATYPE-CHARACTER-SPECIAL-TABLE"
+>Таблице 8-5</A
+>. Тип <TT
+CLASS="TYPE"
+>name</TT
+> создан <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>только</I
+></SPAN
+> для хранения идентификаторов во внутренних системных таблицах и не предназначен для обычного применения пользователями. В настоящее время его длина составляет 64 байта (63 ASCII-символа плюс конечный знак), но в исходном коде <TT
+CLASS="LITERAL"
+>C</TT
+> она задаётся константой <TT
+CLASS="SYMBOL"
+>NAMEDATALEN</TT
+>. Эта константа определяется во время компиляции (и её можно менять в особых случаях), а кроме того, максимальная длина по умолчанию может быть увеличена в следующих версиях. Тип <TT
+CLASS="TYPE"
+>"char"</TT
+> (обратите внимание на кавычки) отличается от <TT
+CLASS="TYPE"
+>char(1)</TT
+> тем, что он фактически хранится в одном байте. Он используется во внутренних системных таблицах для простых перечислений.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="DATATYPE-CHARACTER-SPECIAL-TABLE"
+></A
+><P
+><B
+>Таблица 8-5. Специальные символьные типы</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Размер</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>"char"</TT
+>
+                </TD
+><TD
+>1 байт</TD
+><TD
+>внутренний однобайтный тип</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>name</TT
+>
+                </TD
+><TD
+>64 байта</TD
+><TD
+>внутренний тип для имён объектов</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="datatype-money.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="datatype-binary.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Денежные типы</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="datatype.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Двоичные типы данных</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

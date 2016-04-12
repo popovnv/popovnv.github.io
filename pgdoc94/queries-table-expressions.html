@@ -1,0 +1,2064 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Табличные выражения</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Запросы"
+HREF="queries.html"><LINK
+REL="PREVIOUS"
+TITLE="Обзор"
+HREF="queries-overview.html"><LINK
+REL="NEXT"
+TITLE="Списки выборки"
+HREF="queries-select-lists.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Обзор"
+HREF="queries-overview.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="queries.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 7. Запросы</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Списки выборки"
+HREF="queries-select-lists.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="QUERIES-TABLE-EXPRESSIONS"
+>7.2. Табличные выражения</A
+></H1
+><P
+><I
+CLASS="FIRSTTERM"
+>Табличное выражение</I
+> вычисляет таблицу. Это выражение содержит предложение <TT
+CLASS="LITERAL"
+>FROM</TT
+>, за которым могут следовать предложения <TT
+CLASS="LITERAL"
+>WHERE</TT
+>, <TT
+CLASS="LITERAL"
+>GROUP BY</TT
+> и <TT
+CLASS="LITERAL"
+>HAVING</TT
+>. Тривиальные табличные выражения просто ссылаются на физическую таблицу, её называют также базовой, но в более сложных выражениях такие таблицы можно преобразовывать и комбинировать самыми разными способами.</P
+><P
+>Необязательные предложения <TT
+CLASS="LITERAL"
+>WHERE</TT
+>, <TT
+CLASS="LITERAL"
+>GROUP BY</TT
+> и <TT
+CLASS="LITERAL"
+>HAVING</TT
+> в табличном выражении определяют последовательность преобразований, осуществляемых с данными таблицы, полученной в предложении <TT
+CLASS="LITERAL"
+>FROM</TT
+>. В результате этих преобразований образуется виртуальная таблица, строки которой передаются списку выборки, вычисляющему выходные строки запроса.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="QUERIES-FROM"
+>7.2.1. Предложение <TT
+CLASS="LITERAL"
+>FROM</TT
+></A
+></H2
+><P
+><A
+HREF="sql-select.html#SQL-FROM"
+><I
+>Предложение <I
+>FROM</I
+></I
+></A
+> образует таблицу из одной или нескольких ссылок на таблицы, разделённых запятыми. </P><PRE
+CLASS="SYNOPSIS"
+>FROM <TT
+CLASS="REPLACEABLE"
+><I
+>табличная_ссылка</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>табличная_ссылка</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, ...</SPAN
+>]</SPAN
+>]</PRE
+><P> Здесь табличной ссылкой может быть имя таблицы (возможно, с именем схемы), производная таблица, например подзапрос, соединение таблиц или сложная комбинация этих вариантов. Если в предложении <TT
+CLASS="LITERAL"
+>FROM</TT
+> перечисляются несколько ссылок, для них применяется перекрёстное соединение (то есть декартово произведение; см. ниже). Список <TT
+CLASS="LITERAL"
+>FROM</TT
+> преобразуется в промежуточную виртуальную таблицу, которая может пройти через преобразования <TT
+CLASS="LITERAL"
+>WHERE</TT
+>, <TT
+CLASS="LITERAL"
+>GROUP BY</TT
+> и <TT
+CLASS="LITERAL"
+>HAVING</TT
+>, и в итоге определит результат табличного выражения.</P
+><P
+>Когда в табличной ссылке указывается таблица, являющаяся родительской в иерархии наследования, в результате будут получены строки не только этой таблицы, но и всех её дочерних таблиц. Чтобы выбрать строки только одной родительской таблицы, перед её именем нужно добавить ключевое слово <TT
+CLASS="LITERAL"
+>ONLY</TT
+>. Учтите, что при этом будут получены только колонки указанной таблицы &mdash; дополнительные колонки дочерних таблиц не попадут в результат.</P
+><P
+>Если же вы не добавляете <TT
+CLASS="LITERAL"
+>ONLY</TT
+> перед именем таблицы, вы можете дописать после него <TT
+CLASS="LITERAL"
+>*</TT
+>, тем самым указав, что должны обрабатываться и все дочерние таблицы. Добавлять <TT
+CLASS="LITERAL"
+>*</TT
+> не обязательно, так как теперь это поведение подразумевается по умолчанию (если только вы не измените параметр конфигурации <A
+HREF="runtime-config-compatible.html#GUC-SQL-INHERITANCE"
+>sql_inheritance</A
+>). Однако такая запись может быть полезна тем, что подчеркнёт использование дополнительных таблиц.</P
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="QUERIES-JOIN"
+>7.2.1.1. Соединённые таблицы</A
+></H3
+><P
+>Соединённая таблица ­­­­­­&mdash; это таблица, полученная из двух других (реальных или производных от них) таблиц в соответствии с правилами соединения конкретного типа. Общий синтаксис описания соединённой таблицы: </P><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>T1</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>тип_соединения</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>T2</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+> <TT
+CLASS="REPLACEABLE"
+><I
+>условие_соединения</I
+></TT
+> </SPAN
+>]</PRE
+><P>Соединения любых типов могут вкладываются друг в друга или объединяться: и <TT
+CLASS="REPLACEABLE"
+><I
+>T1</I
+></TT
+>, и <TT
+CLASS="REPLACEABLE"
+><I
+>T2</I
+></TT
+> могут быть результатами соединения. Для однозначного определения порядка соединений предложения <TT
+CLASS="LITERAL"
+>JOIN</TT
+> можно заключать в скобки. Если скобки отсутствуют, предложения <TT
+CLASS="LITERAL"
+>JOIN</TT
+> обрабатываются слева направо.</P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><P
+><B
+>Типы соединений</B
+></P
+><DL
+><DT
+>Перекрёстное соединение </DT
+><DD
+><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>T1</I
+></TT
+> CROSS JOIN <TT
+CLASS="REPLACEABLE"
+><I
+>T2</I
+></TT
+></PRE
+><P
+>Соединённую таблицу образуют все возможные сочетания строк из <TT
+CLASS="REPLACEABLE"
+><I
+>T1</I
+></TT
+> и <TT
+CLASS="REPLACEABLE"
+><I
+>T2</I
+></TT
+> (т. е. их декартово произведение), а набор её колонок объединяет в себе колонки <TT
+CLASS="REPLACEABLE"
+><I
+>T1</I
+></TT
+> со следующими за ними колонками <TT
+CLASS="REPLACEABLE"
+><I
+>T2</I
+></TT
+>. Если таблицы содержат N и M строк, соединённая таблица будет содержать N * M строк.</P
+><P
+><TT
+CLASS="LITERAL"
+>FROM <TT
+CLASS="REPLACEABLE"
+><I
+>T1</I
+></TT
+> CROSS JOIN <TT
+CLASS="REPLACEABLE"
+><I
+>T2</I
+></TT
+></TT
+> эквивалентно <TT
+CLASS="LITERAL"
+>FROM <TT
+CLASS="REPLACEABLE"
+><I
+>T1</I
+></TT
+> INNER JOIN <TT
+CLASS="REPLACEABLE"
+><I
+>T2</I
+></TT
+> ON TRUE</TT
+> (см. ниже). Эта запись также эквивалентна <TT
+CLASS="LITERAL"
+>FROM <TT
+CLASS="REPLACEABLE"
+><I
+>T1</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>T2</I
+></TT
+></TT
+>. </P><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Последняя запись не полностью эквивалентна первым при указании более чем двух таблиц, так как <TT
+CLASS="LITERAL"
+>JOIN</TT
+> связывает таблицы сильнее, чем запятая. Например, <TT
+CLASS="LITERAL"
+>FROM <TT
+CLASS="REPLACEABLE"
+><I
+>T1</I
+></TT
+> CROSS JOIN <TT
+CLASS="REPLACEABLE"
+><I
+>T2</I
+></TT
+> INNER JOIN <TT
+CLASS="REPLACEABLE"
+><I
+>T3</I
+></TT
+> ON <TT
+CLASS="REPLACEABLE"
+><I
+>условие</I
+></TT
+></TT
+> не равнозначно <TT
+CLASS="LITERAL"
+>FROM <TT
+CLASS="REPLACEABLE"
+><I
+>T1</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>T2</I
+></TT
+> INNER JOIN <TT
+CLASS="REPLACEABLE"
+><I
+>T3</I
+></TT
+> ON <TT
+CLASS="REPLACEABLE"
+><I
+>условие</I
+></TT
+></TT
+>, так как <TT
+CLASS="REPLACEABLE"
+><I
+>условие</I
+></TT
+> может ссылаться на <TT
+CLASS="REPLACEABLE"
+><I
+>T1</I
+></TT
+> в первом случае, но не во втором.</P
+></BLOCKQUOTE
+></DIV
+><P></P
+></DD
+><DT
+>Соединения с сопоставлениями строк </DT
+><DD
+><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>T1</I
+></TT
+> { [<SPAN
+CLASS="OPTIONAL"
+>INNER</SPAN
+>] | { LEFT | RIGHT | FULL } [<SPAN
+CLASS="OPTIONAL"
+>OUTER</SPAN
+>] } JOIN <TT
+CLASS="REPLACEABLE"
+><I
+>T2</I
+></TT
+>
+  ON <TT
+CLASS="REPLACEABLE"
+><I
+>логическое_выражение</I
+></TT
+>
+<TT
+CLASS="REPLACEABLE"
+><I
+>T1</I
+></TT
+> { [<SPAN
+CLASS="OPTIONAL"
+>INNER</SPAN
+>] | { LEFT | RIGHT | FULL } [<SPAN
+CLASS="OPTIONAL"
+>OUTER</SPAN
+>] } JOIN <TT
+CLASS="REPLACEABLE"
+><I
+>T2</I
+></TT
+>
+  USING ( <TT
+CLASS="REPLACEABLE"
+><I
+>список колонок соединения</I
+></TT
+> )
+<TT
+CLASS="REPLACEABLE"
+><I
+>T1</I
+></TT
+> NATURAL { [<SPAN
+CLASS="OPTIONAL"
+>INNER</SPAN
+>] | { LEFT | RIGHT | FULL } [<SPAN
+CLASS="OPTIONAL"
+>OUTER</SPAN
+>] } JOIN <TT
+CLASS="REPLACEABLE"
+><I
+>T2</I
+></TT
+></PRE
+><P
+>Слова <TT
+CLASS="LITERAL"
+>INNER</TT
+> и <TT
+CLASS="LITERAL"
+>OUTER</TT
+> необязательны во всех формах. По умолчанию подразумевается <TT
+CLASS="LITERAL"
+>INNER</TT
+> (внутреннее соединение), а при указании <TT
+CLASS="LITERAL"
+>LEFT</TT
+>, <TT
+CLASS="LITERAL"
+>RIGHT</TT
+> и <TT
+CLASS="LITERAL"
+>FULL</TT
+> &mdash; внешнее соединение.</P
+><P
+><I
+CLASS="FIRSTTERM"
+>Условие соединения</I
+> указывается в предложении <TT
+CLASS="LITERAL"
+>ON</TT
+> или <TT
+CLASS="LITERAL"
+>USING</TT
+>, либо неявно задаётся ключевым словом <TT
+CLASS="LITERAL"
+>NATURAL</TT
+>. Это условие определяет, какие строки двух исходных таблиц считаются <SPAN
+CLASS="QUOTE"
+>"соответствующими"</SPAN
+> друг другу (это подробно рассматривается ниже).</P
+><P
+>Возможные типы соединений с сопоставлениями строк: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>INNER JOIN</TT
+></DT
+><DD
+><P
+>Для каждой строки R1 из T1 в результирующей таблице содержится строка для каждой строки в T2, удовлетворяющей условию соединения с R1.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>LEFT OUTER JOIN</TT
+></DT
+><DD
+><P
+>Сначала выполняется внутреннее соединение (INNER JOIN). Затем в результат добавляются все строки из T1, которым не соответствуют никакие строки в T2, а вместо значений колонок T2 вставляются NULL. Таким образом, в результирующей таблице всегда будет минимум одна строка для каждой строки из T1.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>RIGHT OUTER JOIN</TT
+></DT
+><DD
+><P
+>Сначала выполняется внутреннее соединение (INNER JOIN). Затем в результат добавляются все строки из T2, которым не соответствуют никакие строки в T1, а вместо значений колонок T1 вставляются NULL. Это соединение является обратным к левому (LEFT JOIN): в результирующей таблице всегда будет минимум одна строка для каждой строки из T2.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>FULL OUTER JOIN</TT
+></DT
+><DD
+><P
+>Сначала выполняется внутреннее соединение. Затем в результат добавляются все строки из T1, которым не соответствуют никакие строки в T2, а вместо значений колонок T2 вставляются NULL. И наконец, в результат включаются все строки из T2, которым не соответствуют никакие строки в T1, а вместо значений колонок T1 вставляются NULL.</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>Предложение <TT
+CLASS="LITERAL"
+>ON</TT
+> определяет наиболее общую форму условия соединения: в нём указываются выражения логического типа, подобные тем, что используются в предложении <TT
+CLASS="LITERAL"
+>WHERE</TT
+>. Пара строк из <TT
+CLASS="REPLACEABLE"
+><I
+>T1</I
+></TT
+> и <TT
+CLASS="REPLACEABLE"
+><I
+>T2</I
+></TT
+> соответствуют друг другу, если выражение <TT
+CLASS="LITERAL"
+>ON</TT
+> возвращает для них true.</P
+><P
+><TT
+CLASS="LITERAL"
+>USING</TT
+> &mdash; это сокращённая запись условия, полезная в ситуации, когда с обеих сторон соединения колонки имеют одинаковые имена. Она принимает список общих имён колонок через запятую и формирует условие соединения с равенством этих колонок. Например, запись соединения <TT
+CLASS="REPLACEABLE"
+><I
+>T1</I
+></TT
+> и <TT
+CLASS="REPLACEABLE"
+><I
+>T2</I
+></TT
+> с <TT
+CLASS="LITERAL"
+>USING (a, b)</TT
+> формирует условие <TT
+CLASS="LITERAL"
+>ON <TT
+CLASS="REPLACEABLE"
+><I
+>T1</I
+></TT
+>.a = <TT
+CLASS="REPLACEABLE"
+><I
+>T2</I
+></TT
+>.a AND <TT
+CLASS="REPLACEABLE"
+><I
+>T1</I
+></TT
+>.b = <TT
+CLASS="REPLACEABLE"
+><I
+>T2</I
+></TT
+>.b</TT
+>.</P
+><P
+>Более того, при выводе <TT
+CLASS="LITERAL"
+>JOIN USING</TT
+> исключаются избыточные колонки: обе сопоставленных колонки выводить не нужно, так как они содержат одинаковые значения. Тогда как <TT
+CLASS="LITERAL"
+>JOIN ON</TT
+> выдаёт все колонки из <TT
+CLASS="REPLACEABLE"
+><I
+>T1</I
+></TT
+>, а за ними все колонки из <TT
+CLASS="REPLACEABLE"
+><I
+>T2</I
+></TT
+>, <TT
+CLASS="LITERAL"
+>JOIN USING</TT
+> выводит одну колонку для каждой пары (в указанном порядке), за ними все оставшиеся колонки из <TT
+CLASS="REPLACEABLE"
+><I
+>T1</I
+></TT
+> и, наконец, все оставшиеся колонки <TT
+CLASS="REPLACEABLE"
+><I
+>T2</I
+></TT
+>.</P
+><P
+> Наконец, <TT
+CLASS="LITERAL"
+>NATURAL</TT
+> &mdash; сокращённая форма <TT
+CLASS="LITERAL"
+>USING</TT
+>: она образует список <TT
+CLASS="LITERAL"
+>USING</TT
+> из всех имён колонок, существующих в обеих входных таблицах. Как и с <TT
+CLASS="LITERAL"
+>USING</TT
+>, эти колонки оказываются в выходной таблице в единственном экземпляре. Если колонок с одинаковыми именами не находится, <TT
+CLASS="LITERAL"
+>NATURAL</TT
+> действует как <TT
+CLASS="LITERAL"
+>CROSS JOIN</TT
+>.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Предложение <TT
+CLASS="LITERAL"
+>USING</TT
+> разумно защищено от изменений в соединяемых отношениях, так как оно связывает только явно перечисленные колонки. <TT
+CLASS="LITERAL"
+>NATURAL</TT
+> считается более рискованным, так как при любом изменении схемы в одном или другом отношении, когда появляются колонки с совпадающими именами, при соединении будут связываться и эти новые колонки.</P
+></BLOCKQUOTE
+></DIV
+></DD
+></DL
+></DIV
+><P
+>Для наглядности предположим, что у нас есть таблицы <TT
+CLASS="LITERAL"
+>t1</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+> num | name
+-----+------
+   1 | a
+   2 | b
+   3 | c</PRE
+><P> и <TT
+CLASS="LITERAL"
+>t2</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+> num | value
+-----+-------
+   1 | xxx
+   3 | yyy
+   5 | zzz</PRE
+><P> С ними для разных типов соединений мы получим следующие результаты: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>=&gt;</SAMP
+> <KBD
+CLASS="USERINPUT"
+>SELECT * FROM t1 CROSS JOIN t2;</KBD
+>
+ num | name | num | value
+-----+------+-----+-------
+   1 | a    |   1 | xxx
+   1 | a    |   3 | yyy
+   1 | a    |   5 | zzz
+   2 | b    |   1 | xxx
+   2 | b    |   3 | yyy
+   2 | b    |   5 | zzz
+   3 | c    |   1 | xxx
+   3 | c    |   3 | yyy
+   3 | c    |   5 | zzz
+(9 rows)
+
+<SAMP
+CLASS="PROMPT"
+>=&gt;</SAMP
+> <KBD
+CLASS="USERINPUT"
+>SELECT * FROM t1 INNER JOIN t2 ON t1.num = t2.num;</KBD
+>
+ num | name | num | value
+-----+------+-----+-------
+   1 | a    |   1 | xxx
+   3 | c    |   3 | yyy
+(2 rows)
+
+<SAMP
+CLASS="PROMPT"
+>=&gt;</SAMP
+> <KBD
+CLASS="USERINPUT"
+>SELECT * FROM t1 INNER JOIN t2 USING (num);</KBD
+>
+ num | name | value
+-----+------+-------
+   1 | a    | xxx
+   3 | c    | yyy
+(2 rows)
+
+<SAMP
+CLASS="PROMPT"
+>=&gt;</SAMP
+> <KBD
+CLASS="USERINPUT"
+>SELECT * FROM t1 NATURAL INNER JOIN t2;</KBD
+>
+ num | name | value
+-----+------+-------
+   1 | a    | xxx
+   3 | c    | yyy
+(2 rows)
+
+<SAMP
+CLASS="PROMPT"
+>=&gt;</SAMP
+> <KBD
+CLASS="USERINPUT"
+>SELECT * FROM t1 LEFT JOIN t2 ON t1.num = t2.num;</KBD
+>
+ num | name | num | value
+-----+------+-----+-------
+   1 | a    |   1 | xxx
+   2 | b    |     |
+   3 | c    |   3 | yyy
+(3 rows)
+
+<SAMP
+CLASS="PROMPT"
+>=&gt;</SAMP
+> <KBD
+CLASS="USERINPUT"
+>SELECT * FROM t1 LEFT JOIN t2 USING (num);</KBD
+>
+ num | name | value
+-----+------+-------
+   1 | a    | xxx
+   2 | b    |
+   3 | c    | yyy
+(3 rows)
+
+<SAMP
+CLASS="PROMPT"
+>=&gt;</SAMP
+> <KBD
+CLASS="USERINPUT"
+>SELECT * FROM t1 RIGHT JOIN t2 ON t1.num = t2.num;</KBD
+>
+ num | name | num | value
+-----+------+-----+-------
+   1 | a    |   1 | xxx
+   3 | c    |   3 | yyy
+     |      |   5 | zzz
+(3 rows)
+
+<SAMP
+CLASS="PROMPT"
+>=&gt;</SAMP
+> <KBD
+CLASS="USERINPUT"
+>SELECT * FROM t1 FULL JOIN t2 ON t1.num = t2.num;</KBD
+>
+ num | name | num | value
+-----+------+-----+-------
+   1 | a    |   1 | xxx
+   2 | b    |     |
+   3 | c    |   3 | yyy
+     |      |   5 | zzz
+(4 rows)</PRE
+><P></P
+><P
+>Условие соединения в предложении <TT
+CLASS="LITERAL"
+>ON</TT
+> может также содержать выражения, не связанные непосредственно с соединением. Это может быть полезно в некоторых запросах, но не следует использовать это необдуманно. Рассмотрите следующий запрос: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>=&gt;</SAMP
+> <KBD
+CLASS="USERINPUT"
+>SELECT * FROM t1 LEFT JOIN t2 ON t1.num = t2.num AND t2.value = 'xxx';</KBD
+>
+ num | name | num | value
+-----+------+-----+-------
+   1 | a    |   1 | xxx
+   2 | b    |     |
+   3 | c    |     |
+(3 rows)</PRE
+><P> Заметьте, что если поместить ограничение в предложение <TT
+CLASS="LITERAL"
+>WHERE</TT
+>, вы получите другой результат: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>=&gt;</SAMP
+> <KBD
+CLASS="USERINPUT"
+>SELECT * FROM t1 LEFT JOIN t2 ON t1.num = t2.num WHERE t2.value = 'xxx';</KBD
+>
+ num | name | num | value
+-----+------+-----+-------
+   1 | a    |   1 | xxx
+(1 row)</PRE
+><P> Это связано с тем, что ограничение, помещённое в предложение <TT
+CLASS="LITERAL"
+>ON</TT
+>, обрабатывается <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>до</I
+></SPAN
+> операции соединения, тогда как ограничение в <TT
+CLASS="LITERAL"
+>WHERE</TT
+> &mdash; <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>после</I
+></SPAN
+>. Это не имеет значения при внутренних соединениях, но важно при внешних.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="QUERIES-TABLE-ALIASES"
+>7.2.1.2. Псевдонимы таблиц и колонок</A
+></H3
+><P
+>Таблицам и ссылкам на сложные таблицы в запросе можно дать временное имя, по которому к ним можно будет обращаться в рамках запроса. Такое имя называется <I
+CLASS="FIRSTTERM"
+>псевдонимом таблицы</I
+>.</P
+><P
+>Определить псевдоним таблицы можно, написав </P><PRE
+CLASS="SYNOPSIS"
+>FROM <TT
+CLASS="REPLACEABLE"
+><I
+>табличная_ссылка</I
+></TT
+> AS <TT
+CLASS="REPLACEABLE"
+><I
+>псевдоним</I
+></TT
+></PRE
+><P> или </P><PRE
+CLASS="SYNOPSIS"
+>FROM <TT
+CLASS="REPLACEABLE"
+><I
+>табличная_ссылка</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>псевдоним</I
+></TT
+></PRE
+><P> Ключевое слово <TT
+CLASS="LITERAL"
+>AS</TT
+> является необязательным. Вместо <TT
+CLASS="REPLACEABLE"
+><I
+>псевдоним</I
+></TT
+> здесь может быть любой идентификатор.</P
+><P
+>Псевдонимы часто применяются для назначения коротких идентификаторов длинным именам таблиц с целью улучшения читаемости запросов. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT * FROM "очень_длинное_имя_таблицы" s JOIN "другое_длинное_имя" a
+  ON s.id = a.num;</PRE
+><P></P
+><P
+>Псевдоним становится новым именем таблицы в рамках текущего запроса, т. е. после назначения псевдонима использовать исходное имя таблицы в другом месте запроса нельзя. Таким образом, следующий запрос недопустим: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT * FROM my_table AS m WHERE my_table.a &gt; 5;    -- неправильно</PRE
+><P></P
+><P
+>Хотя в основном псевдонимы используются для удобства, они бывают необходимы, когда таблица соединяется сама с собой, например: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT * FROM people AS mother JOIN people AS child
+  ON mother.id = child.mother_id;</PRE
+><P> Кроме того, псевдонимы обязательно нужно назначать подзапросам (см. <A
+HREF="queries-table-expressions.html#QUERIES-SUBQUERIES"
+>Подраздел 7.2.1.3</A
+>).</P
+><P
+>В случае неоднозначности определения псевдонимов можно использовать скобки. В следующем примере первый оператор назначает псевдоним <TT
+CLASS="LITERAL"
+>b</TT
+> второму экземпляру <TT
+CLASS="LITERAL"
+>my_table</TT
+>, а второй оператор назначает псевдоним результату соединения: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT * FROM my_table AS a CROSS JOIN my_table AS b ...
+SELECT * FROM (my_table AS a CROSS JOIN my_table) AS b ...</PRE
+><P></P
+><P
+>В другой форме назначения псевдонима временные имена даются не только таблицам, но и её колонкам: </P><PRE
+CLASS="SYNOPSIS"
+>FROM <TT
+CLASS="REPLACEABLE"
+><I
+>табличная_ссылка</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>AS</SPAN
+>] <TT
+CLASS="REPLACEABLE"
+><I
+>псевдоним</I
+></TT
+> ( <TT
+CLASS="REPLACEABLE"
+><I
+>колонка1</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>колонка2</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, ...</SPAN
+>]</SPAN
+>] )</PRE
+><P> Если псевдонимов колонок оказывается меньше, чем фактически колонок в таблице, остальные колонки сохраняют свои исходные имена. Эта запись особенно полезна для замкнутых соединений или подзапросов.</P
+><P
+>Когда псевдоним применяется к результату <TT
+CLASS="LITERAL"
+>JOIN</TT
+>, он скрывает оригинальные имена таблиц внутри <TT
+CLASS="LITERAL"
+>JOIN</TT
+>. Например, это допустимый SQL-запрос: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT a.* FROM my_table AS a JOIN your_table AS b ON ...</PRE
+><P>а запрос: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT a.* FROM (my_table AS a JOIN your_table AS b ON ...) AS c</PRE
+><P> ошибочный, так как псевдоним таблицы <TT
+CLASS="LITERAL"
+>a</TT
+> не виден снаружи определения псевдонима <TT
+CLASS="LITERAL"
+>c</TT
+>.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="QUERIES-SUBQUERIES"
+>7.2.1.3. Подзапросы</A
+></H3
+><P
+>Подзапросы, образующие таблицы, должны заключаться в скобки и им <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>обязательно</I
+></SPAN
+> должны назначаться псевдонимы (как описано в <A
+HREF="queries-table-expressions.html#QUERIES-TABLE-ALIASES"
+>Подразделе 7.2.1.2</A
+>). Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>FROM (SELECT * FROM table1) AS псевдоним</PRE
+><P></P
+><P
+>Этот пример равносилен записи <TT
+CLASS="LITERAL"
+>FROM table1 AS псевдоним</TT
+>. Более интересные ситуации, которые нельзя свести к простому соединению, возникают, когда в подзапросе используются агрегирующие функции или группировка.</P
+><P
+>Подзапросом может также быть список <TT
+CLASS="COMMAND"
+>VALUES</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>FROM (VALUES ('anne', 'smith'), ('bob', 'jones'), ('joe', 'blow'))
+     AS names(first, last)</PRE
+><P> Такому подзапросу тоже требуется псевдоним. Назначать псевдонимы колонкам списка <TT
+CLASS="COMMAND"
+>VALUES</TT
+> не требуется, но вообще это хороший приём. Подробнее это описано в <A
+HREF="queries-values.html"
+>Разделе 7.7</A
+>.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="QUERIES-TABLEFUNCTIONS"
+>7.2.1.4. Табличные функции</A
+></H3
+><P
+>Табличные функции &mdash; это функции, выдающие набор строк, содержащих либо базовые типы данных (скалярных типов), либо составные типы (табличные строки). Они применяются в запросах как таблицы, представления или подзапросы в предложении <TT
+CLASS="LITERAL"
+>FROM</TT
+>. Колонки, возвращённые табличными функциями, можно включить в выражения <TT
+CLASS="LITERAL"
+>SELECT</TT
+>, <TT
+CLASS="LITERAL"
+>JOIN</TT
+> или <TT
+CLASS="LITERAL"
+>WHERE</TT
+> так же, как колонки таблиц, представлений или подзапросов.</P
+><P
+>Табличные функции можно также скомбинировать, используя запись <TT
+CLASS="LITERAL"
+>ROWS FROM</TT
+>. Результаты функций будут возвращены в параллельных колонках; число строк в этом случае будет наибольшим из результатов всех функций, а результаты функций с меньшим количеством строк будут дополнены значениями NULL.</P
+><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>вызов_функции</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>WITH ORDINALITY</SPAN
+>] [<SPAN
+CLASS="OPTIONAL"
+>[<SPAN
+CLASS="OPTIONAL"
+>AS</SPAN
+>] <TT
+CLASS="REPLACEABLE"
+><I
+>псевдоним_таблицы</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>псевдоним_колонки</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, ...</SPAN
+>])</SPAN
+>]</SPAN
+>]
+ROWS FROM( <TT
+CLASS="REPLACEABLE"
+><I
+>вызов_функции</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, ...</SPAN
+>] ) [<SPAN
+CLASS="OPTIONAL"
+>WITH ORDINALITY</SPAN
+>] [<SPAN
+CLASS="OPTIONAL"
+>[<SPAN
+CLASS="OPTIONAL"
+>AS</SPAN
+>] <TT
+CLASS="REPLACEABLE"
+><I
+>псевдоним_таблицы</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>псевдоним_колонки</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, ...</SPAN
+>])</SPAN
+>]</SPAN
+>]</PRE
+><P
+>Если указано предложение <TT
+CLASS="LITERAL"
+>WITH ORDINALITY</TT
+>, к колонкам результатов функций будет добавлена ещё одна, с типом <TT
+CLASS="TYPE"
+>bigint</TT
+>. В этой колонке нумеруются строки результирующего набора, начиная с 1. (Это обобщение стандартного SQL-синтаксиса <TT
+CLASS="LITERAL"
+>UNNEST ... WITH ORDINALITY</TT
+>.) По умолчанию, эта колонка называется <TT
+CLASS="LITERAL"
+>ordinality</TT
+>, но ей можно присвоить и другое имя с помощью указания <TT
+CLASS="LITERAL"
+>AS</TT
+>.</P
+><P
+>Специальную табличную функцию <TT
+CLASS="LITERAL"
+>UNNEST</TT
+> можно вызвать с любым числом параметров-массивов, а возвращает она соответствующее число колонок, как если бы <TT
+CLASS="LITERAL"
+>UNNEST</TT
+> (<A
+HREF="functions-array.html"
+>Раздел 9.18</A
+>) вызывалась для каждого параметра в отдельности, а результаты объединялись с помощью конструкции <TT
+CLASS="LITERAL"
+>ROWS FROM</TT
+>.</P
+><PRE
+CLASS="SYNOPSIS"
+>UNNEST( <TT
+CLASS="REPLACEABLE"
+><I
+>выражение_массива</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, ...</SPAN
+>] ) [<SPAN
+CLASS="OPTIONAL"
+>WITH ORDINALITY</SPAN
+>] [<SPAN
+CLASS="OPTIONAL"
+>[<SPAN
+CLASS="OPTIONAL"
+>AS</SPAN
+>] <TT
+CLASS="REPLACEABLE"
+><I
+>псевдоним_таблицы</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>псевдоним_колонки</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, ...</SPAN
+>])</SPAN
+>]</SPAN
+>]</PRE
+><P
+>Если <TT
+CLASS="REPLACEABLE"
+><I
+>псевдоним_таблицы</I
+></TT
+> не указан, в качестве имени таблицы используется имя функции; в случае с конструкцией <TT
+CLASS="LITERAL"
+>ROWS FROM()</TT
+> &mdash; имя первой функции.</P
+><P
+>Если псевдонимы колонок не указаны, то для функции, возвращающей базовый тип данных, именем колонки будет имя функции. Для функций, возвращающих составной тип, имена результирующих колонок определяются индивидуальными атрибутами типа.</P
+><P
+>Несколько примеров: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE foo (fooid int, foosubid int, fooname text);
+
+CREATE FUNCTION getfoo(int) RETURNS SETOF foo AS $$
+    SELECT * FROM foo WHERE fooid = $1;
+$$ LANGUAGE SQL;
+
+SELECT * FROM getfoo(1) AS t1;
+
+SELECT * FROM foo
+    WHERE foosubid IN (
+                        SELECT foosubid
+                        FROM getfoo(foo.fooid) z
+                        WHERE z.fooid = foo.fooid
+                      );
+
+CREATE VIEW vw_getfoo AS SELECT * FROM getfoo(1);
+
+SELECT * FROM vw_getfoo;</PRE
+><P></P
+><P
+>В некоторых случаях бывает удобно определить табличную функцию, возвращающую различные наборы колонок при разных вариантах вызова. Для этого нужно указать, что она возвращает псевдотип <TT
+CLASS="TYPE"
+>record</TT
+>. Используя такую функцию, ожидаемую структуру строк нужно описать в самом запросе, чтобы система знала, как разобрать запрос и составить его план. Записывается это так:</P
+><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>вызов_функции</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>AS</SPAN
+>] <TT
+CLASS="REPLACEABLE"
+><I
+>псевдоним</I
+></TT
+> (<TT
+CLASS="REPLACEABLE"
+><I
+>определение_колонки</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, ...</SPAN
+>])
+<TT
+CLASS="REPLACEABLE"
+><I
+>вызов_функции</I
+></TT
+> AS [<SPAN
+CLASS="OPTIONAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>псевдоним</I
+></TT
+></SPAN
+>] (<TT
+CLASS="REPLACEABLE"
+><I
+>определение_колонки</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, ...</SPAN
+>])
+ROWS FROM( ... <TT
+CLASS="REPLACEABLE"
+><I
+>вызов_функции</I
+></TT
+> AS (<TT
+CLASS="REPLACEABLE"
+><I
+>определение_колонки</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, ...</SPAN
+>]) [<SPAN
+CLASS="OPTIONAL"
+>, ...</SPAN
+>] )</PRE
+><P
+>Без <TT
+CLASS="LITERAL"
+>ROWS FROM()</TT
+> список <TT
+CLASS="REPLACEABLE"
+><I
+>определения_колонок</I
+></TT
+> заменяет список псевдонимов, который можно также добавить в предложении <TT
+CLASS="LITERAL"
+>FROM</TT
+>; имена в определениях колонок служат псевдонимами. С <TT
+CLASS="LITERAL"
+>ROWS FROM()</TT
+> список <TT
+CLASS="REPLACEABLE"
+><I
+>определения_колонок</I
+></TT
+> можно добавить к каждой функции отдельно, либо в случае с одной функцией и без предложения <TT
+CLASS="LITERAL"
+>WITH ORDINALITY</TT
+>, список <TT
+CLASS="REPLACEABLE"
+><I
+>определения_колонок</I
+></TT
+> можно записать вместо списка с псевдонимами колонок после <TT
+CLASS="LITERAL"
+>ROWS FROM()</TT
+>.</P
+><P
+>Взгляните на этот пример: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT *
+    FROM dblink('dbname=mydb', 'SELECT proname, prosrc FROM pg_proc')
+      AS t1(proname name, prosrc text)
+    WHERE proname LIKE 'bytea%';</PRE
+><P> Здесь функция <A
+HREF="contrib-dblink-function.html"
+>dblink</A
+> (из модуля <A
+HREF="dblink.html"
+>dblink</A
+>) выполняет удалённый запрос. Она объявлена как функция, возвращающая тип <TT
+CLASS="TYPE"
+>record</TT
+>, так как он подойдёт для запроса любого типа. В этом случае фактический набор колонок функции необходимо описать в вызывающем её запросе, чтобы анализатор запроса знал, например, как преобразовать <TT
+CLASS="LITERAL"
+>*</TT
+>.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="QUERIES-LATERAL"
+>7.2.1.5. Подзапросы <TT
+CLASS="LITERAL"
+>LATERAL</TT
+></A
+></H3
+><P
+>Перед подзапросами в предложении <TT
+CLASS="LITERAL"
+>FROM</TT
+> можно добавить ключевое слово <TT
+CLASS="LITERAL"
+>LATERAL</TT
+>. Это позволит ссылаться в них на колонки предшествующих элементов списка <TT
+CLASS="LITERAL"
+>FROM</TT
+>. (Без <TT
+CLASS="LITERAL"
+>LATERAL</TT
+> каждый подзапрос выполняется независимо и поэтому не может обращаться к другим элементам <TT
+CLASS="LITERAL"
+>FROM</TT
+>.)</P
+><P
+>Перед табличными функциями в предложении <TT
+CLASS="LITERAL"
+>FROM</TT
+> также можно указать <TT
+CLASS="LITERAL"
+>LATERAL</TT
+>, но для них это ключевое слово необязательно; в аргументах функций в любом случае можно обращаться к колонкам в предыдущих элементах <TT
+CLASS="LITERAL"
+>FROM</TT
+>.</P
+><P
+>Элемент <TT
+CLASS="LITERAL"
+>LATERAL</TT
+> может находиться на верхнем уровне списка <TT
+CLASS="LITERAL"
+>FROM</TT
+> или в дереве <TT
+CLASS="LITERAL"
+>JOIN</TT
+>. В последнем случае он может также ссылаться на любые элементы в левой части <TT
+CLASS="LITERAL"
+>JOIN</TT
+>, справа от которого он находится.</P
+><P
+>Когда элемент <TT
+CLASS="LITERAL"
+>FROM</TT
+> содержит ссылки <TT
+CLASS="LITERAL"
+>LATERAL</TT
+>, запрос выполняется следующим образом: сначала для строки элемента <TT
+CLASS="LITERAL"
+>FROM</TT
+> с целевыми колонками, или набора строк из нескольких элементов <TT
+CLASS="LITERAL"
+>FROM</TT
+>, содержащих целевые колонки, вычисляется элемент <TT
+CLASS="LITERAL"
+>LATERAL</TT
+> со значениями этих колонок. Затем результирующие строки обычным образом соединяются со строками, из которых они были вычислены. Эта процедура повторяется для всех строк исходных таблиц.</P
+><P
+><TT
+CLASS="LITERAL"
+>LATERAL</TT
+> можно использовать так: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT * FROM foo, LATERAL (SELECT * FROM bar WHERE bar.id = foo.bar_id) ss;</PRE
+><P> Здесь это не очень полезно, так как тот же результат можно получить более простым и привычным способом: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT * FROM foo, bar WHERE bar.id = foo.bar_id;</PRE
+><P>
+Применять <TT
+CLASS="LITERAL"
+>LATERAL</TT
+> имеет смысл в основном, когда для вычисления соединяемых строк необходимо обратиться к колонкам других таблиц. В частности, это полезно, когда нужно передать значение функции, возвращающей набор данных. Например, если предположить, что <CODE
+CLASS="FUNCTION"
+>vertices(polygon)</CODE
+> возвращает набор вершин многоугольника, близкие вершины многоугольников из таблицы polygons можно получить так: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT p1.id, p2.id, v1, v2
+FROM polygons p1, polygons p2,
+     LATERAL vertices(p1.poly) v1,
+     LATERAL vertices(p2.poly) v2
+WHERE (v1 &lt;-&gt; v2) &lt; 10 AND p1.id != p2.id;</PRE
+><P> Этот запрос можно записать и так: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT p1.id, p2.id, v1, v2
+FROM polygons p1 CROSS JOIN LATERAL vertices(p1.poly) v1,
+     polygons p2 CROSS JOIN LATERAL vertices(p2.poly) v2
+WHERE (v1 &lt;-&gt; v2) &lt; 10 AND p1.id != p2.id;</PRE
+><P> или переформулировать другими способами. (Как уже упоминалось, в данном примере ключевое слово <TT
+CLASS="LITERAL"
+>LATERAL</TT
+> не требуется, но мы добавили его для ясности.)</P
+><P
+>Особенно полезно бывает использовать <TT
+CLASS="LITERAL"
+>LEFT JOIN</TT
+> с подзапросом <TT
+CLASS="LITERAL"
+>LATERAL</TT
+>, чтобы исходные строки оказывались в результате, даже если подзапрос <TT
+CLASS="LITERAL"
+>LATERAL</TT
+> не возвращает строк. Например, если функция <CODE
+CLASS="FUNCTION"
+>get_product_names()</CODE
+> выдаёт названия продуктов, выпущенных определённым производителем, но о продукции некоторых производителей информации нет, мы можем найти, каких именно, примерно так: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT m.name
+FROM manufacturers m LEFT JOIN LATERAL get_product_names(m.id) pname ON true
+WHERE pname IS NULL;</PRE
+><P></P
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="QUERIES-WHERE"
+>7.2.2. Предложение <TT
+CLASS="LITERAL"
+>WHERE</TT
+></A
+></H2
+><P
+><A
+HREF="sql-select.html#SQL-WHERE"
+><I
+>Предложение <I
+>WHERE</I
+></I
+></A
+> записывается так:</P><PRE
+CLASS="SYNOPSIS"
+>WHERE <TT
+CLASS="REPLACEABLE"
+><I
+>условие_ограничения</I
+></TT
+></PRE
+><P> где <TT
+CLASS="REPLACEABLE"
+><I
+>условие_ограничения</I
+></TT
+> &mdash; любое выражения значения (см. <A
+HREF="sql-expressions.html"
+>Раздел 4.2</A
+>), выдающее результат типа <TT
+CLASS="TYPE"
+>boolean</TT
+>.</P
+><P
+>После обработки предложения <TT
+CLASS="LITERAL"
+>FROM</TT
+> каждая строка полученной виртуальной таблицы проходит проверку по условию ограничения. Если результат условия равен true, эта строка остаётся в выходной таблице, а иначе (если результат равен false или NULL) отбрасывается. В условии ограничения, как правило, задействуется минимум одна колонка из таблицы, полученной на выходе <TT
+CLASS="LITERAL"
+>FROM</TT
+>. Хотя строго говоря, это не требуется, но в противном случае предложение <TT
+CLASS="LITERAL"
+>WHERE</TT
+> будет бессмысленным.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Условие для внутреннего соединения можно записать как в предложении <TT
+CLASS="LITERAL"
+>WHERE</TT
+>, так и в предложении <TT
+CLASS="LITERAL"
+>JOIN</TT
+>. Например, это выражение: </P><PRE
+CLASS="PROGRAMLISTING"
+>FROM a, b WHERE a.id = b.id AND b.val &gt; 5</PRE
+><P> равнозначно этому: </P><PRE
+CLASS="PROGRAMLISTING"
+>FROM a INNER JOIN b ON (a.id = b.id) WHERE b.val &gt; 5</PRE
+><P> и возможно, даже этому: </P><PRE
+CLASS="PROGRAMLISTING"
+>FROM a NATURAL JOIN b WHERE b.val &gt; 5</PRE
+><P> Какой вариант выбрать, в основном дело вкуса и стиля. Вариант с <TT
+CLASS="LITERAL"
+>JOIN</TT
+> внутри предложения <TT
+CLASS="LITERAL"
+>FROM</TT
+>, возможно, не лучший с точки зрения совместимости с другими СУБД, хотя он и описан в стандарте SQL. Но для внешних соединений других вариантов нет: их можно записывать только во <TT
+CLASS="LITERAL"
+>FROM</TT
+>. Предложения <TT
+CLASS="LITERAL"
+>ON</TT
+> и <TT
+CLASS="LITERAL"
+>USING</TT
+> во внешних соединениях <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>не</I
+></SPAN
+> равнозначны условию <TT
+CLASS="LITERAL"
+>WHERE</TT
+>, так как они могут добавлять строки (для входных строк без соответствия), а также удалять их из конечного результата.</P
+></BLOCKQUOTE
+></DIV
+><P
+>Несколько примеров запросов с <TT
+CLASS="LITERAL"
+>WHERE</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT ... FROM fdt WHERE c1 &gt; 5
+
+SELECT ... FROM fdt WHERE c1 IN (1, 2, 3)
+
+SELECT ... FROM fdt WHERE c1 IN (SELECT c1 FROM t2)
+
+SELECT ... FROM fdt WHERE c1 IN (SELECT c3 FROM t2 WHERE c2 = fdt.c1 + 10)
+
+SELECT ... FROM fdt WHERE c1 BETWEEN
+  (SELECT c3 FROM t2 WHERE c2 = fdt.c1 + 10) AND 100
+
+SELECT ... FROM fdt WHERE EXISTS (SELECT c1 FROM t2 WHERE c2 &gt; fdt.c1)</PRE
+><P>
+<TT
+CLASS="LITERAL"
+>fdt</TT
+> &mdash; название таблицы, порождённой в предложении <TT
+CLASS="LITERAL"
+>FROM</TT
+>. Строки, которые не соответствуют условию <TT
+CLASS="LITERAL"
+>WHERE</TT
+>, исключаются из <TT
+CLASS="LITERAL"
+>fdt</TT
+>. Обратите внимание, как в качестве выражений значения используются скалярные подзапросы. Как и любые другие запросы, подзапросы могут содержать сложные табличные выражения. Заметьте также, что <TT
+CLASS="LITERAL"
+>fdt</TT
+> используется в подзапросах. Дополнение имени <TT
+CLASS="LITERAL"
+>c1</TT
+> в виде <TT
+CLASS="LITERAL"
+>fdt.c1</TT
+> необходимо только, если в порождённой таблице в подзапросе также оказывается колонка <TT
+CLASS="LITERAL"
+>c1</TT
+>. Полное имя придаёт ясность даже там, где без него можно обойтись. Этот пример показывает, как область именования колонок внешнего запроса распространяется на все вложенные в него внутренние запросы.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="QUERIES-GROUP"
+>7.2.3. Предложения <TT
+CLASS="LITERAL"
+>GROUP BY</TT
+> и <TT
+CLASS="LITERAL"
+>HAVING</TT
+></A
+></H2
+><P
+>Строки порождённой входной таблицы, прошедшие фильтр <TT
+CLASS="LITERAL"
+>WHERE</TT
+>, можно сгруппировать с помощью предложения <TT
+CLASS="LITERAL"
+>GROUP BY</TT
+>, а затем оставить в результате только нужные группы строк, используя предложение <TT
+CLASS="LITERAL"
+>HAVING</TT
+>.</P
+><PRE
+CLASS="SYNOPSIS"
+>SELECT <TT
+CLASS="REPLACEABLE"
+><I
+>список_выборки</I
+></TT
+>
+    FROM ...
+    [<SPAN
+CLASS="OPTIONAL"
+>WHERE ...</SPAN
+>]
+    GROUP BY <TT
+CLASS="REPLACEABLE"
+><I
+>группирующая_колонка</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>группирующая_колонка</I
+></TT
+></SPAN
+>]...</PRE
+><P
+><A
+HREF="sql-select.html#SQL-GROUPBY"
+><I
+>Предложение <I
+>GROUP BY</I
+></I
+></A
+> группирует строки таблицы, объединяя их в одну группу при совпадении значений во всех перечисленных колонках. Порядок, в котором указаны колонки, не имеет значения. В результате наборы строк с одинаковыми значениями преобразуются в отдельные строки, представляющие все строки группы. Это может быть полезно для устранения избыточности выходных данных и/или для вычисления агрегатных функций, применённых к этим группам. Например: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>=&gt;</SAMP
+> <KBD
+CLASS="USERINPUT"
+>SELECT * FROM test1;</KBD
+>
+ x | y
+---+---
+ a | 3
+ c | 2
+ b | 5
+ a | 1
+(4 rows)
+
+<SAMP
+CLASS="PROMPT"
+>=&gt;</SAMP
+> <KBD
+CLASS="USERINPUT"
+>SELECT x FROM test1 GROUP BY x;</KBD
+>
+ x
+---
+ a
+ b
+ c
+(3 rows)</PRE
+><P></P
+><P
+>Во втором запросе мы не могли написать <TT
+CLASS="LITERAL"
+>SELECT * FROM test1 GROUP BY x</TT
+>, так как для колонки <TT
+CLASS="LITERAL"
+>y</TT
+> нет единого значения, связанного с каждой группой. Однако колонки, по которым выполняется группировка, можно использовать в списке выборки, так как они имеют единственное значение в каждой группе.</P
+><P
+>Вообще говоря, в группированной таблице колонки, не включённые в список <TT
+CLASS="LITERAL"
+>GROUP BY</TT
+>, можно использовать только в агрегатных выражениях. Пример такого агрегатного выражения: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>=&gt;</SAMP
+> <KBD
+CLASS="USERINPUT"
+>SELECT x, sum(y) FROM test1 GROUP BY x;</KBD
+>
+ x | sum
+---+-----
+ a |   4
+ b |   5
+ c |   2
+(3 rows)</PRE
+><P> Здесь <TT
+CLASS="LITERAL"
+>sum</TT
+> &mdash; агрегатная функция, вычисляющая единственное значение для всей группы. Подробную информацию о существующих агрегатных функциях можно найти в <A
+HREF="functions-aggregate.html"
+>Разделе 9.20</A
+>.</P
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>Группировка без агрегатных выражений по сути выдаёт набор различающихся значений колонок. Этот же результат можно получить с помощью предложения <TT
+CLASS="LITERAL"
+>DISTINCT</TT
+> (см. <A
+HREF="queries-select-lists.html#QUERIES-DISTINCT"
+>Подраздел 7.3.3</A
+>).</P
+></BLOCKQUOTE
+></DIV
+><P
+>Взгляните на следующий пример: в нём вычисляется общая сумма продаж по каждому продукту (а не общая сумма по всем продуктам): </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT product_id, p.name, (sum(s.units) * p.price) AS sales
+    FROM products p LEFT JOIN sales s USING (product_id)
+    GROUP BY product_id, p.name, p.price;</PRE
+><P> В этом примере колонки <TT
+CLASS="LITERAL"
+>product_id</TT
+>, <TT
+CLASS="LITERAL"
+>p.name</TT
+> и <TT
+CLASS="LITERAL"
+>p.price</TT
+> должны присутствовать в списке <TT
+CLASS="LITERAL"
+>GROUP BY</TT
+>, так как они используются в списке выборки. Колонка <TT
+CLASS="LITERAL"
+>s.units</TT
+> может отсутствовать в списке <TT
+CLASS="LITERAL"
+>GROUP BY</TT
+>, так как она используется только в агрегатном выражении (<TT
+CLASS="LITERAL"
+>sum(...)</TT
+>), вычисляющем сумму продаж. Для каждого продукта этот запрос возвращает строку с итоговой суммой по всем продажам данного продукта.</P
+><P
+>Если бы в таблице products по колонке <TT
+CLASS="LITERAL"
+>product_id</TT
+> был создан первичный ключ, тогда в данном примере было бы достаточно сгруппировать строки по <TT
+CLASS="LITERAL"
+>product_id</TT
+>, так как название и цена продукта <I
+CLASS="FIRSTTERM"
+>функционально зависят</I
+> от кода продукта и можно однозначно определить, какое название и цену возвращать для каждой группы по ID.</P
+><P
+>В стандарте SQL <TT
+CLASS="LITERAL"
+>GROUP BY</TT
+> может группировать только по колонкам исходной таблицы, но расширение <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> позволяет использовать в <TT
+CLASS="LITERAL"
+>GROUP BY</TT
+> колонки из списка выборки. Также возможна группировка по выражениям, а не просто именам колонок.</P
+><P
+>Если таблица была сгруппирована с помощью <TT
+CLASS="LITERAL"
+>GROUP BY</TT
+>, но интерес представляют только некоторые группы, отфильтровать их можно с помощью предложения <TT
+CLASS="LITERAL"
+>HAVING</TT
+>, действующего подобно <TT
+CLASS="LITERAL"
+>WHERE</TT
+>. Записывается это так: </P><PRE
+CLASS="SYNOPSIS"
+>SELECT <TT
+CLASS="REPLACEABLE"
+><I
+>список_выборки</I
+></TT
+> FROM ... [<SPAN
+CLASS="OPTIONAL"
+>WHERE ...</SPAN
+>] GROUP BY ...
+  HAVING <TT
+CLASS="REPLACEABLE"
+><I
+>логическое_выражение</I
+></TT
+></PRE
+><P> В предложении <TT
+CLASS="LITERAL"
+>HAVING</TT
+> могут использоваться и группирующие выражения, и выражения, не участвующие в группировке (в этом случае это должны быть агрегирующие функции).</P
+><P
+>Пример: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>=&gt;</SAMP
+> <KBD
+CLASS="USERINPUT"
+>SELECT x, sum(y) FROM test1 GROUP BY x HAVING sum(y) &gt; 3;</KBD
+>
+ x | sum
+---+-----
+ a |   4
+ b |   5
+(2 rows)
+
+<SAMP
+CLASS="PROMPT"
+>=&gt;</SAMP
+> <KBD
+CLASS="USERINPUT"
+>SELECT x, sum(y) FROM test1 GROUP BY x HAVING x &lt; 'c';</KBD
+>
+ x | sum
+---+-----
+ a |   4
+ b |   5
+(2 rows)</PRE
+><P></P
+><P
+>И ещё один более реалистичный пример: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT product_id, p.name, (sum(s.units) * (p.price - p.cost)) AS profit
+    FROM products p LEFT JOIN sales s USING (product_id)
+    WHERE s.date &gt; CURRENT_DATE - INTERVAL '4 weeks'
+    GROUP BY product_id, p.name, p.price, p.cost
+    HAVING sum(p.price * s.units) &gt; 5000;</PRE
+><P> В данном примере предложение <TT
+CLASS="LITERAL"
+>WHERE</TT
+> выбирает строки по колонке, не включённой в группировку (выражение истинно только для продаж за последние четыре недели), тогда как предложение <TT
+CLASS="LITERAL"
+>HAVING</TT
+> отфильтровывает группы с общей суммой продаж больше 5000. Заметьте, что агрегатные выражения не обязательно должны быть одинаковыми во всех частях запроса.</P
+><P
+>Если в запросе есть вызовы агрегатных функций, но нет предложения <TT
+CLASS="LITERAL"
+>GROUP BY</TT
+>, строки всё равно будут группироваться: в результате окажется одна строка группы (или возможно, ни одной строки, если эта строка будет отброшена предложением <TT
+CLASS="LITERAL"
+>HAVING</TT
+>). Это справедливо и для запросов, которые содержат только предложение <TT
+CLASS="LITERAL"
+>HAVING</TT
+>, но не содержат вызовы агрегатных функций и предложение <TT
+CLASS="LITERAL"
+>GROUP BY</TT
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="QUERIES-WINDOW"
+>7.2.4. Обработка оконных функций</A
+></H2
+><P
+>Если запрос содержит оконные функции (см. <A
+HREF="tutorial-window.html"
+>Раздел 3.5</A
+>, <A
+HREF="functions-window.html"
+>Раздел 9.21</A
+> и <A
+HREF="sql-expressions.html#SYNTAX-WINDOW-FUNCTIONS"
+>Подраздел 4.2.8</A
+>), эти функции вычисляются после каждой группировки, агрегатных выражений и фильтрации <TT
+CLASS="LITERAL"
+>HAVING</TT
+>. Другими словами, если в запросе есть агрегатные функции, предложения <TT
+CLASS="LITERAL"
+>GROUP BY</TT
+> или <TT
+CLASS="LITERAL"
+>HAVING</TT
+>, оконные функции видят не исходные строки, полученные из <TT
+CLASS="LITERAL"
+>FROM</TT
+>/<TT
+CLASS="LITERAL"
+>WHERE</TT
+>, а сгруппированные.</P
+><P
+>Когда используются несколько оконных функций, все оконные функции, имеющие в своих определениях синтаксически равнозначные предложения <TT
+CLASS="LITERAL"
+>PARTITION BY</TT
+> и <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+>, гарантированно обрабатывают данные за один проход. Таким образом, они увидят один порядок сортировки, даже если <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> не определяет порядок однозначно. Однако относительно функций с разными формулировками <TT
+CLASS="LITERAL"
+>PARTITION BY</TT
+> и <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> никаких гарантий не даётся. (В таких случаях между проходами вычислений оконных функций обычно требуется дополнительный этап сортировки и эта сортировка может не сохранять порядок строк, равнозначный с точки зрения <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+>.)</P
+><P
+>В настоящее время оконные функции всегда требуют предварительно отсортированных данных, так что результат запроса будет отсортирован согласно тому или иному предложению <TT
+CLASS="LITERAL"
+>PARTITION BY</TT
+>/<TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> оконных функций. Однако полагаться на это не следует. Если вы хотите, чтобы результаты сортировались определённым образом, явно добавьте предложение <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> на верхнем уровне запроса.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="queries-overview.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="queries-select-lists.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Обзор</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="queries.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Списки выборки</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

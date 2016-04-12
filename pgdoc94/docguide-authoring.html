@@ -1,0 +1,308 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Написание документации</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Документация"
+HREF="docguide.html"><LINK
+REL="PREVIOUS"
+TITLE="Сборка документации"
+HREF="docguide-build.html"><LINK
+REL="NEXT"
+TITLE="Руководство по стилю"
+HREF="docguide-style.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Сборка документации"
+HREF="docguide-build.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="docguide.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Приложение I. Документация</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Руководство по стилю"
+HREF="docguide-style.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="DOCGUIDE-AUTHORING"
+>I.4. Написание документации</A
+></H1
+><P
+>Форматы <ACRONYM
+CLASS="ACRONYM"
+>SGML</ACRONYM
+> и <SPAN
+CLASS="PRODUCTNAME"
+>DocBook</SPAN
+> не страдают от обилия средств их редактирования с открытым исходным кодом. Чаще всего для написания документации используется редактор <SPAN
+CLASS="PRODUCTNAME"
+>Emacs</SPAN
+>/<SPAN
+CLASS="PRODUCTNAME"
+>XEmacs</SPAN
+> в подходящем режиме. В некоторых системах эти редакторы устанавливаются при типичной полной установке.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN128837"
+>I.4.1. Emacs/PSGML</A
+></H2
+><P
+>Режим <SPAN
+CLASS="PRODUCTNAME"
+>PSGML</SPAN
+> — наиболее популярный и мощный режим редактирования документов <ACRONYM
+CLASS="ACRONYM"
+>SGML</ACRONYM
+>. При правильной настройке в <SPAN
+CLASS="APPLICATION"
+>Emacs</SPAN
+> он позволяет вставлять теги и проверять корректность разметки. Его также можно использовать для редактирования <ACRONYM
+CLASS="ACRONYM"
+>HTML</ACRONYM
+>. Загружаемые файлы, инструкции по установке и подробную документацию вы можете найти на <A
+HREF="http://www.lysator.liu.se/projects/about_psgml.html"
+TARGET="_top"
+>сайте PSGML</A
+>.</P
+><P
+>Необходимо отметить важный момент относительно <SPAN
+CLASS="PRODUCTNAME"
+>PSGML</SPAN
+>: его автор предполагал, что вашим основным каталогом с <ACRONYM
+CLASS="ACRONYM"
+>DTD</ACRONYM
+> <ACRONYM
+CLASS="ACRONYM"
+>SGML</ACRONYM
+> будет <TT
+CLASS="FILENAME"
+>/usr/local/lib/sgml</TT
+>. Если же у вас, как и в приводимых ранее примерах, это каталог <TT
+CLASS="FILENAME"
+>/usr/local/share/sgml</TT
+>, вам нужно дополнительно скорректировать предопределённый путь, либо воспользовавшись переменной окружения <TT
+CLASS="ENVAR"
+>SGML_CATALOG_FILES</TT
+>, либо настроив соответственно вашу инсталляцию <SPAN
+CLASS="PRODUCTNAME"
+>PSGML</SPAN
+> (как это сделать, можно узнать из его описания).</P
+><P
+>Поместите следующие строки в файл <TT
+CLASS="FILENAME"
+>~/.emacs</TT
+> (изменив пути на подходящие для вашей системы): </P><PRE
+CLASS="PROGRAMLISTING"
+>; ********** для режима SGML (psgml)
+
+(setq sgml-omittag t)
+(setq sgml-shorttag t)
+(setq sgml-minimize-attributes nil)
+(setq sgml-always-quote-attributes t)
+(setq sgml-indent-step 1)
+(setq sgml-indent-data t)
+(setq sgml-parent-document nil)
+(setq sgml-exposed-tags nil)
+(setq sgml-catalog-files '("/usr/local/share/sgml/catalog"))
+
+(autoload 'sgml-mode "psgml" "Major mode to edit SGML files." t )</PRE
+><P> и добавьте в тот же файл запись для <ACRONYM
+CLASS="ACRONYM"
+>SGML</ACRONYM
+> в существующее определение <TT
+CLASS="VARNAME"
+>auto-mode-alist</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>(setq
+  auto-mode-alist
+  '(("\\.sgml$" . sgml-mode)
+   ))</PRE
+><P></P
+><P
+>Используя <SPAN
+CLASS="PRODUCTNAME"
+>PSGML</SPAN
+>, вы можете найти удобным вставлять подходящие объявления <TT
+CLASS="LITERAL"
+>DOCTYPE</TT
+> в отдельные файлы книги, когда вы редактируете их. Например, редактируя текущий текст, который относится к главе приложений (appendix), вы можете обозначить документ как экземпляр документа <SPAN
+CLASS="QUOTE"
+>"appendix"</SPAN
+>, добавив в него следующую первую строку: </P><PRE
+CLASS="PROGRAMLISTING"
+>&lt;!DOCTYPE appendix PUBLIC "-//OASIS//DTD DocBook V4.2//EN"&gt;</PRE
+><P> Это будет означать, что всё и вся, читающее этот <ACRONYM
+CLASS="ACRONYM"
+>SGML</ACRONYM
+>, сможет прочитать его правильно, и его корректность можно будет проверить командой <TT
+CLASS="COMMAND"
+>nsgmls -s docguide.sgml</TT
+>. (Но вы должны будете убрать эту строку, прежде чем собирать весь комплект документации.)</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN128866"
+>I.4.2. Другие режимы Emacs</A
+></H2
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>GNU Emacs</SPAN
+> предлагает другой режим <ACRONYM
+CLASS="ACRONYM"
+>SGML</ACRONYM
+>, не такой мощный как <SPAN
+CLASS="PRODUCTNAME"
+>PSGML</SPAN
+>, но при этом менее запутанный и тяжеловесный. Кроме того, в нём реализована подсветка синтаксиса (привязка шрифтов), которая бывает весьма полезна. Пример конфигурации для этого режима содержится в <TT
+CLASS="FILENAME"
+>src/tools/editors/emacs.samples</TT
+>.</P
+><P
+>Норм Уолш предложил <A
+HREF="http://nwalsh.com/emacs/docbookide/index.html"
+TARGET="_top"
+>главный режим</A
+> специально для DocBook, в котором также реализовал привязку шрифтов и ряд возможностей для оптимизации ввода текста.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="docguide-build.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="docguide-style.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Сборка документации</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="docguide.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Руководство по стилю</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

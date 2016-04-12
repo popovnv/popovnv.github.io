@@ -1,0 +1,282 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Резервное копирование и восстановление</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Администрирование сервера"
+HREF="admin.html"><LINK
+REL="PREVIOUS"
+TITLE="Обслуживание журнала"
+HREF="logfile-maintenance.html"><LINK
+REL="NEXT"
+TITLE="Выгрузка в SQL"
+HREF="backup-dump.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="CHAPTER"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Обслуживание журнала"
+HREF="logfile-maintenance.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="admin.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Выгрузка в SQL"
+HREF="backup-dump.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="BACKUP"
+></A
+>Глава 24. Резервное копирование и восстановление</H1
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Содержание</B
+></DT
+><DT
+>24.1. <A
+HREF="backup-dump.html"
+>Выгрузка в <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+></A
+></DT
+><DD
+><DL
+><DT
+>24.1.1. <A
+HREF="backup-dump.html#BACKUP-DUMP-RESTORE"
+>Восстановление дампа</A
+></DT
+><DT
+>24.1.2. <A
+HREF="backup-dump.html#BACKUP-DUMP-ALL"
+>Использование <SPAN
+CLASS="APPLICATION"
+>pg_dumpall</SPAN
+></A
+></DT
+><DT
+>24.1.3. <A
+HREF="backup-dump.html#BACKUP-DUMP-LARGE"
+>Управление большими базами данных</A
+></DT
+></DL
+></DD
+><DT
+>24.2. <A
+HREF="backup-file.html"
+>Резервное копирование на уровне файлов</A
+></DT
+><DT
+>24.3. <A
+HREF="continuous-archiving.html"
+>Непрерывное архивирование и восстановление на момент времени (Point-in-Time Recovery, PITR)</A
+></DT
+><DD
+><DL
+><DT
+>24.3.1. <A
+HREF="continuous-archiving.html#BACKUP-ARCHIVING-WAL"
+>Настройка архивирования WAL</A
+></DT
+><DT
+>24.3.2. <A
+HREF="continuous-archiving.html#BACKUP-BASE-BACKUP"
+>Создание базовой резервной копии</A
+></DT
+><DT
+>24.3.3. <A
+HREF="continuous-archiving.html#BACKUP-LOWLEVEL-BASE-BACKUP"
+>Создание базовой резервной копии через низкоуровневый API</A
+></DT
+><DT
+>24.3.4. <A
+HREF="continuous-archiving.html#BACKUP-PITR-RECOVERY"
+>Восстановление непрерывной архивной копии</A
+></DT
+><DT
+>24.3.5. <A
+HREF="continuous-archiving.html#BACKUP-TIMELINES"
+>Линии времени</A
+></DT
+><DT
+>24.3.6. <A
+HREF="continuous-archiving.html#BACKUP-TIPS"
+>Советы и примеры</A
+></DT
+><DT
+>24.3.7. <A
+HREF="continuous-archiving.html#CONTINUOUS-ARCHIVING-CAVEATS"
+>Ограничения</A
+></DT
+></DL
+></DD
+></DL
+></DIV
+><P
+>Как и всё, что содержит важные данные, базы данных <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> следует регулярно сохранять в резервной копии. Хотя эта процедура по существу проста, важно чётко понимать лежащие в её основе приёмы и положения.</P
+><P
+>Существует три фундаментально разных подхода к резервному копированию данных в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>: <P
+></P
+></P><UL
+><LI
+><P
+>Выгрузка в <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+></P
+></LI
+><LI
+><P
+>Копирование на уровне файлов</P
+></LI
+><LI
+><P
+>Непрерывное архивирование</P
+></LI
+></UL
+><P> Каждый из них имеет свои сильные и слабые стороны; все они обсуждаются в следующих разделах.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="logfile-maintenance.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="backup-dump.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Обслуживание журнала</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="admin.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Выгрузка в <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

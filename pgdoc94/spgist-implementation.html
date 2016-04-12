@@ -1,0 +1,310 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Реализация</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Индексы SP-GiST"
+HREF="spgist.html"><LINK
+REL="PREVIOUS"
+TITLE="Расширяемость"
+HREF="spgist-extensibility.html"><LINK
+REL="NEXT"
+TITLE="Примеры"
+HREF="spgist-examples.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Расширяемость"
+HREF="spgist-extensibility.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="spgist.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 57. Индексы SP-GiST</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Примеры"
+HREF="spgist-examples.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="SPGIST-IMPLEMENTATION"
+>57.4. Реализация</A
+></H1
+><P
+>В этом разделе освещаются тонкости реализации и особенности, о которых полезно знать тем, кто будет реализовывать классы операторов <ACRONYM
+CLASS="ACRONYM"
+>SP-GiST</ACRONYM
+>.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="SPGIST-LIMITS"
+>57.4.1. Ограничения SP-GiST</A
+></H2
+><P
+>Отдельные кортежи листьев и внутренние кортежи должны умещаться в одной странице индекса (по умолчанию её размер 8 Кбайт). Таким образом при индексировании значений типов данных переменной длины большие значения могут поддерживаться только такими схемами, как цифровые деревья, в которых каждый уровень дерева включает префикс, достаточно короткий для помещения в страницу, и на конечном уровне листьев содержится суффикс, который также достаточно мал, чтобы поместиться в странице. Класс операторов должен устанавливать признак <TT
+CLASS="STRUCTFIELD"
+>longValuesOK</TT
+>, только если он готов организовывать такую структуру. Если этот признак не установлен, ядро <ACRONYM
+CLASS="ACRONYM"
+>SP-GiST</ACRONYM
+> не примет запрос на индексацию значения, которое слишком велико для одной страницы индекса.</P
+><P
+>Также класс операторов должен отвечать за то, чтобы внутренние кортежи при расширении не выходили за пределы страницы индекса; это ограничивает число дочерних узлов, которые могут принадлежать одному внутреннему кортежу, а также максимальный размер значения префикса.</P
+><P
+>Ещё одно ограничение состоит в том, что когда узел внутреннего кортежа указывает на набор кортежей листьев, все эти кортежи должны находиться в одной странице индекса. (Это конструктивное ограничение введено для оптимизации позиционирования и экономии места на ссылках, связывающих такие кортежи вместе.) Если набор кортежей листьев оказывается слишком большим для одной страницы, выполняется разделение и вставляется промежуточный внутренний кортеж. Чтобы устранить возникшую проблему, новый внутренний кортеж <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>должен</I
+></SPAN
+> разделять набор значений в листе на несколько групп узлов. Если функция <CODE
+CLASS="FUNCTION"
+>picksplit</CODE
+> класса операторов не может сделать это, ядро <ACRONYM
+CLASS="ACRONYM"
+>SP-GiST</ACRONYM
+> переходит к чрезвычайным мерам, описанным в <A
+HREF="spgist-implementation.html#SPGIST-ALL-THE-SAME"
+>Подразделе 57.4.3</A
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="SPGIST-NULL-LABELS"
+>57.4.2. SP-GiST без меток узлов</A
+></H2
+><P
+>В некоторых древовидных схемах каждый внутренний кортеж содержит фиксированный набор узлов; например, в дереве квадрантов это всегда четыре узла, соответствующие четырём квадрантам вокруг центральной точки внутреннего кортежа. В таком случае код обычно работает с узлами по номерам и необходимости в явных метках узлов нет. Чтобы убрать метки узлов (и таким образом сэкономить место), функция <CODE
+CLASS="FUNCTION"
+>picksplit</CODE
+> может возвратить NULL вместо массива <TT
+CLASS="STRUCTFIELD"
+>nodeLabels</TT
+>. В результате при последующих вызовах функций <CODE
+CLASS="FUNCTION"
+>choose</CODE
+> и <CODE
+CLASS="FUNCTION"
+>inner_consistent</CODE
+> им вместо <TT
+CLASS="STRUCTFIELD"
+>nodeLabels</TT
+> будет передаваться NULL. В принципе метки узлов могут применяться для одних внутренних кортежей и опускаться для других в том же индексе.</P
+><P
+>Когда внутренний кортеж содержит узлы без меток, функция <CODE
+CLASS="FUNCTION"
+>choose</CODE
+> не может выбрать действие <TT
+CLASS="LITERAL"
+>spgAddNode</TT
+>, так как в этом случае предполагается, что набор узлов фиксированный. Также нельзя сгенерировать узел без метки в действиях <TT
+CLASS="LITERAL"
+>spgSplitTuple</TT
+>, потому что, как ожидается, при этом потребуется действие <TT
+CLASS="LITERAL"
+>spgAddNode</TT
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="SPGIST-ALL-THE-SAME"
+>57.4.3. Внутренние кортежи <SPAN
+CLASS="QUOTE"
+>"все-равны"</SPAN
+></A
+></H2
+><P
+>Ядро <ACRONYM
+CLASS="ACRONYM"
+>SP-GiST</ACRONYM
+> может переопределить результаты функции <CODE
+CLASS="FUNCTION"
+>picksplit</CODE
+> класса операторов, когда эта функция не может разделить поступившие значения листьев на минимум две категории узлов. Когда это происходит, создаётся новый внутренний кортеж с несколькими узлами, каждый из которых имеет одну метку (если имеет), которую <CODE
+CLASS="FUNCTION"
+>picksplit</CODE
+> дала одному узлу, а значения листьев распределяются случайно между этими равнозначными узлами. Для этого внутреннего кортежа устанавливается флаг <TT
+CLASS="LITERAL"
+>allTheSame</TT
+>, который предупреждает функции <CODE
+CLASS="FUNCTION"
+>choose</CODE
+> и <CODE
+CLASS="FUNCTION"
+>inner_consistent</CODE
+>, что кортеж не содержит набор узлов, который они обычно ожидают.</P
+><P
+>Когда обрабатывается кортеж с флагом <TT
+CLASS="LITERAL"
+>allTheSame</TT
+>, выбранное функцией <CODE
+CLASS="FUNCTION"
+>choose</CODE
+> действие <TT
+CLASS="LITERAL"
+>spgMatchNode</TT
+> воспринимается как указание, что новое значение можно присвоить одному из равнозначных узлов; код ядра будет игнорировать полученное значение <TT
+CLASS="STRUCTFIELD"
+>nodeN</TT
+> и спустится в один из узлов, выбранный случайно (чтобы дерево было сбалансированным). Будет считаться ошибкой, если <CODE
+CLASS="FUNCTION"
+>choose</CODE
+> выберет действие <TT
+CLASS="LITERAL"
+>spgAddNode</TT
+>, так как при этом не все узлы окажутся равны; если добавляемое значение не соответствует существующим узлам, должно выбираться действие <TT
+CLASS="LITERAL"
+>spgSplitTuple</TT
+>.</P
+><P
+>Также, когда обрабатывается кортеж с флагом <TT
+CLASS="LITERAL"
+>allTheSame</TT
+>, функция <CODE
+CLASS="FUNCTION"
+>inner_consistent</CODE
+> должна вернуть все или не возвращать никакие узлы для продолжения поиска по индексу, так как все узлы равнозначны. Для этого может потребоваться, а может и не потребоваться код обработки особого случая, в зависимости от того, как <CODE
+CLASS="FUNCTION"
+>inner_consistent</CODE
+> обычно воспринимает узлы.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="spgist-extensibility.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="spgist-examples.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Расширяемость</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="spgist.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Примеры</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

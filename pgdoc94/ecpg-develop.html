@@ -1,0 +1,381 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Внутреннее устройство</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="ECPG — встраиваемый SQL в C"
+HREF="ecpg.html"><LINK
+REL="PREVIOUS"
+TITLE="Режим совместимости с Informix"
+HREF="ecpg-informix-compat.html"><LINK
+REL="NEXT"
+TITLE="Информационная схема"
+HREF="information-schema.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Режим совместимости с Informix"
+HREF="ecpg-informix-compat.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ecpg.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 33. <SPAN
+CLASS="APPLICATION"
+>ECPG</SPAN
+> — встраиваемый <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> в C</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Информационная схема"
+HREF="information-schema.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="ECPG-DEVELOP"
+>33.16. Внутреннее устройство</A
+></H1
+><P
+>В этом разделе рассказывается, как препроцессор <SPAN
+CLASS="APPLICATION"
+>ECPG</SPAN
+> устроен внутри. Эта информация может оказаться полезной для пользователей, желающих понять, как использовать <SPAN
+CLASS="APPLICATION"
+>ECPG</SPAN
+>.</P
+><P
+>Первые четыре строки, которые <TT
+CLASS="COMMAND"
+>ecpg</TT
+> записывает в вывод, фиксированы. Первые две строки содержат комментарии, а следующие две директивы включения, подключающие интерфейс к библиотеке. Затем препроцессор прочитывает файл и продолжает запись в вывод. Обычно он просто печатает всё в устройство вывода.</P
+><P
+>Встречая команду <TT
+CLASS="COMMAND"
+>EXEC SQL</TT
+>, он вмешивается и изменяет её. Данная команда начинается со слов <TT
+CLASS="COMMAND"
+>EXEC SQL</TT
+> и заканчивается знаком <TT
+CLASS="COMMAND"
+>;</TT
+>. Всё между ними воспринимается как оператор <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> и разбирается для подстановки переменных.</P
+><P
+>Подстановка переменных имеет место, когда символ начинается с двоеточия (<TT
+CLASS="LITERAL"
+>:</TT
+>). ECPG будет искать переменную с таким именем среди переменных, ранее объявленных в секции <TT
+CLASS="LITERAL"
+>EXEC SQL DECLARE</TT
+>.</P
+><P
+>Самая важная функция в библиотеке — <CODE
+CLASS="FUNCTION"
+>ECPGdo</CODE
+>, которая осуществляет выполнение большинства команд. Она принимает переменное число аргументов (это число легко может достигать 50, и мы надеемся, что это не приведёт к проблемам ни на какой платформе).</P
+><P
+>Ей передаются следующие аргументы: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+>Номер строки</DT
+><DD
+><P
+>Номер исходной строки; используется только в сообщениях об ошибках.</P
+></DD
+><DT
+>Строка</DT
+><DD
+><P
+>Команда <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>, которая должна быть выполнена. На её содержимое влияют входные переменные, то есть переменные, добавленные в команду, но неизвестные во время компиляции. Места, в которые должны вставляться переменные, обозначаются знаками <TT
+CLASS="LITERAL"
+>?</TT
+>.</P
+></DD
+><DT
+>Входные переменные</DT
+><DD
+><P
+>Для каждой входной переменной формируются десять аргументов. (См. ниже.)</P
+></DD
+><DT
+><TT
+CLASS="PARAMETER"
+>ECPGt_EOIT</TT
+></DT
+><DD
+><P
+>Перечисление (<TT
+CLASS="TYPE"
+>enum</TT
+>), показывающее, что больше входных переменных нет.</P
+></DD
+><DT
+>Выходные переменные</DT
+><DD
+><P
+>Для каждой входной переменной формируются десять аргументов. (См. ниже.) Эти переменные заполняются данной функцией.</P
+></DD
+><DT
+><TT
+CLASS="PARAMETER"
+>ECPGt_EORT</TT
+></DT
+><DD
+><P
+>Перечисление (<TT
+CLASS="TYPE"
+>enum</TT
+>), показывающее, что больше выходных переменных нет.</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>Для каждой переменной, включённой в команду <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>, эта функция принимает десять аргументов: <P
+></P
+></P><OL
+TYPE="1"
+><LI
+><P
+>Тип в виде специального символа.</P
+></LI
+><LI
+><P
+>Указатель на значение или указатель на указатель.</P
+></LI
+><LI
+><P
+>Размер переменной, если она имеет тип <TT
+CLASS="TYPE"
+>char</TT
+> или <TT
+CLASS="TYPE"
+>varchar</TT
+>.</P
+></LI
+><LI
+><P
+>Число элементов в массиве (при выборке данных в массив).</P
+></LI
+><LI
+><P
+>Смещение следующего элемента в массиве (при выборке данных в массив).</P
+></LI
+><LI
+><P
+>Тип переменной-индикатора в виде специального символа.</P
+></LI
+><LI
+><P
+>Указатель на переменную-индикатор.</P
+></LI
+><LI
+><P
+>0</P
+></LI
+><LI
+><P
+>Число элементов в массиве индикаторов (при выборке данных в массив).</P
+></LI
+><LI
+><P
+>Смещение следующего элемента в массиве индикаторов (при выборке данных в массив).</P
+></LI
+></OL
+><P></P
+><P
+>Заметьте, что не все команды SQL обрабатываются таким образом. Например, команда открытия курсора вида: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL OPEN <TT
+CLASS="REPLACEABLE"
+><I
+>курсор</I
+></TT
+>;</PRE
+><P> не копируется в вывод. Вместо этого в позиции команды <TT
+CLASS="COMMAND"
+>OPEN</TT
+> применяется команда <TT
+CLASS="COMMAND"
+>DECLARE</TT
+> этого курсора, так как на самом деле курсор открывает она.</P
+><P
+>Ниже показан полный пример, демонстрирующий результат обработки препроцессором файла <TT
+CLASS="FILENAME"
+>foo.pgc</TT
+> (детали могут меняться от версии к версии препроцессора): </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL BEGIN DECLARE SECTION;
+int index;
+int result;
+EXEC SQL END DECLARE SECTION;
+...
+EXEC SQL SELECT res INTO :result FROM mytable WHERE index = :index;</PRE
+><P> преобразуется в: </P><PRE
+CLASS="PROGRAMLISTING"
+>/* Processed by ecpg (2.6.0) */
+/* These two include files are added by the preprocessor */
+#include &lt;ecpgtype.h&gt;;
+#include &lt;ecpglib.h&gt;;
+
+/* exec sql begin declare section */
+
+#line 1 "foo.pgc"
+
+ int index;
+ int result;
+/* exec sql end declare section */
+...
+ECPGdo(__LINE__, NULL, "SELECT res FROM mytable WHERE index = ?     ",
+        ECPGt_int,&amp;(index),1L,1L,sizeof(int),
+        ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT,
+        ECPGt_int,&amp;(result),1L,1L,sizeof(int),
+        ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EORT);
+#line 147 "foo.pgc"</PRE
+><P> (Отступы здесь добавлены для читаемости, препроцессор их не вставляет.)</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ecpg-informix-compat.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="information-schema.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Режим совместимости с <SPAN
+CLASS="PRODUCTNAME"
+>Informix</SPAN
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ecpg.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Информационная схема</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

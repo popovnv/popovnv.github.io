@@ -1,0 +1,607 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Требования</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Установка из исходного кода"
+HREF="installation.html"><LINK
+REL="PREVIOUS"
+TITLE="Краткий вариант"
+HREF="install-short.html"><LINK
+REL="NEXT"
+TITLE="Получение исходного кода"
+HREF="install-getsource.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Краткий вариант"
+HREF="install-short.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="installation.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 15. Установка из исходного кода</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Получение исходного кода"
+HREF="install-getsource.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="INSTALL-REQUIREMENTS"
+>15.2. Требования</A
+></H1
+><P
+>В принципе, запустить <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> должно быть возможно на любой современной Unix-совместимой платформе. Платформы, прошедшие специальную проверку на совместимость к моменту выпуска версии, перечислены далее в <A
+HREF="supported-platforms.html"
+>Разделе 15.6</A
+>. В подкаталоге <TT
+CLASS="FILENAME"
+>doc</TT
+> дистрибутива <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> вы можете найти несколько документов <ACRONYM
+CLASS="ACRONYM"
+>FAQ</ACRONYM
+> по разным платформам, к которым следует обратиться в случае затруднений.</P
+><P
+>Для сборки <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> требуются следующие программные пакеты: <P
+></P
+></P><UL
+><LI
+><P
+>&#13;
+      Требуется <ACRONYM
+CLASS="ACRONYM"
+>GNU</ACRONYM
+> <SPAN
+CLASS="APPLICATION"
+>make</SPAN
+> версии 3.80 или новее; другие программы <SPAN
+CLASS="APPLICATION"
+>make</SPAN
+> или ранние версии <ACRONYM
+CLASS="ACRONYM"
+>GNU</ACRONYM
+> <SPAN
+CLASS="APPLICATION"
+>make</SPAN
+> работать <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>не</I
+></SPAN
+> будут. (Иногда <ACRONYM
+CLASS="ACRONYM"
+>GNU</ACRONYM
+> <SPAN
+CLASS="APPLICATION"
+>make</SPAN
+> устанавливается под именем <TT
+CLASS="FILENAME"
+>gmake</TT
+>.) Чтобы проверить наличие и версию <ACRONYM
+CLASS="ACRONYM"
+>GNU</ACRONYM
+> <SPAN
+CLASS="APPLICATION"
+>make</SPAN
+>, введите: </P><PRE
+CLASS="SCREEN"
+><KBD
+CLASS="USERINPUT"
+>make --version</KBD
+></PRE
+><P></P
+></LI
+><LI
+><P
+>Вам потребуется компилятор C, соответствующий <ACRONYM
+CLASS="ACRONYM"
+>ISO</ACRONYM
+>/<ACRONYM
+CLASS="ACRONYM"
+>ANSI</ACRONYM
+> (как минимум, совместимый с C89). Рекомендуется использовать последние версии <SPAN
+CLASS="PRODUCTNAME"
+>GCC</SPAN
+>, но известно, что <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> собирается самыми разными компиляторами и других производителей.</P
+></LI
+><LI
+><P
+>Для распаковки пакета исходного кода необходим <SPAN
+CLASS="APPLICATION"
+>tar</SPAN
+>, а также <SPAN
+CLASS="APPLICATION"
+>gzip</SPAN
+> или <SPAN
+CLASS="APPLICATION"
+>bzip2</SPAN
+>.</P
+></LI
+><LI
+><P
+> По умолчанию при сборке используется библиотека <ACRONYM
+CLASS="ACRONYM"
+>GNU</ACRONYM
+> <SPAN
+CLASS="PRODUCTNAME"
+>Readline</SPAN
+>. Она позволяет запоминать все вводимые команды в <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> (SQL-интерпретатор командной строки для PostgreSQL) и затем, пользуясь клавишами-стрелками, возвращаться к ним и редактировать их. Это очень удобно и мы настоятельно рекомендуем пользоваться этим. Если вы не желаете использовать эту возможность, вы должны добавить указание <TT
+CLASS="OPTION"
+>--without-readline</TT
+> для <TT
+CLASS="FILENAME"
+>configure</TT
+>. В качестве альтернативы часто можно использовать библиотеку <TT
+CLASS="FILENAME"
+>libedit</TT
+> с лицензией BSD, изначально разработанную для <SPAN
+CLASS="PRODUCTNAME"
+>NetBSD</SPAN
+>. Библиотека <TT
+CLASS="FILENAME"
+>libedit</TT
+> совместима с GNU <SPAN
+CLASS="PRODUCTNAME"
+>Readline</SPAN
+> и подключается, если <TT
+CLASS="FILENAME"
+>libreadline</TT
+> не найдена, или когда <TT
+CLASS="FILENAME"
+>configure</TT
+> передаётся указание <TT
+CLASS="OPTION"
+>--with-libedit-preferred</TT
+>. Если вы используете систему на базе Linux с пакетами, учтите, что вам потребуются два пакета: <TT
+CLASS="LITERAL"
+>readline</TT
+> и <TT
+CLASS="LITERAL"
+>readline-devel</TT
+>, если в вашем дистрибутиве они разделены.</P
+></LI
+><LI
+><P
+> По умолчанию для сжатия данных используется библиотека <SPAN
+CLASS="PRODUCTNAME"
+>zlib</SPAN
+>. Если вы не хотите её использовать, вы должны передать <TT
+CLASS="FILENAME"
+>configure</TT
+> указание <TT
+CLASS="OPTION"
+>--without-zlib</TT
+>. Это указание отключает поддержку сжатых архивов в <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+> и <SPAN
+CLASS="APPLICATION"
+>pg_restore</SPAN
+>.</P
+></LI
+></UL
+><P></P
+><P
+>Следующие пакеты не являются обязательными. Они не требуются в стандартной конфигурации, но они необходимы для определённых вариантов сборки, описанных ниже: <P
+></P
+></P><UL
+><LI
+><P
+>Чтобы сервер поддерживал язык программирования <SPAN
+CLASS="APPLICATION"
+>PL/Perl</SPAN
+>, вам потребуется полная инсталляция <SPAN
+CLASS="PRODUCTNAME"
+>Perl</SPAN
+>, включая библиотеку <TT
+CLASS="FILENAME"
+>libperl</TT
+> и заголовочные файлы. Так как <SPAN
+CLASS="APPLICATION"
+>PL/Perl</SPAN
+> будет разделяемой библиотекой, библиотека <TT
+CLASS="FILENAME"
+>libperl</TT
+> так же должна быть разделяемой для большинства платформ. В последних версиях <SPAN
+CLASS="PRODUCTNAME"
+>Perl</SPAN
+> это вариант по умолчанию, но в ранних версиях это было не так, и в любом случае это выбирает тот, кто устанавливает Perl в вашей системе. Если вы планируете отвести <SPAN
+CLASS="APPLICATION"
+>PL/Perl</SPAN
+> не второстепенную роль, следует убедиться в том, что инсталляция <SPAN
+CLASS="PRODUCTNAME"
+>Perl</SPAN
+> была собрана с флагом <TT
+CLASS="LITERAL"
+>usemultiplicity</TT
+> (так ли это, может показать команда <TT
+CLASS="LITERAL"
+>perl -V</TT
+>).</P
+><P
+>Если вам не хватает какой-то необходимой разделяемой библиотеки, при сборке <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> появится примерно такое сообщение об этом: </P><PRE
+CLASS="SCREEN"
+>*** Cannot build PL/Perl because libperl is not a shared library.
+*** You might have to rebuild your Perl installation.  Refer to
+*** the documentation for details.</PRE
+><P> (Если вы проигнорируете это замечание, вы просто увидите, что объект библиотеки <SPAN
+CLASS="APPLICATION"
+>PL/Perl</SPAN
+>, <TT
+CLASS="FILENAME"
+>plperl.so</TT
+> или подобный, не будет установлен.) Если вы получили это сообщение, вы должны пересобрать и установить <SPAN
+CLASS="PRODUCTNAME"
+>Perl</SPAN
+> вручную, чтобы успешно собрать <SPAN
+CLASS="APPLICATION"
+>PL/Perl</SPAN
+>. При этом в процессе конфигурирования <SPAN
+CLASS="PRODUCTNAME"
+>Perl</SPAN
+> выберите разделяемую библиотеку.</P
+></LI
+><LI
+><P
+>Чтобы собрать сервер с поддержкой языка программирования <SPAN
+CLASS="APPLICATION"
+>PL/Python</SPAN
+>, вам потребуется инсталляция <SPAN
+CLASS="PRODUCTNAME"
+>Python</SPAN
+> с заголовочными файлами и модулем <SPAN
+CLASS="APPLICATION"
+>distutils</SPAN
+>. Версия <SPAN
+CLASS="PRODUCTNAME"
+>Python</SPAN
+> должна быть не меньше 2.3. (Чтобы работать с аргументами функций типа <TT
+CLASS="TYPE"
+>numeric</TT
+>, в инсталляции 2.3.x должен быть включён отдельно устанавливаемый модуль <TT
+CLASS="FILENAME"
+>cdecimal</TT
+>; заметьте, что регрессионные тесты <SPAN
+CLASS="APPLICATION"
+>PL/Python</SPAN
+> не будут пройдены, если он отсутствует.) <SPAN
+CLASS="PRODUCTNAME"
+>Python 3</SPAN
+> поддерживается, начиная с версии 3.1, но используя Python 3, следует учитывать написанное в <A
+HREF="plpython-python23.html"
+>Разделе 43.1</A
+>.</P
+><P
+>Так как <SPAN
+CLASS="APPLICATION"
+>PL/Python</SPAN
+> будет разделяемой библиотекой, библиотека <TT
+CLASS="FILENAME"
+>libpython</TT
+> так же должна быть разделяемой для большинства платформ. По умолчанию в стандартной инсталляции <SPAN
+CLASS="PRODUCTNAME"
+>Python</SPAN
+> это не так. Если вы собираете и устанавливаете <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> и вы получили файл <TT
+CLASS="FILENAME"
+>plpython.so</TT
+> (возможно, с другим расширением), всё в порядке. В противном случае вы заметите при сборке пролетающее уведомление такого содержания: </P><PRE
+CLASS="SCREEN"
+>*** Cannot build PL/Python because libpython is not a shared library.
+*** You might have to rebuild your Python installation.  Refer to
+*** the documentation for details.</PRE
+><P> Это значит, что вам придётся пересобрать (возможно, частично) вашу инсталляцию <SPAN
+CLASS="PRODUCTNAME"
+>Python</SPAN
+>, чтобы получить эту разделяемую библиотеку.</P
+><P
+>Если у вас возникли сложности, запустите для <SPAN
+CLASS="PRODUCTNAME"
+>Python</SPAN
+> 2.3 или новее configure с флагом <TT
+CLASS="LITERAL"
+>--enable-shared</TT
+>. В некоторых операционных системах компилировать разделяемую библиотеку не требуется, но вам нужно убедить в этом систему сборки <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. За подробностями обратитесь к <TT
+CLASS="FILENAME"
+>Makefile</TT
+> в каталоге <TT
+CLASS="FILENAME"
+>src/pl/plpython</TT
+>.</P
+></LI
+><LI
+><P
+>Чтобы собрать поддержку процедурного языка <SPAN
+CLASS="APPLICATION"
+>PL/Tcl</SPAN
+>, вам конечно потребуется инсталляция <SPAN
+CLASS="PRODUCTNAME"
+>Tcl</SPAN
+>. Если вы используете <SPAN
+CLASS="PRODUCTNAME"
+>Tcl</SPAN
+> до версии 8.4, убедитесь в том, что она собрана без поддержки многопоточности.</P
+></LI
+><LI
+><P
+>Чтобы включить поддержку национальных языков (<ACRONYM
+CLASS="ACRONYM"
+>NLS</ACRONYM
+>, Native Language Support), то есть возможность выводить сообщения программы не только на английском языке, вам потребуется реализация <ACRONYM
+CLASS="ACRONYM"
+>API</ACRONYM
+> <SPAN
+CLASS="APPLICATION"
+>Gettext</SPAN
+>. В некоторых системах эта реализация встроена (например, в <SPAN
+CLASS="SYSTEMITEM"
+>Linux</SPAN
+>, <SPAN
+CLASS="SYSTEMITEM"
+>NetBSD</SPAN
+>, <SPAN
+CLASS="SYSTEMITEM"
+>Solaris</SPAN
+>), а для других вы можете получить дополнительный пакет по адресу <A
+HREF="http://www.gnu.org/software/gettext/"
+TARGET="_top"
+>http://www.gnu.org/software/gettext/</A
+>. Если вы используете реализацию <SPAN
+CLASS="APPLICATION"
+>Gettext</SPAN
+> в библиотеке <ACRONYM
+CLASS="ACRONYM"
+>GNU</ACRONYM
+>, вам понадобится ещё пакет <SPAN
+CLASS="PRODUCTNAME"
+>GNU Gettext</SPAN
+> для некоторых утилит. Для любых других реализаций он не требуется.</P
+></LI
+><LI
+><P
+>Вам могут понадобиться пакеты <SPAN
+CLASS="APPLICATION"
+>Kerberos</SPAN
+>, <SPAN
+CLASS="PRODUCTNAME"
+>OpenSSL</SPAN
+>, <SPAN
+CLASS="PRODUCTNAME"
+>OpenLDAP</SPAN
+> и/или <SPAN
+CLASS="APPLICATION"
+>PAM</SPAN
+>, если вам нужна поддержка аутентификации или шифрования, которую они обеспечивают.</P
+></LI
+><LI
+><P
+>Для сборки документации <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> предъявляется отдельный набор требований; см. <A
+HREF="docguide-toolsets.html"
+>Раздел I.2</A
+>.</P
+></LI
+></UL
+><P></P
+><P
+>Если вы хотите скомпилировать код из дерева <SPAN
+CLASS="PRODUCTNAME"
+>Git</SPAN
+>, а не из специального пакета исходного кода, либо вы хотите работать с этим кодом, вам также понадобятся следующие пакеты: <P
+></P
+></P><UL
+><LI
+><P
+> GNU <SPAN
+CLASS="APPLICATION"
+>Flex</SPAN
+> и <SPAN
+CLASS="APPLICATION"
+>Bison</SPAN
+> потребуются для сборки из содержимого Git или если вы меняете собственно файлы определений анализа и разбора. Если они вам понадобятся, то версия <SPAN
+CLASS="APPLICATION"
+>Flex</SPAN
+> должна быть не меньше 2.5.31, а <SPAN
+CLASS="APPLICATION"
+>Bison</SPAN
+> — не меньше 1.875. Другие программы <SPAN
+CLASS="APPLICATION"
+>lex</SPAN
+> и <SPAN
+CLASS="APPLICATION"
+>yacc</SPAN
+> работать не будут.</P
+></LI
+><LI
+><P
+><SPAN
+CLASS="APPLICATION"
+>Perl</SPAN
+> 5.8 или новее потребуется для сборки из содержимого Git, либо если вы меняете исходные файлы этапов сборки, построенных на скриптах Perl. Если вы выполняете сборку в Windows, вам потребуется <SPAN
+CLASS="APPLICATION"
+>Perl</SPAN
+> в любом случае. <SPAN
+CLASS="APPLICATION"
+>Perl</SPAN
+> также требуется для выполнения некоторых комплектов тестов.</P
+></LI
+></UL
+><P></P
+><P
+>Если вам понадобится какой-либо пакет <ACRONYM
+CLASS="ACRONYM"
+>GNU</ACRONYM
+>, вы можете найти его на вашем локальном зеркале <ACRONYM
+CLASS="ACRONYM"
+>GNU</ACRONYM
+> (список зеркал: <A
+HREF="http://www.gnu.org/order/ftp.html"
+TARGET="_top"
+>http://www.gnu.org/order/ftp.html</A
+>) или на сайте <A
+HREF="ftp://ftp.gnu.org/gnu/"
+TARGET="_top"
+>ftp://ftp.gnu.org/gnu/</A
+>.</P
+><P
+>Также проверьте, достаточно ли места на диске. Вам потребуется около 100 Мб для исходного кода в процессе компиляции и около 20 Мб для каталога инсталляции. Пустой кластер баз данных занимает около 35 Мб; базы данных занимают примерно в пять раз больше места, чем те же данные в обычном текстовом файле. Если вы планируете запускать регрессионные тесты, вам может временно понадобиться ещё около 150 Мб. Проверить наличие свободного места можно с помощью команды <TT
+CLASS="COMMAND"
+>df</TT
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="install-short.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="install-getsource.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Краткий вариант</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="installation.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Получение исходного кода</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

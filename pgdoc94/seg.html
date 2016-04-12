@@ -1,0 +1,850 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>seg</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Дополнительно поставляемые модули"
+HREF="contrib.html"><LINK
+REL="PREVIOUS"
+TITLE="postgres_fdw"
+HREF="postgres-fdw.html"><LINK
+REL="NEXT"
+TITLE="sepgsql"
+HREF="sepgsql.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="postgres_fdw"
+HREF="postgres-fdw.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Приложение E. Дополнительно поставляемые модули</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="sepgsql"
+HREF="sepgsql.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="SEG"
+>E.33. seg</A
+></H1
+><P
+>Этот модуль реализует тип данных <TT
+CLASS="TYPE"
+>seg</TT
+> для представления отрезков или интервалов чисел с плавающей точкой. Тип <TT
+CLASS="TYPE"
+>seg</TT
+> может выражать отсутствие уверенности в границах интервала, что позволяет применять его для представления лабораторных измерений.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN124564"
+>E.33.1. Обоснование</A
+></H2
+><P
+>Геометрия измерений обычно более сложна, чем точка в числовом континууме. Измерение обычно представляет собой отрезок этого континуума с нечёткими границами. Измеряемые показатели выражаются интервалами вследствие неопределённости и случайности, а также того, что измеряемое значение может отражать некоторое условие, например, диапазон температур стабильности протеина.</P
+><P
+>Руководствуясь только здравым смыслом, кажется более удобным хранить такие данные в виде интервалов, а не в виде двух отдельных чисел. На практике это оказывается даже эффективнее в большинстве приложений.</P
+><P
+>Более того, вследствие нечёткости границ использование традиционных числовых типов данных приводит к определённой потере информации. Рассмотрим такой пример: ваш инструмент выдаёт 6.50 и вы вводите это значение в базу данных. Что вы получите, прочитав это значение из базы? Смотрите: </P><PRE
+CLASS="SCREEN"
+>test=&gt; select 6.50 :: float8 as "pH";
+ pH
+---
+6.5
+(1 row)</PRE
+><P> В мире измерений, 6.50 — не то же самое, что 6.5. И разница между этими измерениями иногда бывает критической. Экспериментаторы обычно записывают (и публикуют) цифры, которые заслуживают доверия. Запись 6.50 на самом деле представляет неточный интервал, содержащийся внутри большего и ещё более неточного интервала, 6.5, и единственное, что у них может быть общего, это их центральные точки. Поэтому мы определённо не хотим, чтобы такие разные элементы данных выглядели одинаково.</P
+><P
+>Вывод? Удобно иметь специальный тип данных, в котором можно сохранить границы интервала с произвольной переменной точностью. В данном случае точность переменная в том смысле, что для каждого элемента данных она может записываться индивидуально.</P
+><P
+>Проверьте это: </P><PRE
+CLASS="SCREEN"
+>test=&gt; select '6.25 .. 6.50'::seg as "pH";
+          pH
+------------
+6.25 .. 6.50
+(1 row)</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN124573"
+>E.33.2. Синтаксис</A
+></H2
+><P
+>Внешнее представление интервала образуется одним или двумя числами с плавающей точкой, соединёнными оператором диапазона (<TT
+CLASS="LITERAL"
+>..</TT
+> или <TT
+CLASS="LITERAL"
+>...</TT
+>). Кроме того, интервал можно задать центральной точкой плюс/минус отклонение. Также этот тип позволяет сохранить дополнительные индикаторы достоверности (<TT
+CLASS="LITERAL"
+>&lt;</TT
+>, <TT
+CLASS="LITERAL"
+>&gt;</TT
+> или <TT
+CLASS="LITERAL"
+>~</TT
+>). (Однако индикаторы достоверности игнорируются всеми встроенными операторами.) Допустимые представления показаны в <A
+HREF="seg.html#SEG-REPR-TABLE"
+>Таблице E-24</A
+>; некоторые примеры приведены в <A
+HREF="seg.html#SEG-INPUT-EXAMPLES"
+>Таблице E-25</A
+>.</P
+><P
+>В <A
+HREF="seg.html#SEG-REPR-TABLE"
+>Таблице E-24</A
+> символы <TT
+CLASS="REPLACEABLE"
+><I
+>x</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>y</I
+></TT
+> и <TT
+CLASS="REPLACEABLE"
+><I
+>delta</I
+></TT
+> обозначают числа с плавающей точкой. Перед значениями <TT
+CLASS="REPLACEABLE"
+><I
+>x</I
+></TT
+> и <TT
+CLASS="REPLACEABLE"
+><I
+>y</I
+></TT
+>, но не <TT
+CLASS="REPLACEABLE"
+><I
+>delta</I
+></TT
+>, может быть добавлен индикатор достоверности.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="SEG-REPR-TABLE"
+></A
+><P
+><B
+>Таблица E-24. Внешнее представление <TT
+CLASS="TYPE"
+>seg</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><TBODY
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>                      <TT
+CLASS="REPLACEABLE"
+><I
+>x</I
+></TT
+>
+                    </TT
+>
+                  </TD
+><TD
+>Одно значение (интервал нулевой длины)</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>x</I
+></TT
+> .. <TT
+CLASS="REPLACEABLE"
+><I
+>y</I
+></TT
+></TT
+>
+                  </TD
+><TD
+>Интервал от <TT
+CLASS="REPLACEABLE"
+><I
+>x</I
+></TT
+> до <TT
+CLASS="REPLACEABLE"
+><I
+>y</I
+></TT
+></TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>x</I
+></TT
+> (+-) <TT
+CLASS="REPLACEABLE"
+><I
+>delta</I
+></TT
+></TT
+>
+                  </TD
+><TD
+>Интервал от <TT
+CLASS="REPLACEABLE"
+><I
+>x</I
+></TT
+> - <TT
+CLASS="REPLACEABLE"
+><I
+>delta</I
+></TT
+> до <TT
+CLASS="REPLACEABLE"
+><I
+>x</I
+></TT
+> + <TT
+CLASS="REPLACEABLE"
+><I
+>delta</I
+></TT
+></TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>x</I
+></TT
+> ..</TT
+>
+                  </TD
+><TD
+>Открытый интервал с нижней границей <TT
+CLASS="REPLACEABLE"
+><I
+>x</I
+></TT
+></TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>.. <TT
+CLASS="REPLACEABLE"
+><I
+>x</I
+></TT
+></TT
+>
+                  </TD
+><TD
+>Открытый интервал с верхней границей <TT
+CLASS="REPLACEABLE"
+><I
+>x</I
+></TT
+></TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><DIV
+CLASS="TABLE"
+><A
+NAME="SEG-INPUT-EXAMPLES"
+></A
+><P
+><B
+>Таблица E-25. Примеры допустимых вводимых значений <TT
+CLASS="TYPE"
+>seg</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><TBODY
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>5.0</TT
+>
+                  </TD
+><TD
+>Создаёт сегмент нулевой длины (или точку, если хотите)</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>~5.0</TT
+>
+                  </TD
+><TD
+>Создаёт сегмент нулевой длины и записывает <TT
+CLASS="LITERAL"
+>~</TT
+> в данные. Знак <TT
+CLASS="LITERAL"
+>~</TT
+> игнорируется при операциях с <TT
+CLASS="TYPE"
+>seg</TT
+>, но сохраняется как комментарий.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>&lt;5.0</TT
+>
+                  </TD
+><TD
+>Создаёт точку с координатой 5.0. Знак <TT
+CLASS="LITERAL"
+>&lt;</TT
+> игнорируется, но сохраняется как комментарий.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>&gt;5.0</TT
+>
+                  </TD
+><TD
+>Создаёт точку с координатой 5.0. Знак <TT
+CLASS="LITERAL"
+>&gt;</TT
+> игнорируется, но сохраняется как комментарий.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>5(+-)0.3</TT
+>
+                  </TD
+><TD
+>Создаёт интервал <TT
+CLASS="LITERAL"
+>4.7 .. 5.3</TT
+>. Заметьте, что запись <TT
+CLASS="LITERAL"
+>(+-)</TT
+> не сохраняется.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>50 ..</TT
+>
+                  </TD
+><TD
+>Всё, что больше или равно 50</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>.. 0</TT
+>
+                  </TD
+><TD
+>Всё, что меньше или равно 0</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>1.5e-2 .. 2E-2</TT
+>
+                  </TD
+><TD
+>Создаёт интервал <TT
+CLASS="LITERAL"
+>0.015 .. 0.02</TT
+></TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>1 ... 2</TT
+>
+                  </TD
+><TD
+>То же, что и <TT
+CLASS="LITERAL"
+>1...2</TT
+>, либо <TT
+CLASS="LITERAL"
+>1 .. 2</TT
+>, либо <TT
+CLASS="LITERAL"
+>1..2</TT
+> (пробелы вокруг оператора диапазона игнорируются)</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Так как <TT
+CLASS="LITERAL"
+>...</TT
+> часто используется в источниках данных, он принимается в качестве альтернативного написания <TT
+CLASS="LITERAL"
+>..</TT
+>. К сожалению, это порождает неоднозначность при разборе: неясно, какая верхняя граница имеется в виду в записи <TT
+CLASS="LITERAL"
+>0...23</TT
+> — <TT
+CLASS="LITERAL"
+>23</TT
+> или <TT
+CLASS="LITERAL"
+>0.23</TT
+>. Для разрешения этой неоднозначности во входных числах <TT
+CLASS="TYPE"
+>seg</TT
+> перед десятичной точкой всегда должна быть минимум одна цифра.</P
+><P
+>В качестве меры предосторожности, <TT
+CLASS="TYPE"
+>seg</TT
+> не принимает интервалы с нижней границей, превышающей верхнюю, например: <TT
+CLASS="LITERAL"
+>5 .. 2</TT
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN124693"
+>E.33.3. Точность</A
+></H2
+><P
+>Значения <TT
+CLASS="TYPE"
+>seg</TT
+> хранятся внутри как пары 32-битных чисел с плавающей точкой. Это значит, что числа с более чем 7 значащими цифрами будут усекаться.</P
+><P
+>Числа, содержащие 7 и меньше значащих цифр, сохраняют изначальную точность. То есть, если запрос возвращает 0.00, вы можете быть уверены, что конечные нули не являются артефактами форматирования: они отражают точность исходных данных. Количество ведущих нулей не влияет на точность: значение 0.0067 будет считаться имеющим только две значащих цифры.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN124698"
+>E.33.4. Usage</A
+></H2
+><P
+>Модуль <TT
+CLASS="FILENAME"
+>seg</TT
+> включает класс операторов индекса GiST для значений <TT
+CLASS="TYPE"
+>seg</TT
+>. Операторы, поддерживаемые этим классом операторов, перечислены в <A
+HREF="seg.html#SEG-GIST-OPERATORS"
+>Таблице E-26</A
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="SEG-GIST-OPERATORS"
+></A
+><P
+><B
+>Таблица E-26. Операторы seg для GiST</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+>Оператор</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>[a, b] &lt;&lt; [c, d]</TT
+>
+                  </TD
+><TD
+>[a, b] полностью находится левее [c, d]. То есть, [a, b] &lt;&lt; [c, d] — true, если b &lt; c, и false в противном случае.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>[a, b] &gt;&gt; [c, d]</TT
+>
+                  </TD
+><TD
+>[a, b] полностью находится правее [c, d]. То есть, [a, b] &gt;&gt; [c, d] — true, если a &gt; d, и false в противном случае.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>[a, b] &amp;&lt; [c, d]</TT
+>
+                  </TD
+><TD
+>Пересекает или левее &mdash; Ещё лучше это читается как <SPAN
+CLASS="QUOTE"
+>"не простирается правее"</SPAN
+>. Результатом будет true, когда b &lt;= d.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>[a, b] &amp;&gt; [c, d]</TT
+>
+                  </TD
+><TD
+>Пересекает или правее &mdash; Ещё лучше это читается как <SPAN
+CLASS="QUOTE"
+>"не простирается левее"</SPAN
+>. Результатом будет true, когда a &gt;= c.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>[a, b] = [c, d]</TT
+>
+                  </TD
+><TD
+>Равенство &mdash; сегменты [a, b] и [c, d] равны, то есть, a = c и b = d.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>[a, b] &amp;&amp; [c, d]</TT
+>
+                  </TD
+><TD
+>Сегменты [a, b] и [c, d] пересекаются.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>[a, b] @&gt; [c, d]</TT
+>
+                  </TD
+><TD
+>Сегмент [a, b] содержит сегмент [c, d], то есть, a &lt;= c и b &gt;= d.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>[a, b] &lt;@ [c, d]</TT
+>
+                  </TD
+><TD
+>Сегмент [a, b] содержится в [c, d], то есть, a &gt;= c и b &lt;= d.</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>(До версии PostgreSQL 8.2 операторы включения <TT
+CLASS="LITERAL"
+>@&gt;</TT
+> и <TT
+CLASS="LITERAL"
+>&lt;@</TT
+> обозначались соответственно как <TT
+CLASS="LITERAL"
+>@</TT
+> и <TT
+CLASS="LITERAL"
+>~</TT
+>. Эти имена по-прежнему действуют, но считаются устаревшими и в конце концов будут упразднены. Заметьте, что старые имена произошли из соглашения, которому раньше следовали ключевые геометрические типы данных!)</P
+><P
+>Также поддерживаются стандартные операторы для B-дерева, например: <DIV
+CLASS="INFORMALTABLE"
+><P
+></P
+><A
+NAME="AEN124752"
+></A
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+>Оператор</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>[a, b] &lt; [c, d]</TT
+></TD
+><TD
+>Меньше</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>[a, b] &gt; [c, d]</TT
+></TD
+><TD
+>Больше</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+> Эти операторы не имеют большого смысла ни для какой практической цели, кроме сортировки. Эти операторы сначала сравнивают (a) с (c), и если они равны, сравнивают (b) с (d). Результат сравнения позволяет упорядочить значения образом, подходящим для большинства случаев, что полезно, если вы хотите применять ORDER BY с этим типом.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN124767"
+>E.33.5. Замечания</A
+></H2
+><P
+>Примеры использования можно увидеть в регрессионном тесте <TT
+CLASS="FILENAME"
+>sql/seg.sql</TT
+>.</P
+><P
+>Механизм, преобразующий <TT
+CLASS="LITERAL"
+>(+-)</TT
+> в обычные диапазоны, не вполне точно определяет число значащих цифр для границ. Например, он добавляет дополнительную цифру к нижней границе, если результирующий интервал включает степень десяти: </P><PRE
+CLASS="SCREEN"
+>postgres=&gt; select '10(+-)1'::seg as seg;
+      seg
+---------
+9.0 .. 11             -- должно быть: 9 .. 11</PRE
+><P></P
+><P
+>Производительность индекса-R-дерева может значительно зависеть от начального порядка вводимых значений. Может быть очень полезно отсортировать входную таблицу по колонке <TT
+CLASS="TYPE"
+>seg</TT
+>; пример можно найти в скрипте <TT
+CLASS="FILENAME"
+>sort-segments.pl</TT
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN124777"
+>E.33.6. Благодарности</A
+></H2
+><P
+>Первый автор: Джин Селков мл. <CODE
+CLASS="EMAIL"
+>&#60;<A
+HREF="mailto:selkovjr@mcs.anl.gov"
+>selkovjr@mcs.anl.gov</A
+>&#62;</CODE
+>, Аргоннская национальная лаборатория, Отдел математики и компьютерных наук</P
+><P
+>Я очень благодарен в первую очередь профессору Джо Геллерштейну (<A
+HREF="http://dbcsberkeleyedu/jmh/"
+TARGET="_top"
+>http://dbcsberkeleyedu/jmh/</A
+>) за пояснение сути GiST (<A
+HREF="http://gistcsberkeleyedu/"
+TARGET="_top"
+>http://gistcsberkeleyedu/</A
+>). Я также признателен всем разработчикам Postgres в настоящем и прошлом за возможность создать свой собственный мир и спокойно жить в нём. Ещё я хотел бы выразить признательность Аргоннской лаборатории и Министерству энергетики США за годы постоянной поддержки моих исследований в области баз данных.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="postgres-fdw.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sepgsql.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>postgres_fdw</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>sepgsql</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,378 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>pageinspect</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Дополнительно поставляемые модули"
+HREF="contrib.html"><LINK
+REL="PREVIOUS"
+TITLE="ltree"
+HREF="ltree.html"><LINK
+REL="NEXT"
+TITLE="passwordcheck"
+HREF="passwordcheck.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="ltree"
+HREF="ltree.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Приложение E. Дополнительно поставляемые модули</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="passwordcheck"
+HREF="passwordcheck.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="PAGEINSPECT"
+>E.22. pageinspect</A
+></H1
+><P
+>Модуль <TT
+CLASS="FILENAME"
+>pageinspect</TT
+> предоставляет функции, позволяющие исследовать страницы баз данных на низком уровне, что бывает полезно для отладки. Все эти функции могут вызывать только суперпользователи.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN122534"
+>E.22.1. Функции</A
+></H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><CODE
+CLASS="FUNCTION"
+>get_raw_page(relname text, fork text, blkno int) returns bytea</CODE
+></DT
+><DD
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>get_raw_page</CODE
+> считывает указанный блок отношения с заданным именем и возвращает копию значения <TT
+CLASS="TYPE"
+>bytea</TT
+>. Это позволяет получить одну согласованную во времени копию блока. В параметре <TT
+CLASS="PARAMETER"
+>fork</TT
+> нужно передать <TT
+CLASS="LITERAL"
+>'main'</TT
+>, чтобы обратиться к основному слою данных, <TT
+CLASS="LITERAL"
+>'fsm'</TT
+> — к карте свободного пространства, <TT
+CLASS="LITERAL"
+>'vm'</TT
+> — к карте видимости, либо <TT
+CLASS="LITERAL"
+>'init'</TT
+> — к слою инициализации.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>get_raw_page(relname text, blkno int) returns bytea</CODE
+></DT
+><DD
+><P
+>Упрощённая версия <CODE
+CLASS="FUNCTION"
+>get_raw_page</CODE
+> для чтения данных из основного слоя. Синоним <TT
+CLASS="LITERAL"
+>get_raw_page(relname, 'main', blkno)</TT
+></P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>page_header(page bytea) returns record</CODE
+></DT
+><DD
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>page_header</CODE
+> показывает поля, общие для всех страниц кучи и индекса <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+><P
+>В качестве аргумента ей передаётся образ страницы, полученный в результате вызова <CODE
+CLASS="FUNCTION"
+>get_raw_page</CODE
+>. Например: </P><PRE
+CLASS="SCREEN"
+>test=# SELECT * FROM page_header(get_raw_page('pg_class', 0));
+    lsn    | checksum | flags  | lower | upper | special | pagesize | version | prune_xid
+-----------+----------+--------+-------+-------+---------+----------+---------+-----------
+ 0/24A1B50 |        1 |      1 |   232 |   368 |    8192 |     8192 |       4 |         0</PRE
+><P> Возвращаемые колонки соответствуют полям в структуре <TT
+CLASS="STRUCTNAME"
+>PageHeaderData</TT
+>. За подробностями обратитесь к <TT
+CLASS="FILENAME"
+>src/include/storage/bufpage.h</TT
+>.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>heap_page_items(page bytea) returns setof record</CODE
+></DT
+><DD
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>heap_page_items</CODE
+> показывает все указатели линейных блоков на странице кучи. Для используемых блоков также выводятся заголовки кортежей. При этом показываются все кортежи, независимо от того, были ли видны они в снимке MVCC в момент копирования исходной страницы.</P
+><P
+>В качестве аргумента ей нужно передать образ страницы кучи, полученный в результате вызова <CODE
+CLASS="FUNCTION"
+>get_raw_page</CODE
+>. Например: </P><PRE
+CLASS="SCREEN"
+>test=# SELECT * FROM heap_page_items(get_raw_page('pg_class', 0));</PRE
+><P> Описание возвращаемых полей можно найти в <TT
+CLASS="FILENAME"
+>src/include/storage/itemid.h</TT
+> и <TT
+CLASS="FILENAME"
+>src/include/access/htup_details.h</TT
+>.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>bt_metap(relname text) returns record</CODE
+></DT
+><DD
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>bt_metap</CODE
+> возвращает информацию о метастранице индекса-B-дерева. Например: </P><PRE
+CLASS="SCREEN"
+>test=# SELECT * FROM bt_metap('pg_cast_oid_index');
+-[ RECORD 1 ]-----
+magic     | 340322
+version   | 2
+root      | 1
+level     | 0
+fastroot  | 1
+fastlevel | 0</PRE
+><P></P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>bt_page_stats(relname text, blkno int) returns record</CODE
+></DT
+><DD
+><P
+><CODE
+CLASS="FUNCTION"
+>bt_page_stats</CODE
+> возвращает сводную информацию по единичным страницам B-дерева. Например: </P><PRE
+CLASS="SCREEN"
+>test=# SELECT * FROM bt_page_stats('pg_cast_oid_index', 1);
+-[ RECORD 1 ]-+-----
+blkno         | 1
+type          | l
+live_items    | 256
+dead_items    | 0
+avg_item_size | 12
+page_size     | 8192
+free_size     | 4056
+btpo_prev     | 0
+btpo_next     | 0
+btpo          | 0
+btpo_flags    | 3</PRE
+><P></P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>bt_page_items(relname text, blkno int) returns setof record</CODE
+></DT
+><DD
+><P
+><CODE
+CLASS="FUNCTION"
+>bt_page_items</CODE
+> возвращает детализированную информацию обо всех элементах на странице B-дерева. Например: </P><PRE
+CLASS="SCREEN"
+>test=# SELECT * FROM bt_page_items('pg_cast_oid_index', 1);
+ itemoffset |  ctid   | itemlen | nulls | vars |    data
+------------+---------+---------+-------+------+-------------
+          1 | (0,1)   |      12 | f     | f    | 23 27 00 00
+          2 | (0,2)   |      12 | f     | f    | 24 27 00 00
+          3 | (0,3)   |      12 | f     | f    | 25 27 00 00
+          4 | (0,4)   |      12 | f     | f    | 26 27 00 00
+          5 | (0,5)   |      12 | f     | f    | 27 27 00 00
+          6 | (0,6)   |      12 | f     | f    | 28 27 00 00
+          7 | (0,7)   |      12 | f     | f    | 29 27 00 00
+          8 | (0,8)   |      12 | f     | f    | 2a 27 00 00</PRE
+><P></P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>fsm_page_contents(page bytea) returns text</CODE
+></DT
+><DD
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>fsm_page_contents</CODE
+> показывает внутреннюю структуру узла на странице FSM. Она выдаёт текст из нескольких строк, по одной строке на узел двоичного дерева на заданной странице. При этом выдаются только ненулевые узлы. Также выводится так называемый указатель &laquo;следующего слота&raquo;, который указывает на следующий слот, получаемый с этой страницы.</P
+><P
+>Подробнее структура страницы FSM описана в <TT
+CLASS="FILENAME"
+>src/backend/storage/freespace/README</TT
+>.</P
+></DD
+></DL
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ltree.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="passwordcheck.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>ltree</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>passwordcheck</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

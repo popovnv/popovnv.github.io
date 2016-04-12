@@ -1,0 +1,287 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Получение параметров соединения через LDAP</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="libpq — библиотека для языка C"
+HREF="libpq.html"><LINK
+REL="PREVIOUS"
+TITLE="Файл соединений служб"
+HREF="libpq-pgservice.html"><LINK
+REL="NEXT"
+TITLE="Поддержка SSL"
+HREF="libpq-ssl.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Файл соединений служб"
+HREF="libpq-pgservice.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="libpq.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 31. <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> — библиотека для языка C</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Поддержка SSL"
+HREF="libpq-ssl.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="LIBPQ-LDAP"
+>31.17. Получение параметров соединения через LDAP</A
+></H1
+><P
+>Если библиотека <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> была собрана с поддержка LDAP (<TT
+CLASS="COMMAND"
+>configure</TT
+> передавался ключ <TT
+CLASS="LITERAL"
+><TT
+CLASS="OPTION"
+>--with-ldap</TT
+></TT
+>), такие параметры соединения, как <TT
+CLASS="LITERAL"
+>host</TT
+> и <TT
+CLASS="LITERAL"
+>dbname</TT
+>, можно получить через LDAP с центрального сервера. Преимущество такого подхода в том, что при изменении параметров подключения к базе данных свойства соединения не придётся изменять на всех клиентских компьютерах.</P
+><P
+>Для получения параметров соединений через LDAP используется файл соединений служб <TT
+CLASS="FILENAME"
+>pg_service.conf</TT
+> (см. <A
+HREF="libpq-pgservice.html"
+>Раздел 31.16</A
+>). Строка в <TT
+CLASS="FILENAME"
+>pg_service.conf</TT
+>, начинающаяся с указания протокола <TT
+CLASS="LITERAL"
+>ldap://</TT
+>, будет воспринята как URL в LDAP и выполнится как запрос к LDAP. Результатом запроса должен быть список пар <TT
+CLASS="LITERAL"
+>keyword = value</TT
+>, которые и будут задавать параметры соединений. Заданный URL должен соответствовать RFC 1959 и иметь следующий вид: </P><PRE
+CLASS="SYNOPSIS"
+>ldap://[<TT
+CLASS="REPLACEABLE"
+><I
+>имя_сервера</I
+></TT
+>[:<TT
+CLASS="REPLACEABLE"
+><I
+>порт</I
+></TT
+>]]/<TT
+CLASS="REPLACEABLE"
+><I
+>база_поиска</I
+></TT
+>?<TT
+CLASS="REPLACEABLE"
+><I
+>атрибут</I
+></TT
+>?<TT
+CLASS="REPLACEABLE"
+><I
+>область_поиска</I
+></TT
+>?<TT
+CLASS="REPLACEABLE"
+><I
+>фильтр</I
+></TT
+></PRE
+><P>; по умолчанию <TT
+CLASS="REPLACEABLE"
+><I
+>имя_сервера</I
+></TT
+> — <TT
+CLASS="LITERAL"
+>localhost</TT
+>, а <TT
+CLASS="REPLACEABLE"
+><I
+>порт</I
+></TT
+> — 389.</P
+><P
+>Обработка <TT
+CLASS="FILENAME"
+>pg_service.conf</TT
+> прекращается после удачного поиска в LDAP, но если с сервером LDAP связаться не удаётся, обрабатываются следующие строки этого файла. Так сделано для того, чтобы можно было реализовать запасные варианты, добавив дополнительные строки с URL LDAP, указывающими на другие серверы LDAP, или классические пары <TT
+CLASS="LITERAL"
+>keyword = value</TT
+>, либо используя параметры соединений по умолчанию. Если же вы хотите получить ошибку в этой ситуации, добавьте после строки с URL-адресом LDAP синтаксически некорректную строку.</P
+><P
+>Простую запись LDAP, созданную из такого файла LDIF </P><PRE
+CLASS="PROGRAMLISTING"
+>version:1
+dn:cn=mydatabase,dc=mycompany,dc=com
+changetype:add
+objectclass:top
+objectclass:device
+cn:mydatabase
+description:host=dbserver.mycompany.com
+description:port=5439
+description:dbname=mydb
+description:user=mydb_user
+description:sslmode=require</PRE
+><P> можно запросить из каталога LDAP, указав следующий URL: </P><PRE
+CLASS="PROGRAMLISTING"
+>ldap://ldap.mycompany.com/dc=mycompany,dc=com?description?one?(cn=mydatabase)</PRE
+><P></P
+><P
+>Также возможно сочетать обычные записи в файле служб с поиском в LDAP. Полный пример описания службы в <TT
+CLASS="FILENAME"
+>pg_service.conf</TT
+> может быть таким: </P><PRE
+CLASS="PROGRAMLISTING"
+># в LDAP хранится только имя и порт сервера; имя базы и пользователя нужно задать явно
+[customerdb]
+dbname=customer
+user=appuser
+ldap://ldap.acme.com/cn=dbserver,cn=hosts?pgconnectinfo?base?(objectclass=*)</PRE
+><P></P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="libpq-pgservice.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="libpq-ssl.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Файл соединений служб</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="libpq.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Поддержка SSL</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

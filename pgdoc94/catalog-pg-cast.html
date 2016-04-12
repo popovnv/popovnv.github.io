@@ -1,0 +1,425 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>          pg_cast
+        </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Системные каталоги"
+HREF="catalogs.html"><LINK
+REL="PREVIOUS"
+TITLE="          pg_auth_members
+        "
+HREF="catalog-pg-auth-members.html"><LINK
+REL="NEXT"
+TITLE="          pg_class
+        "
+HREF="catalog-pg-class.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="          pg_auth_members
+        "
+HREF="catalog-pg-auth-members.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 48. Системные каталоги</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="          pg_class
+        "
+HREF="catalog-pg-class.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CATALOG-PG-CAST"
+>48.10. <TT
+CLASS="STRUCTNAME"
+>pg_cast</TT
+></A
+></H1
+><P
+>В каталоге <TT
+CLASS="STRUCTNAME"
+>pg_cast</TT
+> хранятся пути приведения типов (как встроенных, так и пользовательских).</P
+><P
+>Следует заметить, что <TT
+CLASS="STRUCTNAME"
+>pg_cast</TT
+> представляет не каждое приведение, которое может выполнять система, а только те, которые нельзя вывести по некоторым общим правилам. Например, приведение типа домена к его базовому типу не представляется явно в <TT
+CLASS="STRUCTNAME"
+>pg_cast</TT
+>. Ещё одно важное исключение составляют <SPAN
+CLASS="QUOTE"
+>"автоматические приведения ввода/вывода"</SPAN
+>, которые выполняются с применением собственных функций ввода/вывода типа данных, преобразующих тип в <TT
+CLASS="TYPE"
+>text</TT
+> или другие строковые типы — они также не представляются явно в <TT
+CLASS="STRUCTNAME"
+>pg_cast</TT
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="AEN96014"
+></A
+><P
+><B
+>Таблица 48-10. Колонки <TT
+CLASS="STRUCTNAME"
+>pg_cast</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип</TH
+><TH
+>Ссылки</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Идентификатор строки (скрытый атрибут; должен выбираться явно)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>castsource</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-type.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_type</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>OID исходного типа данных</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>casttarget</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-type.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_type</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>OID целевого типа данных</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>castfunc</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-proc.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>OID функции, выполняющей приведение, или 0, если для данного метода приведения не требуется функция.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>castcontext</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>char</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Определяет, в каких контекстах может выполняться приведение. Символ <TT
+CLASS="LITERAL"
+>e</TT
+> означает только явное приведение (explicit), с применением синтаксиса <TT
+CLASS="LITERAL"
+>CAST</TT
+> или <TT
+CLASS="LITERAL"
+>::</TT
+>. Символ <TT
+CLASS="LITERAL"
+>a</TT
+> означает неявное присваивание (assignment) целевой колонке, а также явное приведение. Символ <TT
+CLASS="LITERAL"
+>i</TT
+> разрешает неявное приведение (implicit), а также все остальные варианты.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>castmethod</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>char</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Показывает, как выполняется приведение. Символ <TT
+CLASS="LITERAL"
+>f</TT
+> означает, что используется функция, указанная в поле <TT
+CLASS="STRUCTFIELD"
+>castfunc</TT
+>. Символ <TT
+CLASS="LITERAL"
+>i</TT
+> означает, что используются функции ввода/вывода. Символ <TT
+CLASS="LITERAL"
+>b</TT
+> означают, что типы являются двоично-сводимыми, так что преобразование не требуется.</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Функции приведения, перечисленные в <TT
+CLASS="STRUCTNAME"
+>pg_cast</TT
+>, должны всегда принимать исходный тип приведения в качестве типа первого аргумента и возвращать результат, имеющий целевой тип. Функция приведения может иметь до трёх аргументов. Второй аргумент, если он присутствует, должен иметь тип <TT
+CLASS="TYPE"
+>integer</TT
+>; в нём передаётся модификатор типа, связанный с целевым типом, либо -1, если такого модификатора нет. Третий аргумент, если он присутствует, должен иметь тип <TT
+CLASS="TYPE"
+>boolean</TT
+>; в нём передаётся <TT
+CLASS="LITERAL"
+>true</TT
+>, если приведение выполняется явно, и <TT
+CLASS="LITERAL"
+>false</TT
+> в противном случае.</P
+><P
+>Вполне возможно создать запись в <TT
+CLASS="STRUCTNAME"
+>pg_cast</TT
+>, в которой исходный тип будет совпадать с целевым, если связанная функция приведения принимает больше одного аргумента. Такие записи представляют <SPAN
+CLASS="QUOTE"
+>"функции преобразования длины"</SPAN
+>, которые приводят значения некоторого типа в соответствие с заданным значением модификатора.</P
+><P
+>Когда в записи <TT
+CLASS="STRUCTNAME"
+>pg_cast</TT
+> исходный и целевой типы приведения различаются и функция принимает более одного аргумента, эта запись представляет преобразование типа из одного в другой и сведение к нужной длине за один шаг. Если же такой записи не находится, приведение к типу с определённым модификатором выполняется в два этапа, сначала выполняется преобразование типа, а затем применяется модификатор типа.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="catalog-pg-auth-members.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="catalog-pg-class.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_auth_members</TT
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

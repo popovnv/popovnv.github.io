@@ -1,0 +1,343 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>ALTER GROUP</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="ALTER FUNCTION"
+HREF="sql-alterfunction.html"><LINK
+REL="NEXT"
+TITLE="ALTER INDEX"
+HREF="sql-alterindex.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="ALTER FUNCTION"
+HREF="sql-alterfunction.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="ALTER INDEX"
+HREF="sql-alterindex.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-ALTERGROUP"
+></A
+>ALTER GROUP</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN68121"
+></A
+><H2
+>Название</H2
+>ALTER GROUP&nbsp;--&nbsp;изменить имя роли или членство</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN68124"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>ALTER GROUP <TT
+CLASS="REPLACEABLE"
+><I
+>имя_группы</I
+></TT
+> ADD USER <TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+> [, ... ]
+ALTER GROUP <TT
+CLASS="REPLACEABLE"
+><I
+>имя_группы</I
+></TT
+> DROP USER <TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+> [, ... ]
+
+ALTER GROUP <TT
+CLASS="REPLACEABLE"
+><I
+>имя_группы</I
+></TT
+> RENAME TO <TT
+CLASS="REPLACEABLE"
+><I
+>новое_имя</I
+></TT
+></PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN68132"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>ALTER GROUP</TT
+> изменяет атрибуты группы пользователей. Эта команда считается устаревшей, хотя и поддерживается для обратной совместимости, так как группы (и пользователи) были заменены более общей концепцией ролей.</P
+><P
+>Первые две формы добавляют пользователей в группу или удаляют их из группы. (В данном случае в качестве <SPAN
+CLASS="QUOTE"
+>"пользователя"</SPAN
+> или <SPAN
+CLASS="QUOTE"
+>"группы"</SPAN
+> может фигурировать любая роль.) По сути они равнозначны командам разрешающим/запрещающим членство в роли <SPAN
+CLASS="QUOTE"
+>"группа"</SPAN
+>; поэтому вместо них рекомендуется использовать <A
+HREF="sql-grant.html"
+>GRANT</A
+> и <A
+HREF="sql-revoke.html"
+>REVOKE</A
+>.</P
+><P
+>Третья форма меняет имя группы. Она в точности равнозначна команде <A
+HREF="sql-alterrole.html"
+>ALTER ROLE</A
+>, выполняющей переименование роли.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN68144"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_группы</I
+></TT
+></DT
+><DD
+><P
+>Имя изменяемой группы (роли).</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+></DT
+><DD
+><P
+>Пользователи (роли), добавляемые или исключаемые из группы. Эти пользователи должны уже существовать; <TT
+CLASS="COMMAND"
+>ALTER GROUP</TT
+> не создаёт и не удаляет пользователей.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>новое_имя</I
+></TT
+></DT
+><DD
+><P
+>Новое имя группы.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN68163"
+></A
+><H2
+>Примеры</H2
+><P
+>Добавление пользователей в группу: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER GROUP staff ADD USER karl, john;</PRE
+><P> Удаление пользователей из группы: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER GROUP workers DROP USER beth;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN68168"
+></A
+><H2
+>Совместимость</H2
+><P
+>Оператор <TT
+CLASS="COMMAND"
+>ALTER GROUP</TT
+> отсутствует в стандарте SQL.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN68172"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-grant.html"
+>GRANT</A
+>, <A
+HREF="sql-revoke.html"
+>REVOKE</A
+>, <A
+HREF="sql-alterrole.html"
+>ALTER ROLE</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-alterfunction.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-alterindex.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>ALTER FUNCTION</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>ALTER INDEX</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

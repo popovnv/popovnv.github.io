@@ -1,0 +1,979 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>          pg_am
+        </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Системные каталоги"
+HREF="catalogs.html"><LINK
+REL="PREVIOUS"
+TITLE="          pg_aggregate
+        "
+HREF="catalog-pg-aggregate.html"><LINK
+REL="NEXT"
+TITLE="          pg_amop
+        "
+HREF="catalog-pg-amop.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="          pg_aggregate
+        "
+HREF="catalog-pg-aggregate.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 48. Системные каталоги</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="          pg_amop
+        "
+HREF="catalog-pg-amop.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CATALOG-PG-AM"
+>48.3. <TT
+CLASS="STRUCTNAME"
+>pg_am</TT
+></A
+></H1
+><P
+>В каталоге <TT
+CLASS="STRUCTNAME"
+>pg_am</TT
+> хранится информация о методах доступа индексов. Каждая строка в нём описывает один метод доступа, поддерживаемый системой. Содержимое этого каталога подробно рассматривается в <A
+HREF="indexam.html"
+>Главе 55</A
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="AEN95064"
+></A
+><P
+><B
+>Таблица 48-3. Колонки <TT
+CLASS="STRUCTNAME"
+>pg_am</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип</TH
+><TH
+>Ссылки</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Идентификатор строки (скрытый атрибут; должен выбираться явно)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>amname</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>name</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Имя метода доступа</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>amstrategies</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int2</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Число стратегий операторов для этого метода доступа, либо 0, если данный метод не имеет определённого набора стратегий операторов</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>amsupport</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int2</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Число опорных процедур для этого метода доступа</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>amcanorder</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Поддерживает ли метод доступа упорядоченное сканирование по значению индексируемой колонки?</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>amcanorderbyop</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Поддерживает ли метод доступа упорядоченное сканирование по результату оператора с индексированной колонкой?</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>amcanbackward</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Поддерживает ли метод доступа сканирование назад?</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>amcanunique</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Поддерживает ли метод доступа уникальные индексы?</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>amcanmulticol</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Поддерживает ли метод доступа индексы по нескольким колонкам?</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>amoptionalkey</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Поддерживает ли метод доступа сканирование без ограничений для первой колонки индекса?</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>amsearcharray</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Поддерживает ли метод доступа поиск <TT
+CLASS="LITERAL"
+>ScalarArrayOpExpr</TT
+>?</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>amsearchnulls</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Поддерживает ли метод доступа поиск <TT
+CLASS="LITERAL"
+>IS NULL</TT
+>/<TT
+CLASS="LITERAL"
+>NOT NULL</TT
+>?</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>amstorage</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Может ли тип хранимых данных индекса отличаться от типа колонки?</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>amclusterable</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Возможна ли кластеризация по индексу такого типа?</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>ampredlocks</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Управляет ли индекс такого типа детальными предикатными блокировками?</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>amkeytype</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-type.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_type</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Тип хранимых в индексе данных, или 0, если этот тип не фиксированный</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>aminsert</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>regproc</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-proc.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Функция <SPAN
+CLASS="QUOTE"
+>"Вставить этот кортеж"</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>ambeginscan</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>regproc</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-proc.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Функция <SPAN
+CLASS="QUOTE"
+>"Подготовиться к сканированию индекса"</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>amgettuple</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>regproc</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-proc.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Функция <SPAN
+CLASS="QUOTE"
+>"Следующий подходящий кортеж"</SPAN
+> или 0, если таковой нет</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>amgetbitmap</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>regproc</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-proc.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Функция <SPAN
+CLASS="QUOTE"
+>"Выбрать все подходящие кортежи"</SPAN
+> или 0, если таковой нет</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>amrescan</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>regproc</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-proc.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Функция <SPAN
+CLASS="QUOTE"
+>"(Пере)запустить сканирование по индексу"</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>amendscan</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>regproc</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-proc.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Функция <SPAN
+CLASS="QUOTE"
+>"Очиститься после сканирования индекса"</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>ammarkpos</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>regproc</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-proc.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Функция <SPAN
+CLASS="QUOTE"
+>"Отметить текущую позицию сканирования"</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>amrestrpos</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>regproc</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-proc.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Функция <SPAN
+CLASS="QUOTE"
+>"Восстановить отмеченную позицию сканирования"</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>ambuild</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>regproc</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-proc.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Функция <SPAN
+CLASS="QUOTE"
+>"Построить новый индекс"</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>ambuildempty</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>regproc</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-proc.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Функция <SPAN
+CLASS="QUOTE"
+>"Построить пустой индекс"</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>ambulkdelete</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>regproc</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-proc.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Функция массового удаления</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>amvacuumcleanup</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>regproc</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-proc.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Функция очистки после <TT
+CLASS="COMMAND"
+>VACUUM</TT
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>amcanreturn</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>regproc</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-proc.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Функция для проверки, поддерживается ли сканирование только по индексу, либо 0, если оно не поддерживается никогда</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>amcostestimate</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>regproc</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-proc.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Функция для оценки стоимости сканирования по индексу</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>amoptions</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>regproc</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-proc.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Функция для разбора и проверки <TT
+CLASS="STRUCTFIELD"
+>reloptions</TT
+> для индекса</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="catalog-pg-aggregate.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="catalog-pg-amop.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_aggregate</TT
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_amop</TT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

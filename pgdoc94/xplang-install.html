@@ -1,0 +1,493 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Установка процедурных языков</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Процедурные языки"
+HREF="xplang.html"><LINK
+REL="PREVIOUS"
+TITLE="Процедурные языки"
+HREF="xplang.html"><LINK
+REL="NEXT"
+TITLE="PL/pgSQL — процедурный язык SQL"
+HREF="plpgsql.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Процедурные языки"
+HREF="xplang.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="xplang.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 39. Процедурные языки</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="PL/pgSQL — процедурный язык SQL"
+HREF="plpgsql.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="XPLANG-INSTALL"
+>39.1. Установка процедурных языков</A
+></H1
+><P
+>Прежде всего, процедурный язык должен быть <SPAN
+CLASS="QUOTE"
+>"установлен"</SPAN
+> в каждую базу данных, где он будет использоваться. Но процедурные языки, устанавливаемые в базу данных <TT
+CLASS="LITERAL"
+>template1</TT
+>, автоматически становятся доступными во всех впоследствии создаваемых базах, так как их определения в <TT
+CLASS="LITERAL"
+>template1</TT
+> будут скопированы командой <TT
+CLASS="COMMAND"
+>CREATE DATABASE</TT
+>. Таким образом, если администратор баз данных захочет, он сможет выбрать, какие языки будут доступны в определённых базах данных, а некоторые языки сделать доступными по умолчанию.</P
+><P
+>Для языков, включённых в стандартный дистрибутив, достаточно выполнить команду <TT
+CLASS="COMMAND"
+>CREATE EXTENSION</TT
+>
+    <TT
+CLASS="REPLACEABLE"
+><I
+>имя_языка</I
+></TT
+>, чтобы установить язык в текущую базу данных. Чтобы сделать это из командной строки оболочки, также можно воспользоваться программой <A
+HREF="app-createlang.html"
+>            <SPAN
+CLASS="APPLICATION"
+>createlang</SPAN
+>
+          </A
+>. Например, чтобы установить в базу данных <TT
+CLASS="LITERAL"
+>template1</TT
+> язык <SPAN
+CLASS="APPLICATION"
+>PL/Perl</SPAN
+>, выполните: </P><PRE
+CLASS="PROGRAMLISTING"
+>createlang plperl template1</PRE
+><P> Описанная ниже ручная процедура рекомендуется только для установки языков, не упакованных в виде расширений.</P
+><DIV
+CLASS="PROCEDURE"
+><P
+><B
+>Установка процедурного языка вручную</B
+></P
+><P
+>Процедурный язык устанавливается в базу данных в пять этапов, и выполнять их должен администратор баз данных. В большинстве случаев необходимые команды SQL следует упаковать в виде установочного скрипта <SPAN
+CLASS="QUOTE"
+>"расширения"</SPAN
+>, чтобы их можно было выполнить, воспользовавшись командой <TT
+CLASS="COMMAND"
+>CREATE EXTENSION</TT
+>.</P
+><OL
+TYPE="1"
+><LI
+CLASS="STEP"
+><A
+NAME="XPLANG-INSTALL-CR1"
+></A
+><P
+>Разделяемый объект для обработчика языка должен быть скомпилирован и установлен в соответствующий каталог библиотек. Это в принципе не отличается от сборки и установки дополнительных модулей с обычными функциями на языке C; см. <A
+HREF="xfunc-c.html#DFUNC"
+>Подраздел 35.9.6</A
+>. Часто обработчик языка зависит от внешней библиотеки, в которой собственно реализован исполнитель языка программирования; в таких случаях нужно установить и эту библиотеку.</P
+></LI
+><LI
+CLASS="STEP"
+><A
+NAME="XPLANG-INSTALL-CR2"
+></A
+><P
+>Обработчик должен быть объявлен командой </P><PRE
+CLASS="SYNOPSIS"
+>CREATE FUNCTION <TT
+CLASS="REPLACEABLE"
+><I
+>имя_функции_обработчика</I
+></TT
+>()
+    RETURNS language_handler
+    AS '<TT
+CLASS="REPLACEABLE"
+><I
+>путь-к-разделяемому-объекту</I
+></TT
+>'
+    LANGUAGE C;</PRE
+><P> Специальный тип возврата <TT
+CLASS="TYPE"
+>language_handler</TT
+> говорит СУБД, что эта функция не возвращает какой-либо определённый тип данных <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>, и значит её нельзя использовать непосредственно в операторах <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>.</P
+></LI
+><LI
+CLASS="STEP"
+><A
+NAME="XPLANG-INSTALL-CR3"
+></A
+><P
+>Дополнительно обработчик языка может предоставить функцию обработки <SPAN
+CLASS="QUOTE"
+>"внедрённого кода"</SPAN
+>, которая будет выполнять анонимные блоки кода (команды <A
+HREF="sql-do.html"
+>DO</A
+>), написанные на этом языке. Если для языка есть обработчик внедрённого кода, объявите его такой командой: </P><PRE
+CLASS="SYNOPSIS"
+>CREATE FUNCTION <TT
+CLASS="REPLACEABLE"
+><I
+>имя_обработчика_внедрённого_кода</I
+></TT
+>(internal)
+    RETURNS void
+    AS '<TT
+CLASS="REPLACEABLE"
+><I
+>путь-к-разделяемому-объекту</I
+></TT
+>'
+    LANGUAGE C;</PRE
+><P></P
+></LI
+><LI
+CLASS="STEP"
+><A
+NAME="XPLANG-INSTALL-CR4"
+></A
+><P
+>Кроме того, обработчик языка может предоставить функцию <SPAN
+CLASS="QUOTE"
+>"проверки"</SPAN
+>, которая будет проверять корректность определения функции, собственно не выполняя её. Функция проверки, если она существует, вызывается командой <TT
+CLASS="COMMAND"
+>CREATE FUNCTION</TT
+>. Если такая функция для языка определена, объявите её такой командой: </P><PRE
+CLASS="SYNOPSIS"
+>CREATE FUNCTION <TT
+CLASS="REPLACEABLE"
+><I
+>имя_функции_проверки</I
+></TT
+>(oid)
+    RETURNS void
+    AS '<TT
+CLASS="REPLACEABLE"
+><I
+>путь-к-разделяемому-объекту</I
+></TT
+>'
+    LANGUAGE C STRICT;</PRE
+><P></P
+></LI
+><LI
+CLASS="STEP"
+><A
+NAME="XPLANG-INSTALL-CR5"
+></A
+><P
+>Наконец, процедурный язык должен быть объявлен командой </P><PRE
+CLASS="SYNOPSIS"
+>CREATE [<SPAN
+CLASS="OPTIONAL"
+>TRUSTED</SPAN
+>] [<SPAN
+CLASS="OPTIONAL"
+>PROCEDURAL</SPAN
+>] LANGUAGE <TT
+CLASS="REPLACEABLE"
+><I
+>имя-языка</I
+></TT
+>
+    HANDLER <TT
+CLASS="REPLACEABLE"
+><I
+>имя_функции_обработчика</I
+></TT
+>
+    [<SPAN
+CLASS="OPTIONAL"
+>INLINE <TT
+CLASS="REPLACEABLE"
+><I
+>имя_обработчика_внедрённого_кода</I
+></TT
+></SPAN
+>]
+    [<SPAN
+CLASS="OPTIONAL"
+>VALIDATOR <TT
+CLASS="REPLACEABLE"
+><I
+>имя_функции_проверки</I
+></TT
+></SPAN
+>] ;</PRE
+><P> Необязательное ключевое слово <TT
+CLASS="LITERAL"
+>TRUSTED</TT
+> (доверенный) указывает, что язык не предоставляет пользователю доступ к данным, которого он не имел бы без него. Доверенные языки предназначены для обычных пользователей баз данных, не имеющих прав суперпользователя, и их можно использовать для безопасного создания функций и триггеров. Так как функции PL выполняются внутри сервера баз данных, флаг <TT
+CLASS="LITERAL"
+>TRUSTED</TT
+> следует устанавливать только для тех языков, которые не позволяют обращаться к внутренним механизмам сервера или файловой системе. Языки <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+>, <SPAN
+CLASS="APPLICATION"
+>PL/Tcl</SPAN
+> и <SPAN
+CLASS="APPLICATION"
+>PL/Perl</SPAN
+> считаются доверенными; языки <SPAN
+CLASS="APPLICATION"
+>PL/TclU</SPAN
+>, <SPAN
+CLASS="APPLICATION"
+>PL/PerlU</SPAN
+> и <SPAN
+CLASS="APPLICATION"
+>PL/PythonU</SPAN
+> предоставляют неограниченную функциональность и их <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>не</I
+></SPAN
+> следует помечать как доверенные.</P
+></LI
+></OL
+></DIV
+><P
+><A
+HREF="xplang-install.html#XPLANG-INSTALL-EXAMPLE"
+>Примере 39-1</A
+> показывает, как выполняется процедура ручной установки для языка <SPAN
+CLASS="APPLICATION"
+>PL/Perl</SPAN
+>.</P
+><DIV
+CLASS="EXAMPLE"
+><A
+NAME="XPLANG-INSTALL-EXAMPLE"
+></A
+><P
+><B
+>Пример 39-1. Установка <SPAN
+CLASS="APPLICATION"
+>PL/Perl</SPAN
+> вручную</B
+></P
+><P
+>Следующая команда говорит серверу баз данных, где найти разделяемый объект для функции-обработчика языка <SPAN
+CLASS="APPLICATION"
+>PL/Perl</SPAN
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION plperl_call_handler() RETURNS language_handler AS
+    '$libdir/plperl' LANGUAGE C;</PRE
+><P></P
+><P
+>Для <SPAN
+CLASS="APPLICATION"
+>PL/Perl</SPAN
+> реализованы обработчик внедрённого кода и функция проверки, так что их мы тоже объявим: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION plperl_inline_handler(internal) RETURNS void AS
+    '$libdir/plperl' LANGUAGE C;
+
+CREATE FUNCTION plperl_validator(oid) RETURNS void AS
+    '$libdir/plperl' LANGUAGE C STRICT;</PRE
+><P></P
+><P
+>Следующая команда: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TRUSTED PROCEDURAL LANGUAGE plperl
+    HANDLER plperl_call_handler
+    INLINE plperl_inline_handler
+    VALIDATOR plperl_validator;</PRE
+><P> определяет, что ранее объявленные функции должны вызываться для функций и триггерных процедур с атрибутом языка <TT
+CLASS="LITERAL"
+>plperl</TT
+>.</P
+></DIV
+><P
+>В стандартной инсталляции <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> обработчик языка <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> уже собран и установлен в каталог <SPAN
+CLASS="QUOTE"
+>"библиотек"</SPAN
+>; более того, сам язык <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> установлен во всех базах данных. Если при сборке сконфигурирована поддержка <SPAN
+CLASS="APPLICATION"
+>Tcl</SPAN
+>, то обработчики для <SPAN
+CLASS="APPLICATION"
+>PL/Tcl</SPAN
+> и <SPAN
+CLASS="APPLICATION"
+>PL/TclU</SPAN
+> собираются и устанавливаются в каталог библиотек, но сам язык по умолчанию в базы данных не устанавливается. Подобным образом, если сконфигурирована поддержка Perl, собираются и устанавливаются обработчики <SPAN
+CLASS="APPLICATION"
+>PL/Perl</SPAN
+> и <SPAN
+CLASS="APPLICATION"
+>PL/PerlU</SPAN
+>, а при включении поддержки Python устанавливается обработчик <SPAN
+CLASS="APPLICATION"
+>PL/PythonU</SPAN
+>, но в базы данных эти языки по умолчанию не устанавливаются.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="xplang.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="plpgsql.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Процедурные языки</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="xplang.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> — процедурный язык <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

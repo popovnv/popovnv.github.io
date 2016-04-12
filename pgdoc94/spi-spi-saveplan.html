@@ -1,0 +1,295 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>SPI_saveplan</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Интерфейсные функции"
+HREF="spi-interface.html"><LINK
+REL="PREVIOUS"
+TITLE="SPI_keepplan"
+HREF="spi-spi-keepplan.html"><LINK
+REL="NEXT"
+TITLE="Вспомогательные интерфейсные функции"
+HREF="spi-interface-support.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="SPI_keepplan"
+HREF="spi-spi-keepplan.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="spi-interface.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Вспомогательные интерфейсные функции"
+HREF="spi-interface-support.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SPI-SPI-SAVEPLAN"
+></A
+>SPI_saveplan</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN65426"
+></A
+><H2
+>Название</H2
+>SPI_saveplan&nbsp;--&nbsp;сохранить подготовленный оператор</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN65429"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>SPIPlanPtr SPI_saveplan(SPIPlanPtr <TT
+CLASS="PARAMETER"
+>plan</TT
+>)</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN65432"
+></A
+><H2
+>Описание</H2
+><P
+><CODE
+CLASS="FUNCTION"
+>SPI_saveplan</CODE
+> копирует переданный оператор (подготовленный функцией <CODE
+CLASS="FUNCTION"
+>SPI_prepare</CODE
+>) в память, чтобы он не был ликвидирован функцией <CODE
+CLASS="FUNCTION"
+>SPI_finish</CODE
+> или менеджером транзакций, и возвращает указатель на скопированный оператор. Это даёт возможность повторно использовать подготовленные операторы при последующих вызовах вашей процедуры в текущем сеансе.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN65438"
+></A
+><H2
+>Аргументы</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>SPIPlanPtr <TT
+CLASS="PARAMETER"
+>plan</TT
+></TT
+></DT
+><DD
+><P
+>подготовленный оператор, который нужно сохранить</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN65447"
+></A
+><H2
+>Возвращаемое значение</H2
+><P
+>Указатель на скопированный оператор, либо <TT
+CLASS="SYMBOL"
+>NULL</TT
+> в случае ошибки. При ошибке <TT
+CLASS="VARNAME"
+>SPI_result</TT
+> принимает одно из этих значений: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="SYMBOL"
+>SPI_ERROR_ARGUMENT</TT
+></DT
+><DD
+><P
+>если <TT
+CLASS="PARAMETER"
+>plan</TT
+> неверный или <TT
+CLASS="SYMBOL"
+>NULL</TT
+></P
+></DD
+><DT
+><TT
+CLASS="SYMBOL"
+>SPI_ERROR_UNCONNECTED</TT
+></DT
+><DD
+><P
+>если вызывается из неподключённой процедуры</P
+></DD
+></DL
+></DIV
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN65465"
+></A
+><H2
+>Замечания</H2
+><P
+>Изначально переданный оператор не освобождается, поэтому вы можете выполнить <CODE
+CLASS="FUNCTION"
+>SPI_freeplan</CODE
+> для него, чтобы высвободить память до <CODE
+CLASS="FUNCTION"
+>SPI_finish</CODE
+>.</P
+><P
+>В большинстве случаев <CODE
+CLASS="FUNCTION"
+>SPI_keepplan</CODE
+> предпочтительнее данной функции, так как она даёт примерно тот же результат, но обходится без физического копирования структур данных подготовленного оператора.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="spi-spi-keepplan.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="spi-interface-support.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>SPI_keepplan</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="spi-interface.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Вспомогательные интерфейсные функции</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

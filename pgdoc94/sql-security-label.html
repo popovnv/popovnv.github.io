@@ -1,0 +1,608 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>SECURITY LABEL</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="SAVEPOINT"
+HREF="sql-savepoint.html"><LINK
+REL="NEXT"
+TITLE="SELECT"
+HREF="sql-select.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="SAVEPOINT"
+HREF="sql-savepoint.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="SELECT"
+HREF="sql-select.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-SECURITY-LABEL"
+></A
+>SECURITY LABEL</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN82950"
+></A
+><H2
+>Название</H2
+>SECURITY LABEL&nbsp;--&nbsp;определить или изменить метку безопасности, применённую к объекту</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN82953"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>SECURITY LABEL [ FOR <TT
+CLASS="REPLACEABLE"
+><I
+>провайдер</I
+></TT
+> ] ON
+{
+  TABLE <TT
+CLASS="REPLACEABLE"
+><I
+>имя_объекта</I
+></TT
+> |
+  COLUMN <TT
+CLASS="REPLACEABLE"
+><I
+>table_name</I
+></TT
+>.<TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+> |
+  AGGREGATE <TT
+CLASS="REPLACEABLE"
+><I
+>имя_агрегатной_функции</I
+></TT
+> ( <TT
+CLASS="REPLACEABLE"
+><I
+>сигнатура_агр_функции</I
+></TT
+> ) |
+  DATABASE <TT
+CLASS="REPLACEABLE"
+><I
+>имя_объекта</I
+></TT
+> |
+  DOMAIN <TT
+CLASS="REPLACEABLE"
+><I
+>имя_объекта</I
+></TT
+> |
+  EVENT TRIGGER <TT
+CLASS="REPLACEABLE"
+><I
+>имя_объекта</I
+></TT
+> |
+  FOREIGN TABLE <TT
+CLASS="REPLACEABLE"
+><I
+>имя_объекта</I
+></TT
+>
+  FUNCTION <TT
+CLASS="REPLACEABLE"
+><I
+>имя_функции</I
+></TT
+> ( [ [ <TT
+CLASS="REPLACEABLE"
+><I
+>режим_аргумента</I
+></TT
+> ] [ <TT
+CLASS="REPLACEABLE"
+><I
+>имя_аргумента</I
+></TT
+> ] <TT
+CLASS="REPLACEABLE"
+><I
+>тип_аргумента</I
+></TT
+> [, ...] ] ) |
+  LARGE OBJECT <TT
+CLASS="REPLACEABLE"
+><I
+>oid_большого_объекта</I
+></TT
+> |
+  MATERIALIZED VIEW <TT
+CLASS="REPLACEABLE"
+><I
+>имя_объекта</I
+></TT
+> |
+  [ PROCEDURAL ] LANGUAGE <TT
+CLASS="REPLACEABLE"
+><I
+>имя_объекта</I
+></TT
+> |
+  ROLE <TT
+CLASS="REPLACEABLE"
+><I
+>имя_объекта</I
+></TT
+> |
+  SCHEMA <TT
+CLASS="REPLACEABLE"
+><I
+>имя_объекта</I
+></TT
+> |
+  SEQUENCE <TT
+CLASS="REPLACEABLE"
+><I
+>имя_объекта</I
+></TT
+> |
+  TABLESPACE <TT
+CLASS="REPLACEABLE"
+><I
+>имя_объекта</I
+></TT
+> |
+  TYPE <TT
+CLASS="REPLACEABLE"
+><I
+>имя_объекта</I
+></TT
+> |
+  VIEW <TT
+CLASS="REPLACEABLE"
+><I
+>имя_объекта</I
+></TT
+>
+} IS '<TT
+CLASS="REPLACEABLE"
+><I
+>метка</I
+></TT
+>'
+
+<SPAN
+CLASS="phrase"
+><SPAN
+CLASS="PHRASE"
+>Здесь <TT
+CLASS="REPLACEABLE"
+><I
+>сигнатура_агр_функции</I
+></TT
+>:</SPAN
+></SPAN
+>
+
+* |
+[ <TT
+CLASS="REPLACEABLE"
+><I
+>режим_аргумента</I
+></TT
+> ] [ <TT
+CLASS="REPLACEABLE"
+><I
+>имя_аргумента</I
+></TT
+> ] <TT
+CLASS="REPLACEABLE"
+><I
+>тип_аргумента</I
+></TT
+> [ , ... ] |
+[ [ <TT
+CLASS="REPLACEABLE"
+><I
+>режим_аргумента</I
+></TT
+> ] [ <TT
+CLASS="REPLACEABLE"
+><I
+>имя_аргумента</I
+></TT
+> ] <TT
+CLASS="REPLACEABLE"
+><I
+>тип_аргумента</I
+></TT
+> [ , ... ] ] ORDER BY [ <TT
+CLASS="REPLACEABLE"
+><I
+>режим_аргумента</I
+></TT
+> ] [ <TT
+CLASS="REPLACEABLE"
+><I
+>имя_аргумента</I
+></TT
+> ] <TT
+CLASS="REPLACEABLE"
+><I
+>тип_аргумента</I
+></TT
+> [ , ... ]</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN82990"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>SECURITY LABEL</TT
+> применяет метку безопасности к объекту базы данных. С определённым объектом может быть связано произвольное количество меток безопасности, по одной для каждого провайдера. Провайдеры меток представляют собой загружаемые модули, которые регистрирует себя, вызывая функцию <CODE
+CLASS="FUNCTION"
+>register_label_provider</CODE
+>.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+><CODE
+CLASS="FUNCTION"
+>register_label_provider</CODE
+> ­­­— это не SQL-функция; её можно вызывать только из скомпилированного кода C, загруженного сервером.</P
+></BLOCKQUOTE
+></DIV
+><P
+>Провайдер меток определяет, допустима ли заданная метка и разрешено ли применять эту метку к указанному объекту. Какой смысл вкладывается в данную метку, так же определяет провайдер меток. <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> не накладывает никаких ограничений на то, как провайдер должен интерпретировать метки безопасности; он просто обеспечивает механизм их хранения. На практике, этот механизм реализован для того, чтобы в базы данных можно было интегрировать системы мандатного управления доступом (MAC) на базе меток, такие как <SPAN
+CLASS="PRODUCTNAME"
+>SE-Linux</SPAN
+>. Такие системы принимают все решения по ограничению доступа, учитывая метки объектов, а не традиционные сущности избирательного управления доступом (DAC), такие как пользователи и группы.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN83001"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_объекта</I
+></TT
+><BR><TT
+CLASS="REPLACEABLE"
+><I
+>имя_таблицы.имя_колонки</I
+></TT
+><BR><TT
+CLASS="REPLACEABLE"
+><I
+>имя_агрегатной_функции</I
+></TT
+><BR><TT
+CLASS="REPLACEABLE"
+><I
+>имя_функции</I
+></TT
+></DT
+><DD
+><P
+>Имя помечаемого объекта. Имена таблиц, агрегатных и обычных функций, доменов, сторонних таблиц, последовательностей и представлений можно дополнить именем схемы.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>провайдер</I
+></TT
+></DT
+><DD
+><P
+>Имя провайдера, с которым будет связана эта метка. Указанный провайдер должен быть загружен и готов выполнять операцию размечивания. Если загружен всего один провайдер, его имя можно опустить для краткости.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>режим_аргумента</I
+></TT
+></DT
+><DD
+><P
+>Режим аргумента обычной или агрегатной функции: <TT
+CLASS="LITERAL"
+>IN</TT
+>, <TT
+CLASS="LITERAL"
+>OUT</TT
+>, <TT
+CLASS="LITERAL"
+>INOUT</TT
+> или <TT
+CLASS="LITERAL"
+>VARIADIC</TT
+>. По умолчанию подразумевается <TT
+CLASS="LITERAL"
+>IN</TT
+>. Заметьте, что <TT
+CLASS="COMMAND"
+>SECURITY LABEL</TT
+> на самом деле не учитывает аргументы <TT
+CLASS="LITERAL"
+>OUT</TT
+>, так как для идентификации функции нужны только типы входных аргументов. Поэтому достаточно перечислить только аргументы <TT
+CLASS="LITERAL"
+>IN</TT
+>, <TT
+CLASS="LITERAL"
+>INOUT</TT
+> и <TT
+CLASS="LITERAL"
+>VARIADIC</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_аргумента</I
+></TT
+></DT
+><DD
+><P
+>Имя аргумента обычной или агрегатной функции. Заметьте, что на самом деле <TT
+CLASS="COMMAND"
+>SECURITY LABEL</TT
+> не обращает внимание на имена аргументов, так как для однозначной идентификации функции достаточно только типов аргументов.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>тип_аргумента</I
+></TT
+></DT
+><DD
+><P
+>Тип данных аргумента обычной или агрегатной функции.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>oid_большого_объекта</I
+></TT
+></DT
+><DD
+><P
+>OID большого объекта.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>PROCEDURAL</TT
+></DT
+><DD
+><P
+>Это слово не несёт смысловой нагрузки.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>метка</I
+></TT
+></DT
+><DD
+><P
+>Новая метка безопасности, записанная в виде строковой константы, либо <TT
+CLASS="LITERAL"
+>NULL</TT
+>, если метку безопасности нужно удалить.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN83062"
+></A
+><H2
+>Примеры</H2
+><P
+>Следующий пример показывает, как можно изменить метку безопасности для таблицы. </P><PRE
+CLASS="PROGRAMLISTING"
+>SECURITY LABEL FOR selinux ON TABLE mytable IS 'system_u:object_r:sepgsql_table_t:s0';</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN83066"
+></A
+><H2
+>Совместимость</H2
+><P
+>Команда <TT
+CLASS="COMMAND"
+>SECURITY LABEL</TT
+> отсутствует в стандарте SQL.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN83070"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sepgsql.html"
+>sepgsql</A
+>, <A
+HREF="dummy-seclabel.html"
+>dummy_seclabel</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-savepoint.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-select.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>SAVEPOINT</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>SELECT</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

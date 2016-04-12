@@ -1,0 +1,197 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Индексы и правила сортировки</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Индексы"
+HREF="indexes.html"><LINK
+REL="PREVIOUS"
+TITLE="Семейства и классы операторов"
+HREF="indexes-opclass.html"><LINK
+REL="NEXT"
+TITLE="Контроль использования индексов"
+HREF="indexes-examine.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Семейства и классы операторов"
+HREF="indexes-opclass.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="indexes.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 11. Индексы</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Контроль использования индексов"
+HREF="indexes-examine.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="INDEXES-COLLATIONS"
+>11.10. Индексы и правила сортировки</A
+></H1
+><P
+>Один индекс может поддерживать только одно правило сортировки для индексируемой колонки. Поэтому при необходимости применять разные правила сортировки могут потребоваться несколько индексов.</P
+><P
+>Рассмотрим следующие операторы: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE test1c (
+    id integer,
+    content varchar COLLATE "x"
+);
+
+CREATE INDEX test1c_content_index ON test1c (content);</PRE
+><P> Этот индекс автоматически использует правило сортировки нижележащей колонки. И запрос вида </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT * FROM test1c WHERE content &gt; <TT
+CLASS="REPLACEABLE"
+><I
+>константа</I
+></TT
+>;</PRE
+><P> сможет использовать этот индекс, так как при сравнении по умолчанию будет действовать правило сортировки колонки. Однако этот индекс не поможет ускорить запросы с каким-либо другим правилом сортировки. Поэтому, если интерес представляют также и запросы вроде </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT * FROM test1c WHERE content &gt; <TT
+CLASS="REPLACEABLE"
+><I
+>константа</I
+></TT
+> COLLATE "y";</PRE
+><P> для них можно создать дополнительный индекс, поддерживающий правило сортировки <TT
+CLASS="LITERAL"
+>"y"</TT
+>, примерно так: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE INDEX test1c_content_y_index ON test1c (content COLLATE "y");</PRE
+><P></P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="indexes-opclass.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="indexes-examine.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Семейства и классы операторов</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="indexes.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Контроль использования индексов</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

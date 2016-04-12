@@ -1,0 +1,954 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Числовые типы</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Типы данных"
+HREF="datatype.html"><LINK
+REL="PREVIOUS"
+TITLE="Типы данных"
+HREF="datatype.html"><LINK
+REL="NEXT"
+TITLE="Денежные типы"
+HREF="datatype-money.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Типы данных"
+HREF="datatype.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="datatype.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 8. Типы данных</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Денежные типы"
+HREF="datatype-money.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="DATATYPE-NUMERIC"
+>8.1. Числовые типы</A
+></H1
+><P
+>Числовые типы включают двух-, четырёх- и восьмибайтные целые, четырёх- и восьмибайтные числа с плавающей точкой, а также десятичные числа с задаваемой точностью. Все эти типы перечислены в <A
+HREF="datatype-numeric.html#DATATYPE-NUMERIC-TABLE"
+>Таблице 8-2</A
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="DATATYPE-NUMERIC-TABLE"
+></A
+><P
+><B
+>Таблица 8-2. Числовые типы</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Размер</TH
+><TH
+>Описание</TH
+><TH
+>Диапазон</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>smallint</TT
+>
+                </TD
+><TD
+>2 байта</TD
+><TD
+>целое в небольшом диапазоне</TD
+><TD
+>-32768 .. +32767</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>integer</TT
+>
+                </TD
+><TD
+>4 байта</TD
+><TD
+>типичный выбор для целых чисел</TD
+><TD
+>-2147483648 .. +2147483647</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                </TD
+><TD
+>8 байт</TD
+><TD
+>целое в большом диапазоне</TD
+><TD
+>-9223372036854775808 .. 9223372036854775807</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>decimal</TT
+>
+                </TD
+><TD
+>переменный</TD
+><TD
+>вещественное число с указанной точностью</TD
+><TD
+>до 131072 цифр до десятичной точки и до 16383 &mdash; после</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>numeric</TT
+>
+                </TD
+><TD
+>переменный</TD
+><TD
+>вещественное число с указанной точностью</TD
+><TD
+>до 131072 цифр до десятичной точки и до 16383 &mdash; после</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>real</TT
+>
+                </TD
+><TD
+>4 байта</TD
+><TD
+>вещественное число с переменной точностью</TD
+><TD
+>точность в пределах 6 десятичных цифр</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>double precision</TT
+>
+                </TD
+><TD
+>8 байт</TD
+><TD
+>вещественное число с переменной точностью</TD
+><TD
+>точность в пределах 15 десятичных цифр</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>smallserial</TT
+>
+                </TD
+><TD
+>2 байта</TD
+><TD
+>небольшое целое с автоувеличением</TD
+><TD
+>1 .. 32767</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>serial</TT
+>
+                </TD
+><TD
+>4 байта</TD
+><TD
+>целое с автоувеличением</TD
+><TD
+>1 .. 2147483647</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>bigserial</TT
+>
+                </TD
+><TD
+>8 байт</TD
+><TD
+>большое целое с автоувеличением</TD
+><TD
+>1 .. 9223372036854775807</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Синтаксис констант числовых типов описан в <A
+HREF="sql-syntax-lexical.html#SQL-SYNTAX-CONSTANTS"
+>Подразделе 4.1.2</A
+>. Для этих типов определён полный набор соответствующих арифметических операторов и функций. За дополнительными сведениями обратитесь к <A
+HREF="functions.html"
+>Главе 9</A
+>. Подробнее эти типы описаны в следующих разделах.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="DATATYPE-INT"
+>8.1.1. Целочисленные типы</A
+></H2
+><P
+>Типы <TT
+CLASS="TYPE"
+>smallint</TT
+>, <TT
+CLASS="TYPE"
+>integer</TT
+> и <TT
+CLASS="TYPE"
+>bigint</TT
+> хранят целые числа, то есть числа без дробной части, имеющие разные допустимые диапазоны. Попытка сохранить значение, выходящее за рамки диапазона, приведёт к ошибке.</P
+><P
+>Чаще всего используется тип <TT
+CLASS="TYPE"
+>integer</TT
+>, как наиболее сбалансированный выбор ширины диапазона, размера и быстродействия. Тип <TT
+CLASS="TYPE"
+>smallint</TT
+> обычно применяется, только когда крайне важно уменьшить размер данных на диске. Тип <TT
+CLASS="TYPE"
+>bigint</TT
+> предназначен для тех случаев, когда числа не умещаются в диапазон типа <TT
+CLASS="TYPE"
+>integer</TT
+>.</P
+><P
+>В <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> определены только типы <TT
+CLASS="TYPE"
+>integer</TT
+> (или <TT
+CLASS="TYPE"
+>int</TT
+>), <TT
+CLASS="TYPE"
+>smallint</TT
+> и <TT
+CLASS="TYPE"
+>bigint</TT
+>. Имена типов <TT
+CLASS="TYPE"
+>int2</TT
+>, <TT
+CLASS="TYPE"
+>int4</TT
+> и <TT
+CLASS="TYPE"
+>int8</TT
+> выходят за рамки стандарта, хотя могут работать и в некоторых других СУБД.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="DATATYPE-NUMERIC-DECIMAL"
+>8.1.2. Числа с фиксированной точностью</A
+></H2
+><P
+>Тип <TT
+CLASS="TYPE"
+>numeric</TT
+> позволяет хранить числа с очень большим количеством цифр и выполнять вычисления точно. Он рекомендуется для хранения денежных сумм и других величин, где важна точность. Однако арифметические операции со значениями <TT
+CLASS="TYPE"
+>numeric</TT
+> выполняются гораздо медленнее, чем с целыми числами или с типами с плавающей точкой, описанными в следующем разделе.</P
+><P
+>Ниже мы используем следующие термины: <I
+CLASS="FIRSTTERM"
+>масштаб</I
+> значения <TT
+CLASS="TYPE"
+>numeric</TT
+> определяет количество десятичных цифр в дробной части, справа от десятичной точки, а <I
+CLASS="FIRSTTERM"
+>точность</I
+> &mdash; общее количество значимых цифр в числе, т. е. количество цифр по обе стороны десятичной точки. Например, число 23.5141 имеет точность 6 и масштаб 4. Целочисленные значения можно считать числами с масштабом 0.</P
+><P
+>Для колонки типа <TT
+CLASS="TYPE"
+>numeric</TT
+> можно настроить и максимальную точность, и максимальный масштаб. Колонка типа <TT
+CLASS="TYPE"
+>numeric</TT
+> объявляется следующим образом: </P><PRE
+CLASS="PROGRAMLISTING"
+>NUMERIC(<TT
+CLASS="REPLACEABLE"
+><I
+>точность</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>масштаб</I
+></TT
+>)</PRE
+><P> Точность должна быть положительной, а масштаб положительным или равным нулю. Альтернативный вариант </P><PRE
+CLASS="PROGRAMLISTING"
+>NUMERIC(<TT
+CLASS="REPLACEABLE"
+><I
+>точность</I
+></TT
+>)</PRE
+><P> устанавливает масштаб 0. Форма: </P><PRE
+CLASS="PROGRAMLISTING"
+>NUMERIC</PRE
+><P> без указания точности и масштаба создаёт колонку, в которой можно сохранять числовые значения любой точности и масштаба в пределах, поддерживаемых системой. В колонке этого типа входные значения не будут приводиться к какому-либо масштабу, тогда как в колонках <TT
+CLASS="TYPE"
+>numeric</TT
+> с явно заданным масштабом значения подгоняются под этот масштаб. (Стандарт <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> утверждает, что по умолчанию должен устанавливаться масштаб 0, т. е. значения должны приводиться к целым числам. Однако мы считаем это не очень полезным. Если для вас важна переносимость, всегда указывайте точность и масштаб явно.)</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Максимально допустимая точность, которую можно указать в объявлении типа, равна 1000; если же использовать <TT
+CLASS="TYPE"
+>NUMERIC</TT
+> без указания точности, действуют ограничения, описанные в <A
+HREF="datatype-numeric.html#DATATYPE-NUMERIC-TABLE"
+>Таблице 8-2</A
+>.</P
+></BLOCKQUOTE
+></DIV
+><P
+>Если масштаб значения, которое нужно сохранить, превышает объявленный масштаб колонки, система округлит его до заданного количества цифр после точки. Если же после этого количество цифр слева в сумме с масштабом превысит объявленную точность, произойдёт ошибка.</P
+><P
+>Числовые значения физически хранятся без каких-либо дополняющих нулей слева или справа. Таким образом, объявляемые точность и масштаб колонки определяют максимальный, а не фиксированный размер хранения. (В этом смысле тип <TT
+CLASS="TYPE"
+>numeric</TT
+> больше похож на тип <TT
+CLASS="TYPE"
+>varchar(<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>)</TT
+>, чем на <TT
+CLASS="TYPE"
+>char(<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>)</TT
+>.) Действительный размер хранения такого значения складывается из двух байт для каждой группы из четырёх цифр и дополнительных трёх-восьми байт.</P
+><P
+>Помимо обычных чисел тип <TT
+CLASS="TYPE"
+>numeric</TT
+> позволяет сохранить специальное значение <TT
+CLASS="LITERAL"
+>NaN</TT
+>, что означает <SPAN
+CLASS="QUOTE"
+>"not-a-number"</SPAN
+> (не число). Любая операция c <TT
+CLASS="LITERAL"
+>NaN</TT
+> выдаёт в результате тоже <TT
+CLASS="LITERAL"
+>NaN</TT
+>. Записывая это значение в виде константы в команде SQL, его нужно заключать в апострофы, например так: <TT
+CLASS="LITERAL"
+>UPDATE table SET x = 'NaN'</TT
+>. Регистр символов в строке <TT
+CLASS="LITERAL"
+>NaN</TT
+> не важен.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>В большинстве реализаций <SPAN
+CLASS="QUOTE"
+>"не-число"</SPAN
+> (<TT
+CLASS="LITERAL"
+>NaN</TT
+>) считается не равным любому другому значению (в том числе и самому <TT
+CLASS="LITERAL"
+>NaN</TT
+>). Чтобы значения <TT
+CLASS="TYPE"
+>numeric</TT
+> можно было сортировать и использовать в древовидных индексах, <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> считает, что значения <TT
+CLASS="LITERAL"
+>NaN</TT
+> равны друг другу и при этом больше любых числовых значений (не <TT
+CLASS="LITERAL"
+>NaN</TT
+>).</P
+></BLOCKQUOTE
+></DIV
+><P
+>Типы <TT
+CLASS="TYPE"
+>decimal</TT
+> и <TT
+CLASS="TYPE"
+>numeric</TT
+> равнозначны. Оба эти типа описаны в стандарте <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="DATATYPE-FLOAT"
+>8.1.3. Типы с плавающей точкой</A
+></H2
+><P
+>Типы данных <TT
+CLASS="TYPE"
+>real</TT
+> и <TT
+CLASS="TYPE"
+>double precision</TT
+> хранят приближённые числовые значения с переменной точностью. На практике эти типы обычно реализуют Стандарт <ACRONYM
+CLASS="ACRONYM"
+>IEEE</ACRONYM
+> 754 для двоичной арифметики с плавающей точкой (с одинарной и двойной точностью соответственно), в той мере, в какой его поддерживают процессор, операционная система и компилятор.</P
+><P
+>Неточность здесь выражается в том, что некоторые значения, которые нельзя преобразовать во внутренний формат, сохраняются приближённо, так что полученное значение может несколько отличаться от записанного. Управление подобными ошибками и их распространение в процессе вычислений является предметом изучения целого раздела математики и компьютерной науки, и здесь не рассматривается. Мы отметим только следующее: <P
+></P
+></P><UL
+><LI
+><P
+>Если вам нужна точность при хранении и вычислениях (например, для денежных сумм), используйте вместо этого тип <TT
+CLASS="TYPE"
+>numeric</TT
+>.</P
+></LI
+><LI
+><P
+>Если вы хотите выполнять с этими типами сложные вычисления, имеющие большую важность, тщательно изучите реализацию операций в вашей среде и особенно поведение в крайних случаях (бесконечность, антипереполнение).</P
+></LI
+><LI
+><P
+>Проверка равенства двух чисел с плавающей точкой может не всегда давать ожидаемый результат.</P
+></LI
+></UL
+><P></P
+><P
+>На большинстве платформ тип <TT
+CLASS="TYPE"
+>real</TT
+> может сохранить значения в пределах от 1E-37 до 1E+37 с точностью не меньше 6 десятичных цифр. Тип <TT
+CLASS="TYPE"
+>double precision</TT
+> предлагает диапазон значений от 1E-307 до 1E+308 и точностью не меньше 15 цифр. Попытка сохранить слишком большие или слишком маленькие значения приведёт к ошибке. Если точность вводимого числа слишком велика, оно будет округлено. При попытке сохранить число, близкое к 0, но непредставимое как отличное от 0, произойдёт ошибка антипереполнения.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Параметр <A
+HREF="runtime-config-client.html#GUC-EXTRA-FLOAT-DIGITS"
+>extra_float_digits</A
+> определяет количество дополнительных значащих цифр при преобразовании значения с плавающей точкой в текст для вывода. Со значением по умолчанию (<TT
+CLASS="LITERAL"
+>0</TT
+>) вывод будет одинаковым на всех платформах, поддерживаемых PostgreSQL. При его увеличении выводимое значение числа будет более точно представлять хранимое, но от этого может пострадать переносимость.</P
+></BLOCKQUOTE
+></DIV
+><P
+>В дополнение к обычным числовым значениям типы с плавающей точкой могут содержать следующие специальные значения: <P
+CLASS="LITERALLAYOUT"
+><TT
+CLASS="LITERAL"
+>Infinity</TT
+><br>
+<TT
+CLASS="LITERAL"
+>-Infinity</TT
+><br>
+<TT
+CLASS="LITERAL"
+>NaN</TT
+></P
+> Они представляют особые значения, описанные в IEEE 754, соответственно: <SPAN
+CLASS="QUOTE"
+>"бесконечность"</SPAN
+>, <SPAN
+CLASS="QUOTE"
+>"минус бесконечность"</SPAN
+> и <SPAN
+CLASS="QUOTE"
+>"не число"</SPAN
+>. (Но компьютерах, где арифметика с плавающей точкой не соответствует стандарту IEEE 754, эти значения, вероятно, не будут работать должным образом.) Записывая эти значения в виде констант в команде SQL, их нужно заключать в апострофы, например так: <TT
+CLASS="LITERAL"
+>UPDATE table SET x = 'Infinity'</TT
+>. Регистр символов в этих строках не важен.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Согласно IEEE754, <TT
+CLASS="LITERAL"
+>NaN</TT
+> не должно считаться равным любому другому значению с плавающей точкой (в том числе и самому <TT
+CLASS="LITERAL"
+>NaN</TT
+>). Чтобы значения с плавающей точкой можно было сортировать и использовать в древовидных индексах, <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> считает, что значения <TT
+CLASS="LITERAL"
+>NaN</TT
+> равны друг другу, и при этом больше любых числовых значений (не <TT
+CLASS="LITERAL"
+>NaN</TT
+>).</P
+></BLOCKQUOTE
+></DIV
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> также поддерживает форматы <TT
+CLASS="TYPE"
+>float</TT
+> и <TT
+CLASS="TYPE"
+>float(<TT
+CLASS="REPLACEABLE"
+><I
+>p</I
+></TT
+>)</TT
+>, оговорённые в стандарте SQL, для указания неточных числовых типов. Здесь <TT
+CLASS="REPLACEABLE"
+><I
+>p</I
+></TT
+> определяет минимально допустимую точность в <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>двоичных</I
+></SPAN
+> цифрах. <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> воспринимает запись от <TT
+CLASS="TYPE"
+>float(1)</TT
+> до <TT
+CLASS="TYPE"
+>float(24)</TT
+> как выбор типа <TT
+CLASS="TYPE"
+>real</TT
+>, а запись от <TT
+CLASS="TYPE"
+>float(25)</TT
+> до <TT
+CLASS="TYPE"
+>float(53)</TT
+> как выбор типа <TT
+CLASS="TYPE"
+>double precision</TT
+>. Значения <TT
+CLASS="REPLACEABLE"
+><I
+>p</I
+></TT
+> вне допустимого диапазона вызывают ошибку. Если <TT
+CLASS="TYPE"
+>float</TT
+> указывается без точности, подразумевается тип <TT
+CLASS="TYPE"
+>double precision</TT
+>.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Предположение, что типы <TT
+CLASS="TYPE"
+>real</TT
+> и <TT
+CLASS="TYPE"
+>double precision</TT
+> имеют в мантиссе 24 и 53 бита соответственно, справедливо для всех реализаций плавающей точки по стандарту IEEE. На платформах, не поддерживающих IEEE, размер мантиссы может несколько отличаться, но для простоты диапазоны <TT
+CLASS="REPLACEABLE"
+><I
+>p</I
+></TT
+> везде считаются одинаковыми.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="DATATYPE-SERIAL"
+>8.1.4. Последовательные типы</A
+></H2
+><P
+>Типы данных <TT
+CLASS="TYPE"
+>smallserial</TT
+>, <TT
+CLASS="TYPE"
+>serial</TT
+> и <TT
+CLASS="TYPE"
+>bigserial</TT
+> не являются настоящими типами, а представляют собой просто удобное средство для создания колонок с уникальными идентификаторами (подобное свойству <TT
+CLASS="LITERAL"
+>AUTO_INCREMENT</TT
+> в некоторых СУБД). В текущей реализации запись: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE <TT
+CLASS="REPLACEABLE"
+><I
+>имя_таблицы</I
+></TT
+> (
+    <TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+> SERIAL
+);</PRE
+><P> равнозначна следующим командам: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE SEQUENCE <TT
+CLASS="REPLACEABLE"
+><I
+>имя_таблицы</I
+></TT
+>_<TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+>_seq;
+CREATE TABLE <TT
+CLASS="REPLACEABLE"
+><I
+>имя_таблицы</I
+></TT
+> (
+    <TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+> integer NOT NULL DEFAULT nextval('<TT
+CLASS="REPLACEABLE"
+><I
+>имя_таблицы</I
+></TT
+>_<TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+>_seq')
+);
+ALTER SEQUENCE <TT
+CLASS="REPLACEABLE"
+><I
+>имя_таблицы</I
+></TT
+>_<TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+>_seq OWNED BY <TT
+CLASS="REPLACEABLE"
+><I
+>имя_таблицы</I
+></TT
+>.<TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+>;</PRE
+><P> То есть при определении такого типа создаётся целочисленная колонка со значением по умолчанию, извлекаемым из генератора последовательности. Чтобы в колонку нельзя было вставить NULL, в её определение добавляется ограничение <TT
+CLASS="LITERAL"
+>NOT NULL</TT
+>. (Во многих случаях также имеет смысл добавить для этой колонки ограничения <TT
+CLASS="LITERAL"
+>UNIQUE</TT
+> или <TT
+CLASS="LITERAL"
+>PRIMARY KEY</TT
+> для защиты от ошибочного добавления дублирующихся значений, но автоматически это не происходит.) Последняя команда определяет, что последовательность <SPAN
+CLASS="QUOTE"
+>"принадлежит"</SPAN
+> колонке, так что она будет удалена при удалении колонки или таблицы.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Так как типы <TT
+CLASS="TYPE"
+>smallserial</TT
+>, <TT
+CLASS="TYPE"
+>serial</TT
+> и <TT
+CLASS="TYPE"
+>bigserial</TT
+> реализованы через последовательности, в числовом ряду значений колонки могут образовываться пропуски (или "дыры"), даже если никакие строки не удалялись. Значение, выделенное из последовательности, считается "задействованным", даже если строку с этим значением не удалось вставить в таблицу. Это может произойти, например, при откате транзакции, добавляющей данные. См. описание <TT
+CLASS="LITERAL"
+>nextval()</TT
+> в <A
+HREF="functions-sequence.html"
+>Разделе 9.16</A
+>.</P
+></BLOCKQUOTE
+></DIV
+><P
+>Чтобы вставить в колонку <TT
+CLASS="TYPE"
+>serial</TT
+> следующее значение последовательности, ей нужно присвоить значение по умолчанию. Это можно сделать, либо исключив её из списка колонок в операторе <TT
+CLASS="COMMAND"
+>INSERT</TT
+>, либо с помощью ключевого слова <TT
+CLASS="LITERAL"
+>DEFAULT</TT
+>.</P
+><P
+>Имена типов <TT
+CLASS="TYPE"
+>serial</TT
+> и <TT
+CLASS="TYPE"
+>serial4</TT
+> равнозначны: они создают колонки <TT
+CLASS="TYPE"
+>integer</TT
+>. Так же являются синонимами имена <TT
+CLASS="TYPE"
+>bigserial</TT
+> и <TT
+CLASS="TYPE"
+>serial8</TT
+>, но они создают колонки <TT
+CLASS="TYPE"
+>bigint</TT
+>. Тип <TT
+CLASS="TYPE"
+>bigserial</TT
+> следует использовать, если за всё время жизни таблицы планируется использовать больше чем 2<SUP
+>31</SUP
+> значений. И наконец, синонимами являются имена типов <TT
+CLASS="TYPE"
+>smallserial</TT
+> и <TT
+CLASS="TYPE"
+>serial2</TT
+>, но они создают колонку <TT
+CLASS="TYPE"
+>smallint</TT
+>.</P
+><P
+>Последовательность, созданная для колонки <TT
+CLASS="TYPE"
+>serial</TT
+>, автоматически удаляется при удалении связанной колонки. Последовательность можно удалить и отдельно от колонки, но при этом также будет удалено определение значения по умолчанию.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="datatype.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="datatype-money.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Типы данных</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="datatype.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Денежные типы</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

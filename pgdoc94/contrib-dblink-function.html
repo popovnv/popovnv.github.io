@@ -1,0 +1,411 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>dblink</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="dblink"
+HREF="dblink.html"><LINK
+REL="PREVIOUS"
+TITLE="dblink_disconnect"
+HREF="contrib-dblink-disconnect.html"><LINK
+REL="NEXT"
+TITLE="dblink_exec"
+HREF="contrib-dblink-exec.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="dblink_disconnect"
+HREF="contrib-dblink-disconnect.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="dblink.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="dblink_exec"
+HREF="contrib-dblink-exec.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="CONTRIB-DBLINK-FUNCTION"
+></A
+>dblink</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN119630"
+></A
+><H2
+>Название</H2
+>dblink&nbsp;--&nbsp;выполняет запрос в удалённой базе данных</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN119633"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>dblink(text connname, text sql [, bool fail_on_error]) returns setof record
+dblink(text connstr, text sql [, bool fail_on_error]) returns setof record
+dblink(text sql [, bool fail_on_error]) returns setof record</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN119635"
+></A
+><H2
+>Описание</H2
+><P
+><CODE
+CLASS="FUNCTION"
+>dblink</CODE
+> выполняет запрос (обычно <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, но это может быть и любой другой оператор SQL, возвращающий строки) в удалённой базе данных.</P
+><P
+>Когда этой функции передаются два аргумента типа <TT
+CLASS="TYPE"
+>text</TT
+>, первый сначала рассматривается как имя постоянного подключения; если такое подключение находится, команда выполняется для него. Если не находится, первый аргумент воспринимается как строка подключения, как для функции <CODE
+CLASS="FUNCTION"
+>dblink_connect</CODE
+>, и заданное подключение устанавливается только на время выполнения этой команды.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN119643"
+></A
+><H2
+>Аргументы</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="PARAMETER"
+>conname</TT
+></DT
+><DD
+><P
+>Имя используемого подключения; опустите этот параметр, чтобы использовать безымянное подключение.</P
+></DD
+><DT
+><TT
+CLASS="PARAMETER"
+>connstr</TT
+></DT
+><DD
+><P
+>Строка подключения, описанная ранее для <CODE
+CLASS="FUNCTION"
+>dblink_connect</CODE
+></P
+></DD
+><DT
+><TT
+CLASS="PARAMETER"
+>sql</TT
+></DT
+><DD
+><P
+>SQL-запрос, который вы хотите выполнить в удалённой базе данных, например <TT
+CLASS="LITERAL"
+>select * from foo</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="PARAMETER"
+>fail_on_error</TT
+></DT
+><DD
+><P
+>Если равен true (это значение по умолчанию), в случае ошибки, выданной на удалённой стороне соединения, ошибка также выдаётся локально. Если равен false, удалённая ошибка выдаётся локально как ЗАМЕЧАНИЕ, и функция не возвращает строки.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN119668"
+></A
+><H2
+>Возвращаемое значение</H2
+><P
+>Эта функция возвращает строки, выдаваемые в результате запроса. Так как <CODE
+CLASS="FUNCTION"
+>dblink</CODE
+> может выполнять произвольные запросы, она объявлена как возвращающая тип <TT
+CLASS="TYPE"
+>record</TT
+>, а не некоторый определённый набор колонок. Это означает, что вы должны указать ожидаемый набор колонок в вызывающем запросе &mdash; в противном случае <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> не будет знать, чего ожидать. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT *
+    FROM dblink('dbname=mydb', 'select proname, prosrc from pg_proc')
+      AS t1(proname name, prosrc text)
+    WHERE proname LIKE 'bytea%';</PRE
+><P> В части <SPAN
+CLASS="QUOTE"
+>"псевдонима"</SPAN
+> предложения <TT
+CLASS="LITERAL"
+>FROM</TT
+> должны указываться имена колонок и типы, которые будет возвращать функция. (Указание имён колонок в псевдониме таблицы предусмотрено стандартом SQL, но определение типов колонок является расширением <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.) Это позволяет системе понять, во что должно разворачиваться обозначение <TT
+CLASS="LITERAL"
+>*</TT
+>, и на что ссылается <TT
+CLASS="STRUCTNAME"
+>proname</TT
+> в предложении <TT
+CLASS="LITERAL"
+>WHERE</TT
+>, прежде чем пытаться выполнять эту функцию. Во время выполнения произойдёт ошибка, если действительный результат запроса из удалённой базы данных не будет содержать столько колонок, сколько указано в предложении <TT
+CLASS="LITERAL"
+>FROM</TT
+>. Однако имена колонок могут не совпадать, так же, как <CODE
+CLASS="FUNCTION"
+>dblink</CODE
+> не настаивает на точном совпадении типов. Функция завершится успешно, если возвращаемые строки данных будут допустимыми для ввода в тип колонки, объявленный в предложении <TT
+CLASS="LITERAL"
+>FROM</TT
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN119684"
+></A
+><H2
+>Замечания</H2
+><P
+>Использовать <CODE
+CLASS="FUNCTION"
+>dblink</CODE
+> с предопределёнными запросами будет удобнее, если создать представление. Это позволит скрыть в его определении информацию о типах колонок и не выписывать её в каждом запросе. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE VIEW myremote_pg_proc AS
+  SELECT *
+    FROM dblink('dbname=postgres', 'select proname, prosrc from pg_proc')
+    AS t1(proname name, prosrc text);
+
+SELECT * FROM myremote_pg_proc WHERE proname LIKE 'bytea%';</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN119689"
+></A
+><H2
+>Примеры</H2
+><PRE
+CLASS="SCREEN"
+>SELECT * FROM dblink('dbname=postgres', 'select proname, prosrc from pg_proc')
+  AS t1(proname name, prosrc text) WHERE proname LIKE 'bytea%';
+  proname   |   prosrc
+------------+------------
+ byteacat   | byteacat
+ byteaeq    | byteaeq
+ bytealt    | bytealt
+ byteale    | byteale
+ byteagt    | byteagt
+ byteage    | byteage
+ byteane    | byteane
+ byteacmp   | byteacmp
+ bytealike  | bytealike
+ byteanlike | byteanlike
+ byteain    | byteain
+ byteaout   | byteaout
+(12 rows)
+
+SELECT dblink_connect('dbname=postgres');
+ dblink_connect
+----------------
+ OK
+(1 row)
+
+SELECT * FROM dblink('select proname, prosrc from pg_proc')
+  AS t1(proname name, prosrc text) WHERE proname LIKE 'bytea%';
+  proname   |   prosrc
+------------+------------
+ byteacat   | byteacat
+ byteaeq    | byteaeq
+ bytealt    | bytealt
+ byteale    | byteale
+ byteagt    | byteagt
+ byteage    | byteage
+ byteane    | byteane
+ byteacmp   | byteacmp
+ bytealike  | bytealike
+ byteanlike | byteanlike
+ byteain    | byteain
+ byteaout   | byteaout
+(12 rows)
+
+SELECT dblink_connect('myconn', 'dbname=regression');
+ dblink_connect
+----------------
+ OK
+(1 row)
+
+SELECT * FROM dblink('myconn', 'select proname, prosrc from pg_proc')
+  AS t1(proname name, prosrc text) WHERE proname LIKE 'bytea%';
+  proname   |   prosrc
+------------+------------
+ bytearecv  | bytearecv
+ byteasend  | byteasend
+ byteale    | byteale
+ byteagt    | byteagt
+ byteage    | byteage
+ byteane    | byteane
+ byteacmp   | byteacmp
+ bytealike  | bytealike
+ byteanlike | byteanlike
+ byteacat   | byteacat
+ byteaeq    | byteaeq
+ bytealt    | bytealt
+ byteain    | byteain
+ byteaout   | byteaout
+(14 rows)</PRE
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="contrib-dblink-disconnect.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="contrib-dblink-exec.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>dblink_disconnect</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="dblink.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>dblink_exec</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

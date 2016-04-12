@@ -1,0 +1,1287 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Методы аутентификации</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Аутентификация клиентского приложения"
+HREF="client-authentication.html"><LINK
+REL="PREVIOUS"
+TITLE="Файл сопоставления имён пользователей"
+HREF="auth-username-maps.html"><LINK
+REL="NEXT"
+TITLE="Проблемы аутентификации"
+HREF="client-authentication-problems.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Файл сопоставления имён пользователей"
+HREF="auth-username-maps.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="client-authentication.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 19. Аутентификация клиентского приложения</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Проблемы аутентификации"
+HREF="client-authentication-problems.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AUTH-METHODS"
+>19.3. Методы аутентификации</A
+></H1
+><P
+>Следующие подразделы содержат более детальную информацию о методах аутентификации.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AUTH-TRUST"
+>19.3.1. Метод аутентификации trust</A
+></H2
+><P
+>Когда указан способ аутентификации <TT
+CLASS="LITERAL"
+>trust</TT
+>, <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> предполагает, что любой подключающийся к серверу авторизован для доступа к базе данных вне зависимости от указанного имени пользователя базы данных (даже если это имя суперпользователя). Конечно, ограничения, прописанные в колонках <TT
+CLASS="LITERAL"
+>database</TT
+> и <TT
+CLASS="LITERAL"
+>user</TT
+> продолжают работать. Этот метод должен применяться только в том случае, когда на уровне операционной системы обеспечена адекватная защита от подключений к серверу.</P
+><P
+>Аутентификация <TT
+CLASS="LITERAL"
+>trust</TT
+> очень удобна для локальных подключений на однопользовательской рабочей станции. Но сам по себе этот метод обычно <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>не</I
+></SPAN
+> подходит для машин с несколькими пользователями. Однако вы можете использовать <TT
+CLASS="LITERAL"
+>trust</TT
+> даже на многопользовательской машине, если ограничите доступ к файлу Unix-сокета сервера, используя систему разрешения файлов. Для этого установите конфигурационные параметры <TT
+CLASS="VARNAME"
+>unix_socket_permissions</TT
+> (и, возможно, <TT
+CLASS="VARNAME"
+>unix_socket_group</TT
+>) как описано в <A
+HREF="runtime-config-connection.html"
+>Разделе 18.3</A
+>. Вы также можете установить конфигурационные параметры <TT
+CLASS="VARNAME"
+>unix_socket_directories</TT
+>, чтобы поместить файл сокета в подходящим образом защищённый каталог.</P
+><P
+>Установка разрешений у файловой системы помогает только в случае подключений через Unix-сокеты. Локальные соединения по TCP/IP не ограничены разрешениями файловой системы. Поэтому, если вы хотите использовать разрешения файловой системы для обеспечения локальной безопасности, уберите строку <TT
+CLASS="LITERAL"
+>host ... 127.0.0.1 ...</TT
+> из <TT
+CLASS="FILENAME"
+>pg_hba.conf</TT
+> или смените метод аутентификации.</P
+><P
+>Метод аутентификации <TT
+CLASS="LITERAL"
+>trust</TT
+> для подключений по TCP/IP допустим только в случае, если вы доверяете каждому пользователю компьютера, получившему разрешение на подключение к серверу строками файла <TT
+CLASS="FILENAME"
+>pg_hba.conf</TT
+>, указывающими метод <TT
+CLASS="LITERAL"
+>trust</TT
+>. Не стоит использовать <TT
+CLASS="LITERAL"
+>trust</TT
+> для любых подключений по TCP/IP, отличных от <SPAN
+CLASS="SYSTEMITEM"
+>localhost</SPAN
+> (127.0.0.1).</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AUTH-PASSWORD"
+>19.3.2. Метод аутентификации password</A
+></H2
+><P
+>Методы аутентификации с помощью пароля это <TT
+CLASS="LITERAL"
+>md5</TT
+> и <TT
+CLASS="LITERAL"
+>password</TT
+>. Эти методы работает сходным образом, за исключением пути, по которому отсылается пароль во время подключения, а именно, хешируется через MD5 или обрабатывается как простой текст.</P
+><P
+>Если вас беспокоит возможность перехвата трафика, предпочтительнее использовать метод <TT
+CLASS="LITERAL"
+>md5</TT
+>. Простого метода <TT
+CLASS="LITERAL"
+>password</TT
+> следует избегать всегда, если возможно. Однако, <TT
+CLASS="LITERAL"
+>md5</TT
+> не может быть использован с параметром <A
+HREF="runtime-config-connection.html#GUC-DB-USER-NAMESPACE"
+>db_user_namespace</A
+>. Если подключение зашифровано по SSL, тогда <TT
+CLASS="LITERAL"
+>password</TT
+> тоже может быть использован без опасений (хотя аутентификация через SSL сертификат будет наилучшим выбором для тех, кто зависит от использования SSL).</P
+><P
+>База данных паролей <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> отделена от паролей пользователей операционной системы. Пароль для каждого пользователя базы данных хранится в системном каталоге <TT
+CLASS="LITERAL"
+>pg_authid</TT
+>. Работать с паролями можно через команды SQL <A
+HREF="sql-createuser.html"
+>CREATE USER</A
+> и <A
+HREF="sql-alterrole.html"
+>ALTER ROLE</A
+>, например, <KBD
+CLASS="USERINPUT"
+>CREATE USER foo WITH PASSWORD 'secret'</KBD
+>. Если для пользователя не было установлено пароля, пароль сохраняется как null, и аутентификация через пароль для данного пользователя будет невозможна.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="GSSAPI-AUTH"
+>19.3.3. Аутентификация GSSAPI</A
+></H2
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>GSSAPI</SPAN
+> является протоколом отраслевого стандарта для безопасной авторизации, определённым в RFC 2743. <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> поддерживает <SPAN
+CLASS="PRODUCTNAME"
+>GSSAPI</SPAN
+> с <SPAN
+CLASS="PRODUCTNAME"
+>Kerberos</SPAN
+> аутентификацией с соответствии с RFC 1964. <SPAN
+CLASS="PRODUCTNAME"
+>GSSAPI</SPAN
+> обеспечивает автоматическую аутентификацию (single sign-on), для систем, которые её поддерживают. Сама по себе аутентификация безопасна, но данные, отсылаемые в ходе подключения к базе данных, не защищены, если не используется <ACRONYM
+CLASS="ACRONYM"
+>SSL</ACRONYM
+>.</P
+><P
+>Поддержка GSSAPI должна быть включена при сборке <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>; за дополнительными сведениями обратитесь к <A
+HREF="installation.html"
+>Главе 15</A
+>.</P
+><P
+>При работе с <SPAN
+CLASS="PRODUCTNAME"
+>Kerberos</SPAN
+> <SPAN
+CLASS="PRODUCTNAME"
+>GSSAPI</SPAN
+> использует стандартные учётные записи в формате <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>servicename</I
+></TT
+>/<TT
+CLASS="REPLACEABLE"
+><I
+>hostname</I
+></TT
+>@<TT
+CLASS="REPLACEABLE"
+><I
+>realm</I
+></TT
+></TT
+>. Сервер PostgreSQL примет любого принципала, включённого в используемый сервером файл таблицы ключей, но необходимо проявить осторожность в указании корректных деталей принципала в ходе соединения с клиентом, применяющим параметр подключения <TT
+CLASS="LITERAL"
+>krbsrvname</TT
+>. (См. также <A
+HREF="libpq-connect.html#LIBPQ-PARAMKEYWORDS"
+>Подраздел 31.1.2</A
+>.) Значение имени сервиса по умолчанию <TT
+CLASS="LITERAL"
+>postgres</TT
+> может быть изменено во время сборки с помощью <TT
+CLASS="LITERAL"
+>./configure --with-krb-srvnam=</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>whatever</I
+></TT
+>. В большинстве сред изменять данный параметр не требуется. Однако некоторые реализации Kerberos могут потребовать иного имени сервиса, например, Microsoft Active Directory требует, чтобы имя сервиса было набрано заглавными буквами (<TT
+CLASS="LITERAL"
+>POSTGRES</TT
+>).</P
+><P
+><TT
+CLASS="REPLACEABLE"
+><I
+>hostname</I
+></TT
+> здесь — это полное доменное имя компьютера, где работает сервер. Областью субъекта-службы является предпочитаемая область данного компьютера.</P
+><P
+>Клиентские принципалы в качестве первого компонента должны иметь свои имена пользователей базы данных <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, например, <TT
+CLASS="LITERAL"
+>pgusername@realm</TT
+>. В качестве альтернативы вы можете использовать файл сопоставления имени пользователя, чтобы соотнести первый компонент имени принципала с именем пользователя базы данных. По умолчанию, область клиента не проверяется <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Если у вас включена межобластная аутентификация и вам необходимо проверить область, используйте параметр <TT
+CLASS="LITERAL"
+>krb_realm</TT
+>, или подключите <TT
+CLASS="LITERAL"
+>include_realm</TT
+>, и используйте сопоставление имён пользователя для проверки области.</P
+><P
+>Убедитесь, что таблица ключей вашего сервера доступна для чтения учётной записи сервера <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> (и желательно, только им). (См. также <A
+HREF="postgres-user.html"
+>Раздел 17.1</A
+>.) Расположение таблицы ключей указывается параметром <A
+HREF="runtime-config-connection.html#GUC-KRB-SERVER-KEYFILE"
+>krb_server_keyfile</A
+>. По умолчанию это <TT
+CLASS="FILENAME"
+>/usr/local/pgsql/etc/krb5.keytab</TT
+> (или любой другой каталог, указанный при сборке как <TT
+CLASS="VARNAME"
+>sysconfdir</TT
+>). Из соображений безопасности рекомендуется использовать отдельную таблицу ключей исключительно для нужд сервера <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, а не открывать доступ к системному файлу таблицы ключей.</P
+><P
+>Файл таблицы ключей генерируется программным обеспечением Kerberos; подробнее это описано в документации Kerberos. Следующий пример для MIT-совместимых реализаций Kerberos 5: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>kadmin% </SAMP
+><KBD
+CLASS="USERINPUT"
+>ank -randkey postgres/server.my.domain.org</KBD
+>
+<SAMP
+CLASS="PROMPT"
+>kadmin% </SAMP
+><KBD
+CLASS="USERINPUT"
+>ktadd -k krb5.keytab postgres/server.my.domain.org</KBD
+></PRE
+><P></P
+><P
+>При подключении к базе данных убедитесь, что у вас есть разрешение на сопоставление принципала с именем пользователя базы данных. Например, для имени пользователя базы данных <TT
+CLASS="LITERAL"
+>fred</TT
+>, принципал <TT
+CLASS="LITERAL"
+>fred@EXAMPLE.COM</TT
+> сможет подключиться. Чтобы дать разрешение на подключение принципалу <TT
+CLASS="LITERAL"
+>fred/users.example.com@EXAMPLE.COM</TT
+>, используйте файл сопоставления имён пользователей, как описано в <A
+HREF="auth-username-maps.html"
+>Разделе 19.2</A
+>.</P
+><P
+>Для метода <SPAN
+CLASS="PRODUCTNAME"
+>GSSAPI</SPAN
+> доступны следующие параметры конфигурации: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>include_realm</TT
+></DT
+><DD
+><P
+>Если установлено 1, то имя области от принципала аутентифицированного пользователя включено в имя пользователя системы, которое прошло через сопоставление имён пользователя (<A
+HREF="auth-username-maps.html"
+>Раздел 19.2</A
+>). Это удобно для работы с пользователями из нескольких областей.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>map</TT
+></DT
+><DD
+><P
+>Разрешает сопоставления между именами пользователя системы и базы данных. (Подробнее см. <A
+HREF="auth-username-maps.html"
+>Раздел 19.2</A
+>). Для принципала Kerberos <TT
+CLASS="LITERAL"
+>username/hostbased@EXAMPLE.COM</TT
+> имя пользователя, взятое для сопоставления - <TT
+CLASS="LITERAL"
+>username/hostbased</TT
+> (если <TT
+CLASS="LITERAL"
+>include_realm</TT
+> отключён), или <TT
+CLASS="LITERAL"
+>username/hostbased@EXAMPLE.COM</TT
+> (если <TT
+CLASS="LITERAL"
+>include_realm</TT
+> включён).</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>krb_realm</TT
+></DT
+><DD
+><P
+>Сопоставляет область с именами пользовательских принципалов. Если этот параметр установлен, то допущены будут только пользователи из этой области. Если не установлен, подключиться могут пользователи любой области и соответственно любое пользовательское сопоставление будет удовлетворено.</P
+></DD
+></DL
+></DIV
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="SSPI-AUTH"
+>19.3.4. Метод аутентификации SSPI</A
+></H2
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>SSPI</SPAN
+> — технология <SPAN
+CLASS="PRODUCTNAME"
+>Windows</SPAN
+> для защищённой аутентификации с единственным входом. <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> использует SSPI в режиме <TT
+CLASS="LITERAL"
+>negotiate</TT
+>, который применяет <SPAN
+CLASS="PRODUCTNAME"
+>Kerberos</SPAN
+>, когда это возможно, и автоматически возвращается к <SPAN
+CLASS="PRODUCTNAME"
+>NTLM</SPAN
+> в других случаях. Аутентификация <SPAN
+CLASS="PRODUCTNAME"
+>SSPI</SPAN
+> работает только, когда и сервер, и клиент работают на платформе <SPAN
+CLASS="PRODUCTNAME"
+>Windows</SPAN
+>, или, на не-Windows платформах, если доступен <SPAN
+CLASS="PRODUCTNAME"
+>GSSAPI</SPAN
+>.</P
+><P
+>Если используется аутентификация <SPAN
+CLASS="PRODUCTNAME"
+>Kerberos</SPAN
+>, <SPAN
+CLASS="PRODUCTNAME"
+>SSPI</SPAN
+> работает так же, как <SPAN
+CLASS="PRODUCTNAME"
+>GSSAPI</SPAN
+>; подробнее об этом рассказывается в <A
+HREF="auth-methods.html#GSSAPI-AUTH"
+>Подразделе 19.3.3</A
+>.</P
+><P
+>Для <SPAN
+CLASS="PRODUCTNAME"
+>SSPI</SPAN
+> доступны следующие параметры конфигурации: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>include_realm</TT
+></DT
+><DD
+><P
+>Если установлено 1, то имя области от принципала аутентифицированного пользователя включено в имя пользователя системы, которое прошло через сопоставление имён пользователя (<A
+HREF="auth-username-maps.html"
+>Раздел 19.2</A
+>). Это удобно для работы с пользователями из нескольких областей.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>map</TT
+></DT
+><DD
+><P
+>Позволяет сопоставить имена пользователей системы и базы данных. За подробностями обратитесь к <A
+HREF="auth-username-maps.html"
+>Разделу 19.2</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>krb_realm</TT
+></DT
+><DD
+><P
+>Сопоставляет область с именами пользовательских принципалов. Если этот параметр установлен, то допущены будут только пользователи из этой области. Если не установлен, подключиться могут пользователи любой области и соответственно любое пользовательское сопоставление будет удовлетворено.</P
+></DD
+></DL
+></DIV
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AUTH-IDENT"
+>19.3.5. Метод аутентификации Ident</A
+></H2
+><P
+>Метод аутентификации ident работает, получая имя пользователя операционной системы клиента от сервера Ident и используя его в качестве разрешённого имени пользователя базы данных (с возможным сопоставлением имён пользователя). Способ доступен только для подключений по TCP/IP.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Когда для локального подключения (не TCP/IP) указан ident, вместо него используется метод аутентификации peer (см. <A
+HREF="auth-methods.html#AUTH-PEER"
+>Подраздел 19.3.6</A
+>).</P
+></BLOCKQUOTE
+></DIV
+><P
+>Для метода <SPAN
+CLASS="PRODUCTNAME"
+>ident</SPAN
+> доступны следующие параметры конфигурации: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>map</TT
+></DT
+><DD
+><P
+>Позволяет сопоставить имена пользователей системы и базы данных. За подробностями обратитесь к <A
+HREF="auth-username-maps.html"
+>Разделу 19.2</A
+>.</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>Протокол <SPAN
+CLASS="QUOTE"
+>"Identification"</SPAN
+> (Ident) описан в RFC 1413. Практически каждая Unix-подобная операционная система поставляется с сервером Ident, по умолчанию слушающим TCP-порт 113. Базовая функция этого сервера — отвечать на вопросы, вроде <SPAN
+CLASS="QUOTE"
+>"Какой пользователь инициировал подключение, которое идет через твой порт <TT
+CLASS="REPLACEABLE"
+><I
+>X</I
+></TT
+> и подключается к моему порту <TT
+CLASS="REPLACEABLE"
+><I
+>Y</I
+></TT
+>?"</SPAN
+>. Поскольку после установления физического подключения <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> знает и <TT
+CLASS="REPLACEABLE"
+><I
+>X</I
+></TT
+>, и <TT
+CLASS="REPLACEABLE"
+><I
+>Y</I
+></TT
+>, он может опрашивать сервер Ident на компьютере клиента и теоретически может определять пользователя операционной системы при каждом подключении.</P
+><P
+>Недостатком этой процедуры является то, что она зависит от интеграции с клиентом: если клиентская машина не вызывает доверия или скомпрометирована, злоумышленник может запустить любую программу на порту 113 и вернуть любое имя пользователя на свой выбор. Поэтому этот метод аутентификации подходит только для закрытых сетей, где каждая клиентская машина находится под жёстким контролем и где база данных и системные администраторы работают в тесном контакте. Другими словами, вы должны доверять машине, на которой работает сервер Ident. Помните предупреждение: <A
+NAME="AEN34226"
+></A
+><TABLE
+BORDER="0"
+WIDTH="100%"
+CELLSPACING="0"
+CELLPADDING="0"
+CLASS="BLOCKQUOTE"
+><TR
+><TD
+WIDTH="10%"
+VALIGN="TOP"
+>&nbsp;</TD
+><TD
+VALIGN="TOP"
+><P
+>Протокол Ident не предназначен для использования как протокол авторизации и контроля доступа.</P
+></TD
+><TD
+WIDTH="10%"
+VALIGN="TOP"
+>&nbsp;</TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="RIGHT"
+VALIGN="TOP"
+>--<SPAN
+CLASS="ATTRIBUTION"
+>RFC 1413</SPAN
+></TD
+><TD
+WIDTH="10%"
+>&nbsp;</TD
+></TR
+></TABLE
+></P
+><P
+>У некоторых серверов Ident есть нестандартная возможность, позволяющая зашифровать возвращаемое имя пользователя, используя ключ, который известен только администратору исходного компьютера. Эту возможность <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>нельзя</I
+></SPAN
+> использовать с <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, поскольку <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> не сможет расшифровать возвращаемую строку и получить фактическое имя пользователя.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AUTH-PEER"
+>19.3.6. Аутентификация peer</A
+></H2
+><P
+>Метод аутентификации peer работает, получая имя пользователя операционной системы клиента из ядра и используя его в качестве разрешённого имени пользователя базы данных (с возможностью сопоставления имён пользователя). Этот метод поддерживается только для локальных подключений.</P
+><P
+>Для метода <SPAN
+CLASS="PRODUCTNAME"
+>peer</SPAN
+> доступны следующие параметры конфигурации: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>map</TT
+></DT
+><DD
+><P
+>Позволяет сопоставить имена пользователей системы и базы данных. За подробностями обратитесь к <A
+HREF="auth-username-maps.html"
+>Разделу 19.2</A
+>.</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>Аутентификация peer доступна только на операционных системах, поддерживающих функцию <CODE
+CLASS="FUNCTION"
+>getpeereid()</CODE
+>, параметр сокета <TT
+CLASS="SYMBOL"
+>SO_PEERCRED</TT
+> или сходные механизмы. В настоящее время это <SPAN
+CLASS="SYSTEMITEM"
+>Linux</SPAN
+>, большая часть разновидностей <SPAN
+CLASS="SYSTEMITEM"
+>BSD</SPAN
+>, включая <SPAN
+CLASS="SYSTEMITEM"
+>OS X</SPAN
+>, и <SPAN
+CLASS="SYSTEMITEM"
+>Solaris</SPAN
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AUTH-LDAP"
+>19.3.7. Метод аутентификации LDAP</A
+></H2
+><P
+>Данный метод аутентификации работает сходным с методом <TT
+CLASS="LITERAL"
+>password</TT
+> образом, за исключением того, что он использует LDAP как метод подтверждения пароля. LDAP используется только для подтверждения пары "имя пользователя/пароль". Поэтому пользователь должен уже существовать в базе данных до того, как для аутентификации будет использован LDAP.</P
+><P
+>Аутентификация LDAP может работать в двух режимах. Первый режим называется простое связывание. В ходе аутентификации сервер связывается с характерным именем, составленным следующим образом: <TT
+CLASS="REPLACEABLE"
+><I
+>prefix</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>username</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>suffix</I
+></TT
+>. Обычно, параметр <TT
+CLASS="REPLACEABLE"
+><I
+>prefix</I
+></TT
+> используется для указания <TT
+CLASS="LITERAL"
+>cn=</TT
+> или <TT
+CLASS="REPLACEABLE"
+><I
+>DOMAIN</I
+></TT
+><TT
+CLASS="LITERAL"
+>\</TT
+> в среде Active Directory. <TT
+CLASS="REPLACEABLE"
+><I
+>suffix</I
+></TT
+> используется для указания оставшейся части DN или в среде, отличной от Active Directory.</P
+><P
+>Второй режим называется поиск+связывание. В ходе аутентификации сервер сначала связывается с каталогом LDAP с закреплённым именем пользователя и паролем, указанным через <TT
+CLASS="REPLACEABLE"
+><I
+>ldapbinddn</I
+></TT
+> и <TT
+CLASS="REPLACEABLE"
+><I
+>ldapbindpasswd</I
+></TT
+>, и выполняет поиск пользователя, пытающегося подключиться к базе данных. Если нет сконфигурированных имени пользователя и пароля, происходит попытка связывания с каталогом. Поиск выполняется в поддереве в <TT
+CLASS="REPLACEABLE"
+><I
+>ldapbasedn</I
+></TT
+> в попытке выявить совпадение с атрибутом, указанном в <TT
+CLASS="REPLACEABLE"
+><I
+>ldapsearchattribute</I
+></TT
+>. Как только в результате поиска определяется пользователь, сервер отключается и заново связывается с каталогом уже как этот пользователь, используя пароль, указанный данным клиентом, чтобы подтвердить, что учётная запись корректна. Этот же режим используется в схемах LDAP-аутентификации в другом программном обеспечении, таком, как Apache mod_authnz_ldap и pam_ldap. Этот метод допускает значительно большую гибкость в том, где в каталоге могут располагаться пользовательские объекты, но в то же время приходится выполнять два отдельных подключения к серверу LDAP.</P
+><P
+>Следующие параметры конфигурации доступны при аутентификации в обоих режимах: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>ldapserver</TT
+></DT
+><DD
+><P
+>Имена и IP-адреса LDAP-серверов для связи. Можно указать несколько серверов, разделяя их пробелами.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>ldapport</TT
+></DT
+><DD
+><P
+>Номер порта для связи с LDAP-сервером. Если порт не указан, используется установленный по умолчанию порт библиотеки LDAP.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>ldaptls</TT
+></DT
+><DD
+><P
+>Равен 1 для установки соединения между PostgreSQL и LDAP-сервером с использованием TLS-шифрования. Имейте в виду, что так шифруется только обмен данными с LDAP-сервером, а клиентское подключение остаётся незашифрованным, если только не применяется SSL.</P
+></DD
+></DL
+></DIV
+><P> Следующие параметры конфигурации доступны только при аутентификации в режиме простого связывания: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>ldapprefix</TT
+></DT
+><DD
+><P
+>Эта строка подставляется перед именем пользователя во время формирования DN для связывания при аутентификации в режиме простого связывания.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>ldapsuffix</TT
+></DT
+><DD
+><P
+>Эта строка размещается после имени пользователя во время формирования DN для связывания, при аутентификации в режиме простого связывания.</P
+></DD
+></DL
+></DIV
+><P> Следующие параметры конфигурации доступны только при аутентификации поиск+связывание: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>ldapbasedn</TT
+></DT
+><DD
+><P
+>Корневая папка DN для начала поиска пользователя при аутентификации в режиме поиск+связывание.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>ldapbinddn</TT
+></DT
+><DD
+><P
+>DN пользователя для связи с каталогом при выполнении поиска в ходе аутентификации в режиме поиск+связывание.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>ldapbindpasswd</TT
+></DT
+><DD
+><P
+>Пароль пользователя для связывания с каталогом при выполнении поиска в ходе аутентификации в режиме поиск+связывание.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>ldapsearchattribute</TT
+></DT
+><DD
+><P
+>Атрибут для соотнесения с именем пользователя в ходе аутентификации поиск+связывание. Если атрибут не указан, будет использован атрибут <TT
+CLASS="LITERAL"
+>uid</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>ldapurl</TT
+></DT
+><DD
+><P
+>Адрес RFC 4516 LDAP. Это альтернативный путь для написания некоторых функций LDAP в более компактной и стандартной форме. Формат записи таков: </P><PRE
+CLASS="SYNOPSIS"
+>ldap://<TT
+CLASS="REPLACEABLE"
+><I
+>host</I
+></TT
+>[:<TT
+CLASS="REPLACEABLE"
+><I
+>port</I
+></TT
+>]/<TT
+CLASS="REPLACEABLE"
+><I
+>basedn</I
+></TT
+>[?[<TT
+CLASS="REPLACEABLE"
+><I
+>attribute</I
+></TT
+>][?[<TT
+CLASS="REPLACEABLE"
+><I
+>scope</I
+></TT
+>]]]</PRE
+><P>
+         <TT
+CLASS="REPLACEABLE"
+><I
+>scope</I
+></TT
+> должен быть представлен или <TT
+CLASS="LITERAL"
+>base</TT
+>, или <TT
+CLASS="LITERAL"
+>one</TT
+>, или <TT
+CLASS="LITERAL"
+>sub</TT
+>, обычно последним. Используется один атрибут, некоторые компоненты стандартных LDAP-адресов, такие, как фильтры и расширения, не поддерживаются.</P
+><P
+>Для неанонимного связывания <TT
+CLASS="LITERAL"
+>ldapbinddn</TT
+> и <TT
+CLASS="LITERAL"
+>ldapbindpasswd</TT
+> должны быть указаны как раздельные параметры.</P
+><P
+>Для применения зашифрованных LDAP-подключений, в дополнение к параметру <TT
+CLASS="LITERAL"
+>ldapurl</TT
+> необходимо использовать параметр <TT
+CLASS="LITERAL"
+>ldaptls</TT
+>. URL-схема <TT
+CLASS="LITERAL"
+>ldaps</TT
+> (прямое SSL-подключение) не поддерживается.</P
+><P
+>В настоящее время URL-адреса LDAP поддерживаются только с OpenLDAP, не в Windows.</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>Нельзя путать параметры конфигурации для режима простого связывания с параметрами для режима поиск+связывание, это ошибка.</P
+><P
+>Это пример конфигурации LDAP для простого связывания: </P><PRE
+CLASS="PROGRAMLISTING"
+>host ... ldap ldapserver=ldap.example.net ldapprefix="cn=" ldapsuffix=", dc=example, dc=net"</PRE
+><P> Когда запрашивается подключение к серверу базы данных в качестве пользователя базы данных <TT
+CLASS="LITERAL"
+>someuser</TT
+>, PostgreSQL пытается связаться с LDAP-сервером, используя DN <TT
+CLASS="LITERAL"
+>cn=someuser, dc=example, dc=net</TT
+> и пароль, предоставленный клиентом. Если это подключение удалось, то доступ к базе данных будет открыт.</P
+><P
+>Пример конфигурации для режима поиск+связывание: </P><PRE
+CLASS="PROGRAMLISTING"
+>host ... ldap ldapserver=ldap.example.net ldapbasedn="dc=example, dc=net" ldapsearchattribute=uid</PRE
+><P> Когда запрашивается подключение к серверу базы данных в качестве пользователя базы данных <TT
+CLASS="LITERAL"
+>someuser</TT
+>, PostgreSQL пытается связаться с сервером LDAP анонимно (поскольку <TT
+CLASS="LITERAL"
+>ldapbinddn</TT
+> не был указан), выполняет поиск для <TT
+CLASS="LITERAL"
+>(uid=someuser)</TT
+> под указанной базой DN. Если запись найдена, проводится попытка связывание с использованием найденной информации и паролем, предоставленным клиентом. Если вторая попытка подключения проходит успешно, предоставляется доступ к базе данных.</P
+><P
+>Пример той же конфигурации для режима поиск+связывание, но записанной в виде URL: </P><PRE
+CLASS="PROGRAMLISTING"
+>host ... ldap lapurl="ldap://ldap.example.net/dc=example,dc=net?uid?sub"</PRE
+><P> Такой URL-формат используется и другим программным обеспечением, поддерживающим аутентификацию по протоколу LDAP, поэтому распространять такую конфигурацию будет легче.</P
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>Поскольку LDAP часто применяет запятые и пробелы для разделения различных частей DN, необходимо использовать кавычки при определении значения параметров, как показано в наших примерах.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AUTH-RADIUS"
+>19.3.8. Аутентификация RADIUS</A
+></H2
+><P
+>Данный метод аутентификации работает сходным с методом <TT
+CLASS="LITERAL"
+>password</TT
+> образом, за исключением того, что он использует RADIUS как метод проверки пароля. RADIUS используется только для подтверждения пары имя пользователя/пароль. Поэтому пользователь должен уже существовать в базе данных до того, как для аутентификации будет использован RADIUS.</P
+><P
+>В ходе аутентификации RADIUS на настроенный RADIUS-сервер посылается запрос доступа. Это сообщение типа <TT
+CLASS="LITERAL"
+>Только Аутентификация</TT
+>, которое включает в себя параметры <TT
+CLASS="LITERAL"
+>имя пользователя</TT
+>, <TT
+CLASS="LITERAL"
+>пароль</TT
+> (зашифрованный) и <TT
+CLASS="LITERAL"
+>идентификатор NAS</TT
+>. Запрос зашифровывается с использованием общего с сервером секрета. RADIUS-сервер отвечает на запрос сервера либо <TT
+CLASS="LITERAL"
+>Доступ принят</TT
+>, либо <TT
+CLASS="LITERAL"
+>Доступ отклонён</TT
+>. Система ведения учёта RADIUS не поддерживается.</P
+><P
+>Для метода RADIUS доступны следующие параметры конфигурации: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>radiusserver</TT
+></DT
+><DD
+><P
+>Имя или IP-адрес сервера RADIUS, с которым будет проходить соединение. Это обязательный параметр.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>radiussecret</TT
+></DT
+><DD
+><P
+>Общий секрет, используемый при контактах с сервером RADIUS. Он должен иметь одинаковое значение на серверах PostgreSQL и RADIUS. Рекомендуется использовать строку как минимум из 16 символов. Это обязательный параметр. </P><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Шифровальный вектор будет достаточно эффективен только в том случае, если <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> собран с поддержкой <SPAN
+CLASS="PRODUCTNAME"
+>OpenSSL</SPAN
+>. В противном случае, передача данных серверу RADIUS будет лишь замаскированной, но не защищённой, поэтому необходимо принять дополнительные меры безопасности.</P
+></BLOCKQUOTE
+></DIV
+><P></P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>radiusport</TT
+></DT
+><DD
+><P
+>Номер порта для связи с сервером RADIUS. Если порт не указан, по умолчанию используется порт <TT
+CLASS="LITERAL"
+>1812</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>radiusidentifier</TT
+></DT
+><DD
+><P
+>Строка, используемая в запросах сервера RADIUS как <TT
+CLASS="LITERAL"
+>Идентификатор NAS</TT
+>. Этот параметр может использоваться как второй параметр, выявляющий, например, какой пользователь пытается подключиться под каким пользователем базы данных, что может быть использовано для формирования соответствий на сервере RADIUS. Если не указан идентификатор, по умолчанию используется <TT
+CLASS="LITERAL"
+>postgresql</TT
+>.</P
+></DD
+></DL
+></DIV
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AUTH-CERT"
+>19.3.9. Аутентификация по сертификату</A
+></H2
+><P
+>Для аутентификации в рамках этого метода используется клиентский сертификат SSL, поэтому данный способ применим только для SSL подключений. Когда используется этот метод, сервер потребует от клиента предъявления действующего сертификата. Пароль у клиента не запрашивается. Атрибут <TT
+CLASS="LITERAL"
+>cn</TT
+> (Обычное имя) сертификата сравнивается с запрашиваемым именем пользователя базы данных, и если они соответствуют, вход разрешается. Если <TT
+CLASS="LITERAL"
+>cn</TT
+> отличается от имени пользователя базы данных, то может быть использован файл сопоставления имён пользователя.</P
+><P
+>Для аутентификации по SSL сертификату доступны следующие параметры конфигурации: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>map</TT
+></DT
+><DD
+><P
+>Позволяет сопоставить имена пользователей системы и базы данных. За подробностями обратитесь к <A
+HREF="auth-username-maps.html"
+>Разделу 19.2</A
+>.</P
+></DD
+></DL
+></DIV
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AUTH-PAM"
+>19.3.10. Метод аутентификации PAM</A
+></H2
+><P
+>Данный метод аутентификации работает сходным с методом <TT
+CLASS="LITERAL"
+>password</TT
+> образом, за исключением того, что он использует подключаемые модули аутентификации (PAM) как механизм аутентификации. По умолчанию именем службы PAM является <TT
+CLASS="LITERAL"
+>postgresql</TT
+>. PAM используется только для подтверждения пар "имя пользователя/пароль". Поэтому пользователь уже должен быть в базе данных, прежде чем механизм PAM может быть использован для аутентификации. Для получения более подробной информацией по PAM, прочтите <A
+HREF="http://www.kernel.org/pub/linux/libs/pam/"
+TARGET="_top"
+><SPAN
+CLASS="PRODUCTNAME"
+>Linux-PAM</SPAN
+> Page</A
+>.</P
+><P
+>Для аутентификации PAM доступны следующие параметры конфигурации:<P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>pamservice</TT
+></DT
+><DD
+><P
+>Имя службы PAM</P
+></DD
+></DL
+></DIV
+><P></P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Если PAM настроен для чтения <TT
+CLASS="FILENAME"
+>/etc/shadow</TT
+>, произойдёт сбой аутентификации, потому что сервер PostgreSQL запущен не пользователем root. Однако это не имеет значения, когда PAM настроен для использования LDAP или других методов аутентификации.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="auth-username-maps.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="client-authentication-problems.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Файл сопоставления имён пользователей</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="client-authentication.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Проблемы аутентификации</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

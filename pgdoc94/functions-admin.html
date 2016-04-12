@@ -1,0 +1,3218 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Функции для системного администрирования</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Функции и операторы"
+HREF="functions.html"><LINK
+REL="PREVIOUS"
+TITLE="Системные информационные функции"
+HREF="functions-info.html"><LINK
+REL="NEXT"
+TITLE="Триггерные функции"
+HREF="functions-trigger.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Системные информационные функции"
+HREF="functions-info.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 9. Функции и операторы</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Триггерные функции"
+HREF="functions-trigger.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="FUNCTIONS-ADMIN"
+>9.26. Функции для системного администрирования</A
+></H1
+><P
+>Функции, описанные в этом разделе, предназначены для контроля и управления сервером <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="FUNCTIONS-ADMIN-SET"
+>9.26.1. Функции для управления конфигурацией</A
+></H2
+><P
+>В <A
+HREF="functions-admin.html#FUNCTIONS-ADMIN-SET-TABLE"
+>Таблице 9-63</A
+> показаны функции, позволяющие получить и изменить значения параметров конфигурации выполнения.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-ADMIN-SET-TABLE"
+></A
+><P
+><B
+>Таблица 9-63. Функции для управления конфигурацией</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип результата</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>current_setting(​<TT
+CLASS="PARAMETER"
+>setting_name</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>text</TT
+>
+                  </TD
+><TD
+>получает текущее значение параметра</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>set_config(<TT
+CLASS="PARAMETER"
+>setting_name</TT
+>, <TT
+CLASS="PARAMETER"
+>new_value</TT
+>, <TT
+CLASS="PARAMETER"
+>is_local</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>text</TT
+>
+                  </TD
+><TD
+>устанавливает новое значение параметра и возвращает его</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>current_setting</CODE
+> выдаёт текущее значение параметра <TT
+CLASS="PARAMETER"
+>setting_name</TT
+>. Она соответствует стандартной <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>-команде <TT
+CLASS="COMMAND"
+>SHOW</TT
+>. Пример использования: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT current_setting('datestyle');
+
+ current_setting
+-----------------
+ ISO, MDY
+(1 row)</PRE
+><P></P
+><P
+><CODE
+CLASS="FUNCTION"
+>set_config</CODE
+> устанавливает для параметра <TT
+CLASS="PARAMETER"
+>setting_name</TT
+> значение <TT
+CLASS="PARAMETER"
+>new_value</TT
+>. Если параметр <TT
+CLASS="PARAMETER"
+>is_local</TT
+> равен <TT
+CLASS="LITERAL"
+>true</TT
+>, новое значение будет действовать только в рамках текущей транзакции. Чтобы это значение действовало на протяжении текущего сеанса, ему нужно присвоить <TT
+CLASS="LITERAL"
+>false</TT
+>. Эта функция соответствует SQL-команде <TT
+CLASS="COMMAND"
+>SET</TT
+>. Пример использования: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT set_config('log_statement_stats', 'off', false);
+
+ set_config
+------------
+ off
+(1 row)</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="FUNCTIONS-ADMIN-SIGNAL"
+>9.26.2. Функции для передачи сигналов серверу</A
+></H2
+><P
+>Функции, перечисленные в <A
+HREF="functions-admin.html#FUNCTIONS-ADMIN-SIGNAL-TABLE"
+>Таблице 9-64</A
+>, позволяют передавать управляющие сигналы другим серверным процессам. Вызывать эти функции обычно могут только суперпользователи, кроме явно отмеченных исключений.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-ADMIN-SIGNAL-TABLE"
+></A
+><P
+><B
+>Таблица 9-64. Функции для передачи сигналов серверу</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип результата</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_cancel_backend(<TT
+CLASS="PARAMETER"
+>pid</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>Отменяет текущий запрос серверного процесса. Эту функцию можно выполнить для другого серверного процесса, если он принадлежит той же роли, что и текущий пользователь. Во всех остальных случаях требуются права суперпользователя.</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_reload_conf()</CODE
+></TT
+>
+        </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>Даёт команду серверным процессам перегрузить конфигурацию</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_rotate_logfile()</CODE
+></TT
+>
+        </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>Прокручивает журнал сообщений сервера</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_terminate_backend(<TT
+CLASS="PARAMETER"
+>pid</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>Завершает серверный процесс. Эту функцию можно выполнить для другого серверного процесса, если он принадлежит той же роли, что и текущий пользователь. Во всех остальных случаях требуются права суперпользователя.</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Каждая из этих функций возвращает <TT
+CLASS="LITERAL"
+>true</TT
+> при успешном завершении и <TT
+CLASS="LITERAL"
+>false</TT
+> в противном случае.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_cancel_backend</CODE
+> и <CODE
+CLASS="FUNCTION"
+>pg_terminate_backend</CODE
+> передают сигналы (<SPAN
+CLASS="SYSTEMITEM"
+>SIGINT</SPAN
+> и <SPAN
+CLASS="SYSTEMITEM"
+>SIGTERM</SPAN
+>, соответственно) серверному процессу с заданным кодом PID. Код активного процесса можно получить из колонки <TT
+CLASS="STRUCTFIELD"
+>pid</TT
+> представления <TT
+CLASS="STRUCTNAME"
+>pg_stat_activity</TT
+> или просмотрев на сервере процессы с именем <TT
+CLASS="COMMAND"
+>postgres</TT
+> (используя <SPAN
+CLASS="APPLICATION"
+>ps</SPAN
+> в Unix или <SPAN
+CLASS="APPLICATION"
+>Диспетчер задач</SPAN
+> в <SPAN
+CLASS="PRODUCTNAME"
+>Windows</SPAN
+>). Роль пользователя активного процесса можно узнать в колонке <TT
+CLASS="STRUCTFIELD"
+>usename</TT
+> представления <TT
+CLASS="STRUCTNAME"
+>pg_stat_activity</TT
+>.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_reload_conf</CODE
+> отправляет сигнал <SPAN
+CLASS="SYSTEMITEM"
+>SIGHUP</SPAN
+> главному серверному процессу, который командует всем подчинённым процессам перезагрузить файлы конфигурации.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_rotate_logfile</CODE
+> указывает менеджеру журнала сообщений немедленно переключиться на новый файл. Это имеет смысл, только когда работает встроенный сборщик сообщений, так как без него подпроцесс менеджера журнала не запускается.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="FUNCTIONS-ADMIN-BACKUP"
+>9.26.3. Функции управления резервным копированием</A
+></H2
+><P
+>Функции, перечисленные в <A
+HREF="functions-admin.html#FUNCTIONS-ADMIN-BACKUP-TABLE"
+>Таблице 9-65</A
+>, предназначены для выполнения резервного копирования &laquo;на ходу&raquo;. Эти функции нельзя выполнять во время восстановления (за исключением <CODE
+CLASS="FUNCTION"
+>pg_is_in_backup</CODE
+>, <CODE
+CLASS="FUNCTION"
+>pg_backup_start_time</CODE
+> и <CODE
+CLASS="FUNCTION"
+>pg_xlog_location_diff</CODE
+>).</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-ADMIN-BACKUP-TABLE"
+></A
+><P
+><B
+>Таблица 9-65. Функции управления резервным копированием</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип результата</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_create_restore_point(​<TT
+CLASS="PARAMETER"
+>name</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>pg_lsn</TT
+>
+                  </TD
+><TD
+>Создаёт именованную точку для восстановления (разрешено только суперпользователям)</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_current_xlog_insert_​location()</CODE
+></TT
+>
+        </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>pg_lsn</TT
+>
+                  </TD
+><TD
+>Получает текущую позицию добавления в журнале транзакций</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_current_xlog_location()</CODE
+></TT
+>
+        </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>pg_lsn</TT
+>
+                  </TD
+><TD
+>Получает текущую позицию записи в журнале транзакций</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_start_backup(<TT
+CLASS="PARAMETER"
+>label</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, <TT
+CLASS="PARAMETER"
+>fast</TT
+> <TT
+CLASS="TYPE"
+>boolean</TT
+></SPAN
+>])</CODE
+></TT
+>
+        </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>pg_lsn</TT
+>
+                  </TD
+><TD
+>Подготавливает сервер к резервному копированию &laquo;на ходу&raquo; (разрешено только суперпользователям и ролям репликации)</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_stop_backup()</CODE
+></TT
+>
+        </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>pg_lsn</TT
+>
+                  </TD
+><TD
+>Сообщает об окончании резервного копирования (разрешено только суперпользователям и ролям репликации)</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_is_in_backup()</CODE
+></TT
+>
+        </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bool</TT
+>
+                  </TD
+><TD
+>Возвращает true в процессе исключительного резервного копирования</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_backup_start_time()</CODE
+></TT
+>
+        </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+>
+                  </TD
+><TD
+>Получает время запуска выполняющегося исключительного резервного копирования</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_switch_xlog()</CODE
+></TT
+>
+        </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>pg_lsn</TT
+>
+                  </TD
+><TD
+>Инициирует переключение на новый файл журнала транзакций (разрешено только суперпользователям)</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_xlogfile_name(​<TT
+CLASS="PARAMETER"
+>location</TT
+> <TT
+CLASS="TYPE"
+>pg_lsn</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>text</TT
+>
+                  </TD
+><TD
+>Получает из строки позиции в журнале транзакции имя соответствующего файла</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_xlogfile_name_offset(​<TT
+CLASS="PARAMETER"
+>location</TT
+> <TT
+CLASS="TYPE"
+>pg_lsn</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+><TT
+CLASS="TYPE"
+>text</TT
+>, <TT
+CLASS="TYPE"
+>integer</TT
+></TD
+><TD
+>Получает из строки позиции в журнале транзакции имя соответствующего файла и десятичное смещение в нём</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_xlog_location_diff(​<TT
+CLASS="PARAMETER"
+>location</TT
+> <TT
+CLASS="TYPE"
+>pg_lsn</TT
+>, <TT
+CLASS="PARAMETER"
+>location</TT
+> <TT
+CLASS="TYPE"
+>pg_lsn</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>numeric</TT
+>
+                  </TD
+><TD
+>Вычисляет разницу между двумя позициями в журнале транзакций</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_start_backup</CODE
+> принимает произвольную заданную пользователем метку резервной копии. (Обычно это имя файла, в котором будет сохранена резервная копия.) Эта функция записывает файл метки (<TT
+CLASS="FILENAME"
+>backup_label</TT
+>) в каталог данных сервера, выполняет процедуру контрольной точки, а затем возвращает в текстовом виде начальную позицию в журнале транзакций для данной резервной копии. Результат этой функции может быть полезен, но если он не нужен, его можно просто игнорировать. </P><PRE
+CLASS="PROGRAMLISTING"
+>postgres=# select pg_start_backup('label_goes_here');
+ pg_start_backup
+-----------------
+ 0/D4445B8
+(1 row)</PRE
+><P> У этой функции есть также второй необязательный, параметр типа <TT
+CLASS="TYPE"
+>boolean</TT
+>. Если он равен <TT
+CLASS="LITERAL"
+>true</TT
+>, <CODE
+CLASS="FUNCTION"
+>pg_start_backup</CODE
+> начнёт работу максимально быстро. При этом будет немедленно выполнена процедура контрольной точки, что может повлечь массу операций ввода/вывода и затормозить параллельные запросы.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_stop_backup</CODE
+> удаляет файл метки, созданный функцией <CODE
+CLASS="FUNCTION"
+>pg_start_backup</CODE
+>, и создаёт файл истории резервного копирования в архивной области журнала транзакций. В этом файле для данной резервной копии сохраняется метка, заданная при вызове <CODE
+CLASS="FUNCTION"
+>pg_start_backup</CODE
+>, начальная и конечная позиция в журнале транзакций, а также время начала и окончания. Возвращает она позицию окончания резервной копии в журнале транзакций (которую также можно игнорировать). После записи конечной позиции текущая позиция записи автоматически перемещается к следующему файлу журнала транзакций, чтобы файл конечной позиции можно было немедленно архивировать для завершения резервного копирования.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_switch_xlog</CODE
+> производит переключение на следующий файл журнала транзакций, что позволяет архивировать текущий (в ситуации, когда архивация выполняется непрерывно). Эта функция возвращает конечную позицию + 1 в только что законченном файле журнала транзакций. Если с момента последнего переключения файлов не было активности, отражающейся в журнале транзакций, <CODE
+CLASS="FUNCTION"
+>pg_switch_xlog</CODE
+> ничего не делает и возвращает начальную позицию в файле журнала транзакций, используемом в данный момент.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_create_restore_point</CODE
+> создаёт именованную запись в журнале транзакций, которую можно использовать как цель при восстановлении, и возвращает соответствующую позицию в журнале транзакций. Затем полученное имя можно присвоить параметру <A
+HREF="recovery-target-settings.html#RECOVERY-TARGET-NAME"
+>recovery_target_name</A
+>, указав тем самым точку, до которой будет выполняться восстановление. Учтите, что если вы создадите несколько точек восстановления с одним именем, восстановление будет остановлено на первой точке с этим именем.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_current_xlog_location</CODE
+> выводит текущую позицию записи в журнале транзакций в том же формате, что и вышеописанные функции. <CODE
+CLASS="FUNCTION"
+>pg_current_xlog_insert_location</CODE
+> подобным образом выводит текущую позицию добавления в журнале транзакций. Позицией добавления называется <SPAN
+CLASS="QUOTE"
+>"логический"</SPAN
+> конец журнала транзакций в любой момент времени, тогда как позиция записи указывает на конец данных, фактически перенесённых на диск из внутренних буферов сервера. Позиция записи отмечает конец данных, которые может видеть снаружи внешний процесс, и именно она представляет интерес при копировании частично заполненных файлов журнала транзакций. Позиция добавления выводится в основном для отладки. Обе эти функции работают в режиме &laquo;только чтение&raquo; и вызывать их можно без прав суперпользователя.</P
+><P
+>Из результатов всех описанных выше функций можно получить соответствующее имя файла журнала транзакций и смещение в нём, используя функцию <CODE
+CLASS="FUNCTION"
+>pg_xlogfile_name_offset</CODE
+>. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>postgres=# SELECT * FROM pg_xlogfile_name_offset(pg_stop_backup());
+        file_name         | file_offset 
+--------------------------+-------------
+ 00000001000000000000000D |     4039624
+(1 row)</PRE
+><P> Подобная ей функция <CODE
+CLASS="FUNCTION"
+>pg_xlogfile_name</CODE
+> извлекает только имя файла журнала транзакций. Когда позиция в журнале транзакций находится ровно на границе файлов, обе эти функции возвращают имя предыдущего файла. Обычно это поведение предпочтительно при архивировании журнала, так как именно предыдущий файл является последним подлежащим архивации.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_xlog_location_diff</CODE
+> вычисляет разницу в байтах между двумя позициями в журнале транзакций. Полученный результат можно использовать с <TT
+CLASS="STRUCTNAME"
+>pg_stat_replication</TT
+> или другими функциями, перечисленными в <A
+HREF="functions-admin.html#FUNCTIONS-ADMIN-BACKUP-TABLE"
+>Таблице 9-65</A
+>, для определения задержки репликации.</P
+><P
+>Подробнее практическое применение этих функций описывается в <A
+HREF="continuous-archiving.html"
+>Разделе 24.3</A
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="FUNCTIONS-RECOVERY-CONTROL"
+>9.26.4. Функции управления восстановлением</A
+></H2
+><P
+>Функции, приведённые в <A
+HREF="functions-admin.html#FUNCTIONS-RECOVERY-INFO-TABLE"
+>Таблице 9-66</A
+>, предоставляют сведения о текущем состоянии резервного сервера. Эти функции могут выполняться, как во время восстановления, так и в обычном режиме работы.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-RECOVERY-INFO-TABLE"
+></A
+><P
+><B
+>Таблица 9-66. Функции для получения информации о восстановлении</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип результата</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_is_in_recovery()</CODE
+></TT
+>
+        </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bool</TT
+>
+                  </TD
+><TD
+>Возвращает true в процессе восстановления.</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_last_xlog_receive_​location()</CODE
+></TT
+>
+        </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>pg_lsn</TT
+>
+                  </TD
+><TD
+>Получает позицию последней записи журнала транзакций, полученной и записанной на диск в процессе потоковой репликации. Пока выполняется потоковая репликация, эта позиция постоянно увеличивается. По окончании восстановления она останавливается на записи WAL, полученной и записанной на диск последней. Если потоковая репликация отключена или ещё не запускалась, функция возвращает NULL.</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_last_xlog_replay_​location()</CODE
+></TT
+>
+        </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>pg_lsn</TT
+>
+                  </TD
+><TD
+>Получает позицию последней записи журнала транзакций, воспроизведённой при восстановлении. В процессе восстановления эта позиция постоянно увеличивается. По окончании восстановления она останавливается на записи WAL, которая была восстановлена последней. Если сервер был запущен не в режиме восстановления, эта функция возвращает NULL.</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_last_xact_replay_​timestamp()</CODE
+></TT
+>
+        </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+>
+                  </TD
+><TD
+>Получает отметку времени последней транзакции, воспроизведённой при восстановлении. Это время, когда на главном сервере произошла фиксация или откат записи WAL для этой транзакции. Если в процессе восстановления не была воспроизведена ни одна транзакция, эта функция возвращает NULL. В противном случае это значение постоянно увеличивается в процессе восстановления. По окончании восстановления оно останавливается на транзакции, которая была восстановлена последней. Если сервер был запущен не в режиме восстановления, эта функция возвращает NULL.</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Функции, перечисленные в <A
+HREF="functions-admin.html#FUNCTIONS-RECOVERY-CONTROL-TABLE"
+>Таблице 9-67</A
+> управляют процессом восстановления. Вызывать их в другое время нельзя.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-RECOVERY-CONTROL-TABLE"
+></A
+><P
+><B
+>Таблица 9-67. Функции управления восстановлением</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип результата</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_is_xlog_replay_paused()</CODE
+></TT
+>
+        </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bool</TT
+>
+                  </TD
+><TD
+>Возвращает true, если восстановление приостановлено.</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_xlog_replay_pause()</CODE
+></TT
+>
+        </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>void</TT
+>
+                  </TD
+><TD
+>Немедленно приостанавливает восстановление (разрешено только суперпользователям).</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_xlog_replay_resume()</CODE
+></TT
+>
+        </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>void</TT
+>
+                  </TD
+><TD
+>Запускает восстановление, если оно было приостановлено (разрешено только суперпользователям).</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Когда восстановление приостановлено, запись изменений в базу не производится. Если она находится в &laquo;горячем резерве&raquo;, все последующие запросы будут видеть один согласованный снимок базы данных и до продолжения восстановления конфликты запросов исключаются.</P
+><P
+>Когда потоковая репликация выключена, пауза при восстановлении может длиться сколь угодно долго без каких-либо проблем. Если же запущена потоковая репликация, новые записи WAL продолжат поступать и заполнят весь диск рано или поздно, в зависимости от длительности паузы, интенсивности записи в WAL и объёма свободного пространства.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="FUNCTIONS-SNAPSHOT-SYNCHRONIZATION"
+>9.26.5. Функции синхронизации снимков</A
+></H2
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> позволяет синхронизировать снимки состояния между сеансами баз данных. <I
+CLASS="FIRSTTERM"
+>Снимок состояния</I
+> определяет, какие данные видны транзакции, работающей с этим снимком. Синхронизация снимков необходима, когда в двух или более сеансах нужно видеть одно и то же содержимое базы данных. Если в двух сеансах транзакции запускаются независимо, всегда есть вероятность, что некая третья транзакция будет зафиксирована между командами <TT
+CLASS="COMMAND"
+>START TRANSACTION</TT
+> для первых двух, и в результате в одном сеансе будет виден результат третьей, а в другом &mdash; нет.</P
+><P
+>Для решения этой проблемы <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> позволяет транзакции <I
+CLASS="FIRSTTERM"
+>экспортировать</I
+> снимок состояния, с которым она работает. Пока экспортирующая этот снимок транзакция выполняется, другие транзакции могут <I
+CLASS="FIRSTTERM"
+>импортировать</I
+> его и, таким образом, увидеть абсолютно то же состояние базы данных, что видит первая транзакция. Но учтите, что любые изменения, произведённые этими транзакциями, будут не видны для других, как это и должно быть с изменениями в незафиксированных транзакциях. Таким образом, транзакции синхронизируют только начальное состояние данных, а последующие производимые в них изменения изолируются как обычно.</P
+><P
+>Снимки состояния экспортируются с помощью функции <CODE
+CLASS="FUNCTION"
+>pg_export_snapshot</CODE
+>, показанной в <A
+HREF="functions-admin.html#FUNCTIONS-SNAPSHOT-SYNCHRONIZATION-TABLE"
+>Таблице 9-68</A
+>, и импортируются командой <A
+HREF="sql-set-transaction.html"
+>SET TRANSACTION</A
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-SNAPSHOT-SYNCHRONIZATION-TABLE"
+></A
+><P
+><B
+>Таблица 9-68. Функции синхронизации снимков</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип результата</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_export_snapshot()</CODE
+></TT
+>
+       </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>text</TT
+>
+                  </TD
+><TD
+>Сохраняет снимок текущего состояния и возвращает его идентификатор</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>pg_export_snapshot</CODE
+> создаёт снимок текущего состояния и возвращает его идентификатор в строке типа <TT
+CLASS="TYPE"
+>text</TT
+>. Данная строка должна передаваться (за рамками базы данных) клиентам, которые будут импортировать этот снимок. При этом импортировать его нужно раньше, чем завершится транзакция, которая его экспортировала. Если необходимо, транзакция может экспортировать несколько снимков. Заметьте, что это имеет смысл только для транзакций уровня <TT
+CLASS="LITERAL"
+>READ COMMITTED</TT
+>, так как транзакции <TT
+CLASS="LITERAL"
+>REPEATABLE READ</TT
+> и более высоких уровней изоляции работают с одним снимком состояния. После того, как транзакция экспортировала снимок, её нельзя подготовить с помощью <A
+HREF="sql-prepare-transaction.html"
+>PREPARE TRANSACTION</A
+>.</P
+><P
+>Подробнее использование экспортированных снимков рассматривается в описании <A
+HREF="sql-set-transaction.html"
+>SET TRANSACTION</A
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="FUNCTIONS-REPLICATION"
+>9.26.6. Функции репликации</A
+></H2
+><P
+>В <A
+HREF="functions-admin.html#FUNCTIONS-REPLICATION-TABLE"
+>Таблице 9-69</A
+> перечислены функции, предназначенные для управления и взаимодействия с механизмом репликации. Чтобы узнать об этом механизме подробнее, обратитесь к <A
+HREF="warm-standby.html#STREAMING-REPLICATION"
+>Подразделу 25.2.5</A
+> и <A
+HREF="warm-standby.html#STREAMING-REPLICATION-SLOTS"
+>Подраздел 25.2.6</A
+>. Использовать эти функции разрешено только суперпользователям.</P
+><P
+>Многие из этих функций соответствуют командам в протоколе репликации; см. <A
+HREF="protocol-replication.html"
+>Раздел 49.3</A
+>.</P
+><P
+>Функции, описанные в <A
+HREF="functions-admin.html#FUNCTIONS-SNAPSHOT-SYNCHRONIZATION"
+>Подразделе 9.26.5</A
+>, <A
+HREF="functions-admin.html#FUNCTIONS-RECOVERY-CONTROL"
+>Подразделе 9.26.4</A
+> и <A
+HREF="functions-admin.html#FUNCTIONS-ADMIN-BACKUP"
+>Подразделе 9.26.3</A
+> также имеют отношение к репликации.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-REPLICATION-TABLE"
+></A
+><P
+><B
+>Таблица 9-69. Функции репликации <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Функция</TH
+><TH
+>Тип результата</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_create_physical_replication_slot(​<TT
+CLASS="PARAMETER"
+>slot_name</TT
+> <TT
+CLASS="TYPE"
+>name</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>(<TT
+CLASS="PARAMETER"
+>slot_name</TT
+> <TT
+CLASS="TYPE"
+>name</TT
+>, <TT
+CLASS="PARAMETER"
+>xlog_position</TT
+> <TT
+CLASS="TYPE"
+>pg_lsn</TT
+>)</TD
+><TD
+>Создаёт новый физический слот репликации с именем <TT
+CLASS="PARAMETER"
+>slot_name</TT
+>. Передача изменений из физического слота возможна только по протоколу потоковой репликации &mdash; см. <A
+HREF="protocol-replication.html"
+>Раздел 49.3</A
+>. Соответствует команде протокола репликации <TT
+CLASS="LITERAL"
+>CREATE_REPLICATION_SLOT ... PHYSICAL</TT
+>.</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_drop_replication_slot(​<TT
+CLASS="PARAMETER"
+>slot_name</TT
+> <TT
+CLASS="TYPE"
+>name</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>        <TT
+CLASS="TYPE"
+>void</TT
+>
+       </TD
+><TD
+>Удаляет физический или логический слот репликации с именем <TT
+CLASS="PARAMETER"
+>slot_name</TT
+>. Соответствует команде протокола репликации <TT
+CLASS="LITERAL"
+>DROP_REPLICATION_SLOT</TT
+>.</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_create_logical_replication_slot(​<TT
+CLASS="PARAMETER"
+>slot_name</TT
+> <TT
+CLASS="TYPE"
+>name</TT
+>, <TT
+CLASS="PARAMETER"
+>plugin</TT
+> <TT
+CLASS="TYPE"
+>name</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>(<TT
+CLASS="PARAMETER"
+>slot_name</TT
+> <TT
+CLASS="TYPE"
+>name</TT
+>, <TT
+CLASS="PARAMETER"
+>xlog_position</TT
+> <TT
+CLASS="TYPE"
+>pg_lsn</TT
+>)</TD
+><TD
+>Создаёт новый логический (декодирующий) слот репликации с именем <TT
+CLASS="PARAMETER"
+>slot_name</TT
+>, используя модуль вывода <TT
+CLASS="PARAMETER"
+>plugin</TT
+>. Эта функция работает так же, как и команда протокола репликации <TT
+CLASS="LITERAL"
+>CREATE_REPLICATION_SLOT ... LOGICAL</TT
+>.</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_logical_slot_get_changes(​<TT
+CLASS="PARAMETER"
+>slot_name</TT
+> <TT
+CLASS="TYPE"
+>name</TT
+>, <TT
+CLASS="PARAMETER"
+>upto_lsn</TT
+> <TT
+CLASS="TYPE"
+>pg_lsn</TT
+>, <TT
+CLASS="PARAMETER"
+>upto_nchanges</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>, VARIADIC <TT
+CLASS="PARAMETER"
+>options</TT
+> <TT
+CLASS="TYPE"
+>text[]</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>(<TT
+CLASS="PARAMETER"
+>location</TT
+> <TT
+CLASS="TYPE"
+>pg_lsn</TT
+>, <TT
+CLASS="PARAMETER"
+>xid</TT
+> <TT
+CLASS="TYPE"
+>xid</TT
+>, <TT
+CLASS="PARAMETER"
+>data</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>)</TD
+><TD
+>Возвращает изменения в слоте <TT
+CLASS="PARAMETER"
+>slot_name</TT
+> с позиции, до которой ранее были получены изменения. Если параметры <TT
+CLASS="PARAMETER"
+>upto_lsn</TT
+> и <TT
+CLASS="PARAMETER"
+>upto_nchanges</TT
+> равны NULL, логическое декодирование продолжится до конца журнала транзакций. Если <TT
+CLASS="PARAMETER"
+>upto_lsn</TT
+> не NULL, декодироваться будут только транзакции, зафиксированные до заданного LSN. Если <TT
+CLASS="PARAMETER"
+>upto_nchanges</TT
+> не NULL, декодирование остановится, когда число строк, полученных при декодировании, превысит заданное значение. Заметьте, однако, что фактическое число возвращённых строк может быть больше, так как это ограничение проверяется только после добавления строк, декодированных для очередной транзакции.</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_logical_slot_peek_changes(​<TT
+CLASS="PARAMETER"
+>slot_name</TT
+> <TT
+CLASS="TYPE"
+>name</TT
+>, <TT
+CLASS="PARAMETER"
+>upto_lsn</TT
+> <TT
+CLASS="TYPE"
+>pg_lsn</TT
+>, <TT
+CLASS="PARAMETER"
+>upto_nchanges</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>, VARIADIC <TT
+CLASS="PARAMETER"
+>options</TT
+> <TT
+CLASS="TYPE"
+>text[]</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>(<TT
+CLASS="PARAMETER"
+>location</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>, <TT
+CLASS="PARAMETER"
+>xid</TT
+> <TT
+CLASS="TYPE"
+>xid</TT
+>, <TT
+CLASS="PARAMETER"
+>data</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>)</TD
+><TD
+>Работает так же, как функция <CODE
+CLASS="FUNCTION"
+>pg_logical_slot_get_changes()</CODE
+>, но не забирает изменения; то есть, они будут получены снова при следующих вызовах.</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_logical_slot_get_binary_changes(​<TT
+CLASS="PARAMETER"
+>slot_name</TT
+> <TT
+CLASS="TYPE"
+>name</TT
+>, <TT
+CLASS="PARAMETER"
+>upto_lsn</TT
+> <TT
+CLASS="TYPE"
+>pg_lsn</TT
+>, <TT
+CLASS="PARAMETER"
+>upto_nchanges</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>, VARIADIC <TT
+CLASS="PARAMETER"
+>options</TT
+> <TT
+CLASS="TYPE"
+>text[]</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>(<TT
+CLASS="PARAMETER"
+>location</TT
+> <TT
+CLASS="TYPE"
+>pg_lsn</TT
+>, <TT
+CLASS="PARAMETER"
+>xid</TT
+> <TT
+CLASS="TYPE"
+>xid</TT
+>, <TT
+CLASS="PARAMETER"
+>data</TT
+> <TT
+CLASS="TYPE"
+>bytea</TT
+>)</TD
+><TD
+>Работает так же, как функция <CODE
+CLASS="FUNCTION"
+>pg_logical_slot_get_changes()</CODE
+>, но выдаёт изменения в типе <TT
+CLASS="TYPE"
+>bytea</TT
+>.</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_logical_slot_peek_binary_changes(​<TT
+CLASS="PARAMETER"
+>slot_name</TT
+> <TT
+CLASS="TYPE"
+>name</TT
+>, <TT
+CLASS="PARAMETER"
+>upto_lsn</TT
+> <TT
+CLASS="TYPE"
+>pg_lsn</TT
+>, <TT
+CLASS="PARAMETER"
+>upto_nchanges</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>, VARIADIC <TT
+CLASS="PARAMETER"
+>options</TT
+> <TT
+CLASS="TYPE"
+>text[]</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>(<TT
+CLASS="PARAMETER"
+>location</TT
+> <TT
+CLASS="TYPE"
+>pg_lsn</TT
+>, <TT
+CLASS="PARAMETER"
+>xid</TT
+> <TT
+CLASS="TYPE"
+>xid</TT
+>, <TT
+CLASS="PARAMETER"
+>data</TT
+> <TT
+CLASS="TYPE"
+>bytea</TT
+>)</TD
+><TD
+>Работает так же, как функция <CODE
+CLASS="FUNCTION"
+>pg_logical_slot_get_changes()</CODE
+>, но выдаёт изменения в типе <TT
+CLASS="TYPE"
+>bytea</TT
+> и не забирает их; то есть, они будут получены снова при следующих вызовах.</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="FUNCTIONS-ADMIN-DBOBJECT"
+>9.26.7. Функции управления объектами баз данных</A
+></H2
+><P
+>Функции, перечисленные в <A
+HREF="functions-admin.html#FUNCTIONS-ADMIN-DBSIZE"
+>Таблице 9-70</A
+>, вычисляют объём, который занимают на диске различные объекты баз данных.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-ADMIN-DBSIZE"
+></A
+><P
+><B
+>Таблица 9-70. Функции получения размера объектов БД</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип результата</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>                      <CODE
+CLASS="FUNCTION"
+>pg_column_size(<TT
+CLASS="TYPE"
+>any</TT
+>)</CODE
+>
+                    </TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>int</TT
+>
+                  </TD
+><TD
+>Число байт, необходимых для хранения заданного значения (возможно, в сжатом виде)</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_database_size(<TT
+CLASS="TYPE"
+>oid</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Объём, который занимает на диске база данных с заданным OID</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_database_size(<TT
+CLASS="TYPE"
+>name</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Объём, который занимает на диске база данных с заданным именем</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_indexes_size(<TT
+CLASS="TYPE"
+>regclass</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Общий объём индексов, связанных с указанной таблицей</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_relation_size(​<TT
+CLASS="PARAMETER"
+>relation</TT
+> <TT
+CLASS="TYPE"
+>regclass</TT
+>, <TT
+CLASS="PARAMETER"
+>fork</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Объём, который занимает на диске указанный слой (<TT
+CLASS="LITERAL"
+>'main'</TT
+>, <TT
+CLASS="LITERAL"
+>'fsm'</TT
+>, <TT
+CLASS="LITERAL"
+>'vm'</TT
+> или <TT
+CLASS="LITERAL"
+>'init'</TT
+>) заданной таблицы или индекса</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_relation_size(​<TT
+CLASS="PARAMETER"
+>relation</TT
+> <TT
+CLASS="TYPE"
+>regclass</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Краткая форма <TT
+CLASS="LITERAL"
+>pg_relation_size(..., 'main')</TT
+></TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_size_pretty(<TT
+CLASS="TYPE"
+>bigint</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>text</TT
+>
+                  </TD
+><TD
+>Преобразует размер в байтах, представленный в 64-битном целом, в понятный человеку формат с единицами измерения</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_size_pretty(<TT
+CLASS="TYPE"
+>numeric</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>text</TT
+>
+                  </TD
+><TD
+>Преобразует размер в байтах, представленный в значении числового типа, в понятный человеку формат с единицами измерения</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_table_size(<TT
+CLASS="TYPE"
+>regclass</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Объём, который занимает на диске данная таблица, за исключением индексов (но включая TOAST, карту свободного места и карту видимости)</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_tablespace_size(<TT
+CLASS="TYPE"
+>oid</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Объём, который занимает на диске табличное пространство с указанным OID</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_tablespace_size(<TT
+CLASS="TYPE"
+>name</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Объём, который занимает на диске табличное пространство с заданным именем</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_total_relation_size(​<TT
+CLASS="TYPE"
+>regclass</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                  </TD
+><TD
+>Общий объём, который занимает на диске заданная таблица, включая все индексы и данные <ACRONYM
+CLASS="ACRONYM"
+>TOAST</ACRONYM
+></TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_column_size</CODE
+> показывает, какой объём требуется для хранения данного значения.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_total_relation_size</CODE
+> принимает OID или имя таблицы или данных TOAST и возвращает общий объём, который занимает на диске эта таблица, включая все связанные с ней индексы. Результат этой функции равняется <CODE
+CLASS="FUNCTION"
+>pg_table_size</CODE
+> <TT
+CLASS="LITERAL"
+>+</TT
+> <CODE
+CLASS="FUNCTION"
+>pg_indexes_size</CODE
+>.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_table_size</CODE
+> принимает OID или имя таблицы и возвращает объём, который занимает на диске эта таблица без индексов. (При этом учитывается размер TOAST, карты свободного места и карты видимости.)</P
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_indexes_size</CODE
+> принимает OID или имя таблицы и возвращает общий объём, который занимают все индексы таблицы.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_database_size</CODE
+> и <CODE
+CLASS="FUNCTION"
+>pg_tablespace_size</CODE
+> принимают OID или имя базы данных либо табличного пространства и возвращают общий объём, который они занимают на диске. Для использования <CODE
+CLASS="FUNCTION"
+>pg_database_size</CODE
+> требуется право <TT
+CLASS="LITERAL"
+>CONNECT</TT
+> для указанной базы данных (оно имеется по умолчанию). Для использования <CODE
+CLASS="FUNCTION"
+>pg_tablespace_size</CODE
+> необходимо иметь право <TT
+CLASS="LITERAL"
+>CREATE</TT
+> в указанном табличном пространстве, если только это не табличное пространство по умолчанию для текущей базы данных.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_relation_size</CODE
+> принимает OID или имя таблицы, индекса или TOAST-таблицы и возвращает размер одного слоя этого отношения (в байтах). (Заметьте, что в большинстве случае удобнее использовать более высокоуровневые функции <CODE
+CLASS="FUNCTION"
+>pg_total_relation_size</CODE
+> и <CODE
+CLASS="FUNCTION"
+>pg_table_size</CODE
+>, которые суммируют размер всех слоёв.) С одним аргументом она возвращает размер основного слоя для данных заданного отношения. Название другого интересующего слоя можно передать во втором аргументе: <P
+></P
+></P><UL
+COMPACT="COMPACT"
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>'main'</TT
+> возвращает размер основного слоя данных заданного отношения.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>'fsm'</TT
+> возвращает размер карты свободного места (см. <A
+HREF="storage-fsm.html"
+>Раздел 59.3</A
+>), связанной с заданным отношением.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>'vm'</TT
+> возвращает размер карты видимости (см. <A
+HREF="storage-vm.html"
+>Раздел 59.4</A
+>), связанной с заданным отношением.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>'init'</TT
+> возвращает размер слоя инициализации для заданного отношения, если он имеется.</P
+></LI
+></UL
+><P></P
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_size_pretty</CODE
+> можно использовать для форматирования результатов других функций в виде, более понятном человеку, с единицами измерения KB, MB, GB и TB.</P
+><P
+>Вышеописанные функции, работающие с таблицами или индексами, принимают аргумент типа <TT
+CLASS="TYPE"
+>regclass</TT
+>, который представляет собой просто OID таблицы или индекса в системном каталоге <TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+>. Однако вам не нужно вручную вычислять OID, так как процедура ввода значения <TT
+CLASS="TYPE"
+>regclass</TT
+> может сделать это за вас. Для этого достаточно записать имя таблицы в апострофах, как обычную текстовую константу. В соответствии с правилами обработки обычных имён <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>, если имя таблицы не заключено в кавычки, эта строка будет переведена в нижний регистр.</P
+><P
+>Если переданному значению OID не соответствуют существующий объект, эти функции возвращают NULL.</P
+><P
+>Функции, перечисленные в <A
+HREF="functions-admin.html#FUNCTIONS-ADMIN-DBLOCATION"
+>Таблице 9-71</A
+>, помогают определить, в каких файлах на диске хранятся объекты базы данных.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-ADMIN-DBLOCATION"
+></A
+><P
+><B
+>Таблица 9-71. Функции определения расположения объектов</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип результата</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_relation_filenode(​<TT
+CLASS="PARAMETER"
+>relation</TT
+> <TT
+CLASS="TYPE"
+>regclass</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>oid</TT
+>
+                  </TD
+><TD
+>Номер файлового узла для указанного отношения</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_relation_filepath(​<TT
+CLASS="PARAMETER"
+>relation</TT
+> <TT
+CLASS="TYPE"
+>regclass</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>text</TT
+>
+                  </TD
+><TD
+>Путь к файлу, в котором хранится указанное отношение</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_filenode_relation(​<TT
+CLASS="PARAMETER"
+>tablespace</TT
+> <TT
+CLASS="TYPE"
+>oid</TT
+>, <TT
+CLASS="PARAMETER"
+>filenode</TT
+> <TT
+CLASS="TYPE"
+>oid</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>regclass</TT
+>
+                  </TD
+><TD
+>Находит отношение, связанное с данным табличным пространством и файловым узлом</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_relation_filenode</CODE
+> принимает OID или имя таблицы, индекса, последовательности или таблицы TOAST и возвращает номер <SPAN
+CLASS="QUOTE"
+>"файлового узла"</SPAN
+>, связанным с этим объектом. Файловым узлом называется основной компонент имени файла, используемого для хранения данных (подробнее это описано в <A
+HREF="storage-file-layout.html"
+>Разделе 59.1</A
+>). Для большинства таблиц этот номер совпадает со значением <TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+>.<TT
+CLASS="STRUCTFIELD"
+>relfilenode</TT
+>, но для некоторых системных каталогов <TT
+CLASS="STRUCTFIELD"
+>relfilenode</TT
+> равен 0, и нужно использовать эту функцию, чтобы узнать действительное значение. Если указанное отношение не хранится на диске, как например представление, данная функция возвращает NULL.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_relation_filepath</CODE
+> подобна <CODE
+CLASS="FUNCTION"
+>pg_relation_filenode</CODE
+>, но возвращает полный путь к файлу (относительно каталога данных <TT
+CLASS="VARNAME"
+>PGDATA</TT
+>) отношения.</P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>pg_filenode_relation</CODE
+> является обратной к <CODE
+CLASS="FUNCTION"
+>pg_relation_filenode</CODE
+>. Она возвращает OID отношения по заданному OID <SPAN
+CLASS="QUOTE"
+>"табличного пространства"</SPAN
+> и <SPAN
+CLASS="QUOTE"
+>"файловому узлу"</SPAN
+>. Для таблицы в табличном пространстве по умолчанию в первом параметре можно передать 0.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="FUNCTIONS-ADMIN-GENFILE"
+>9.26.8. Функции для работы с обычными файлами</A
+></H2
+><P
+>Функции, перечисленные в <A
+HREF="functions-admin.html#FUNCTIONS-ADMIN-GENFILE-TABLE"
+>Таблице 9-72</A
+>, предоставляют прямой доступ к файлам, находящимся на сервере. Они позволяют обращаться только к файлам в каталоге кластера баз данных (по относительному пути) или в каталоге <TT
+CLASS="VARNAME"
+>log_directory</TT
+> (по пути, заданному в параметре конфигурации <TT
+CLASS="VARNAME"
+>log_directory</TT
+>). Использовать эти функции могут только суперпользователи.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-ADMIN-GENFILE-TABLE"
+></A
+><P
+><B
+>Таблица 9-72. Функции для работы с обычными файлами</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип результата</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_ls_dir(​<TT
+CLASS="PARAMETER"
+>dirname</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>setof text</TT
+>
+                  </TD
+><TD
+>Возвращает список содержимого каталога</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_read_file(<TT
+CLASS="PARAMETER"
+>filename</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+> [, <TT
+CLASS="PARAMETER"
+>offset</TT
+> <TT
+CLASS="TYPE"
+>bigint</TT
+>, <TT
+CLASS="PARAMETER"
+>length</TT
+> <TT
+CLASS="TYPE"
+>bigint</TT
+>])</CODE
+></TT
+>
+       </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>text</TT
+>
+                  </TD
+><TD
+>Возвращает содержимое текстового файла</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_read_binary_file(<TT
+CLASS="PARAMETER"
+>filename</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+> [, <TT
+CLASS="PARAMETER"
+>offset</TT
+> <TT
+CLASS="TYPE"
+>bigint</TT
+>, <TT
+CLASS="PARAMETER"
+>length</TT
+> <TT
+CLASS="TYPE"
+>bigint</TT
+>])</CODE
+></TT
+>
+       </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>bytea</TT
+>
+                  </TD
+><TD
+>Возвращает содержимое файла</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_stat_file(<TT
+CLASS="PARAMETER"
+>filename</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>record</TT
+>
+                  </TD
+><TD
+>Возвращает информацию о файле</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_ls_dir</CODE
+> возвращает имена всех файлов и подкаталогов в заданном каталоге, за исключением специальных элементов <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>.</TT
+>"</SPAN
+> и <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>..</TT
+>"</SPAN
+>.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_read_file</CODE
+> возвращает фрагмент текстового файла с заданного смещения (<TT
+CLASS="PARAMETER"
+>offset</TT
+>), размером не больше <TT
+CLASS="PARAMETER"
+>length</TT
+> байт (размер может быть меньше, если файл кончится раньше). Если смещение <TT
+CLASS="PARAMETER"
+>offset</TT
+> отрицательно, оно отсчитывается от конца файла. Если параметры <TT
+CLASS="PARAMETER"
+>offset</TT
+> и <TT
+CLASS="PARAMETER"
+>length</TT
+> опущены, возвращается всё содержимое файла. Прочитанные из файла байты обрабатываются как символы в серверной кодировке; если они оказываются недопустимыми для этой кодировки, возникает ошибка.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_read_binary_file</CODE
+> подобна <CODE
+CLASS="FUNCTION"
+>pg_read_file</CODE
+>, но её результат имеет тип <TT
+CLASS="TYPE"
+>bytea</TT
+>; как следствие, никакие проверки кодировки не выполняются. В сочетании с <CODE
+CLASS="FUNCTION"
+>convert_from</CODE
+> эту функцию можно применять для чтения файлов в произвольной кодировке: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT convert_from(pg_read_binary_file('file_in_utf8.txt'), 'UTF8');</PRE
+><P></P
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_stat_file</CODE
+> возвращает запись, содержащую размер файла, время последнего обращения и последнего изменения, а также время последнего изменения состояния (только в Unix-системах), время создания (только в Windows) и признак типа <TT
+CLASS="TYPE"
+>boolean</TT
+>, показывающий, что это каталог. Примеры использования: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT * FROM pg_stat_file('filename');
+SELECT (pg_stat_file('filename')).modification;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="FUNCTIONS-ADVISORY-LOCKS"
+>9.26.9. Функции управления рекомендательными блокировками</A
+></H2
+><P
+>Функции, перечисленные в <A
+HREF="functions-admin.html#FUNCTIONS-ADVISORY-LOCKS-TABLE"
+>Таблице 9-73</A
+>, предназначены для управления рекомендательными блокировками. Подробнее об их использовании можно узнать в <A
+HREF="explicit-locking.html#ADVISORY-LOCKS"
+>Подразделе 13.3.5</A
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-ADVISORY-LOCKS-TABLE"
+></A
+><P
+><B
+>Таблица 9-73. Функции управления рекомендательными блокировками</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип результата</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_advisory_lock(<TT
+CLASS="PARAMETER"
+>key</TT
+> <TT
+CLASS="TYPE"
+>bigint</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>void</TT
+>
+                  </TD
+><TD
+>Получает исключительную блокировку на уровне сеанса</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_advisory_lock(<TT
+CLASS="PARAMETER"
+>key1</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>, <TT
+CLASS="PARAMETER"
+>key2</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>void</TT
+>
+                  </TD
+><TD
+>Получает исключительную блокировку на уровне сеанса</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_advisory_lock_shared(​<TT
+CLASS="PARAMETER"
+>key</TT
+> <TT
+CLASS="TYPE"
+>bigint</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>void</TT
+>
+                  </TD
+><TD
+>Получает разделяемую блокировку на уровне сеанса</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_advisory_lock_shared(​<TT
+CLASS="PARAMETER"
+>key1</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>, <TT
+CLASS="PARAMETER"
+>key2</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>void</TT
+>
+                  </TD
+><TD
+>Получает разделяемую блокировку на уровне сеанса</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_advisory_unlock(<TT
+CLASS="PARAMETER"
+>key</TT
+> <TT
+CLASS="TYPE"
+>bigint</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>Освобождает исключительную блокировку на уровне сеанса</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_advisory_unlock(<TT
+CLASS="PARAMETER"
+>key1</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>, <TT
+CLASS="PARAMETER"
+>key2</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>Освобождает исключительную блокировку на уровне сеанса</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_advisory_unlock_all()</CODE
+></TT
+>
+       </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>void</TT
+>
+                  </TD
+><TD
+>Освобождает все блокировки на уровне сеанса, удерживаемые в данном сеансе</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_advisory_unlock_shared(​<TT
+CLASS="PARAMETER"
+>key</TT
+> <TT
+CLASS="TYPE"
+>bigint</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>Освобождает разделяемую блокировку на уровне сеанса</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_advisory_unlock_shared(​<TT
+CLASS="PARAMETER"
+>key1</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>, <TT
+CLASS="PARAMETER"
+>key2</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>Освобождает разделяемую блокировку на уровне сеанса</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_advisory_xact_lock(<TT
+CLASS="PARAMETER"
+>key</TT
+> <TT
+CLASS="TYPE"
+>bigint</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>void</TT
+>
+                  </TD
+><TD
+>Получает исключительную блокировку на уровне транзакции</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_advisory_xact_lock(<TT
+CLASS="PARAMETER"
+>key1</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>, <TT
+CLASS="PARAMETER"
+>key2</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>void</TT
+>
+                  </TD
+><TD
+>Получает исключительную блокировку на уровне транзакции</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_advisory_xact_lock_​shared(​<TT
+CLASS="PARAMETER"
+>key</TT
+> <TT
+CLASS="TYPE"
+>bigint</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>void</TT
+>
+                  </TD
+><TD
+>Получает разделяемую блокировку на уровне транзакции</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_advisory_xact_lock_​shared(​<TT
+CLASS="PARAMETER"
+>key1</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>, <TT
+CLASS="PARAMETER"
+>key2</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>void</TT
+>
+                  </TD
+><TD
+>Получает разделяемую блокировку на уровне транзакции</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_try_advisory_lock(<TT
+CLASS="PARAMETER"
+>key</TT
+> <TT
+CLASS="TYPE"
+>bigint</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>Получает исключительную блокировку на уровне сеанса, если это возможно</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_try_advisory_lock(<TT
+CLASS="PARAMETER"
+>key1</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>, <TT
+CLASS="PARAMETER"
+>key2</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>Получает исключительную блокировку на уровне сеанса, если это возможно</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_try_advisory_lock_​shared(​<TT
+CLASS="PARAMETER"
+>key</TT
+> <TT
+CLASS="TYPE"
+>bigint</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>Получает разделяемую блокировку на уровне сеанса, если это возможно</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_try_advisory_lock_​shared(​<TT
+CLASS="PARAMETER"
+>key1</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>, <TT
+CLASS="PARAMETER"
+>key2</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>Получает разделяемую блокировку на уровне сеанса, если это возможно</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_try_advisory_xact_lock(​<TT
+CLASS="PARAMETER"
+>key</TT
+> <TT
+CLASS="TYPE"
+>bigint</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>Получает исключительную блокировку на уровне транзакции, если это возможно</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_try_advisory_xact_lock(​<TT
+CLASS="PARAMETER"
+>key1</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>, <TT
+CLASS="PARAMETER"
+>key2</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>Получает исключительную блокировку на уровне транзакции, если это возможно</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_try_advisory_xact_lock_​shared(​<TT
+CLASS="PARAMETER"
+>key</TT
+> <TT
+CLASS="TYPE"
+>bigint</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>Получает разделяемую блокировку на уровне транзакции, если это возможно</TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_try_advisory_xact_lock_​shared(​<TT
+CLASS="PARAMETER"
+>key1</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>, <TT
+CLASS="PARAMETER"
+>key2</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>Получает разделяемую блокировку на уровне транзакции, если это возможно</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_advisory_lock</CODE
+> блокирует определённый приложением ресурс, задаваемый одним 64-битным или двумя 32-битными ключами (заметьте, что их значения не пересекаются). Если идентификатор этого ресурса удерживает другой сеанс, эта функция не завершится, пока ресурс не станет доступным. Данная функция устанавливает блокировку в исключительном режиме. Если поступает сразу несколько запросов на блокировку, они накапливаются, так что если один ресурс был заблокирован три раза, его необходимо три раза разблокировать, чтобы он был доступен в других сеансах.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_advisory_lock_shared</CODE
+> работает подобно <CODE
+CLASS="FUNCTION"
+>pg_advisory_lock</CODE
+>, но позволяет разделять блокировку с другими сеансами, запрашивающими её как разделяемую. Выполнение может быть приостановлено, только если другой сеанс запросил её в исключительном режиме.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_try_advisory_lock</CODE
+> работает подобно <CODE
+CLASS="FUNCTION"
+>pg_advisory_lock</CODE
+>, но не ждёт освобождения ресурса. Эта функция либо немедленно получает блокировку и возвращает <TT
+CLASS="LITERAL"
+>true</TT
+>, либо сразу возвращает <TT
+CLASS="LITERAL"
+>false</TT
+>, если получить её не удаётся.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_try_advisory_lock_shared</CODE
+> работает как <CODE
+CLASS="FUNCTION"
+>pg_try_advisory_lock</CODE
+>, но пытается получить разделяемую, а не исключительную блокировку.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_advisory_unlock</CODE
+> освобождает ранее полученную исключительную блокировку на уровне сеанса. Если блокировка освобождена успешна, эта функция возвращает <TT
+CLASS="LITERAL"
+>true</TT
+>, а если она не была занята &mdash; <TT
+CLASS="LITERAL"
+>false</TT
+>, при этом сервер выдаёт предупреждение SQL.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_advisory_unlock_shared</CODE
+> работает подобно <CODE
+CLASS="FUNCTION"
+>pg_advisory_unlock</CODE
+>, но освобождает разделяемую блокировку на уровне сеанса.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_advisory_unlock_all</CODE
+> освобождает все блокировки на уровне сеанса, закреплённые за текущим сеансом. (Эта функция неявно вызывается в конце любого сеанса, даже при нештатном отключении клиента.)</P
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_advisory_xact_lock</CODE
+> работает подобно <CODE
+CLASS="FUNCTION"
+>pg_advisory_lock</CODE
+>, но её блокировка автоматически освобождается в конце текущей транзакции и не может быть освобождена явным образом.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_advisory_xact_lock_shared</CODE
+> подобна функции <CODE
+CLASS="FUNCTION"
+>pg_advisory_lock_shared</CODE
+>, но её блокировка автоматически освобождается в конце текущей транзакции и не может быть освобождена явным образом.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_try_advisory_xact_lock</CODE
+> работает подобно <CODE
+CLASS="FUNCTION"
+>pg_try_advisory_lock</CODE
+>, но её блокировка (если она была получена) автоматически освобождается в конце текущей транзакции и не может быть освобождена явным образом.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>pg_try_advisory_xact_lock_shared</CODE
+> работает подобно <CODE
+CLASS="FUNCTION"
+>pg_try_advisory_lock_shared</CODE
+>, но её блокировка (если она была получена) автоматически освобождается в конце текущей транзакции и не может быть освобождена явным образом.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions-info.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="functions-trigger.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Системные информационные функции</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Триггерные функции</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

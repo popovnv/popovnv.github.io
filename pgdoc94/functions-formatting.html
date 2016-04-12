@@ -1,0 +1,2488 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Функции форматирования данных</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Функции и операторы"
+HREF="functions.html"><LINK
+REL="PREVIOUS"
+TITLE="Поиск по шаблону"
+HREF="functions-matching.html"><LINK
+REL="NEXT"
+TITLE="Операторы и функции даты/времени"
+HREF="functions-datetime.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Поиск по шаблону"
+HREF="functions-matching.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 9. Функции и операторы</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Операторы и функции даты/времени"
+HREF="functions-datetime.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="FUNCTIONS-FORMATTING"
+>9.8. Функции форматирования данных</A
+></H1
+><P
+>Функции форматирования в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> предоставляют богатый набор инструментов для преобразования самых разных типов данных (дата/время, целое, числа с плавающей и фиксированной точкой) в форматированные строки и обратно. Все они перечислены в <A
+HREF="functions-formatting.html#FUNCTIONS-FORMATTING-TABLE"
+>Таблице 9-21</A
+>. Все эти функции следует одному соглашению: в первом аргументе передаётся значение, которое нужно отформатировать, а во втором &mdash; шаблон, определяющий формат ввода или вывода.</P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>to_timestamp</CODE
+> может иметь также один аргумент; в этом случае она принимает число <TT
+CLASS="TYPE"
+>double precision</TT
+> и преобразует его из времени Unix (число секунд с 1970-01-01 00:00:00+00) в <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+> (время с часовым поясом). (Значения времени Unix типа <TT
+CLASS="TYPE"
+>Integer</TT
+> просто неявно приводятся к типу <TT
+CLASS="TYPE"
+>double precision</TT
+>.)</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-FORMATTING-TABLE"
+></A
+><P
+><B
+>Таблица 9-21. Функции форматирования</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Функция</TH
+><TH
+>Тип результата</TH
+><TH
+>Описание</TH
+><TH
+>Пример</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>to_char(<TT
+CLASS="TYPE"
+>timestamp</TT
+>, <TT
+CLASS="TYPE"
+>text</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>преобразует время в текст</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(​current_timestamp, 'HH12:MI:SS')</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>to_char(<TT
+CLASS="TYPE"
+>interval</TT
+>, <TT
+CLASS="TYPE"
+>text</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>преобразует интервал в текст</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(​interval '15h&nbsp;2m&nbsp;12s', 'HH24:MI:SS')</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>to_char(<TT
+CLASS="TYPE"
+>int</TT
+>, <TT
+CLASS="TYPE"
+>text</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>преобразует целое в текст</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(125, '999')</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>to_char</CODE
+>(​<TT
+CLASS="TYPE"
+>double precision</TT
+>, <TT
+CLASS="TYPE"
+>text</TT
+>)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>преобразует плавающее одинарной/двойной точности в текст</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(​125.8::real, '999D9')</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>to_char(<TT
+CLASS="TYPE"
+>numeric</TT
+>, <TT
+CLASS="TYPE"
+>text</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>преобразует числовое значение в текст</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(-125.8, '999D99S')</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>to_date(<TT
+CLASS="TYPE"
+>text</TT
+>, <TT
+CLASS="TYPE"
+>text</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>date</TT
+>
+                </TD
+><TD
+>преобразует текст в дату</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_date(​'05&nbsp;Dec&nbsp;2000', 'DD&nbsp;Mon&nbsp;YYYY')</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>to_number(<TT
+CLASS="TYPE"
+>text</TT
+>, <TT
+CLASS="TYPE"
+>text</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>numeric</TT
+>
+                </TD
+><TD
+>преобразует текст в число</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_number(​'12,454.8-', '99G999D9S')</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>to_timestamp(<TT
+CLASS="TYPE"
+>text</TT
+>, <TT
+CLASS="TYPE"
+>text</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+>
+                </TD
+><TD
+>преобразует строку во время</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_timestamp(​'05&nbsp;Dec&nbsp;2000', 'DD&nbsp;Mon&nbsp;YYYY')</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>to_timestamp(<TT
+CLASS="TYPE"
+>double precision</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+>
+                </TD
+><TD
+>преобразует время в стиле Unix в стандартное время</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_timestamp(​1284352323)</TT
+>
+                </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Шаблон вывода <CODE
+CLASS="FUNCTION"
+>to_char</CODE
+> может содержать ряд кодов, которые распознаются при форматировании и заменяются соответствующими данными. Любой текст, который не является кодом, копируется в результат в неизменном виде. Подобным образом, в строке шаблона ввода (для других функций) коды шаблона определяют, какие значения содержит передаваемая текстовая строка.</P
+><P
+>Все коды форматирования даты и времени перечислены в <A
+HREF="functions-formatting.html#FUNCTIONS-FORMATTING-DATETIME-TABLE"
+>Таблице 9-22</A
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-FORMATTING-DATETIME-TABLE"
+></A
+><P
+><B
+>Таблица 9-22. Коды форматирования даты/времени</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+>Код</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>HH</TT
+>
+                </TD
+><TD
+>час (01-12)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>HH12</TT
+>
+                </TD
+><TD
+>час (01-12)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>HH24</TT
+>
+                </TD
+><TD
+>час (00-23)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>MI</TT
+>
+                </TD
+><TD
+>минута (00-59)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>SS</TT
+>
+                </TD
+><TD
+>секунда (00-59)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>MS</TT
+>
+                </TD
+><TD
+>миллисекунда (000-999)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>US</TT
+>
+                </TD
+><TD
+>микросекунда (000000-999999)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>SSSS</TT
+>
+                </TD
+><TD
+>число секунд с начала суток (0-86399)</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>AM</TT
+>, <TT
+CLASS="LITERAL"
+>am</TT
+>, <TT
+CLASS="LITERAL"
+>PM</TT
+> или <TT
+CLASS="LITERAL"
+>pm</TT
+></TD
+><TD
+>обозначение времени до/после полудня (без точек)</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>A.M.</TT
+>, <TT
+CLASS="LITERAL"
+>a.m.</TT
+>, <TT
+CLASS="LITERAL"
+>P.M.</TT
+> или <TT
+CLASS="LITERAL"
+>p.m.</TT
+></TD
+><TD
+>обозначение времени до/после полудня (с точками)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>Y,YYY</TT
+>
+                </TD
+><TD
+>год (4 или более цифр) с разделителем</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>YYYY</TT
+>
+                </TD
+><TD
+>год (4 или более цифр)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>YYY</TT
+>
+                </TD
+><TD
+>последние 3 цифры года</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>YY</TT
+>
+                </TD
+><TD
+>последние 2 цифры года</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>Y</TT
+>
+                </TD
+><TD
+>последняя цифра года</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>IYYY</TT
+>
+                </TD
+><TD
+>недельный год по ISO 8601 (4 или более цифр)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>IYY</TT
+>
+                </TD
+><TD
+>последние 3 цифры недельного года по ISO 8601</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>IY</TT
+>
+                </TD
+><TD
+>последние 2 цифры недельного года по ISO 8601</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>I</TT
+>
+                </TD
+><TD
+>последняя цифра недельного года по ISO 8601</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>BC</TT
+>, <TT
+CLASS="LITERAL"
+>bc</TT
+>, <TT
+CLASS="LITERAL"
+>AD</TT
+> или <TT
+CLASS="LITERAL"
+>ad</TT
+></TD
+><TD
+>обозначение эры (без точек)</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>B.C.</TT
+>, <TT
+CLASS="LITERAL"
+>b.c.</TT
+>, <TT
+CLASS="LITERAL"
+>A.D.</TT
+> или <TT
+CLASS="LITERAL"
+>a.d.</TT
+></TD
+><TD
+>обозначение эры (с точками)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>MONTH</TT
+>
+                </TD
+><TD
+>полное название месяца в верхнем регистре (дополненное пробелами до 9 символов)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>Month</TT
+>
+                </TD
+><TD
+>полное название месяца с большой буквы (дополненное пробелами до 9 символов)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>month</TT
+>
+                </TD
+><TD
+>полное название месяца в нижнем регистре (дополненное пробелами до 9 символов)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>MON</TT
+>
+                </TD
+><TD
+>сокращённое название месяца в верхнем регистре (3 буквы в английском; в других языках длина может меняться)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>Mon</TT
+>
+                </TD
+><TD
+>сокращённое название месяца с большой буквы (3 буквы в английском; в других языках длина может меняться)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>mon</TT
+>
+                </TD
+><TD
+>сокращённое название месяца в нижнем регистре (3 буквы в английском; в других языках длина может меняться)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>MM</TT
+>
+                </TD
+><TD
+>номер месяца (01-12)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>DAY</TT
+>
+                </TD
+><TD
+>полное название дня недели в верхнем регистре (дополненное пробелами до 9 символов)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>Day</TT
+>
+                </TD
+><TD
+>полное название дня недели с большой буквы (дополненное пробелами до 9 символов)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>day</TT
+>
+                </TD
+><TD
+>полное название дня недели в нижнем регистре (дополненное пробелами до 9 символов)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>DY</TT
+>
+                </TD
+><TD
+>сокращённое название дня недели в верхнем регистре (3 буквы в английском; в других языках может меняться)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>Dy</TT
+>
+                </TD
+><TD
+>сокращённое название дня недели с большой буквы (3 буквы в английском; в других языках длина может меняться)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>dy</TT
+>
+                </TD
+><TD
+>сокращённое название дня недели в нижнем регистре (3 буквы в английском; в других языках длина может меняться)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>DDD</TT
+>
+                </TD
+><TD
+>номер дня в году (001-366)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>IDDD</TT
+>
+                </TD
+><TD
+>номер дня в году по ISO 8601 (001-371; 1 день &mdash; понедельник первой недели по ISO)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>DD</TT
+>
+                </TD
+><TD
+>день месяца (01-31)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>D</TT
+>
+                </TD
+><TD
+>номер дня недели, считая с воскресенья (<TT
+CLASS="LITERAL"
+>1</TT
+>) до субботы (<TT
+CLASS="LITERAL"
+>7</TT
+>)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>ID</TT
+>
+                </TD
+><TD
+>номер дня недели по ISO 8601, считая с понедельника (<TT
+CLASS="LITERAL"
+>1</TT
+>) до воскресенья (<TT
+CLASS="LITERAL"
+>7</TT
+>)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>W</TT
+>
+                </TD
+><TD
+>неделя месяца (1-5) (первая неделя начинается в первое число месяца)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>WW</TT
+>
+                </TD
+><TD
+>номер недели в году (1-53) (первая неделя начинается в первый день года)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>IW</TT
+>
+                </TD
+><TD
+>номер недели в году по ISO 8601 (01-53; первый четверг года относится к неделе 1)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>CC</TT
+>
+                </TD
+><TD
+>век (2 цифры) (двадцать первый век начался 2001-01-01)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>J</TT
+>
+                </TD
+><TD
+>День по юлианскому календарю (номер дня с 24 ноября 4714 г. до н. э.)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>Q</TT
+>
+                </TD
+><TD
+>квартал (игнорируется функциями <CODE
+CLASS="FUNCTION"
+>to_date</CODE
+> и <CODE
+CLASS="FUNCTION"
+>to_timestamp</CODE
+>)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>RM</TT
+>
+                </TD
+><TD
+>номер месяца римскими цифрами в верхнем регистре (I-XII; I=январь)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>rm</TT
+>
+                </TD
+><TD
+>номер месяца римскими цифрами в нижнем регистре (i-xii; i=январь)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>TZ</TT
+>
+                </TD
+><TD
+>название часового пояса в верхнем регистре</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>tz</TT
+>
+                </TD
+><TD
+>название часового пояса в нижнем регистре</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>OF</TT
+>
+                </TD
+><TD
+>смещение часового пояса</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>К любым кодам форматирования можно добавить модификаторы, изменяющие их поведение. Например, шаблон форматирования <TT
+CLASS="LITERAL"
+>FMMonth</TT
+> включает код <TT
+CLASS="LITERAL"
+>Month</TT
+> с модификатором <TT
+CLASS="LITERAL"
+>FM</TT
+>. Модификаторы, предназначенные для форматирования даты/времени, перечислены в <A
+HREF="functions-formatting.html#FUNCTIONS-FORMATTING-DATETIMEMOD-TABLE"
+>Таблице 9-23</A
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-FORMATTING-DATETIMEMOD-TABLE"
+></A
+><P
+><B
+>Таблица 9-23. Модификаторы кодов для форматирования даты/времени</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Модификатор</TH
+><TH
+>Описание</TH
+><TH
+>Пример</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>Приставка <TT
+CLASS="LITERAL"
+>FM</TT
+></TD
+><TD
+>режим заполнения (подавляет дополнение пробелами и нули справа)</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>FMMonth</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>Окончание <TT
+CLASS="LITERAL"
+>TH</TT
+></TD
+><TD
+>окончание порядкового числительного в верхнем регистре</TD
+><TD
+><TT
+CLASS="LITERAL"
+>DDTH</TT
+>, например <TT
+CLASS="LITERAL"
+>12TH</TT
+></TD
+></TR
+><TR
+><TD
+>Окончание <TT
+CLASS="LITERAL"
+>th</TT
+></TD
+><TD
+>окончание порядкового числительного в нижнем регистре</TD
+><TD
+><TT
+CLASS="LITERAL"
+>DDth</TT
+>, например <TT
+CLASS="LITERAL"
+>12th</TT
+></TD
+></TR
+><TR
+><TD
+>Приставка <TT
+CLASS="LITERAL"
+>FX</TT
+></TD
+><TD
+>глобальный параметр фиксированного формата (см. замечания)</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>FX&nbsp;Month&nbsp;DD&nbsp;Day</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>Приставка <TT
+CLASS="LITERAL"
+>TM</TT
+></TD
+><TD
+>режим перевода (выводятся локализованные названия дней и месяцев, исходя из <A
+HREF="runtime-config-client.html#GUC-LC-TIME"
+>lc_time</A
+>)</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>TMMonth</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>Окончание <TT
+CLASS="LITERAL"
+>SP</TT
+></TD
+><TD
+>режим числа прописью (не реализован)</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>DDSP</TT
+>
+                </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Замечания по использованию форматов даты/времени: <P
+></P
+></P><UL
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>FM</TT
+> подавляет дополняющие пробелы и нули справа, которые в противном случае будут добавлены, чтобы результат имел фиксированную ширину. В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> модификатор <TT
+CLASS="LITERAL"
+>FM</TT
+> действует только на следующий код, тогда как в Oracle <TT
+CLASS="LITERAL"
+>FM</TT
+> её действие распространяется на все последующие коды, пока не будет отключено последующим модификатором <TT
+CLASS="LITERAL"
+>FM</TT
+>.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>TM</TT
+> не затрагивает дополняющие пробелы.</P
+></LI
+><LI
+><P
+><CODE
+CLASS="FUNCTION"
+>to_timestamp</CODE
+> и <CODE
+CLASS="FUNCTION"
+>to_date</CODE
+> пропускают повторяющиеся пробелы во входной строке, если только не используется параметр <TT
+CLASS="LITERAL"
+>FX</TT
+>. Например, <TT
+CLASS="LITERAL"
+>to_timestamp('2000&nbsp;&nbsp;&nbsp;&nbsp;JUN', 'YYYY MON')</TT
+> будет работать, но <TT
+CLASS="LITERAL"
+>to_timestamp('2000&nbsp;&nbsp;&nbsp;&nbsp;JUN', 'FXYYYY MON')</TT
+> вернёт ошибку, так как <CODE
+CLASS="FUNCTION"
+>to_timestamp</CODE
+> в данном случае ожидает только один разделяющий пробел. Приставка <TT
+CLASS="LITERAL"
+>FX</TT
+> должна быть первой в шаблоне.</P
+></LI
+><LI
+><P
+><CODE
+CLASS="FUNCTION"
+>to_timestamp</CODE
+> и <CODE
+CLASS="FUNCTION"
+>to_date</CODE
+> предназначены для обработки входных форматов, для которых недостаточно простого приведения. Эти функции интерпретируют вводимые данные с послаблениями, проверяя только грубые ошибки. Хотя они выдают корректные данные, результат может отличаться от ожидаемого. В частности, входные аргументы этих функций не ограничиваются обычными диапазонами, так что <TT
+CLASS="LITERAL"
+>to_date('20096040','YYYYMMDD')</TT
+> выдаёт <TT
+CLASS="LITERAL"
+>2014-01-17</TT
+>, а не ошибку. С приведением такого не происходит.</P
+></LI
+><LI
+><P
+>Шаблоны для функций <CODE
+CLASS="FUNCTION"
+>to_char</CODE
+> могут содержать обычный текст; он будет выведен в неизменном виде. Чтобы вывести текст принудительно, например, если в нём оказываются поддерживаемые коды, его можно заключить в кавычки. Например, в строке <TT
+CLASS="LITERAL"
+>'"Hello Year "YYYY'</TT
+>, код <TT
+CLASS="LITERAL"
+>YYYY</TT
+> будет заменён номером года, а буква <TT
+CLASS="LITERAL"
+>Y</TT
+> в слове <TT
+CLASS="LITERAL"
+>Year</TT
+> останется неизменной. В функциях <CODE
+CLASS="FUNCTION"
+>to_date</CODE
+>, <CODE
+CLASS="FUNCTION"
+>to_number</CODE
+> и <CODE
+CLASS="FUNCTION"
+>to_timestamp</CODE
+> при обработке подстроки в кавычках просто пропускаются символы входной строки по числу символов в подстроке, например для <TT
+CLASS="LITERAL"
+>"XX"</TT
+> будут пропущены два символа.</P
+></LI
+><LI
+><P
+>Если вы хотите получить в результате кавычки, перед ними нужно добавить обратную косую черту, например так: <TT
+CLASS="LITERAL"
+>'\"YYYY Month\"'</TT
+>.</P
+></LI
+><LI
+><P
+>Если формат года определяется менее, чем 4 цифрами, например, как <TT
+CLASS="LITERAL"
+>YYY</TT
+>, и в переданном значении года тоже меньше 4 цифр, год пересчитывается в максимально близкий к году 2020, т. е. <TT
+CLASS="LITERAL"
+>95</TT
+> воспринимается как 1995.</P
+></LI
+><LI
+><P
+>С преобразованием <TT
+CLASS="LITERAL"
+>YYYY</TT
+> из строки в тип <TT
+CLASS="TYPE"
+>timestamp</TT
+> или <TT
+CLASS="TYPE"
+>date</TT
+> связано ограничение, когда обрабатываемый год записывается более чем 4 цифрами. После <TT
+CLASS="LITERAL"
+>YYYY</TT
+> необходимо будет добавить не цифровой символ или соответствующий код, иначе год всегда будет восприниматься как 4 цифры. Например, в <TT
+CLASS="LITERAL"
+>to_date('200001131', 'YYYYMMDD')</TT
+> (с годом 20000) год будет интерпретирован как состоящий из 4 цифр; чтобы исправить ситуацию, нужно добавить не цифровой разделитель после года, как в <TT
+CLASS="LITERAL"
+>to_date('20000-1131', 'YYYY-MMDD')</TT
+>, или код как в <TT
+CLASS="LITERAL"
+>to_date('20000Nov31', 'YYYYMonDD')</TT
+>.</P
+></LI
+><LI
+><P
+>В преобразованиях из строки в тип <TT
+CLASS="TYPE"
+>timestamp</TT
+> или <TT
+CLASS="TYPE"
+>date</TT
+>, поле <TT
+CLASS="LITERAL"
+>CC</TT
+> (век) игнорируется, если шаблон включает поля <TT
+CLASS="LITERAL"
+>YYY</TT
+>, <TT
+CLASS="LITERAL"
+>YYYY</TT
+> или <TT
+CLASS="LITERAL"
+>Y,YYY</TT
+>. Когда <TT
+CLASS="LITERAL"
+>CC</TT
+> используется с <TT
+CLASS="LITERAL"
+>YY</TT
+> или <TT
+CLASS="LITERAL"
+>Y</TT
+>, год вычисляется как год данного столетия. Если присутствует только код столетия, без года, подразумевается первый год этого века.</P
+></LI
+><LI
+><P
+>Даты по недельному календарю ISO 8601 (отличающиеся от григорианских) можно передать функциям <CODE
+CLASS="FUNCTION"
+>to_timestamp</CODE
+> и <CODE
+CLASS="FUNCTION"
+>to_date</CODE
+> одним из двух способов: <P
+></P
+></P><UL
+><LI
+><P
+>Год, номер недели и дня недели: например, <TT
+CLASS="LITERAL"
+>to_date('2006-42-4', 'IYYY-IW-ID')</TT
+> возвращает дату <TT
+CLASS="LITERAL"
+>2006-10-19</TT
+>. Если день недели опускается, он считается равным 1 (понедельнику).</P
+></LI
+><LI
+><P
+>Год и день года: например, <TT
+CLASS="LITERAL"
+>to_date('2006-291', 'IYYY-IDDD')</TT
+> также возвращает <TT
+CLASS="LITERAL"
+>2006-10-19</TT
+>.</P
+></LI
+></UL
+><P></P
+><P
+>Попытка ввести дату из смеси полей григорианского и недельного календаря ISO 8601 бессмысленна, поэтому это будет считаться ошибкой. В контексте ISO 8601 понятия <SPAN
+CLASS="QUOTE"
+>"номер месяца"</SPAN
+> и <SPAN
+CLASS="QUOTE"
+>"день месяца"</SPAN
+> не существуют, а в григорианском календаре нет понятия номера недели по ISO.</P
+><DIV
+CLASS="CAUTION"
+><P
+></P
+><TABLE
+CLASS="CAUTION"
+BORDER="1"
+WIDTH="90%"
+><TR
+><TD
+ALIGN="CENTER"
+><B
+>Предостережение</B
+></TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+><P
+>Тогда как <CODE
+CLASS="FUNCTION"
+>to_date</CODE
+> не примет смесь полей григорианского и недельного календаря ISO, <CODE
+CLASS="FUNCTION"
+>to_char</CODE
+> способна на это, так как форматы вроде <TT
+CLASS="LITERAL"
+>YYYY-MM-DD (IYYY-IDDD)</TT
+> могут быть полезны. Но избегайте форматов типа <TT
+CLASS="LITERAL"
+>IYYY-MM-DD</TT
+>; в противном случае с датами в начале года возможны сюрпризы. (За дополнительными сведениями обратитесь к <A
+HREF="functions-datetime.html#FUNCTIONS-DATETIME-EXTRACT"
+>Подразделу 9.9.1</A
+>.)</P
+></TD
+></TR
+></TABLE
+></DIV
+></LI
+><LI
+><P
+>При преобразовании из текстовой строки в <TT
+CLASS="TYPE"
+>timestamp</TT
+>, миллисекунды (<TT
+CLASS="LITERAL"
+>MS</TT
+>) или микросекунды (<TT
+CLASS="LITERAL"
+>US</TT
+>) воспринимаются как дробная часть числа секунд. Например, <TT
+CLASS="LITERAL"
+>to_timestamp('12:3', 'SS:MS')</TT
+> &mdash; это не 3 миллисекунды, а 300, так как это значение воспринимается как 12 + 0.3 сек. Это значит, что для формата <TT
+CLASS="LITERAL"
+>SS:MS</TT
+> вводимые значения <TT
+CLASS="LITERAL"
+>12:3</TT
+>, <TT
+CLASS="LITERAL"
+>12:30</TT
+> и <TT
+CLASS="LITERAL"
+>12:300</TT
+> задают одно и то же число миллисекунд. Чтобы получить три миллисекунды, время нужно записать в виде <TT
+CLASS="LITERAL"
+>12:003</TT
+>, тогда это будет воспринято как 12 + 0.003 = 12.003 сек.</P
+><P
+>Ещё более сложный пример: <TT
+CLASS="LITERAL"
+>to_timestamp('15:12:02.020.001230', 'HH:MI:SS.MS.US')</TT
+> будет преобразовано в 15 часов, 12 минут и 2 секунды + 20 миллисекунд + 1230 микросекунд = 2.021230 seconds.</P
+></LI
+><LI
+><P
+>Нумерация дней недели в <CODE
+CLASS="FUNCTION"
+>to_char(..., 'ID')</CODE
+> соответствует функции <CODE
+CLASS="FUNCTION"
+>extract(isodow from ...)</CODE
+>, но нумерация <CODE
+CLASS="FUNCTION"
+>to_char(..., 'D')</CODE
+> не соответствует нумерации, принятой в <CODE
+CLASS="FUNCTION"
+>extract(dow from ...)</CODE
+>.</P
+></LI
+><LI
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>to_char(interval)</CODE
+> обрабатывает форматы <TT
+CLASS="LITERAL"
+>HH</TT
+> и <TT
+CLASS="LITERAL"
+>HH12</TT
+> в рамках 12 часов, то есть 0 и 36 часов будут выводиться как <TT
+CLASS="LITERAL"
+>12</TT
+>, тогда как <TT
+CLASS="LITERAL"
+>HH24</TT
+> выводит значение полностью и для интервалов выводимое значение может превышать 23.</P
+></LI
+></UL
+><P></P
+><P
+>Коды форматирования числовых значений перечислены в <A
+HREF="functions-formatting.html#FUNCTIONS-FORMATTING-NUMERIC-TABLE"
+>Таблице 9-24</A
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-FORMATTING-NUMERIC-TABLE"
+></A
+><P
+><B
+>Таблица 9-24. Коды форматирования чисел</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+>Код</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>9</TT
+>
+                </TD
+><TD
+>значение с заданным количеством цифр</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>0</TT
+>
+                </TD
+><TD
+>значение с ведущими нулями</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>.</TT
+> (точка)</TD
+><TD
+>десятичная точка</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>,</TT
+> (запятая)</TD
+><TD
+>разделитель групп (тысяч)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>PR</TT
+>
+                </TD
+><TD
+>отрицательное значение в угловых скобках</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>S</TT
+>
+                </TD
+><TD
+>знак, добавляемый к числу (с учётом локали)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>L</TT
+>
+                </TD
+><TD
+>символ денежной единицы (с учётом локали)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>D</TT
+>
+                </TD
+><TD
+>разделитель целой и дробной части числа (с учётом локали)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>G</TT
+>
+                </TD
+><TD
+>разделитель групп (с учётом локали)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>MI</TT
+>
+                </TD
+><TD
+>знак минус в заданной позиции (если число &lt; 0)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>PL</TT
+>
+                </TD
+><TD
+>знак плюс в заданной позиции (если число &gt; 0)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>SG</TT
+>
+                </TD
+><TD
+>знак плюс или минус в заданной позиции</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>RN</TT
+>
+                </TD
+><TD
+>число римскими цифрами (в диапазоне от 1 до 3999)</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>TH</TT
+> или <TT
+CLASS="LITERAL"
+>th</TT
+></TD
+><TD
+>окончание порядкового числительного</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>V</TT
+>
+                </TD
+><TD
+>сдвиг на заданное количество цифр (см. замечания)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>EEEE</TT
+>
+                </TD
+><TD
+>экспоненциальная запись числа</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Замечания по использованию форматов чисел: <P
+></P
+></P><UL
+><LI
+><P
+>Знак числа, полученный кодами <TT
+CLASS="LITERAL"
+>SG</TT
+>, <TT
+CLASS="LITERAL"
+>PL</TT
+> или <TT
+CLASS="LITERAL"
+>MI</TT
+>, не присоединяется к числу; например, <TT
+CLASS="LITERAL"
+>to_char(-12, 'MI9999')</TT
+> выдаёт <TT
+CLASS="LITERAL"
+>'-&nbsp;&nbsp;12'</TT
+>, тогда как <TT
+CLASS="LITERAL"
+>to_char(-12, 'S9999')</TT
+> &mdash; <TT
+CLASS="LITERAL"
+>'&nbsp;&nbsp;-12'</TT
+>. В Oracle <TT
+CLASS="LITERAL"
+>MI</TT
+> не может идти перед <TT
+CLASS="LITERAL"
+>9</TT
+>, наоборот <TT
+CLASS="LITERAL"
+>9</TT
+> нужно указать перед <TT
+CLASS="LITERAL"
+>MI</TT
+>.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>9</TT
+> выводит значение с таким количеством цифр, какое было бы, если бы оно состояло из девяток. Если цифры в данном месте не оказывается, выводится пробел.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>TH</TT
+> не преобразует значения меньше 0 и не поддерживает дробные числа.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>PL</TT
+>, <TT
+CLASS="LITERAL"
+>SG</TT
+> и <TT
+CLASS="LITERAL"
+>TH</TT
+> &mdash; расширения <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>V</TT
+> по сути умножает вводимое значение на <TT
+CLASS="LITERAL"
+>10^<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+></TT
+>, где <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+> &mdash; число цифр, следующих за <TT
+CLASS="LITERAL"
+>V</TT
+>. Функция <CODE
+CLASS="FUNCTION"
+>to_char</CODE
+> не поддерживает <TT
+CLASS="LITERAL"
+>V</TT
+> с дробными числами (например, <TT
+CLASS="LITERAL"
+>99.9V99</TT
+> не допускается).</P
+></LI
+><LI
+><P
+>Код <TT
+CLASS="LITERAL"
+>EEEE</TT
+> (научная запись) не может сочетаться с любыми другими вариантами форматирования или модификаторами, за исключением цифр и десятичной точки, и должен располагаться в конце строки шаблона (например, <TT
+CLASS="LITERAL"
+>9.99EEEE</TT
+> &mdash; допустимый шаблон).</P
+></LI
+></UL
+><P></P
+><P
+>Для изменения поведения кодов к ним могут быть применены определённые модификаторы. Например, <TT
+CLASS="LITERAL"
+>FM9999</TT
+> обрабатывается как код <TT
+CLASS="LITERAL"
+>9999</TT
+> с модификатором <TT
+CLASS="LITERAL"
+>FM</TT
+>. Все модификаторы для форматирования чисел перечислены в <A
+HREF="functions-formatting.html#FUNCTIONS-FORMATTING-NUMERICMOD-TABLE"
+>Таблице 9-25</A
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-FORMATTING-NUMERICMOD-TABLE"
+></A
+><P
+><B
+>Таблица 9-25. Модификаторы шаблонов для форматирования чисел</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Модификатор</TH
+><TH
+>Описание</TH
+><TH
+>Пример</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>Приставка <TT
+CLASS="LITERAL"
+>FM</TT
+></TD
+><TD
+>режим заполнения (подавляет дополнение пробелами и нули справа)</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>FM9999</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>Окончание <TT
+CLASS="LITERAL"
+>TH</TT
+></TD
+><TD
+>окончание порядкового числительного в верхнем регистре</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>999TH</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>Окончание <TT
+CLASS="LITERAL"
+>th</TT
+></TD
+><TD
+>окончание порядкового числительного в нижнем регистре</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>999th</TT
+>
+                </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>В <A
+HREF="functions-formatting.html#FUNCTIONS-FORMATTING-EXAMPLES-TABLE"
+>Таблице 9-26</A
+> приведены некоторые примеры использования функции <CODE
+CLASS="FUNCTION"
+>to_char</CODE
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-FORMATTING-EXAMPLES-TABLE"
+></A
+><P
+><B
+>Таблица 9-26. Примеры <CODE
+CLASS="FUNCTION"
+>to_char</CODE
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+>Выражение</TH
+><TH
+>Результат</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(current_timestamp, 'Day,&nbsp;DD&nbsp;&nbsp;HH12:MI:SS')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'Tuesday&nbsp;&nbsp;,&nbsp;06&nbsp;&nbsp;05:39:18'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(current_timestamp, 'FMDay,&nbsp;FMDD&nbsp;&nbsp;HH12:MI:SS')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'Tuesday,&nbsp;6&nbsp;&nbsp;05:39:18'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(-0.1, '99.99')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'&nbsp;&nbsp;-.10'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(-0.1, 'FM9.99')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'-.1'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(0.1, '0.9')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'&nbsp;0.1'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(12, '9990999.9')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'&nbsp;&nbsp;&nbsp;&nbsp;0012.0'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(12, 'FM9990999.9')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'0012.'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(485, '999')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'&nbsp;485'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(-485, '999')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'-485'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(485, '9&nbsp;9&nbsp;9')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'&nbsp;4&nbsp;8&nbsp;5'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(1485, '9,999')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'&nbsp;1,485'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(1485, '9G999')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'&nbsp;1&nbsp;485'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(148.5, '999.999')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'&nbsp;148.500'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(148.5, 'FM999.999')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'148.5'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(148.5, 'FM999.990')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'148.500'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(148.5, '999D999')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'&nbsp;148,500'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(3148.5, '9G999D999')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'&nbsp;3&nbsp;148,500'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(-485, '999S')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'485-'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(-485, '999MI')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'485-'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(485, '999MI')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'485&nbsp;'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(485, 'FM999MI')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'485'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(485, 'PL999')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'+485'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(485, 'SG999')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'+485'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(-485, 'SG999')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'-485'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(-485, '9SG99')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'4-85'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(-485, '999PR')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'&lt;485&gt;'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(485, 'L999')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'DM&nbsp;485</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(485, 'RN')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CDLXXXV'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(485, 'FMRN')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'CDLXXXV'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(5.2, 'FMRN')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'V'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(482, '999th')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'&nbsp;482nd'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(485, '"Good&nbsp;number:"999')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'Good&nbsp;number:&nbsp;485'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(485.8, '"Pre:"999"&nbsp;Post:"&nbsp;.999')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'Pre:&nbsp;485&nbsp;Post:&nbsp;.800'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(12, '99V999')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'&nbsp;12000'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(12.4, '99V999')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'&nbsp;12400'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(12.45, '99V9')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'&nbsp;125'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_char(0.0004859, '9.99EEEE')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>' 4.86e-04'</TT
+>
+                </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions-matching.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="functions-datetime.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Поиск по шаблону</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Операторы и функции даты/времени</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

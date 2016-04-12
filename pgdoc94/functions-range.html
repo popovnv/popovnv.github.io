@@ -1,0 +1,903 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Диапазонные функции и операторы</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Функции и операторы"
+HREF="functions.html"><LINK
+REL="PREVIOUS"
+TITLE="Функции и операторы для работы с массивами"
+HREF="functions-array.html"><LINK
+REL="NEXT"
+TITLE="Агрегатные функции"
+HREF="functions-aggregate.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Функции и операторы для работы с массивами"
+HREF="functions-array.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 9. Функции и операторы</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Агрегатные функции"
+HREF="functions-aggregate.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="FUNCTIONS-RANGE"
+>9.19. Диапазонные функции и операторы</A
+></H1
+><P
+>Диапазонные типы данных рассматриваются в <A
+HREF="rangetypes.html"
+>Разделе 8.17</A
+>.</P
+><P
+>В <A
+HREF="functions-range.html#RANGE-OPERATORS-TABLE"
+>Таблице 9-47</A
+> показаны операторы, предназначенные для работы с диапазонами.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="RANGE-OPERATORS-TABLE"
+></A
+><P
+><B
+>Таблица 9-47. Диапазонные операторы</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Оператор</TH
+><TH
+>Описание</TH
+><TH
+>Пример</TH
+><TH
+>Результат</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>=</TT
+> </TD
+><TD
+>равно</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>int4range(1,5) = '[1,4]'::int4range</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>t</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>&lt;&gt;</TT
+> </TD
+><TD
+>не равно</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>numrange(1.1,2.2) &lt;&gt; numrange(1.1,2.3)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>t</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>&lt;</TT
+> </TD
+><TD
+>меньше</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>int4range(1,10) &lt; int4range(2,3)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>t</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>&gt;</TT
+> </TD
+><TD
+>больше</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>int4range(1,10) &gt; int4range(1,5)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>t</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>&lt;=</TT
+> </TD
+><TD
+>меньше или равно</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>numrange(1.1,2.2) &lt;= numrange(1.1,2.2)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>t</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>&gt;=</TT
+> </TD
+><TD
+>больше или равно</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>numrange(1.1,2.2) &gt;= numrange(1.1,2.0)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>t</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>@&gt;</TT
+> </TD
+><TD
+>содержит диапазон</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>int4range(2,4) @&gt; int4range(2,3)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>t</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>@&gt;</TT
+> </TD
+><TD
+>содержит элемент</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'[2011-01-01,​2011-03-01)'​::tsrange @&gt; '2011-01-10'​::timestamp</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>t</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>&lt;@</TT
+> </TD
+><TD
+>диапазон содержится в</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>int4range(2,4) &lt;@ int4range(1,7)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>t</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>&lt;@</TT
+> </TD
+><TD
+>элемент содержится в</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>42 &lt;@ int4range(1,7)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>f</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>&amp;&amp;</TT
+> </TD
+><TD
+>пересекает (есть общие точки)</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>int8range(3,7) &amp;&amp; int8range(4,12)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>t</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>&lt;&lt;</TT
+> </TD
+><TD
+>строго слева от</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>int8range(1,10) &lt;&lt; int8range(100,110)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>t</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>&gt;&gt;</TT
+> </TD
+><TD
+>строго справа от</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>int8range(50,60) &gt;&gt; int8range(20,30)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>t</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>&amp;&lt;</TT
+> </TD
+><TD
+>не простирается правее</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>int8range(1,20) &amp;&lt; int8range(18,20)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>t</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>&amp;&gt;</TT
+> </TD
+><TD
+>не простирается левее</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>int8range(7,20) &amp;&gt; int8range(5,10)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>t</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>-|-</TT
+> </TD
+><TD
+>примыкает к</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>numrange(1.1,2.2) -|- numrange(2.2,3.3)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>t</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>+</TT
+> </TD
+><TD
+>union</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>numrange(5,15) + numrange(10,20)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>[5,20)</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>*</TT
+> </TD
+><TD
+>пересечение</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>int8range(5,15) * int8range(10,20)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>[10,15)</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>-</TT
+> </TD
+><TD
+>вычитание</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>int8range(5,15) - int8range(10,20)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>[5,10)</TT
+>
+                </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Простые операторы сравнения <TT
+CLASS="LITERAL"
+>&lt;</TT
+>, <TT
+CLASS="LITERAL"
+>&gt;</TT
+>, <TT
+CLASS="LITERAL"
+>&lt;=</TT
+> и <TT
+CLASS="LITERAL"
+>&gt;=</TT
+> сначала сравнивают нижние границы, и только если они равны, сравнивают верхние. Эти операторы сравнения обычно не очень полезны для диапазонов; основное их предназначение &mdash; сделать возможным построение индексов-B-деревьев по диапазонам.</P
+><P
+>Операторы слева/справа/примыкает всегда возвращают false, если один из диапазонов пуст; то есть, считается, что пустой диапазон находится не слева и не справа от какого-либо другого диапазона.</P
+><P
+>Операторы сложения и вычитания вызывают ошибку, если получающийся в результате диапазон оказывается состоящим из двух разделённых поддиапазонов, так как его нельзя представить в этом типе данных.</P
+><P
+>В <A
+HREF="functions-range.html#RANGE-FUNCTIONS-TABLE"
+>Таблице 9-48</A
+> перечислены функции, предназначенные для работы с диапазонными типами.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="RANGE-FUNCTIONS-TABLE"
+></A
+><P
+><B
+>Таблица 9-48. Диапазонные функции</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Функция</TH
+><TH
+>Тип результата</TH
+><TH
+>Описание</TH
+><TH
+>Пример</TH
+><TH
+>Результат</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>         <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>lower</CODE
+>(​<TT
+CLASS="TYPE"
+>anyrange</TT
+>)</TT
+>
+        </TD
+><TD
+>тип элемента диапазона</TD
+><TD
+>нижняя граница диапазона</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>lower(​numrange(​1.1, 2.2))</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>1.1</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>         <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>upper</CODE
+>(​<TT
+CLASS="TYPE"
+>anyrange</TT
+>)</TT
+>
+        </TD
+><TD
+>тип элемента диапазона</TD
+><TD
+>верхняя граница диапазона</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>upper(​numrange(​1.1, 2.2))</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>2.2</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>         <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>isempty</CODE
+>(​<TT
+CLASS="TYPE"
+>anyrange</TT
+>)</TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>диапазон пуст?</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>isempty(​numrange(1.1,​2.2))</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>false</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>         <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>lower_inc</CODE
+>(​<TT
+CLASS="TYPE"
+>anyrange</TT
+>)</TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>нижняя граница включается?</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>lower_inc(​numrange(​1.1, 2.2))</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>true</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>         <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>upper_inc</CODE
+>(​<TT
+CLASS="TYPE"
+>anyrange</TT
+>)</TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>верхняя граница включается?</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>upper_inc(​numrange(​1.1, 2.2))</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>false</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>         <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>lower_inf</CODE
+>(​<TT
+CLASS="TYPE"
+>anyrange</TT
+>)</TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>нижняя граница равна бесконечности?</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>lower_inf(​'(,)'::​daterange)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>true</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>         <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>upper_inf</CODE
+>(​<TT
+CLASS="TYPE"
+>anyrange</TT
+>)</TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>верхняя граница равна бесконечности?</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>upper_inf(​'(,)'::daterange)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>true</TT
+>
+                </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Функции <CODE
+CLASS="FUNCTION"
+>lower</CODE
+> и <CODE
+CLASS="FUNCTION"
+>upper</CODE
+> возвращают NULL, если диапазон пуст или указанная граница равна бесконечности. Если же пустой диапазон передаётся функциям <CODE
+CLASS="FUNCTION"
+>lower_inc</CODE
+>, <CODE
+CLASS="FUNCTION"
+>upper_inc</CODE
+>, <CODE
+CLASS="FUNCTION"
+>lower_inf</CODE
+> и <CODE
+CLASS="FUNCTION"
+>upper_inf</CODE
+>, все они возвращают false.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions-array.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="functions-aggregate.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Функции и операторы для работы с массивами</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Агрегатные функции</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

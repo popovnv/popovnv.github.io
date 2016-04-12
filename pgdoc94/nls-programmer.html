@@ -1,0 +1,408 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Программисту</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Языковая поддержка"
+HREF="nls.html"><LINK
+REL="PREVIOUS"
+TITLE="Переводчику"
+HREF="nls-translator.html"><LINK
+REL="NEXT"
+TITLE="Написание обработчика процедурного языка"
+HREF="plhandler.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Переводчику"
+HREF="nls-translator.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="nls.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 51. Языковая поддержка</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Написание обработчика процедурного языка"
+HREF="plhandler.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="NLS-PROGRAMMER"
+>51.2. Программисту</A
+></H1
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="NLS-MECHANICS"
+>51.2.1. Механизмы</A
+></H2
+><P
+>Данный раздел описывает как добавить языковую поддержку в программе или библиотеке, которая является частью дистрибутива <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. В настоящий момент это относится только к программам на языке С.</P
+><DIV
+CLASS="PROCEDURE"
+><P
+><B
+>Добавление языковой поддержки для программы</B
+></P
+><OL
+TYPE="1"
+><LI
+CLASS="STEP"
+><P
+>Вставьте этот код в начало программы: </P><PRE
+CLASS="PROGRAMLISTING"
+>#ifdef ENABLE_NLS
+#include &lt;locale.h&gt;
+#endif
+
+...
+
+#ifdef ENABLE_NLS
+setlocale(LC_ALL, "");
+bindtextdomain("<TT
+CLASS="REPLACEABLE"
+><I
+>progname</I
+></TT
+>", LOCALEDIR);
+textdomain("<TT
+CLASS="REPLACEABLE"
+><I
+>progname</I
+></TT
+>");
+#endif</PRE
+><P> (<TT
+CLASS="REPLACEABLE"
+><I
+>progname</I
+></TT
+> фактически может быть выбрана произвольно.)</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Везде, где сообщение нуждается в переводе, необходимо вставить вызов <CODE
+CLASS="FUNCTION"
+>gettext()</CODE
+>. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>fprintf(stderr, "panic level %d\n", lvl);</PRE
+><P> нужно заменить на: </P><PRE
+CLASS="PROGRAMLISTING"
+>fprintf(stderr, gettext("panic level %d\n"), lvl);</PRE
+><P> (<TT
+CLASS="SYMBOL"
+>gettext</TT
+> определяется как холостая команда, если NLS поддержка не настроена.)</P
+><P
+>Это часто приводит к немалой путанице. Один из распространённых подходов в этом случае: </P><PRE
+CLASS="PROGRAMLISTING"
+>#define _(x) gettext(x)</PRE
+><P> Ещё одно решение допустимо, если программа часто выполняет обмен данными через одну или несколько функций, таких как <CODE
+CLASS="FUNCTION"
+>ereport()</CODE
+> в серверном процессе. Тогда вы выполняете внутренний вызов функции <CODE
+CLASS="FUNCTION"
+>gettext</CODE
+> для каждой входящей строки.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Добавьте файл <TT
+CLASS="FILENAME"
+>nls.mk</TT
+> в каталог с исходными кодами программы. Данный файл будет считаться сборочным файлом (makefile). В нём необходимо выполнить присвоение значений для следующих переменных: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="VARNAME"
+>CATALOG_NAME</TT
+></DT
+><DD
+><P
+>Имя программы, которое указано в вызове <CODE
+CLASS="FUNCTION"
+>textdomain()</CODE
+>.</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>AVAIL_LANGUAGES</TT
+></DT
+><DD
+><P
+>Список выполненных переводов (изначально пустой).</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>GETTEXT_FILES</TT
+></DT
+><DD
+><P
+>Список файлов, которые содержат подлежащие переводу строки, т. е. помеченные <CODE
+CLASS="FUNCTION"
+>gettext</CODE
+> или альтернативным решением. В итоге, в него будут включены почти все исходные файлы программы. Если список станет слишком длинным, можно первый <SPAN
+CLASS="QUOTE"
+>"file"</SPAN
+> сделать <TT
+CLASS="LITERAL"
+>+</TT
+> а второе слово — файлом, который содержит по одному имени файла на строку.</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>GETTEXT_TRIGGERS</TT
+></DT
+><DD
+><P
+>Утилитам, которые генерируют каталоги сообщений для работы переводчиков, должно быть известно, какие вызовы функции содержат строки, подлежащие переводу. По умолчанию распознаются только вызовы <CODE
+CLASS="FUNCTION"
+>gettext()</CODE
+>. Если вы использовали <CODE
+CLASS="FUNCTION"
+>_</CODE
+> или другие идентификаторы, необходимо перечислить их здесь. Если подлежащая переводу строка не является первым аргументом, необходимо, чтобы элемент имел форму <TT
+CLASS="LITERAL"
+>func:2</TT
+> (для второго аргумента). Если функция поддерживает сообщения в форме множественного числа, элемент должен выглядеть следующим образом <TT
+CLASS="LITERAL"
+>func:1,2</TT
+> (идентификация аргументов в виде сообщений в форме единственного и множественного числа).</P
+></DD
+></DL
+></DIV
+><P></P
+></LI
+></OL
+></DIV
+><P
+>Система сборки автоматически соберёт и установит каталоги сообщений.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="NLS-GUIDELINES"
+>51.2.2. Рекомендации по написанию сообщений</A
+></H2
+><P
+>Ниже описаны некоторые рекомендации по написанию сообщений, которые легко перевести. <P
+></P
+></P><UL
+><LI
+><P
+>Не составляйте предложения во время выполнения. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>printf("Files were %s.\n", flag ? "copied" : "removed");</PRE
+><P> Порядок слов в предложении может отличаться в других языках. Также, даже если вы не забываете вызывать <CODE
+CLASS="FUNCTION"
+>gettext()</CODE
+> для каждого фрагмента, возможно, что по отдельности они не будут переведены хорошо. Лучше продублировать небольшую часть кода, чтобы каждое сообщение было переведено как единое целое. Лишь цифры, имена файлов и подобные текущие переменные следует вставлять в текст сообщения во время выполнения.</P
+></LI
+><LI
+><P
+>По тем же причинам следующий подход не будет работать: </P><PRE
+CLASS="PROGRAMLISTING"
+>printf("copied %d file%s", n, n!=1 ? "s" : "");</PRE
+><P> так как это подразумевает, как формируется форма множественного числа. Если вы думаете, что сможете решить это таким способом: </P><PRE
+CLASS="PROGRAMLISTING"
+>if (n==1)
+    printf("copied 1 file");
+else
+    printf("copied %d files", n):</PRE
+><P> возможно, вы будете разочарованы. В некоторых языках существует более двух форм, и они образуются по особым правилам. Обычно лучше сформулировать сообщение, которое позволит полностью избежать этой проблемы, например: </P><PRE
+CLASS="PROGRAMLISTING"
+>printf("number of copied files: %d", n);</PRE
+><P></P
+><P
+>Если вы действительно хотите формировать правильно составленные сообщения в форме множественного числа, есть способ этого добиться, но это несколько неудобно. При генерировании первичного или детализированного сообщения об ошибке в <CODE
+CLASS="FUNCTION"
+>ereport()</CODE
+>, можно написать так: </P><PRE
+CLASS="PROGRAMLISTING"
+>errmsg_plural("copied %d file",
+              "copied %d files",
+              n,
+              n)</PRE
+><P> Первым аргументом является строка формата, соответствующая форме единственного числа в английском языке, вторым аргументом — строка формата, соответствующая форме множественного числа в английском языке, и третьим аргументом — управляющее целочисленное значение, которое определяет, какую форму (единственного или множественного числа) использовать. Последующие аргументы форматируются на основе строки формата, как обычно. (Как правило, значение аргумента для управления формой множественного числа будет также одним из значений, подлежащих форматированию, поэтому оно должно быть записано дважды.) В английском языке важно лишь, является ли значение <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+> единицей или нет, но в других языках может быть много различных форм множественного числа. Переводчик рассматривает две английские формы как группу и имеет возможность задать несколько вариантов замены строк, при этом подходящий вариант выбирается исходя из текущего значения <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>.</P
+><P
+>Если вам нужно составить сообщение в форме множественного числа, которое не используется непосредственно при выводе сообщений в <CODE
+CLASS="FUNCTION"
+>errmsg</CODE
+> или <CODE
+CLASS="FUNCTION"
+>errdetail</CODE
+>, вы должны воспользоваться базовой функцией <CODE
+CLASS="FUNCTION"
+>ngettext</CODE
+>. См. документацию по gettext.</P
+></LI
+><LI
+><P
+>Если вы хотите передать какую-либо информацию переводчику, например о том, насколько сообщение соотносится с другими выходными данными, перед строкой должен появиться комментарий, который начинается с <TT
+CLASS="LITERAL"
+>translator</TT
+>, например: </P><PRE
+CLASS="PROGRAMLISTING"
+>/* translator: This message is not what it seems to be. */</PRE
+><P> Эти комментарии копируются в файлы каталога сообщений, чтобы переводчик мог их видеть.</P
+></LI
+></UL
+><P></P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="nls-translator.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="plhandler.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Переводчику</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="nls.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Написание обработчика процедурного языка</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

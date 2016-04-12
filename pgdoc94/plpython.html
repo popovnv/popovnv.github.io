@@ -1,0 +1,343 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>PL/Python — процедурный язык Python</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Серверное программирование"
+HREF="server-programming.html"><LINK
+REL="PREVIOUS"
+TITLE="Внутренние особенности PL/Perl"
+HREF="plperl-under-the-hood.html"><LINK
+REL="NEXT"
+TITLE="Python 2 и Python 3"
+HREF="plpython-python23.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="CHAPTER"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Внутренние особенности PL/Perl"
+HREF="plperl-under-the-hood.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="server-programming.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Python 2 и Python 3"
+HREF="plpython-python23.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="PLPYTHON"
+></A
+>Глава 43. PL/Python — процедурный язык Python</H1
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Содержание</B
+></DT
+><DT
+>43.1. <A
+HREF="plpython-python23.html"
+>Python 2 и Python 3</A
+></DT
+><DT
+>43.2. <A
+HREF="plpython-funcs.html"
+>Функции на PL/Python</A
+></DT
+><DT
+>43.3. <A
+HREF="plpython-data.html"
+>Значения данных</A
+></DT
+><DD
+><DL
+><DT
+>43.3.1. <A
+HREF="plpython-data.html#AEN63293"
+>Сопоставление типов данных</A
+></DT
+><DT
+>43.3.2. <A
+HREF="plpython-data.html#AEN63352"
+>Null, None</A
+></DT
+><DT
+>43.3.3. <A
+HREF="plpython-data.html#PLPYTHON-ARRAYS"
+>Массивы, списки</A
+></DT
+><DT
+>43.3.4. <A
+HREF="plpython-data.html#AEN63370"
+>Составные типы</A
+></DT
+><DT
+>43.3.5. <A
+HREF="plpython-data.html#AEN63399"
+>Функции, возвращающие множества</A
+></DT
+></DL
+></DD
+><DT
+>43.4. <A
+HREF="plpython-sharing.html"
+>Совместное использование данных</A
+></DT
+><DT
+>43.5. <A
+HREF="plpython-do.html"
+>Анонимные блоки кода</A
+></DT
+><DT
+>43.6. <A
+HREF="plpython-trigger.html"
+>Триггерные функции</A
+></DT
+><DT
+>43.7. <A
+HREF="plpython-database.html"
+>Обращение к базе данных</A
+></DT
+><DD
+><DL
+><DT
+>43.7.1. <A
+HREF="plpython-database.html#AEN63536"
+>Функции обращения к базе данных</A
+></DT
+><DT
+>43.7.2. <A
+HREF="plpython-database.html#PLPYTHON-TRAPPING"
+>Обработка ошибок</A
+></DT
+></DL
+></DD
+><DT
+>43.8. <A
+HREF="plpython-subtransaction.html"
+>Неявные подтранзакции</A
+></DT
+><DD
+><DL
+><DT
+>43.8.1. <A
+HREF="plpython-subtransaction.html#AEN63695"
+>Менеджеры контекста подтранзакций</A
+></DT
+><DT
+>43.8.2. <A
+HREF="plpython-subtransaction.html#AEN63710"
+>Старые версии Python</A
+></DT
+></DL
+></DD
+><DT
+>43.9. <A
+HREF="plpython-util.html"
+>Вспомогательные функции</A
+></DT
+><DT
+>43.10. <A
+HREF="plpython-envar.html"
+>Переменные окружения</A
+></DT
+></DL
+></DIV
+><P
+>Процедурный язык <SPAN
+CLASS="APPLICATION"
+>PL/Python</SPAN
+> позволяет писать функции <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> на <A
+HREF="http://www.python.org"
+TARGET="_top"
+>языке Python</A
+>.</P
+><P
+>Чтобы установить PL/Python в определённую базу данных, выполните команду <TT
+CLASS="LITERAL"
+>CREATE EXTENSION plpythonu</TT
+>, либо запустите в оболочке системы <TT
+CLASS="LITERAL"
+>createlang plpythonu <TT
+CLASS="REPLACEABLE"
+><I
+>имя_данных</I
+></TT
+></TT
+> (но смотрите также <A
+HREF="plpython-python23.html"
+>Раздел 43.1</A
+>).</P
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>Если язык устанавливается в <TT
+CLASS="LITERAL"
+>template1</TT
+>, он будет автоматически установлен во все создаваемые впоследствии базы данных.</P
+></BLOCKQUOTE
+></DIV
+><P
+>PL/Python представлен только в виде <SPAN
+CLASS="QUOTE"
+>"недоверенного"</SPAN
+> языка, что означает, что он никаким способом не ограничивает действия пользователей, и поэтому он называется <TT
+CLASS="LITERAL"
+>plpythonu</TT
+>. Доверенная вариация <TT
+CLASS="LITERAL"
+>plpython</TT
+> может появиться в будущем, если в Python будет разработан безопасный механизм выполнения. Автор функции на недоверенном языке PL/Python должен позаботиться о том, чтобы эту функцию нельзя было использовать не по назначению, так как она может делать всё, что может пользователь с правами администратора баз данных. Создавать функции на недоверенных языках, таких как <TT
+CLASS="LITERAL"
+>plpythonu</TT
+>, разрешено только суперпользователям.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Пользователи, имеющие дело с исходным кодом, должны явно включить сборку PL/Python в процессе установки. (За дополнительными сведениями обратитесь к инструкциям по установке.) Пользователи двоичных пакетов могут найти PL/Python в отдельном модуле.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="plperl-under-the-hood.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="plpython-python23.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Внутренние особенности PL/Perl</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="server-programming.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Python 2 и Python 3</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

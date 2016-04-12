@@ -1,0 +1,425 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>          pg_rewrite
+        </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Системные каталоги"
+HREF="catalogs.html"><LINK
+REL="PREVIOUS"
+TITLE="          pg_range
+        "
+HREF="catalog-pg-range.html"><LINK
+REL="NEXT"
+TITLE="          pg_replication_slots
+        "
+HREF="catalog-pg-replication-slots.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="          pg_range
+        "
+HREF="catalog-pg-range.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 48. Системные каталоги</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="          pg_replication_slots
+        "
+HREF="catalog-pg-replication-slots.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CATALOG-PG-REWRITE"
+>48.38. <TT
+CLASS="STRUCTNAME"
+>pg_rewrite</TT
+></A
+></H1
+><P
+>В каталоге <TT
+CLASS="STRUCTNAME"
+>pg_rewrite</TT
+> хранятся правила перезаписи для таблиц и представлений.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="AEN99025"
+></A
+><P
+><B
+>Таблица 48-38. Колонки <TT
+CLASS="STRUCTNAME"
+>pg_rewrite</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип</TH
+><TH
+>Ссылки</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Идентификатор строки (скрытый атрибут; должен выбираться явно)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>rulename</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>name</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Имя правила</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>ev_class</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-class.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Таблица, к которой относится это правило</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>ev_type</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>char</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Тип события, для которого предназначено это правило: 1 = <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, 2 = <TT
+CLASS="COMMAND"
+>UPDATE</TT
+>, 3 = <TT
+CLASS="COMMAND"
+>INSERT</TT
+>, 4 = <TT
+CLASS="COMMAND"
+>DELETE</TT
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>ev_enabled</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>char</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Устанавливает, в каких режимах <A
+HREF="runtime-config-client.html#GUC-SESSION-REPLICATION-ROLE"
+>session_replication_role</A
+> срабатывает правило: <TT
+CLASS="LITERAL"
+>O</TT
+> = правило срабатывает в режимах <SPAN
+CLASS="QUOTE"
+>"origin"</SPAN
+> (источник) и <SPAN
+CLASS="QUOTE"
+>"local"</SPAN
+> (локально), <TT
+CLASS="LITERAL"
+>D</TT
+> = правило отключено, <TT
+CLASS="LITERAL"
+>R</TT
+> = правило срабатывает в режиме <SPAN
+CLASS="QUOTE"
+>"replica"</SPAN
+> (реплика), <TT
+CLASS="LITERAL"
+>A</TT
+> = правило срабатывает всегда.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>is_instead</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>True, если это правило <TT
+CLASS="LITERAL"
+>INSTEAD</TT
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>ev_qual</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>pg_node_tree</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Дерево выражения (в форме представления <CODE
+CLASS="FUNCTION"
+>nodeToString()</CODE
+>) для условия применения правила</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>ev_action</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>pg_node_tree</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Дерево запроса (в форме представления <CODE
+CLASS="FUNCTION"
+>nodeToString()</CODE
+>) для действия правила</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Если для таблицы есть какие-либо правила в этом каталоге, значением <TT
+CLASS="LITERAL"
+>pg_class.relhasrules</TT
+> для неё должно быть true.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="catalog-pg-range.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="catalog-pg-replication-slots.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_range</TT
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_replication_slots</TT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,1875 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>ltree</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Дополнительно поставляемые модули"
+HREF="contrib.html"><LINK
+REL="PREVIOUS"
+TITLE="lo"
+HREF="lo.html"><LINK
+REL="NEXT"
+TITLE="pageinspect"
+HREF="pageinspect.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="lo"
+HREF="lo.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Приложение E. Дополнительно поставляемые модули</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="pageinspect"
+HREF="pageinspect.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="LTREE"
+>E.21. ltree</A
+></H1
+><P
+>Этот модуль реализует тип данных <TT
+CLASS="TYPE"
+>ltree</TT
+> для представления меток данных в иерархической древовидной структуре. Он также предоставляет расширенные средства для поиска в таких деревьях.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN121939"
+>E.21.1. Определения</A
+></H2
+><P
+><I
+CLASS="FIRSTTERM"
+>Метка</I
+> — это последовательность алфавитно-цифровых символов и знаков подчёркивания (например, в локали C допускаются символы <TT
+CLASS="LITERAL"
+>A-Za-z0-9_</TT
+>). Метки должны занимать меньше 256 байт.</P
+><P
+>Примеры: <TT
+CLASS="LITERAL"
+>42</TT
+>, <TT
+CLASS="LITERAL"
+>Personal_Services</TT
+></P
+><P
+><I
+CLASS="FIRSTTERM"
+>Путь метки</I
+> — это последовательность из нуля или более меток, разделённых точками, (например, <TT
+CLASS="LITERAL"
+>L1.L2.L3</TT
+>), представляющая путь от корня иерархического дерева к конкретному узлу. Длина пути метки должна быть меньше 65 КБ, но лучше, если она будет в пределах 2 КБ. На практике это ограничение не является критичным; например, самый длинный путь в каталоге DMOZ (<A
+HREF="http://www.dmoz.org"
+TARGET="_top"
+>http://www.dmoz.org</A
+>) имеет длину около 240 байт.</P
+><P
+>Пример: <TT
+CLASS="LITERAL"
+>Top.Countries.Europe.Russia</TT
+></P
+><P
+>Модуль <TT
+CLASS="FILENAME"
+>ltree</TT
+> предоставляет несколько типов данных:</P
+><P
+></P
+><UL
+><LI
+><P
+><TT
+CLASS="TYPE"
+>ltree</TT
+> хранит путь метки.</P
+></LI
+><LI
+><P
+><TT
+CLASS="TYPE"
+>lquery</TT
+> представляет напоминающий регулярные выражения запрос для поиска нужных значений <TT
+CLASS="TYPE"
+>ltree</TT
+>. Простое слово выбирает путь с этой меткой. Звёздочка (<TT
+CLASS="LITERAL"
+>*</TT
+>) выбирает ноль или более меток. Например: </P><PRE
+CLASS="SYNOPSIS"
+>foo         <I
+CLASS="LINEANNOTATION"
+>Выбирает в точности путь метки <TT
+CLASS="LITERAL"
+>foo</TT
+></I
+>
+*.foo.*     <I
+CLASS="LINEANNOTATION"
+>Выбирает путь, содержащий метку <TT
+CLASS="LITERAL"
+>foo</TT
+></I
+>
+*.foo       <I
+CLASS="LINEANNOTATION"
+>Выбирает путь, в котором последняя метка <TT
+CLASS="LITERAL"
+>foo</TT
+></I
+></PRE
+><P></P
+><P
+>Звёздочке можно также добавить числовую характеристику, ограничивающую число потенциально совпадающих меток: </P><PRE
+CLASS="SYNOPSIS"
+>*{<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>}        <I
+CLASS="LINEANNOTATION"
+>Выбирает ровно <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+> меток</I
+>
+*{<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>,}       <I
+CLASS="LINEANNOTATION"
+>Выбирает не меньше <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+> меток</I
+>
+*{<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>,<TT
+CLASS="REPLACEABLE"
+><I
+>m</I
+></TT
+>}      <I
+CLASS="LINEANNOTATION"
+>Выбирает не меньше <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+> и не больше <TT
+CLASS="REPLACEABLE"
+><I
+>m</I
+></TT
+> меток</I
+>
+*{,<TT
+CLASS="REPLACEABLE"
+><I
+>m</I
+></TT
+>}       <I
+CLASS="LINEANNOTATION"
+>Выбирает не больше <TT
+CLASS="REPLACEABLE"
+><I
+>m</I
+></TT
+> меток &mdash; то же самое, что и </I
+> *{0,<TT
+CLASS="REPLACEABLE"
+><I
+>m</I
+></TT
+>}</PRE
+><P></P
+><P
+>В конце метки, отличной от звёздочки, в <TT
+CLASS="TYPE"
+>lquery</TT
+> можно добавить модификаторы, чтобы найти что-то сложнее, чем точное соответствие: </P><PRE
+CLASS="SYNOPSIS"
+>@           <I
+CLASS="LINEANNOTATION"
+>Выбирать метки без учёта регистра, например, запросу <TT
+CLASS="LITERAL"
+>a@</TT
+> соответствует <TT
+CLASS="LITERAL"
+>A</TT
+></I
+>
+*           <I
+CLASS="LINEANNOTATION"
+>Выбирать любую метку с данным префиксом, например запросу <TT
+CLASS="LITERAL"
+>foo*</TT
+> соответствует <TT
+CLASS="LITERAL"
+>foobar</TT
+></I
+>
+%           <I
+CLASS="LINEANNOTATION"
+>Выбирать начальные слова, разделённые подчёркиваниями</I
+></PRE
+><P> Поведение модификатора <TT
+CLASS="LITERAL"
+>%</TT
+> несколько нетривиальное. Он пытается найти соответствие по словам, а не по всей метке. Например, запросу <TT
+CLASS="LITERAL"
+>foo_bar%</TT
+> соответствует <TT
+CLASS="LITERAL"
+>foo_bar_baz</TT
+> но не <TT
+CLASS="LITERAL"
+>foo_barbaz</TT
+>. В сочетании с <TT
+CLASS="LITERAL"
+>*</TT
+>, сопоставление префикса применяется отдельно к каждому слову, например запросу <TT
+CLASS="LITERAL"
+>foo_bar%*</TT
+> соответствует <TT
+CLASS="LITERAL"
+>foo1_bar2_baz</TT
+>, но не <TT
+CLASS="LITERAL"
+>foo1_br2_baz</TT
+>.</P
+><P
+>Также вы можете записать несколько различных меток через знак <TT
+CLASS="LITERAL"
+>|</TT
+> (обозначающий ИЛИ) для выборки любой из этих меток, либо добавить знак <TT
+CLASS="LITERAL"
+>!</TT
+> (НЕ) в начале, чтобы выбрать все метки, не соответствующие указанным альтернативам.</P
+><P
+>Расширенный пример <TT
+CLASS="TYPE"
+>lquery</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>Top.*{0,2}.sport*@.!football|tennis.Russ*|Spain
+a.  b.     c.      d.               e.</PRE
+><P> Этот запрос выберет путь, который:</P
+><P
+></P
+><OL
+TYPE="a"
+><LI
+><P
+>начинается с метки <TT
+CLASS="LITERAL"
+>Top</TT
+></P
+></LI
+><LI
+><P
+>и затем включает от нуля до двух меток до</P
+></LI
+><LI
+><P
+>метки, начинающейся с префикса <TT
+CLASS="LITERAL"
+>sport</TT
+> (без учёта регистра)</P
+></LI
+><LI
+><P
+>затем метку, отличную от <TT
+CLASS="LITERAL"
+>football</TT
+> и <TT
+CLASS="LITERAL"
+>tennis</TT
+></P
+></LI
+><LI
+><P
+>и заканчивается меткой, которая начинается подстрокой <TT
+CLASS="LITERAL"
+>Russ</TT
+> или в точности равна <TT
+CLASS="LITERAL"
+>Spain</TT
+>.</P
+></LI
+></OL
+></LI
+><LI
+><P
+><TT
+CLASS="TYPE"
+>ltxtquery</TT
+> представляет подобный полнотекстовому запрос поиска подходящих значений <TT
+CLASS="TYPE"
+>ltree</TT
+>. Значение <TT
+CLASS="TYPE"
+>ltxtquery</TT
+> содержит слова, возможно с модификаторами <TT
+CLASS="LITERAL"
+>@</TT
+>, <TT
+CLASS="LITERAL"
+>*</TT
+>, <TT
+CLASS="LITERAL"
+>%</TT
+> в конце; эти модификаторы имеют то же значение, что и в <TT
+CLASS="TYPE"
+>lquery</TT
+>. Слова можно объединять символами <TT
+CLASS="LITERAL"
+>&amp;</TT
+> (И), <TT
+CLASS="LITERAL"
+>|</TT
+> (ИЛИ), <TT
+CLASS="LITERAL"
+>!</TT
+> (НЕ) и скобками. Ключевое отличие от <TT
+CLASS="TYPE"
+>lquery</TT
+> состоит в том, что <TT
+CLASS="TYPE"
+>ltxtquery</TT
+> выбирает слова независимо от их положения в пути метки.</P
+><P
+>Пример <TT
+CLASS="TYPE"
+>ltxtquery</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>Europe &amp; Russia*@ &amp; !Transportation</PRE
+><P> Этот запрос выберет пути, содержащие метку <TT
+CLASS="LITERAL"
+>Europe</TT
+> или любую метку с начальной подстрокой <TT
+CLASS="LITERAL"
+>Russia</TT
+> (без учёта регистра), но не пути, содержащие метку <TT
+CLASS="LITERAL"
+>Transportation</TT
+>. Положение этих слов в пути не имеет значения. Кроме того, когда применяется <TT
+CLASS="LITERAL"
+>%</TT
+>, слово может быть сопоставлено с любым другим отделённым подчёркиваниями словом в метке, вне зависимости от его положения.</P
+></LI
+></UL
+><P
+>Замечание: <TT
+CLASS="TYPE"
+>ltxtquery</TT
+> допускает пробелы между символами, а <TT
+CLASS="TYPE"
+>ltree</TT
+> и <TT
+CLASS="TYPE"
+>lquery</TT
+> — нет.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN122054"
+>E.21.2. Операторы и функции</A
+></H2
+><P
+>Для типа <TT
+CLASS="TYPE"
+>ltree</TT
+> определены обычные операторы сравнения <TT
+CLASS="LITERAL"
+>=</TT
+>, <TT
+CLASS="LITERAL"
+>&lt;&gt;</TT
+>, <TT
+CLASS="LITERAL"
+>&lt;</TT
+>, <TT
+CLASS="LITERAL"
+>&gt;</TT
+>, <TT
+CLASS="LITERAL"
+>&lt;=</TT
+>, <TT
+CLASS="LITERAL"
+>&gt;=</TT
+>. Сравнение сортирует пути в порядке движения по дереву, а потомки узла сортируются по тексту метки. В дополнение к ним есть и специализированные операторы, перечисленные в <A
+HREF="ltree.html#LTREE-OP-TABLE"
+>Таблице E-12</A
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="LTREE-OP-TABLE"
+></A
+><P
+><B
+>Таблица E-12. Операторы <TT
+CLASS="TYPE"
+>ltree</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Оператор</TH
+><TH
+>Возвращает</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+><TT
+CLASS="TYPE"
+>ltree</TT
+> <TT
+CLASS="LITERAL"
+>@&gt;</TT
+> <TT
+CLASS="TYPE"
+>ltree</TT
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>левый аргумент является предком правого (или равен ему)?</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="TYPE"
+>ltree</TT
+> <TT
+CLASS="LITERAL"
+>&lt;@</TT
+> <TT
+CLASS="TYPE"
+>ltree</TT
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>левый аргумент является потомком правого (или равен ему)?</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="TYPE"
+>ltree</TT
+> <TT
+CLASS="LITERAL"
+>~</TT
+> <TT
+CLASS="TYPE"
+>lquery</TT
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>значение <TT
+CLASS="TYPE"
+>ltree</TT
+> соответствует <TT
+CLASS="TYPE"
+>lquery</TT
+>?</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="TYPE"
+>lquery</TT
+> <TT
+CLASS="LITERAL"
+>~</TT
+> <TT
+CLASS="TYPE"
+>ltree</TT
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>значение <TT
+CLASS="TYPE"
+>ltree</TT
+> соответствует <TT
+CLASS="TYPE"
+>lquery</TT
+>?</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="TYPE"
+>ltree</TT
+> <TT
+CLASS="LITERAL"
+>?</TT
+> <TT
+CLASS="TYPE"
+>lquery[]</TT
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>значение <TT
+CLASS="TYPE"
+>ltree</TT
+> соответствует одному из <TT
+CLASS="TYPE"
+>lquery</TT
+> в массиве?</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="TYPE"
+>lquery[]</TT
+> <TT
+CLASS="LITERAL"
+>?</TT
+> <TT
+CLASS="TYPE"
+>ltree</TT
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>значение <TT
+CLASS="TYPE"
+>ltree</TT
+> соответствует одному из <TT
+CLASS="TYPE"
+>lquery</TT
+> в массиве?</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="TYPE"
+>ltree</TT
+> <TT
+CLASS="LITERAL"
+>@</TT
+> <TT
+CLASS="TYPE"
+>ltxtquery</TT
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>значение <TT
+CLASS="TYPE"
+>ltree</TT
+> соответствует <TT
+CLASS="TYPE"
+>ltxtquery</TT
+>?</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="TYPE"
+>ltxtquery</TT
+> <TT
+CLASS="LITERAL"
+>@</TT
+> <TT
+CLASS="TYPE"
+>ltree</TT
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>значение <TT
+CLASS="TYPE"
+>ltree</TT
+> соответствует <TT
+CLASS="TYPE"
+>ltxtquery</TT
+>?</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="TYPE"
+>ltree</TT
+> <TT
+CLASS="LITERAL"
+>||</TT
+> <TT
+CLASS="TYPE"
+>ltree</TT
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>ltree</TT
+>
+                  </TD
+><TD
+>объединяет два пути <TT
+CLASS="TYPE"
+>ltree</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="TYPE"
+>ltree</TT
+> <TT
+CLASS="LITERAL"
+>||</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>ltree</TT
+>
+                  </TD
+><TD
+>преобразует текст в <TT
+CLASS="TYPE"
+>ltree</TT
+> и объединяет с путём</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="TYPE"
+>text</TT
+> <TT
+CLASS="LITERAL"
+>||</TT
+> <TT
+CLASS="TYPE"
+>ltree</TT
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>ltree</TT
+>
+                  </TD
+><TD
+>преобразует текст в <TT
+CLASS="TYPE"
+>ltree</TT
+> и объединяет с путём</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="TYPE"
+>ltree[]</TT
+> <TT
+CLASS="LITERAL"
+>@&gt;</TT
+> <TT
+CLASS="TYPE"
+>ltree</TT
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>массив содержит предка <TT
+CLASS="TYPE"
+>ltree</TT
+>?</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="TYPE"
+>ltree</TT
+> <TT
+CLASS="LITERAL"
+>&lt;@</TT
+> <TT
+CLASS="TYPE"
+>ltree[]</TT
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>массив содержит предка <TT
+CLASS="TYPE"
+>ltree</TT
+>?</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="TYPE"
+>ltree[]</TT
+> <TT
+CLASS="LITERAL"
+>&lt;@</TT
+> <TT
+CLASS="TYPE"
+>ltree</TT
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>массив содержит потомка <TT
+CLASS="TYPE"
+>ltree</TT
+>?</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="TYPE"
+>ltree</TT
+> <TT
+CLASS="LITERAL"
+>@&gt;</TT
+> <TT
+CLASS="TYPE"
+>ltree[]</TT
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>массив содержит потомка <TT
+CLASS="TYPE"
+>ltree</TT
+>?</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="TYPE"
+>ltree[]</TT
+> <TT
+CLASS="LITERAL"
+>~</TT
+> <TT
+CLASS="TYPE"
+>lquery</TT
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>массив содержит путь, соответствующий <TT
+CLASS="TYPE"
+>lquery</TT
+>?</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="TYPE"
+>lquery</TT
+> <TT
+CLASS="LITERAL"
+>~</TT
+> <TT
+CLASS="TYPE"
+>ltree[]</TT
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>массив содержит путь, соответствующий <TT
+CLASS="TYPE"
+>lquery</TT
+>?</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="TYPE"
+>ltree[]</TT
+> <TT
+CLASS="LITERAL"
+>?</TT
+> <TT
+CLASS="TYPE"
+>lquery[]</TT
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>массив <TT
+CLASS="TYPE"
+>ltree</TT
+> содержит путь, соответствующий любому из <TT
+CLASS="TYPE"
+>lquery</TT
+>?</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="TYPE"
+>lquery[]</TT
+> <TT
+CLASS="LITERAL"
+>?</TT
+> <TT
+CLASS="TYPE"
+>ltree[]</TT
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>массив <TT
+CLASS="TYPE"
+>ltree</TT
+> содержит путь, соответствующий любому из <TT
+CLASS="TYPE"
+>lquery</TT
+>?</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="TYPE"
+>ltree[]</TT
+> <TT
+CLASS="LITERAL"
+>@</TT
+> <TT
+CLASS="TYPE"
+>ltxtquery</TT
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>массив содержит путь, соответствующий <TT
+CLASS="TYPE"
+>ltxtquery</TT
+>?</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="TYPE"
+>ltxtquery</TT
+> <TT
+CLASS="LITERAL"
+>@</TT
+> <TT
+CLASS="TYPE"
+>ltree[]</TT
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                  </TD
+><TD
+>массив содержит путь, соответствующий <TT
+CLASS="TYPE"
+>ltxtquery</TT
+>?</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="TYPE"
+>ltree[]</TT
+> <TT
+CLASS="LITERAL"
+>?@&gt;</TT
+> <TT
+CLASS="TYPE"
+>ltree</TT
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>ltree</TT
+>
+                  </TD
+><TD
+>первый элемент массива, являющийся предком <TT
+CLASS="TYPE"
+>ltree</TT
+>; NULL, если такого нет</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="TYPE"
+>ltree[]</TT
+> <TT
+CLASS="LITERAL"
+>?&lt;@</TT
+> <TT
+CLASS="TYPE"
+>ltree</TT
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>ltree</TT
+>
+                  </TD
+><TD
+>первый элемент массива, являющийся потомком <TT
+CLASS="TYPE"
+>ltree</TT
+>; NULL, если такого нет</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="TYPE"
+>ltree[]</TT
+> <TT
+CLASS="LITERAL"
+>?~</TT
+> <TT
+CLASS="TYPE"
+>lquery</TT
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>ltree</TT
+>
+                  </TD
+><TD
+>первый элемент массива, соответствующий <TT
+CLASS="TYPE"
+>lquery</TT
+>; NULL, если такого нет</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="TYPE"
+>ltree[]</TT
+> <TT
+CLASS="LITERAL"
+>?@</TT
+> <TT
+CLASS="TYPE"
+>ltxtquery</TT
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>ltree</TT
+>
+                  </TD
+><TD
+>первый элемент массива, соответствующий <TT
+CLASS="TYPE"
+>ltxtquery</TT
+>; NULL, если такого нет</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Операторы <TT
+CLASS="LITERAL"
+>&lt;@</TT
+>, <TT
+CLASS="LITERAL"
+>@&gt;</TT
+>, <TT
+CLASS="LITERAL"
+>@</TT
+> и <TT
+CLASS="LITERAL"
+>~</TT
+> имеют аналоги в виде <TT
+CLASS="LITERAL"
+>^&lt;@</TT
+>, <TT
+CLASS="LITERAL"
+>^@&gt;</TT
+>, <TT
+CLASS="LITERAL"
+>^@</TT
+>, <TT
+CLASS="LITERAL"
+>^~</TT
+>, которые отличатся только тем, что не используют индексы. Они полезны только для тестирования.</P
+><P
+>Доступные функции перечислены в <A
+HREF="ltree.html#LTREE-FUNC-TABLE"
+>Таблице E-13</A
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="LTREE-FUNC-TABLE"
+></A
+><P
+><B
+>Таблица E-13. Функции <TT
+CLASS="TYPE"
+>ltree</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Функция</TH
+><TH
+>Тип результата</TH
+><TH
+>Описание</TH
+><TH
+>Пример</TH
+><TH
+>Результат</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                    <CODE
+CLASS="FUNCTION"
+>subltree(ltree, int start, int end)</CODE
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>ltree</TT
+>
+                  </TD
+><TD
+>подпуть <TT
+CLASS="TYPE"
+>ltree</TT
+> от позиции <TT
+CLASS="PARAMETER"
+>start</TT
+> до позиции <TT
+CLASS="PARAMETER"
+>end</TT
+>-1 (начиная с 0)</TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>subltree('Top.Child1.Child2',1,2)</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>Child1</TT
+>
+                  </TD
+></TR
+><TR
+><TD
+>                    <CODE
+CLASS="FUNCTION"
+>subpath(ltree, int offset, int len)</CODE
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>ltree</TT
+>
+                  </TD
+><TD
+>подпуть <TT
+CLASS="TYPE"
+>ltree</TT
+>, начиная с позиции <TT
+CLASS="PARAMETER"
+>offset</TT
+>, длиной <TT
+CLASS="PARAMETER"
+>len</TT
+>. Если <TT
+CLASS="PARAMETER"
+>offset</TT
+> меньше нуля, подпуть начинается с этого смещения от конца пути. Если <TT
+CLASS="PARAMETER"
+>len</TT
+> меньше нуля, будет отброшено заданное число меток с конца строки.</TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>subpath('Top.Child1.Child2',0,2)</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>Top.Child1</TT
+>
+                  </TD
+></TR
+><TR
+><TD
+>                    <CODE
+CLASS="FUNCTION"
+>subpath(ltree, int offset)</CODE
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>ltree</TT
+>
+                  </TD
+><TD
+>подпуть <TT
+CLASS="TYPE"
+>ltree</TT
+>, начиная с позиции <TT
+CLASS="PARAMETER"
+>offset</TT
+> и до конца пути. Если <TT
+CLASS="PARAMETER"
+>offset</TT
+> меньше нуля, подпуть начинается с этого смещения от конца пути.</TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>subpath('Top.Child1.Child2',1)</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>Child1.Child2</TT
+>
+                  </TD
+></TR
+><TR
+><TD
+>                    <CODE
+CLASS="FUNCTION"
+>nlevel(ltree)</CODE
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>integer</TT
+>
+                  </TD
+><TD
+>число меток в пути</TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>nlevel('Top.Child1.Child2')</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>3</TT
+>
+                  </TD
+></TR
+><TR
+><TD
+>                    <CODE
+CLASS="FUNCTION"
+>index(ltree a, ltree b)</CODE
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>integer</TT
+>
+                  </TD
+><TD
+>позиция первого вхождения <TT
+CLASS="PARAMETER"
+>b</TT
+> в <TT
+CLASS="PARAMETER"
+>a</TT
+>; -1, если вхождения нет</TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>index('0.1.2.3.5.4.5.6.8.5.6.8','5.6')</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>6</TT
+>
+                  </TD
+></TR
+><TR
+><TD
+>                    <CODE
+CLASS="FUNCTION"
+>index(ltree a, ltree b, int offset)</CODE
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>integer</TT
+>
+                  </TD
+><TD
+>позиция первого вхождения <TT
+CLASS="PARAMETER"
+>b</TT
+> в <TT
+CLASS="PARAMETER"
+>a</TT
+>, найденного от позиции <TT
+CLASS="PARAMETER"
+>offset</TT
+>; если <TT
+CLASS="PARAMETER"
+>offset</TT
+> меньше 0, поиск начинается с <TT
+CLASS="PARAMETER"
+>-offset</TT
+> меток от конца пути</TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>index('0.1.2.3.5.4.5.6.8.5.6.8','5.6',-4)</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>9</TT
+>
+                  </TD
+></TR
+><TR
+><TD
+>                    <CODE
+CLASS="FUNCTION"
+>text2ltree(text)</CODE
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>ltree</TT
+>
+                  </TD
+><TD
+>приводит <TT
+CLASS="TYPE"
+>text</TT
+> к типу <TT
+CLASS="TYPE"
+>ltree</TT
+></TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+></TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+></TT
+>
+                  </TD
+></TR
+><TR
+><TD
+>                    <CODE
+CLASS="FUNCTION"
+>ltree2text(ltree)</CODE
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>text</TT
+>
+                  </TD
+><TD
+>приводит <TT
+CLASS="TYPE"
+>ltree</TT
+> к типу <TT
+CLASS="TYPE"
+>text</TT
+></TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+></TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+></TT
+>
+                  </TD
+></TR
+><TR
+><TD
+>                    <CODE
+CLASS="FUNCTION"
+>lca(ltree, ltree, ...)</CODE
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>ltree</TT
+>
+                  </TD
+><TD
+>самый нижний общий предок, то есть наибольший общий префикс путей (принимается до 8 аргументов)</TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>lca('1.2.2.3','1.2.3.4.5.6')</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>1.2</TT
+>
+                  </TD
+></TR
+><TR
+><TD
+>                    <CODE
+CLASS="FUNCTION"
+>lca(ltree[])</CODE
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>ltree</TT
+>
+                  </TD
+><TD
+>самый нижний предок, то есть наибольший общий префикс путей</TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>lca(array['1.2.2.3'::ltree,'1.2.3'])</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>1.2</TT
+>
+                  </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN122465"
+>E.21.3. Индексы</A
+></H2
+><P
+><TT
+CLASS="FILENAME"
+>ltree</TT
+> поддерживает несколько типов индексов, которые могут ускорить означенные операции:</P
+><P
+></P
+><UL
+><LI
+><P
+>B-дерево по значениям <TT
+CLASS="TYPE"
+>ltree</TT
+>: <TT
+CLASS="LITERAL"
+>&lt;</TT
+>, <TT
+CLASS="LITERAL"
+>&lt;=</TT
+>, <TT
+CLASS="LITERAL"
+>=</TT
+>, <TT
+CLASS="LITERAL"
+>&gt;=</TT
+>, <TT
+CLASS="LITERAL"
+>&gt;</TT
+></P
+></LI
+><LI
+><P
+>GiST по значениям <TT
+CLASS="TYPE"
+>ltree</TT
+>: <TT
+CLASS="LITERAL"
+>&lt;</TT
+>, <TT
+CLASS="LITERAL"
+>&lt;=</TT
+>, <TT
+CLASS="LITERAL"
+>=</TT
+>, <TT
+CLASS="LITERAL"
+>&gt;=</TT
+>, <TT
+CLASS="LITERAL"
+>&gt;</TT
+>, <TT
+CLASS="LITERAL"
+>@&gt;</TT
+>, <TT
+CLASS="LITERAL"
+>&lt;@</TT
+>, <TT
+CLASS="LITERAL"
+>@</TT
+>, <TT
+CLASS="LITERAL"
+>~</TT
+>, <TT
+CLASS="LITERAL"
+>?</TT
+></P
+><P
+>Пример создания такого индекса:</P
+><PRE
+CLASS="PROGRAMLISTING"
+>CREATE INDEX path_gist_idx ON test USING GIST (path);</PRE
+></LI
+><LI
+><P
+>GiST по колонке <TT
+CLASS="TYPE"
+>ltree[]</TT
+>: <TT
+CLASS="LITERAL"
+>ltree[] &lt;@ ltree</TT
+>, <TT
+CLASS="LITERAL"
+>ltree @&gt; ltree[]</TT
+>, <TT
+CLASS="LITERAL"
+>@</TT
+>, <TT
+CLASS="LITERAL"
+>~</TT
+>, <TT
+CLASS="LITERAL"
+>?</TT
+></P
+><P
+>Пример создания такого индекса:</P
+><PRE
+CLASS="PROGRAMLISTING"
+>CREATE INDEX path_gist_idx ON test USING GIST (array_path);</PRE
+><P
+>Примечание: Индекс этого типа является неточным.</P
+></LI
+></UL
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN122504"
+>E.21.4. Пример</A
+></H2
+><P
+>Для этого примера используются следующие данные (это же описание данных находится в файле <TT
+CLASS="FILENAME"
+>contrib/ltree/ltreetest.sql</TT
+> в дистрибутиве исходного кода):</P
+><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE test (path ltree);
+INSERT INTO test VALUES ('Top');
+INSERT INTO test VALUES ('Top.Science');
+INSERT INTO test VALUES ('Top.Science.Astronomy');
+INSERT INTO test VALUES ('Top.Science.Astronomy.Astrophysics');
+INSERT INTO test VALUES ('Top.Science.Astronomy.Cosmology');
+INSERT INTO test VALUES ('Top.Hobbies');
+INSERT INTO test VALUES ('Top.Hobbies.Amateurs_Astronomy');
+INSERT INTO test VALUES ('Top.Collections');
+INSERT INTO test VALUES ('Top.Collections.Pictures');
+INSERT INTO test VALUES ('Top.Collections.Pictures.Astronomy');
+INSERT INTO test VALUES ('Top.Collections.Pictures.Astronomy.Stars');
+INSERT INTO test VALUES ('Top.Collections.Pictures.Astronomy.Galaxies');
+INSERT INTO test VALUES ('Top.Collections.Pictures.Astronomy.Astronauts');
+CREATE INDEX path_gist_idx ON test USING gist(path);
+CREATE INDEX path_idx ON test USING btree(path);</PRE
+><P
+>В итоге мы получаем таблицу <TT
+CLASS="STRUCTNAME"
+>test</TT
+>, наполненную данными, представляющими следующую иерархию:</P
+><PRE
+CLASS="LITERALLAYOUT"
+>                        Top
+                     /   |  \
+             Science Hobbies Collections
+                 /       |              \
+        Astronomy   Amateurs_Astronomy Pictures
+           /  \                            |
+Astrophysics  Cosmology                Astronomy
+                                        /  |    \
+                                 Galaxies Stars Astronauts</PRE
+><P
+>Мы можем выбрать потомки в иерархии наследования: </P><PRE
+CLASS="SCREEN"
+>ltreetest=&gt; SELECT path FROM test WHERE path &lt;@ 'Top.Science';
+                path
+------------------------------------
+ Top.Science
+ Top.Science.Astronomy
+ Top.Science.Astronomy.Astrophysics
+ Top.Science.Astronomy.Cosmology
+(4 rows)</PRE
+><P></P
+><P
+>Несколько примеров выборки по путям: </P><PRE
+CLASS="SCREEN"
+>ltreetest=&gt; SELECT path FROM test WHERE path ~ '*.Astronomy.*';
+                     path
+-----------------------------------------------
+ Top.Science.Astronomy
+ Top.Science.Astronomy.Astrophysics
+ Top.Science.Astronomy.Cosmology
+ Top.Collections.Pictures.Astronomy
+ Top.Collections.Pictures.Astronomy.Stars
+ Top.Collections.Pictures.Astronomy.Galaxies
+ Top.Collections.Pictures.Astronomy.Astronauts
+(7 rows)
+
+ltreetest=&gt; SELECT path FROM test WHERE path ~ '*.!pictures@.*.Astronomy.*';
+                path
+------------------------------------
+ Top.Science.Astronomy
+ Top.Science.Astronomy.Astrophysics
+ Top.Science.Astronomy.Cosmology
+(3 rows)</PRE
+><P></P
+><P
+>Ещё несколько примеров полнотекстового поиска: </P><PRE
+CLASS="SCREEN"
+>ltreetest=&gt; SELECT path FROM test WHERE path @ 'Astro*% &amp; !pictures@';
+                path
+------------------------------------
+ Top.Science.Astronomy
+ Top.Science.Astronomy.Astrophysics
+ Top.Science.Astronomy.Cosmology
+ Top.Hobbies.Amateurs_Astronomy
+(4 rows)
+
+ltreetest=&gt; SELECT path FROM test WHERE path @ 'Astro* &amp; !pictures@';
+                path
+------------------------------------
+ Top.Science.Astronomy
+ Top.Science.Astronomy.Astrophysics
+ Top.Science.Astronomy.Cosmology
+(3 rows)</PRE
+><P></P
+><P
+>Образование пути с помощью функций: </P><PRE
+CLASS="SCREEN"
+>ltreetest=&gt; SELECT subpath(path,0,2)||'Space'||subpath(path,2) FROM test WHERE path &lt;@ 'Top.Science.Astronomy';
+                 ?column?
+------------------------------------------
+ Top.Science.Space.Astronomy
+ Top.Science.Space.Astronomy.Astrophysics
+ Top.Science.Space.Astronomy.Cosmology
+(3 rows)</PRE
+><P></P
+><P
+>Эту процедуру можно упростить, создав функцию SQL, вставляющую метку в определённую позицию в пути: </P><PRE
+CLASS="SCREEN"
+>CREATE FUNCTION ins_label(ltree, int, text) RETURNS ltree
+    AS 'select subpath($1,0,$2) || $3 || subpath($1,$2);'
+    LANGUAGE SQL IMMUTABLE;
+
+ltreetest=&gt; SELECT ins_label(path,2,'Space') FROM test WHERE path &lt;@ 'Top.Science.Astronomy';
+                ins_label
+------------------------------------------
+ Top.Science.Space.Astronomy
+ Top.Science.Space.Astronomy.Astrophysics
+ Top.Science.Space.Astronomy.Cosmology
+(3 rows)</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN122522"
+>E.21.5. Авторы</A
+></H2
+><P
+>Разработку осуществили Фёдор Сигаев (<CODE
+CLASS="EMAIL"
+>&#60;<A
+HREF="mailto:teodor@stack.net"
+>teodor@stack.net</A
+>&#62;</CODE
+>) и Олег Бартунов (<CODE
+CLASS="EMAIL"
+>&#60;<A
+HREF="mailto:oleg@sai.msu.su"
+>oleg@sai.msu.su</A
+>&#62;</CODE
+>). Дополнительные сведения можно найти на странице <A
+HREF="http://www.sai.msu.su/~megera/postgres/gist/"
+TARGET="_top"
+>http://www.sai.msu.su/~megera/postgres/gist/</A
+>. Авторы выражают благодарность Евгению Родичеву за полезную дискуссии. Замечания и сообщения об ошибках приветствуются.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="lo.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="pageinspect.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>lo</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>pageinspect</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

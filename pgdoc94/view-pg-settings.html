@@ -1,0 +1,660 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>          pg_settings
+        </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Системные каталоги"
+HREF="catalogs.html"><LINK
+REL="PREVIOUS"
+TITLE="          pg_seclabels
+        "
+HREF="view-pg-seclabels.html"><LINK
+REL="NEXT"
+TITLE="          pg_shadow
+        "
+HREF="view-pg-shadow.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="          pg_seclabels
+        "
+HREF="view-pg-seclabels.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 48. Системные каталоги</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="          pg_shadow
+        "
+HREF="view-pg-shadow.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="VIEW-PG-SETTINGS"
+>48.67. <TT
+CLASS="STRUCTNAME"
+>pg_settings</TT
+></A
+></H1
+><P
+>Представление <TT
+CLASS="STRUCTNAME"
+>pg_settings</TT
+> открывает доступ к параметрам времени выполнения сервера. По сути оно представляет собой альтернативный интерфейс для команд <A
+HREF="sql-show.html"
+>SHOW</A
+> и <A
+HREF="sql-set.html"
+>SET</A
+>. Оно также позволяет получить некоторые свойства каждого параметра, которые нельзя получить непосредственно, используя команду <TT
+CLASS="COMMAND"
+>SHOW</TT
+>, например, минимальные и максимальные значения.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="AEN101862"
+></A
+><P
+><B
+>Таблица 48-68. Колонки <TT
+CLASS="STRUCTNAME"
+>pg_settings</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>name</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Имя параметра конфигурации времени выполнения</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>setting</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Текущее значение параметра</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>unit</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Неявно подразумеваемая единица измерения параметра</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>category</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Логическая группа параметра</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>short_desc</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Краткое описание параметра</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>extra_desc</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Дополнительное, более подробное, описание параметра</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>context</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Контекст, в котором может задаваться значение параметра (см. ниже)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>vartype</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Тип параметра (<TT
+CLASS="LITERAL"
+>bool</TT
+>, <TT
+CLASS="LITERAL"
+>enum</TT
+>, <TT
+CLASS="LITERAL"
+>integer</TT
+>, <TT
+CLASS="LITERAL"
+>real</TT
+> или <TT
+CLASS="LITERAL"
+>string</TT
+>)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>source</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Источник текущего значения параметра</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>min_val</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Минимальное допустимое значение параметра (NULL для нечисловых значений)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>max_val</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Максимально допустимое значение параметра (NULL для нечисловых значений)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>enumvals</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text[]</TT
+>
+                </TD
+><TD
+>Допустимые значения параметра-перечисления (NULL для значений не перечислений)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>boot_val</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Значение параметра, устанавливаемое при запуске сервера, если параметр не устанавливается другим образом</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>reset_val</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Значение, к которому будет сбрасывать параметр команда <TT
+CLASS="COMMAND"
+>RESET</TT
+> в текущем сеансе</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>sourcefile</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Файл конфигурации, в котором было задано текущее значение (NULL для значений, полученных не из файлов конфигурации, или при чтении этого поля не суперпользователем); полезно при использовании указаний <TT
+CLASS="LITERAL"
+>include</TT
+> в файлах конфигурации</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>sourceline</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>integer</TT
+>
+                </TD
+><TD
+>Номер строки в файле конфигурации, в которой было задано текущее значение (NULL для значений, полученных не из файлов конфигурации, или при чтении этого поля не суперпользователем)</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Поле <TT
+CLASS="STRUCTFIELD"
+>context</TT
+> может содержать одно из следующих значений (они перечислены в порядке уменьшения сложности изменения параметров):</P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>internal</TT
+></DT
+><DD
+><P
+>Эти параметры нельзя изменить непосредственно; они отражают значения, определяемые внутри системы. Некоторые из них можно изменить, пересобрав сервер с другими параметрами конфигурации, либо передав другие аргументы команде <TT
+CLASS="COMMAND"
+>initdb</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>postmaster</TT
+></DT
+><DD
+><P
+>Эти параметры могут быть применены только при запуске сервера, так что любое изменение требует перезапуска сервера. Значения этих параметров обычно задаются в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+>, либо передаются в командной строке при запуске сервера. Разумеется, параметры более низкого уровня <TT
+CLASS="STRUCTFIELD"
+>context</TT
+> также можно задать в момент запуска сервера.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>sighup</TT
+></DT
+><DD
+><P
+>Внесённые в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+> изменения этих параметров можно применить, не перезапуская сервер. Если передать управляющему процессу сигнал <SPAN
+CLASS="SYSTEMITEM"
+>SIGHUP</SPAN
+>, он перечитает <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+> и применит изменения. Управляющий процесс также перешлёт сигнал <SPAN
+CLASS="SYSTEMITEM"
+>SIGHUP</SPAN
+> всем своим дочерним процессам, чтобы они тоже приняли новое значение.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>backend</TT
+></DT
+><DD
+><P
+>Внесённые в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+> изменения этих параметров можно применить без перезапуска сервера; их также можно задать для определённого сеанса в пакете запроса соединения (например, через переменную окружения <TT
+CLASS="LITERAL"
+>PGOPTIONS</TT
+>, учитываемую библиотекой <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>). Однако эти параметры никогда не меняются в сеансе, когда он уже начат. Если вы измените их в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+>, отправьте сигнал <SPAN
+CLASS="SYSTEMITEM"
+>SIGHUP</SPAN
+> управляющему процессу, чтобы он перечитал <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+>. Новые значения подействуют только на сеансы, запускаемые после этого.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>superuser</TT
+></DT
+><DD
+><P
+>Эти параметры можно изменить в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+>, либо в рамках сеанса, командой <TT
+CLASS="COMMAND"
+>SET</TT
+>; но только суперпользователи могут менять их, используя <TT
+CLASS="COMMAND"
+>SET</TT
+>. Изменения в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+> будут отражены в существующих сеансах, только если в них командой <TT
+CLASS="COMMAND"
+>SET</TT
+> не были заданы локальные значения.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>user</TT
+></DT
+><DD
+><P
+>Эти параметры можно изменить в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+>, либо в рамках сеанса, командой <TT
+CLASS="COMMAND"
+>SET</TT
+>. В рамках сеанса изменять их разрешено всем пользователям. Изменения в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+> будут отражены в существующих сеансах, только если в них командой <TT
+CLASS="COMMAND"
+>SET</TT
+> не были заданы локальные значения.</P
+></DD
+></DL
+></DIV
+><P
+>Чтобы узнать больше о различных способах изменения этих параметров, обратитесь к <A
+HREF="config-setting.html"
+>Разделу 18.1</A
+>.</P
+><P
+>Представление <TT
+CLASS="STRUCTNAME"
+>pg_settings</TT
+> не допускает добавление и удаление строк, но допускает изменение. Команда <TT
+CLASS="COMMAND"
+>UPDATE</TT
+>, применённая к строке <TT
+CLASS="STRUCTNAME"
+>pg_settings</TT
+>, равнозначна выполнению команды <A
+HREF="sql-set.html"
+>SET</A
+> для этого параметра. Изменение повлияет только на значение в текущем сеансе. Если <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> выполняется в транзакции, которая затем прерывается, эффект <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> пропадает, когда транзакция откатывается. После фиксирования окружающей транзакции этот эффект сохраняется до завершения сеанса, если он не будет переопределён другой командой <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> или <TT
+CLASS="COMMAND"
+>SET</TT
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="view-pg-seclabels.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="view-pg-shadow.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_seclabels</TT
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_shadow</TT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,613 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Условные выражения</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Функции и операторы"
+HREF="functions.html"><LINK
+REL="PREVIOUS"
+TITLE="Функции для работы с последовательностями"
+HREF="functions-sequence.html"><LINK
+REL="NEXT"
+TITLE="Функции и операторы для работы с массивами"
+HREF="functions-array.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Функции для работы с последовательностями"
+HREF="functions-sequence.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 9. Функции и операторы</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Функции и операторы для работы с массивами"
+HREF="functions-array.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="FUNCTIONS-CONDITIONAL"
+>9.17. Условные выражения</A
+></H1
+><P
+>В этом разделе описаны <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>-совместимые условные выражения, которые поддерживаются в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>Если возможностей этих условных выражений оказывается недостаточно, вероятно, имеет смысл перейти к написанию хранимых процедур на более мощном языке программирования.</P
+></BLOCKQUOTE
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="FUNCTIONS-CASE"
+>9.17.1. <TT
+CLASS="LITERAL"
+>CASE</TT
+></A
+></H2
+><P
+>Выражение <TT
+CLASS="TOKEN"
+>CASE</TT
+> в <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> представляет собой общее условное выражение, напоминающее операторы if/else в других языках программирования: </P><PRE
+CLASS="SYNOPSIS"
+>CASE WHEN <TT
+CLASS="REPLACEABLE"
+><I
+>условие</I
+></TT
+> THEN <TT
+CLASS="REPLACEABLE"
+><I
+>результат</I
+></TT
+>
+     [<SPAN
+CLASS="OPTIONAL"
+>WHEN ...</SPAN
+>]
+     [<SPAN
+CLASS="OPTIONAL"
+>ELSE <TT
+CLASS="REPLACEABLE"
+><I
+>результат</I
+></TT
+></SPAN
+>]
+END</PRE
+><P>
+
+Предложения <TT
+CLASS="TOKEN"
+>CASE</TT
+> можно использовать везде, где допускаются выражения. Каждое <TT
+CLASS="REPLACEABLE"
+><I
+>условие</I
+></TT
+> в нём представляет собой выражение, возвращающее результат типа <TT
+CLASS="TYPE"
+>boolean</TT
+>. Если результатом выражения оказывается true, значением выражения <TT
+CLASS="TOKEN"
+>CASE</TT
+> становится <TT
+CLASS="REPLACEABLE"
+><I
+>результат</I
+></TT
+>, следующий за условием, а остальная часть выражения <TT
+CLASS="TOKEN"
+>CASE</TT
+> не вычисляется. Если же условие не выполняется, за ним таким же образом проверяются все последующие предложения <TT
+CLASS="TOKEN"
+>WHEN</TT
+>. Если не выполняется ни одно из <TT
+CLASS="REPLACEABLE"
+><I
+>условий</I
+></TT
+> <TT
+CLASS="TOKEN"
+>WHEN</TT
+>, значением <TT
+CLASS="TOKEN"
+>CASE</TT
+> становится <TT
+CLASS="REPLACEABLE"
+><I
+>результат</I
+></TT
+>, записанный в предложении <TT
+CLASS="TOKEN"
+>ELSE</TT
+>. Если при этом предложение <TT
+CLASS="TOKEN"
+>ELSE</TT
+> отсутствует, результатом выражения будет NULL.</P
+><P
+>Пример: </P><PRE
+CLASS="SCREEN"
+>SELECT * FROM test;
+
+ a
+---
+ 1
+ 2
+ 3
+
+
+SELECT a,
+       CASE WHEN a=1 THEN 'one'
+            WHEN a=2 THEN 'two'
+            ELSE 'other'
+       END
+    FROM test;
+
+ a | case
+---+-------
+ 1 | one
+ 2 | two
+ 3 | other</PRE
+><P></P
+><P
+>Типы данных всех выражений <TT
+CLASS="REPLACEABLE"
+><I
+>результатов</I
+></TT
+> должны приводиться к одному выходному типу. Подробнее это описано в <A
+HREF="typeconv-union-case.html"
+>Разделе 10.5</A
+>.</P
+><P
+>Существует также <SPAN
+CLASS="QUOTE"
+>"простая"</SPAN
+> форма выражения <TT
+CLASS="TOKEN"
+>CASE</TT
+>, разновидность вышеприведённой общей формы: </P><PRE
+CLASS="SYNOPSIS"
+>CASE <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+>
+    WHEN <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> THEN <TT
+CLASS="REPLACEABLE"
+><I
+>результат</I
+></TT
+>
+    [<SPAN
+CLASS="OPTIONAL"
+>WHEN ...</SPAN
+>]
+    [<SPAN
+CLASS="OPTIONAL"
+>ELSE <TT
+CLASS="REPLACEABLE"
+><I
+>результат</I
+></TT
+></SPAN
+>]
+END</PRE
+><P> В такой форме сначала вычисляется первое <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+>, а затем его результат сравнивается с выражениями <TT
+CLASS="REPLACEABLE"
+><I
+>значений</I
+></TT
+> в предложениях <TT
+CLASS="TOKEN"
+>WHEN</TT
+>, пока не будет найдено равное ему. Если такого не значения не находится, возвращается <TT
+CLASS="REPLACEABLE"
+><I
+>результат</I
+></TT
+> предложения <TT
+CLASS="TOKEN"
+>ELSE</TT
+> (или NULL). Эта форма больше похожа на оператор <CODE
+CLASS="FUNCTION"
+>switch</CODE
+>, существующий в языке C.</P
+><P
+>Показанный ранее пример можно записать по-другому, используя простую форму <TT
+CLASS="TOKEN"
+>CASE</TT
+>: </P><PRE
+CLASS="SCREEN"
+>SELECT a,
+       CASE a WHEN 1 THEN 'one'
+              WHEN 2 THEN 'two'
+              ELSE 'other'
+       END
+    FROM test;
+
+ a | case
+---+-------
+ 1 | one
+ 2 | two
+ 3 | other</PRE
+><P></P
+><P
+>В выражении <TT
+CLASS="TOKEN"
+>CASE</TT
+> вычисляются только те подвыражения, которые необходимы для получения результата. Например, так можно избежать ошибки деления на ноль: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT ... WHERE CASE WHEN x &lt;&gt; 0 THEN y/x &gt; 1.5 ELSE false END;</PRE
+><P></P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Как было описано в <A
+HREF="sql-expressions.html#SYNTAX-EXPRESS-EVAL"
+>Подразделе 4.2.14</A
+>, всё же возможны ситуации, когда подвыражения вычисляются на разных этапах, так что железной гарантии, что в <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="TOKEN"
+>CASE</TT
+> вычисляются только необходимые подвыражения"</SPAN
+>, в принципе нет. Например, константное подвыражение <TT
+CLASS="LITERAL"
+>1/0</TT
+> обычно вызывает ошибку деления на ноль на этапе планирования, хотя эта ветвь <TT
+CLASS="TOKEN"
+>CASE</TT
+> может вовсе не вычисляться во время выполнения.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="FUNCTIONS-COALESCE-NVL-IFNULL"
+>9.17.2. <TT
+CLASS="LITERAL"
+>COALESCE</TT
+></A
+></H2
+><PRE
+CLASS="SYNOPSIS"
+><CODE
+CLASS="FUNCTION"
+>COALESCE</CODE
+>(​<TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, ...</SPAN
+>])</PRE
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>COALESCE</CODE
+> возвращает первый попавшийся аргумент, отличный от NULL. Если же все аргументы равны NULL, результатом тоже будет NULL. Это часто используется при отображении данных для подстановки некоторого значения по умолчанию вместо значений NULL: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT COALESCE(description, short_description, '(none)') ...</PRE
+><P> Этот запрос вернёт значение <TT
+CLASS="VARNAME"
+>description</TT
+>, если оно не равно NULL, либо <TT
+CLASS="VARNAME"
+>short_description</TT
+>, если оно не NULL, и строку <TT
+CLASS="LITERAL"
+>(none)</TT
+>, если оба эти значения равны NULL.</P
+><P
+>Как и выражение <TT
+CLASS="TOKEN"
+>CASE</TT
+>, <CODE
+CLASS="FUNCTION"
+>COALESCE</CODE
+> вычисляет только те аргументы, которые необходимы для получения результата; то есть, аргументы правее первого отличного от NULL аргумента не вычисляются. Эта функция соответствует стандарту SQL, а в некоторых других СУБД её аналоги называются <CODE
+CLASS="FUNCTION"
+>NVL</CODE
+> и <CODE
+CLASS="FUNCTION"
+>IFNULL</CODE
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="FUNCTIONS-NULLIF"
+>9.17.3. <TT
+CLASS="LITERAL"
+>NULLIF</TT
+></A
+></H2
+><PRE
+CLASS="SYNOPSIS"
+><CODE
+CLASS="FUNCTION"
+>NULLIF</CODE
+>(​<TT
+CLASS="REPLACEABLE"
+><I
+>значение1</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>значение2</I
+></TT
+>)</PRE
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>NULLIF</CODE
+> возвращает значение NULL, если <TT
+CLASS="REPLACEABLE"
+><I
+>значение1</I
+></TT
+> равно <TT
+CLASS="REPLACEABLE"
+><I
+>значение2</I
+></TT
+>; в противном случае она возвращает <TT
+CLASS="REPLACEABLE"
+><I
+>значение1</I
+></TT
+>. Это может быть полезно для реализации обратной операции к <CODE
+CLASS="FUNCTION"
+>COALESCE</CODE
+>. В частности, для примера, показанного выше: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT NULLIF(value, '(none)') ...</PRE
+><P></P
+><P
+>Если аргумент <TT
+CLASS="LITERAL"
+>value</TT
+> равен <TT
+CLASS="LITERAL"
+>(none)</TT
+>, результатом выражения будет NULL, а в противном случае &mdash; значение аргумента <TT
+CLASS="LITERAL"
+>value</TT
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="FUNCTIONS-GREATEST-LEAST"
+>9.17.4. <TT
+CLASS="LITERAL"
+>GREATEST</TT
+> и <TT
+CLASS="LITERAL"
+>LEAST</TT
+></A
+></H2
+><PRE
+CLASS="SYNOPSIS"
+><CODE
+CLASS="FUNCTION"
+>GREATEST</CODE
+>(​<TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, ...</SPAN
+>])</PRE
+><PRE
+CLASS="SYNOPSIS"
+><CODE
+CLASS="FUNCTION"
+>LEAST</CODE
+>(​<TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, ...</SPAN
+>])</PRE
+><P
+>Функции <CODE
+CLASS="FUNCTION"
+>GREATEST</CODE
+> и <CODE
+CLASS="FUNCTION"
+>LEAST</CODE
+> выбирают наибольшее или наименьшее значение из списка выражений. Все эти выражения должны приводиться к общему типу данных, который станет типом результата (подробнее об этом в <A
+HREF="typeconv-union-case.html"
+>Разделе 10.5</A
+>). Значения NULL в этом списке игнорируются, так что результат выражения будет равен NULL, только если все его аргументы равны NULL.</P
+><P
+>Заметьте, что функции <CODE
+CLASS="FUNCTION"
+>GREATEST</CODE
+> и <CODE
+CLASS="FUNCTION"
+>LEAST</CODE
+> не описаны в стандарте SQL, но часто реализуются в СУБД как расширения. В некоторых других СУБД они могут возвращать NULL, когда не все, а любой из аргументов равен NULL.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions-sequence.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="functions-array.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Функции для работы с последовательностями</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Функции и операторы для работы с массивами</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

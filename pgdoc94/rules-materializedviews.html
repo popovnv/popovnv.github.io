@@ -1,0 +1,314 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Материализованные представления</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Система правил"
+HREF="rules.html"><LINK
+REL="PREVIOUS"
+TITLE="Система правил и представления"
+HREF="rules-views.html"><LINK
+REL="NEXT"
+TITLE="Правила для INSERT, UPDATE и DELETE"
+HREF="rules-update.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Система правил и представления"
+HREF="rules-views.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="rules.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 38. Система правил</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Правила для INSERT, UPDATE и DELETE"
+HREF="rules-update.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="RULES-MATERIALIZEDVIEWS"
+>38.3. Материализованные представления</A
+></H1
+><P
+>Материализованные представления в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> основаны на системе правил, как и представления, но их содержимое сохраняется как таблица. Основное отличие между: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE MATERIALIZED VIEW mymatview AS SELECT * FROM mytab;</PRE
+><P> и этой командой: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE mymatview AS SELECT * FROM mytab;</PRE
+><P> состоит в том, что материализованное представление впоследствии нельзя будет изменить непосредственно, а запрос, создающий материализованное представление, сохраняется точно так же, как запрос представления, и получить актуальные данные в материализованном представлении можно так: </P><PRE
+CLASS="PROGRAMLISTING"
+>REFRESH MATERIALIZED VIEW mymatview;</PRE
+><P> Информация о материализованном представлении в системных каталогах <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> ничем не отличается от информации о таблице или представлении. Поэтому для анализатора запроса материализованное представление является просто отношением, как таблица или представление. Когда запрос обращается к материализованному представлению, данные возвращаются непосредственно из него, как из таблицы; правило применяется, только чтобы его наполнить.</P
+><P
+>Хотя обращение к данным в материализованном представлении часто выполняется гораздо быстрее, чем обращение к нижележащим таблицам напрямую или через представление, данные в нём не всегда актуальные (но иногда это вполне приемлемо). Рассмотрим таблицу с данными продаж: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE invoice (
+    invoice_no    integer        PRIMARY KEY,
+    seller_no     integer,       -- идентификатор продавца
+    invoice_date  date,          -- дата продажи
+    invoice_amt   numeric(13,2)  -- сумма продажи
+);</PRE
+><P> Если пользователям нужно быстро обработать исторические данные, возможно их интересуют только общие показатели, а полнота данных на текущий момент не важна: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE MATERIALIZED VIEW sales_summary AS
+  SELECT
+      seller_no,
+      invoice_date,
+      sum(invoice_amt)::numeric(13,2) as sales_amt
+    FROM invoice
+    WHERE invoice_date &lt; CURRENT_DATE
+    GROUP BY
+      seller_no,
+      invoice_date
+    ORDER BY
+      seller_no,
+      invoice_date;
+
+CREATE UNIQUE INDEX sales_summary_seller
+  ON sales_summary (seller_no, invoice_date);</PRE
+><P> Это материализованное представление может быть полезно для построения графика в информационной панели менеджеров по продажам. Для ежесуточного обновления статистики можно запланировать задание по расписанию, которое будет выполнять этот оператор: </P><PRE
+CLASS="PROGRAMLISTING"
+>REFRESH MATERIALIZED VIEW sales_summary;</PRE
+><P></P
+><P
+>Ещё одно применение материализованного представления — предоставить быстрый доступ к данным, получаемым с удалённой системы через обёртку сторонних данных. Ниже приведён простой пример с обёрткой <TT
+CLASS="LITERAL"
+>file_fdw</TT
+>, с замерами времени, но так как при этом использовался кеш локальной системы, выигрыш в производительности при обращении к удалённой системе обычно будет гораздо больше, чем показано здесь. Заметьте, что мы также использовали возможность добавить индекс в материализованное представление, тогда как <TT
+CLASS="LITERAL"
+>file_fdw</TT
+> индексы не поддерживает; при других видах доступа к сторонним данным такого преимущества может не быть.</P
+><P
+>Подготовка: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE EXTENSION file_fdw;
+CREATE SERVER local_file FOREIGN DATA WRAPPER file_fdw;
+CREATE FOREIGN TABLE words (word text NOT NULL)
+  SERVER local_file
+  OPTIONS (filename '/usr/share/dict/words');
+CREATE MATERIALIZED VIEW wrd AS SELECT * FROM words;
+CREATE UNIQUE INDEX wrd_word ON wrd (word);
+CREATE EXTENSION pg_trgm;
+CREATE INDEX wrd_trgm ON wrd USING gist (word gist_trgm_ops);
+VACUUM ANALYZE wrd;</PRE
+><P> Теперь давайте проверим написание слова. Сначала непосредственно через обёртку <TT
+CLASS="LITERAL"
+>file_fdw</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT count(*) FROM words WHERE word = 'caterpiler';
+
+ count 
+-------
+     0
+(1 row)</PRE
+><P> Выполнив <TT
+CLASS="COMMAND"
+>EXPLAIN ANALYZE</TT
+>, мы получаем: </P><PRE
+CLASS="PROGRAMLISTING"
+> Aggregate  (cost=21763.99..21764.00 rows=1 width=0) (actual time=188.180..188.181 rows=1 loops=1)
+   -&gt;  Foreign Scan on words  (cost=0.00..21761.41 rows=1032 width=0) (actual time=188.177..188.177 rows=0 loops=1)
+         Filter: (word = 'caterpiler'::text)
+         Rows Removed by Filter: 479829
+         Foreign File: /usr/share/dict/words
+         Foreign File Size: 4953699
+ Planning time: 0.118 ms
+ Execution time: 188.273 ms</PRE
+><P> Если же теперь обратиться к материализованному представлению, запрос выполнится гораздо быстрее: </P><PRE
+CLASS="PROGRAMLISTING"
+> Aggregate  (cost=4.44..4.45 rows=1 width=0) (actual time=0.042..0.042 rows=1 loops=1)
+   -&gt;  Index Only Scan using wrd_word on wrd  (cost=0.42..4.44 rows=1 width=0) (actual time=0.039..0.039 rows=0 loops=1)
+         Index Cond: (word = 'caterpiler'::text)
+         Heap Fetches: 0
+ Planning time: 0.164 ms
+ Execution time: 0.117 ms</PRE
+><P> В любом случае слово записано неправильно, поэтому давайте попробуем найти то, что имелось в виду. Сначала опять через <TT
+CLASS="LITERAL"
+>file_fdw</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT word FROM words ORDER BY word &lt;-&gt; 'caterpiler' LIMIT 10;
+
+     word     
+---------------
+ cater
+ caterpillar
+ Caterpillar
+ caterpillars
+ caterpillar's
+ Caterpillar's
+ caterer
+ caterer's
+ caters
+ catered
+(10 rows)</PRE
+><P>
+
+</P><PRE
+CLASS="PROGRAMLISTING"
+> Limit  (cost=11583.61..11583.64 rows=10 width=32) (actual time=1431.591..1431.594 rows=10 loops=1)
+   -&gt;  Sort  (cost=11583.61..11804.76 rows=88459 width=32) (actual time=1431.589..1431.591 rows=10 loops=1)
+         Sort Key: ((word &lt;-&gt; 'caterpiler'::text))
+         Sort Method: top-N heapsort  Memory: 25kB
+         -&gt;  Foreign Scan on words  (cost=0.00..9672.05 rows=88459 width=32) (actual time=0.057..1286.455 rows=479829 loops=1)
+               Foreign File: /usr/share/dict/words
+               Foreign File Size: 4953699
+ Planning time: 0.128 ms
+ Execution time: 1431.679 ms</PRE
+><P> Затем через материализованное представление: </P><PRE
+CLASS="PROGRAMLISTING"
+> Limit  (cost=0.29..1.06 rows=10 width=10) (actual time=187.222..188.257 rows=10 loops=1)
+   -&gt;  Index Scan using wrd_trgm on wrd  (cost=0.29..37020.87 rows=479829 width=10) (actual time=187.219..188.252 rows=10 loops=1)
+         Order By: (word &lt;-&gt; 'caterpiler'::text)
+ Planning time: 0.196 ms
+ Execution time: 198.640 ms</PRE
+><P> Если периодическое обновление данных из другого источника в локальной базе данных вас устраивает, этот подход может дать значительный выигрыш в скорости.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="rules-views.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="rules-update.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Система правил и представления</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="rules.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Правила для <TT
+CLASS="COMMAND"
+>INSERT</TT
+>, <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> и <TT
+CLASS="COMMAND"
+>DELETE</TT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,759 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Серверное программирование</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="PREVIOUS"
+TITLE="          views
+        "
+HREF="infoschema-views.html"><LINK
+REL="NEXT"
+TITLE="Расширение SQL"
+HREF="extend.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="PART"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="          views
+        "
+HREF="infoschema-views.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Расширение SQL"
+HREF="extend.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="PART"
+><A
+NAME="SERVER-PROGRAMMING"
+></A
+><DIV
+CLASS="TITLEPAGE"
+><H1
+CLASS="TITLE"
+>V. Серверное программирование</H1
+><DIV
+CLASS="PARTINTRO"
+><A
+NAME="AEN54690"
+></A
+><P
+>Эта часть документации посвящена расширению функциональности сервера путём реализации собственных функций, типов данных, триггеров и т. д. Это довольно сложные темы, для освоения которых рекомендуется предварительно изучить и понять всю остальную документацию для пользователей <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. В последних главах этой части описываются языки программирования на стороне сервера, поддерживаемые дистрибутивом <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, и рассматриваются общие вопросы, связанные с программированием на стороне сервера. Но прежде чем погружаться в этот материал, важно изучить предыдущие разделы <A
+HREF="extend.html"
+>Главы 35</A
+> (где освещаются функции).</P
+></DIV
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Содержание</B
+></DT
+><DT
+>35. <A
+HREF="extend.html"
+>Расширение <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+></A
+></DT
+><DD
+><DL
+><DT
+>35.1. <A
+HREF="extend-how.html"
+>Как реализована расширяемость</A
+></DT
+><DT
+>35.2. <A
+HREF="extend-type-system.html"
+>Система типов <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></A
+></DT
+><DT
+>35.3. <A
+HREF="xfunc.html"
+>Пользовательские функции</A
+></DT
+><DT
+>35.4. <A
+HREF="xfunc-sql.html"
+>Функции на языке запросов (<ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>)</A
+></DT
+><DT
+>35.5. <A
+HREF="xfunc-overload.html"
+>Перегрузка функций</A
+></DT
+><DT
+>35.6. <A
+HREF="xfunc-volatility.html"
+>Категории изменчивости функций</A
+></DT
+><DT
+>35.7. <A
+HREF="xfunc-pl.html"
+>Функции на процедурных языках</A
+></DT
+><DT
+>35.8. <A
+HREF="xfunc-internal.html"
+>Внутренние функции</A
+></DT
+><DT
+>35.9. <A
+HREF="xfunc-c.html"
+>Функции на языке C</A
+></DT
+><DT
+>35.10. <A
+HREF="xaggr.html"
+>Пользовательские агрегатные функции</A
+></DT
+><DT
+>35.11. <A
+HREF="xtypes.html"
+>Пользовательские типы</A
+></DT
+><DT
+>35.12. <A
+HREF="xoper.html"
+>Пользовательские операторы</A
+></DT
+><DT
+>35.13. <A
+HREF="xoper-optimization.html"
+>Информация для оптимизации операторов</A
+></DT
+><DT
+>35.14. <A
+HREF="xindex.html"
+>Интерфейсы расширений для индексов</A
+></DT
+><DT
+>35.15. <A
+HREF="extend-extensions.html"
+>Упаковывание связанных объектов в расширение</A
+></DT
+><DT
+>35.16. <A
+HREF="extend-pgxs.html"
+>Инфраструктура сборки расширений</A
+></DT
+></DL
+></DD
+><DT
+>36. <A
+HREF="triggers.html"
+>Триггеры</A
+></DT
+><DD
+><DL
+><DT
+>36.1. <A
+HREF="trigger-definition.html"
+>Обзор механизма работы триггеров</A
+></DT
+><DT
+>36.2. <A
+HREF="trigger-datachanges.html"
+>Видимость изменений в данных</A
+></DT
+><DT
+>36.3. <A
+HREF="trigger-interface.html"
+>Триггерные функции на языке C</A
+></DT
+><DT
+>36.4. <A
+HREF="trigger-example.html"
+>Полный пример триггера</A
+></DT
+></DL
+></DD
+><DT
+>37. <A
+HREF="event-triggers.html"
+>Триггеры событий</A
+></DT
+><DD
+><DL
+><DT
+>37.1. <A
+HREF="event-trigger-definition.html"
+>Обзор механизма работы триггеров событий</A
+></DT
+><DT
+>37.2. <A
+HREF="event-trigger-matrix.html"
+>Матрица срабатывания триггеров событий</A
+></DT
+><DT
+>37.3. <A
+HREF="event-trigger-interface.html"
+>Триггерные функции событий на языке C</A
+></DT
+><DT
+>37.4. <A
+HREF="event-trigger-example.html"
+>Полный пример триггера события</A
+></DT
+></DL
+></DD
+><DT
+>38. <A
+HREF="rules.html"
+>Система правил</A
+></DT
+><DD
+><DL
+><DT
+>38.1. <A
+HREF="querytree.html"
+>Дерево запроса</A
+></DT
+><DT
+>38.2. <A
+HREF="rules-views.html"
+>Система правил и представления</A
+></DT
+><DT
+>38.3. <A
+HREF="rules-materializedviews.html"
+>Материализованные представления</A
+></DT
+><DT
+>38.4. <A
+HREF="rules-update.html"
+>Правила для <TT
+CLASS="COMMAND"
+>INSERT</TT
+>, <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> и <TT
+CLASS="COMMAND"
+>DELETE</TT
+></A
+></DT
+><DT
+>38.5. <A
+HREF="rules-privileges.html"
+>Правила и права</A
+></DT
+><DT
+>38.6. <A
+HREF="rules-status.html"
+>Правила и статус команд</A
+></DT
+><DT
+>38.7. <A
+HREF="rules-triggers.html"
+>Сравнение правил и триггеров</A
+></DT
+></DL
+></DD
+><DT
+>39. <A
+HREF="xplang.html"
+>Процедурные языки</A
+></DT
+><DD
+><DL
+><DT
+>39.1. <A
+HREF="xplang-install.html"
+>Установка процедурных языков</A
+></DT
+></DL
+></DD
+><DT
+>40. <A
+HREF="plpgsql.html"
+><SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> — процедурный язык <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+></A
+></DT
+><DD
+><DL
+><DT
+>40.1. <A
+HREF="plpgsql-overview.html"
+>Обзор</A
+></DT
+><DT
+>40.2. <A
+HREF="plpgsql-structure.html"
+>Структура <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+></A
+></DT
+><DT
+>40.3. <A
+HREF="plpgsql-declarations.html"
+>Объявления</A
+></DT
+><DT
+>40.4. <A
+HREF="plpgsql-expressions.html"
+>Выражения</A
+></DT
+><DT
+>40.5. <A
+HREF="plpgsql-statements.html"
+>Основные операторы</A
+></DT
+><DT
+>40.6. <A
+HREF="plpgsql-control-structures.html"
+>Управляющие структуры</A
+></DT
+><DT
+>40.7. <A
+HREF="plpgsql-cursors.html"
+>Курсоры</A
+></DT
+><DT
+>40.8. <A
+HREF="plpgsql-errors-and-messages.html"
+>Сообщения и ошибки</A
+></DT
+><DT
+>40.9. <A
+HREF="plpgsql-trigger.html"
+>Триггерные процедуры</A
+></DT
+><DT
+>40.10. <A
+HREF="plpgsql-implementation.html"
+><SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> изнутри</A
+></DT
+><DT
+>40.11. <A
+HREF="plpgsql-development-tips.html"
+>Советы по разработке на <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+></A
+></DT
+><DT
+>40.12. <A
+HREF="plpgsql-porting.html"
+>Портирование из <SPAN
+CLASS="PRODUCTNAME"
+>Oracle</SPAN
+> PL/SQL</A
+></DT
+></DL
+></DD
+><DT
+>41. <A
+HREF="pltcl.html"
+>PL/Tcl — процедурный язык Tcl</A
+></DT
+><DD
+><DL
+><DT
+>41.1. <A
+HREF="pltcl-overview.html"
+>Обзор</A
+></DT
+><DT
+>41.2. <A
+HREF="pltcl-functions.html"
+>Функции на PL/Tcl и их аргументы</A
+></DT
+><DT
+>41.3. <A
+HREF="pltcl-data.html"
+>Значения данных в PL/Tcl</A
+></DT
+><DT
+>41.4. <A
+HREF="pltcl-global.html"
+>Глобальные данные в PL/Tcl</A
+></DT
+><DT
+>41.5. <A
+HREF="pltcl-dbaccess.html"
+>Обращение к базе данных из PL/Tcl</A
+></DT
+><DT
+>41.6. <A
+HREF="pltcl-trigger.html"
+>Процедуры триггеров на PL/Tcl</A
+></DT
+><DT
+>41.7. <A
+HREF="pltcl-event-trigger.html"
+>Процедуры событийных триггеров в PL/Tcl</A
+></DT
+><DT
+>41.8. <A
+HREF="pltcl-unknown.html"
+>Модули и команда <CODE
+CLASS="FUNCTION"
+>unknown</CODE
+></A
+></DT
+><DT
+>41.9. <A
+HREF="pltcl-procnames.html"
+>Имена процедур Tcl</A
+></DT
+></DL
+></DD
+><DT
+>42. <A
+HREF="plperl.html"
+>PL/Perl — процедурный язык Perl</A
+></DT
+><DD
+><DL
+><DT
+>42.1. <A
+HREF="plperl-funcs.html"
+>Функции на PL/Perl и их аргументы</A
+></DT
+><DT
+>42.2. <A
+HREF="plperl-data.html"
+>Значения в PL/Perl</A
+></DT
+><DT
+>42.3. <A
+HREF="plperl-builtins.html"
+>Встроенные функции</A
+></DT
+><DT
+>42.4. <A
+HREF="plperl-global.html"
+>Глобальные значения в PL/Perl</A
+></DT
+><DT
+>42.5. <A
+HREF="plperl-trusted.html"
+>Доверенный и недоверенный PL/Perl</A
+></DT
+><DT
+>42.6. <A
+HREF="plperl-triggers.html"
+>Триггеры на PL/Perl</A
+></DT
+><DT
+>42.7. <A
+HREF="plperl-event-triggers.html"
+>Событийные триггеры на PL/Perl</A
+></DT
+><DT
+>42.8. <A
+HREF="plperl-under-the-hood.html"
+>Внутренние особенности PL/Perl</A
+></DT
+></DL
+></DD
+><DT
+>43. <A
+HREF="plpython.html"
+>PL/Python — процедурный язык Python</A
+></DT
+><DD
+><DL
+><DT
+>43.1. <A
+HREF="plpython-python23.html"
+>Python 2 и Python 3</A
+></DT
+><DT
+>43.2. <A
+HREF="plpython-funcs.html"
+>Функции на PL/Python</A
+></DT
+><DT
+>43.3. <A
+HREF="plpython-data.html"
+>Значения данных</A
+></DT
+><DT
+>43.4. <A
+HREF="plpython-sharing.html"
+>Совместное использование данных</A
+></DT
+><DT
+>43.5. <A
+HREF="plpython-do.html"
+>Анонимные блоки кода</A
+></DT
+><DT
+>43.6. <A
+HREF="plpython-trigger.html"
+>Триггерные функции</A
+></DT
+><DT
+>43.7. <A
+HREF="plpython-database.html"
+>Обращение к базе данных</A
+></DT
+><DT
+>43.8. <A
+HREF="plpython-subtransaction.html"
+>Неявные подтранзакции</A
+></DT
+><DT
+>43.9. <A
+HREF="plpython-util.html"
+>Вспомогательные функции</A
+></DT
+><DT
+>43.10. <A
+HREF="plpython-envar.html"
+>Переменные окружения</A
+></DT
+></DL
+></DD
+><DT
+>44. <A
+HREF="spi.html"
+>Интерфейс программирования сервера</A
+></DT
+><DD
+><DL
+><DT
+>44.1. <A
+HREF="spi-interface.html"
+>Интерфейсные функции</A
+></DT
+><DT
+>44.2. <A
+HREF="spi-interface-support.html"
+>Вспомогательные интерфейсные функции</A
+></DT
+><DT
+>44.3. <A
+HREF="spi-memory.html"
+>Управление памятью</A
+></DT
+><DT
+>44.4. <A
+HREF="spi-visibility.html"
+>Видимость изменений в данных</A
+></DT
+><DT
+>44.5. <A
+HREF="spi-examples.html"
+>Примеры</A
+></DT
+></DL
+></DD
+><DT
+>45. <A
+HREF="bgworker.html"
+>Фоновые рабочие процессы</A
+></DT
+><DT
+>46. <A
+HREF="logicaldecoding.html"
+>Логическое декодирование</A
+></DT
+><DD
+><DL
+><DT
+>46.1. <A
+HREF="logicaldecoding-example.html"
+>Примеры логического декодирования</A
+></DT
+><DT
+>46.2. <A
+HREF="logicaldecoding-explanation.html"
+>Концепции логического декодирования</A
+></DT
+><DT
+>46.3. <A
+HREF="logicaldecoding-walsender.html"
+>Интерфейс протокола потоковой репликации</A
+></DT
+><DT
+>46.4. <A
+HREF="logicaldecoding-sql.html"
+>Интерфейс логического декодирования на уровне <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+></A
+></DT
+><DT
+>46.5. <A
+HREF="logicaldecoding-catalogs.html"
+>Системные каталоги, связанные с логическим декодированием</A
+></DT
+><DT
+>46.6. <A
+HREF="logicaldecoding-output-plugin.html"
+>Модули вывода логического декодирования</A
+></DT
+><DT
+>46.7. <A
+HREF="logicaldecoding-writer.html"
+>Запись вывода логического декодирования</A
+></DT
+><DT
+>46.8. <A
+HREF="logicaldecoding-synchronous.html"
+>Поддержка синхронной репликации для логического декодирования</A
+></DT
+></DL
+></DD
+></DL
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="infoschema-views.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="extend.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><TT
+CLASS="LITERAL"
+>views</TT
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Расширение <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

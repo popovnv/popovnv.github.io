@@ -1,0 +1,313 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>DROP ROLE</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="DROP OWNED"
+HREF="sql-drop-owned.html"><LINK
+REL="NEXT"
+TITLE="DROP RULE"
+HREF="sql-droprule.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="DROP OWNED"
+HREF="sql-drop-owned.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="DROP RULE"
+HREF="sql-droprule.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-DROPROLE"
+></A
+>DROP ROLE</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN79761"
+></A
+><H2
+>Название</H2
+>DROP ROLE&nbsp;--&nbsp;удалить роль в базе данных</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN79764"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>DROP ROLE [ IF EXISTS ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> [, ...]</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN79767"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>DROP ROLE</TT
+> удаляет указанные роли. Удалить роль суперпользователя может только суперпользователь, а чтобы удалить роль обычного пользователя, достаточно иметь право <TT
+CLASS="LITERAL"
+>CREATEROLE</TT
+>.</P
+><P
+>Если на эту роль есть ссылки в какой-либо базе данных в кластере, возникнет ошибка и роль не будет удалена. Прежде чем удалять роль, необходимо удалить все принадлежащие ей объекты (или сменить их владельца), а также лишить её данных ей прав. Для этой цели можно применить команды <A
+HREF="sql-reassign-owned.html"
+>REASSIGN OWNED</A
+> и <A
+HREF="sql-drop-owned.html"
+>DROP OWNED</A
+>.</P
+><P
+>Однако ликвидировать членство в ролях, связанное с этой ролью, не требуется; <TT
+CLASS="COMMAND"
+>DROP ROLE</TT
+> автоматически исключит данную роль из других ролей, и третьи роли из данной. Сами роли при этом не удаляются и другим образом никак не затрагиваются.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN79777"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>IF EXISTS</TT
+></DT
+><DD
+><P
+>Не считать ошибкой, если роль не существует. В этом случае будет выдано замечание.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></DT
+><DD
+><P
+>Имя роли, подлежащей удалению.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN79790"
+></A
+><H2
+>Замечания</H2
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> включает программу <A
+HREF="app-dropuser.html"
+>            <SPAN
+CLASS="APPLICATION"
+>dropuser</SPAN
+>
+          </A
+>, которая предоставляет ту же функциональность (на самом деле она вызывает эту команду), но может запускаться в командной оболочке.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN79795"
+></A
+><H2
+>Примеры</H2
+><P
+>Удаление роли: </P><PRE
+CLASS="PROGRAMLISTING"
+>DROP ROLE jonathan;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN79799"
+></A
+><H2
+>Совместимость</H2
+><P
+>В стандарте SQL определена команда <TT
+CLASS="COMMAND"
+>DROP ROLE</TT
+>, но она может удалять только по одной роли, а для её выполнения требуются другие права, не такие как в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN79804"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-createrole.html"
+>CREATE ROLE</A
+>, <A
+HREF="sql-alterrole.html"
+>ALTER ROLE</A
+>, <A
+HREF="sql-set-role.html"
+>SET ROLE</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-drop-owned.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-droprule.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>DROP OWNED</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>DROP RULE</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

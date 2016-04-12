@@ -1,0 +1,238 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Пользовательские операторы</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Расширение SQL"
+HREF="extend.html"><LINK
+REL="PREVIOUS"
+TITLE="Пользовательские типы"
+HREF="xtypes.html"><LINK
+REL="NEXT"
+TITLE="Информация для оптимизации операторов"
+HREF="xoper-optimization.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Пользовательские типы"
+HREF="xtypes.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="extend.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 35. Расширение <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Информация для оптимизации операторов"
+HREF="xoper-optimization.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="XOPER"
+>35.12. Пользовательские операторы</A
+></H1
+><P
+>Любой оператор представляет собой <SPAN
+CLASS="QUOTE"
+>"синтаксический сахар"</SPAN
+> для вызова нижележащей функции, выполняющей реальную работу; поэтому прежде чем вы сможете создать оператор, необходимо создать нижележащую функцию. Однако оператор — <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>не исключительно</I
+></SPAN
+> синтаксический сахар, так как он несёт и дополнительную информацию, помогающую планировщику запросов оптимизировать запросы с этим оператором. Рассмотрению этой дополнительной информации будет посвящён следующий раздел.</P
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> поддерживает левые унарные, правые унарные и бинарные операторы. Операторы могут быть перегружены; то есть одно имя оператора могут иметь различные операторы с разным количеством и типами операндов. Когда выполняется запрос, система определяет, какой оператор вызвать, по количеству и типам предоставленных операндов.</P
+><P
+>В следующем примере создаётся оператор сложения двух комплексных чисел. Предполагается, что мы уже создали определение типа <TT
+CLASS="TYPE"
+>complex</TT
+> (см. <A
+HREF="xtypes.html"
+>Раздел 35.11</A
+>). Сначала нам нужна функция, собственно выполняющая операцию, а затем мы сможем определить оператор: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION complex_add(complex, complex)
+    RETURNS complex
+    AS '<TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+>', 'complex_add'
+    LANGUAGE C IMMUTABLE STRICT;
+
+CREATE OPERATOR + (
+    leftarg = complex,
+    rightarg = complex,
+    procedure = complex_add,
+    commutator = +
+);</PRE
+><P></P
+><P
+>Теперь мы можем выполнить такой запрос: </P><PRE
+CLASS="SCREEN"
+>SELECT (a + b) AS c FROM test_complex;
+
+        c
+-----------------
+ (5.2,6.05)
+ (133.42,144.95)</PRE
+><P></P
+><P
+>Мы продемонстрировали создание бинарного оператора. Чтобы создать унарный оператор, просто опустите <TT
+CLASS="LITERAL"
+>leftarg</TT
+> (для левого унарного) или <TT
+CLASS="LITERAL"
+>rightarg</TT
+> (для правого унарного). Обязательными в <TT
+CLASS="COMMAND"
+>CREATE OPERATOR</TT
+> являются только предложение <TT
+CLASS="LITERAL"
+>procedure</TT
+> и объявления аргументов. Предложение <TT
+CLASS="LITERAL"
+>commutator</TT
+>, добавленное в данном примере, представляет необязательную подсказку для оптимизатора запросов. Подробнее о <TT
+CLASS="LITERAL"
+>commutator</TT
+> и других подсказках для оптимизатора рассказывается в следующем разделе.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="xtypes.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="xoper-optimization.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Пользовательские типы</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="extend.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Информация для оптимизации операторов</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,357 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>unaccent</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Дополнительно поставляемые модули"
+HREF="contrib.html"><LINK
+REL="PREVIOUS"
+TITLE="tsearch2"
+HREF="tsearch2.html"><LINK
+REL="NEXT"
+TITLE="uuid-ossp"
+HREF="uuid-ossp.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="tsearch2"
+HREF="tsearch2.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Приложение E. Дополнительно поставляемые модули</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="uuid-ossp"
+HREF="uuid-ossp.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="UNACCENT"
+>E.43. unaccent</A
+></H1
+><P
+>Модуль <TT
+CLASS="FILENAME"
+>unaccent</TT
+> представляет словарь текстового поиска, который убирает надстрочные (диакритические) знаки из лексем. Это фильтрующий словарь, что значит, что выводимые им данные всегда передаются следующему словарю (если он есть), в отличие от нормальных словарей. Применяя его, можно выполнить полнотекстовый поиск без учёта ударений (диакритики).</P
+><P
+>Текущую реализацию <TT
+CLASS="FILENAME"
+>unaccent</TT
+> нельзя использовать в качестве нормализующего словаря для словаря <TT
+CLASS="FILENAME"
+>thesaurus</TT
+>.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN125769"
+>E.43.1. Конфигурирование</A
+></H2
+><P
+>Словарь <TT
+CLASS="LITERAL"
+>unaccent</TT
+> принимает следующие параметры:</P
+><P
+></P
+><UL
+><LI
+><P
+>Параметр <TT
+CLASS="LITERAL"
+>RULES</TT
+> задаёт базовое имя файла со списком правил преобразования. Этот файл должен находиться в каталоге <TT
+CLASS="FILENAME"
+>$SHAREDIR/tsearch_data/</TT
+> (где под <TT
+CLASS="LITERAL"
+>$SHAREDIR</TT
+> понимается каталог с общими данными инсталляции <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>). Имя файла должно заканчиваться расширением <TT
+CLASS="LITERAL"
+>.rules</TT
+> (которое не нужно указывать в параметре <TT
+CLASS="LITERAL"
+>RULES</TT
+>).</P
+></LI
+></UL
+><P
+>Файл правил имеет следующий формат:</P
+><P
+></P
+><UL
+><LI
+><P
+>Каждая строка содержит пару символов; первый из них представляет букву с диакритическим знаком, а второй — без. Первый символ заменяется на второй. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>&Agrave;        A
+&Aacute;        A
+&Acirc;        A
+&Atilde;        A
+&Auml;        A
+&Aring;        A
+&AElig;        A</PRE
+><P></P
+></LI
+></UL
+><P
+>Более полный набор правил, непосредственно пригодный для европейских языков, можно найти в файле <TT
+CLASS="FILENAME"
+>unaccent.rules</TT
+>, который помещается в <TT
+CLASS="FILENAME"
+>$SHAREDIR/tsearch_data/</TT
+>, когда устанавливается модуль <TT
+CLASS="FILENAME"
+>unaccent</TT
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN125791"
+>E.43.2. Usage</A
+></H2
+><P
+>При установке расширения <TT
+CLASS="LITERAL"
+>unaccent</TT
+> в базе создаётся шаблон текстового поиска <TT
+CLASS="LITERAL"
+>unaccent</TT
+> и словарь <TT
+CLASS="LITERAL"
+>unaccent</TT
+> на его основе. Для словаря <TT
+CLASS="LITERAL"
+>unaccent</TT
+> по умолчанию определяется параметр <TT
+CLASS="LITERAL"
+>RULES='unaccent'</TT
+>, благодаря чему его можно сразу использовать со стандартным файлом <TT
+CLASS="FILENAME"
+>unaccent.rules</TT
+>. При желании вы можете изменить этот параметр, например, так </P><PRE
+CLASS="PROGRAMLISTING"
+>mydb=# ALTER TEXT SEARCH DICTIONARY unaccent (RULES='my_rules');</PRE
+><P> или создать новые словари на основе этого шаблона.</P
+><P
+>Протестировать этот словарь можно так: </P><PRE
+CLASS="PROGRAMLISTING"
+>mydb=# select ts_lexize('unaccent','H&ocirc;tel');
+ ts_lexize
+-----------
+ {Hotel}
+(1 row)</PRE
+><P></P
+><P
+>Следующий пример показывает, как вставить словарь <TT
+CLASS="FILENAME"
+>unaccent</TT
+> в конфигурацию текстового поиска: </P><PRE
+CLASS="PROGRAMLISTING"
+>mydb=# CREATE TEXT SEARCH CONFIGURATION fr ( COPY = french );
+mydb=# ALTER TEXT SEARCH CONFIGURATION fr
+        ALTER MAPPING FOR hword, hword_part, word
+        WITH unaccent, french_stem;
+mydb=# select to_tsvector('fr','H&ocirc;tels de la Mer');
+    to_tsvector
+-------------------
+ 'hotel':1 'mer':4
+(1 row)
+
+mydb=# select to_tsvector('fr','H&ocirc;tel de la Mer') @@ to_tsquery('fr','Hotels');
+ ?column?
+----------
+ t
+(1 row)
+
+mydb=# select ts_headline('fr','H&ocirc;tel de la Mer',to_tsquery('fr','Hotels'));
+      ts_headline
+------------------------
+ &lt;b&gt;H&ocirc;tel&lt;/b&gt; de la Mer
+(1 row)</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN125806"
+>E.43.3. Функции</A
+></H2
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>unaccent()</CODE
+> удаляет надстрочные (диакритические) знаки из заданной строки. По сути она представляет собой обёртку вокруг словаря <TT
+CLASS="FILENAME"
+>unaccent</TT
+>, но может вызываться и вне обычного контекста текстового поиска.</P
+><PRE
+CLASS="SYNOPSIS"
+>unaccent([<SPAN
+CLASS="OPTIONAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>словарь</I
+></TT
+>,</SPAN
+>] <TT
+CLASS="REPLACEABLE"
+><I
+>строка</I
+></TT
+>) returns <TT
+CLASS="TYPE"
+>text</TT
+></PRE
+><P
+>Пример: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT unaccent('unaccent', 'H&ocirc;tel');
+SELECT unaccent('H&ocirc;tel');</PRE
+><P></P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="tsearch2.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="uuid-ossp.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>tsearch2</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>uuid-ossp</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

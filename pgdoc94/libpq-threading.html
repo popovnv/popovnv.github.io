@@ -1,0 +1,280 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Поведение в многопоточных программах</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="libpq — библиотека для языка C"
+HREF="libpq.html"><LINK
+REL="PREVIOUS"
+TITLE="Поддержка SSL"
+HREF="libpq-ssl.html"><LINK
+REL="NEXT"
+TITLE="Сборка программ с libpq"
+HREF="libpq-build.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Поддержка SSL"
+HREF="libpq-ssl.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="libpq.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 31. <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> — библиотека для языка C</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Сборка программ с libpq"
+HREF="libpq-build.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="LIBPQ-THREADING"
+>31.19. Поведение в многопоточных программах</A
+></H1
+><P
+>Библиотека <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> по умолчанию поддерживает повторные вызовы и многопоточность. Для соответствующего варианта сборки вашего приложения вам может понадобиться передать компилятору специальные параметры командной строки. Чтобы узнать, как собрать многопоточное приложение, обратитесь к документации вашей системы или поищите в файле <TT
+CLASS="FILENAME"
+>src/Makefile.global</TT
+> значения <TT
+CLASS="LITERAL"
+>PTHREAD_CFLAGS</TT
+> и <TT
+CLASS="LITERAL"
+>PTHREAD_LIBS</TT
+>. Эта функция позволяет узнать, поддерживает ли <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> многопоточность:</P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="LIBPQ-PQISTHREADSAFE"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQisthreadsafe</CODE
+></DT
+><DD
+><P
+>Возвращает состояние потокобезопасности в библиотеке <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>. </P><PRE
+CLASS="SYNOPSIS"
+>int PQisthreadsafe();</PRE
+><P></P
+><P
+>Возвращает 1, если библиотека <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> потокобезопасная, или 0 в противном случае.</P
+></DD
+></DL
+></DIV
+><P
+>Реализация многопоточности не лишена ограничений: два потока не должны пытаться одновременно работать с одним объектом <TT
+CLASS="STRUCTNAME"
+>PGconn</TT
+>. В частности, не допускается параллельное выполнение команд из разных потоков через один объект соединения. (Если вам нужно выполнять команды одновременно, используйте несколько соединений.)</P
+><P
+>Объекты <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+> после создания обычно доступны только для чтения, и поэтому их можно свободно передавать между потоками. Однако, если вы используете какую-либо из функций, изменяющих <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+>, описанных в <A
+HREF="libpq-misc.html"
+>Разделе 31.11</A
+> или <A
+HREF="libpq-events.html"
+>Разделе 31.13</A
+>, вы должны также избегать одновременных обращений к одному объекту <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+>.</P
+><P
+>Устаревшие функции <CODE
+CLASS="FUNCTION"
+>PQrequestCancel</CODE
+> и <CODE
+CLASS="FUNCTION"
+>PQoidStatus</CODE
+> не являются потокобезопасными и не должны применяться в многопоточных программах. Вместо <CODE
+CLASS="FUNCTION"
+>PQrequestCancel</CODE
+> можно использовать <CODE
+CLASS="FUNCTION"
+>PQcancel</CODE
+>, а вместо <CODE
+CLASS="FUNCTION"
+>PQoidStatus</CODE
+> — <CODE
+CLASS="FUNCTION"
+>PQoidValue</CODE
+>.</P
+><P
+>Если вы применяете Kerberos в своём приложении (помимо возможного использования внутри <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>), вы должны обеспечить блокировку вокруг вызовов Kerberos, так как функции Kerberos не являются потокобезопасными. Обратите внимание на функцию <CODE
+CLASS="FUNCTION"
+>PQregisterThreadLock</CODE
+> в исходном коде <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>, позволяющую организовать совместные блокировки между <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> и вашим приложением.</P
+><P
+>Если вы сталкиваетесь с проблемами многопоточности в приложениях, запустите программу <TT
+CLASS="FILENAME"
+>src/tools/thread</TT
+>, чтобы понять, есть ли в вашей системе небезопасные при многопоточности функции. Эта программа запускается скриптом <TT
+CLASS="FILENAME"
+>configure</TT
+>, но если вы устанавливаете двоичный пакет, ваши библиотеки могут не соответствовать тем, что использовались при сборке.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="libpq-ssl.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="libpq-build.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Поддержка SSL</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="libpq.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Сборка программ с <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

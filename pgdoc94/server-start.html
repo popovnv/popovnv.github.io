@@ -1,0 +1,511 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Запуск сервера баз данных</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Подготовка к работе и сопровождение сервера"
+HREF="runtime.html"><LINK
+REL="PREVIOUS"
+TITLE="Создание кластера баз данных"
+HREF="creating-cluster.html"><LINK
+REL="NEXT"
+TITLE="Управление ресурсами ядра"
+HREF="kernel-resources.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Создание кластера баз данных"
+HREF="creating-cluster.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="runtime.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 17. Подготовка к работе и сопровождение сервера</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Управление ресурсами ядра"
+HREF="kernel-resources.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="SERVER-START"
+>17.3. Запуск сервера баз данных</A
+></H1
+><P
+>Чтобы кто-либо смог обратиться к базе данных, необходимо сначала запустить сервер баз данных. Программа сервера называется <TT
+CLASS="COMMAND"
+>postgres</TT
+>. Для работы программа <TT
+CLASS="COMMAND"
+>postgres</TT
+> должна знать, где найти данные, которые она будет использовать. Указать это местоположение позволяет параметр <TT
+CLASS="OPTION"
+>-D</TT
+>. Таким образом, проще всего запустить сервер, выполнив команду: </P><PRE
+CLASS="SCREEN"
+>$ <KBD
+CLASS="USERINPUT"
+>postgres -D /usr/local/pgsql/data</KBD
+></PRE
+><P> в результате которой сервер продолжит работу в качестве процесса переднего плана. Запускать эту команду следует под именем учётной записи <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Без параметра <TT
+CLASS="OPTION"
+>-D</TT
+> сервер попытается использовать каталог данных, указанный в переменной окружения <TT
+CLASS="ENVAR"
+>PGDATA</TT
+>. Если и эта переменная не определена, сервер не будет запущен.</P
+><P
+>Однако обычно лучше запускать <TT
+CLASS="COMMAND"
+>postgres</TT
+> в фоновом режиме. Для этого можно применить обычный синтаксис, принятый в оболочке Unix: </P><PRE
+CLASS="SCREEN"
+>$ <KBD
+CLASS="USERINPUT"
+>postgres -D /usr/local/pgsql/data &gt;logfile 2&gt;&amp;1 &amp;</KBD
+></PRE
+><P> Важно где-либо сохранять информацию, которую выводит сервер в каналы <SPAN
+CLASS="SYSTEMITEM"
+>stdout</SPAN
+> и <SPAN
+CLASS="SYSTEMITEM"
+>stderr</SPAN
+>, как показано выше. Это полезно и для целей аудита, и для диагностики проблем. (Более глубоко работа с файлами журналов рассматривается в <A
+HREF="logfile-maintenance.html"
+>Разделе 23.3</A
+>.)</P
+><P
+>Программа <TT
+CLASS="COMMAND"
+>postgres</TT
+> также принимает несколько других параметров командной строки. За дополнительными сведениями обратитесь к справочной странице <A
+HREF="app-postgres.html"
+>            <SPAN
+CLASS="APPLICATION"
+>postgres</SPAN
+>
+          </A
+> и к следующей <A
+HREF="runtime-config.html"
+>Главе 18</A
+>.</P
+><P
+>Такой вариант запуска довольно быстро может оказаться неудобным. Поэтому для упрощения подобных задач предлагается вспомогательная программа <A
+HREF="app-pg-ctl.html"
+>            <SPAN
+CLASS="APPLICATION"
+>pg_ctl</SPAN
+>
+          </A
+>. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>pg_ctl start -l logfile</PRE
+><P> запустит сервер в фоновом режиме и направит выводимые сообщения сервера в указанный файл журнала. Параметр <TT
+CLASS="OPTION"
+>-D</TT
+> для неё имеет то же значение, что и для программы <TT
+CLASS="COMMAND"
+>postgres</TT
+>. С помощью <TT
+CLASS="COMMAND"
+>pg_ctl</TT
+> также можно остановить сервер.</P
+><P
+>Обычно возникает желание, чтобы сервер баз данных сам запускался при загрузке операционной системы. Скрипты автозапуска для разных систем разные, но в составе <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> предлагается несколько типовых скриптов в каталоге <TT
+CLASS="FILENAME"
+>contrib/start-scripts</TT
+>. Для установки такого скрипта в систему требуются права root.</P
+><P
+>В различных системах приняты разные соглашения о порядке запуска служб в процессе загрузки. Во многих системах для этого используется файл <TT
+CLASS="FILENAME"
+>/etc/rc.local</TT
+> или <TT
+CLASS="FILENAME"
+>/etc/rc.d/rc.local</TT
+>. В других применяются каталоги <TT
+CLASS="FILENAME"
+>init.d</TT
+> или <TT
+CLASS="FILENAME"
+>rc.d</TT
+>. Однако при любом варианте запускаться сервер должен от имени пользователя <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, но <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>не root</I
+></SPAN
+> или какого-либо другого пользователя. Поэтому команду запуска обычно следует записывать в форме <TT
+CLASS="LITERAL"
+>su postgres -c '...'</TT
+>. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>su postgres -c 'pg_ctl start -D /usr/local/pgsql/data -l serverlog'</PRE
+><P></P
+><P
+>Ниже приведены более конкретные предложения для нескольких основных ОС. (Вместо указанных нами шаблонных значений необходимо подставить правильный путь к каталогу данных и фактическое имя пользователя.) <P
+></P
+></P><UL
+><LI
+><P
+>Для запуска во <SPAN
+CLASS="PRODUCTNAME"
+>FreeBSD</SPAN
+> воспользуйтесь файлом <TT
+CLASS="FILENAME"
+>contrib/start-scripts/freebsd</TT
+> в дереве исходного кода <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. </P
+></LI
+><LI
+><P
+>В <SPAN
+CLASS="PRODUCTNAME"
+>OpenBSD</SPAN
+>, добавьте в файл <TT
+CLASS="FILENAME"
+>/etc/rc.local</TT
+> следующие строки: </P><PRE
+CLASS="PROGRAMLISTING"
+>if [ -x /usr/local/pgsql/bin/pg_ctl -a -x /usr/local/pgsql/bin/postgres ]; then
+    su -l postgres -c '/usr/local/pgsql/bin/pg_ctl start -s -l /var/postgresql/log -D /usr/local/pgsql/data'
+    echo -n ' postgresql'
+fi</PRE
+><P></P
+></LI
+><LI
+><P
+>В системах <SPAN
+CLASS="PRODUCTNAME"
+>Linux</SPAN
+> вы можете либо добавить </P><PRE
+CLASS="PROGRAMLISTING"
+>/usr/local/pgsql/bin/pg_ctl start -l logfile -D /usr/local/pgsql/data</PRE
+><P> в <TT
+CLASS="FILENAME"
+>/etc/rc.d/rc.local</TT
+> или в <TT
+CLASS="FILENAME"
+>/etc/rc.local</TT
+>, либо воспользоваться файлом <TT
+CLASS="FILENAME"
+>contrib/start-scripts/linux</TT
+> в дереве исходного кода <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+></LI
+><LI
+><P
+>В <SPAN
+CLASS="PRODUCTNAME"
+>NetBSD</SPAN
+> можно использовать скрипт запуска для <SPAN
+CLASS="PRODUCTNAME"
+>FreeBSD</SPAN
+> или для <SPAN
+CLASS="PRODUCTNAME"
+>Linux</SPAN
+>, в зависимости от предпочтений. </P
+></LI
+><LI
+><P
+>В <SPAN
+CLASS="PRODUCTNAME"
+>Solaris</SPAN
+>, создайте файл с именем <TT
+CLASS="FILENAME"
+>/etc/init.d/postgresql</TT
+>, содержащий следующую стоку: </P><PRE
+CLASS="PROGRAMLISTING"
+>su - postgres -c "/usr/local/pgsql/bin/pg_ctl start -l logfile -D /usr/local/pgsql/data"</PRE
+><P> Затем создайте символическую ссылку на него в каталоге <TT
+CLASS="FILENAME"
+>/etc/rc3.d</TT
+> с именем <TT
+CLASS="FILENAME"
+>S99postgresql</TT
+>.</P
+></LI
+></UL
+><P></P
+><P
+>Когда сервер работает, идентификатор его процесса (<ACRONYM
+CLASS="ACRONYM"
+>PID</ACRONYM
+>) сохраняется в файле <TT
+CLASS="FILENAME"
+>postmaster.pid</TT
+> в каталоге данных. Это позволяет исключить запуск нескольких экземпляров сервера с одним каталогом данных, а также может быть полезно для выключения сервера.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="SERVER-START-FAILURES"
+>17.3.1. Сбои при запуске сервера</A
+></H2
+><P
+>Есть несколько распространённых причин, по которым сервер может не запуститься. Чтобы понять, чем вызван сбой, просмотрите файл журнала сервера или запустите сервер вручную (не перенаправляя его потоки стандартного вывода и ошибок) и проанализируйте выводимые сообщения. Ниже мы рассмотрим некоторые из наиболее частых сообщений об ошибках более подробно.</P
+><P
+></P><PRE
+CLASS="SCREEN"
+>LOG:  could not bind IPv4 socket: Address already in use
+HINT:  Is another postmaster already running on port 5432? If not, wait a few seconds and retry.
+FATAL:  could not create TCP/IP listen socket</PRE
+><P> Это обычно означает именно то, что написано: вы пытаетесь запустить сервер на том же порту, на котором уже работает другой. Однако, если сообщение ядра не <SAMP
+CLASS="COMPUTEROUTPUT"
+>Адрес
+     уже используется</SAMP
+> или подобное, возможна и другая проблема. Например, при попытке запустить сервер с номером зарезервированного порта будут выданы такие сообщения: </P><PRE
+CLASS="SCREEN"
+>$ <KBD
+CLASS="USERINPUT"
+>postgres -p 666</KBD
+>
+LOG:  could not bind IPv4 socket: Permission denied
+HINT:  Is another postmaster already running on port 666? If not, wait a few seconds and retry.
+FATAL:  could not create TCP/IP listen socket</PRE
+><P></P
+><P
+>Следующее сообщение: </P><PRE
+CLASS="SCREEN"
+>FATAL:  could not create shared memory segment: Invalid argument
+DETAIL:  Failed system call was shmget(key=5440001, size=4011376640, 03600).</PRE
+><P> может означать, что установленный для вашего ядра предельный размер разделяемой памяти слишком мал для рабочей области, которую пытается создать <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> (в данном примере 4011376640 байт). Возможно также, что в вашем ядре вообще отсутствует поддержка разделяемой памяти в стиле System-V. В качестве временного решения можно попытаться запустить сервер с меньшим числом буферов (<A
+HREF="runtime-config-resource.html#GUC-SHARED-BUFFERS"
+>shared_buffers</A
+>), но в итоге вам, скорее всего, придётся переконфигурировать ядро и увеличить допустимый размер разделяемой памяти. Вы также можете увидеть это сообщение при попытке запустить несколько серверов на одном компьютере, если запрошенный ими объём разделяемой памяти в сумме превышает этот предел.</P
+><P
+>Сообщение: </P><PRE
+CLASS="SCREEN"
+>FATAL:  could not create semaphores: No space left on device
+DETAIL:  Failed system call was semget(5440126, 17, 03600).</PRE
+><P> <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>не</I
+></SPAN
+> означает, что у вас закончилось место на диске. Это значит, что установленное в вашем ядре предельное число семафоров <SPAN
+CLASS="SYSTEMITEM"
+>System V</SPAN
+> меньше, чем количество семафоров, которое пытается создать <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Как и в предыдущем случае, можно попытаться обойти эту проблему, запустив сервер с меньшим числом допустимых подключений (<A
+HREF="runtime-config-connection.html#GUC-MAX-CONNECTIONS"
+>max_connections</A
+>), но в конце концов вам придётся увеличить этот предел в ядре.</P
+><P
+>Если вы получаете ошибку <SPAN
+CLASS="QUOTE"
+>"illegal system call"</SPAN
+> (неверный системный вызов), то, вероятнее всего, ваше ядро вовсе не поддерживает разделяемую память или семафоры. В этом случае, вам остаётся только переконфигурировать ядро и включить их поддержку.</P
+><P
+>Настройка средств <ACRONYM
+CLASS="ACRONYM"
+>IPC</ACRONYM
+> в стиле <SPAN
+CLASS="SYSTEMITEM"
+>System V</SPAN
+>
+      описывается в <A
+HREF="kernel-resources.html#SYSVIPC"
+>Подразделе 17.4.1</A
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="CLIENT-CONNECTION-PROBLEMS"
+>17.3.2. Проблемы с подключениями клиентов</A
+></H2
+><P
+>Хотя ошибки подключений, возможные на стороне клиента, довольно разнообразны и зависят от приложений, всё же несколько проблем могут быть связаны непосредственно с тем, как был запущен сервер. Описание ошибок, отличных от описанных ниже, следует искать в документации соответствующего клиентского приложения.</P
+><P
+></P><PRE
+CLASS="SCREEN"
+>psql: could not connect to server: Connection refused
+        Is the server running on host "server.joe.com" and accepting
+        TCP/IP connections on port 5432?</PRE
+><P> Это общая проблема <SPAN
+CLASS="QUOTE"
+>"я не могу найти сервер и начать взаимодействие с ним"</SPAN
+>. Показанное выше сообщение говорит о попытке установить подключение по TCP/IP. Очень часто объясняется это тем, что сервер просто забыли настроить для работы по протоколу TCP/IP.</P
+><P
+>Кроме того, при попытке установить подключение к локальному серверу через доменный сокет Unix можно получить такое сообщение: </P><PRE
+CLASS="SCREEN"
+>psql: could not connect to server: No such file or directory
+        Is the server running locally and accepting
+        connections on Unix domain socket "/tmp/.s.PGSQL.5432"?</PRE
+><P></P
+><P
+>Путь в последней строке помогает понять, к правильному ли адресу пытается подключиться клиент. Если сервер на самом деле не принимает подключения по этому адресу, обычно выдаётся сообщение ядра <SAMP
+CLASS="COMPUTEROUTPUT"
+>Connection refused</SAMP
+> (В соединении отказано) или <SAMP
+CLASS="COMPUTEROUTPUT"
+>No such file or directory</SAMP
+> (Нет такого файла или каталога), приведённое выше. (Важно понимать, что <SAMP
+CLASS="COMPUTEROUTPUT"
+>Connection refused</SAMP
+> в данном контексте <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>не</I
+></SPAN
+> означает, что сервер получил запрос на подключение и отверг его. В этом случае были бы выданы другие сообщения, например, показанные в <A
+HREF="client-authentication-problems.html"
+>Разделе 19.4</A
+>.) Другие сообщения об ошибках, например <SAMP
+CLASS="COMPUTEROUTPUT"
+>Connection timed out</SAMP
+> (Таймаут соединения) могут сигнализировать о более фундаментальных проблемах, например, о нарушениях сетевых соединений.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="creating-cluster.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="kernel-resources.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Создание кластера баз данных</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="runtime.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Управление ресурсами ядра</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

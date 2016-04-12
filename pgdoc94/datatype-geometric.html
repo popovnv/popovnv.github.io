@@ -1,0 +1,1116 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Геометрические типы</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Типы данных"
+HREF="datatype.html"><LINK
+REL="PREVIOUS"
+TITLE="Типы перечислений"
+HREF="datatype-enum.html"><LINK
+REL="NEXT"
+TITLE="Типы, описывающие сетевые адреса"
+HREF="datatype-net-types.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Типы перечислений"
+HREF="datatype-enum.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="datatype.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 8. Типы данных</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Типы, описывающие сетевые адреса"
+HREF="datatype-net-types.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="DATATYPE-GEOMETRIC"
+>8.8. Геометрические типы</A
+></H1
+><P
+>Геометрические типы данных представляют объекты в двумерном пространстве. Все существующие в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> геометрические типы перечислены в <A
+HREF="datatype-geometric.html#DATATYPE-GEO-TABLE"
+>Таблице 8-20</A
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="DATATYPE-GEO-TABLE"
+></A
+><P
+><B
+>Таблица 8-20. Геометрические типы</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Размер</TH
+><TH
+>Описание</TH
+><TH
+>Представление</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>point</TT
+>
+                </TD
+><TD
+>16 байт</TD
+><TD
+>Точка на плоскости</TD
+><TD
+>(x,y)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>line</TT
+>
+                </TD
+><TD
+>32 байта</TD
+><TD
+>Бесконечная прямая</TD
+><TD
+>{A,B,C}</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>lseg</TT
+>
+                </TD
+><TD
+>32 байта</TD
+><TD
+>Отрезок</TD
+><TD
+>((x1,y1),(x2,y2))</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>box</TT
+>
+                </TD
+><TD
+>32 байта</TD
+><TD
+>Прямоугольник</TD
+><TD
+>((x1,y1),(x2,y2))</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>path</TT
+>
+                </TD
+><TD
+>16+16n байт</TD
+><TD
+>Закрытый путь (подобный многоугольнику)</TD
+><TD
+>((x1,y1),...)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>path</TT
+>
+                </TD
+><TD
+>16+16n байт</TD
+><TD
+>Открытый путь</TD
+><TD
+>[(x1,y1),...]</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>polygon</TT
+>
+                </TD
+><TD
+>40+16n байт</TD
+><TD
+>Многоугольник (подобный закрытому пути)</TD
+><TD
+>((x1,y1),...)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>circle</TT
+>
+                </TD
+><TD
+>24 байта</TD
+><TD
+>Окружность</TD
+><TD
+>&lt;(x,y),r&gt; (центр окружности и радиус)</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Для выполнения различных геометрических операций, в частности масштабирования, вращения и определения пересечений, <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> предлагает богатый набор функций и операторов. Они рассматриваются в <A
+HREF="functions-geometry.html"
+>Разделе 9.11</A
+>.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN6713"
+>8.8.1. Точки</A
+></H2
+><P
+>Точки &mdash; это основной элемент, на базе которого строятся все остальные геометрические типы. Значения типа <TT
+CLASS="TYPE"
+>point</TT
+> записываются в одном из двух форматов: </P><PRE
+CLASS="SYNOPSIS"
+>( <TT
+CLASS="REPLACEABLE"
+><I
+>x</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>y</I
+></TT
+> )
+  <TT
+CLASS="REPLACEABLE"
+><I
+>x</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>y</I
+></TT
+></PRE
+><P> где <TT
+CLASS="REPLACEABLE"
+><I
+>x</I
+></TT
+> и <TT
+CLASS="REPLACEABLE"
+><I
+>y</I
+></TT
+> &mdash; координаты точки на плоскости, выраженные числами с плавающей точкой.</P
+><P
+>Выводятся точки в первом формате.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="DATATYPE-LINE"
+>8.8.2. Прямые</A
+></H2
+><P
+>Прямые представляются линейным уравнением <TT
+CLASS="REPLACEABLE"
+><I
+>A</I
+></TT
+>x + <TT
+CLASS="REPLACEABLE"
+><I
+>B</I
+></TT
+>y + <TT
+CLASS="REPLACEABLE"
+><I
+>C</I
+></TT
+> = 0, где <TT
+CLASS="REPLACEABLE"
+><I
+>A</I
+></TT
+> и <TT
+CLASS="REPLACEABLE"
+><I
+>B</I
+></TT
+> не равны 0. Значения типа <TT
+CLASS="TYPE"
+>line</TT
+> вводятся и выводятся в следующем виде: </P><PRE
+CLASS="SYNOPSIS"
+>{ <TT
+CLASS="REPLACEABLE"
+><I
+>A</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>B</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>C</I
+></TT
+> }</PRE
+><P> Кроме того, для ввода может использоваться любая из этих форм: </P><PRE
+CLASS="SYNOPSIS"
+>[ ( <TT
+CLASS="REPLACEABLE"
+><I
+>x1</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>y1</I
+></TT
+> ) , ( <TT
+CLASS="REPLACEABLE"
+><I
+>x2</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>y2</I
+></TT
+> ) ]
+( ( <TT
+CLASS="REPLACEABLE"
+><I
+>x1</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>y1</I
+></TT
+> ) , ( <TT
+CLASS="REPLACEABLE"
+><I
+>x2</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>y2</I
+></TT
+> ) )
+  ( <TT
+CLASS="REPLACEABLE"
+><I
+>x1</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>y1</I
+></TT
+> ) , ( <TT
+CLASS="REPLACEABLE"
+><I
+>x2</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>y2</I
+></TT
+> )
+    <TT
+CLASS="REPLACEABLE"
+><I
+>x1</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>y1</I
+></TT
+>   ,   <TT
+CLASS="REPLACEABLE"
+><I
+>x2</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>y2</I
+></TT
+></PRE
+><P> где <TT
+CLASS="LITERAL"
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>x1</I
+></TT
+>,<TT
+CLASS="REPLACEABLE"
+><I
+>y1</I
+></TT
+>)</TT
+> и <TT
+CLASS="LITERAL"
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>x2</I
+></TT
+>,<TT
+CLASS="REPLACEABLE"
+><I
+>y2</I
+></TT
+>)</TT
+> &mdash; две различные точки на данной прямой.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="DATATYPE-LSEG"
+>8.8.3. Отрезки</A
+></H2
+><P
+>Отрезок представляется парой точек, определяющих концы отрезка. Значения типа <TT
+CLASS="TYPE"
+>lseg</TT
+> записываются в одной из следующих форм: </P><PRE
+CLASS="SYNOPSIS"
+>[ ( <TT
+CLASS="REPLACEABLE"
+><I
+>x1</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>y1</I
+></TT
+> ) , ( <TT
+CLASS="REPLACEABLE"
+><I
+>x2</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>y2</I
+></TT
+> ) ]
+( ( <TT
+CLASS="REPLACEABLE"
+><I
+>x1</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>y1</I
+></TT
+> ) , ( <TT
+CLASS="REPLACEABLE"
+><I
+>x2</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>y2</I
+></TT
+> ) )
+  ( <TT
+CLASS="REPLACEABLE"
+><I
+>x1</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>y1</I
+></TT
+> ) , ( <TT
+CLASS="REPLACEABLE"
+><I
+>x2</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>y2</I
+></TT
+> )
+    <TT
+CLASS="REPLACEABLE"
+><I
+>x1</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>y1</I
+></TT
+>   ,   <TT
+CLASS="REPLACEABLE"
+><I
+>x2</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>y2</I
+></TT
+></PRE
+><P> где <TT
+CLASS="LITERAL"
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>x1</I
+></TT
+>,<TT
+CLASS="REPLACEABLE"
+><I
+>y1</I
+></TT
+>)</TT
+> и <TT
+CLASS="LITERAL"
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>x2</I
+></TT
+>,<TT
+CLASS="REPLACEABLE"
+><I
+>y2</I
+></TT
+>)</TT
+> &mdash; концы отрезка.</P
+><P
+>Выводятся отрезки в первом формате.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN6797"
+>8.8.4. Прямоугольники</A
+></H2
+><P
+>Прямоугольник представляется двумя точками, находящимися в противоположных его углах. Значения типа <TT
+CLASS="TYPE"
+>box</TT
+> записываются в одной из следующих форм: </P><PRE
+CLASS="SYNOPSIS"
+>( ( <TT
+CLASS="REPLACEABLE"
+><I
+>x1</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>y1</I
+></TT
+> ) , ( <TT
+CLASS="REPLACEABLE"
+><I
+>x2</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>y2</I
+></TT
+> ) )
+  ( <TT
+CLASS="REPLACEABLE"
+><I
+>x1</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>y1</I
+></TT
+> ) , ( <TT
+CLASS="REPLACEABLE"
+><I
+>x2</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>y2</I
+></TT
+> )
+    <TT
+CLASS="REPLACEABLE"
+><I
+>x1</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>y1</I
+></TT
+>   ,   <TT
+CLASS="REPLACEABLE"
+><I
+>x2</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>y2</I
+></TT
+></PRE
+><P> где <TT
+CLASS="LITERAL"
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>x1</I
+></TT
+>,<TT
+CLASS="REPLACEABLE"
+><I
+>y1</I
+></TT
+>)</TT
+> и <TT
+CLASS="LITERAL"
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>x2</I
+></TT
+>,<TT
+CLASS="REPLACEABLE"
+><I
+>y2</I
+></TT
+>)</TT
+> &mdash; противоположные углы прямоугольника.</P
+><P
+>Выводятся прямоугольники во второй форме.</P
+><P
+>Во вводимом значении могут быть указаны любые два противоположных угла, но затем они будут упорядочены, так что внутри сохранятся правый верхний и левый нижний углы, в таком порядке.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN6826"
+>8.8.5. Пути</A
+></H2
+><P
+>Пути представляют собой списки соединённых точек. Пути могут быть <I
+CLASS="FIRSTTERM"
+>закрытыми</I
+>, когда подразумевается, что первая и последняя точка в списке соединены, или <I
+CLASS="FIRSTTERM"
+>открытыми</I
+>, в противном случае.</P
+><P
+>Значения типа <TT
+CLASS="TYPE"
+>path</TT
+> записываются в одной из следующих форм: </P><PRE
+CLASS="SYNOPSIS"
+>[ ( <TT
+CLASS="REPLACEABLE"
+><I
+>x1</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>y1</I
+></TT
+> ) , ... , ( <TT
+CLASS="REPLACEABLE"
+><I
+>xn</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>yn</I
+></TT
+> ) ]
+( ( <TT
+CLASS="REPLACEABLE"
+><I
+>x1</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>y1</I
+></TT
+> ) , ... , ( <TT
+CLASS="REPLACEABLE"
+><I
+>xn</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>yn</I
+></TT
+> ) )
+  ( <TT
+CLASS="REPLACEABLE"
+><I
+>x1</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>y1</I
+></TT
+> ) , ... , ( <TT
+CLASS="REPLACEABLE"
+><I
+>xn</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>yn</I
+></TT
+> )
+  ( <TT
+CLASS="REPLACEABLE"
+><I
+>x1</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>y1</I
+></TT
+>   , ... ,   <TT
+CLASS="REPLACEABLE"
+><I
+>xn</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>yn</I
+></TT
+> )
+    <TT
+CLASS="REPLACEABLE"
+><I
+>x1</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>y1</I
+></TT
+>   , ... ,   <TT
+CLASS="REPLACEABLE"
+><I
+>xn</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>yn</I
+></TT
+></PRE
+><P> где точки задают узлы сегментов, составляющих путь. Квадратные скобки (<TT
+CLASS="LITERAL"
+>[]</TT
+>) указывают, что путь открытый, а круглые (<TT
+CLASS="LITERAL"
+>()</TT
+>) &mdash; закрытый. Когда внешние скобки опускаются, как в показанных выше последних трёх формах, считается, что путь закрытый.</P
+><P
+>Пути выводятся в первой или второй форме, в соответствии с типом.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="DATATYPE-POLYGON"
+>8.8.6. Многоугольники</A
+></H2
+><P
+>Многоугольники представляются списками точек (вершин). Многоугольники похожи на закрытые пути, но хранятся в другом виде и для работы с ними предназначен отдельный набор функций.</P
+><P
+>Значения типа <TT
+CLASS="TYPE"
+>polygon</TT
+> записываются в одной из следующих форм: </P><PRE
+CLASS="SYNOPSIS"
+>( ( <TT
+CLASS="REPLACEABLE"
+><I
+>x1</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>y1</I
+></TT
+> ) , ... , ( <TT
+CLASS="REPLACEABLE"
+><I
+>xn</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>yn</I
+></TT
+> ) )
+  ( <TT
+CLASS="REPLACEABLE"
+><I
+>x1</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>y1</I
+></TT
+> ) , ... , ( <TT
+CLASS="REPLACEABLE"
+><I
+>xn</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>yn</I
+></TT
+> )
+  ( <TT
+CLASS="REPLACEABLE"
+><I
+>x1</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>y1</I
+></TT
+>   , ... ,   <TT
+CLASS="REPLACEABLE"
+><I
+>xn</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>yn</I
+></TT
+> )
+    <TT
+CLASS="REPLACEABLE"
+><I
+>x1</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>y1</I
+></TT
+>   , ... ,   <TT
+CLASS="REPLACEABLE"
+><I
+>xn</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>yn</I
+></TT
+></PRE
+><P> где точки задают узлы сегментов, образующих границу многоугольника.</P
+><P
+>Выводятся многоугольники в первом формате.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="DATATYPE-CIRCLE"
+>8.8.7. Окружности</A
+></H2
+><P
+>Окружности задаются координатами центра и радиусом. Значения типа <TT
+CLASS="TYPE"
+>circle</TT
+> записываются в одном из следующих форматов: </P><PRE
+CLASS="SYNOPSIS"
+>&lt; ( <TT
+CLASS="REPLACEABLE"
+><I
+>x</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>y</I
+></TT
+> ) , <TT
+CLASS="REPLACEABLE"
+><I
+>r</I
+></TT
+> &gt;
+( ( <TT
+CLASS="REPLACEABLE"
+><I
+>x</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>y</I
+></TT
+> ) , <TT
+CLASS="REPLACEABLE"
+><I
+>r</I
+></TT
+> )
+  ( <TT
+CLASS="REPLACEABLE"
+><I
+>x</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>y</I
+></TT
+> ) , <TT
+CLASS="REPLACEABLE"
+><I
+>r</I
+></TT
+>
+    <TT
+CLASS="REPLACEABLE"
+><I
+>x</I
+></TT
+> , <TT
+CLASS="REPLACEABLE"
+><I
+>y</I
+></TT
+>   , <TT
+CLASS="REPLACEABLE"
+><I
+>r</I
+></TT
+></PRE
+><P> где <TT
+CLASS="LITERAL"
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>x</I
+></TT
+>,<TT
+CLASS="REPLACEABLE"
+><I
+>y</I
+></TT
+>)</TT
+> &mdash; центр окружности, а <TT
+CLASS="REPLACEABLE"
+><I
+>r</I
+></TT
+> &mdash; её радиус.</P
+><P
+>Выводятся окружности в первом формате.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="datatype-enum.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="datatype-net-types.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Типы перечислений</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="datatype.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Типы, описывающие сетевые адреса</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

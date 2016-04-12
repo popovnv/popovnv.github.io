@@ -1,0 +1,347 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Интерпретация данных даты и времени</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Поддержка даты и времени"
+HREF="datetime-appendix.html"><LINK
+REL="PREVIOUS"
+TITLE="Поддержка даты и времени"
+HREF="datetime-appendix.html"><LINK
+REL="NEXT"
+TITLE="Ключевые слова для обозначения даты и времени"
+HREF="datetime-keywords.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Поддержка даты и времени"
+HREF="datetime-appendix.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="datetime-appendix.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Приложение B. Поддержка даты и времени</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Ключевые слова для обозначения даты и времени"
+HREF="datetime-keywords.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="DATETIME-INPUT-RULES"
+>B.1. Интерпретация данных даты и времени</A
+></H1
+><P
+>Все значения даты и времени расшифровываются при помощи следующей процедуры.</P
+><DIV
+CLASS="PROCEDURE"
+><OL
+TYPE="1"
+><LI
+CLASS="STEP"
+><P
+>Разделить входную строку на фрагменты и определить каждый фрагмент как строку, время, часовой пояс или цифру.</P
+><OL
+CLASS="SUBSTEPS"
+TYPE="a"
+><LI
+CLASS="STEP"
+><P
+>Если числовой фрагмент содержит двоеточие (<TT
+CLASS="LITERAL"
+>:</TT
+>), значит эта строка представляет время. Включаются все последующие цифры и двоеточия.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Если числовой фрагмент содержит тире (<TT
+CLASS="LITERAL"
+>-</TT
+>), косую черту (<TT
+CLASS="LITERAL"
+>/</TT
+>) или две и более точек (<TT
+CLASS="LITERAL"
+>.</TT
+>), то это строка даты, которая, возможно, включает название месяца. Если фрагмент даты уже встречался, он интерпретируется как название часового пояса (например, <TT
+CLASS="LITERAL"
+>America/New_York</TT
+>).</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Если этот фрагмент является лишь числом, он представляет собой отдельное поле или составную дату ISO 8601 (например, <TT
+CLASS="LITERAL"
+>19990113</TT
+> для 13 января 1999 года) или время (например, <TT
+CLASS="LITERAL"
+>141516</TT
+> для 14:15:16).</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Если фрагмент начинается с плюса (<TT
+CLASS="LITERAL"
+>+</TT
+>) или минуса (<TT
+CLASS="LITERAL"
+>-</TT
+>), то это или числовой часовой пояс или специальное поле.</P
+></LI
+></OL
+></LI
+><LI
+CLASS="STEP"
+><P
+>Если фрагмент является текстовой строкой, сопоставить его с возможными строками:</P
+><OL
+CLASS="SUBSTEPS"
+TYPE="a"
+><LI
+CLASS="STEP"
+><P
+>Выполнить двоичный поиск в справочной таблице соответствующего фрагмента в виде аббревиатуры часового пояса.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Если фрагмент не найден, выполнить подобный просмотр в таблице двоичного поиска, чтобы определить фрагмент как специальную строку (например, <TT
+CLASS="LITERAL"
+>today</TT
+>), день (например, <TT
+CLASS="LITERAL"
+>Thursday</TT
+>), месяц (например, <TT
+CLASS="LITERAL"
+>January</TT
+>) или неучитываемое слово (например, <TT
+CLASS="LITERAL"
+>at</TT
+>, <TT
+CLASS="LITERAL"
+>on</TT
+>).</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Если фрагмент всё же не найден, выдать ошибку.</P
+></LI
+></OL
+></LI
+><LI
+CLASS="STEP"
+><P
+>Когда фрагмент является числом или числовым полем:</P
+><OL
+CLASS="SUBSTEPS"
+TYPE="a"
+><LI
+CLASS="STEP"
+><P
+>Если получено восемь или шесть цифр и никакое другое поле даты ранее не было прочитано, интерпретировать их как <SPAN
+CLASS="QUOTE"
+>"составленную дату"</SPAN
+> (например, <TT
+CLASS="LITERAL"
+>19990118</TT
+> или <TT
+CLASS="LITERAL"
+>990118</TT
+>). Такая дата интерпретируется как <TT
+CLASS="LITERAL"
+>ГГГГММДД</TT
+> или <TT
+CLASS="LITERAL"
+>ГГММДД</TT
+>.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Если фрагмент представляет собой трёхзначное число, и год уже был прочитан, интерпретировать как день года.</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Если это четыре или шесть цифр и год уже был прочитан, интерпретировать как время (<TT
+CLASS="LITERAL"
+>ЧЧММ</TT
+> или <TT
+CLASS="LITERAL"
+>ЧЧММСС</TT
+>).</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Если найдены три или более цифр, а поля даты ещё не были найдены, интерпретировать как год (это ведёт к установке порядка гг-мм-дд для оставшихся полей даты).</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>В противном случае подразумевается, что порядок сортировки полей даты определяется значением <TT
+CLASS="VARNAME"
+>DateStyle</TT
+>: мм-дд-гг, дд-мм-гг или гг-мм-дд. Выдать ошибку, если оказалось, что поле месяца или дня вышло за пределы диапазона.</P
+></LI
+></OL
+></LI
+><LI
+CLASS="STEP"
+><P
+>Если указан год до н. э., отнять год и добавить единицу для внутреннего хранения. (В григорианском календаре отсутствует нулевой год, поэтому 1 год до н. э. становится нулевым.)</P
+></LI
+><LI
+CLASS="STEP"
+><P
+>Если год до н. э. не был указан, и если поле года имело два разряда, установить для записи года четыре разряда. Если поле меньше 70, добавить 2000, в противном случае добавить 1900. <DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>Годы с 1 по 99 н. э. по григорианскому календарю могут вводится при помощи четырёхзначного числа с начальными нулями (например, <TT
+CLASS="LITERAL"
+>0099</TT
+> это год 99 н. э.).</P
+></BLOCKQUOTE
+></DIV
+></P
+></LI
+></OL
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="datetime-appendix.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="datetime-keywords.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Поддержка даты и времени</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="datetime-appendix.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Ключевые слова для обозначения даты и времени</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

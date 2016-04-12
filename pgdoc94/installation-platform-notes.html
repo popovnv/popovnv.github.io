@@ -1,0 +1,1223 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Замечания по отдельным платформам</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Установка из исходного кода"
+HREF="installation.html"><LINK
+REL="PREVIOUS"
+TITLE="Поддерживаемые платформы"
+HREF="supported-platforms.html"><LINK
+REL="NEXT"
+TITLE="Установка из исходного кода в Windows"
+HREF="install-windows.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Поддерживаемые платформы"
+HREF="supported-platforms.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="installation.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 15. Установка из исходного кода</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Установка из исходного кода в Windows"
+HREF="install-windows.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="INSTALLATION-PLATFORM-NOTES"
+>15.7. Замечания по отдельным платформам</A
+></H1
+><P
+>В этом разделе приведены дополнительные замечания по отдельным платформам, связанные с установкой и подготовкой к работе PostgreSQL. Обязательно изучите ещё инструкции по установке, и в частности <A
+HREF="install-requirements.html"
+>Раздел 15.2</A
+>. Также обратитесь к <A
+HREF="regress.html"
+>Главе 30</A
+>, где рассказывается, как прочитать результаты регрессионных тестов.</P
+><P
+>Если какие-то платформы здесь не упоминаются, значит каких-либо известных особенностей установки в них нет.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="INSTALLATION-NOTES-AIX"
+>15.7.1. AIX</A
+></H2
+><P
+>PostgreSQL работает в AIX, но установить его правильно может быть непростой задачей. Поддерживаемыми считаются версии AIX с 4.3.3 до 6.1. Для сборки вы можете применить GCC или собственный компилятор IBM <TT
+CLASS="COMMAND"
+>xlc</TT
+>. Вообще говоря, полезно использовать последние версии AIX и PostgreSQL. Получить актуальную информацию о версиях AIX, работа в которых проверена на данный момент, можно на сайте фермы сборки.</P
+><P
+>Минимальные рекомендуемые уровни исправлений для поддерживаемых версий AIX:</P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+>AIX 4.3.3</DT
+><DD
+><P
+>Эксплуатационный уровень (ML) 11 + пакет исправлений после ML11</P
+></DD
+><DT
+>AIX 5.1</DT
+><DD
+><P
+>Эксплуатационный уровень (ML) 9 + пакет исправлений после ML9</P
+></DD
+><DT
+>AIX 5.2</DT
+><DD
+><P
+>Технологический уровень (TL) 10, Пакет обновлений (SP) 3</P
+></DD
+><DT
+>AIX 5.3</DT
+><DD
+><P
+>Технологический уровень (TL) 7</P
+></DD
+><DT
+>AIX 6.1</DT
+><DD
+><P
+>Базовый уровень</P
+></DD
+></DL
+></DIV
+><P
+>Чтобы проверить ваш текущий уровень исправлений, выполните <TT
+CLASS="COMMAND"
+>oslevel -r</TT
+> в AIX версии с 4.3.3 по 5.2 ML 7, либо <TT
+CLASS="COMMAND"
+>oslevel -s</TT
+> в более поздних версиях.</P
+><P
+>Если Readline или libz у вас установлены не в <TT
+CLASS="LITERAL"
+>/usr/local</TT
+>, передайте <TT
+CLASS="COMMAND"
+>configure</TT
+> следующие ключи в дополнение к вашим: <TT
+CLASS="LITERAL"
+>--with-includes=/usr/local/include --with-libraries=/usr/local/lib</TT
+>.</P
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN27435"
+>15.7.1.1. Особенности использования GCC</A
+></H3
+><P
+>В AIX 5.3 наблюдались проблемы с компиляцией и запуском PostgreSQL с использованием GCC.</P
+><P
+>Для успешной сборки вам потребуется GCC версии новее 3.3.2, особенно, если вы используете версию из системного пакета. Мы добивались успеха с 4.0.1. Проблемы с предыдущими версиями, судя по всему, были связаны больше с тем, как IBM упаковала GCC, а не собственно с GCC, поэтому если вы скомпилируете GCC самостоятельно, положительный исход возможен и с ранней версией GCC.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN27439"
+>15.7.1.2. Неработающие доменные сокеты Unix</A
+></H3
+><P
+>В AIX 5.3 была проблема с размером структуры <TT
+CLASS="STRUCTNAME"
+>sockaddr_storage</TT
+>. В версии 5.3 IBM увеличила размер <TT
+CLASS="STRUCTNAME"
+>sockaddr_un</TT
+>, структуры адреса для доменных сокетов Unix, но не увеличила соответственно размер <TT
+CLASS="STRUCTNAME"
+>sockaddr_storage</TT
+>. В итоге при попытке PostgreSQL использовать доменные сокеты Unix происходило переполнение этой структуры в libpq. Подключение через TCP/IP устанавливается корректно, а через доменные сокеты Unix — нет, и в результате регрессионные тесты не проходят.</P
+><P
+>Об этой проблеме было сообщено IBM, она зафиксирована в отчёте об ошибке PMR29657. Если вы обновите систему до эксплуатационного уровня 5300-03 или новее, она получит соответствующее исправление. В качестве временного решения можно присвоить <TT
+CLASS="SYMBOL"
+>_SS_MAXSIZE</TT
+> значение 1025 в <TT
+CLASS="FILENAME"
+>/usr/include/sys/socket.h</TT
+>. В любом случае, после исправления этого заголовочного файла перекомпилируйте PostgreSQL.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN27448"
+>15.7.1.3. Проблемы с сетевыми адресами</A
+></H3
+><P
+>PostgreSQL пользуется системной функцией <CODE
+CLASS="FUNCTION"
+>getaddrinfo</CODE
+> для разбора IP-адресов, указанных в параметре <TT
+CLASS="VARNAME"
+>listen_addresses</TT
+>, файле <TT
+CLASS="FILENAME"
+>pg_hba.conf</TT
+> и т. д. В старых версиях AIX эта функция работала некорректно. Если вы столкнулись с проблемами в этой области, обновление до уровня исправлений AIX, обозначенного выше, должно решить их.</P
+><P
+>Один пользователь сообщает:</P
+><P
+>Используя PostgreSQL версии 8.1 в AIX 5.3, мы периодически сталкивались с тем, что сборщик статистики <SPAN
+CLASS="QUOTE"
+>"загадочным образом"</SPAN
+> не запускается. Кажется, это результат незапланированного поведения реализации IPv6. Похоже, что PostgreSQL и IPv6 не дружат в AIX 5.3.</P
+><P
+>Для <SPAN
+CLASS="QUOTE"
+>"решения"</SPAN
+> проблемы можно выполнить одно из следующих действий. <P
+></P
+></P><UL
+><LI
+><P
+>Удалите адрес IPv6 для localhost: </P><PRE
+CLASS="SCREEN"
+>(от имени root)
+# ifconfig lo0 inet6 ::1/0 delete</PRE
+><P></P
+></LI
+><LI
+><P
+>Удалите IPv6 из сетевых сервисов. Файл <TT
+CLASS="FILENAME"
+>/etc/netsvc.conf</TT
+> в AIX примерно соответствует файлу <TT
+CLASS="FILENAME"
+>/etc/nsswitch.conf</TT
+> в Solaris/Linux. По умолчанию в AIX он выглядит так: </P><PRE
+CLASS="PROGRAMLISTING"
+>hosts=local,bind</PRE
+><P> Чтобы отключить поиск адресов IPv6, замените его содержимое следующим: </P><PRE
+CLASS="PROGRAMLISTING"
+>hosts=local4,bind4</PRE
+><P></P
+></LI
+></UL
+><P></P
+><DIV
+CLASS="WARNING"
+><P
+></P
+><TABLE
+CLASS="WARNING"
+BORDER="1"
+WIDTH="100%"
+><TR
+><TD
+ALIGN="CENTER"
+><B
+>Внимание</B
+></TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+><P
+>К этим временным решениям приходилось прибегать из-за проблем, связанных с сырой реализацией IPv6, которая заметно улучшилась в последующих выпусках AIX 5.3. Эти решения работали в AIX версии 5.3, но они конечно далеки от идеальных. Кроме того, сообщалось, что они не только не требуются, но и приводят к другим проблемам в AIX 6.1, где поддержка IPv6 стала более зрелой.</P
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN27471"
+>15.7.1.4. Управление памятью</A
+></H3
+><P
+>Иногда управление памятью в AIX может работать несколько странно. В системе может быть свободно несколько гигабайт ОЗУ, но при запуске приложений всё равно возможны ошибки, связанные с адресным пространством или нехваткой памяти. Например, необычную ошибку может выдать команда <TT
+CLASS="COMMAND"
+>createlang</TT
+>. При запуске от имени владельца инсталляции PostgreSQL: </P><PRE
+CLASS="SCREEN"
+>-bash-3.00$ createlang plperl template1
+createlang: language installation failed: ERROR:  could not load library "/opt/dbs/pgsql748/lib/plperl.so": A memory address is not in the address space for the process.</PRE
+><P> (createlang: установить язык не удалось: ОШИБКА: не удалось загрузить библиотеку "/opt/dbs/pgsql748/lib/plperl.so": Адрес памяти находится не в адресном пространстве процесса.) При запуске от имени не владельца, а члена группы-владельца инсталляции PostgreSQL: </P><PRE
+CLASS="SCREEN"
+>-bash-3.00$ createlang plperl template1
+createlang: language installation failed: ERROR:  could not load library "/opt/dbs/pgsql748/lib/plperl.so": Bad address</PRE
+><P> (createlang: установить язык не удалось: ОШИБКА: не удалось загрузить библиотеку "/opt/dbs/pgsql748/lib/plperl.so": Неверный адрес) Также сообщения о нехватке памяти могут появляться в журнале PostgreSQL при попытке выделить блок памяти размером около 256 МиБ или больше.</P
+><P
+>Общая причина всех этих проблем связана с битностью и моделью памяти серверного процесса. По умолчанию все исполняемые файлы для AIX собираются как 32-битные, вне зависимости от того, какой тип оборудования или ядра используется. Такие 32-битные процессы ограничиваются общим пространством в 4 ГиБ, разделённым на сегменты по 256 МиБ, по одной из нескольких моделей. По умолчанию в куче можно выделить меньше 256 МиБ, так как она разделяет один сегмент со стеком.</P
+><P
+>В ситуации с показанным выше примером <TT
+CLASS="COMMAND"
+>createlang</TT
+>, проверьте umask и разрешения, назначенные для двоичных файлов в вашей инсталляции PostgreSQL. Задействованные в данном примере двоичные файлы были 32-битными и установились с режимом 750 вместо 755. Из-за таких разрешений только владелец или член группы-владельца могли загрузить требуемую библиотеку. Так как она недоступна для чтения всеми, загрузчик помещал этот объект в область кучи процесса, а не в сегменты разделяемых библиотек, где он должен находиться.</P
+><P
+>В <SPAN
+CLASS="QUOTE"
+>"идеале"</SPAN
+> эту проблему можно решить, если использовать 64-битную сборку PostgreSQL, но это не всегда практично, так как с 32-битным процессором нельзя будет запустить 64-битный код (можно только собрать).</P
+><P
+>При желании использовать 32-битную версию сервера установите в <TT
+CLASS="SYMBOL"
+>LDR_CNTRL</TT
+> значение <TT
+CLASS="LITERAL"
+>MAXDATA=0x<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>0000000</TT
+>, где 1 &lt;= n &lt;= 8, до запуска PostgreSQL, и попробуйте подобрать подходящее значение и параметры <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+>. Переменная окружения <TT
+CLASS="SYMBOL"
+>LDR_CNTRL</TT
+> говорит AIX, что вы хотите, чтобы сервер получил <TT
+CLASS="SYMBOL"
+>MAXDATA</TT
+> байт для области кучи, в сегментах по 256 МиБ. Подобрав рабочее значение, можно воспользоваться <TT
+CLASS="COMMAND"
+>ldedit</TT
+> и модифицировать двоичные файлы, чтобы они использовали такой размер кучи по умолчанию. Тот же эффект можно получить, пересобрав PostgreSQL с указанием <TT
+CLASS="LITERAL"
+>configure LDFLAGS="-Wl,-bmaxdata:0x<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>0000000"</TT
+>.</P
+><P
+>Для 64-битной сборки определите переменную <TT
+CLASS="ENVAR"
+>OBJECT_MODE</TT
+> со значением 64 и передайте <TT
+CLASS="COMMAND"
+>configure</TT
+> указания <TT
+CLASS="LITERAL"
+>CC="gcc -maix64"</TT
+> и <TT
+CLASS="LITERAL"
+>LDFLAGS="-Wl,-bbigtoc"</TT
+>. (Для <TT
+CLASS="COMMAND"
+>xlc</TT
+> параметры могут быть другими.) Если нужное значение <TT
+CLASS="ENVAR"
+>OBJECT_MODE</TT
+> не будет экспортировано, при сборке могут произойти ошибки на стадии компоновки. Когда переменная <TT
+CLASS="ENVAR"
+>OBJECT_MODE</TT
+> установлена, она говорит сборочным утилитам AIX, таким как <TT
+CLASS="COMMAND"
+>ar</TT
+>, <TT
+CLASS="COMMAND"
+>as</TT
+> и <TT
+CLASS="COMMAND"
+>ld</TT
+>, какие типы объектов обрабатывать по умолчанию.</P
+><P
+>По умолчанию система может чрезмерно выделять память в пространстве подкачки. Хотя нам не приходилось с этим сталкиваться, AIX уничтожает процессы при попытке обращения к чрезмерно выделенной памяти, когда её фактически не хватает. Наиболее близкое, что мы наблюдали, была ошибка порождения процесса из-за того, что система решала, что для него не хватает памяти. Как и многие другие компоненты AIX, механизмы распределения пространства подкачки и уничтожения процессов при нехватке памяти можно настроить на уровне системы или процесса, если возникают подобные проблемы.</P
+><H3
+><A
+NAME="AEN27504"
+>Ссылки и ресурсы</A
+></H3
+><DIV
+CLASS="BIBLIOENTRY"
+><A
+NAME="AEN27506"
+></A
+><P
+>"                    <A
+HREF="http://publib.boulder.ibm.com/infocenter/pseries/topic/com.ibm.aix.doc/aixprggd/genprogc/lrg_prg_support.htm"
+TARGET="_top"
+>Поддержка больших программ</A
+>
+                  ", <I
+>Документация AIX: Общие концепции программирования: Написание и отладка программ</I
+>.</P
+><DIV
+CLASS="BIBLIOENTRYBLOCK"
+STYLE="margin-left: 0.5in"
+></DIV
+></DIV
+><DIV
+CLASS="BIBLIOENTRY"
+><A
+NAME="AEN27512"
+></A
+><P
+>"                    <A
+HREF="http://publib.boulder.ibm.com/infocenter/pseries/topic/com.ibm.aix.doc/aixprggd/genprogc/address_space.htm"
+TARGET="_top"
+>Обзор адресного пространства программ</A
+>
+                  ", <I
+>Документация AIX: Общие концепции программирования: Написание и отладка программ</I
+>.</P
+><DIV
+CLASS="BIBLIOENTRYBLOCK"
+STYLE="margin-left: 0.5in"
+></DIV
+></DIV
+><DIV
+CLASS="BIBLIOENTRY"
+><A
+NAME="AEN27518"
+></A
+><P
+>"                    <A
+HREF="http://publib.boulder.ibm.com/infocenter/pseries/v5r3/topic/com.ibm.aix.doc/aixbman/prftungd/resmgmt2.htm"
+TARGET="_top"
+>Обзор производительности менеджера виртуальной памяти (VMM)</A
+>
+                  ", <I
+>Документация AIX: Руководство по управлению производительностью</I
+>.</P
+><DIV
+CLASS="BIBLIOENTRYBLOCK"
+STYLE="margin-left: 0.5in"
+></DIV
+></DIV
+><DIV
+CLASS="BIBLIOENTRY"
+><A
+NAME="AEN27524"
+></A
+><P
+>"                    <A
+HREF="http://publib.boulder.ibm.com/infocenter/pseries/v5r3/topic/com.ibm.aix.doc/aixbman/prftungd/memperf7.htm"
+TARGET="_top"
+>Распределение страничного пространства</A
+>
+                  ", <I
+>Документация AIX: Руководство по управлению производительностью</I
+>.</P
+><DIV
+CLASS="BIBLIOENTRYBLOCK"
+STYLE="margin-left: 0.5in"
+></DIV
+></DIV
+><DIV
+CLASS="BIBLIOENTRY"
+><A
+NAME="AEN27530"
+></A
+><P
+>"                    <A
+HREF="http://publib.boulder.ibm.com/infocenter/pseries/v5r3/topic/com.ibm.aix.doc/aixbman/prftungd/memperf6.htm"
+TARGET="_top"
+>Настройка параметров пространства подкачки</A
+>
+                  ", <I
+>Документация AIX: Руководство по управлению производительностью</I
+>.</P
+><DIV
+CLASS="BIBLIOENTRYBLOCK"
+STYLE="margin-left: 0.5in"
+></DIV
+></DIV
+><DIV
+CLASS="BIBLIOENTRY"
+><A
+NAME="AEN27536"
+></A
+><P
+><I
+>                  <A
+HREF="http://www.redbooks.ibm.com/abstracts/sg245674.html?Open"
+TARGET="_top"
+>Разработка и перенос на AIX приложений на C и C++</A
+>
+                </I
+>, Красная книга IBM.</P
+><DIV
+CLASS="BIBLIOENTRYBLOCK"
+STYLE="margin-left: 0.5in"
+></DIV
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="INSTALLATION-NOTES-CYGWIN"
+>15.7.2. Cygwin</A
+></H2
+><P
+>PostgreSQL можно собрать с применением Cygwin, Linux-подобной среды для Windows, но сейчас этому методу предпочитается обычная сборка в Windows (см. <A
+HREF="install-windows.html"
+>Главу 16</A
+>), и запускать сервер в среде Cygwin более не рекомендуется.</P
+><P
+>Выполняя сборку, следуйте обычной процедуре установки (т. е., <TT
+CLASS="LITERAL"
+>./configure; make</TT
+>; и т. д.), с учётом следующих особенностей Cygwin: <P
+></P
+></P><UL
+><LI
+><P
+>Настройте путь поиска так, чтобы каталог bin в Cygwin стоял перед каталогами утилит Windows. Это поможет избавиться от проблем при компиляции.</P
+></LI
+><LI
+><P
+>Команда <TT
+CLASS="COMMAND"
+>adduser</TT
+> не поддерживается; воспользуйтесь соответствующим средством управления пользователями для Windows NT, 2000 или XP. Либо просто пропустите этот шаг.</P
+></LI
+><LI
+><P
+>Команда <TT
+CLASS="COMMAND"
+>su</TT
+> не поддерживается; для эмуляции su в Windows NT, 2000 или XP воспользуйтесь ssh. Либо пропустите этот шаг.</P
+></LI
+><LI
+><P
+>OpenSSL не поддерживается.</P
+></LI
+><LI
+><P
+>Запустите <TT
+CLASS="COMMAND"
+>cygserver</TT
+> для поддержки разделяемой памяти. Для этого введите команду <TT
+CLASS="LITERAL"
+>/usr/sbin/cygserver &amp;</TT
+>. Эта программа должна работать всегда при запуске сервера PostgreSQL или инициализации кластера баз данных (<TT
+CLASS="COMMAND"
+>initdb</TT
+>). Возможно, вам придётся настроить конфигурацию <TT
+CLASS="COMMAND"
+>cygserver</TT
+> (например, увеличить <TT
+CLASS="SYMBOL"
+>SEMMNS</TT
+>), чтобы PostgreSQL мог получить требуемые системные ресурсы.</P
+></LI
+><LI
+><P
+>Сборка может завершиться ошибкой в некоторых системах, где используется локаль, отличная от C. Чтобы исправить это, выберите локаль C, выполнив <TT
+CLASS="COMMAND"
+>export LANG=C.utf8</TT
+> до сборки, а затем восстановите предыдущее значение после установки PostgreSQL.</P
+></LI
+><LI
+><P
+>Параллельные регрессионные тесты (<TT
+CLASS="LITERAL"
+>make check</TT
+>) могут выдавать ложные ошибки тестирования при переполнении очереди <CODE
+CLASS="FUNCTION"
+>listen()</CODE
+>, из-за чего подключения могут не устанавливаться или зависать. Вы можете ограничить число подключений, определив переменную make <TT
+CLASS="VARNAME"
+>MAX_CONNECTIONS</TT
+> так: </P><PRE
+CLASS="PROGRAMLISTING"
+>make MAX_CONNECTIONS=5 check</PRE
+><P> (В некоторых системах поддерживается до 10 одновременных подключений).</P
+></LI
+></UL
+><P></P
+><P
+>Сервер PostgreSQL и <TT
+CLASS="COMMAND"
+>cygserver</TT
+> можно запустить в виде служб Windows NT. Как это сделать, рассказывается в описании <TT
+CLASS="FILENAME"
+>README</TT
+>, включённом в двоичный пакет PostgreSQL для Cygwin. Оно устанавливается в каталог <TT
+CLASS="FILENAME"
+>/usr/share/doc/Cygwin</TT
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="INSTALLATION-NOTES-HPUX"
+>15.7.3. HP-UX</A
+></H2
+><P
+>PostgreSQL 7.3+ должен работать на машинах Series 700/800 PA-RISC под управлением HP-UX 10.X или 11.X, с подходящими уровнями системных исправлений и средствами сборки. Как минимум один разработчик регулярно тестирует сборку в HP-UX 10.20, и мы получали сообщения об успешных установках в HP-UX 11.00 и 11.11.</P
+><P
+>Помимо пакета исходного кода PostgreSQL, вам потребуется GNU make (HP make не подойдёт) и GCC или полный компилятор ANSI C от HP. Если вы намерены выполнить сборку не из дистрибутивного пакета исходного кода, а из Git, вам также потребуется Flex (GNU lex) и Bison (GNU yacc). Мы также рекомендуем убедиться, что у вас установлены довольно свежие исправления HP. Для сборки 64-битного кода в HP-UX 11.11 вам потребуется PHSS_30966 (11.11) или более новое исправление, без него <TT
+CLASS="COMMAND"
+>initdb</TT
+> может зависать: <P
+CLASS="LITERALLAYOUT"
+>PHSS_30966&nbsp;&nbsp;s700_800&nbsp;Накопительное&nbsp;исправление&nbsp;ld(1)&nbsp;и&nbsp;утилит&nbsp;компоновки.</P
+> Как правило, для сборки нужно иметь текущие исправления libc и ld/dld, а также компилятора (если вы используете компилятор HP). Получить эти исправления можно на сайтах поддержки HP <A
+HREF="http://itrc.hp.com"
+TARGET="_top"
+>http://itrc.hp.com</A
+> и <A
+HREF="ftp://us-ffs.external.hp.com/"
+TARGET="_top"
+>ftp://us-ffs.external.hp.com/</A
+>.</P
+><P
+>Если вы проводите сборку на машине PA-RISC 2.0 и хотите получить 64-битный исполняемый код, вы должны использовать 64-битную версию GCC. Скомпилированный GCC для HP-UX PA-RISC и Itanium доступен по адресу <A
+HREF="http://www.hp.com/go/gcc"
+TARGET="_top"
+>http://www.hp.com/go/gcc</A
+>. Не забудьте также загрузить и установить binutils.</P
+><P
+>Если вы проводите сборку на машине PA-RISC 2.0 и хотите, чтобы скомпилированный код запускался на машинах PA-RISC 1.1, также потребуется указать <TT
+CLASS="OPTION"
+>+DAportable</TT
+> в <TT
+CLASS="ENVAR"
+>CFLAGS</TT
+>.</P
+><P
+>Если вы проводите сборку на машине HP-UX Itanium, вам потребуется последний компилятор ANSI C от HP с соответствующим исправлением или более новыми: <P
+CLASS="LITERALLAYOUT"
+>PHSS_30848&nbsp;&nbsp;s700_800&nbsp;Компилятор&nbsp;HP&nbsp;С&nbsp;(A.05.57)<br>
+PHSS_30849&nbsp;&nbsp;s700_800&nbsp;Исправление&nbsp;библиотеки&nbsp;u2comp/be/plugin</P
+></P
+><P
+>Если вы используете компилятор HP C и GCC, может потребоваться явно выбрать предпочитаемый компилятор при запуске <TT
+CLASS="COMMAND"
+>configure</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>./configure CC=cc</PRE
+><P> для использования компилятора C от HP, либо </P><PRE
+CLASS="PROGRAMLISTING"
+>./configure CC=gcc</PRE
+><P> для выбора GCC. При отсутствии явного указания configure выберет <TT
+CLASS="COMMAND"
+>gcc</TT
+>, если есть такая возможность.</P
+><P
+>По умолчанию целевой каталог установки — <TT
+CLASS="FILENAME"
+>/usr/local/pgsql</TT
+>, но вы, возможно, захотите его изменить на другой, внутри <TT
+CLASS="FILENAME"
+>/opt</TT
+>. В этом случае передайте его <TT
+CLASS="COMMAND"
+>configure</TT
+> с ключом <TT
+CLASS="OPTION"
+>--prefix</TT
+>.</P
+><P
+>В регрессионных тестах возможны отклонения при геометрических проверках, в наименее значащих цифрах, в зависимости от применяемого компилятора и математической библиотеки. Любые другие ошибки заслуживают внимания.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="INSTALLATION-NOTES-MINGW"
+>15.7.4. MinGW/Собственная сборка Windows</A
+></H2
+><P
+>PostgreSQL для Windows можно собрать с использованием MinGW, Unix-подобной среды сборки для операционных систем Microsoft, либо используя набор средств разработки Microsoft <SPAN
+CLASS="PRODUCTNAME"
+>Visual C++</SPAN
+>. При использовании MinGW применяется обычная система сборки, описанная в этой главе; сборка Visual C++ выполняется по-другому, как описано в <A
+HREF="install-windows.html"
+>Главе 16</A
+>. Это полностью естественная сборка для Windows, для которой не требуется дополнительное ПО вроде MinGW. Готовый инсталлятор для Windows можно найти на сайте PostgreSQL.</P
+><P
+>PostgreSQL, портированный в Windows, будет работать в 32- или 64-битной версии Windows 2000 или новее. В предыдущих операционных системах нет достаточной инфраструктуры (но там можно использовать Cygwin). MinGW, Unix-подобные средства сборки, и MSYS, набор утилит Unix, требуемых для исполнения скриптов типа <TT
+CLASS="COMMAND"
+>configure</TT
+>, можно загрузить с сайта <A
+HREF="http://www.mingw.org/"
+TARGET="_top"
+>http://www.mingw.org/</A
+>. Эти дополнительные программы нужны только для сборки, для запуска полученных исполняемых файлов они не требуются.</P
+><P
+>Чтобы собрать 64-битную версию с использованием MinGW, установите набор 64-битных утилит с <A
+HREF="http://mingw-w64.sourceforge.net/"
+TARGET="_top"
+>http://mingw-w64.sourceforge.net/</A
+>, добавьте путь к его каталогу bin в <TT
+CLASS="ENVAR"
+>PATH</TT
+> и запустите <TT
+CLASS="COMMAND"
+>configure</TT
+> с параметром <TT
+CLASS="COMMAND"
+>--host=x86_64-w64-mingw</TT
+>.</P
+><P
+>Когда вы всё установите, запускать <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+> предлагается из <TT
+CLASS="COMMAND"
+>CMD.EXE</TT
+>, так как в консоли MSYS есть проблемы с буферизацией.</P
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="WINDOWS-CRASH-DUMPS"
+>15.7.4.1. Сбор аварийных дампов в Windows</A
+></H3
+><P
+>В случае аварии PostgreSQL в Windows он может сгенерировать минидамп памяти, который помогает выяснить причину аварии, подобно дампам памяти в Unix. Проанализировать эти дампы можно, используя <SPAN
+CLASS="PRODUCTNAME"
+>Windows Debugger Tools</SPAN
+> (Средства отладки Windows) или <SPAN
+CLASS="PRODUCTNAME"
+>Visual Studio</SPAN
+>. Чтобы в Windows получить дамп в случае аварии, создайте подкаталог <TT
+CLASS="FILENAME"
+>crashdumps</TT
+> в каталоге данных кластера. Дампы будут записываться в этот каталог с уникальным именем, составленным из идентификатора процесса, давшего сбой, и времени сбоя.</P
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="INSTALLATION-NOTES-SCO"
+>15.7.5. SCO OpenServer и SCO UnixWare</A
+></H2
+><P
+>PostgreSQL можно собрать в SCO UnixWare 7 и SCO OpenServer 5. В OpenServer для сборки можно использовать либо Инструменты разработки OpenServer (OpenServer Development Kit), либо Универсальные средства разработки (Universal Development Kit). Возможно, при этом потребуется выполнить дополнительные действия, как описано ниже.</P
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN27644"
+>15.7.5.1. Skunkware</A
+></H3
+><P
+>Вы должны найти свою копию SCO Skunkware CD. Skunkware CD поставлялся с UnixWare 7 и текущими версиями OpenServer 5. В набор Skunkware входят готовые к установке версии многих популярных программ, доступных в Интернете. В частности, в него входят gzip, gunzip, GNU Make, Flex и Bison. Для UnixWare 7.1 этот CD называется "Open License Software Supplement" (Дополнительное ПО с открытыми лицензиями). Если у вас нет такого CD, это ПО можно найти на сайте <A
+HREF="http://www.sco.com/skunkware/"
+TARGET="_top"
+>http://www.sco.com/skunkware/</A
+>.</P
+><P
+>Версии Skunkware для UnixWare и OpenServer различаются. Убедитесь, что вы устанавливаете правильную версию для вашей ОС, но учтите следующие замечания.</P
+><P
+>В UnixWare 7.1.3 и новее компилятор GCC поставляется на UDK CD, вместе с GNU Make.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN27650"
+>15.7.5.2. GNU Make</A
+></H3
+><P
+>Вам потребуется программа GNU Make, которая находится на Skunkware CD. По умолчанию она устанавливается в <TT
+CLASS="FILENAME"
+>/usr/local/bin/make</TT
+>.</P
+><P
+>В UnixWare 7.1.3 и новее программа GNU Make включена в раздел OSTK диска UDK и устанавливается в <TT
+CLASS="FILENAME"
+>/usr/gnu/bin/gmake</TT
+>.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN27656"
+>15.7.5.3. Readline</A
+></H3
+><P
+>Библиотека Readline поставляется на Skunkware CD, но она не включена в Skunkware CD для UnixWare 7.1. Если у вас есть Skunkware CD для UnixWare 7.0.0 или 7.0.1, вы можете установить её с этого диска. В противном случае, обратитесь к <A
+HREF="http://www.sco.com/skunkware/"
+TARGET="_top"
+>http://www.sco.com/skunkware/</A
+>.</P
+><P
+>По умолчанию Readline устанавливается в <TT
+CLASS="FILENAME"
+>/usr/local/lib</TT
+> и <TT
+CLASS="FILENAME"
+>/usr/local/include</TT
+>. Однако <TT
+CLASS="COMMAND"
+>configure</TT
+> для PostgreSQL не сможет найти её там без дополнительной помощи. Поэтому, если вы установили Readline, передайте <TT
+CLASS="COMMAND"
+>configure</TT
+> следующие параметры: </P><PRE
+CLASS="PROGRAMLISTING"
+>./configure --with-libraries=/usr/local/lib --with-includes=/usr/local/include</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN27666"
+>15.7.5.4. Использование UDK в OpenServer</A
+></H3
+><P
+>Если вы используете новый компилятор из Универсальных средств разработки (UDK, Universal Development Kit) в OpenServer, вам потребуется задать размещение библиотек UDK: </P><PRE
+CLASS="PROGRAMLISTING"
+>./configure --with-libraries=/udk/usr/lib --with-includes=/udk/usr/include</PRE
+><P> Совместите эти параметры с заданными выше для Readline: </P><PRE
+CLASS="PROGRAMLISTING"
+>./configure --with-libraries="/udk/usr/lib /usr/local/lib" --with-includes="/udk/usr/include /usr/local/include"</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN27671"
+>15.7.5.5. Получение справки man по PostgreSQL</A
+></H3
+><P
+>По умолчанию страницы man для PostgreSQL устанавливаются в <TT
+CLASS="FILENAME"
+>/usr/local/pgsql/man</TT
+>. Но UnixWare по умолчанию не ищет там эти страницы. Чтобы вы могли обращаться к ним, потребуется изменить переменную <TT
+CLASS="VARNAME"
+>MANPATH</TT
+> в <TT
+CLASS="FILENAME"
+>/etc/default/man</TT
+>, например так: </P><PRE
+CLASS="PROGRAMLISTING"
+>MANPATH=/usr/lib/scohelp/%L/man:/usr/dt/man:/usr/man:/usr/share/man:scohelp:/usr/local/man:/usr/local/pgsql/man</PRE
+><P></P
+><P
+>В OpenServer необходимо провести дополнительные исследования, чтобы справкой man можно было пользоваться, потому что в этой системе man работает немного не так, как в других. В настоящее время PostgreSQL просто не устанавливает справочные страницы в ней.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN27679"
+>15.7.5.6. Проблемы C99 с функциональным дополнением 7.1.1b</A
+></H3
+><P
+>Для компиляторов, более ранних, чем выпущенный с OpenUNIX 8.0.0 (UnixWare 7.1.2), в том числе с функциональным дополнением 7.1.1b, может потребоваться указать <TT
+CLASS="OPTION"
+>-Xb</TT
+> в переменной окружения <TT
+CLASS="VARNAME"
+>CC</TT
+> или <TT
+CLASS="VARNAME"
+>CFLAGS</TT
+>. Признаком этой проблемы будет ошибка при компиляции <TT
+CLASS="FILENAME"
+>tuplesort.c</TT
+> в коде, ссылающемся на встроенные функции. Судя по всему, соответствующее исправление включено в компилятор версии 7.1.2(8.0.0) и новее.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN27686"
+>15.7.5.7. Многопоточность в UnixWare</A
+></H3
+><P
+>Для использования многопоточности вы <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>должны</I
+></SPAN
+> добавлять указание <TT
+CLASS="OPTION"
+>-Kpthread</TT
+> при компиляции <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>всех</I
+></SPAN
+> программ на базе libpq. Библиотека libpq вызывает функции <CODE
+CLASS="FUNCTION"
+>pthread_*</CODE
+>, которые доступны только при компиляции с флагом <TT
+CLASS="OPTION"
+>-Kpthread</TT
+>/<TT
+CLASS="OPTION"
+>-Kthread</TT
+>.</P
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="INSTALLATION-NOTES-SOLARIS"
+>15.7.6. Solaris</A
+></H2
+><P
+>PostgreSQL хорошо поддерживается в Solaris. Чем новее операционная система, тем меньше затруднений будет; подробнее об этом ниже.</P
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN27701"
+>15.7.6.1. Требуемые инструменты</A
+></H3
+><P
+>Вы можете выполнить сборку с GCC или с набором компиляторов Sun. Для лучшей оптимизации кода на архитектуре SPARC настоятельно рекомендуется использовать компилятор Sun. Мы слышали о проблемах с GCC 2.95.1, поэтому рекомендуется использовать GCC 2.95.3 или новее. Если вы решили применить компилятор Sun, не выберите по ошибке <TT
+CLASS="FILENAME"
+>/usr/ucb/cc</TT
+>; правильный путь — <TT
+CLASS="FILENAME"
+>/opt/SUNWspro/bin/cc</TT
+>.</P
+><P
+>Sun Studio вы можете загрузить с сайта <A
+HREF="http://www.oracle.com/technetwork/server-storage/solarisstudio/downloads/"
+TARGET="_top"
+>http://www.oracle.com/technetwork/server-storage/solarisstudio/downloads/</A
+>. Средства GNU по большей части интегрированы в Solaris 10, либо представлены на сопутствующем CD. Если вам нужны пакеты для старых версий Solaris, вы можете найти их на сайте <A
+HREF="http://www.sunfreeware.com"
+TARGET="_top"
+>http://www.sunfreeware.com</A
+>. Если вы предпочитаете исходный код, обратитесь к <A
+HREF="http://www.gnu.org/order/ftp.html"
+TARGET="_top"
+>http://www.gnu.org/order/ftp.html</A
+>.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN27710"
+>15.7.6.2. Проблемы с OpenSSL</A
+></H3
+><P
+>Собирая PostgreSQL с поддержкой OpenSSL, вы можете получить ошибки компиляции в следующих файлах: <P
+></P
+></P><UL
+><LI
+><P
+><TT
+CLASS="FILENAME"
+>src/backend/libpq/crypt.c</TT
+></P
+></LI
+><LI
+><P
+><TT
+CLASS="FILENAME"
+>src/backend/libpq/password.c</TT
+></P
+></LI
+><LI
+><P
+><TT
+CLASS="FILENAME"
+>src/interfaces/libpq/fe-auth.c</TT
+></P
+></LI
+><LI
+><P
+><TT
+CLASS="FILENAME"
+>src/interfaces/libpq/fe-connect.c</TT
+></P
+></LI
+></UL
+><P> Это вызвано конфликтом имён между стандартным <TT
+CLASS="FILENAME"
+>/usr/include/crypt.h</TT
+> и заголовочными файлами в составе OpenSSL.</P
+><P
+>Эту проблему можно решить, обновив инсталляцию OpenSSL до версии 0.9.6a. Solaris 9 и новее уже включает обновлённую версию OpenSSL.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN27728"
+>15.7.6.3. Процедура configure сообщает о сбое тестовой программы</A
+></H3
+><P
+>Если <TT
+CLASS="COMMAND"
+>configure</TT
+> сообщает о сбое тестовой программы, это может быть вызвано тем, что при связывании во время выполнения не удаётся найти некоторую библиотеку, вероятно, libz, libreadline или какую-то другую нестандартную, например, libssl. Чтобы указать правильное размещение библиотеки, задайте переменную окружения <TT
+CLASS="ENVAR"
+>LDFLAGS</TT
+> в командной строке <TT
+CLASS="COMMAND"
+>configure</TT
+>, например так: </P><PRE
+CLASS="PROGRAMLISTING"
+>configure ... LDFLAGS="-R /usr/sfw/lib:/opt/sfw/lib:/usr/local/lib"</PRE
+><P> За дополнительными сведениями обратитесь к странице man <SPAN
+CLASS="CITEREFENTRY"
+><SPAN
+CLASS="REFENTRYTITLE"
+>ld</SPAN
+></SPAN
+>.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN27738"
+>15.7.6.4. Периодические сбои 64-битной сборки</A
+></H3
+><P
+>В Solaris 7 и старее 64-битная версия libc содержала бракованную функцию <CODE
+CLASS="FUNCTION"
+>vsnprintf</CODE
+>, которая могла вызывать непредсказуемые сбои PostgreSQL. Самое простое известное решение — сделать, чтобы PostgreSQL использовал собственную версию <CODE
+CLASS="FUNCTION"
+>vsnprintf</CODE
+> вместо библиотечной версии. Для этого, выполнив <TT
+CLASS="COMMAND"
+>configure</TT
+>, отредактируйте полученный в результате <TT
+CLASS="COMMAND"
+>configure</TT
+> файл. В <TT
+CLASS="FILENAME"
+>src/Makefile.global</TT
+> поменяйте строку </P><PRE
+CLASS="PROGRAMLISTING"
+>LIBOBJS =</PRE
+><P> на такую </P><PRE
+CLASS="PROGRAMLISTING"
+>LIBOBJS = snprintf.o</PRE
+><P> (В этой переменной уже также могут быть перечислены и другие файлы.) Затем продолжите сборку как обычно.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN27748"
+>15.7.6.5. Компиляция для максимальной производительности</A
+></H3
+><P
+>Для архитектуры SPARC настоятельно рекомендуется проводить компиляцию с использованием Sun Studio. Добавив флаг <TT
+CLASS="OPTION"
+>-xO5</TT
+>, вы можете получить исполняемый код, который будет работать значительно быстрее. Но не добавляйте никакие флаги, влияющие на вычисления с плавающей точкой или обработку <TT
+CLASS="VARNAME"
+>errno</TT
+> (например, <TT
+CLASS="OPTION"
+>-fast</TT
+>). С такими флагами PostgreSQL может вести себя нестандартно, например, выполняя операции с датами/временем.</P
+><P
+>Если у вас нет причины использовать 64-битные программы в архитектуре SPARC, собирайте 32-битную версию, так как 64-битные операции, а значит и 64-битные программы, выполняются медленнее 32-битных. С другой стороны, 32-битный код для процессоров семейства AMD64 не является &laquo;родным&raquo;, поэтому на таких процессорах значительно медленнее работает 32-битный код.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN27755"
+>15.7.6.6. Применение DTrace для трассировки PostgreSQL</A
+></H3
+><P
+>Да, вы можете использовать DTrace. За дополнительными сведениями обратитесь к <A
+HREF="dynamic-trace.html"
+>Разделу 27.4</A
+>. Другую полезную информацию можно найти в этой статье: <A
+HREF="https://blogs.oracle.com/robertlor/entry/user_level_dtrace_probes_in"
+TARGET="_top"
+>https://blogs.oracle.com/robertlor/entry/user_level_dtrace_probes_in</A
+>.</P
+><P
+>Если компоновка исполняемого файла <TT
+CLASS="COMMAND"
+>postgres</TT
+> прерывается с таким сообщением об ошибке: </P><PRE
+CLASS="SCREEN"
+>Undefined                       first referenced
+ symbol                             in file
+AbortTransaction                    utils/probes.o
+CommitTransaction                   utils/probes.o
+ld: fatal: Symbol referencing errors. No output written to postgres
+collect2: ld returned 1 exit status
+make: *** [postgres] Error 1</PRE
+><P> Это означает, что ваша инсталляция DTrace слишком стара и неспособна работать с пробами в статических функциях. В этом случае вам нужна версия Solaris 10u4 или новее.</P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="supported-platforms.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="install-windows.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Поддерживаемые платформы</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="installation.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Установка из исходного кода в <SPAN
+CLASS="PRODUCTNAME"
+>Windows</SPAN
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

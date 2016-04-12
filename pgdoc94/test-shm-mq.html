@@ -1,0 +1,197 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>test_shm_mq</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Дополнительно поставляемые модули"
+HREF="contrib.html"><LINK
+REL="PREVIOUS"
+TITLE="test_parser"
+HREF="test-parser.html"><LINK
+REL="NEXT"
+TITLE="tsearch2"
+HREF="tsearch2.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="test_parser"
+HREF="test-parser.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Приложение E. Дополнительно поставляемые модули</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="tsearch2"
+HREF="tsearch2.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="TEST-SHM-MQ"
+>E.41. test_shm_mq</A
+></H1
+><P
+>Модуль <TT
+CLASS="FILENAME"
+>test_shm_mq</TT
+> представляет пример использования механизмов динамической общей памяти и очереди сообщений в общей памяти для синхронизации процесса, обслуживающего клиента, с одним или несколькими фоновыми рабочими процессами. Он не наделён какой-то полезной нагрузкой сам по себе, а является лишь демонстрацией использования этих механизмов и тестом их функционирования.</P
+><P
+>Функции этого расширения передают одно сообщение в цикле через цепочку процессов. Содержимое сообщения, размер очереди сообщений, через которое оно передаётся, и число процессов в цепочке можно настроить. В конце сообщение можно проверить и убедиться в том, что оно не было испорчено при передаче.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN125663"
+>E.41.1. Функции</A
+></H2
+><PRE
+CLASS="SYNOPSIS"
+>test_shm_mq(queue_size int8, message text,
+            repeat_count int4 default 1, num_workers int4 default 1)
+    RETURNS void</PRE
+><P
+>Эта функция передаёт и принимает сообщения синхронно. Процесс, обслуживающий пользователя, передаёт указанное сообщение первому фоновому рабочему процессу через очередь сообщений заданного размера (queue_size). Первый рабочий процесс посылает сообщение второму, если число рабочих процессов (num_workers) больше одного, и так далее. В конце концов последний рабочий процесс возвращает сообщение процессу, обслуживающему пользователя. Если число повторений (repeat_count) больше одного, обслуживающий процесс вновь передаёт сообщение первому рабочему процессу. Когда сообщение будет передано и получено всеми координирующими процессами заданное число (repeat_count) раз, обслуживающий процесс проверяет, совпадает ли окончательно полученное сообщение с отправленным изначально, и выдаёт ошибку, если это не так.</P
+><PRE
+CLASS="SYNOPSIS"
+>test_shm_mq_pipelined(queue_size int8, message text,
+                      repeat_count int4 default 1, num_workers int4 default 1,
+                      verify bool default true)
+    RETURNS void</PRE
+><P
+>Эта функция передаёт одно сообщение заданное число (repeat_count) раз первому рабочему процессу через очередь заданного размера (queue_size). Затем эти сообщения передаются каждому рабочему процессу по порядку, опять же через очередь заданного размера. Наконец, последний рабочий процесс возвращает сообщения процессу, обслуживающему пользователя. Этот процесс выполняет передачу и приём в неблокирующем режиме, так что он может начать получать копии сообщений до того, как закончит передавать все копии сообщения. Аргумент <TT
+CLASS="LITERAL"
+>verify</TT
+> определяет, будут ли полученные копии сообщения сравниваться с отправляемым сообщением. (Это занимает определённое время, так что имеет смысл отключить эту проверку при тестировании производительности.)</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="test-parser.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="tsearch2.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>test_parser</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>tsearch2</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

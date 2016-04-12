@@ -1,0 +1,549 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>SET TRANSACTION</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="SET SESSION AUTHORIZATION"
+HREF="sql-set-session-authorization.html"><LINK
+REL="NEXT"
+TITLE="SHOW"
+HREF="sql-show.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="SET SESSION AUTHORIZATION"
+HREF="sql-set-session-authorization.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="SHOW"
+HREF="sql-show.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-SET-TRANSACTION"
+></A
+>SET TRANSACTION</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN84686"
+></A
+><H2
+>Название</H2
+>SET TRANSACTION&nbsp;--&nbsp;установить характеристики текущей транзакции</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN84689"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>SET TRANSACTION <TT
+CLASS="REPLACEABLE"
+><I
+>режим_транзакции</I
+></TT
+> [, ...]
+SET TRANSACTION SNAPSHOT <TT
+CLASS="REPLACEABLE"
+><I
+>id_снимка</I
+></TT
+>
+SET SESSION CHARACTERISTICS AS TRANSACTION <TT
+CLASS="REPLACEABLE"
+><I
+>режим_транзакции</I
+></TT
+> [, ...]
+
+<SPAN
+CLASS="phrase"
+><SPAN
+CLASS="PHRASE"
+>Где возможные варианты <TT
+CLASS="REPLACEABLE"
+><I
+>режим_транзакции</I
+></TT
+>:</SPAN
+></SPAN
+>
+
+    ISOLATION LEVEL { SERIALIZABLE | REPEATABLE READ | READ COMMITTED | READ UNCOMMITTED }
+    READ WRITE | READ ONLY
+    [ NOT ] DEFERRABLE</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN84696"
+></A
+><H2
+>Описание</H2
+><P
+>Команда <TT
+CLASS="COMMAND"
+>SET TRANSACTION</TT
+> устанавливает характеристики текущей транзакции. На последующие транзакции она не влияет. <TT
+CLASS="COMMAND"
+>SET SESSION CHARACTERISTICS</TT
+> устанавливает характеристики транзакции по умолчанию для последующих транзакций в рамках сеанса. Заданные по умолчанию характеристики затем можно переопределить для отдельных транзакций командой <TT
+CLASS="COMMAND"
+>SET TRANSACTION</TT
+>.</P
+><P
+>К характеристикам транзакции относится уровень изоляции транзакции, режим доступа транзакции (чтение/запись или только чтение) и допустимость её откладывания. В дополнение к ним можно выбрать снимок, но только для текущей транзакции, не для сеанса по умолчанию.</P
+><P
+>Уровень изоляции транзакции определяет, какие данные может видеть транзакция, когда параллельно с ней выполняются другие транзакции: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>READ COMMITTED</TT
+></DT
+><DD
+><P
+>Оператор видит только те строки, которые были зафиксированы до начала его выполнения. Этот уровень устанавливается по умолчанию.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>REPEATABLE READ</TT
+></DT
+><DD
+><P
+>Все операторы текущей транзакции видят только те строки, которые были зафиксированы перед первым запросом на выборку или изменение данных, выполненным в этой транзакции.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>SERIALIZABLE</TT
+></DT
+><DD
+><P
+>Все операторы текущей транзакции видят только те строки, которые были зафиксированы перед первым запросом на выборку или изменение данных, выполненным в этой транзакции. Если наложение операций чтения и записи параллельных сериализуемых транзакций может привести к ситуации, невозможной при последовательном их выполнении (когда одна транзакция выполняется за другой), произойдёт откат одной из транзакций с ошибкой <TT
+CLASS="LITERAL"
+>serialization_failure</TT
+> (сбой сериализации).</P
+></DD
+></DL
+></DIV
+><P> В стандарте SQL определён ещё один уровень, <TT
+CLASS="LITERAL"
+>READ UNCOMMITTED</TT
+>. В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> уровень <TT
+CLASS="LITERAL"
+>READ UNCOMMITTED</TT
+> обрабатывается как <TT
+CLASS="LITERAL"
+>READ COMMITTED</TT
+>.</P
+><P
+>Уровень изоляции транзакции нельзя изменить после выполнения первого запроса на выборку или изменение данных (<TT
+CLASS="COMMAND"
+>SELECT</TT
+>, <TT
+CLASS="COMMAND"
+>INSERT</TT
+>, <TT
+CLASS="COMMAND"
+>DELETE</TT
+>, <TT
+CLASS="COMMAND"
+>UPDATE</TT
+>, <TT
+CLASS="COMMAND"
+>FETCH</TT
+> или <TT
+CLASS="COMMAND"
+>COPY</TT
+>) в текущей транзакции. За дополнительными сведениями об изоляции транзакций и управлении параллельным доступом обратитесь к <A
+HREF="mvcc.html"
+>Главе 13</A
+>.</P
+><P
+>Режим доступа транзакции определяет, будет ли транзакция только читать данные или будет и читать, и писать. По умолчанию подразумевается чтение/запись. В транзакции без записи запрещаются следующие команды SQL: <TT
+CLASS="LITERAL"
+>INSERT</TT
+>, <TT
+CLASS="LITERAL"
+>UPDATE</TT
+>, <TT
+CLASS="LITERAL"
+>DELETE</TT
+> и <TT
+CLASS="LITERAL"
+>COPY FROM</TT
+>, если только целевая таблица не временная; любые команды <TT
+CLASS="LITERAL"
+>CREATE</TT
+>, <TT
+CLASS="LITERAL"
+>ALTER</TT
+> и <TT
+CLASS="LITERAL"
+>DROP</TT
+>, а также <TT
+CLASS="LITERAL"
+>COMMENT</TT
+>, <TT
+CLASS="LITERAL"
+>GRANT</TT
+>, <TT
+CLASS="LITERAL"
+>REVOKE</TT
+>, <TT
+CLASS="LITERAL"
+>TRUNCATE</TT
+>; кроме того, запрещаются <TT
+CLASS="LITERAL"
+>EXPLAIN ANALYZE</TT
+> и <TT
+CLASS="LITERAL"
+>EXECUTE</TT
+>, если команда, которую они должны выполнить, относится к вышеперечисленным. Это высокоуровневое определение режима только для чтения, которое в принципе не исключает запись на диск.</P
+><P
+>Свойство <TT
+CLASS="LITERAL"
+>DEFERRABLE</TT
+> оказывает влияние, только если транзакция находится также в режимах <TT
+CLASS="LITERAL"
+>SERIALIZABLE</TT
+> и <TT
+CLASS="LITERAL"
+>READ ONLY</TT
+>. Когда для транзакции установлены все три этих свойства, транзакция может быть заблокирована при первой попытке получить свой снимок данных, после чего она сможет выполняться без дополнительных усилий, обычных для режима <TT
+CLASS="LITERAL"
+>SERIALIZABLE</TT
+>, и без риска привести к сбою сериализации или пострадать от него. Этот режим подходит для длительных операций, например для построения отчётов или резервного копирования.</P
+><P
+>Команда <TT
+CLASS="LITERAL"
+>SET TRANSACTION SNAPSHOT</TT
+> позволяет выполнить новую транзакцию со <I
+CLASS="FIRSTTERM"
+>снимком данных</I
+>, который имеет уже существующая. Эта ранее созданная транзакция должна экспортировать этот снимок с помощью функции <TT
+CLASS="LITERAL"
+>pg_export_snapshot</TT
+> (см. <A
+HREF="functions-admin.html#FUNCTIONS-SNAPSHOT-SYNCHRONIZATION"
+>Подраздел 9.26.5</A
+>). Эта функция возвращает идентификатор снимка, который и нужно передать команде <TT
+CLASS="LITERAL"
+>SET TRANSACTION SNAPSHOT</TT
+> в качестве идентификатора импортируемого снимка. В данной команде этот идентификатор должен записываться в виде строковой константы, например <TT
+CLASS="LITERAL"
+>'000003A1-1'</TT
+>. <TT
+CLASS="LITERAL"
+>SET TRANSACTION SNAPSHOT</TT
+> можно выполнить только в начале транзакции, до первого запроса на выборку или изменение данных (<TT
+CLASS="COMMAND"
+>SELECT</TT
+>, <TT
+CLASS="COMMAND"
+>INSERT</TT
+>, <TT
+CLASS="COMMAND"
+>DELETE</TT
+>, <TT
+CLASS="COMMAND"
+>UPDATE</TT
+>, <TT
+CLASS="COMMAND"
+>FETCH</TT
+> или <TT
+CLASS="COMMAND"
+>COPY</TT
+>) в текущей транзакции. Более того, для транзакции уже должен быть установлен уровень изоляции <TT
+CLASS="LITERAL"
+>SERIALIZABLE</TT
+> или <TT
+CLASS="LITERAL"
+>REPEATABLE READ</TT
+> (в противном случае, снимок будет сразу же потерян, так как на уровне <TT
+CLASS="LITERAL"
+>READ COMMITTED</TT
+> для каждой команды делается новый снимок). Если импортирующая транзакция работает на уровне изоляции <TT
+CLASS="LITERAL"
+>SERIALIZABLE</TT
+>, то транзакция, экспортирующая снимок, также должна работать на этом уровне. Кроме того, транзакции в режиме чтение/запись не могут импортировать снимок из транзакции в режиме &laquo;только чтение&raquo;.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN84770"
+></A
+><H2
+>Замечания</H2
+><P
+>Если команде <TT
+CLASS="COMMAND"
+>SET TRANSACTION</TT
+> не предшествует <TT
+CLASS="COMMAND"
+>START TRANSACTION</TT
+> или <TT
+CLASS="COMMAND"
+>BEGIN</TT
+>, она выдаёт предупреждение и больше ничего не делает.</P
+><P
+>Без <TT
+CLASS="COMMAND"
+>SET TRANSACTION</TT
+> можно обойтись, задав требуемые <TT
+CLASS="REPLACEABLE"
+><I
+>режимы_транзакции</I
+></TT
+> в операторах <TT
+CLASS="COMMAND"
+>BEGIN</TT
+> или <TT
+CLASS="COMMAND"
+>START TRANSACTION</TT
+>. Но для <TT
+CLASS="COMMAND"
+>SET TRANSACTION SNAPSHOT</TT
+> такой возможности не предусмотрено.</P
+><P
+>Режимы транзакции для сеанса по умолчанию можно также задать в конфигурационных переменных <A
+HREF="runtime-config-client.html#GUC-DEFAULT-TRANSACTION-ISOLATION"
+>default_transaction_isolation</A
+>, <A
+HREF="runtime-config-client.html#GUC-DEFAULT-TRANSACTION-READ-ONLY"
+>default_transaction_read_only</A
+> и <A
+HREF="runtime-config-client.html#GUC-DEFAULT-TRANSACTION-DEFERRABLE"
+>default_transaction_deferrable</A
+>. (На практике, <TT
+CLASS="COMMAND"
+>SET SESSION CHARACTERISTICS</TT
+> — это просто более многословная альтернатива изменению этих переменных командой <TT
+CLASS="COMMAND"
+>SET</TT
+>.) Это значит, что значения этих переменных по умолчанию можно задать в файле конфигурации, с помощью команды <TT
+CLASS="COMMAND"
+>ALTER DATABASE</TT
+> и т. д. За дополнительными сведениями обратитесь к <A
+HREF="runtime-config.html"
+>Главе 18</A
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN84790"
+></A
+><H2
+>Примеры</H2
+><P
+>Чтобы начать новую транзакцию со снимком данных, который получила уже существующая транзакция, его нужно сначала экспортировать из первой транзакции. При этом будет получен идентификатор снимка, например: </P><PRE
+CLASS="PROGRAMLISTING"
+>BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+SELECT pg_export_snapshot();
+ pg_export_snapshot
+--------------------
+ 000003A1-1
+(1 row)</PRE
+><P> Затем этот идентификатор нужно передать команде <TT
+CLASS="COMMAND"
+>SET TRANSACTION SNAPSHOT</TT
+> в начале новой транзакции: </P><PRE
+CLASS="PROGRAMLISTING"
+>BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+SET TRANSACTION SNAPSHOT '000003A1-1';</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="R1-SQL-SET-TRANSACTION-3"
+></A
+><H2
+>Совместимость</H2
+><P
+>Эти команды определены в стандарте <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>, за исключением режима транзакции <TT
+CLASS="LITERAL"
+>DEFERRABLE</TT
+> и формы <TT
+CLASS="COMMAND"
+>SET TRANSACTION SNAPSHOT</TT
+>, которые являются расширениями <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+><P
+>В стандарте уровнем изоляции по умолчанию является <TT
+CLASS="LITERAL"
+>SERIALIZABLE</TT
+>. В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> уровнем по умолчанию обычно считается <TT
+CLASS="LITERAL"
+>READ COMMITTED</TT
+>, но его можно изменить, как описано выше.</P
+><P
+>В стандарте SQL есть ещё одна характеристика транзакции, которую нельзя задать этими командами: размер диагностической области. Эта специфическая концепция встраиваемого SQL, поэтому в сервере <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> она не реализована.</P
+><P
+>Стандарт SQL требует, чтобы последовательные <TT
+CLASS="REPLACEABLE"
+><I
+>режимы_транзакций</I
+></TT
+> разделялись запятыми, но по историческим причинам <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> позволяет опустить запятые.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-set-session-authorization.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-show.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>SET SESSION AUTHORIZATION</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>SHOW</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

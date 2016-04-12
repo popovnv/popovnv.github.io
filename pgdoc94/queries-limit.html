@@ -1,0 +1,300 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>LIMIT и OFFSET</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Запросы"
+HREF="queries.html"><LINK
+REL="PREVIOUS"
+TITLE="Сортировка строк"
+HREF="queries-order.html"><LINK
+REL="NEXT"
+TITLE="Списки VALUES"
+HREF="queries-values.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Сортировка строк"
+HREF="queries-order.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="queries.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 7. Запросы</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Списки VALUES"
+HREF="queries-values.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="QUERIES-LIMIT"
+>7.6. <TT
+CLASS="LITERAL"
+>LIMIT</TT
+> и <TT
+CLASS="LITERAL"
+>OFFSET</TT
+></A
+></H1
+><P
+>Указания <TT
+CLASS="LITERAL"
+>LIMIT</TT
+> и <TT
+CLASS="LITERAL"
+>OFFSET</TT
+> позволяют получить только часть строк из тех, что выдал остальной запрос: </P><PRE
+CLASS="SYNOPSIS"
+>SELECT <TT
+CLASS="REPLACEABLE"
+><I
+>список_выборки</I
+></TT
+>
+    FROM <TT
+CLASS="REPLACEABLE"
+><I
+>табличное_выражение</I
+></TT
+>
+    [<SPAN
+CLASS="OPTIONAL"
+> ORDER BY ... </SPAN
+>]
+    [<SPAN
+CLASS="OPTIONAL"
+> LIMIT { <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+> | ALL } </SPAN
+>] [<SPAN
+CLASS="OPTIONAL"
+> OFFSET <TT
+CLASS="REPLACEABLE"
+><I
+>число</I
+></TT
+> </SPAN
+>]</PRE
+><P></P
+><P
+>Если указывается число LIMIT, в результате возвращается не больше заданного числа строк (меньше может быть, если сам запрос выдал меньшее количество строк). <TT
+CLASS="LITERAL"
+>LIMIT ALL</TT
+> равносильно отсутствию указания <TT
+CLASS="LITERAL"
+>LIMIT</TT
+>.</P
+><P
+><TT
+CLASS="LITERAL"
+>OFFSET</TT
+> указывает пропустить указанное число строк, прежде чем начать выдавать строки. <TT
+CLASS="LITERAL"
+>OFFSET 0</TT
+> равносильно отсутствию указания <TT
+CLASS="LITERAL"
+>OFFSET</TT
+>, а <TT
+CLASS="LITERAL"
+>LIMIT NULL</TT
+> &mdash; отсутствию <TT
+CLASS="LITERAL"
+>LIMIT</TT
+>. Если указано и <TT
+CLASS="LITERAL"
+>OFFSET</TT
+>, и <TT
+CLASS="LITERAL"
+>LIMIT</TT
+>, сначала система пропускает <TT
+CLASS="LITERAL"
+>OFFSET</TT
+> строк, а затем начинает подсчитывать строки для ограничения <TT
+CLASS="LITERAL"
+>LIMIT</TT
+>.</P
+><P
+>Применяя <TT
+CLASS="LITERAL"
+>LIMIT</TT
+>, важно использовать также предложение <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+>, чтобы строки результата выдавались в определённом порядке. Иначе будут возвращаться непредсказуемые подмножества строк. Вы можете запросить строки с десятой по двадцатую, но какой порядок вы имеете в виду? Порядок будет неизвестен, если не добавить <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+>.</P
+><P
+>Оптимизатор запроса учитывает ограничение <TT
+CLASS="LITERAL"
+>LIMIT</TT
+>, строя планы выполнения запросов, поэтому вероятнее всего планы (а значит и порядок строк) будут меняться при разных <TT
+CLASS="LITERAL"
+>LIMIT</TT
+> и <TT
+CLASS="LITERAL"
+>OFFSET</TT
+>. Таким образом, различные значения <TT
+CLASS="LITERAL"
+>LIMIT</TT
+>/<TT
+CLASS="LITERAL"
+>OFFSET</TT
+>, выбирающие разные подмножества результатов запроса, <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>приведут к несогласованности результатов</I
+></SPAN
+>, если не установить предсказуемую сортировку с помощью <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+>. Это не ошибка, а неизбежное следствие того, что SQL не гарантирует вывод результатов запроса в некотором порядке, если порядок не определён явно предложением <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+>.</P
+><P
+>Строки, пропускаемые согласно предложению <TT
+CLASS="LITERAL"
+>OFFSET</TT
+>, тем не менее должны вычисляться на сервере. Таким образом, при больших значениях <TT
+CLASS="LITERAL"
+>OFFSET</TT
+> работает неэффективно.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="queries-order.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="queries-values.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Сортировка строк</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="queries.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Списки <TT
+CLASS="LITERAL"
+>VALUES</TT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

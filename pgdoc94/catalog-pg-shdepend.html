@@ -1,0 +1,454 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>          pg_shdepend
+        </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Системные каталоги"
+HREF="catalogs.html"><LINK
+REL="PREVIOUS"
+TITLE="          pg_seclabel
+        "
+HREF="catalog-pg-seclabel.html"><LINK
+REL="NEXT"
+TITLE="          pg_shdescription
+        "
+HREF="catalog-pg-shdescription.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="          pg_seclabel
+        "
+HREF="catalog-pg-seclabel.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 48. Системные каталоги</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="          pg_shdescription
+        "
+HREF="catalog-pg-shdescription.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CATALOG-PG-SHDEPEND"
+>48.41. <TT
+CLASS="STRUCTNAME"
+>pg_shdepend</TT
+></A
+></H1
+><P
+>В каталоге <TT
+CLASS="STRUCTNAME"
+>pg_shdepend</TT
+> записываются отношения зависимости между объектами баз данных и разделяемыми объектами, такими как роли. Эта информация позволяет <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> удостовериться, что эти объекты не используется, прежде чем удалять их.</P
+><P
+>Также смотрите каталог <A
+HREF="catalog-pg-depend.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_depend</TT
+></A
+>, который играет подобную роль в отношении зависимостей объектов в одной базе данных.</P
+><P
+>В отличие от большинства системных каталогов, <TT
+CLASS="STRUCTNAME"
+>pg_shdepend</TT
+> разделяется всеми базами данных кластера: есть только один экземпляр <TT
+CLASS="STRUCTNAME"
+>pg_shdepend</TT
+> в кластере, а не отдельные в каждой базе данных.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="AEN99285"
+></A
+><P
+><B
+>Таблица 48-41. Колонки <TT
+CLASS="STRUCTNAME"
+>pg_shdepend</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип</TH
+><TH
+>Ссылки</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>dbid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-database.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_database</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>OID базы данных, в которой находится зависимый объект, или ноль, если это глобальный объект</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>classid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-class.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>OID системного каталога, в котором находится зависимый объект</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>objid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>любая колонка OID</TD
+><TD
+>OID определённого зависимого объекта</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>objsubid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int4</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Для колонки таблицы это номер колонки (<TT
+CLASS="STRUCTFIELD"
+>objid</TT
+> и <TT
+CLASS="STRUCTFIELD"
+>classid</TT
+> указывают на саму таблицу). Для всех других типов объектов это поле содержит ноль.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>refclassid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-class.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>OID системного каталога, к которому относится вышестоящий объект (это должен быть разделяемый каталог)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>refobjid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>любая колонка OID</TD
+><TD
+>OID определённого вышестоящего объекта</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>deptype</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>char</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Код, определяющий конкретную семантику данного отношения зависимости; см. текст</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Во всех случаях, запись в <TT
+CLASS="STRUCTNAME"
+>pg_shdepend</TT
+> показывает, что вышестоящий объект нельзя удалить, не удаляя подчинённый объект. Однако есть несколько подвидов зависимости, задаваемых в поле <TT
+CLASS="STRUCTFIELD"
+>deptype</TT
+>: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="SYMBOL"
+>SHARED_DEPENDENCY_OWNER</TT
+> (<TT
+CLASS="LITERAL"
+>o</TT
+>)</DT
+><DD
+><P
+>Вышестоящий объект (это должна быть роль) является владельцем зависимого объекта.</P
+></DD
+><DT
+><TT
+CLASS="SYMBOL"
+>SHARED_DEPENDENCY_ACL</TT
+> (<TT
+CLASS="LITERAL"
+>a</TT
+>)</DT
+><DD
+><P
+>Вышестоящий объект (это должна быть роль) упоминается в ACL (списке управления доступом, то есть списке прав) подчинённого объекта. (Запись <TT
+CLASS="SYMBOL"
+>SHARED_DEPENDENCY_ACL</TT
+> не создаётся для владельца объекта, так как для владельца всё равно имеется запись <TT
+CLASS="SYMBOL"
+>SHARED_DEPENDENCY_OWNER</TT
+>.)</P
+></DD
+><DT
+><TT
+CLASS="SYMBOL"
+>SHARED_DEPENDENCY_PIN</TT
+> (<TT
+CLASS="LITERAL"
+>p</TT
+>)</DT
+><DD
+><P
+>Зависимый объект отсутствует; этот тип записи показывает, что система сама зависит от вышестоящего объекта, так что этот объект нельзя удалять ни при каких условиях. Записи этого типа создаются только командой <TT
+CLASS="COMMAND"
+>initdb</TT
+>. Поля зависимого объекта в такой записи содержат нули.</P
+></DD
+></DL
+></DIV
+><P> В будущем могут появиться и другие подвиды зависимости. Заметьте в частности, что с текущим определением вышестоящими объектами могут быть только роли.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="catalog-pg-seclabel.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="catalog-pg-shdescription.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_seclabel</TT
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_shdescription</TT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

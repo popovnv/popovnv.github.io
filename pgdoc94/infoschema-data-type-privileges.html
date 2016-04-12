@@ -1,0 +1,300 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>          data_type_privileges
+        </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Информационная схема"
+HREF="information-schema.html"><LINK
+REL="PREVIOUS"
+TITLE="          constraint_table_usage
+        "
+HREF="infoschema-constraint-table-usage.html"><LINK
+REL="NEXT"
+TITLE="          domain_constraints
+        "
+HREF="infoschema-domain-constraints.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="          constraint_table_usage
+        "
+HREF="infoschema-constraint-table-usage.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="information-schema.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 34. Информационная схема</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="          domain_constraints
+        "
+HREF="infoschema-domain-constraints.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="INFOSCHEMA-DATA-TYPE-PRIVILEGES"
+>34.19. <TT
+CLASS="LITERAL"
+>data_type_privileges</TT
+></A
+></H1
+><P
+>Представление <TT
+CLASS="LITERAL"
+>data_type_privileges</TT
+> описывает все дескрипторы типов данных, к которым имеет доступ текущий пользователь, являясь их владельцем или имея некоторые права для них. Дескриптор типа данных формируется, когда тип данных задействуется в определении колонки таблицы, домена или функции (в качестве типа параметра или результата), и хранит некоторую информацию о том, как этот тип используется в данном случае (например, объявленную максимальную длину, если это применимо). Каждому дескриптору типа данных назначается уникальный идентификатор, уникальный среди всех дескрипторов типов, назначаемых одному объекту (таблица, домен, функция). Это представление, вероятно, не полезно для приложений, но на его базе определены некоторые другие представления в информационной схеме.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="AEN50666"
+></A
+><P
+><B
+>Таблица 34-17. Колонки <TT
+CLASS="LITERAL"
+>data_type_privileges</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип данных</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>object_catalog</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Имя базы данных, содержащей описываемый объект (всегда текущая база)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>object_schema</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Имя схемы, содержащей описываемый объект</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>object_name</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Имя описываемого объекта</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>object_type</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>character_data</TT
+>
+                </TD
+><TD
+>Тип описываемого объекта: <TT
+CLASS="LITERAL"
+>TABLE</TT
+> (дескриптор типа данных относится к колонке этой таблицы), <TT
+CLASS="LITERAL"
+>DOMAIN</TT
+> (дескриптор типа данных относится к домену) или <TT
+CLASS="LITERAL"
+>ROUTINE</TT
+> (дескриптор типа данных относится к типу данных параметра или результата функции).</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>dtd_identifier</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Идентификатор дескриптора типа данных, уникальный среди дескрипторов типов для этого же объекта.</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="infoschema-constraint-table-usage.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="infoschema-domain-constraints.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><TT
+CLASS="LITERAL"
+>constraint_table_usage</TT
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="information-schema.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><TT
+CLASS="LITERAL"
+>domain_constraints</TT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

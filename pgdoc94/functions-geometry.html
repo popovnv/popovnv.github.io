@@ -1,0 +1,1829 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Геометрические функции и операторы</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Функции и операторы"
+HREF="functions.html"><LINK
+REL="PREVIOUS"
+TITLE="Функции для перечислений"
+HREF="functions-enum.html"><LINK
+REL="NEXT"
+TITLE="Функции и операторы для работы с сетевыми адресами"
+HREF="functions-net.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Функции для перечислений"
+HREF="functions-enum.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 9. Функции и операторы</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Функции и операторы для работы с сетевыми адресами"
+HREF="functions-net.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="FUNCTIONS-GEOMETRY"
+>9.11. Геометрические функции и операторы</A
+></H1
+><P
+>Для геометрических типов <TT
+CLASS="TYPE"
+>point</TT
+>, <TT
+CLASS="TYPE"
+>box</TT
+>, <TT
+CLASS="TYPE"
+>lseg</TT
+>, <TT
+CLASS="TYPE"
+>line</TT
+>, <TT
+CLASS="TYPE"
+>path</TT
+>, <TT
+CLASS="TYPE"
+>polygon</TT
+> и <TT
+CLASS="TYPE"
+>circle</TT
+> разработан большой набор встроенных функций и операторов, представленный в <A
+HREF="functions-geometry.html#FUNCTIONS-GEOMETRY-OP-TABLE"
+>Таблице 9-31</A
+>, <A
+HREF="functions-geometry.html#FUNCTIONS-GEOMETRY-FUNC-TABLE"
+>Таблице 9-32</A
+> и <A
+HREF="functions-geometry.html#FUNCTIONS-GEOMETRY-CONV-TABLE"
+>Таблице 9-33</A
+>.</P
+><DIV
+CLASS="CAUTION"
+><P
+></P
+><TABLE
+CLASS="CAUTION"
+BORDER="1"
+WIDTH="100%"
+><TR
+><TD
+ALIGN="CENTER"
+><B
+>Предостережение</B
+></TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+><P
+>Заметьте, что оператор <SPAN
+CLASS="QUOTE"
+>"идентичности"</SPAN
+>, <TT
+CLASS="LITERAL"
+>~=</TT
+>, представляет обычное сравнение на равенство значений <TT
+CLASS="TYPE"
+>point</TT
+>, <TT
+CLASS="TYPE"
+>box</TT
+>, <TT
+CLASS="TYPE"
+>polygon</TT
+> и <TT
+CLASS="TYPE"
+>circle</TT
+>. Для некоторых из этих типов определён также оператор <TT
+CLASS="LITERAL"
+>=</TT
+>, но <TT
+CLASS="LITERAL"
+>=</TT
+> проверяет только равенство <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>площадей</I
+></SPAN
+>. Другие скалярные операторы сравнения (<TT
+CLASS="LITERAL"
+>&lt;=</TT
+> и т. д.) так же сравнивают площади значений этих типов.</P
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-GEOMETRY-OP-TABLE"
+></A
+><P
+><B
+>Таблица 9-31. Геометрические операторы</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Оператор</TH
+><TH
+>Описание</TH
+><TH
+>Пример</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>+</TT
+> </TD
+><TD
+>Сдвиг</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>box '((0,0),(1,1))' + point '(2.0,0)'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>-</TT
+> </TD
+><TD
+>Сдвиг</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>box '((0,0),(1,1))' - point '(2.0,0)'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>*</TT
+> </TD
+><TD
+>Масштабирование/поворот</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>box '((0,0),(1,1))' * point '(2.0,0)'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>/</TT
+> </TD
+><TD
+>Масштабирование/поворот</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>box '((0,0),(2,2))' / point '(2.0,0)'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>#</TT
+> </TD
+><TD
+>Точка или прямоугольник в пересечении</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'((1,-1),(-1,1))' # '((1,1),(-1,-1))'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>#</TT
+> </TD
+><TD
+>Число точек в пути или вершин в многоугольнике</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+># '((1,0),(0,1),(-1,0))'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>@-@</TT
+> </TD
+><TD
+>Длина, периметр или длина окружности</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>@-@ path '((0,0),(1,0))'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>@@</TT
+> </TD
+><TD
+>Центр</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>@@ circle '((0,0),10)'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>##</TT
+> </TD
+><TD
+>Точка, ближайшая к первому операнду и принадлежащая второму</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>point '(0,0)' ## lseg '((2,0),(0,2))'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>&lt;-&gt;</TT
+> </TD
+><TD
+>Расстояние между операндами</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>circle '((0,0),1)' &lt;-&gt; circle '((5,0),1)'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>&amp;&amp;</TT
+> </TD
+><TD
+>Пересекаются ли операнды? (Для положительного ответа достаточно одной общей точки.)</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>box '((0,0),(1,1))' &amp;&amp; box '((0,0),(2,2))'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>&lt;&lt;</TT
+> </TD
+><TD
+>Строго слева?</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>circle '((0,0),1)' &lt;&lt; circle '((5,0),1)'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>&gt;&gt;</TT
+> </TD
+><TD
+>Строго справа?</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>circle '((5,0),1)' &gt;&gt; circle '((0,0),1)'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>&amp;&lt;</TT
+> </TD
+><TD
+>Не простирается правее?</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>box '((0,0),(1,1))' &amp;&lt; box '((0,0),(2,2))'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>&amp;&gt;</TT
+> </TD
+><TD
+>Не простирается левее?</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>box '((0,0),(3,3))' &amp;&gt; box '((0,0),(2,2))'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>&lt;&lt;|</TT
+> </TD
+><TD
+>Строго ниже?</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>box '((0,0),(3,3))' &lt;&lt;| box '((3,4),(5,5))'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>|&gt;&gt;</TT
+> </TD
+><TD
+>Строго выше?</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>box '((3,4),(5,5))' |&gt;&gt; box '((0,0),(3,3))'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>&amp;&lt;|</TT
+> </TD
+><TD
+>Не простирается выше?</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>box '((0,0),(1,1))' &amp;&lt;| box '((0,0),(2,2))'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>|&amp;&gt;</TT
+> </TD
+><TD
+>Не простирается ниже?</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>box '((0,0),(3,3))' |&amp;&gt; box '((0,0),(2,2))'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>&lt;^</TT
+> </TD
+><TD
+>Ниже (может касаться)?</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>circle '((0,0),1)' &lt;^ circle '((0,5),1)'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>&gt;^</TT
+> </TD
+><TD
+>Выше (может касаться)?</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>circle '((0,5),1)' &gt;^ circle '((0,0),1)'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>?#</TT
+> </TD
+><TD
+>Пересекает?</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>lseg '((-1,0),(1,0))' ?# box '((-2,-2),(2,2))'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>?-</TT
+> </TD
+><TD
+>Горизонтальный объект?</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>?- lseg '((-1,0),(1,0))'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>?-</TT
+> </TD
+><TD
+>Выровнены по горизонтали?</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>point '(1,0)' ?- point '(0,0)'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>?|</TT
+> </TD
+><TD
+>Вертикальный объект?</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>?| lseg '((-1,0),(1,0))'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>?|</TT
+> </TD
+><TD
+>Выровнены по вертикали?</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>point '(0,1)' ?| point '(0,0)'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>?-|</TT
+> </TD
+><TD
+>Перпендикулярны?</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>lseg '((0,0),(0,1))' ?-| lseg '((0,0),(1,0))'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>?||</TT
+> </TD
+><TD
+>Параллельны?</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>lseg '((-1,0),(1,0))' ?|| lseg '((-1,2),(1,2))'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>@&gt;</TT
+> </TD
+><TD
+>Первый объект включает второй?</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>circle '((0,0),2)' @&gt; point '(1,1)'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>&lt;@</TT
+> </TD
+><TD
+>Первый объект включён во второй?</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>point '(1,1)' &lt;@ circle '((0,0),2)'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>~=</TT
+> </TD
+><TD
+>Одинаковы?</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>polygon '((0,0),(1,1))' ~= polygon '((1,1),(0,0))'</TT
+>
+                </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>До <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> 8.2 операторы включения <TT
+CLASS="LITERAL"
+>@&gt;</TT
+> и <TT
+CLASS="LITERAL"
+>&lt;@</TT
+> назывались соответственно <TT
+CLASS="LITERAL"
+>~</TT
+> и <TT
+CLASS="LITERAL"
+>@</TT
+>. Эти имена по-прежнему доступны, но считаются устаревшими и в конце концов будут удалены.</P
+></BLOCKQUOTE
+></DIV
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-GEOMETRY-FUNC-TABLE"
+></A
+><P
+><B
+>Таблица 9-32. Геометрические функции</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Функция</TH
+><TH
+>Тип результата</TH
+><TH
+>Описание</TH
+><TH
+>Пример</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>area(<TT
+CLASS="REPLACEABLE"
+><I
+>объект</I
+></TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>double precision</TT
+>
+                </TD
+><TD
+>площадь</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>area(box '((0,0),(1,1))')</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>center(<TT
+CLASS="REPLACEABLE"
+><I
+>объект</I
+></TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>point</TT
+>
+                </TD
+><TD
+>центр</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>center(box '((0,0),(1,2))')</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>diameter(<TT
+CLASS="TYPE"
+>circle</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>double precision</TT
+>
+                </TD
+><TD
+>диаметр круга</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>diameter(circle '((0,0),2.0)')</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>height(<TT
+CLASS="TYPE"
+>box</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>double precision</TT
+>
+                </TD
+><TD
+>вертикальный размер прямоугольника</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>height(box '((0,0),(1,1))')</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>isclosed(<TT
+CLASS="TYPE"
+>path</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>замкнутый путь?</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>isclosed(path '((0,0),(1,1),​(2,0))')</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>isopen(<TT
+CLASS="TYPE"
+>path</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>открытый путь?</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>isopen(path '[(0,0),(1,1),​(2,0)]')</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>length(​<TT
+CLASS="REPLACEABLE"
+><I
+>объект</I
+></TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>double precision</TT
+>
+                </TD
+><TD
+>длина</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>length(path '((-1,0),(1,0))')</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>npoints(<TT
+CLASS="TYPE"
+>path</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int</TT
+>
+                </TD
+><TD
+>число точек</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>npoints(path '[(0,0),(1,1),​(2,0)]')</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>npoints(<TT
+CLASS="TYPE"
+>polygon</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int</TT
+>
+                </TD
+><TD
+>число точек</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>npoints(polygon '((1,1),(0,0))')</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>pclose(<TT
+CLASS="TYPE"
+>path</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>path</TT
+>
+                </TD
+><TD
+>преобразует путь в замкнутый</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>pclose(path '[(0,0),(1,1),​(2,0)]')</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>popen(<TT
+CLASS="TYPE"
+>path</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>path</TT
+>
+                </TD
+><TD
+>преобразует путь в открытый</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>popen(path '((0,0),(1,1),​(2,0))')</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>radius(<TT
+CLASS="TYPE"
+>circle</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>double precision</TT
+>
+                </TD
+><TD
+>радиус окружности</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>radius(circle '((0,0),2.0)')</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>width(<TT
+CLASS="TYPE"
+>box</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>double precision</TT
+>
+                </TD
+><TD
+>горизонтальный размер прямоугольника</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>width(box '((0,0),(1,1))')</TT
+>
+                </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-GEOMETRY-CONV-TABLE"
+></A
+><P
+><B
+>Таблица 9-33. Функции преобразования геометрических типов</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Функция</TH
+><TH
+>Тип результата</TH
+><TH
+>Описание</TH
+><TH
+>Пример</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>box(<TT
+CLASS="TYPE"
+>circle</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>box</TT
+>
+                </TD
+><TD
+>окружность в прямоугольник</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>box(circle '((0,0),2.0)')</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>box(<TT
+CLASS="TYPE"
+>point</TT
+>, <TT
+CLASS="TYPE"
+>point</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>box</TT
+>
+                </TD
+><TD
+>точки в прямоугольник</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>box(point '(0,0)', point '(1,1)')</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>box(<TT
+CLASS="TYPE"
+>polygon</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>box</TT
+>
+                </TD
+><TD
+>многоугольник в прямоугольник</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>box(polygon '((0,0),(1,1),​(2,0))')</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>circle(<TT
+CLASS="TYPE"
+>box</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>circle</TT
+>
+                </TD
+><TD
+>прямоугольник в окружность</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>circle(box '((0,0),(1,1))')</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>circle(<TT
+CLASS="TYPE"
+>point</TT
+>, <TT
+CLASS="TYPE"
+>double precision</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>circle</TT
+>
+                </TD
+><TD
+>окружность из центра и радиуса</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>circle(point '(0,0)', 2.0)</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>circle(<TT
+CLASS="TYPE"
+>polygon</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>circle</TT
+>
+                </TD
+><TD
+>многоугольник в окружность</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>circle(polygon '((0,0),(1,1),​(2,0))')</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>line(<TT
+CLASS="TYPE"
+>point</TT
+>, <TT
+CLASS="TYPE"
+>point</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>line</TT
+>
+                </TD
+><TD
+>точки в прямую</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>line(point '(-1,0)', point '(1,0)')</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>lseg(<TT
+CLASS="TYPE"
+>box</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>lseg</TT
+>
+                </TD
+><TD
+>диагональ прямоугольника в отрезок</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>lseg(box '((-1,0),(1,0))')</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>lseg(<TT
+CLASS="TYPE"
+>point</TT
+>, <TT
+CLASS="TYPE"
+>point</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>lseg</TT
+>
+                </TD
+><TD
+>точки в отрезок</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>lseg(point '(-1,0)', point '(1,0)')</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>path(<TT
+CLASS="TYPE"
+>polygon</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>path</TT
+>
+                </TD
+><TD
+>многоугольник в путь</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>path(polygon '((0,0),(1,1),​(2,0))')</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>point</CODE
+>(​<TT
+CLASS="TYPE"
+>double precision</TT
+>, <TT
+CLASS="TYPE"
+>double precision</TT
+>)</TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>point</TT
+>
+                </TD
+><TD
+>образует точку</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>point(23.4, -44.5)</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>point(<TT
+CLASS="TYPE"
+>box</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>point</TT
+>
+                </TD
+><TD
+>центр прямоугольника</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>point(box '((-1,0),(1,0))')</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>point(<TT
+CLASS="TYPE"
+>circle</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>point</TT
+>
+                </TD
+><TD
+>центр окружности</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>point(circle '((0,0),2.0)')</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>point(<TT
+CLASS="TYPE"
+>lseg</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>point</TT
+>
+                </TD
+><TD
+>центр отрезка</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>point(lseg '((-1,0),(1,0))')</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>point(<TT
+CLASS="TYPE"
+>polygon</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>point</TT
+>
+                </TD
+><TD
+>центр многоугольника</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>point(polygon '((0,0),(1,1),​(2,0))')</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>polygon(<TT
+CLASS="TYPE"
+>box</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>polygon</TT
+>
+                </TD
+><TD
+>прямоугольник в многоугольник с 4 вершинами</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>polygon(box '((0,0),(1,1))')</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>polygon(<TT
+CLASS="TYPE"
+>circle</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>polygon</TT
+>
+                </TD
+><TD
+>круг в многоугольник с 12 вершинами</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>polygon(circle '((0,0),2.0)')</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>polygon(<TT
+CLASS="REPLACEABLE"
+><I
+>число_точек</I
+></TT
+>, <TT
+CLASS="TYPE"
+>circle</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>polygon</TT
+>
+                </TD
+><TD
+>окружность с заданным <TT
+CLASS="REPLACEABLE"
+><I
+>числом_точек</I
+></TT
+></TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>polygon(12, circle '((0,0),2.0)')</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>polygon(<TT
+CLASS="TYPE"
+>path</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>polygon</TT
+>
+                </TD
+><TD
+>путь в многоугольник</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>polygon(path '((0,0),(1,1),​(2,0))')</TT
+>
+                </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>К двум компонентам типа <TT
+CLASS="TYPE"
+>point</TT
+> (точка) можно обратиться, как к элементам массива с индексами 0 и 1. Например, если <TT
+CLASS="LITERAL"
+>t.p</TT
+> &mdash; колонка типа <TT
+CLASS="TYPE"
+>point</TT
+>, <TT
+CLASS="LITERAL"
+>SELECT p[0] FROM t</TT
+> вернёт координату X, а <TT
+CLASS="LITERAL"
+>UPDATE t SET p[1] = ...</TT
+> изменит координату Y. Таким же образом, значение типа <TT
+CLASS="TYPE"
+>box</TT
+> или <TT
+CLASS="TYPE"
+>lseg</TT
+> можно воспринимать как массив двух значений типа <TT
+CLASS="TYPE"
+>point</TT
+>.</P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>area</CODE
+> работает с типами <TT
+CLASS="TYPE"
+>box</TT
+>, <TT
+CLASS="TYPE"
+>circle</TT
+> и <TT
+CLASS="TYPE"
+>path</TT
+>. При этом для типа <TT
+CLASS="TYPE"
+>path</TT
+> заданный путь не должен быть самопересекающимся. Например, эта функция не примет значение типа <TT
+CLASS="TYPE"
+>path</TT
+> <TT
+CLASS="LITERAL"
+>'((0,0),(0,1),(2,1),(2,2),(1,2),(1,0),(0,0))'::PATH</TT
+>, но примет визуально идентичный путь <TT
+CLASS="LITERAL"
+>'((0,0),(0,1),(1,1),(1,2),(2,2),(2,1),(1,1),(1,0),(0,0))'​::PATH</TT
+>. Если вы не вполне поняли, что здесь подразумевается под самопересечением пути, нарисуйте на бумаге две фигуры по приведённым координатам.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions-enum.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="functions-net.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Функции для перечислений</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Функции и операторы для работы с сетевыми адресами</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

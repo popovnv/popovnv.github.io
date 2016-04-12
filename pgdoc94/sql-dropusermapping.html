@@ -1,0 +1,313 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>DROP USER MAPPING</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="DROP USER"
+HREF="sql-dropuser.html"><LINK
+REL="NEXT"
+TITLE="DROP VIEW"
+HREF="sql-dropview.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="DROP USER"
+HREF="sql-dropuser.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="DROP VIEW"
+HREF="sql-dropview.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-DROPUSERMAPPING"
+></A
+>DROP USER MAPPING</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN80557"
+></A
+><H2
+>Название</H2
+>DROP USER MAPPING&nbsp;--&nbsp;удалить сопоставление пользователя для стороннего сервера</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN80560"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>DROP USER MAPPING [ IF EXISTS ] FOR { <TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+> | USER | CURRENT_USER | PUBLIC } SERVER <TT
+CLASS="REPLACEABLE"
+><I
+>имя_сервера</I
+></TT
+></PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN80564"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>DROP USER MAPPING</TT
+> удаляет существующее сопоставление пользователя для стороннего сервера.</P
+><P
+>Владелец стороннего сервера может удалить заданные для этого сервера сопоставления любых пользователей. Кроме того, обычный пользователь может удалить сопоставление для собственного имени, если он имеет право <TT
+CLASS="LITERAL"
+>USAGE</TT
+> для сервера.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN80570"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>IF EXISTS</TT
+></DT
+><DD
+><P
+>Не считать ошибкой, если сопоставление не существует. В этом случае будет выдано замечание.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+></DT
+><DD
+><P
+>Имя пользователя для сопоставления. Значения <TT
+CLASS="LITERAL"
+>CURRENT_USER</TT
+> и <TT
+CLASS="LITERAL"
+>USER</TT
+> соответствуют имени текущего пользователя. Значение <TT
+CLASS="LITERAL"
+>PUBLIC</TT
+> соответствует именам всех текущих и будущих пользователей системы.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_сервера</I
+></TT
+></DT
+><DD
+><P
+>Имя сервера, для которого меняется сопоставление пользователей.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN80591"
+></A
+><H2
+>Примеры</H2
+><P
+>Удаление сопоставления пользователя <TT
+CLASS="LITERAL"
+>bob</TT
+> для сервера <TT
+CLASS="LITERAL"
+>foo</TT
+>, если оно существует: </P><PRE
+CLASS="PROGRAMLISTING"
+>DROP USER MAPPING IF EXISTS FOR bob SERVER foo;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN80597"
+></A
+><H2
+>Совместимость</H2
+><P
+><TT
+CLASS="COMMAND"
+>DROP USER MAPPING</TT
+> соответствует стандарту ISO/IEC 9075-9 (SQL/MED). Предложение <TT
+CLASS="LITERAL"
+>IF EXISTS</TT
+> является расширением <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN80603"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-createusermapping.html"
+>CREATE USER MAPPING</A
+>, <A
+HREF="sql-alterusermapping.html"
+>ALTER USER MAPPING</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-dropuser.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-dropview.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>DROP USER</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>DROP VIEW</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,987 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Команды SQL</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Справочное руководство"
+HREF="reference.html"><LINK
+REL="PREVIOUS"
+TITLE="Справочное руководство"
+HREF="reference.html"><LINK
+REL="NEXT"
+TITLE="ABORT"
+HREF="sql-abort.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFERENCE"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Справочное руководство"
+HREF="reference.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="reference.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="ABORT"
+HREF="sql-abort.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="REFERENCE"
+><A
+NAME="SQL-COMMANDS"
+></A
+><DIV
+CLASS="TITLEPAGE"
+><H1
+CLASS="TITLE"
+>I. Команды SQL</H1
+><DIV
+CLASS="PARTINTRO"
+><A
+NAME="AEN66596"
+></A
+><P
+>Эта часть документации содержит справочную информацию по командам <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>, поддерживаемым <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Под <SPAN
+CLASS="QUOTE"
+>"SQL"</SPAN
+> здесь понимается язык вообще; сведения о соответствии стандартам и совместимости всех команд приведены на соответствующих страниц справочника.</P
+></DIV
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Содержание</B
+></DT
+><DT
+><A
+HREF="sql-abort.html"
+>ABORT</A
+>&nbsp;--&nbsp;прервать текущую транзакцию</DT
+><DT
+><A
+HREF="sql-alteraggregate.html"
+>ALTER AGGREGATE</A
+>&nbsp;--&nbsp;изменить определение агрегатной функции</DT
+><DT
+><A
+HREF="sql-altercollation.html"
+>ALTER COLLATION</A
+>&nbsp;--&nbsp;изменить определение правила сортировки</DT
+><DT
+><A
+HREF="sql-alterconversion.html"
+>ALTER CONVERSION</A
+>&nbsp;--&nbsp;изменить определение перекодировки</DT
+><DT
+><A
+HREF="sql-alterdatabase.html"
+>ALTER DATABASE</A
+>&nbsp;--&nbsp;изменить атрибуты базы данных</DT
+><DT
+><A
+HREF="sql-alterdefaultprivileges.html"
+>ALTER DEFAULT PRIVILEGES</A
+>&nbsp;--&nbsp;определить права доступа по умолчанию</DT
+><DT
+><A
+HREF="sql-alterdomain.html"
+>ALTER DOMAIN</A
+>&nbsp;--&nbsp;изменить определение домена</DT
+><DT
+><A
+HREF="sql-altereventtrigger.html"
+>ALTER EVENT TRIGGER</A
+>&nbsp;--&nbsp;изменить определение событийного триггера</DT
+><DT
+><A
+HREF="sql-alterextension.html"
+>ALTER EXTENSION</A
+>&nbsp;--&nbsp;изменить определение расширения</DT
+><DT
+><A
+HREF="sql-alterforeigndatawrapper.html"
+>ALTER FOREIGN DATA WRAPPER</A
+>&nbsp;--&nbsp;изменить определение обёртки сторонних данных</DT
+><DT
+><A
+HREF="sql-alterforeigntable.html"
+>ALTER FOREIGN TABLE</A
+>&nbsp;--&nbsp;изменить определение сторонней таблицы</DT
+><DT
+><A
+HREF="sql-alterfunction.html"
+>ALTER FUNCTION</A
+>&nbsp;--&nbsp;изменить определение функции</DT
+><DT
+><A
+HREF="sql-altergroup.html"
+>ALTER GROUP</A
+>&nbsp;--&nbsp;изменить имя роли или членство</DT
+><DT
+><A
+HREF="sql-alterindex.html"
+>ALTER INDEX</A
+>&nbsp;--&nbsp;изменить определение индекса</DT
+><DT
+><A
+HREF="sql-alterlanguage.html"
+>ALTER LANGUAGE</A
+>&nbsp;--&nbsp;изменить определение процедурного языка</DT
+><DT
+><A
+HREF="sql-alterlargeobject.html"
+>ALTER LARGE OBJECT</A
+>&nbsp;--&nbsp;изменить определение большого объекта</DT
+><DT
+><A
+HREF="sql-altermaterializedview.html"
+>ALTER MATERIALIZED VIEW</A
+>&nbsp;--&nbsp;изменить определение материализованного представления</DT
+><DT
+><A
+HREF="sql-alteroperator.html"
+>ALTER OPERATOR</A
+>&nbsp;--&nbsp;изменить определение оператора</DT
+><DT
+><A
+HREF="sql-alteropclass.html"
+>ALTER OPERATOR CLASS</A
+>&nbsp;--&nbsp;изменить определение класса операторов</DT
+><DT
+><A
+HREF="sql-alteropfamily.html"
+>ALTER OPERATOR FAMILY</A
+>&nbsp;--&nbsp;изменить определение семейства операторов</DT
+><DT
+><A
+HREF="sql-alterrole.html"
+>ALTER ROLE</A
+>&nbsp;--&nbsp;изменить роль в базе данных</DT
+><DT
+><A
+HREF="sql-alterrule.html"
+>ALTER RULE</A
+>&nbsp;--&nbsp;изменить определение правила</DT
+><DT
+><A
+HREF="sql-alterschema.html"
+>ALTER SCHEMA</A
+>&nbsp;--&nbsp;изменить определение схемы</DT
+><DT
+><A
+HREF="sql-altersequence.html"
+>ALTER SEQUENCE</A
+>&nbsp;--&nbsp;изменить определение генератора последовательности</DT
+><DT
+><A
+HREF="sql-alterserver.html"
+>ALTER SERVER</A
+>&nbsp;--&nbsp;изменить определение стороннего сервера</DT
+><DT
+><A
+HREF="sql-altersystem.html"
+>ALTER SYSTEM</A
+>&nbsp;--&nbsp;изменить параметр конфигурации сервера</DT
+><DT
+><A
+HREF="sql-altertable.html"
+>ALTER TABLE</A
+>&nbsp;--&nbsp;изменить определение таблицы</DT
+><DT
+><A
+HREF="sql-altertablespace.html"
+>ALTER TABLESPACE</A
+>&nbsp;--&nbsp;изменить определение табличного пространства</DT
+><DT
+><A
+HREF="sql-altertsconfig.html"
+>ALTER TEXT SEARCH CONFIGURATION</A
+>&nbsp;--&nbsp;изменить определение конфигурации текстового поиска</DT
+><DT
+><A
+HREF="sql-altertsdictionary.html"
+>ALTER TEXT SEARCH DICTIONARY</A
+>&nbsp;--&nbsp;изменить определение словаря текстового поиска</DT
+><DT
+><A
+HREF="sql-altertsparser.html"
+>ALTER TEXT SEARCH PARSER</A
+>&nbsp;--&nbsp;изменить определение анализатора текстового поиска</DT
+><DT
+><A
+HREF="sql-altertstemplate.html"
+>ALTER TEXT SEARCH TEMPLATE</A
+>&nbsp;--&nbsp;изменить определение шаблона текстового поиска</DT
+><DT
+><A
+HREF="sql-altertrigger.html"
+>ALTER TRIGGER</A
+>&nbsp;--&nbsp;изменить определение триггера</DT
+><DT
+><A
+HREF="sql-altertype.html"
+>ALTER TYPE</A
+>&nbsp;--&nbsp;изменить определение типа</DT
+><DT
+><A
+HREF="sql-alteruser.html"
+>ALTER USER</A
+>&nbsp;--&nbsp;изменить роль в базе данных</DT
+><DT
+><A
+HREF="sql-alterusermapping.html"
+>ALTER USER MAPPING</A
+>&nbsp;--&nbsp;изменить определение сопоставления пользователей</DT
+><DT
+><A
+HREF="sql-alterview.html"
+>ALTER VIEW</A
+>&nbsp;--&nbsp;изменить определение представления</DT
+><DT
+><A
+HREF="sql-analyze.html"
+>ANALYZE</A
+>&nbsp;--&nbsp;собрать статистику по базе данных</DT
+><DT
+><A
+HREF="sql-begin.html"
+>BEGIN</A
+>&nbsp;--&nbsp;начать блок транзакции</DT
+><DT
+><A
+HREF="sql-checkpoint.html"
+>CHECKPOINT</A
+>&nbsp;--&nbsp;записать контрольную точку в журнал транзакций</DT
+><DT
+><A
+HREF="sql-close.html"
+>CLOSE</A
+>&nbsp;--&nbsp;закрыть курсор</DT
+><DT
+><A
+HREF="sql-cluster.html"
+>CLUSTER</A
+>&nbsp;--&nbsp;кластеризовать таблицу согласно индексу</DT
+><DT
+><A
+HREF="sql-comment.html"
+>COMMENT</A
+>&nbsp;--&nbsp;задать или изменить комментарий объекта</DT
+><DT
+><A
+HREF="sql-commit.html"
+>COMMIT</A
+>&nbsp;--&nbsp;зафиксировать текущую транзакцию</DT
+><DT
+><A
+HREF="sql-commit-prepared.html"
+>COMMIT PREPARED</A
+>&nbsp;--&nbsp;зафиксировать транзакцию, которая ранее была подготовлена для двухфазной фиксации</DT
+><DT
+><A
+HREF="sql-copy.html"
+>COPY</A
+>&nbsp;--&nbsp;копировать данные между файлом и таблицей</DT
+><DT
+><A
+HREF="sql-createaggregate.html"
+>CREATE AGGREGATE</A
+>&nbsp;--&nbsp;создать агрегатную функцию</DT
+><DT
+><A
+HREF="sql-createcast.html"
+>CREATE CAST</A
+>&nbsp;--&nbsp;создать приведение</DT
+><DT
+><A
+HREF="sql-createcollation.html"
+>CREATE COLLATION</A
+>&nbsp;--&nbsp;создать правило сортировки</DT
+><DT
+><A
+HREF="sql-createconversion.html"
+>CREATE CONVERSION</A
+>&nbsp;--&nbsp;создать перекодировку</DT
+><DT
+><A
+HREF="sql-createdatabase.html"
+>CREATE DATABASE</A
+>&nbsp;--&nbsp;создать базу данных</DT
+><DT
+><A
+HREF="sql-createdomain.html"
+>CREATE DOMAIN</A
+>&nbsp;--&nbsp;создать домен</DT
+><DT
+><A
+HREF="sql-createeventtrigger.html"
+>CREATE EVENT TRIGGER</A
+>&nbsp;--&nbsp;создать событийный триггер</DT
+><DT
+><A
+HREF="sql-createextension.html"
+>CREATE EXTENSION</A
+>&nbsp;--&nbsp;установить расширение</DT
+><DT
+><A
+HREF="sql-createforeigndatawrapper.html"
+>CREATE FOREIGN DATA WRAPPER</A
+>&nbsp;--&nbsp;создать новую обёртку сторонних данных</DT
+><DT
+><A
+HREF="sql-createforeigntable.html"
+>CREATE FOREIGN TABLE</A
+>&nbsp;--&nbsp;создать стороннюю таблицу</DT
+><DT
+><A
+HREF="sql-createfunction.html"
+>CREATE FUNCTION</A
+>&nbsp;--&nbsp;создать функцию</DT
+><DT
+><A
+HREF="sql-creategroup.html"
+>CREATE GROUP</A
+>&nbsp;--&nbsp;создать роль в базе данных</DT
+><DT
+><A
+HREF="sql-createindex.html"
+>CREATE INDEX</A
+>&nbsp;--&nbsp;создать индекс</DT
+><DT
+><A
+HREF="sql-createlanguage.html"
+>CREATE LANGUAGE</A
+>&nbsp;--&nbsp;создать процедурный язык</DT
+><DT
+><A
+HREF="sql-creatematerializedview.html"
+>CREATE MATERIALIZED VIEW</A
+>&nbsp;--&nbsp;создать материализованное представление</DT
+><DT
+><A
+HREF="sql-createoperator.html"
+>CREATE OPERATOR</A
+>&nbsp;--&nbsp;создать оператор</DT
+><DT
+><A
+HREF="sql-createopclass.html"
+>CREATE OPERATOR CLASS</A
+>&nbsp;--&nbsp;создать класс операторов</DT
+><DT
+><A
+HREF="sql-createopfamily.html"
+>CREATE OPERATOR FAMILY</A
+>&nbsp;--&nbsp;создать семейство операторов</DT
+><DT
+><A
+HREF="sql-createrole.html"
+>CREATE ROLE</A
+>&nbsp;--&nbsp;создать роль в базе данных</DT
+><DT
+><A
+HREF="sql-createrule.html"
+>CREATE RULE</A
+>&nbsp;--&nbsp;создать правило перезаписи</DT
+><DT
+><A
+HREF="sql-createschema.html"
+>CREATE SCHEMA</A
+>&nbsp;--&nbsp;создать схему</DT
+><DT
+><A
+HREF="sql-createsequence.html"
+>CREATE SEQUENCE</A
+>&nbsp;--&nbsp;создать генератор последовательности</DT
+><DT
+><A
+HREF="sql-createserver.html"
+>CREATE SERVER</A
+>&nbsp;--&nbsp;создать сторонний сервер</DT
+><DT
+><A
+HREF="sql-createtable.html"
+>CREATE TABLE</A
+>&nbsp;--&nbsp;создать таблицу</DT
+><DT
+><A
+HREF="sql-createtableas.html"
+>CREATE TABLE AS</A
+>&nbsp;--&nbsp;создать таблицу из результатов запроса</DT
+><DT
+><A
+HREF="sql-createtablespace.html"
+>CREATE TABLESPACE</A
+>&nbsp;--&nbsp;создать табличное пространство</DT
+><DT
+><A
+HREF="sql-createtsconfig.html"
+>CREATE TEXT SEARCH CONFIGURATION</A
+>&nbsp;--&nbsp;создать конфигурацию текстового поиска</DT
+><DT
+><A
+HREF="sql-createtsdictionary.html"
+>CREATE TEXT SEARCH DICTIONARY</A
+>&nbsp;--&nbsp;создать словарь текстового поиска</DT
+><DT
+><A
+HREF="sql-createtsparser.html"
+>CREATE TEXT SEARCH PARSER</A
+>&nbsp;--&nbsp;создать анализатор текстового поиска</DT
+><DT
+><A
+HREF="sql-createtstemplate.html"
+>CREATE TEXT SEARCH TEMPLATE</A
+>&nbsp;--&nbsp;создать шаблон текстового поиска</DT
+><DT
+><A
+HREF="sql-createtrigger.html"
+>CREATE TRIGGER</A
+>&nbsp;--&nbsp;создать триггер</DT
+><DT
+><A
+HREF="sql-createtype.html"
+>CREATE TYPE</A
+>&nbsp;--&nbsp;создать новый тип данных</DT
+><DT
+><A
+HREF="sql-createuser.html"
+>CREATE USER</A
+>&nbsp;--&nbsp;создать роль в базе данных</DT
+><DT
+><A
+HREF="sql-createusermapping.html"
+>CREATE USER MAPPING</A
+>&nbsp;--&nbsp;создать сопоставление пользователя для стороннего сервера</DT
+><DT
+><A
+HREF="sql-createview.html"
+>CREATE VIEW</A
+>&nbsp;--&nbsp;создать представление</DT
+><DT
+><A
+HREF="sql-deallocate.html"
+>DEALLOCATE</A
+>&nbsp;--&nbsp;освободить подготовленный оператор</DT
+><DT
+><A
+HREF="sql-declare.html"
+>DECLARE</A
+>&nbsp;--&nbsp;определить курсор</DT
+><DT
+><A
+HREF="sql-delete.html"
+>DELETE</A
+>&nbsp;--&nbsp;удалить записи таблицы</DT
+><DT
+><A
+HREF="sql-discard.html"
+>DISCARD</A
+>&nbsp;--&nbsp;очистить состояние сеанса</DT
+><DT
+><A
+HREF="sql-do.html"
+>DO</A
+>&nbsp;--&nbsp;выполнить анонимный блок кода</DT
+><DT
+><A
+HREF="sql-dropaggregate.html"
+>DROP AGGREGATE</A
+>&nbsp;--&nbsp;удалить агрегатную функцию</DT
+><DT
+><A
+HREF="sql-dropcast.html"
+>DROP CAST</A
+>&nbsp;--&nbsp;удалить приведение типа</DT
+><DT
+><A
+HREF="sql-dropcollation.html"
+>DROP COLLATION</A
+>&nbsp;--&nbsp;удалить правило сортировки</DT
+><DT
+><A
+HREF="sql-dropconversion.html"
+>DROP CONVERSION</A
+>&nbsp;--&nbsp;удалить преобразование</DT
+><DT
+><A
+HREF="sql-dropdatabase.html"
+>DROP DATABASE</A
+>&nbsp;--&nbsp;удалить базу данных</DT
+><DT
+><A
+HREF="sql-dropdomain.html"
+>DROP DOMAIN</A
+>&nbsp;--&nbsp;удалить домен</DT
+><DT
+><A
+HREF="sql-dropeventtrigger.html"
+>DROP EVENT TRIGGER</A
+>&nbsp;--&nbsp;удалить событийный триггер</DT
+><DT
+><A
+HREF="sql-dropextension.html"
+>DROP EXTENSION</A
+>&nbsp;--&nbsp;удалить расширение</DT
+><DT
+><A
+HREF="sql-dropforeigndatawrapper.html"
+>DROP FOREIGN DATA WRAPPER</A
+>&nbsp;--&nbsp;удалить обёртку сторонних данных</DT
+><DT
+><A
+HREF="sql-dropforeigntable.html"
+>DROP FOREIGN TABLE</A
+>&nbsp;--&nbsp;удалить стороннюю таблицу</DT
+><DT
+><A
+HREF="sql-dropfunction.html"
+>DROP FUNCTION</A
+>&nbsp;--&nbsp;удалить функцию</DT
+><DT
+><A
+HREF="sql-dropgroup.html"
+>DROP GROUP</A
+>&nbsp;--&nbsp;удалить роль в базе данных</DT
+><DT
+><A
+HREF="sql-dropindex.html"
+>DROP INDEX</A
+>&nbsp;--&nbsp;удалить индекс</DT
+><DT
+><A
+HREF="sql-droplanguage.html"
+>DROP LANGUAGE</A
+>&nbsp;--&nbsp;удалить процедурный язык</DT
+><DT
+><A
+HREF="sql-dropmaterializedview.html"
+>DROP MATERIALIZED VIEW</A
+>&nbsp;--&nbsp;удалить материализованное представление</DT
+><DT
+><A
+HREF="sql-dropoperator.html"
+>DROP OPERATOR</A
+>&nbsp;--&nbsp;удалить оператор</DT
+><DT
+><A
+HREF="sql-dropopclass.html"
+>DROP OPERATOR CLASS</A
+>&nbsp;--&nbsp;удалить класс операторов</DT
+><DT
+><A
+HREF="sql-dropopfamily.html"
+>DROP OPERATOR FAMILY</A
+>&nbsp;--&nbsp;удалить семейство операторов</DT
+><DT
+><A
+HREF="sql-drop-owned.html"
+>DROP OWNED</A
+>&nbsp;--&nbsp;удалить объекты базы данных, принадлежащие роли</DT
+><DT
+><A
+HREF="sql-droprole.html"
+>DROP ROLE</A
+>&nbsp;--&nbsp;удалить роль в базе данных</DT
+><DT
+><A
+HREF="sql-droprule.html"
+>DROP RULE</A
+>&nbsp;--&nbsp;удалить правило перезаписи</DT
+><DT
+><A
+HREF="sql-dropschema.html"
+>DROP SCHEMA</A
+>&nbsp;--&nbsp;удалить схему</DT
+><DT
+><A
+HREF="sql-dropsequence.html"
+>DROP SEQUENCE</A
+>&nbsp;--&nbsp;удалить последовательность</DT
+><DT
+><A
+HREF="sql-dropserver.html"
+>DROP SERVER</A
+>&nbsp;--&nbsp;удалить описание стороннего сервера</DT
+><DT
+><A
+HREF="sql-droptable.html"
+>DROP TABLE</A
+>&nbsp;--&nbsp;удалить таблицу</DT
+><DT
+><A
+HREF="sql-droptablespace.html"
+>DROP TABLESPACE</A
+>&nbsp;--&nbsp;удалить табличное пространство</DT
+><DT
+><A
+HREF="sql-droptsconfig.html"
+>DROP TEXT SEARCH CONFIGURATION</A
+>&nbsp;--&nbsp;удалить конфигурацию текстового поиска</DT
+><DT
+><A
+HREF="sql-droptsdictionary.html"
+>DROP TEXT SEARCH DICTIONARY</A
+>&nbsp;--&nbsp;удалить словарь текстового поиска</DT
+><DT
+><A
+HREF="sql-droptsparser.html"
+>DROP TEXT SEARCH PARSER</A
+>&nbsp;--&nbsp;удалить анализатор текстового поиска</DT
+><DT
+><A
+HREF="sql-droptstemplate.html"
+>DROP TEXT SEARCH TEMPLATE</A
+>&nbsp;--&nbsp;удалить шаблон текстового поиска</DT
+><DT
+><A
+HREF="sql-droptrigger.html"
+>DROP TRIGGER</A
+>&nbsp;--&nbsp;удалить триггер</DT
+><DT
+><A
+HREF="sql-droptype.html"
+>DROP TYPE</A
+>&nbsp;--&nbsp;удалить тип данных</DT
+><DT
+><A
+HREF="sql-dropuser.html"
+>DROP USER</A
+>&nbsp;--&nbsp;удалить роль в базе данных</DT
+><DT
+><A
+HREF="sql-dropusermapping.html"
+>DROP USER MAPPING</A
+>&nbsp;--&nbsp;удалить сопоставление пользователя для стороннего сервера</DT
+><DT
+><A
+HREF="sql-dropview.html"
+>DROP VIEW</A
+>&nbsp;--&nbsp;удалить представление</DT
+><DT
+><A
+HREF="sql-end.html"
+>END</A
+>&nbsp;--&nbsp;зафиксировать текущую транзакцию</DT
+><DT
+><A
+HREF="sql-execute.html"
+>EXECUTE</A
+>&nbsp;--&nbsp;выполнить подготовленный оператор</DT
+><DT
+><A
+HREF="sql-explain.html"
+>EXPLAIN</A
+>&nbsp;--&nbsp;показать план выполнения оператора</DT
+><DT
+><A
+HREF="sql-fetch.html"
+>FETCH</A
+>&nbsp;--&nbsp;получить результат запроса через курсор</DT
+><DT
+><A
+HREF="sql-grant.html"
+>GRANT</A
+>&nbsp;--&nbsp;определить права доступа</DT
+><DT
+><A
+HREF="sql-insert.html"
+>INSERT</A
+>&nbsp;--&nbsp;добавить строки в таблицу</DT
+><DT
+><A
+HREF="sql-listen.html"
+>LISTEN</A
+>&nbsp;--&nbsp;ожидать уведомления</DT
+><DT
+><A
+HREF="sql-load.html"
+>LOAD</A
+>&nbsp;--&nbsp;загрузить файл разделяемой библиотеки</DT
+><DT
+><A
+HREF="sql-lock.html"
+>LOCK</A
+>&nbsp;--&nbsp;заблокировать таблицу</DT
+><DT
+><A
+HREF="sql-move.html"
+>MOVE</A
+>&nbsp;--&nbsp;переместить курсор</DT
+><DT
+><A
+HREF="sql-notify.html"
+>NOTIFY</A
+>&nbsp;--&nbsp;сгенерировать уведомление</DT
+><DT
+><A
+HREF="sql-prepare.html"
+>PREPARE</A
+>&nbsp;--&nbsp;подготовить оператор к выполнению</DT
+><DT
+><A
+HREF="sql-prepare-transaction.html"
+>PREPARE TRANSACTION</A
+>&nbsp;--&nbsp;подготовить текущую транзакцию для двухфазной фиксации</DT
+><DT
+><A
+HREF="sql-reassign-owned.html"
+>REASSIGN OWNED</A
+>&nbsp;--&nbsp;сменить владельца объектов базы данных, принадлежащих заданной роли</DT
+><DT
+><A
+HREF="sql-refreshmaterializedview.html"
+>REFRESH MATERIALIZED VIEW</A
+>&nbsp;--&nbsp;заменить содержимое материализованного представления</DT
+><DT
+><A
+HREF="sql-reindex.html"
+>REINDEX</A
+>&nbsp;--&nbsp;перестроить индексы</DT
+><DT
+><A
+HREF="sql-release-savepoint.html"
+>RELEASE SAVEPOINT</A
+>&nbsp;--&nbsp;высвободить ранее определённую точку сохранения</DT
+><DT
+><A
+HREF="sql-reset.html"
+>RESET</A
+>&nbsp;--&nbsp;восстановить значение по умолчанию заданного параметра времени выполнения</DT
+><DT
+><A
+HREF="sql-revoke.html"
+>REVOKE</A
+>&nbsp;--&nbsp;отозвать права доступа</DT
+><DT
+><A
+HREF="sql-rollback.html"
+>ROLLBACK</A
+>&nbsp;--&nbsp;прервать текущую транзакцию</DT
+><DT
+><A
+HREF="sql-rollback-prepared.html"
+>ROLLBACK PREPARED</A
+>&nbsp;--&nbsp;отменить транзакцию, которая ранее была подготовлена для двухфазной фиксации</DT
+><DT
+><A
+HREF="sql-rollback-to.html"
+>ROLLBACK TO SAVEPOINT</A
+>&nbsp;--&nbsp;откатиться к точке сохранения</DT
+><DT
+><A
+HREF="sql-savepoint.html"
+>SAVEPOINT</A
+>&nbsp;--&nbsp;определить новую точку сохранения в текущей транзакции</DT
+><DT
+><A
+HREF="sql-security-label.html"
+>SECURITY LABEL</A
+>&nbsp;--&nbsp;определить или изменить метку безопасности, применённую к объекту</DT
+><DT
+><A
+HREF="sql-select.html"
+>SELECT</A
+>&nbsp;--&nbsp;получить строки из таблицы или представления</DT
+><DT
+><A
+HREF="sql-selectinto.html"
+>SELECT INTO</A
+>&nbsp;--&nbsp;создать таблицу из результатов запроса</DT
+><DT
+><A
+HREF="sql-set.html"
+>SET</A
+>&nbsp;--&nbsp;изменить параметр времени выполнения</DT
+><DT
+><A
+HREF="sql-set-constraints.html"
+>SET CONSTRAINTS</A
+>&nbsp;--&nbsp;установить время проверки ограничений для текущей транзакции</DT
+><DT
+><A
+HREF="sql-set-role.html"
+>SET ROLE</A
+>&nbsp;--&nbsp;установить идентификатор текущего пользователя в рамках сеанса</DT
+><DT
+><A
+HREF="sql-set-session-authorization.html"
+>SET SESSION AUTHORIZATION</A
+>&nbsp;--&nbsp;установить идентификатор пользователя сеанса и идентификатор текущего пользователя в рамках сеанса</DT
+><DT
+><A
+HREF="sql-set-transaction.html"
+>SET TRANSACTION</A
+>&nbsp;--&nbsp;установить характеристики текущей транзакции</DT
+><DT
+><A
+HREF="sql-show.html"
+>SHOW</A
+>&nbsp;--&nbsp;показать значение параметра времени выполнения</DT
+><DT
+><A
+HREF="sql-start-transaction.html"
+>START TRANSACTION</A
+>&nbsp;--&nbsp;начать блок транзакции</DT
+><DT
+><A
+HREF="sql-truncate.html"
+>TRUNCATE</A
+>&nbsp;--&nbsp;опустошить таблицу или набор таблиц</DT
+><DT
+><A
+HREF="sql-unlisten.html"
+>UNLISTEN</A
+>&nbsp;--&nbsp;прекратить ожидание уведомления</DT
+><DT
+><A
+HREF="sql-update.html"
+>UPDATE</A
+>&nbsp;--&nbsp;изменить строки таблицы</DT
+><DT
+><A
+HREF="sql-vacuum.html"
+>VACUUM</A
+>&nbsp;--&nbsp;провести сборку мусора и, возможно, проанализировать базу данных</DT
+><DT
+><A
+HREF="sql-values.html"
+>VALUES</A
+>&nbsp;--&nbsp;вычислить набор строк</DT
+></DL
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="reference.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-abort.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Справочное руководство</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="reference.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>ABORT</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

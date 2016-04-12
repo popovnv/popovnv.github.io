@@ -1,0 +1,784 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Асинхронная обработка команд</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="libpq — библиотека для языка C"
+HREF="libpq.html"><LINK
+REL="PREVIOUS"
+TITLE="Функции для исполнения команд"
+HREF="libpq-exec.html"><LINK
+REL="NEXT"
+TITLE="Построчное извлечение результатов запроса"
+HREF="libpq-single-row-mode.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Функции для исполнения команд"
+HREF="libpq-exec.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="libpq.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 31. <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> — библиотека для языка C</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Построчное извлечение результатов запроса"
+HREF="libpq-single-row-mode.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="LIBPQ-ASYNC"
+>31.4. Асинхронная обработка команд</A
+></H1
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>PQexec</CODE
+> хорошо подходит для отправки команд серверу в нормальных, синхронных приложениях. Однако, она имеет ряд недостатков, которые могут иметь значение для некоторых пользователей: <P
+></P
+></P><UL
+><LI
+><P
+><CODE
+CLASS="FUNCTION"
+>PQexec</CODE
+> ожидает завершения выполнения команды. Приложение может иметь и другую работу, которую нужно делать (такую, как поддержание пользовательского интерфейса), в таком случае оно не захочет блокироваться, ожидая ответа.</P
+></LI
+><LI
+><P
+>Поскольку выполнение клиентского приложения приостанавливается, пока оно ожидает результата, то приложению трудно решить, что оно хотело бы попытаться отменить выполняющуюся команду. (Это можно сделать из обработчика сигнала, но никак иначе.)</P
+></LI
+><LI
+><P
+><CODE
+CLASS="FUNCTION"
+>PQexec</CODE
+> может возвратить только одну структуру <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+>. Если отправленная серверу строка-команда содержит множественные <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>-команды, то все структуры <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+>, кроме последней, отбрасываются функцией <CODE
+CLASS="FUNCTION"
+>PQexec</CODE
+>.</P
+></LI
+><LI
+><P
+><CODE
+CLASS="FUNCTION"
+>PQexec</CODE
+> всегда собирает все результаты выполнения команды, буферизуя их в единственной структуре <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+>. В то время как для приложения это упрощает логику обработки ошибок, это может быть непрактично, когда результат содержит много строк.</P
+></LI
+></UL
+><P></P
+><P
+>Приложения, которым эти ограничения не подходят, могут вместо <CODE
+CLASS="FUNCTION"
+>PQexec</CODE
+> использовать базовые функции, на основе которых и построена функция <CODE
+CLASS="FUNCTION"
+>PQexec</CODE
+>: <CODE
+CLASS="FUNCTION"
+>PQsendQuery</CODE
+> и <CODE
+CLASS="FUNCTION"
+>PQgetResult</CODE
+>. Есть также функции <CODE
+CLASS="FUNCTION"
+>PQsendQueryParams</CODE
+>, <CODE
+CLASS="FUNCTION"
+>PQsendPrepare</CODE
+>, <CODE
+CLASS="FUNCTION"
+>PQsendQueryPrepared</CODE
+>, <CODE
+CLASS="FUNCTION"
+>PQsendDescribePrepared</CODE
+> и <CODE
+CLASS="FUNCTION"
+>PQsendDescribePortal</CODE
+>, которые можно использовать совместно с <CODE
+CLASS="FUNCTION"
+>PQgetResult</CODE
+>, чтобы продублировать функциональность <CODE
+CLASS="FUNCTION"
+>PQexecParams</CODE
+>, <CODE
+CLASS="FUNCTION"
+>PQprepare</CODE
+>, <CODE
+CLASS="FUNCTION"
+>PQexecPrepared</CODE
+>, <CODE
+CLASS="FUNCTION"
+>PQdescribePrepared</CODE
+> и <CODE
+CLASS="FUNCTION"
+>PQdescribePortal</CODE
+> соответственно. <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="LIBPQ-PQSENDQUERY"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQsendQuery</CODE
+></DT
+><DD
+><P
+>Отправляет команду серверу, не ожидая получения результата. Если команда была отправлена успешно, то функция возвратит значение 1, в противном случае она возвратит 0 (тогда нужно воспользоваться функцией <CODE
+CLASS="FUNCTION"
+>PQerrorMessage</CODE
+> для получения дополнительной информации о сбое). </P><PRE
+CLASS="SYNOPSIS"
+>int PQsendQuery(PGconn *conn, const char *command);</PRE
+><P> После успешного вызова <CODE
+CLASS="FUNCTION"
+>PQsendQuery</CODE
+> вызовите <CODE
+CLASS="FUNCTION"
+>PQgetResult</CODE
+> один или несколько раз, чтобы получить результат. Функцию <CODE
+CLASS="FUNCTION"
+>PQsendQuery</CODE
+> нельзя вызвать повторно (на том же самом соединении) до тех пор, пока <CODE
+CLASS="FUNCTION"
+>PQgetResult</CODE
+> не вернёт нулевой указатель, означающий, что выполнение команды завершено.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQSENDQUERYPARAMS"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQsendQueryParams</CODE
+></DT
+><DD
+><P
+>Отправляет серверу команду и обособленные параметры, не ожидая получения результатов. </P><PRE
+CLASS="SYNOPSIS"
+>int PQsendQueryParams(PGconn *conn,
+                      const char *command,
+                      int nParams,
+                      const Oid *paramTypes,
+                      const char * const *paramValues,
+                      const int *paramLengths,
+                      const int *paramFormats,
+                      int resultFormat);</PRE
+><P> Эта функция эквивалентна функции <CODE
+CLASS="FUNCTION"
+>PQsendQuery</CODE
+>, за исключением того, что параметры запроса можно указать отдельно от самой строки запроса. Эта функция обрабатывает свои параметры точно так же, как и функция <CODE
+CLASS="FUNCTION"
+>PQexecParams</CODE
+>. Аналогично функции <CODE
+CLASS="FUNCTION"
+>PQexecParams</CODE
+>, данная функция не будет работать при подключениях по протоколу версии 2.0, также она позволяет включить только одну команду в строку запроса.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQSENDPREPARE"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQsendPrepare</CODE
+></DT
+><DD
+><P
+>Посылает запрос на создание подготовленного оператора с данными параметрами и не дожидается завершения его выполнения.</P><PRE
+CLASS="SYNOPSIS"
+>int PQsendPrepare(PGconn *conn,
+                  const char *stmtName,
+                  const char *query,
+                  int nParams,
+                  const Oid *paramTypes);</PRE
+><P> Это асинхронная версия функции <CODE
+CLASS="FUNCTION"
+>PQprepare</CODE
+>. Она возвращает 1, если ей удалось отправить запрос, и 0 в противном случае. После её успешного вызова следует вызвать функцию <CODE
+CLASS="FUNCTION"
+>PQgetResult</CODE
+>, чтобы определить, успешно ли создал сервер подготовленный оператор. Эта функция обрабатывает свои параметры точно так же, как и функция <CODE
+CLASS="FUNCTION"
+>PQprepare</CODE
+>. Аналогично функции <CODE
+CLASS="FUNCTION"
+>PQprepare</CODE
+>, данная функция не будет работать при подключениях по протоколу версии 2.0.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQSENDQUERYPREPARED"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQsendQueryPrepared</CODE
+></DT
+><DD
+><P
+>Посылает запрос на выполнение подготовленного оператора с данными параметрами, не ожидая получения результата. </P><PRE
+CLASS="SYNOPSIS"
+>int PQsendQueryPrepared(PGconn *conn,
+                        const char *stmtName,
+                        int nParams,
+                        const char * const *paramValues,
+                        const int *paramLengths,
+                        const int *paramFormats,
+                        int resultFormat);</PRE
+><P> Эта функция подобна функции <CODE
+CLASS="FUNCTION"
+>PQsendQueryParams</CODE
+>, но команда, которая должна быть выполнена, задаётся путём указания предварительно подготовленного оператора, вместо задания строки запроса. Эта функция обрабатывает свои параметры точно так же, как и функция <CODE
+CLASS="FUNCTION"
+>PQexecPrepared</CODE
+>. Аналогично функции <CODE
+CLASS="FUNCTION"
+>PQexecPrepared</CODE
+>, данная функция не будет работать при подключениях по протоколу версии 2.0.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQSENDDESCRIBEPREPARED"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQsendDescribePrepared</CODE
+></DT
+><DD
+><P
+>Отправляет запрос на получение информации об указанном подготовленном операторе и не дожидается завершения выполнения запроса. </P><PRE
+CLASS="SYNOPSIS"
+>int PQsendDescribePrepared(PGconn *conn, const char *stmtName);</PRE
+><P> Это асинхронная версия функции <CODE
+CLASS="FUNCTION"
+>PQdescribePrepared</CODE
+>. Она возвращает 1, если ей удалось отправить запрос, и 0 в противном случае. После её успешного вызова следует вызвать функцию <CODE
+CLASS="FUNCTION"
+>PQgetResult</CODE
+> для получения результата. Эта функция обрабатывает свои параметры точно так же, как и функция <CODE
+CLASS="FUNCTION"
+>PQdescribePrepared</CODE
+>. Аналогично функции <CODE
+CLASS="FUNCTION"
+>PQdescribePrepared</CODE
+>, данная функция не будет работать при подключениях по протоколу версии 2.0.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQSENDDESCRIBEPORTAL"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQsendDescribePortal</CODE
+></DT
+><DD
+><P
+>Отправляет запрос на получение информации об указанном портале и не дожидается завершения выполнения запроса. </P><PRE
+CLASS="SYNOPSIS"
+>int PQsendDescribePortal(PGconn *conn, const char *portalName);</PRE
+><P> Это асинхронная версия функции <CODE
+CLASS="FUNCTION"
+>PQdescribePortal</CODE
+>. Она возвращает 1, если ей удалось отправить запрос, и 0 в противном случае. После её успешного вызова следует вызвать функцию <CODE
+CLASS="FUNCTION"
+>PQgetResult</CODE
+> для получения результата. Эта функция обрабатывает свои параметры точно так же, как и функция <CODE
+CLASS="FUNCTION"
+>PQdescribePortal</CODE
+>. Аналогично функции <CODE
+CLASS="FUNCTION"
+>PQdescribePortal</CODE
+>, данная функция не будет работать при подключениях по протоколу версии 2.0.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQGETRESULT"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQgetResult</CODE
+></DT
+><DD
+><P
+>Ожидает получения следующего результата после предшествующего вызова <CODE
+CLASS="FUNCTION"
+>PQsendQuery</CODE
+>, <CODE
+CLASS="FUNCTION"
+>PQsendQueryParams</CODE
+>, <CODE
+CLASS="FUNCTION"
+>PQsendPrepare</CODE
+>, <CODE
+CLASS="FUNCTION"
+>PQsendQueryPrepared</CODE
+>, <CODE
+CLASS="FUNCTION"
+>PQsendDescribePrepared</CODE
+> или <CODE
+CLASS="FUNCTION"
+>PQsendDescribePortal</CODE
+> и возвращает его. Когда команда завершена и результатов больше не будет, тогда возвращается нулевой указатель. </P><PRE
+CLASS="SYNOPSIS"
+>PGresult *PQgetResult(PGconn *conn);</PRE
+><P></P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>PQgetResult</CODE
+> должна вызываться повторно до тех пор, пока она не вернёт нулевой указатель, означающий, что команда завершена. (Если она вызвана, когда нет ни одной активной команды, тогда <CODE
+CLASS="FUNCTION"
+>PQgetResult</CODE
+> просто возвратит нулевой указатель сразу же.) Каждый ненулевой результат, полученный от <CODE
+CLASS="FUNCTION"
+>PQgetResult</CODE
+>, должен обрабатываться с помощью тех же самых функций доступа к структуре <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+>, которые были описаны выше. Не забывайте освобождать память, занимаемую каждым результирующим объектом, с помощью функции <CODE
+CLASS="FUNCTION"
+>PQclear</CODE
+>, когда работа с этим объектом закончена. Обратите внимание, что <CODE
+CLASS="FUNCTION"
+>PQgetResult</CODE
+> заблокируется, только если какая-либо команда активна, а необходимые ответные данные ещё не были прочитаны функцией <CODE
+CLASS="FUNCTION"
+>PQconsumeInput</CODE
+>.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Даже когда <CODE
+CLASS="FUNCTION"
+>PQresultStatus</CODE
+> показывает фатальную ошибку, все равно следует вызывать функцию <CODE
+CLASS="FUNCTION"
+>PQgetResult</CODE
+> до тех пор, пока она не возвратит нулевой указатель, чтобы позволить <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> полностью обработать информацию об ошибке.</P
+></BLOCKQUOTE
+></DIV
+></DD
+></DL
+></DIV
+><P></P
+><P
+>Использование <CODE
+CLASS="FUNCTION"
+>PQsendQuery</CODE
+> и <CODE
+CLASS="FUNCTION"
+>PQgetResult</CODE
+> решает одну из проблем <CODE
+CLASS="FUNCTION"
+>PQexec</CODE
+>: если строка команды содержит несколько <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>-команд, то результаты каждой из них можно получить индивидуально. (Между прочим, это позволяет организовать частичное совмещение обработки: клиент может обрабатывать результаты одной команды, в то время как сервер ещё работает с более поздними запросами, содержащимися в той же самой строке-команде.)</P
+><P
+>Ещё одной часто требующейся функциональной возможностью, которую можно получить с помощью <CODE
+CLASS="FUNCTION"
+>PQsendQuery</CODE
+> и <CODE
+CLASS="FUNCTION"
+>PQgetResult</CODE
+>, является извлечение больших выборок по одной строке за раз. Это обсуждается в <A
+HREF="libpq-single-row-mode.html"
+>Разделе 31.5</A
+>.</P
+><P
+>Сам по себе вызов <CODE
+CLASS="FUNCTION"
+>PQgetResult</CODE
+> все же заставит клиента заблокироваться до те пор, пока сервер не завершит выполнение следующей <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>-команды. Этого можно избежать с помощью надлежащего использования ещё двух функций: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="LIBPQ-PQCONSUMEINPUT"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQconsumeInput</CODE
+></DT
+><DD
+><P
+>Если сервер готов передать данные, принять их. </P><PRE
+CLASS="SYNOPSIS"
+>int PQconsumeInput(PGconn *conn);</PRE
+><P></P
+><P
+><CODE
+CLASS="FUNCTION"
+>PQconsumeInput</CODE
+> обычно возвращает 1, показывая, что <SPAN
+CLASS="QUOTE"
+>"ошибки нет"</SPAN
+>, но возвращает 0, если имела место какая-либо проблема (в таком случае можно обратиться к функции <CODE
+CLASS="FUNCTION"
+>PQerrorMessage</CODE
+> за уточнением). Обратите внимание, что результат не говорит, были ли какие-либо входные данные фактически собраны. После вызова функции <CODE
+CLASS="FUNCTION"
+>PQconsumeInput</CODE
+> приложение может проверить <CODE
+CLASS="FUNCTION"
+>PQisBusy</CODE
+> и/или <CODE
+CLASS="FUNCTION"
+>PQnotifies</CODE
+>, чтобы посмотреть, не изменилось ли их состояние.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>PQconsumeInput</CODE
+> можно вызвать, даже если приложение ещё не готово иметь дело с результатом или уведомлением. Функция прочитает доступные данные и сохранит их в буфере, при этом обрабатывая условие готовности к чтению функции <CODE
+CLASS="FUNCTION"
+>select()</CODE
+>. Таким образом, приложение может использовать <CODE
+CLASS="FUNCTION"
+>PQconsumeInput</CODE
+>, чтобы немедленно обработать это состояние <CODE
+CLASS="FUNCTION"
+>select()</CODE
+>, а изучать результаты позже.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQISBUSY"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQisBusy</CODE
+></DT
+><DD
+><P
+>Возвращает 1, если команда занята работой, то есть функция <CODE
+CLASS="FUNCTION"
+>PQgetResult</CODE
+> была бы заблокирована в ожидании ввода. Возвращаемое значение 0 показывает, что функция <CODE
+CLASS="FUNCTION"
+>PQgetResult</CODE
+> при её вызове гарантированно не будет заблокирована. </P><PRE
+CLASS="SYNOPSIS"
+>int PQisBusy(PGconn *conn);</PRE
+><P></P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>PQisBusy</CODE
+> сама не будет пытаться прочитать данные с сервера; следовательно, сначала нужно вызвать <CODE
+CLASS="FUNCTION"
+>PQconsumeInput</CODE
+>, иначе состояние занятости никогда не прекратится.</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>В типичном приложении, использующем эти функции, будет главный цикл, в котором функции <CODE
+CLASS="FUNCTION"
+>select()</CODE
+> или <CODE
+CLASS="FUNCTION"
+>poll()</CODE
+> служат для организации ожидания наступления всех условий, на которые цикл должен отвечать. Одним из условий будет наличие ввода, доступного от сервера, что в терминах функции <CODE
+CLASS="FUNCTION"
+>select()</CODE
+> означает наличие данных, готовых для чтения на файловом дескрипторе, идентифицируемом с помощью <CODE
+CLASS="FUNCTION"
+>PQsocket</CODE
+>. Когда главный цикл обнаруживает ввод, готовый для чтения, он должен вызвать <CODE
+CLASS="FUNCTION"
+>PQconsumeInput</CODE
+>, чтобы прочитать этот ввод. Затем он может вызвать <CODE
+CLASS="FUNCTION"
+>PQisBusy</CODE
+>, а после неё уже <CODE
+CLASS="FUNCTION"
+>PQgetResult</CODE
+>, если <CODE
+CLASS="FUNCTION"
+>PQisBusy</CODE
+> возвратит "ложь" (0). Главный цикл может также вызвать <CODE
+CLASS="FUNCTION"
+>PQnotifies</CODE
+>, чтобы обнаружить сообщения <TT
+CLASS="COMMAND"
+>NOTIFY</TT
+> (см. <A
+HREF="libpq-notify.html"
+>Раздел 31.8</A
+>).</P
+><P
+>Клиент, который использует <CODE
+CLASS="FUNCTION"
+>PQsendQuery</CODE
+>/<CODE
+CLASS="FUNCTION"
+>PQgetResult</CODE
+>, может также попытаться отменить команду, которая все ещё обрабатывается сервером; см. <A
+HREF="libpq-cancel.html"
+>Раздел 31.6</A
+>. Но, независимо от возвращаемого значения функции <CODE
+CLASS="FUNCTION"
+>PQcancel</CODE
+>, приложение должно продолжать обычную последовательность операций чтения результатов запроса, используя <CODE
+CLASS="FUNCTION"
+>PQgetResult</CODE
+>. Успешная отмена просто заставит команду завершиться раньше, чем она сделала бы в противном случае.</P
+><P
+>Используя функции, описанные выше, можно избежать блокирования, ожидая ввода от сервера баз данных. Однако, все же возможно, что приложение будет заблокировано в ожидании отправки вывода на сервер. Это бывает относительно нечасто, но может иметь место, если отправлены очень длинные SQL-команды или значения данных. (Однако, это значительно более вероятно, если приложение отправляет данные через команду <TT
+CLASS="COMMAND"
+>COPY IN</TT
+>.) Чтобы предотвратить эту возможность и достичь совершенно неблокирующего режима работы с базой данных, можно использовать следующие дополнительные функции. <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="LIBPQ-PQSETNONBLOCKING"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQsetnonblocking</CODE
+></DT
+><DD
+><P
+>Устанавливает неблокирующий статус подключения. </P><PRE
+CLASS="SYNOPSIS"
+>int PQsetnonblocking(PGconn *conn, int arg);</PRE
+><P></P
+><P
+>Устанавливает состояние подключения как неблокирующее, если <TT
+CLASS="PARAMETER"
+>arg</TT
+> равен 1, или блокирующее, если <TT
+CLASS="PARAMETER"
+>arg</TT
+> равен 0. Возвращает 0 в случае успешного завершения и -1 в случае ошибки.</P
+><P
+>В неблокирующем состоянии вызовы <CODE
+CLASS="FUNCTION"
+>PQsendQuery</CODE
+>, <CODE
+CLASS="FUNCTION"
+>PQputline</CODE
+>, <CODE
+CLASS="FUNCTION"
+>PQputnbytes</CODE
+> и <CODE
+CLASS="FUNCTION"
+>PQendcopy</CODE
+> не будут блокироваться, а вместо этого возвратят ошибку, если данные функции требуется вызвать повторно.</P
+><P
+>Обратите внимание, что функция <CODE
+CLASS="FUNCTION"
+>PQexec</CODE
+> не соблюдает неблокирующего режима. Если она вызвана, то будет работать в блокирующей манере все равно.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQISNONBLOCKING"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQisnonblocking</CODE
+></DT
+><DD
+><P
+>Возвращает режим блокирования для подключения базы данных. </P><PRE
+CLASS="SYNOPSIS"
+>int PQisnonblocking(const PGconn *conn);</PRE
+><P></P
+><P
+>Возвращает 1, если подключение установлено в неблокирующем режиме, и 0, если режим блокирующий.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQFLUSH"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQflush</CODE
+></DT
+><DD
+><P
+>Пытается сбросить любые выходные данные, стоящие в очереди, на сервер. Возвращает 0 в случае успеха (или если очередь на отправку пуста), -1 в случае сбоя по какой-либо причине или 1, если она ещё не смогла отправить все данные, находящиеся в очереди (этот случай может иметь место, только если соединение неблокирующее). </P><PRE
+CLASS="SYNOPSIS"
+>int PQflush(PGconn *conn);</PRE
+><P></P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>После отправки любой команды или данных через неблокирующее подключение следует вызвать функцию <CODE
+CLASS="FUNCTION"
+>PQflush</CODE
+>. Если она возвратит 1, подождите, пока сокет станет готовым к записи, и вызовите её снова; повторяйте, пока не получите 0. Как только <CODE
+CLASS="FUNCTION"
+>PQflush</CODE
+> возвратит 0, подождите, пока сокет не станет готовым к чтению, а затем прочитайте ответ, как описано выше.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="libpq-exec.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="libpq-single-row-mode.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Функции для исполнения команд</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="libpq.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Построчное извлечение результатов запроса</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,505 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>          pg_depend
+        </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Системные каталоги"
+HREF="catalogs.html"><LINK
+REL="PREVIOUS"
+TITLE="          pg_default_acl
+        "
+HREF="catalog-pg-default-acl.html"><LINK
+REL="NEXT"
+TITLE="          pg_description
+        "
+HREF="catalog-pg-description.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="          pg_default_acl
+        "
+HREF="catalog-pg-default-acl.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 48. Системные каталоги</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="          pg_description
+        "
+HREF="catalog-pg-description.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CATALOG-PG-DEPEND"
+>48.18. <TT
+CLASS="STRUCTNAME"
+>pg_depend</TT
+></A
+></H1
+><P
+>В каталоге <TT
+CLASS="STRUCTNAME"
+>pg_depend</TT
+> записываются отношения зависимости между объектами базы данных. Благодаря этой информации, команды <TT
+CLASS="COMMAND"
+>DROP</TT
+> могут найти, какие объекты должны удаляться при использовании <TT
+CLASS="COMMAND"
+>DROP CASCADE</TT
+>, или когда нужно запрещать удаление при <TT
+CLASS="COMMAND"
+>DROP RESTRICT</TT
+>.</P
+><P
+>Также смотрите описание каталога <A
+HREF="catalog-pg-shdepend.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_shdepend</TT
+></A
+>, который играет подобную роль в отношении совместно используемых объектов в кластере баз данных.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="AEN97117"
+></A
+><P
+><B
+>Таблица 48-18. Колонки <TT
+CLASS="STRUCTNAME"
+>pg_depend</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип</TH
+><TH
+>Ссылки</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>classid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-class.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>OID системного каталога, в котором находится зависимый объект</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>objid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>любая колонка OID</TD
+><TD
+>OID определённого зависимого объекта</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>objsubid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int4</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Для колонки таблицы это номер колонки (<TT
+CLASS="STRUCTFIELD"
+>objid</TT
+> и <TT
+CLASS="STRUCTFIELD"
+>classid</TT
+> указывают на саму таблицу). Для всех других типов объектов это поле содержит ноль.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>refclassid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-class.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>OID системного каталога, в котором находится вышестоящий объект</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>refobjid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>любая колонка OID</TD
+><TD
+>OID определённого вышестоящего объекта</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>refobjsubid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int4</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Для колонки таблицы это номер колонки (<TT
+CLASS="STRUCTFIELD"
+>refobjid</TT
+> и <TT
+CLASS="STRUCTFIELD"
+>refclassid</TT
+> указывают на саму таблицу). Для всех других типов объектов это поле содержит ноль.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>deptype</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>char</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Код, определяющий конкретную семантику данного отношения зависимости; см. текст</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Во всех случаях, запись в <TT
+CLASS="STRUCTNAME"
+>pg_depend</TT
+> показывает, что вышестоящий объект нельзя удалить, не удаляя подчинённый объект. Однако есть несколько подвидов зависимости, задаваемых в поле <TT
+CLASS="STRUCTFIELD"
+>deptype</TT
+>: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="SYMBOL"
+>DEPENDENCY_NORMAL</TT
+> (<TT
+CLASS="LITERAL"
+>n</TT
+>)</DT
+><DD
+><P
+>Обычное отношение между отдельно создаваемыми объектами. Подчинённый объект можно удалить, не затрагивая вышестоящий объект. Вышестоящий объект можно удалить только с указанием <TT
+CLASS="LITERAL"
+>CASCADE</TT
+>, при этом будет удалён и подчинённый объект. Например, колонка таблицы находится в обычной зависимости от своего типа данных.</P
+></DD
+><DT
+><TT
+CLASS="SYMBOL"
+>DEPENDENCY_AUTO</TT
+> (<TT
+CLASS="LITERAL"
+>a</TT
+>)</DT
+><DD
+><P
+>Подчинённый объект может быть удалён отдельно от вышестоящего и должен быть удалён автоматически (вне зависимости от указаний <TT
+CLASS="LITERAL"
+>RESTRICT</TT
+> и <TT
+CLASS="LITERAL"
+>CASCADE</TT
+>), если удаляется вышестоящий объект. Например, именованное ограничение для таблицы находится в автоматической зависимости от таблицы, так что оно исчезнет при удалении таблицы.</P
+></DD
+><DT
+><TT
+CLASS="SYMBOL"
+>DEPENDENCY_INTERNAL</TT
+> (<TT
+CLASS="LITERAL"
+>i</TT
+>)</DT
+><DD
+><P
+>Подчинённый объект был создан в процессе создания вышестоящего и на самом деле является только частью его внутренней реализации. Для такого объекта будет запрещена команда <TT
+CLASS="COMMAND"
+>DROP</TT
+> (мы подскажем пользователю, что вместо него надо указать <TT
+CLASS="COMMAND"
+>DROP</TT
+> вышестоящий объект). Действие <TT
+CLASS="COMMAND"
+>DROP</TT
+> для вышестоящего объекта будет распространено и на этот подчинённый объект, вне зависимости от присутствия указания <TT
+CLASS="COMMAND"
+>CASCADE</TT
+>. Например, триггер, созданный для обеспечения ограничения внешнего ключа, становится внутренне зависимым от записи ограничения в <TT
+CLASS="STRUCTNAME"
+>pg_constraint</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="SYMBOL"
+>DEPENDENCY_EXTENSION</TT
+> (<TT
+CLASS="LITERAL"
+>e</TT
+>)</DT
+><DD
+><P
+>Подчинённый объект входит в состав <I
+CLASS="FIRSTTERM"
+>расширения</I
+>, которое является вышестоящим объектом (см. <A
+HREF="catalog-pg-extension.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_extension</TT
+></A
+>). Удалить подчинённый объект можно, только выполнив команду <TT
+CLASS="COMMAND"
+>DROP EXTENSION</TT
+> для вышестоящего объекта. Функционально этот тип зависимости действует так же, как и внутренняя зависимость, но он выделен для наглядности и упрощения <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+>.</P
+></DD
+><DT
+><TT
+CLASS="SYMBOL"
+>DEPENDENCY_PIN</TT
+> (<TT
+CLASS="LITERAL"
+>p</TT
+>)</DT
+><DD
+><P
+>Зависимый объект отсутствует; этот тип записи показывает, что система сама зависит от вышестоящего объекта, так что этот объект нельзя удалять ни при каких условиях. Записи этого типа создаются только командой <TT
+CLASS="COMMAND"
+>initdb</TT
+>. Поля зависимого объекта в такой записи содержат нули.</P
+></DD
+></DL
+></DIV
+><P> В будущем могут появиться и другие подвиды зависимости.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="catalog-pg-default-acl.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="catalog-pg-description.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_default_acl</TT
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_description</TT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

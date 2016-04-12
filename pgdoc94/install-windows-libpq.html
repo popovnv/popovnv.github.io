@@ -1,0 +1,333 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Сборка libpq с помощью Visual C++ или Borland C++</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Установка из исходного кода в Windows"
+HREF="install-windows.html"><LINK
+REL="PREVIOUS"
+TITLE="Сборка с помощью Visual C++ или Microsoft Windows SDK"
+HREF="install-windows-full.html"><LINK
+REL="NEXT"
+TITLE="Подготовка к работе и сопровождение сервера"
+HREF="runtime.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Сборка с помощью Visual C++ или Microsoft Windows SDK"
+HREF="install-windows-full.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="install-windows.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 16. Установка из исходного кода в <SPAN
+CLASS="PRODUCTNAME"
+>Windows</SPAN
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Подготовка к работе и сопровождение сервера"
+HREF="runtime.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="INSTALL-WINDOWS-LIBPQ"
+>16.2. Сборка <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> с помощью <SPAN
+CLASS="PRODUCTNAME"
+>Visual C++</SPAN
+> или <SPAN
+CLASS="PRODUCTNAME"
+>Borland C++</SPAN
+></A
+></H1
+><P
+>Использовать <SPAN
+CLASS="PRODUCTNAME"
+>Visual C++ 7.1-9.0</SPAN
+> или <SPAN
+CLASS="PRODUCTNAME"
+>Borland C++</SPAN
+> для компиляции libpq рекомендуется, только если вам нужна версия с другими флагами для отладки/выпуска, либо вам нужна статическая библиотека для компоновки приложения. Для нормального использования рекомендуется вариант сборки с <SPAN
+CLASS="PRODUCTNAME"
+>MinGW</SPAN
+>, либо <SPAN
+CLASS="PRODUCTNAME"
+>Visual Studio</SPAN
+>, либо <SPAN
+CLASS="PRODUCTNAME"
+>Windows SDK</SPAN
+>.</P
+><P
+>Чтобы собрать клиентскую библиотеку <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>, используя <SPAN
+CLASS="PRODUCTNAME"
+>Visual Studio 7.1</SPAN
+> или новее, перейдите в каталог <TT
+CLASS="FILENAME"
+>src</TT
+> и введите команду: </P><PRE
+CLASS="SCREEN"
+><KBD
+CLASS="USERINPUT"
+>nmake /f win32.mak</KBD
+></PRE
+><P></P
+><P
+>Чтобы собрать 64-битную версию клиентской библиотеки <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>, используя <SPAN
+CLASS="PRODUCTNAME"
+>Visual Studio 8.0</SPAN
+> или выше, перейдите в каталог <TT
+CLASS="FILENAME"
+>src</TT
+> и введите команду: </P><PRE
+CLASS="SCREEN"
+><KBD
+CLASS="USERINPUT"
+>nmake /f win32.mak CPU=AMD64</KBD
+></PRE
+><P> Подробнее узнать о поддерживаемых переменных можно в файле <TT
+CLASS="FILENAME"
+>win32.mak</TT
+>.</P
+><P
+>Чтобы собрать клиентскую библиотеку <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>, используя <SPAN
+CLASS="PRODUCTNAME"
+>Borland C++</SPAN
+>, перейдите в каталог <TT
+CLASS="FILENAME"
+>src</TT
+> и введите команду: </P><PRE
+CLASS="SCREEN"
+><KBD
+CLASS="USERINPUT"
+>make -N -DCFG=Release /f bcc32.mak</KBD
+></PRE
+><P></P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN28080"
+>16.2.1. Генерируемые файлы</A
+></H2
+><P
+>При сборке будут получены следующие файлы: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="FILENAME"
+>interfaces\libpq\Release\libpq.dll</TT
+></DT
+><DD
+><P
+>Динамически связываемая клиентская библиотека</P
+></DD
+><DT
+><TT
+CLASS="FILENAME"
+>interfaces\libpq\Release\libpqdll.lib</TT
+></DT
+><DD
+><P
+>Библиотека импорта для связывания программ с <TT
+CLASS="FILENAME"
+>libpq.dll</TT
+></P
+></DD
+><DT
+><TT
+CLASS="FILENAME"
+>interfaces\libpq\Release\libpq.lib</TT
+></DT
+><DD
+><P
+>Статическая версия клиентской библиотеки</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>Обычно устанавливать какие-либо клиентские файлы не требуется. Достаточно поместить файл <TT
+CLASS="FILENAME"
+>libpq.dll</TT
+> в тот каталог, где находится исполняемый файл приложения. Не устанавливайте <TT
+CLASS="FILENAME"
+>libpq.dll</TT
+> в каталоги Windows, <TT
+CLASS="FILENAME"
+>System</TT
+> или <TT
+CLASS="FILENAME"
+>System32</TT
+>, если только это не абсолютно необходимо. Если эта библиотека устанавливается программой setup, при установке нужно проверить версию по содержимому включённого в неё ресурса <TT
+CLASS="SYMBOL"
+>VERSIONINFO</TT
+>, чтобы более новая версия библиотеки не была заменена старой.</P
+><P
+>Если вы планируете разрабатывать программы, использующие <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> в текущей системе, вы должны добавить подкаталоги <TT
+CLASS="FILENAME"
+>src\include</TT
+> и <TT
+CLASS="FILENAME"
+>src\interfaces\libpq</TT
+> в путь поиска заголовочных файлов для компилятора.</P
+><P
+>Чтобы использовать данную библиотеку, вы должны добавить файл <TT
+CLASS="FILENAME"
+>libpqdll.lib</TT
+> в ваш проект. (В Visual C++ просто щёлкните проект правой кнопкой и выберите соответствующее действие.)</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="install-windows-full.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="runtime.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Сборка с помощью <SPAN
+CLASS="PRODUCTNAME"
+>Visual C++</SPAN
+> или <SPAN
+CLASS="PRODUCTNAME"
+>Microsoft Windows SDK</SPAN
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="install-windows.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Подготовка к работе и сопровождение сервера</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

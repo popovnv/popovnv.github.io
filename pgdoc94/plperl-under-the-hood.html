@@ -1,0 +1,350 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Внутренние особенности PL/Perl</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="PL/Perl — процедурный язык Perl"
+HREF="plperl.html"><LINK
+REL="PREVIOUS"
+TITLE="Событийные триггеры на PL/Perl"
+HREF="plperl-event-triggers.html"><LINK
+REL="NEXT"
+TITLE="PL/Python — процедурный язык Python"
+HREF="plpython.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Событийные триггеры на PL/Perl"
+HREF="plperl-event-triggers.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="plperl.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 42. PL/Perl — процедурный язык Perl</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="PL/Python — процедурный язык Python"
+HREF="plpython.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="PLPERL-UNDER-THE-HOOD"
+>42.8. Внутренние особенности PL/Perl</A
+></H1
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="PLPERL-CONFIG"
+>42.8.1. Конфигурирование</A
+></H2
+><P
+>В этом разделе описываются параметры конфигурации, влияющие на работу <SPAN
+CLASS="APPLICATION"
+>PL/Perl</SPAN
+>.</P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="GUC-PLPERL-ON-INIT"
+></A
+><TT
+CLASS="VARNAME"
+>plperl.on_init</TT
+> (<TT
+CLASS="TYPE"
+>string</TT
+>) </DT
+><DD
+><P
+>Задаёт код Perl, который будет выполняться при первой инициализации интерпретатора Perl, до того, как он получает специализацию <TT
+CLASS="LITERAL"
+>plperl</TT
+> или <TT
+CLASS="LITERAL"
+>plperlu</TT
+>. Когда этот код выполняется, функции SPI ещё не доступны. Если выполнение кода завершается ошибкой, инициализация интерпретатора прерывается и ошибка распространяется в вызывающий запрос, в результате чего текущая транзакция или подтранзакция прерывается.</P
+><P
+>Размер этого кода ограничивается одной строкой. Более объёмный код можно поместить в модуль и загрузить этот модуль в строке <TT
+CLASS="LITERAL"
+>on_init</TT
+>. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>plperl.on_init = 'require "plperlinit.pl"'
+plperl.on_init = 'use lib "/my/app"; use MyApp::PgInit;'</PRE
+><P></P
+><P
+>Любые модули, загруженные в <TT
+CLASS="LITERAL"
+>plperl.on_init</TT
+>, явно или неявно, будут доступны для использования в коде на языке <TT
+CLASS="LITERAL"
+>plperl</TT
+>. Это может создать угрозу безопасности. Чтобы определить, какие модули были загружены, можно выполнить: </P><PRE
+CLASS="PROGRAMLISTING"
+>DO 'elog(WARNING, join ", ", sort keys %INC)' LANGUAGE plperl;</PRE
+><P></P
+><P
+>Если библиотека plperl включена в <A
+HREF="runtime-config-client.html#GUC-SHARED-PRELOAD-LIBRARIES"
+>shared_preload_libraries</A
+>, инициализация произойдёт в главном процессе (postmaster) и в этом случае необходимо очень серьёзно оценить риск нарушения работоспособности этого процесса. Основной смысл использовать эту возможность в том, чтобы модули Perl, подключаемые в <TT
+CLASS="LITERAL"
+>plperl.on_init</TT
+>, загружались только при запуске главного процесса, и это исключало бы издержки загрузки для отдельных сеансов. Однако, имейте в виду, что эти издержки исключаются только при загрузке в сеансе первого интерпретатора Perl &mdash; будь то PL/PerlU или PL/Perl для первой SQL-роли, вызывающей функцию на PL/Perl. Любые дополнительные интерпретаторы Perl, создаваемые в сеансе базы данных, должны будут выполнять <TT
+CLASS="LITERAL"
+>plperl.on_init</TT
+> заново. Также учтите, что в Windows предварительная загрузка не даёт никакого выигрыша, так как интерпретатор Perl, созданный в главном процессе, не передаётся дочерним процессам.</P
+><P
+>Задать этот параметр можно только в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+> или в командной строке при запуске сервера.</P
+></DD
+><DT
+><A
+NAME="GUC-PLPERL-ON-PLPERL-INIT"
+></A
+><TT
+CLASS="VARNAME"
+>plperl.on_plperl_init</TT
+> (<TT
+CLASS="TYPE"
+>string</TT
+>) <BR><TT
+CLASS="VARNAME"
+>plperl.on_plperlu_init</TT
+> (<TT
+CLASS="TYPE"
+>string</TT
+>) </DT
+><DD
+><P
+>В этих параметрах задаётся код Perl, который будет выполняться в момент, когда интерпретатор Perl получает специализацию <TT
+CLASS="LITERAL"
+>plperl</TT
+> или <TT
+CLASS="LITERAL"
+>plperlu</TT
+>, соответственно. Это произойдёт, когда в рамках сеанса будет первый раз вызвана функция на PL/Perl или PL/PerlU, либо когда потребуется дополнительный интерпретатор при использовании другого языка или при вызове функции PL/Perl новой SQL-ролью. Этот код выполняется после инициализации, произведённой в <TT
+CLASS="LITERAL"
+>plperl.on_init</TT
+>. Однако функции SPI в момент исполнения этого кода ещё не доступны. Код в <TT
+CLASS="LITERAL"
+>plperl.on_plperl_init</TT
+> запускается после того, как интерпретатор <SPAN
+CLASS="QUOTE"
+>"помещается под замок"</SPAN
+>, так что в нём разрешаются только доверенные операции.</P
+><P
+>Если этот код завершается ошибкой, инициализация прерывается и ошибка распространяется в вызывающий запрос, что приводит к прерыванию текущей транзакции или подтранзакции. При этом любые действия, уже произведённые в Perl, не будут отменены; однако использоваться этот интерпретатор больше не будет. При следующей попытке использовать этот язык система попытается заново инициализировать свежий интерпретатор Perl.</P
+><P
+>Изменять эти параметры разрешено только суперпользователям. Хотя изменить их можно в рамках сеанса, такие изменения не повлияют на работу интерпретаторов Perl, задействованных для выполнения функций ранее.</P
+></DD
+><DT
+><A
+NAME="GUC-PLPERL-USE-STRICT"
+></A
+><TT
+CLASS="VARNAME"
+>plperl.use_strict</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>При значении, равном true, последующая компиляция функций PL/Perl будет выполняться с включённым указанием <TT
+CLASS="LITERAL"
+>strict</TT
+>. Этот параметр не влияет на функции, уже скомпилированные в текущем сеансе.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="PLPERL-MISSING"
+>42.8.2. Ограничения и недостающие возможности</A
+></H2
+><P
+>Следующие возможности в настоящее время в PL/Perl отсутствуют, но их реализация будет желанной доработкой. <P
+></P
+></P><UL
+><LI
+><P
+>Функции на PL/Perl не могут напрямую вызывать друг друга.</P
+></LI
+><LI
+><P
+>SPI ещё не полностью реализован.</P
+></LI
+><LI
+><P
+>Если вы выбираете очень большие наборы данных, используя <TT
+CLASS="LITERAL"
+>spi_exec_query</TT
+>, вы должны понимать, что все эти данные загружаются в память. Вы можете избежать этого, используя пару функций <TT
+CLASS="LITERAL"
+>spi_query</TT
+>/<TT
+CLASS="LITERAL"
+>spi_fetchrow</TT
+>, как показано ранее.</P
+><P
+>Похожая проблема возникает, если функция, возвращающая множество, передаёт в PostgreSQL большое число строк, выполняя <TT
+CLASS="LITERAL"
+>return</TT
+>. Этой проблемы так же можно избежать, выполняя для каждой возвращаемой строки <TT
+CLASS="LITERAL"
+>return_next</TT
+>, как показано ранее.</P
+></LI
+><LI
+><P
+>Когда сеанс завершается штатно, не по причине критической ошибки, в Perl выполняются все блоки <TT
+CLASS="LITERAL"
+>END</TT
+>, которые были определены. Никакие другие действия в настоящее время не выполняются. В частности, буферы файлов автоматически не сбрасываются и объекты автоматически не уничтожаются.</P
+></LI
+></UL
+><P></P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="plperl-event-triggers.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="plpython.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Событийные триггеры на PL/Perl</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="plperl.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>PL/Python — процедурный язык Python</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

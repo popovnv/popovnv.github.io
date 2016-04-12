@@ -1,0 +1,231 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Концепция</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="ECPG — встраиваемый SQL в C"
+HREF="ecpg.html"><LINK
+REL="PREVIOUS"
+TITLE="ECPG — встраиваемый SQL в C"
+HREF="ecpg.html"><LINK
+REL="NEXT"
+TITLE="Управление подключениями к базе данных"
+HREF="ecpg-connect.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="ECPG — встраиваемый SQL в C"
+HREF="ecpg.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ecpg.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 33. <SPAN
+CLASS="APPLICATION"
+>ECPG</SPAN
+> — встраиваемый <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> в C</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Управление подключениями к базе данных"
+HREF="ecpg-connect.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="ECPG-CONCEPT"
+>33.1. Концепция</A
+></H1
+><P
+>Программа со встраиваемым SQL состоит из кода, написанного на обычном языке программирования, в данном случае, С, дополненного командами SQL в специально обозначенных секциях. Чтобы собрать программу, её исходный код (<TT
+CLASS="FILENAME"
+>*.pgc</TT
+>) сначала нужно пропустить через препроцессор встраиваемого SQL, который превратит её в обычную программу на C (<TT
+CLASS="FILENAME"
+>*.c</TT
+>), которую затем сможет обработать компилятор C. (Подробнее компиляция и компоновка описывается в <A
+HREF="ecpg-process.html"
+>Разделе 33.10</A
+>). Преобразованные приложения ECPG вызывают функции в библиотеке libpq через библиотеку встраиваемого SQL (ecpglib) и взаимодействуют с сервером PostgreSQL по обычному клиент-серверному протоколу.</P
+><P
+>Встраиваемый <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> имеет ряд преимуществ по сравнению с другими методами вызова команд <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> из кода C. Во-первых, этот механизм берёт на себя заботу о передаче информации через переменные в программе на <ACRONYM
+CLASS="ACRONYM"
+>C</ACRONYM
+>. Во-вторых, код SQL в программе проверяется на синтаксическую правильность во время сборки. В-третьих, встраиваемый <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> в C описан стандартом <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> и поддерживается многими другими СУБД <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>. Реализация в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> разработана так, чтобы максимально соответствовать этому стандарту, поэтому обычно достаточно легко портировать в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> программы с встраиваемым <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>, написанные для других СУБД.</P
+><P
+>Как уже сказано, программы, написанные для интерфейса встраиваемого <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>, представляют собой обычные программы на C с добавленным специальным кодом, который выполняет действия, связанные с базой данных. Этот специальный код всегда имеет следующую форму: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL ...;</PRE
+><P> Такие операторы синтаксически занимают место операторов C. В зависимости от конкретного оператора, они могут размещаться на глобальном уровне или внутри функции. Встраиваемые операторы <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> следуют правилам учёта регистра, принятым в обычном коде <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>, а не в C. Они также допускают вложенные комментарии в стиле C, разрешённые стандартом SQL. Однако остальная часть программы, написанная на C, в соответствии со стандартом C содержать вложенные комментарии не может.</P
+><P
+>Все встраиваемые операторы SQL рассматриваются в следующих разделах.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ecpg.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ecpg-connect.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><SPAN
+CLASS="APPLICATION"
+>ECPG</SPAN
+> — встраиваемый <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> в C</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ecpg.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Управление подключениями к базе данных</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

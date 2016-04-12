@@ -1,0 +1,619 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Операторы сравнения</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Функции и операторы"
+HREF="functions.html"><LINK
+REL="PREVIOUS"
+TITLE="Логические операторы"
+HREF="functions-logical.html"><LINK
+REL="NEXT"
+TITLE="Математические функции и операторы"
+HREF="functions-math.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Логические операторы"
+HREF="functions-logical.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 9. Функции и операторы</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Математические функции и операторы"
+HREF="functions-math.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="FUNCTIONS-COMPARISON"
+>9.2. Операторы сравнения</A
+></H1
+><P
+>Набор операторов сравнения включает обычные операторы, перечисленные в таблице <A
+HREF="functions-comparison.html#FUNCTIONS-COMPARISON-TABLE"
+>Таблице 9-1</A
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-COMPARISON-TABLE"
+></A
+><P
+><B
+>Таблица 9-1. Операторы сравнения</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+>Оператор</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>&lt;</TT
+> </TD
+><TD
+>меньше</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>&gt;</TT
+> </TD
+><TD
+>больше</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>&lt;=</TT
+> </TD
+><TD
+>меньше или равно</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>&gt;=</TT
+> </TD
+><TD
+>больше или равно</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>=</TT
+> </TD
+><TD
+>равно</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>&lt;&gt;</TT
+> или <TT
+CLASS="LITERAL"
+>!=</TT
+></TD
+><TD
+>не равно</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Оператор <TT
+CLASS="LITERAL"
+>!=</TT
+> преобразуется в <TT
+CLASS="LITERAL"
+>&lt;&gt;</TT
+> на стадии разбора запроса. Как следствие, реализовать операторы <TT
+CLASS="LITERAL"
+>!=</TT
+> и <TT
+CLASS="LITERAL"
+>&lt;&gt;</TT
+> по-разному невозможно.</P
+></BLOCKQUOTE
+></DIV
+><P
+>Операторы сравнения определены для всех типов данных, для которых они имеют смысл. Все операторы сравнения представляют собой бинарные операторы, возвращающие значения типа <TT
+CLASS="TYPE"
+>boolean</TT
+>; при этом выражения вида <TT
+CLASS="LITERAL"
+>1 &lt; 2 &lt; 3</TT
+> недопустимы (так как не существует оператора <TT
+CLASS="LITERAL"
+>&lt;</TT
+>, который бы сравнивал булево значение с <TT
+CLASS="LITERAL"
+>3</TT
+>).</P
+><P
+> Операторы сравнения дополняет специальная конструкция <TT
+CLASS="TOKEN"
+>BETWEEN</TT
+>: </P><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>a</I
+></TT
+> BETWEEN <TT
+CLASS="REPLACEABLE"
+><I
+>x</I
+></TT
+> AND <TT
+CLASS="REPLACEABLE"
+><I
+>y</I
+></TT
+></PRE
+><P> равнозначно выражению </P><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>a</I
+></TT
+> &gt;= <TT
+CLASS="REPLACEABLE"
+><I
+>x</I
+></TT
+> AND <TT
+CLASS="REPLACEABLE"
+><I
+>a</I
+></TT
+> &lt;= <TT
+CLASS="REPLACEABLE"
+><I
+>y</I
+></TT
+></PRE
+><P> Заметьте, что <TT
+CLASS="TOKEN"
+>BETWEEN</TT
+> считает, что границы интервала также включаются в интервал. <TT
+CLASS="LITERAL"
+>NOT BETWEEN</TT
+> выполняет противоположное сравнение: </P><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>a</I
+></TT
+> NOT BETWEEN <TT
+CLASS="REPLACEABLE"
+><I
+>x</I
+></TT
+> AND <TT
+CLASS="REPLACEABLE"
+><I
+>y</I
+></TT
+></PRE
+><P> равнозначно выражению </P><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>a</I
+></TT
+> &lt; <TT
+CLASS="REPLACEABLE"
+><I
+>x</I
+></TT
+> OR <TT
+CLASS="REPLACEABLE"
+><I
+>a</I
+></TT
+> &gt; <TT
+CLASS="REPLACEABLE"
+><I
+>y</I
+></TT
+></PRE
+><P>
+Конструкция <TT
+CLASS="LITERAL"
+>BETWEEN SYMMETRIC</TT
+> аналогична <TT
+CLASS="LITERAL"
+>BETWEEN</TT
+>, за исключением того, что аргумент слева от <TT
+CLASS="LITERAL"
+>AND</TT
+> не обязательно должен быть меньше или равен аргументу справа. Если это не так, аргументы автоматически меняются местами, то есть интервал всегда будет не пустым.</P
+><P
+> Для проверки, содержит ли значение NULL или нет, используются конструкции: </P><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> IS NULL
+<TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> IS NOT NULL</PRE
+><P> или равнозначные (но нестандартные) конструкции: </P><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> ISNULL
+<TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> NOTNULL</PRE
+><P></P
+><P
+>Заметьте, что проверка <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> = NULL</TT
+> <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>не</I
+></SPAN
+> будет работать, так как <TT
+CLASS="LITERAL"
+>NULL</TT
+> считается <SPAN
+CLASS="QUOTE"
+>"не равным"</SPAN
+> <TT
+CLASS="LITERAL"
+>NULL</TT
+>. (Значение NULL представляет неопределённость и равны ли две неопределённости, тоже не определено.) Это поведение полностью соответствует стандарту SQL.</P
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>Некоторые приложения могут ожидать, что <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> = NULL</TT
+> вернёт true, если результатом <TT
+CLASS="REPLACEABLE"
+><I
+>выражения</I
+></TT
+> является NULL. Такие приложения настоятельно рекомендуется исправить и привести в соответствие со стандартом SQL. Однако, в случаях, когда это невозможно, это поведение можно изменить с помощью параметра конфигурации <A
+HREF="runtime-config-compatible.html#GUC-TRANSFORM-NULL-EQUALS"
+>transform_null_equals</A
+>. Когда этот параметр включён, <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> преобразует условие <TT
+CLASS="LITERAL"
+>x = NULL</TT
+> в <TT
+CLASS="LITERAL"
+>x IS NULL</TT
+>.</P
+></BLOCKQUOTE
+></DIV
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Если <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> возвращает табличную строку, тогда условие <TT
+CLASS="LITERAL"
+>IS NULL</TT
+> будет истинным, когда само выражение равно NULL или все поля строки равны NULL, а <TT
+CLASS="LITERAL"
+>IS NOT NULL</TT
+> будет истинным, когда выражение не равно NULL и все поля строки также не NULL. Вследствие такого определения, <TT
+CLASS="LITERAL"
+>IS NULL</TT
+> и <TT
+CLASS="LITERAL"
+>IS NOT NULL</TT
+> не всегда будут возвращать взаимодополняющие результаты для таких выражений, так как для строк, одни поля которых NULL, а другие не NULL, оба условия будут ложными. Это поведение соответствует стандарту SQL и отличается от того, как это было реализовано в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> до версии 8.2.</P
+></BLOCKQUOTE
+></DIV
+><P
+> Обычные операторы сравнения выдают NULL (что означает <SPAN
+CLASS="QUOTE"
+>"неопределённость"</SPAN
+>), а не true или false, когда любое из сравниваемых значений NULL. Например, <TT
+CLASS="LITERAL"
+>7 = NULL</TT
+> выдаёт NULL, так же, как и <TT
+CLASS="LITERAL"
+>7 &lt;&gt; NULL</TT
+>. Когда это поведение нежелательно, можно использовать конструкции <TT
+CLASS="LITERAL"
+>IS [<SPAN
+CLASS="OPTIONAL"
+> NOT </SPAN
+>] DISTINCT FROM</TT
+>: </P><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> IS DISTINCT FROM <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+>
+<TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> IS NOT DISTINCT FROM <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+></PRE
+><P> Для значений не NULL условие <TT
+CLASS="LITERAL"
+>IS DISTINCT FROM</TT
+> работает так же, как оператор <TT
+CLASS="LITERAL"
+>&lt;&gt;</TT
+>. Однако, если оба сравниваемых значения NULL, результат будет false, и только если одно из значений NULL, возвращается true. Аналогично, условие <TT
+CLASS="LITERAL"
+>IS NOT DISTINCT FROM</TT
+> равносильно <TT
+CLASS="LITERAL"
+>=</TT
+> для значений не NULL, но возвращает true, если оба сравниваемых значения NULL и false в противном случае. Таким образом, эти конструкции по сути работают с NULL, как с обычным значением, а не с <SPAN
+CLASS="QUOTE"
+>"неопределённостью"</SPAN
+>.</P
+><P
+> Логические значения можно также проверить с помощью условий </P><PRE
+CLASS="SYNOPSIS"
+><TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> IS TRUE
+<TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> IS NOT TRUE
+<TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> IS FALSE
+<TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> IS NOT FALSE
+<TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> IS UNKNOWN
+<TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> IS NOT UNKNOWN</PRE
+><P> Они всегда возвращают true или false и никогда NULL, даже если какой-любо операнд NULL. Они интерпретируют значение NULL как <SPAN
+CLASS="QUOTE"
+>"неизвестное"</SPAN
+> логическое состояние. Заметьте, что <TT
+CLASS="LITERAL"
+>IS UNKNOWN</TT
+> и <TT
+CLASS="LITERAL"
+>IS NOT UNKNOWN</TT
+> по сути равнозначны <TT
+CLASS="LITERAL"
+>IS NULL</TT
+> и <TT
+CLASS="LITERAL"
+>IS NOT NULL</TT
+>, соответственно, за исключением того, что выражение может быть только булевого типа.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions-logical.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="functions-math.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Логические операторы</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Математические функции и операторы</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

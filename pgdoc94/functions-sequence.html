@@ -1,0 +1,623 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Функции для работы с последовательностями</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Функции и операторы"
+HREF="functions.html"><LINK
+REL="PREVIOUS"
+TITLE="Функции и операторы JSON"
+HREF="functions-json.html"><LINK
+REL="NEXT"
+TITLE="Условные выражения"
+HREF="functions-conditional.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Функции и операторы JSON"
+HREF="functions-json.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 9. Функции и операторы</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Условные выражения"
+HREF="functions-conditional.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="FUNCTIONS-SEQUENCE"
+>9.16. Функции для работы с последовательностями</A
+></H1
+><P
+>В этом разделе описаны функции для работы с объектами, представляющими <I
+CLASS="FIRSTTERM"
+>последовательности</I
+>. Такие объекты (также называемыми генераторами последовательностей или просто последовательностями) являются специальными таблицами из одной строки и создаются командой <A
+HREF="sql-createsequence.html"
+>CREATE SEQUENCE</A
+>. Используются они обычно для получения уникальных идентификаторов строк таблицы. Функции, перечисленные в <A
+HREF="functions-sequence.html#FUNCTIONS-SEQUENCE-TABLE"
+>Таблице 9-44</A
+>, предоставляют простые и безопасные для параллельного использования методы получения очередных значений таких последовательностей.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-SEQUENCE-TABLE"
+></A
+><P
+><B
+>Таблица 9-44. Функции для работы с последовательностями</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Функция</TH
+><TH
+>Тип результата</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>currval(<TT
+CLASS="TYPE"
+>regclass</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                </TD
+><TD
+>Выдаёт значение заданной последовательности, которое было возвращено при последнем вызове функции <CODE
+CLASS="FUNCTION"
+>nextval</CODE
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>lastval()</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                </TD
+><TD
+>Выдаёт значение любой последовательности, которое было возвращено при последнем вызове функции <CODE
+CLASS="FUNCTION"
+>nextval</CODE
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>nextval(<TT
+CLASS="TYPE"
+>regclass</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                </TD
+><TD
+>Продвигает последовательность к следующему значению и возвращает его</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>setval(<TT
+CLASS="TYPE"
+>regclass</TT
+>, <TT
+CLASS="TYPE"
+>bigint</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                </TD
+><TD
+>Устанавливает текущее значение последовательности</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>setval(<TT
+CLASS="TYPE"
+>regclass</TT
+>, <TT
+CLASS="TYPE"
+>bigint</TT
+>, <TT
+CLASS="TYPE"
+>boolean</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                </TD
+><TD
+>Устанавливает текущее значение последовательности и флаг <TT
+CLASS="LITERAL"
+>is_called</TT
+>, указывающий на то, что это значение использовалось</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Последовательность, к которой будет обращаться одна из этих функций, определяется аргументом <TT
+CLASS="TYPE"
+>regclass</TT
+>, задающим просто OID последовательности в системном каталоге <TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+>. Вычислять этот OID вручную не нужно, так как процедура ввода данных <TT
+CLASS="TYPE"
+>regclass</TT
+> автоматически выполнит эту работу за вас. Просто запишите имя последовательности в апострофах, чтобы оно выглядело как строковая константа. Для совместимости с обычными именами <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> эта строка будет переведена в нижний регистр, если только она не заключена в кавычки. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>nextval('foo')      <I
+CLASS="LINEANNOTATION"
+>обращается к последовательности <TT
+CLASS="LITERAL"
+>foo</TT
+></I
+>
+nextval('FOO')      <I
+CLASS="LINEANNOTATION"
+>обращается к последовательности <TT
+CLASS="LITERAL"
+>foo</TT
+></I
+>
+nextval('"Foo"')    <I
+CLASS="LINEANNOTATION"
+>обращается к последовательности <TT
+CLASS="LITERAL"
+>Foo</TT
+></I
+></PRE
+><P> При необходимости имя последовательности можно дополнить именем схемы: </P><PRE
+CLASS="PROGRAMLISTING"
+>nextval('myschema.foo')     <I
+CLASS="LINEANNOTATION"
+>обращается к <TT
+CLASS="LITERAL"
+>myschema.foo</TT
+></I
+>
+nextval('"myschema".foo')   <I
+CLASS="LINEANNOTATION"
+>то же самое</I
+>
+nextval('foo')              <I
+CLASS="LINEANNOTATION"
+>ищет <TT
+CLASS="LITERAL"
+>foo</TT
+> в пути поиска</I
+></PRE
+><P> Подробнее тип <TT
+CLASS="TYPE"
+>regclass</TT
+> описан в <A
+HREF="datatype-oid.html"
+>Разделе 8.18</A
+>.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> до версии 8.1 аргументы этих функций имели тип <TT
+CLASS="TYPE"
+>text</TT
+>, а не <TT
+CLASS="TYPE"
+>regclass</TT
+>, и поэтому описанное выше преобразование текстовой строки в OID имело место при каждом вызове функции. Это поведение сохраняется и сейчас для обратной совместимости, но сейчас оно реализовано как неявное приведение типа <TT
+CLASS="TYPE"
+>text</TT
+> к типу <TT
+CLASS="TYPE"
+>regclass</TT
+> перед вызовом функции.</P
+><P
+>Когда вы записываете аргумент функции, работающей с последовательностью, как текстовую строку в чистом виде, она становится константой типа <TT
+CLASS="TYPE"
+>regclass</TT
+>. Так как фактически это будет просто значение OID, оно будет привязано к изначально идентифицированной последовательности, несмотря на то, что она может быть переименована, перенесена в другую схему и т. д. Такое <SPAN
+CLASS="QUOTE"
+>"раннее связывание"</SPAN
+> обычно желательно для ссылок на последовательности в значениях колонок по умолчанию и представлениях. Но иногда возникает необходимость в <SPAN
+CLASS="QUOTE"
+>"позднем связывании"</SPAN
+>, когда ссылки на последовательности распознаются в процессе выполнения. Чтобы получить такое поведение, нужно принудительно изменить тип константы с <TT
+CLASS="TYPE"
+>regclass</TT
+> на <TT
+CLASS="TYPE"
+>text</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>nextval('foo'::text)      <I
+CLASS="LINEANNOTATION"
+><TT
+CLASS="LITERAL"
+>foo</TT
+> распознаётся во время выполнения</I
+></PRE
+><P> Заметьте, что версии <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> до 8.1 поддерживали только позднее связывание, так что это может быть полезно и для совместимости со старыми приложениями.</P
+><P
+>Конечно же, аргументом таких функций может быть не только константа, но и выражение. Если это выражение текстового типа, неявное приведение типов повлечёт разрешение имени во время выполнения.</P
+></BLOCKQUOTE
+></DIV
+><P
+>Ниже описаны все функции, предназначенные для работы с последовательностями: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><CODE
+CLASS="FUNCTION"
+>nextval</CODE
+></DT
+><DD
+><P
+>Продвигает последовательность к следующему значению и возвращает его. Это атомарная операция: если <CODE
+CLASS="FUNCTION"
+>nextval</CODE
+> вызывается одновременно в нескольких сеансах, в результате каждого вызова будут гарантированно получены разные значения.</P
+><P
+>Если последовательность создаётся с параметрами по умолчанию, успешные вызовы <CODE
+CLASS="FUNCTION"
+>nextval</CODE
+> получают очередные значения по возрастанию, начиная с 1. Другое поведение можно получить с помощью специальных параметров в команде <A
+HREF="sql-createsequence.html"
+>CREATE SEQUENCE</A
+>; подробнее это описано на странице описания команды.</P
+><DIV
+CLASS="IMPORTANT"
+><BLOCKQUOTE
+CLASS="IMPORTANT"
+><P
+><B
+>Важно: </B
+>Во избежания блокирования параллельных транзакций, пытающихся получить значения одной последовательности, операция <CODE
+CLASS="FUNCTION"
+>nextval</CODE
+> никогда не откатывается; т. е., как только значение было выбрано, оно считается использованным, даже если транзакция, выполнившая <CODE
+CLASS="FUNCTION"
+>nextval</CODE
+>, позже будет прервана. Это означает, что прерванные транзакции могут оставлять <SPAN
+CLASS="QUOTE"
+>"дыры"</SPAN
+> в последовательности задействованных значений.</P
+></BLOCKQUOTE
+></DIV
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>currval</CODE
+></DT
+><DD
+><P
+>Возвращает значение, выданное при последнем вызове <CODE
+CLASS="FUNCTION"
+>nextval</CODE
+> для этой последовательности в текущем сеансе. (Если в данном сеансе <CODE
+CLASS="FUNCTION"
+>nextval</CODE
+> ни разу не вызывалась для данной последовательности, возвращается ошибка.) Так как это значение ограничено рамками сеанса, эта функция выдаёт предсказуемый результат вне зависимости от того, вызвалась ли впоследствии <CODE
+CLASS="FUNCTION"
+>nextval</CODE
+> в других сеансах или нет.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>lastval</CODE
+></DT
+><DD
+><P
+>Возвращает значение, выданное при последнем вызове <CODE
+CLASS="FUNCTION"
+>nextval</CODE
+> в текущем сеансе. Эта функция подобна <CODE
+CLASS="FUNCTION"
+>currval</CODE
+>, но она не принимает в параметрах имя последовательности, а выдаёт значение для той последовательности, для которой <CODE
+CLASS="FUNCTION"
+>nextval</CODE
+> вызывалась в текущем сеансе в последний раз. Если в текущем сеансе функция <CODE
+CLASS="FUNCTION"
+>nextval</CODE
+> ещё не вызывалась, при вызове <CODE
+CLASS="FUNCTION"
+>lastval</CODE
+> произойдёт ошибка.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>setval</CODE
+></DT
+><DD
+><P
+>Сбрасывает счётчик последовательности. В форме с двумя параметрами устанавливает для последовательности заданное значение поля <TT
+CLASS="LITERAL"
+>last_value</TT
+> и значение <TT
+CLASS="LITERAL"
+>true</TT
+> для флага <TT
+CLASS="LITERAL"
+>is_called</TT
+>, показывающего, что при следующем вызове <CODE
+CLASS="FUNCTION"
+>nextval</CODE
+> последовательность должна сначала продвинуться к очередному значению, которое будет возвращено. При этом <CODE
+CLASS="FUNCTION"
+>currval</CODE
+> также возвратит заданное значение. В форме с тремя параметрами флагу <TT
+CLASS="LITERAL"
+>is_called</TT
+> можно присвоить <TT
+CLASS="LITERAL"
+>true</TT
+> или <TT
+CLASS="LITERAL"
+>false</TT
+>. Со значением <TT
+CLASS="LITERAL"
+>true</TT
+> она действует так же, как и форма с двумя параметрами. Если же присвоить этому флагу значение <TT
+CLASS="LITERAL"
+>false</TT
+>, первый вызов <CODE
+CLASS="FUNCTION"
+>nextval</CODE
+> после этого вернёт именно заданное значение, а продвижение последовательности произойдёт при последующем вызове <CODE
+CLASS="FUNCTION"
+>nextval</CODE
+>. Кроме того, значение, возвращаемое <CODE
+CLASS="FUNCTION"
+>currval</CODE
+> в этом случае, не меняется. Например, </P><PRE
+CLASS="SCREEN"
+>SELECT setval('foo', 42);           <I
+CLASS="LINEANNOTATION"
+>Следующий вызов <CODE
+CLASS="FUNCTION"
+>nextval</CODE
+> вернёт 43</I
+>
+SELECT setval('foo', 42, true);     <I
+CLASS="LINEANNOTATION"
+>То же самое</I
+>
+SELECT setval('foo', 42, false);    <I
+CLASS="LINEANNOTATION"
+>Следующий вызов <CODE
+CLASS="FUNCTION"
+>nextval</CODE
+> вернёт 42</I
+></PRE
+><P> Результатом самой функции <CODE
+CLASS="FUNCTION"
+>setval</CODE
+> будет просто значение её второго аргумента.</P
+><DIV
+CLASS="IMPORTANT"
+><BLOCKQUOTE
+CLASS="IMPORTANT"
+><P
+><B
+>Важно: </B
+>Так как значения последовательностей изменяются вне транзакций, действие функции <CODE
+CLASS="FUNCTION"
+>setval</CODE
+> не отменяется при откате транзакции.</P
+></BLOCKQUOTE
+></DIV
+></DD
+></DL
+></DIV
+><P></P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions-json.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="functions-conditional.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Функции и операторы JSON</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Условные выражения</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,528 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>VACUUM</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="UPDATE"
+HREF="sql-update.html"><LINK
+REL="NEXT"
+TITLE="VALUES"
+HREF="sql-values.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="UPDATE"
+HREF="sql-update.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="VALUES"
+HREF="sql-values.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-VACUUM"
+></A
+>VACUUM</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN85332"
+></A
+><H2
+>Название</H2
+>VACUUM&nbsp;--&nbsp;провести сборку мусора и, возможно, проанализировать базу данных</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN85335"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>VACUUM [ ( { FULL | FREEZE | VERBOSE | ANALYZE } [, ...] ) ] [ <TT
+CLASS="REPLACEABLE"
+><I
+>table_name</I
+></TT
+> [ (<TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+> [, ...] ) ] ]
+VACUUM [ FULL ] [ FREEZE ] [ VERBOSE ] [ <TT
+CLASS="REPLACEABLE"
+><I
+>table_name</I
+></TT
+> ]
+VACUUM [ FULL ] [ FREEZE ] [ VERBOSE ] ANALYZE [ <TT
+CLASS="REPLACEABLE"
+><I
+>table_name</I
+></TT
+> [ (<TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+> [, ...] ) ] ]</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN85342"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>VACUUM</TT
+> высвобождает пространство, занимаемое &laquo;мёртвыми&raquo; кортежами. При обычных операциях <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> кортежи, удалённые или устаревшие в результате обновления, физически не удаляются из таблицы; они сохраняются в ней, пока не будет выполнена команда <TT
+CLASS="COMMAND"
+>VACUUM</TT
+>. Таким образом, периодически необходимо выполнять <TT
+CLASS="COMMAND"
+>VACUUM</TT
+>, особенно для часто изменяемых таблиц.</P
+><P
+>Без параметра команда <TT
+CLASS="COMMAND"
+>VACUUM</TT
+> обрабатывает все таблицы в текущей базе данных, которые может очистить текущий пользователь. Если в параметре передаётся имя таблицы, <TT
+CLASS="COMMAND"
+>VACUUM</TT
+> обрабатывает только эту таблицу.</P
+><P
+><TT
+CLASS="COMMAND"
+>VACUUM ANALYZE</TT
+> выполняет очистку (<TT
+CLASS="COMMAND"
+>VACUUM</TT
+>), а затем анализ (<TT
+CLASS="COMMAND"
+>ANALYZE</TT
+>) всех указанных таблиц. Это удобная комбинация для регулярного обслуживания БД. За дополнительной информацией об анализе обратитесь к описанию <A
+HREF="sql-analyze.html"
+>ANALYZE</A
+>.</P
+><P
+>Простая команда <TT
+CLASS="COMMAND"
+>VACUUM</TT
+> (без <TT
+CLASS="LITERAL"
+>FULL</TT
+>) только высвобождает пространство и делает его доступным для повторного использования. Эта форма команды может работать параллельно с обычными операциями чтения и записи таблицы, так она не требует исключительной блокировки. Однако освобождённое место не возвращается операционной системе (в большинстве случаев); оно просто остаётся доступным для размещения данных этой же таблицы. <TT
+CLASS="COMMAND"
+>VACUUM FULL</TT
+> переписывает всё содержимое таблицы в новый файл на диске, не содержащий ничего лишнего, что позволяет возвратить неиспользованное пространство операционной системе. Эта форма работает намного медленнее и запрашивает исключительную блокировку для каждой обрабатываемой таблицы.</P
+><P
+>Когда список параметров заключается в скобки, параметры могут быть записаны в любом порядке. Без скобок параметры должны указываться именно в том порядке, который показан выше. Синтаксис со скобками появился в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> 9.0; вариант записи без скобок считается устаревшим.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN85363"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>FULL</TT
+></DT
+><DD
+><P
+>Выбирает режим <SPAN
+CLASS="QUOTE"
+>"полной"</SPAN
+> очистки, который может освободить больше пространства, но выполняется гораздо дольше и запрашивает исключительную блокировку таблицы. Этот режим также требует дополнительное место на диске, так как он записывает новую копию таблицы и не освобождает старую до завершения операции. Обычно это следует использовать, только когда требуется высвободить значительный объём пространства, выделенного таблице.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>FREEZE</TT
+></DT
+><DD
+><P
+>Выбирает агрессивную <SPAN
+CLASS="QUOTE"
+>"заморозку"</SPAN
+> кортежей. Добавление указания <TT
+CLASS="LITERAL"
+>FREEZE</TT
+> равносильно выполнению команды <TT
+CLASS="COMMAND"
+>VACUUM</TT
+> с параметрами <A
+HREF="runtime-config-client.html#GUC-VACUUM-FREEZE-MIN-AGE"
+>vacuum_freeze_min_age</A
+> и <A
+HREF="runtime-config-client.html#GUC-VACUUM-FREEZE-TABLE-AGE"
+>vacuum_freeze_table_age</A
+>, равными нулю. Агрессивная заморозка всегда выполняется при перезаписи таблицы, поэтому в режиме <TT
+CLASS="LITERAL"
+>FULL</TT
+> это указание избыточно.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>VERBOSE</TT
+></DT
+><DD
+><P
+>Выводит подробный отчёт об очистке для каждой таблицы.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>ANALYZE</TT
+></DT
+><DD
+><P
+>Обновляет статистику, которую использует планировщик для выбора наиболее эффективного способа выполнения запроса.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>table_name</I
+></TT
+></DT
+><DD
+><P
+>Имя (возможно, дополненное схемой) определённой таблицы, подлежащей очистке. По умолчанию очищаются все таблицы в текущей базе данных.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_колонки</I
+></TT
+></DT
+><DD
+><P
+>Имя колонки, подлежащей анализу. По умолчанию анализируются все колонки. Если указан список колонок, подразумевается операция <TT
+CLASS="LITERAL"
+>ANALYZE</TT
+>.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN85404"
+></A
+><H2
+>Выводимая информация</H2
+><P
+>С указанием <TT
+CLASS="LITERAL"
+>VERBOSE</TT
+> команда <TT
+CLASS="COMMAND"
+>VACUUM</TT
+> выдаёт сообщения о процессе очистки, отмечая текущую обрабатываемую таблицу. Также она выводит различные статистические сведения о таблицах.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN85409"
+></A
+><H2
+>Замечания</H2
+><P
+>Чтобы очистить таблицу, обычно нужно быть владельцем этой таблицы или суперпользователем. Однако владельцам баз данных также разрешено сжимать все таблицы в своих базах, за исключением общих каталогов. (Ограничение в отношении общих каталогов означает, что настоящую глобальную команду <TT
+CLASS="COMMAND"
+>VACUUM</TT
+> может выполнить только суперпользователь.) <TT
+CLASS="COMMAND"
+>VACUUM</TT
+> при обработке пропускает все таблицы, на очистку которых текущий пользователь не имеет прав.</P
+><P
+><TT
+CLASS="COMMAND"
+>VACUUM</TT
+> нельзя выполнять внутри блока транзакции.</P
+><P
+>Для таблиц с индексами <ACRONYM
+CLASS="ACRONYM"
+>GIN</ACRONYM
+>, <TT
+CLASS="COMMAND"
+>VACUUM</TT
+> (в любой форме) также завершает все ожидающие операции добавления в индекс, перемещая записи индекса из очереди в соответствующие места в основной структуре индекса <ACRONYM
+CLASS="ACRONYM"
+>GIN</ACRONYM
+>. За подробностями обратитесь к <A
+HREF="gin-implementation.html#GIN-FAST-UPDATE"
+>Подразделу 58.4.1</A
+>.</P
+><P
+>Мы рекомендуем очищать активные производственные базы данных достаточно часто (как минимум, каждую ночь), чтобы избавляться от &laquo;мёртвых&raquo; строк. После добавления или удаления большого числа строк может быть хорошей идеей выполнить команду <TT
+CLASS="COMMAND"
+>VACUUM ANALYZE</TT
+> для каждой затронутой таблицы. При этом результаты всех последних изменений будут отражены в системных каталогах, что позволит планировщику запросов <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> принимать более эффективные решения при планировании.</P
+><P
+>Режим <TT
+CLASS="OPTION"
+>FULL</TT
+> не рекомендуется для обычного применения, но в некоторых случаях он бывает полезен. Например, когда были удалены или изменены почти все строки таблицы, может возникнуть желание физически сжать её, чтобы освободить место на диске и ускорить сканирование этой таблицы. Чаще всего <TT
+CLASS="COMMAND"
+>VACUUM FULL</TT
+> сжимает таблицу более эффективно, чем обычный <TT
+CLASS="COMMAND"
+>VACUUM</TT
+>.</P
+><P
+><TT
+CLASS="COMMAND"
+>VACUUM</TT
+> создаёт значительную нагрузку на подсистему ввода/вывода, что может отрицательно сказаться на производительности других активных сеансов. Поэтому иногда полезно использовать возможность задержки очистки с учётом её стоимости. За подробностями обратитесь к <A
+HREF="runtime-config-resource.html#RUNTIME-CONFIG-RESOURCE-VACUUM-COST"
+>Подразделу 18.4.4</A
+>.</P
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> включает средство <SPAN
+CLASS="QUOTE"
+>"автоочистки"</SPAN
+>, которое позволяет автоматизировать регулярную очистку. Чтобы узнать больше об автоматической и ручной очистке, обратитесь к <A
+HREF="routine-vacuuming.html"
+>Разделу 23.1</A
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN85435"
+></A
+><H2
+>Примеры</H2
+><P
+>Ниже показан пример выполнения команды <TT
+CLASS="COMMAND"
+>VACUUM</TT
+> для таблицы из базы данных regression: </P><PRE
+CLASS="PROGRAMLISTING"
+>regression=# VACUUM (VERBOSE, ANALYZE) onek;
+INFO:  vacuuming "public.onek"
+INFO:  index "onek_unique1" now contains 1000 tuples in 14 pages
+DETAIL:  3000 index tuples were removed.
+0 index pages have been deleted, 0 are currently reusable.
+CPU 0.01s/0.08u sec elapsed 0.18 sec.
+INFO:  index "onek_unique2" now contains 1000 tuples in 16 pages
+DETAIL:  3000 index tuples were removed.
+0 index pages have been deleted, 0 are currently reusable.
+CPU 0.00s/0.07u sec elapsed 0.23 sec.
+INFO:  index "onek_hundred" now contains 1000 tuples in 13 pages
+DETAIL:  3000 index tuples were removed.
+0 index pages have been deleted, 0 are currently reusable.
+CPU 0.01s/0.08u sec elapsed 0.17 sec.
+INFO:  index "onek_stringu1" now contains 1000 tuples in 48 pages
+DETAIL:  3000 index tuples were removed.
+0 index pages have been deleted, 0 are currently reusable.
+CPU 0.01s/0.09u sec elapsed 0.59 sec.
+INFO:  "onek": removed 3000 tuples in 108 pages
+DETAIL:  CPU 0.01s/0.06u sec elapsed 0.07 sec.
+INFO:  "onek": found 3000 removable, 1000 nonremovable tuples in 143 pages
+DETAIL:  0 dead tuples cannot be removed yet.
+There were 0 unused item pointers.
+0 pages are entirely empty.
+CPU 0.07s/0.39u sec elapsed 1.56 sec.
+INFO:  analyzing "public.onek"
+INFO:  "onek": 36 pages, 1000 rows sampled, 1000 estimated total rows
+VACUUM</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN85440"
+></A
+><H2
+>Совместимость</H2
+><P
+>Оператор <TT
+CLASS="COMMAND"
+>VACUUM</TT
+> отсутствует в стандарте SQL.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN85444"
+></A
+><H2
+>См. также</H2
+><A
+HREF="app-vacuumdb.html"
+>            <SPAN
+CLASS="APPLICATION"
+>vacuumdb</SPAN
+>
+          </A
+>, <A
+HREF="runtime-config-resource.html#RUNTIME-CONFIG-RESOURCE-VACUUM-COST"
+>Подраздел 18.4.4</A
+>, <A
+HREF="routine-vacuuming.html#AUTOVACUUM"
+>Подраздел 23.1.6</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-update.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-values.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>UPDATE</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>VALUES</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

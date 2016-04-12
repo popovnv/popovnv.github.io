@@ -1,0 +1,3442 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Операторы и функции даты/времени</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Функции и операторы"
+HREF="functions.html"><LINK
+REL="PREVIOUS"
+TITLE="Функции форматирования данных"
+HREF="functions-formatting.html"><LINK
+REL="NEXT"
+TITLE="Функции для перечислений"
+HREF="functions-enum.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Функции форматирования данных"
+HREF="functions-formatting.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 9. Функции и операторы</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Функции для перечислений"
+HREF="functions-enum.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="FUNCTIONS-DATETIME"
+>9.9. Операторы и функции даты/времени</A
+></H1
+><P
+>Все существующие функции для обработки даты/времени перечислены в <A
+HREF="functions-datetime.html#FUNCTIONS-DATETIME-TABLE"
+>Таблице 9-28</A
+>, а подробнее они описаны в следующих подразделах. Поведение основных арифметических операторов (<TT
+CLASS="LITERAL"
+>+</TT
+>, <TT
+CLASS="LITERAL"
+>*</TT
+> и т. д.) описано в <A
+HREF="functions-datetime.html#OPERATORS-DATETIME-TABLE"
+>Таблице 9-27</A
+>. Функции форматирования этих типов данных были перечислены в <A
+HREF="functions-formatting.html"
+>Разделе 9.8</A
+>. Общую информацию об этих типах вы получили (или можете получить) в <A
+HREF="datatype-datetime.html"
+>Разделе 8.5</A
+>.</P
+><P
+>Все описанные ниже функции и операторы принимают две разновидности типов <TT
+CLASS="TYPE"
+>time</TT
+> или <TT
+CLASS="TYPE"
+>timestamp</TT
+>: с часовым поясом (<TT
+CLASS="TYPE"
+>time with time zone</TT
+> и <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+>) и без него (<TT
+CLASS="TYPE"
+>time without time zone</TT
+> и <TT
+CLASS="TYPE"
+>timestamp without time zone</TT
+>). Для краткости здесь они рассматриваются вместе. Кроме того, операторы <TT
+CLASS="LITERAL"
+>+</TT
+> и <TT
+CLASS="LITERAL"
+>*</TT
+> обладают переместительным свойством (например, date + integer = integer + date); здесь будет приведён только один вариант для каждой пары.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="OPERATORS-DATETIME-TABLE"
+></A
+><P
+><B
+>Таблица 9-27. Операторы даты/времени</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Оператор</TH
+><TH
+>Пример</TH
+><TH
+>Результат</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>+</TT
+> </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>date '2001-09-28' + integer '7'</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>date '2001-10-05'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>+</TT
+> </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>date '2001-09-28' + interval '1 hour'</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>timestamp '2001-09-28 01:00:00'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>+</TT
+> </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>date '2001-09-28' + time '03:00'</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>timestamp '2001-09-28 03:00:00'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>+</TT
+> </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>interval '1 day' + interval '1 hour'</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>interval '1 day 01:00:00'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>+</TT
+> </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>timestamp '2001-09-28 01:00' + interval '23 hours'</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>timestamp '2001-09-29 00:00:00'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>+</TT
+> </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>time '01:00' + interval '3 hours'</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>time '04:00:00'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>-</TT
+> </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>- interval '23 hours'</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>interval '-23:00:00'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>-</TT
+> </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>date '2001-10-01' - date '2001-09-28'</TT
+>
+                </TD
+><TD
+><TT
+CLASS="LITERAL"
+>integer '3'</TT
+> (дня)</TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>-</TT
+> </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>date '2001-10-01' - integer '7'</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>date '2001-09-24'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>-</TT
+> </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>date '2001-09-28' - interval '1 hour'</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>timestamp '2001-09-27 23:00:00'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>-</TT
+> </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>time '05:00' - time '03:00'</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>interval '02:00:00'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>-</TT
+> </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>time '05:00' - interval '2 hours'</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>time '03:00:00'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>-</TT
+> </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>timestamp '2001-09-28 23:00' - interval '23 hours'</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>timestamp '2001-09-28 00:00:00'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>-</TT
+> </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>interval '1 day' - interval '1 hour'</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>interval '1 day -01:00:00'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>-</TT
+> </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>timestamp '2001-09-29 03:00' - timestamp '2001-09-27 12:00'</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>interval '1 day 15:00:00'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>*</TT
+> </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>900 * interval '1 second'</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>interval '00:15:00'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>*</TT
+> </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>21 * interval '1 day'</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>interval '21 days'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>*</TT
+> </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>double precision '3.5' * interval '1 hour'</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>interval '03:30:00'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>/</TT
+> </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>interval '1 hour' / double precision '1.5'</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>interval '00:40:00'</TT
+>
+                </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-DATETIME-TABLE"
+></A
+><P
+><B
+>Таблица 9-28. Функции даты/времени</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Функция</TH
+><TH
+>Тип результата</TH
+><TH
+>Описание</TH
+><TH
+>Пример</TH
+><TH
+>Результат</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>age(<TT
+CLASS="TYPE"
+>timestamp</TT
+>, <TT
+CLASS="TYPE"
+>timestamp</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>interval</TT
+>
+                </TD
+><TD
+>Вычитает аргументы и выдаёт <SPAN
+CLASS="QUOTE"
+>"символический"</SPAN
+> результат с годами и месяцами, а не просто днями</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>age(timestamp '2001-04-10', timestamp '1957-06-13')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>43 years 9 mons 27 days (43 года 9 месяцев 27 дней)</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>age(<TT
+CLASS="TYPE"
+>timestamp</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>interval</TT
+>
+                </TD
+><TD
+>Вычитает дату/время из <CODE
+CLASS="FUNCTION"
+>current_date</CODE
+> (полночь текущего дня)</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>age(timestamp '1957-06-13')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>43 years 8 mons 3 days (43 года 8 месяцев 3 дня)</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>clock_timestamp​()</CODE
+></TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+>
+                </TD
+><TD
+>Текущая дата и время (меняется в процессе выполнения операторов); см. <A
+HREF="functions-datetime.html#FUNCTIONS-DATETIME-CURRENT"
+>Подраздел 9.9.4</A
+></TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>current_date</CODE
+></TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>date</TT
+>
+                </TD
+><TD
+>Текущая дата; см. <A
+HREF="functions-datetime.html#FUNCTIONS-DATETIME-CURRENT"
+>Подраздел 9.9.4</A
+></TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>current_time</CODE
+></TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>time with time zone</TT
+>
+                </TD
+><TD
+>Текущее время суток; см. <A
+HREF="functions-datetime.html#FUNCTIONS-DATETIME-CURRENT"
+>Подраздел 9.9.4</A
+></TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>current_​timestamp</CODE
+></TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+>
+                </TD
+><TD
+>Текущая дата и время (на момент начала транзакции); см. <A
+HREF="functions-datetime.html#FUNCTIONS-DATETIME-CURRENT"
+>Подраздел 9.9.4</A
+></TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>date_part(<TT
+CLASS="TYPE"
+>text</TT
+>, <TT
+CLASS="TYPE"
+>timestamp</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>double precision</TT
+>
+                </TD
+><TD
+>Возвращает поле даты (равнозначно <CODE
+CLASS="FUNCTION"
+>extract</CODE
+>); см. <A
+HREF="functions-datetime.html#FUNCTIONS-DATETIME-EXTRACT"
+>Подраздел 9.9.1</A
+></TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>date_part(​'hour', timestamp '2001-02-16 20:38:40')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>20</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>date_part(<TT
+CLASS="TYPE"
+>text</TT
+>, <TT
+CLASS="TYPE"
+>interval</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>double precision</TT
+>
+                </TD
+><TD
+>Возвращает поле даты (равнозначно <CODE
+CLASS="FUNCTION"
+>extract</CODE
+>); см. <A
+HREF="functions-datetime.html#FUNCTIONS-DATETIME-EXTRACT"
+>Подраздел 9.9.1</A
+></TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>date_part(​'month', interval '2 years 3 months')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>3</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>date_trunc(<TT
+CLASS="TYPE"
+>text</TT
+>, <TT
+CLASS="TYPE"
+>timestamp</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>timestamp</TT
+>
+                </TD
+><TD
+>Отсекает компоненты даты до заданной точности; см. также <A
+HREF="functions-datetime.html#FUNCTIONS-DATETIME-TRUNC"
+>Подраздел 9.9.2</A
+></TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>date_trunc(​'hour', timestamp '2001-02-16 20:38:40')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>2001-02-16 20:00:00</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>date_trunc(<TT
+CLASS="TYPE"
+>text</TT
+>, <TT
+CLASS="TYPE"
+>interval</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>interval</TT
+>
+                </TD
+><TD
+>Отсекает компоненты даты до заданной точности; см. также <A
+HREF="functions-datetime.html#FUNCTIONS-DATETIME-TRUNC"
+>Подраздел 9.9.2</A
+></TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>date_trunc(​'hour', interval '2 days 3 hours 40 minutes')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>2 days 03:00:00</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>extract</CODE
+>(<TT
+CLASS="PARAMETER"
+>field</TT
+> from <TT
+CLASS="TYPE"
+>timestamp</TT
+>)</TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>double precision</TT
+>
+                </TD
+><TD
+>Возвращает поле даты; см. <A
+HREF="functions-datetime.html#FUNCTIONS-DATETIME-EXTRACT"
+>Подраздел 9.9.1</A
+></TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>extract(hour from timestamp '2001-02-16 20:38:40')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>20</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>extract</CODE
+>(<TT
+CLASS="PARAMETER"
+>field</TT
+> from <TT
+CLASS="TYPE"
+>interval</TT
+>)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>double precision</TT
+>
+                </TD
+><TD
+>Возвращает поле даты; см. <A
+HREF="functions-datetime.html#FUNCTIONS-DATETIME-EXTRACT"
+>Подраздел 9.9.1</A
+></TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>extract(month from interval '2 years 3 months')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>3</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>isfinite(​<TT
+CLASS="TYPE"
+>date</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>Проверяет конечность даты (её отличие от +/-бесконечности)</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>isfinite(date '2001-02-16')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>true</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>isfinite(​<TT
+CLASS="TYPE"
+>timestamp</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>Проверяет конечность времени (его отличие от +/-бесконечности)</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>isfinite(​timestamp '2001-02-16 21:28:30')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>true</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>isfinite(​<TT
+CLASS="TYPE"
+>interval</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>Проверяет конечность интервала</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>isfinite(interval '4 hours')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>true</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>justify_days(​<TT
+CLASS="TYPE"
+>interval</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>interval</TT
+>
+                </TD
+><TD
+>Преобразует интервал так, что каждый 30-дневный период считается одним месяцем</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>justify_days(​interval '35 days')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>1 mon 5 days (1 месяц 5 дней)</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>justify_hours(​<TT
+CLASS="TYPE"
+>interval</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>interval</TT
+>
+                </TD
+><TD
+>Преобразует интервал так, что каждый 24-часовой период считается одним днём</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>justify_hours(​interval '27 hours')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>1 day 03:00:00 (1 день 03:00:00)</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>justify_interval(​<TT
+CLASS="TYPE"
+>interval</TT
+>)</CODE
+></TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>interval</TT
+>
+                </TD
+><TD
+>Преобразует интервал с применением <CODE
+CLASS="FUNCTION"
+>justify_days</CODE
+> и <CODE
+CLASS="FUNCTION"
+>justify_hours</CODE
+> и дополнительно корректирует знаки</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>justify_​interval(​interval '1 mon -1 hour')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>29 days 23:00:00 (29 дней 23:00:00)</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>localtime</CODE
+></TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>time</TT
+>
+                </TD
+><TD
+>Текущее время суток; см. <A
+HREF="functions-datetime.html#FUNCTIONS-DATETIME-CURRENT"
+>Подраздел 9.9.4</A
+></TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>localtimestamp</CODE
+></TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>timestamp</TT
+>
+                </TD
+><TD
+>Текущая дата и время (на момент начала транзакции); см. <A
+HREF="functions-datetime.html#FUNCTIONS-DATETIME-CURRENT"
+>Подраздел 9.9.4</A
+></TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>            <CODE
+CLASS="FUNCTION"
+>make_date(​<TT
+CLASS="PARAMETER"
+>year</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>, <TT
+CLASS="PARAMETER"
+>month</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>, <TT
+CLASS="PARAMETER"
+>day</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>)</CODE
+>
+         </TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>date</TT
+>
+                </TD
+><TD
+>Образует дату из полей: year (год), month (месяц) и day (день)</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>make_date(2013, 7, 15)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>2013-07-15</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>          <CODE
+CLASS="FUNCTION"
+>make_interval(​<TT
+CLASS="PARAMETER"
+>years</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+> DEFAULT 0, <TT
+CLASS="PARAMETER"
+>months</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+> DEFAULT 0, <TT
+CLASS="PARAMETER"
+>weeks</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+> DEFAULT 0, <TT
+CLASS="PARAMETER"
+>days</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+> DEFAULT 0, <TT
+CLASS="PARAMETER"
+>hours</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+> DEFAULT 0, <TT
+CLASS="PARAMETER"
+>mins</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+> DEFAULT 0, <TT
+CLASS="PARAMETER"
+>secs</TT
+> <TT
+CLASS="TYPE"
+>double precision</TT
+> DEFAULT 0.0)</CODE
+>
+         </TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>interval</TT
+>
+                </TD
+><TD
+>Образует интервал из полей: years (годы), months (месяцы), weeks (недели), days (дни), hours (часы), minutes (минуты) и secs (секунды)</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>make_interval(days := 10)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>10 days</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>          <CODE
+CLASS="FUNCTION"
+>make_time(​<TT
+CLASS="PARAMETER"
+>hour</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>, <TT
+CLASS="PARAMETER"
+>min</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>, <TT
+CLASS="PARAMETER"
+>sec</TT
+> <TT
+CLASS="TYPE"
+>double precision</TT
+>)</CODE
+>
+         </TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>time</TT
+>
+                </TD
+><TD
+>Образует время из полей: hour (час), minute (минута) и sec (секунда)</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>make_time(8, 15, 23.5)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>08:15:23.5</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>          <CODE
+CLASS="FUNCTION"
+>make_timestamp(​<TT
+CLASS="PARAMETER"
+>year</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>, <TT
+CLASS="PARAMETER"
+>month</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>, <TT
+CLASS="PARAMETER"
+>day</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>, <TT
+CLASS="PARAMETER"
+>hour</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>, <TT
+CLASS="PARAMETER"
+>min</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>, <TT
+CLASS="PARAMETER"
+>sec</TT
+> <TT
+CLASS="TYPE"
+>double precision</TT
+>)</CODE
+>
+         </TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>timestamp</TT
+>
+                </TD
+><TD
+>Образует дату и время из полей: year (год), month (месяц), day (день), hour (час), minute (минута) и sec (секунда)</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>make_timestamp(2013, 7, 15, 8, 15, 23.5)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>2013-07-15 08:15:23.5</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>          <CODE
+CLASS="FUNCTION"
+>make_timestamptz(​<TT
+CLASS="PARAMETER"
+>year</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>, <TT
+CLASS="PARAMETER"
+>month</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>, <TT
+CLASS="PARAMETER"
+>day</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>, <TT
+CLASS="PARAMETER"
+>hour</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>, <TT
+CLASS="PARAMETER"
+>min</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>, <TT
+CLASS="PARAMETER"
+>sec</TT
+> <TT
+CLASS="TYPE"
+>double precision</TT
+>, [<SPAN
+CLASS="OPTIONAL"
+><TT
+CLASS="PARAMETER"
+>timezone</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+></SPAN
+>])</CODE
+>
+         </TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+>
+                </TD
+><TD
+>Образует дату и время с часовым поясом из полей: year (год), month (месяц), day (день), hour (час), minute (минута) и sec (секунда). Если параметр <TT
+CLASS="PARAMETER"
+>timezone</TT
+> (часовой пояс) не указан, используется текущий часовой пояс.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>make_timestamptz(​2013, 7, 15, 8, 15, 23.5)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>2013-07-15 08:15:23.5+01</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>now()</CODE
+></TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+>
+                </TD
+><TD
+>Текущая дата и время (на момент начала транзакции); см. <A
+HREF="functions-datetime.html#FUNCTIONS-DATETIME-CURRENT"
+>Подраздел 9.9.4</A
+></TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>statement_​timestamp()</CODE
+></TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+>
+                </TD
+><TD
+>Текущая дата и время (на момент начала текущего оператора); см. <A
+HREF="functions-datetime.html#FUNCTIONS-DATETIME-CURRENT"
+>Подраздел 9.9.4</A
+></TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>timeofday()</CODE
+></TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Текущая дата и время (как <CODE
+CLASS="FUNCTION"
+>clock_​timestamp</CODE
+>, но в виде строки типа <TT
+CLASS="TYPE"
+>text</TT
+>); см. <A
+HREF="functions-datetime.html#FUNCTIONS-DATETIME-CURRENT"
+>Подраздел 9.9.4</A
+></TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>transaction_​timestamp()</CODE
+></TT
+>
+        </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+>
+                </TD
+><TD
+>Текущая дата и время (на момент начала транзакции); см. <A
+HREF="functions-datetime.html#FUNCTIONS-DATETIME-CURRENT"
+>Подраздел 9.9.4</A
+></TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+> В дополнение к этим функциям поддерживается SQL-оператор <TT
+CLASS="LITERAL"
+>OVERLAPS</TT
+>: </P><PRE
+CLASS="SYNOPSIS"
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>начало1</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>конец1</I
+></TT
+>) OVERLAPS (<TT
+CLASS="REPLACEABLE"
+><I
+>начало2</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>конец2</I
+></TT
+>)
+(<TT
+CLASS="REPLACEABLE"
+><I
+>начало1</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>длительность1</I
+></TT
+>) OVERLAPS (<TT
+CLASS="REPLACEABLE"
+><I
+>начало2</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>длительность2</I
+></TT
+>)</PRE
+><P> Его результатом будет true, когда два периода времени (определённые своими границами) пересекаются, и false в противном случае. Границы периода можно задать либо в виде пары дат, времени или дат со временем, либо как дату, время (или дату со временем) c интервалом. Когда указывается пара значений, первым может быть и начало, и конец периода: <TT
+CLASS="LITERAL"
+>OVERLAPS</TT
+> автоматически считает началом периода меньшее значение. Периоды времени считаются наполовину открытыми, т. е. <TT
+CLASS="REPLACEABLE"
+><I
+>начало</I
+></TT
+><TT
+CLASS="LITERAL"
+>&lt;=</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>время</I
+></TT
+><TT
+CLASS="LITERAL"
+>&lt;</TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>конец</I
+></TT
+>, если только <TT
+CLASS="REPLACEABLE"
+><I
+>начало</I
+></TT
+> и <TT
+CLASS="REPLACEABLE"
+><I
+>конец</I
+></TT
+> не равны &mdash; в этом случае период представляет один момент времени. Это означает, например, что два периода, имеющие только общую границу, не будут считаться пересекающимися.</P
+><PRE
+CLASS="SCREEN"
+>SELECT (DATE '2001-02-16', DATE '2001-12-21') OVERLAPS
+       (DATE '2001-10-30', DATE '2002-10-30');
+<I
+CLASS="LINEANNOTATION"
+>Результат:</I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>true</SAMP
+>
+SELECT (DATE '2001-02-16', INTERVAL '100 days') OVERLAPS
+       (DATE '2001-10-30', DATE '2002-10-30');
+<I
+CLASS="LINEANNOTATION"
+>Результат:</I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>false</SAMP
+>
+SELECT (DATE '2001-10-29', DATE '2001-10-30') OVERLAPS
+       (DATE '2001-10-30', DATE '2001-10-31');
+<I
+CLASS="LINEANNOTATION"
+>Результат:</I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>false</SAMP
+>
+SELECT (DATE '2001-10-30', DATE '2001-10-30') OVERLAPS
+       (DATE '2001-10-30', DATE '2001-10-31');
+<I
+CLASS="LINEANNOTATION"
+>Результат:</I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>true</SAMP
+></PRE
+><P
+>При добавлении к дате со временем типа <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+> значения <TT
+CLASS="TYPE"
+>interval</TT
+> (или при вычитании из него <TT
+CLASS="TYPE"
+>interval</TT
+>), поле дней в этой дате увеличивается (или уменьшается) на указанное число дней. При пересечении границы перехода на летнее время (если в часовом поясе текущего сеанса производится этот переход) это означает, что <TT
+CLASS="LITERAL"
+>interval '1 day'</TT
+> и <TT
+CLASS="LITERAL"
+>interval '24 hours'</TT
+> не обязательно будут равны. Например, в часовом поясе <TT
+CLASS="LITERAL"
+>CST7CDT</TT
+> результатом выражения <TT
+CLASS="LITERAL"
+>timestamp with time zone '2005-04-02 12:00-07' + interval '1 day' </TT
+> будет <TT
+CLASS="LITERAL"
+>timestamp with time zone '2005-04-03 12:00-06'</TT
+>, тогда как, если добавить <TT
+CLASS="LITERAL"
+>interval '24 hours'</TT
+> к тому же значению <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+>, в результате получится <TT
+CLASS="LITERAL"
+>timestamp with time zone '2005-04-03 13:00-06'</TT
+>. Эта разница объясняется тем, что <TT
+CLASS="LITERAL"
+>2005-04-03 02:00</TT
+> в часовом поясе <TT
+CLASS="LITERAL"
+>CST7CDT</TT
+> произошёл переход на летнее время.</P
+><P
+>Обратите внимание на возможную неоднозначность в поле <TT
+CLASS="LITERAL"
+>months</TT
+> в результате функции <CODE
+CLASS="FUNCTION"
+>age</CODE
+>, вызванную тем, что число дней в разных месяцах неодинаково. Вычисляя оставшиеся дни месяца, <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> рассматривает месяц меньшей из двух дат. Например, результатом <TT
+CLASS="LITERAL"
+>age('2004-06-01', '2004-04-30')</TT
+> будет <TT
+CLASS="LITERAL"
+>1 mon 1 day</TT
+>, так как в апреле 30 дней, а то же выражение с датой 30 мая выдаст <TT
+CLASS="LITERAL"
+>1 mon 2 days</TT
+>, так как в мае 31 день.</P
+><P
+>Вычитание дат и дат со временем также может быть нетривиальной операцией. Один принципиально простой способ выполнить такое вычисление &mdash; преобразовать каждое значение в количество секунд, используя <TT
+CLASS="LITERAL"
+>EXTRACT(EPOCH FROM ...)</TT
+>, а затем найти разницу результатов; при этом будет получено число <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>секунд</I
+></SPAN
+> между двумя датами. При этом будет учтено неодинаковое число дней в месяцах, изменения часовых поясов и переходы на летнее время. При вычитании дат или дат со временем с помощью оператора <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>-</TT
+>"</SPAN
+> выдаётся число дней (по 24 часа) и часов/минут/секунд между данными значениями, с учётом тех же факторов. Функция <CODE
+CLASS="FUNCTION"
+>age</CODE
+> возвращает число лет, месяцев, дней и часов/минут/секунд, выполняя вычитание по полям, а затем пересчитывая отрицательные значения. Различие этих подходов иллюстрируют следующие запросы. Показанные результаты были получены для часового пояса <TT
+CLASS="LITERAL"
+>'US/Eastern'</TT
+>; между двумя заданными датами произошёл переход на летнее время:</P
+><PRE
+CLASS="SCREEN"
+>SELECT EXTRACT(EPOCH FROM timestamptz '2013-07-01 12:00:00') -
+       EXTRACT(EPOCH FROM timestamptz '2013-03-01 12:00:00');
+<I
+CLASS="LINEANNOTATION"
+>Результат:</I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>10537200</SAMP
+>
+SELECT (EXTRACT(EPOCH FROM timestamptz '2013-07-01 12:00:00') -
+        EXTRACT(EPOCH FROM timestamptz '2013-03-01 12:00:00'))
+        / 60 / 60 / 24;
+<I
+CLASS="LINEANNOTATION"
+>Результат:</I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>121.958333333333</SAMP
+>
+SELECT timestamptz '2013-07-01 12:00:00' - timestamptz '2013-03-01 12:00:00';
+<I
+CLASS="LINEANNOTATION"
+>Результат:</I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>121 days 23:00:00</SAMP
+>
+SELECT age(timestamptz '2013-07-01 12:00:00', timestamptz '2013-03-01 12:00:00');
+<I
+CLASS="LINEANNOTATION"
+>Результат:</I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>4 mons</SAMP
+></PRE
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="FUNCTIONS-DATETIME-EXTRACT"
+>9.9.1. <CODE
+CLASS="FUNCTION"
+>EXTRACT</CODE
+>, <CODE
+CLASS="FUNCTION"
+>date_part</CODE
+></A
+></H2
+><PRE
+CLASS="SYNOPSIS"
+>EXTRACT(<TT
+CLASS="REPLACEABLE"
+><I
+>field</I
+></TT
+> FROM <TT
+CLASS="REPLACEABLE"
+><I
+>source</I
+></TT
+>)</PRE
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>extract</CODE
+> получает из значений даты/времени поля, такие как год или час. Здесь <TT
+CLASS="REPLACEABLE"
+><I
+>источник</I
+></TT
+> &mdash; значение типа <TT
+CLASS="TYPE"
+>timestamp</TT
+>, <TT
+CLASS="TYPE"
+>time</TT
+> или <TT
+CLASS="TYPE"
+>interval</TT
+>. (Выражения типа <TT
+CLASS="TYPE"
+>date</TT
+> приводятся к типу <TT
+CLASS="TYPE"
+>timestamp</TT
+>, так что допускается и этот тип.) Указанное <TT
+CLASS="REPLACEABLE"
+><I
+>поле</I
+></TT
+> представляет собой идентификатор, по которому из источника выбирается заданное поле. Функция <CODE
+CLASS="FUNCTION"
+>extract</CODE
+> возвращает значения типа <TT
+CLASS="TYPE"
+>double precision</TT
+>. Допустимые поля: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>century</TT
+></DT
+><DD
+><P
+>Век:</P
+><PRE
+CLASS="SCREEN"
+>SELECT EXTRACT(CENTURY FROM TIMESTAMP '2000-12-16 12:21:13');
+<I
+CLASS="LINEANNOTATION"
+>Результат:</I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>20</SAMP
+>
+SELECT EXTRACT(CENTURY FROM TIMESTAMP '2001-02-16 20:38:40');
+<I
+CLASS="LINEANNOTATION"
+>Результат:</I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>21</SAMP
+></PRE
+><P
+>Первый век начался 0001-01-01 00:00:00, хотя люди в то время и не считали так. Это определение распространяется на все страны с григорианским календарём. Века с номером 0 нет было; считается, что 1 наступил после -1. Если такое положение вещей вас не устраивает, направляйте жалобы по адресу: Ватикан, Собор Святого Петра, Папе.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>day</TT
+></DT
+><DD
+><P
+>Для значений <TT
+CLASS="TYPE"
+>timestamp</TT
+> это день месяца (1 - 31), для значений <TT
+CLASS="TYPE"
+>interval</TT
+> &mdash; число дней</P
+><PRE
+CLASS="SCREEN"
+>SELECT EXTRACT(DAY FROM TIMESTAMP '2001-02-16 20:38:40');
+<I
+CLASS="LINEANNOTATION"
+>Результат:</I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>16</SAMP
+>
+
+SELECT EXTRACT(DAY FROM INTERVAL '40 days 1 minute');
+<I
+CLASS="LINEANNOTATION"
+>Результат:</I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>40</SAMP
+></PRE
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>decade</TT
+></DT
+><DD
+><P
+>Год, делённый на 10</P
+><PRE
+CLASS="SCREEN"
+>SELECT EXTRACT(DECADE FROM TIMESTAMP '2001-02-16 20:38:40');
+<I
+CLASS="LINEANNOTATION"
+>Результат:</I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>200</SAMP
+></PRE
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>dow</TT
+></DT
+><DD
+><P
+>День недели, считая с воскресенья (<TT
+CLASS="LITERAL"
+>0</TT
+>) до субботы (<TT
+CLASS="LITERAL"
+>6</TT
+>)</P
+><PRE
+CLASS="SCREEN"
+>SELECT EXTRACT(DOW FROM TIMESTAMP '2001-02-16 20:38:40');
+<I
+CLASS="LINEANNOTATION"
+>Результат:</I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>5</SAMP
+></PRE
+><P
+>Заметьте, что в <CODE
+CLASS="FUNCTION"
+>extract</CODE
+> дни недели нумеруются не так, как в функции <CODE
+CLASS="FUNCTION"
+>to_char(..., 'D')</CODE
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>doy</TT
+></DT
+><DD
+><P
+>День года (1 - 365/366)</P
+><PRE
+CLASS="SCREEN"
+>SELECT EXTRACT(DOY FROM TIMESTAMP '2001-02-16 20:38:40');
+<I
+CLASS="LINEANNOTATION"
+>Результат:</I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>47</SAMP
+></PRE
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>epoch</TT
+></DT
+><DD
+><P
+>Для значений <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+> это число секунд с 1970-01-01 00:00:00 UTC (может быть отрицательным); для значений <TT
+CLASS="TYPE"
+>date</TT
+> и <TT
+CLASS="TYPE"
+>timestamp</TT
+> это число секунд с 1970-01-01 00:00:00 по местному времени, а для <TT
+CLASS="TYPE"
+>interval</TT
+> &mdash; общая длительность интервала в секундах</P
+><PRE
+CLASS="SCREEN"
+>SELECT EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE
+ '2001-02-16 20:38:40.12-08');
+<I
+CLASS="LINEANNOTATION"
+>Результат:</I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>982384720.12</SAMP
+>
+
+SELECT EXTRACT(EPOCH FROM INTERVAL '5 days 3 hours');
+<I
+CLASS="LINEANNOTATION"
+>Результат:</I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>442800</SAMP
+></PRE
+><P
+>Преобразовать время эпохи назад, в значение дата/время можно так:</P
+><PRE
+CLASS="SCREEN"
+>SELECT TIMESTAMP WITH TIME ZONE
+ 'epoch' + 982384720.12 * INTERVAL '1 second';</PRE
+><P
+>(Это преобразование осуществляет функция <CODE
+CLASS="FUNCTION"
+>to_timestamp</CODE
+>.)</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>hour</TT
+></DT
+><DD
+><P
+>Час (0 - 23)</P
+><PRE
+CLASS="SCREEN"
+>SELECT EXTRACT(HOUR FROM TIMESTAMP '2001-02-16 20:38:40');
+<I
+CLASS="LINEANNOTATION"
+>Результат:</I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>20</SAMP
+></PRE
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>isodow</TT
+></DT
+><DD
+><P
+>День недели, считая с понедельника (<TT
+CLASS="LITERAL"
+>1</TT
+>) до воскресенья (<TT
+CLASS="LITERAL"
+>7</TT
+>)</P
+><PRE
+CLASS="SCREEN"
+>SELECT EXTRACT(ISODOW FROM TIMESTAMP '2001-02-18 20:38:40');
+<I
+CLASS="LINEANNOTATION"
+>Результат:</I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>7</SAMP
+></PRE
+><P
+>Результат отличается от <TT
+CLASS="LITERAL"
+>dow</TT
+> только для воскресенья. Такая нумерация соответствует <ACRONYM
+CLASS="ACRONYM"
+>ISO</ACRONYM
+> 8601.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>isoyear</TT
+></DT
+><DD
+><P
+>Год по недельному календарю <ACRONYM
+CLASS="ACRONYM"
+>ISO</ACRONYM
+> 8601, в который попадает дата (неприменимо к интервалам)</P
+><PRE
+CLASS="SCREEN"
+>SELECT EXTRACT(ISOYEAR FROM DATE '2006-01-01');
+<I
+CLASS="LINEANNOTATION"
+>Результат:</I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>2005</SAMP
+>
+SELECT EXTRACT(ISOYEAR FROM DATE '2006-01-02');
+<I
+CLASS="LINEANNOTATION"
+>Результат:</I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>2006</SAMP
+></PRE
+><P
+>Год по недельному календарю <ACRONYM
+CLASS="ACRONYM"
+>ISO</ACRONYM
+> начинается с понедельника недели, в которой оказывается 4 января, так что в начале января или в конце декабря год по <ACRONYM
+CLASS="ACRONYM"
+>ISO</ACRONYM
+> может отличаться от года по григорианскому календарю. Подробнее об этом рассказывается в описании поля <TT
+CLASS="LITERAL"
+>week</TT
+>.</P
+><P
+>Этого поля не было в PostgreSQL до версии 8.3.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>microseconds</TT
+></DT
+><DD
+><P
+>Значение секунд с дробной частью, умноженное на 1 000 000; заметьте, что оно включает и целые секунды</P
+><PRE
+CLASS="SCREEN"
+>SELECT EXTRACT(MICROSECONDS FROM TIME '17:12:28.5');
+<I
+CLASS="LINEANNOTATION"
+>Результат:</I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>28500000</SAMP
+></PRE
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>millennium</TT
+></DT
+><DD
+><P
+>Тысячелетие</P
+><PRE
+CLASS="SCREEN"
+>SELECT EXTRACT(MILLENNIUM FROM TIMESTAMP '2001-02-16 20:38:40');
+<I
+CLASS="LINEANNOTATION"
+>Результат:</I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>3</SAMP
+></PRE
+><P
+>Годы 20 века относятся ко второму тысячелетию. Третье тысячелетие началось 1 января 2001 г.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>milliseconds</TT
+></DT
+><DD
+><P
+>Значение секунд с дробной частью, умноженное на 1 000; заметьте, что оно включает и целые секунды.</P
+><PRE
+CLASS="SCREEN"
+>SELECT EXTRACT(MILLISECONDS FROM TIME '17:12:28.5');
+<I
+CLASS="LINEANNOTATION"
+>Результат:</I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>28500</SAMP
+></PRE
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>minute</TT
+></DT
+><DD
+><P
+>Минуты (0 - 59)</P
+><PRE
+CLASS="SCREEN"
+>SELECT EXTRACT(MINUTE FROM TIMESTAMP '2001-02-16 20:38:40');
+<I
+CLASS="LINEANNOTATION"
+>Результат:</I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>38</SAMP
+></PRE
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>month</TT
+></DT
+><DD
+><P
+>Для значений <TT
+CLASS="TYPE"
+>timestamp</TT
+> это номер месяца в году (1 - 12), а для <TT
+CLASS="TYPE"
+>interval</TT
+> &mdash; остаток от деления числа месяцев на 12 (в интервале 0 - 11)</P
+><PRE
+CLASS="SCREEN"
+>SELECT EXTRACT(MONTH FROM TIMESTAMP '2001-02-16 20:38:40');
+<I
+CLASS="LINEANNOTATION"
+>Результат:</I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>2</SAMP
+>
+
+SELECT EXTRACT(MONTH FROM INTERVAL '2 years 3 months');
+<I
+CLASS="LINEANNOTATION"
+>Результат:</I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>3</SAMP
+>
+
+SELECT EXTRACT(MONTH FROM INTERVAL '2 years 13 months');
+<I
+CLASS="LINEANNOTATION"
+>Результат:</I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>1</SAMP
+></PRE
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>quarter</TT
+></DT
+><DD
+><P
+>Квартал года (1 - 4), к которому относится дата</P
+><PRE
+CLASS="SCREEN"
+>SELECT EXTRACT(QUARTER FROM TIMESTAMP '2001-02-16 20:38:40');
+<I
+CLASS="LINEANNOTATION"
+>Результат:</I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>1</SAMP
+></PRE
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>second</TT
+></DT
+><DD
+><P
+>Секунды, включая дробную часть (0 - 59<A
+NAME="AEN14731"
+HREF="#FTN.AEN14731"
+><SPAN
+CLASS="footnote"
+>[1]</SPAN
+></A
+>)</P
+><PRE
+CLASS="SCREEN"
+>SELECT EXTRACT(SECOND FROM TIMESTAMP '2001-02-16 20:38:40');
+<I
+CLASS="LINEANNOTATION"
+>Результат:</I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>40</SAMP
+>
+
+SELECT EXTRACT(SECOND FROM TIME '17:12:28.5');
+<I
+CLASS="LINEANNOTATION"
+>Результат:</I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>28.5</SAMP
+></PRE
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>timezone</TT
+></DT
+><DD
+><P
+>Смещение часового пояса от UTC, представленное в секундах. Положительные значения соответствуют часовым поясам к востоку от UTC, а отрицательные &mdash; к западу. (Выражаясь технически точно, <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> использует <ACRONYM
+CLASS="ACRONYM"
+>UT1</ACRONYM
+>, так как секунды координации не учитываются.)</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>timezone_hour</TT
+></DT
+><DD
+><P
+>Поле часов в смещении часового пояса</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>timezone_minute</TT
+></DT
+><DD
+><P
+>Поле минут в смещении часового пояса</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>week</TT
+></DT
+><DD
+><P
+>Номер недели в году по недельному календарю <ACRONYM
+CLASS="ACRONYM"
+>ISO</ACRONYM
+> 8601. По определению, недели <ACRONYM
+CLASS="ACRONYM"
+>ISO</ACRONYM
+> 8601 начинаются с понедельника, а первая неделя года включает 4 января этого года. Другими словами, первый четверг года всегда оказывается в 1 неделе этого года.</P
+><P
+>В системе нумерации недель ISO первые числа января могут относиться к 52-ой или 53-ей неделе предыдущего года, а последние числа декабря &mdash; к первой неделе следующего года. Например, <TT
+CLASS="LITERAL"
+>2005-01-01</TT
+> относится к 53-ей неделе 2004 г., а <TT
+CLASS="LITERAL"
+>2006-01-01</TT
+> &mdash; к 52-ей неделе 2005 г., тогда как <TT
+CLASS="LITERAL"
+>2012-12-31</TT
+> включается в первую неделю 2013 г. Поэтому для получения согласованных результатов рекомендуется использовать поле <TT
+CLASS="LITERAL"
+>isoyear</TT
+> в паре с <TT
+CLASS="LITERAL"
+>week</TT
+>.</P
+><PRE
+CLASS="SCREEN"
+>SELECT EXTRACT(WEEK FROM TIMESTAMP '2001-02-16 20:38:40');
+<I
+CLASS="LINEANNOTATION"
+>Результат:</I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>7</SAMP
+></PRE
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>year</TT
+></DT
+><DD
+><P
+>Поле года. Учтите, что года <TT
+CLASS="LITERAL"
+>0</TT
+> не было, и это следует иметь в виду, вычитая из годов нашей эры годы до нашей эры.</P
+><PRE
+CLASS="SCREEN"
+>SELECT EXTRACT(YEAR FROM TIMESTAMP '2001-02-16 20:38:40');
+<I
+CLASS="LINEANNOTATION"
+>Результат:</I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>2001</SAMP
+></PRE
+></DD
+></DL
+></DIV
+><P></P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>extract</CODE
+> в основном предназначена для вычислительных целей. Функции форматирования даты/времени описаны в <A
+HREF="functions-formatting.html"
+>Разделе 9.8</A
+>.</P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>date_part</CODE
+> эмулирует традиционный для <SPAN
+CLASS="PRODUCTNAME"
+>Ingres</SPAN
+> эквивалент стандартной <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>-функции <CODE
+CLASS="FUNCTION"
+>extract</CODE
+>: </P><PRE
+CLASS="SYNOPSIS"
+>date_part('<TT
+CLASS="REPLACEABLE"
+><I
+>поле</I
+></TT
+>', <TT
+CLASS="REPLACEABLE"
+><I
+>источник</I
+></TT
+>)</PRE
+><P> Заметьте, что здесь параметр <TT
+CLASS="REPLACEABLE"
+><I
+>поле</I
+></TT
+> должен быть строковым значением, а не именем. Функция <CODE
+CLASS="FUNCTION"
+>date_part</CODE
+> воспринимает те же поля, что и <CODE
+CLASS="FUNCTION"
+>extract</CODE
+>.</P
+><PRE
+CLASS="SCREEN"
+>SELECT date_part('day', TIMESTAMP '2001-02-16 20:38:40');
+<I
+CLASS="LINEANNOTATION"
+>Результат:</I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>16</SAMP
+>
+
+SELECT date_part('hour', INTERVAL '4 hours 3 minutes');
+<I
+CLASS="LINEANNOTATION"
+>Результат:</I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>4</SAMP
+></PRE
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="FUNCTIONS-DATETIME-TRUNC"
+>9.9.2. <CODE
+CLASS="FUNCTION"
+>date_trunc</CODE
+></A
+></H2
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>date_trunc</CODE
+> работает подобно <CODE
+CLASS="FUNCTION"
+>trunc</CODE
+> для чисел.</P
+><P
+></P><PRE
+CLASS="SYNOPSIS"
+>date_trunc('<TT
+CLASS="REPLACEABLE"
+><I
+>поле</I
+></TT
+>', <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+>)</PRE
+><P>
+Здесь <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> &mdash; это выражение типа <TT
+CLASS="TYPE"
+>timestamp</TT
+> или <TT
+CLASS="TYPE"
+>interval</TT
+>. (Значения типов <TT
+CLASS="TYPE"
+>date</TT
+> и <TT
+CLASS="TYPE"
+>time</TT
+> автоматически приводятся к типам <TT
+CLASS="TYPE"
+>timestamp</TT
+> и <TT
+CLASS="TYPE"
+>interval</TT
+>, соответственно.) Параметр <TT
+CLASS="REPLACEABLE"
+><I
+>поле</I
+></TT
+> определяет, до какой точности обрезать переданное значение. Возвращаемое значение будет иметь тип <TT
+CLASS="TYPE"
+>timestamp</TT
+> или <TT
+CLASS="TYPE"
+>interval</TT
+> и все его значения, менее значимые, чем заданное поле, будут равны нулю (или единице, если это номер дня или месяца).</P
+><P
+>Параметр <TT
+CLASS="REPLACEABLE"
+><I
+>поле</I
+></TT
+> может принимать следующие значения: <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>microseconds</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>milliseconds</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>second</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>minute</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>hour</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>day</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>week</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>month</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>quarter</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>year</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>decade</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>century</TT
+></TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+>millennium</TT
+></TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></P
+><P
+>Примеры: </P><PRE
+CLASS="SCREEN"
+>SELECT date_trunc('hour', TIMESTAMP '2001-02-16 20:38:40');
+<I
+CLASS="LINEANNOTATION"
+>Результат: </I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>2001-02-16 20:00:00</SAMP
+>
+
+SELECT date_trunc('year', TIMESTAMP '2001-02-16 20:38:40');
+<I
+CLASS="LINEANNOTATION"
+>Результат: </I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>2001-01-01 00:00:00</SAMP
+></PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="FUNCTIONS-DATETIME-ZONECONVERT"
+>9.9.3. <TT
+CLASS="LITERAL"
+>AT TIME ZONE</TT
+></A
+></H2
+><P
+>Конструкция <TT
+CLASS="LITERAL"
+>AT TIME ZONE</TT
+> позволяет переводить время в разные часовые пояса. Все её разновидности показаны в <A
+HREF="functions-datetime.html#FUNCTIONS-DATETIME-ZONECONVERT-TABLE"
+>Таблице 9-29</A
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-DATETIME-ZONECONVERT-TABLE"
+></A
+><P
+><B
+>Таблица 9-29. Разновидности <TT
+CLASS="LITERAL"
+>AT TIME ZONE</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Выражение</TH
+><TH
+>Тип результата</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>         <TT
+CLASS="LITERAL"
+><TT
+CLASS="TYPE"
+>timestamp without time zone</TT
+> AT TIME ZONE <TT
+CLASS="REPLACEABLE"
+><I
+>часовой_пояс</I
+></TT
+></TT
+>
+        </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+>
+                  </TD
+><TD
+>Воспринимает заданное время <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>без указания часового пояса</I
+></SPAN
+> как время в указанном часовом поясе</TD
+></TR
+><TR
+><TD
+>         <TT
+CLASS="LITERAL"
+><TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+> AT TIME ZONE <TT
+CLASS="REPLACEABLE"
+><I
+>часовой_пояс</I
+></TT
+></TT
+>
+        </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>timestamp without time zone</TT
+>
+                  </TD
+><TD
+>Переводит данное значение timestamp <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>с часовым поясом</I
+></SPAN
+> в другой часовой пояс, но не сохраняет информацию о нём в результате</TD
+></TR
+><TR
+><TD
+>         <TT
+CLASS="LITERAL"
+><TT
+CLASS="TYPE"
+>time with time zone</TT
+> AT TIME ZONE <TT
+CLASS="REPLACEABLE"
+><I
+>часовой_пояс</I
+></TT
+></TT
+>
+        </TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>time with time zone</TT
+>
+                  </TD
+><TD
+>Переводит данное время <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>с часовым поясом</I
+></SPAN
+> в другой часовой пояс</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>В этих выражениях желаемый <TT
+CLASS="REPLACEABLE"
+><I
+>часовой_пояс</I
+></TT
+> можно задать либо в виде текстовой строки (например, <TT
+CLASS="LITERAL"
+>'PST'</TT
+>) или как интервал (например, <TT
+CLASS="LITERAL"
+>INTERVAL '-08:00'</TT
+>). В первом случае название часового пояса можно указать любым из способов, описанных в <A
+HREF="datatype-datetime.html#DATATYPE-TIMEZONES"
+>Подразделе 8.5.3</A
+>.</P
+><P
+>Примеры (в предположении, что местный часовой пояс <TT
+CLASS="LITERAL"
+>PST8PDT</TT
+>): </P><PRE
+CLASS="SCREEN"
+>SELECT TIMESTAMP '2001-02-16 20:38:40' AT TIME ZONE 'MST';
+<I
+CLASS="LINEANNOTATION"
+>Результат: </I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>2001-02-16 19:38:40-08</SAMP
+>
+
+SELECT TIMESTAMP WITH TIME ZONE '2001-02-16 20:38:40-05' AT TIME ZONE 'MST';
+<I
+CLASS="LINEANNOTATION"
+>Результат: </I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>2001-02-16 18:38:40</SAMP
+></PRE
+><P> В первом примере время без часового пояса интерпретируется как время в часовом поясе MST (UTC-7), а затем оно преобразуется в PST (UTC-8) для вывода. Во втором примере время, указанное с часовым поясом EST (UTC-5), преобразуется во время для часового пояса MST (UTC-7).</P
+><P
+>Функция <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>timezone</CODE
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>часовой_пояс</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>время</I
+></TT
+>)</TT
+> равнозначна SQL-совместимой конструкции <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>время</I
+></TT
+> AT TIME ZONE <TT
+CLASS="REPLACEABLE"
+><I
+>часовой_пояс</I
+></TT
+></TT
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="FUNCTIONS-DATETIME-CURRENT"
+>9.9.4. Текущая дата/время</A
+></H2
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> предоставляет набор функций, результат которых зависит от текущей даты и времени. Все следующие функции соответствуют стандарту SQL и возвращают значения, отражающие время начала текущей транзакции: </P><PRE
+CLASS="SYNOPSIS"
+>CURRENT_DATE
+CURRENT_TIME
+CURRENT_TIMESTAMP
+CURRENT_TIME(<TT
+CLASS="REPLACEABLE"
+><I
+>точность</I
+></TT
+>)
+CURRENT_TIMESTAMP(<TT
+CLASS="REPLACEABLE"
+><I
+>точность</I
+></TT
+>)
+LOCALTIME
+LOCALTIMESTAMP
+LOCALTIME(<TT
+CLASS="REPLACEABLE"
+><I
+>точность</I
+></TT
+>)
+LOCALTIMESTAMP(<TT
+CLASS="REPLACEABLE"
+><I
+>точность</I
+></TT
+>)</PRE
+><P></P
+><P
+><CODE
+CLASS="FUNCTION"
+>CURRENT_TIME</CODE
+> и <CODE
+CLASS="FUNCTION"
+>CURRENT_TIMESTAMP</CODE
+> возвращают время с часовым поясом. В результатах <CODE
+CLASS="FUNCTION"
+>LOCALTIME</CODE
+> и <CODE
+CLASS="FUNCTION"
+>LOCALTIMESTAMP</CODE
+> нет информации о часовом поясе.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>CURRENT_TIME</CODE
+>, <CODE
+CLASS="FUNCTION"
+>CURRENT_TIMESTAMP</CODE
+>, <CODE
+CLASS="FUNCTION"
+>LOCALTIME</CODE
+> и <CODE
+CLASS="FUNCTION"
+>LOCALTIMESTAMP</CODE
+> могут принимать необязательный параметр точности, определяющий, до какого знака после запятой следует округлять поле секунд. Если этот параметр отсутствует, результат будет иметь максимально возможную точность.</P
+><P
+>Несколько примеров: </P><PRE
+CLASS="SCREEN"
+>SELECT CURRENT_TIME;
+<I
+CLASS="LINEANNOTATION"
+>Результат: </I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>14:39:53.662522-05</SAMP
+>
+
+SELECT CURRENT_DATE;
+<I
+CLASS="LINEANNOTATION"
+>Результат: </I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>2001-12-23</SAMP
+>
+
+SELECT CURRENT_TIMESTAMP;
+<I
+CLASS="LINEANNOTATION"
+>Результат: </I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>2001-12-23 14:39:53.662522-05</SAMP
+>
+
+SELECT CURRENT_TIMESTAMP(2);
+<I
+CLASS="LINEANNOTATION"
+>Результат: </I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>2001-12-23 14:39:53.66-05</SAMP
+>
+
+SELECT LOCALTIMESTAMP;
+<I
+CLASS="LINEANNOTATION"
+>Результат: </I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>2001-12-23 14:39:53.662522</SAMP
+></PRE
+><P></P
+><P
+>Так как эти функции возвращают время начала текущей транзакции, во время транзакции эти значения не меняются. Это считается не ошибкой, а особенностью реализации: цель такого поведения в том, чтобы в одной транзакции <SPAN
+CLASS="QUOTE"
+>"текущее"</SPAN
+> время было одинаковым и для разных изменений в одной транзакций записывалась одна отметка времени.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>В других СУБД эти значения могут изменяться чаще.</P
+></BLOCKQUOTE
+></DIV
+><P
+>В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> есть также функции, возвращающие время начала текущего оператора, а также текущее время в момент вызова функции. Таким образом, в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> есть следующие функции, не описанные в стандарте SQL: </P><PRE
+CLASS="SYNOPSIS"
+>transaction_timestamp()
+statement_timestamp()
+clock_timestamp()
+timeofday()
+now()</PRE
+><P></P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>transaction_timestamp()</CODE
+> равнозначна конструкции <CODE
+CLASS="FUNCTION"
+>CURRENT_TIMESTAMP</CODE
+>, но в её названии явно отражено, что она возвращает. Функция <CODE
+CLASS="FUNCTION"
+>statement_timestamp()</CODE
+> возвращает время начала текущего оператора (более точно, время получения последнего командного сообщения от клиента). Функции <CODE
+CLASS="FUNCTION"
+>statement_timestamp()</CODE
+> и <CODE
+CLASS="FUNCTION"
+>transaction_timestamp()</CODE
+> возвращают одно и то же значение в первой команде транзакции, но в последующих их показания будут расходиться. Функция <CODE
+CLASS="FUNCTION"
+>clock_timestamp()</CODE
+> возвращает фактическое текущее время, так что её значение меняется в рамках одной команды SQL. Функция <CODE
+CLASS="FUNCTION"
+>timeofday()</CODE
+> существует в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> по историческим причинам и, подобно <CODE
+CLASS="FUNCTION"
+>clock_timestamp()</CODE
+>, она возвращает фактическое текущее время, но представленное в виде форматированной строки типа <TT
+CLASS="TYPE"
+>text</TT
+>, а не значения <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+>. Функция <CODE
+CLASS="FUNCTION"
+>now()</CODE
+> &mdash; традиционный для <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> эквивалент функции <CODE
+CLASS="FUNCTION"
+>transaction_timestamp()</CODE
+>.</P
+><P
+>Все типы даты/времени также принимают специальное буквальное значение <TT
+CLASS="LITERAL"
+>now</TT
+>, подразумевающее текущую дату и время (тоже на момент начала транзакции). Таким образом, результат следующих трёх операторов будет одинаковым: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT CURRENT_TIMESTAMP;
+SELECT now();
+SELECT TIMESTAMP 'now';  -- не подходит для DEFAULT</PRE
+><P></P
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>Третья форма не подходит для указания в качестве значения <TT
+CLASS="LITERAL"
+>DEFAULT</TT
+> при создании таблицы. Система преобразует <TT
+CLASS="LITERAL"
+>now</TT
+> в значение <TT
+CLASS="TYPE"
+>timestamp</TT
+> в момент разбора константы, поэтому, когда будет вставляться значение по умолчанию, в соответствующей колонке окажется время создания таблицы! Первые две формы не будут вычисляться, пока не потребуется значение по умолчанию, так как это вызовы функции. Поэтому они дадут желаемый результат при добавлении строки в таблицу.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="FUNCTIONS-DATETIME-DELAY"
+>9.9.5. Задержка выполнения</A
+></H2
+><P
+>В случае необходимости вы можете приостановить выполнение серверного процесса, используя следующие функции: </P><PRE
+CLASS="SYNOPSIS"
+>pg_sleep(<TT
+CLASS="REPLACEABLE"
+><I
+>сек</I
+></TT
+>)
+pg_sleep_for(<TT
+CLASS="TYPE"
+>interval</TT
+>)
+pg_sleep_until(<TT
+CLASS="TYPE"
+>timestamp with time zon</TT
+>)</PRE
+><P>
+
+    Функция <CODE
+CLASS="FUNCTION"
+>pg_sleep</CODE
+> переводит процесс текущего сеанса в спящее состояние на указанное число секунд (<TT
+CLASS="REPLACEABLE"
+><I
+>сек</I
+></TT
+>). Параметр <TT
+CLASS="REPLACEABLE"
+><I
+>сек</I
+></TT
+> имеет тип <TT
+CLASS="TYPE"
+>double precision</TT
+>, так что в нём можно указать и дробное число. Функция <CODE
+CLASS="FUNCTION"
+>pg_sleep_for</CODE
+> введена для удобства, ей можно передать большие значения задержки в типе <TT
+CLASS="TYPE"
+>interval</TT
+>. А <CODE
+CLASS="FUNCTION"
+>pg_sleep_until</CODE
+> удобнее использовать, когда необходимо задать определённое время выхода из спящего состояния. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT pg_sleep(1.5);
+SELECT pg_sleep_for('5 minutes');
+SELECT pg_sleep_until('tomorrow 03:00');</PRE
+><P></P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Действительное разрешение интервала задержки зависит от платформы; обычно это 0.01. Фактическая длительность задержки не будет меньше указанного времени, но может быть больше, в зависимости, например от нагрузки на сервер. В частности, не гарантируется, что <CODE
+CLASS="FUNCTION"
+>pg_sleep_until</CODE
+> проснётся именно в указанное время, но она точно не проснётся раньше.</P
+></BLOCKQUOTE
+></DIV
+><DIV
+CLASS="WARNING"
+><P
+></P
+><TABLE
+CLASS="WARNING"
+BORDER="1"
+WIDTH="100%"
+><TR
+><TD
+ALIGN="CENTER"
+><B
+>Внимание</B
+></TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+><P
+>Прежде чем вызывать <CODE
+CLASS="FUNCTION"
+>pg_sleep</CODE
+> или её вариации, убедитесь в том, что в текущем сеансе нет ненужных блокировок. В противном случае в состояние ожидания могут перейти и другие сеансы, так что это отразится на системе в целом.</P
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+></DIV
+><H3
+CLASS="FOOTNOTES"
+>Примечания</H3
+><TABLE
+BORDER="0"
+CLASS="FOOTNOTES"
+WIDTH="100%"
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+WIDTH="5%"
+><A
+NAME="FTN.AEN14731"
+HREF="functions-datetime.html#AEN14731"
+><SPAN
+CLASS="footnote"
+>[1]</SPAN
+></A
+></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+WIDTH="95%"
+><P
+>60, если операционная система поддерживает секунды координации</P
+></TD
+></TR
+></TABLE
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions-formatting.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="functions-enum.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Функции форматирования данных</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Функции для перечислений</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

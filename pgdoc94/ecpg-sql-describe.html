@@ -1,0 +1,313 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>DESCRIBE</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды встраиваемого SQL"
+HREF="ecpg-sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="DECLARE"
+HREF="ecpg-sql-declare.html"><LINK
+REL="NEXT"
+TITLE="DISCONNECT"
+HREF="ecpg-sql-disconnect.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="DECLARE"
+HREF="ecpg-sql-declare.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ecpg-sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="DISCONNECT"
+HREF="ecpg-sql-disconnect.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="ECPG-SQL-DESCRIBE"
+></A
+>DESCRIBE</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN47901"
+></A
+><H2
+>Название</H2
+>DESCRIBE&nbsp;--&nbsp;получить информацию о подготовленном операторе или наборе результатов</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN47904"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>DESCRIBE [ OUTPUT ] <TT
+CLASS="REPLACEABLE"
+><I
+>подготовленный_оператор</I
+></TT
+> USING [ SQL ] DESCRIPTOR <TT
+CLASS="REPLACEABLE"
+><I
+>имя_дескриптора</I
+></TT
+>
+DESCRIBE [ OUTPUT ] <TT
+CLASS="REPLACEABLE"
+><I
+>подготовленный_оператор</I
+></TT
+> INTO [ SQL ] DESCRIPTOR <TT
+CLASS="REPLACEABLE"
+><I
+>имя_дескриптора</I
+></TT
+>
+DESCRIBE [ OUTPUT ] <TT
+CLASS="REPLACEABLE"
+><I
+>подготовленный_оператор</I
+></TT
+> INTO <TT
+CLASS="REPLACEABLE"
+><I
+>имя_sqlda</I
+></TT
+></PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN47912"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>DESCRIBE</TT
+> получает метаданные о результирующих колонках, содержащихся в подготовленном операторе, не считывая собственно строки результата.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN47916"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>подготовленный_оператор</I
+></TT
+></DT
+><DD
+><P
+>Имя подготовленного оператора. Это может быть идентификатор SQL или переменная среды.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_дескриптора</I
+></TT
+></DT
+><DD
+><P
+>Имя дескриптора, задаётся с учётом регистра. Это может быть идентификатор SQL или переменная среды.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_sqlda</I
+></TT
+></DT
+><DD
+><P
+>Имя переменной SQLDA.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN47934"
+></A
+><H2
+>Примеры</H2
+><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL ALLOCATE DESCRIPTOR mydesc;
+EXEC SQL PREPARE stmt1 FROM :sql_stmt;
+EXEC SQL DESCRIBE stmt1 INTO SQL DESCRIPTOR mydesc;
+EXEC SQL GET DESCRIPTOR mydesc VALUE 1 :charvar = NAME;
+EXEC SQL DEALLOCATE DESCRIPTOR mydesc;</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN47937"
+></A
+><H2
+>Совместимость</H2
+><P
+>Команда <TT
+CLASS="COMMAND"
+>DESCRIBE</TT
+> описана в стандарте SQL.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN47941"
+></A
+><H2
+>См. также</H2
+><A
+HREF="ecpg-sql-allocate-descriptor.html"
+>ALLOCATE DESCRIPTOR</A
+>, <A
+HREF="ecpg-sql-get-descriptor.html"
+>GET DESCRIPTOR</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ecpg-sql-declare.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ecpg-sql-disconnect.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>DECLARE</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ecpg-sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>DISCONNECT</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

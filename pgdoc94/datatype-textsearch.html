@@ -1,0 +1,427 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Типы, предназначенные для текстового поиска</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Типы данных"
+HREF="datatype.html"><LINK
+REL="PREVIOUS"
+TITLE="Битовые строки"
+HREF="datatype-bit.html"><LINK
+REL="NEXT"
+TITLE="Тип UUID"
+HREF="datatype-uuid.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Битовые строки"
+HREF="datatype-bit.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="datatype.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 8. Типы данных</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Тип UUID"
+HREF="datatype-uuid.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="DATATYPE-TEXTSEARCH"
+>8.11. Типы, предназначенные для текстового поиска</A
+></H1
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> предоставляет два типа данных для поддержки полнотекстового поиска. Текстовым поиском называется операция анализа набора <I
+CLASS="FIRSTTERM"
+>документов</I
+> с текстом на естественном языке, в результате которой находятся фрагменты, наиболее соответствующие <I
+CLASS="FIRSTTERM"
+>запросу</I
+>. Тип <TT
+CLASS="TYPE"
+>tsvector</TT
+> представляет документ в виде, оптимизированном для текстового поиска, а <TT
+CLASS="TYPE"
+>tsquery</TT
+> представляет запрос текстового поиска в подобном виде. Более подробно это описывается в <A
+HREF="textsearch.html"
+>Главе 12</A
+>, а все связанные функции и операторы перечислены в <A
+HREF="functions-textsearch.html"
+>Разделе 9.13</A
+>.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="DATATYPE-TSVECTOR"
+>8.11.1. <TT
+CLASS="TYPE"
+>tsvector</TT
+></A
+></H2
+><P
+>Значение типа <TT
+CLASS="TYPE"
+>tsvector</TT
+> содержит отсортированный список неповторяющихся <I
+CLASS="FIRSTTERM"
+>лексем</I
+>, т. е. слов, <I
+CLASS="FIRSTTERM"
+>нормализованных</I
+> так, что все словоформы сводятся к одной (подробнее это описано в <A
+HREF="textsearch.html"
+>Главе 12</A
+>). Сортировка и исключение повторяющихся слов производится автоматически при вводе значения, как показано в этом примере: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT 'a fat cat sat on a mat and ate a fat rat'::tsvector;
+                      tsvector
+----------------------------------------------------
+ 'a' 'and' 'ate' 'cat' 'fat' 'mat' 'on' 'rat' 'sat'</PRE
+><P> Для представления в виде лексем пробелов или знаков препинания их нужно заключить в апострофы: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT $$the lexeme '    ' contains spaces$$::tsvector;
+                 tsvector                  
+-------------------------------------------
+ '    ' 'contains' 'lexeme' 'spaces' 'the'</PRE
+><P> (В данном и следующих примерах мы используем строку в долларах, чтобы не дублировать все апострофы в таких строках.) При этом включаемый апостроф или обратную косую черту нужно продублировать: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT $$the lexeme 'Joe''s' contains a quote$$::tsvector;
+                    tsvector                    
+------------------------------------------------
+ 'Joe''s' 'a' 'contains' 'lexeme' 'quote' 'the'</PRE
+><P> Также для лексем можно указать их целочисленные <I
+CLASS="FIRSTTERM"
+>позиции</I
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT 'a:1 fat:2 cat:3 sat:4 on:5 a:6 mat:7 and:8 ate:9 a:10 fat:11
+  rat:12'::tsvector;
+                                  tsvector
+---------------------------------------------------------------------------
+ 'a':1,6,10 'and':8 'ate':9 'cat':3 'fat':2,11 'mat':7 'on':5 'rat':12
+  'sat':4</PRE
+><P> Позиция обычно указывает положение исходного слова в документе. Информация о расположении слов затем может использоваться для <I
+CLASS="FIRSTTERM"
+>оценки близости</I
+>. Позиция может задаваться числом от 1 до 16383; большие значения просто заменяются на 16383. Если для одной лексемы дважды указывается одно положение, такое повторение отбрасывается.</P
+><P
+>Лексемам, для которых заданы позиции, также можно назначить <I
+CLASS="FIRSTTERM"
+>вес</I
+>, выраженный буквами <TT
+CLASS="LITERAL"
+>A</TT
+>, <TT
+CLASS="LITERAL"
+>B</TT
+>, <TT
+CLASS="LITERAL"
+>C</TT
+> или <TT
+CLASS="LITERAL"
+>D</TT
+>. Вес <TT
+CLASS="LITERAL"
+>D</TT
+> подразумевается по умолчанию и поэтому он не показывается при выводе: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT 'a:1A fat:2B,4C cat:5D'::tsvector;
+          tsvector          
+----------------------------
+ 'a':1A 'cat':5 'fat':2B,4C</PRE
+><P> Веса обычно применяются для отражения структуры документа, например для придания особого значения словам в заголовке по сравнению со словами в обычном тексте. Назначенным весам можно сопоставить числовые приоритеты в функциях ранжирования результатов.</P
+><P
+>Важно понимать, что тип <TT
+CLASS="TYPE"
+>tsvector</TT
+> сам по себе не выполняет нормализацию; предполагается, что в сохраняемом значении слова уже нормализованы приложением. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>select 'The Fat Rats'::tsvector;
+      tsvector      
+--------------------
+ 'Fat' 'Rats' 'The'</PRE
+><P> Для большинства англоязычных приложений приведённые выше слова будут считаться ненормализованными, но для <TT
+CLASS="TYPE"
+>tsvector</TT
+> это не важно. Поэтому исходный документ обычно следует обработать функцией <CODE
+CLASS="FUNCTION"
+>to_tsvector</CODE
+>, нормализующей слова: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT to_tsvector('english', 'The Fat Rats');
+   to_tsvector   
+-----------------
+ 'fat':2 'rat':3</PRE
+><P> И это подробнее описано в <A
+HREF="textsearch.html"
+>Главе 12</A
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="DATATYPE-TSQUERY"
+>8.11.2. <TT
+CLASS="TYPE"
+>tsquery</TT
+></A
+></H2
+><P
+>Значение <TT
+CLASS="TYPE"
+>tsquery</TT
+> содержит искомые лексемы, объединённые логическими операторами <TT
+CLASS="LITERAL"
+>&amp;</TT
+> (И), <TT
+CLASS="LITERAL"
+>|</TT
+> (ИЛИ) и <TT
+CLASS="LITERAL"
+>!</TT
+> (НЕ). Для группировки операторов могут использоваться скобки: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT 'fat &amp; rat'::tsquery;
+    tsquery    
+---------------
+ 'fat' &amp; 'rat'
+
+SELECT 'fat &amp; (rat | cat)'::tsquery;
+          tsquery          
+---------------------------
+ 'fat' &amp; ( 'rat' | 'cat' )
+
+SELECT 'fat &amp; rat &amp; ! cat'::tsquery;
+        tsquery         
+------------------------
+ 'fat' &amp; 'rat' &amp; !'cat'</PRE
+><P> Без скобок эти операторы имеют разные приоритеты, в порядке убывания: <TT
+CLASS="LITERAL"
+>!</TT
+>, <TT
+CLASS="LITERAL"
+>&amp;</TT
+> и <TT
+CLASS="LITERAL"
+>|</TT
+>.</P
+><P
+>Лексемам в <TT
+CLASS="TYPE"
+>tsquery</TT
+> можно дополнительно сопоставить буквы весов, при этом они будут соответствовать только тем лексемам в <TT
+CLASS="TYPE"
+>tsvector</TT
+>, которые имеют те же веса: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT 'fat:ab &amp; cat'::tsquery;
+    tsquery
+------------------
+ 'fat':AB &amp; 'cat'</PRE
+><P></P
+><P
+>Кроме того, в лексемах <TT
+CLASS="TYPE"
+>tsquery</TT
+> можно использовать знак <TT
+CLASS="LITERAL"
+>*</TT
+> для поиска по префиксу: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT 'super:*'::tsquery;
+  tsquery  
+-----------
+ 'super':*</PRE
+><P> Этот запрос найдёт все слова в <TT
+CLASS="TYPE"
+>tsvector</TT
+>, начинающиеся с приставки <SPAN
+CLASS="QUOTE"
+>"super"</SPAN
+>. Заметьте, что сначала приставка обрабатывается согласно конфигурации текстового поиска, поэтому следующее сравнение возвращает true: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT to_tsvector( 'postgraduate' ) @@ to_tsquery( 'postgres:*' );
+ ?column? 
+----------
+ t
+(1 row)</PRE
+><P> так как <TT
+CLASS="LITERAL"
+>postgres</TT
+> преобразуется в <TT
+CLASS="LITERAL"
+>postgr</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT to_tsquery('postgres:*');
+ to_tsquery 
+------------
+ 'postgr':*
+(1 row)</PRE
+><P> и эта приставка затем находится в слове <TT
+CLASS="LITERAL"
+>postgraduate</TT
+>.</P
+><P
+>Апострофы в лексемах этого типа можно использовать так же, как и в лексемах в <TT
+CLASS="TYPE"
+>tsvector</TT
+>; и так же, как и для типа <TT
+CLASS="TYPE"
+>tsvector</TT
+>, необходимая нормализация слов должна выполняться до приведения значения к типу <TT
+CLASS="TYPE"
+>tsquery</TT
+>. Для такой нормализации удобно использовать функцию <CODE
+CLASS="FUNCTION"
+>to_tsquery</CODE
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT to_tsquery('Fat:ab &amp; Cats');
+    to_tsquery    
+------------------
+ 'fat':AB &amp; 'cat'</PRE
+><P></P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="datatype-bit.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="datatype-uuid.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Битовые строки</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="datatype.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Тип <ACRONYM
+CLASS="ACRONYM"
+>UUID</ACRONYM
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

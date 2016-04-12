@@ -1,0 +1,378 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>ALTER SYSTEM</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="ALTER SERVER"
+HREF="sql-alterserver.html"><LINK
+REL="NEXT"
+TITLE="ALTER TABLE"
+HREF="sql-altertable.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="ALTER SERVER"
+HREF="sql-alterserver.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="ALTER TABLE"
+HREF="sql-altertable.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-ALTERSYSTEM"
+></A
+>ALTER SYSTEM</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN69407"
+></A
+><H2
+>Название</H2
+>ALTER SYSTEM&nbsp;--&nbsp;изменить параметр конфигурации сервера</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN69410"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>ALTER SYSTEM SET <TT
+CLASS="REPLACEABLE"
+><I
+>параметр_конфигурации</I
+></TT
+> { TO | = } { <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> | '<TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+>' | DEFAULT }
+
+ALTER SYSTEM RESET <TT
+CLASS="REPLACEABLE"
+><I
+>параметр_конфигурации</I
+></TT
+>
+ALTER SYSTEM RESET ALL</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN69416"
+></A
+><H2
+>Описание</H2
+><P
+>Оператор <TT
+CLASS="COMMAND"
+>ALTER SYSTEM</TT
+> применяется для изменения параметров конфигурации сервера, распространяющихся на весь кластер баз данных. Пользоваться им может быть удобнее, чем вручную редактировать файл <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+>. <TT
+CLASS="COMMAND"
+>ALTER SYSTEM</TT
+> записывает заданное значение параметра в файл <TT
+CLASS="FILENAME"
+>postgresql.auto.conf</TT
+>, который считывается сервером в дополнение к <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+>. При указании в качестве значения параметра <TT
+CLASS="LITERAL"
+>DEFAULT</TT
+> или применении формы <TT
+CLASS="COMMAND"
+>RESET</TT
+> соответствующий элемент конфигурации удаляется из <TT
+CLASS="FILENAME"
+>postgresql.auto.conf</TT
+>. Удалить все настроенные таким способом параметры позволяет предложение <TT
+CLASS="LITERAL"
+>RESET ALL</TT
+>.</P
+><P
+>Значения, установленные командой <TT
+CLASS="COMMAND"
+>ALTER SYSTEM</TT
+>, вступают в силу только после следующей перезагрузки сервера (<SPAN
+CLASS="SYSTEMITEM"
+>SIGHUP</SPAN
+> или <TT
+CLASS="LITERAL"
+>pg_ctl reload</TT
+>), либо после следующего перезапуска, если эти параметры устанавливаются только при запуске сервера.</P
+><P
+>Выполнить <TT
+CLASS="COMMAND"
+>ALTER SYSTEM</TT
+> могут только суперпользователи. А так как эта команда работает непосредственно с файловой системой и не может быть отменена, её нельзя поместить в блок транзакции или функцию.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN69434"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>параметр_конфигурации</I
+></TT
+></DT
+><DD
+><P
+>Имя устанавливаемого параметра конфигурации. Список доступных параметров приведён в <A
+HREF="runtime-config.html"
+>Главе 18</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+></DT
+><DD
+><P
+>Новое значение параметра. Значениями могут быть строковые константы, идентификаторы, числа или списки таких элементов через запятую, в зависимости от конкретного параметра. Если в качестве значения указать <TT
+CLASS="LITERAL"
+>DEFAULT</TT
+>, параметр и его значение удаляется из <TT
+CLASS="FILENAME"
+>postgresql.auto.conf</TT
+>.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN69450"
+></A
+><H2
+>Замечания</H2
+><P
+>С помощью этой команды нельзя задать <A
+HREF="runtime-config-file-locations.html#GUC-DATA-DIRECTORY"
+>data_directory</A
+>, равно как и другие параметры, недопустимые в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+> (например, <A
+HREF="runtime-config-preset.html"
+>предустановленные параметры</A
+>).</P
+><P
+>Другие способы настройки параметров описаны в <A
+HREF="config-setting.html"
+>Разделе 18.1</A
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN69458"
+></A
+><H2
+>Примеры</H2
+><P
+>Установка уровня ведения журнала транзакций (<TT
+CLASS="LITERAL"
+>wal_level</TT
+>): </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER SYSTEM SET wal_level = hot_standby;</PRE
+><P></P
+><P
+>Отмена изменения, восстановление значения, заданного в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER SYSTEM RESET wal_level;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN69466"
+></A
+><H2
+>Совместимость</H2
+><P
+>Оператор <TT
+CLASS="COMMAND"
+>ALTER SYSTEM</TT
+> является расширением <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN69471"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-set.html"
+>SET</A
+>, <A
+HREF="sql-show.html"
+>SHOW</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-alterserver.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-altertable.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>ALTER SERVER</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>ALTER TABLE</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

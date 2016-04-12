@@ -1,0 +1,324 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Примеры</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Интерфейс программирования сервера"
+HREF="spi.html"><LINK
+REL="PREVIOUS"
+TITLE="Видимость изменений в данных"
+HREF="spi-visibility.html"><LINK
+REL="NEXT"
+TITLE="Фоновые рабочие процессы"
+HREF="bgworker.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Видимость изменений в данных"
+HREF="spi-visibility.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="spi.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 44. Интерфейс программирования сервера</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Фоновые рабочие процессы"
+HREF="bgworker.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="SPI-EXAMPLES"
+>44.5. Примеры</A
+></H1
+><P
+>Этот раздел содержит очень простой пример использования SPI. Процедура <CODE
+CLASS="FUNCTION"
+>execq</CODE
+> принимает в качестве первого аргумента команду SQL, а в качестве второго число строк, выполняет команду, вызывая <CODE
+CLASS="FUNCTION"
+>SPI_exec</CODE
+>, и возвращает число строк, обработанных этой командой. Более сложные примеры работы с SPI вы можете найти в <TT
+CLASS="FILENAME"
+>src/test/regress/regress.c</TT
+> в дереве исходного кода, а также в модуле <A
+HREF="contrib-spi.html"
+>spi</A
+>.</P
+><PRE
+CLASS="PROGRAMLISTING"
+>#include "postgres.h"
+
+#include "executor/spi.h"
+#include "utils/builtins.h"
+
+#ifdef PG_MODULE_MAGIC
+PG_MODULE_MAGIC;
+#endif
+
+int execq(text *sql, int cnt);
+
+int
+execq(text *sql, int cnt)
+{
+    char *command;
+    int ret;
+    int proc;
+
+    /* Преобразовать данный текстовый объект в строку C */
+    command = text_to_cstring(sql);
+
+    SPI_connect();
+
+    ret = SPI_exec(command, cnt);
+
+    proc = SPI_processed;
+    /*
+     * Если были выбраны какие-то строки, вывести их через elog(INFO).
+     */
+    if (ret &gt; 0 &amp;&amp; SPI_tuptable != NULL)
+    {
+        TupleDesc tupdesc = SPI_tuptable-&gt;tupdesc;
+        SPITupleTable *tuptable = SPI_tuptable;
+        char buf[8192];
+        int i, j;
+
+        for (j = 0; j &lt; proc; j++)
+        {
+            HeapTuple tuple = tuptable-&gt;vals[j];
+
+            for (i = 1, buf[0] = 0; i &lt;= tupdesc-&gt;natts; i++)
+                snprintf(buf + strlen (buf), sizeof(buf) - strlen(buf), " %s%s",
+                        SPI_getvalue(tuple, tupdesc, i),
+                        (i == tupdesc-&gt;natts) ? " " : " |");
+            elog(INFO, "EXECQ: %s", buf);
+        }
+    }
+
+    SPI_finish();
+    pfree(command);
+
+    return (proc);
+}</PRE
+><P
+>(В этой функции используется соглашение о вызовах версии 0, чтобы этот пример было легче понять. В реальных приложениях вы должны использовать новый интерфейс версии 1.)</P
+><P
+>Так эта функция будет объявляться после того, как она будет скомпилирована в разделяемую библиотеку (подробности в <A
+HREF="xfunc-c.html#DFUNC"
+>Подразделе 35.9.6</A
+>): </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION execq(text, integer) RETURNS integer
+    AS '<TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+>'
+    LANGUAGE C;</PRE
+><P></P
+><P
+>Демонстрация использования: </P><PRE
+CLASS="PROGRAMLISTING"
+>=&gt; SELECT execq('CREATE TABLE a (x integer)', 0);
+ execq
+-------
+     0
+(1 row)
+
+=&gt; INSERT INTO a VALUES (execq('INSERT INTO a VALUES (0)', 0));
+INSERT 0 1
+=&gt; SELECT execq('SELECT * FROM a', 0);
+INFO:  EXECQ:  0    -- вставлено функцией execq
+INFO:  EXECQ:  1    -- возвращено функцией execq и вставлено командой INSERT
+
+ execq
+-------
+     2
+(1 row)
+
+=&gt; SELECT execq('INSERT INTO a SELECT x + 2 FROM a', 1);
+ execq
+-------
+     1
+(1 row)
+
+=&gt; SELECT execq('SELECT * FROM a', 10);
+INFO:  EXECQ:  0
+INFO:  EXECQ:  1
+INFO:  EXECQ:  2    -- 0 + 2, вставлена только одна строка - как указано
+
+ execq
+-------
+     3              -- 10 — только максимальное значение, 3 — реальное число строк
+(1 row)
+
+=&gt; DELETE FROM a;
+DELETE 3
+=&gt; INSERT INTO a VALUES (execq('SELECT * FROM a', 0) + 1);
+INSERT 0 1
+=&gt; SELECT * FROM a;
+ x
+---
+ 1                  -- нет строк в a (0) + 1
+(1 row)
+
+=&gt; INSERT INTO a VALUES (execq('SELECT * FROM a', 0) + 1);
+INFO:  EXECQ:  1
+INSERT 0 1
+=&gt; SELECT * FROM a;
+ x
+---
+ 1
+ 2                  -- была одна строка в a + 1
+(2 rows)
+
+-- Этот пример демонстрирует правило видимости изменений в данных:
+
+=&gt; INSERT INTO a SELECT execq('SELECT * FROM a', 0) * x FROM a;
+INFO:  EXECQ:  1
+INFO:  EXECQ:  2
+INFO:  EXECQ:  1
+INFO:  EXECQ:  2
+INFO:  EXECQ:  2
+INSERT 0 2
+=&gt; SELECT * FROM a;
+ x
+---
+ 1
+ 2
+ 2                  -- 2 строки * 1 (x в первой в строке)
+ 6                  -- 3 строки (2 + 1 только вставленная) * 2 (x во второй строке)
+(4 rows)               ^^^^^^
+                       строки, видимые в execq() при разных вызовах</PRE
+><P></P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="spi-visibility.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="bgworker.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Видимость изменений в данных</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="spi.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Фоновые рабочие процессы</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

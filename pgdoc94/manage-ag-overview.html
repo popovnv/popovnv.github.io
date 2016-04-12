@@ -1,0 +1,231 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Обзор</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Управление базами данных"
+HREF="managing-databases.html"><LINK
+REL="PREVIOUS"
+TITLE="Управление базами данных"
+HREF="managing-databases.html"><LINK
+REL="NEXT"
+TITLE="Создание базы данных"
+HREF="manage-ag-createdb.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Управление базами данных"
+HREF="managing-databases.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="managing-databases.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 21. Управление базами данных</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Создание базы данных"
+HREF="manage-ag-createdb.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="MANAGE-AG-OVERVIEW"
+>21.1. Обзор</A
+></H1
+><P
+>База данных — именованная коллекция объектов <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> (<SPAN
+CLASS="QUOTE"
+>"объектов базы данных"</SPAN
+>). В целом, каждый объект базы данных (таблицы, функции и т. д.) принадлежит одной и только одной базе данных. (Правда есть несколько системных каталогов, например, <TT
+CLASS="LITERAL"
+>pg_database</TT
+>, которые принадлежат всему кластеру и доступны для каждой базы данных этого кластера.) Если точнее, база данных это набор схем, которые включают в себя таблицы, функции и т. д. Таким образом, полная иерархия включает в себя: сервер, базу данных, схему, таблицу (или иные типы объектов, к примеру, функции).</P
+><P
+>При подключении к серверу базы данных, клиент должен указать в параметрах подключения имя базы данных, с которой нужно соединиться. Одно соединение не может иметь доступ более чем к одной базе данных. Однако приложение не ограничено в количестве соединений к одной и той же или разным базам данных. Базы данных разделены физически и контроль доступа осуществляется на уровне соединения. В случае, когда один экземпляр сервера <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> обслуживает проекты или пользователей, которых необходимо изолировать друг от друга, рекомендуется размещать их в раздельных базах данных. В случае, когда проекты или пользователи взаимосвязаны и должны иметь возможность использовать общие ресурсы, они должны размещаться в одной базе данных, но, возможно, в раздельных схемах. Схемы — в чистом виде логическая структура, и кто к чему может получить доступ управляется системой привилегий. Более подробная информация по управлению схемами приведена в <A
+HREF="ddl-schemas.html"
+>Разделе 5.7</A
+>.</P
+><P
+>Базы данных создаются командой <TT
+CLASS="COMMAND"
+>CREATE DATABASE</TT
+> (см. <A
+HREF="manage-ag-createdb.html"
+>Раздел 21.2</A
+>), а удаляются командой <TT
+CLASS="COMMAND"
+>DROP DATABASE</TT
+> (см. <A
+HREF="manage-ag-dropdb.html"
+>Раздел 21.5</A
+>). Список существующих баз данных можно посмотреть в системном каталоге <TT
+CLASS="STRUCTNAME"
+>pg_database</TT
+>, например, </P><PRE
+CLASS="SYNOPSIS"
+>SELECT datname FROM pg_database;</PRE
+><P> Метакоманда <TT
+CLASS="LITERAL"
+>\l</TT
+> или ключ <TT
+CLASS="OPTION"
+>-l</TT
+> командной строки приложения <A
+HREF="app-psql.html"
+>            <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>
+          </A
+> также позволяют вывести список существующих баз данных.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Стандарт <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> называет базы данных <SPAN
+CLASS="QUOTE"
+>"каталогами"</SPAN
+>, но на практике у них нет отличий.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="managing-databases.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="manage-ag-createdb.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Управление базами данных</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="managing-databases.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Создание базы данных</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

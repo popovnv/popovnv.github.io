@@ -1,0 +1,382 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Списки выборки</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Запросы"
+HREF="queries.html"><LINK
+REL="PREVIOUS"
+TITLE="Табличные выражения"
+HREF="queries-table-expressions.html"><LINK
+REL="NEXT"
+TITLE="Сочетание запросов"
+HREF="queries-union.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Табличные выражения"
+HREF="queries-table-expressions.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="queries.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 7. Запросы</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Сочетание запросов"
+HREF="queries-union.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="QUERIES-SELECT-LISTS"
+>7.3. Списки выборки</A
+></H1
+><P
+>Как говорилось в предыдущем разделе, табличное выражение в <TT
+CLASS="COMMAND"
+>SELECT</TT
+> создаёт промежуточную виртуальную таблицу, возможно объединяя таблицы, представления, группируя и исключая лишние строки и т. д. Полученная таблица передаётся для обработки в <I
+CLASS="FIRSTTERM"
+>список выборки</I
+>. Этот список выбирает, какие <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>колонки</I
+></SPAN
+> промежуточной таблицы должны выводиться в результате и как именно.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="QUERIES-SELECT-LIST-ITEMS"
+>7.3.1. Элементы списка выборки</A
+></H2
+><P
+>Простейший список выборки образует элемент <TT
+CLASS="LITERAL"
+>*</TT
+>, который выбирает все колонки из полученного табличного выражения. Список выборки также может содержать список выражений значения через запятую (как определено в <A
+HREF="sql-expressions.html"
+>Разделе 4.2</A
+>). Например, это может быть список имён колонок: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT a, b, c FROM ...</PRE
+><P> Имена колонок <TT
+CLASS="LITERAL"
+>a</TT
+>, <TT
+CLASS="LITERAL"
+>b</TT
+> и <TT
+CLASS="LITERAL"
+>c</TT
+> представляют либо фактические имена колонок таблиц, перечисленных в предложении <TT
+CLASS="LITERAL"
+>FROM</TT
+>, либо их псевдонимы, определённые как описано в <A
+HREF="queries-table-expressions.html#QUERIES-TABLE-ALIASES"
+>Подразделе 7.2.1.2</A
+>. Пространство имён в списке выборки то же, что и в предложении <TT
+CLASS="LITERAL"
+>WHERE</TT
+>, если не используется группировка. В противном случае оно совпадает с пространством имён предложения <TT
+CLASS="LITERAL"
+>HAVING</TT
+>.</P
+><P
+>Если колонка с заданным именем есть в нескольких таблицах, необходимо также указать имя таблицы, например так: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT tbl1.a, tbl2.a, tbl1.b FROM ...</PRE
+><P> Обращаясь к нескольким таблицам, бывает удобно получить сразу все колонки одной из таблиц: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT tbl1.*, tbl2.a FROM ...</PRE
+><P> (См. также <A
+HREF="queries-table-expressions.html#QUERIES-WHERE"
+>Подраздел 7.2.2</A
+>.)</P
+><P
+>Если в списке выборки используется обычное выражение значения, по сути при этом в возвращаемую таблицу добавляется новая виртуальная колонка. Выражение значения вычисляется один раз для каждой строки результата со значениями колонок в данной строке. Хотя выражения в списке выборки не обязательно должны обращаться к колонкам табличного выражения из предложения <TT
+CLASS="LITERAL"
+>FROM</TT
+>; они могут содержать, например и простые арифметические выражения.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="QUERIES-COLUMN-LABELS"
+>7.3.2. Метки колонок</A
+></H2
+><P
+>Элементам в списке выборки можно назначить имена для последующей обработки, например, для указания в предложении <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> или для вывода в клиентском приложении. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT a AS value, b + c AS sum FROM ...</PRE
+><P></P
+><P
+>Если выходное имя колонки не определено (с помощью <TT
+CLASS="LITERAL"
+>AS</TT
+>), система назначает имя сама. Для простых ссылок на колонки этим именем становится имя целевой колонки, а для вызовов функций это имя функции. Для сложных выражений система генерирует некоторое подходящее имя.</P
+><P
+>Слово <TT
+CLASS="LITERAL"
+>AS</TT
+> можно опустить, но только если имя новой колонки не является ключевым словом <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> (см. <A
+HREF="sql-keywords-appendix.html"
+>Приложение C</A
+>). Во избежание случайного совпадения имени с ключевым словом это имя можно заключить в кавычки. Например, <TT
+CLASS="LITERAL"
+>VALUE</TT
+> &mdash; ключевое слово, поэтому такой вариант не будет работать: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT a value, b + c AS sum FROM ...</PRE
+><P> а такой будет: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT a "value", b + c AS sum FROM ...</PRE
+><P> Для предотвращения конфликта с ключевыми словами, которые могут появиться в будущем, рекомендуется всегда писать <TT
+CLASS="LITERAL"
+>AS</TT
+> или заключать метки выходных колонок в кавычки.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Именование выходных колонок отличается от того, что происходит в предложении <TT
+CLASS="LITERAL"
+>FROM</TT
+> (см. <A
+HREF="queries-table-expressions.html#QUERIES-TABLE-ALIASES"
+>Подраздел 7.2.1.2</A
+>). Одну колонку можно переименовать дважды, но на выходе окажется имя, назначенное в списке выборки.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="QUERIES-DISTINCT"
+>7.3.3. <TT
+CLASS="LITERAL"
+>DISTINCT</TT
+></A
+></H2
+><P
+>После обработки списка выборки в результирующей таблице можно дополнительно исключить дублирующиеся строки. Для этого сразу после <TT
+CLASS="LITERAL"
+>SELECT</TT
+> добавляется ключевое слово <TT
+CLASS="LITERAL"
+>DISTINCT</TT
+>: </P><PRE
+CLASS="SYNOPSIS"
+>SELECT DISTINCT <TT
+CLASS="REPLACEABLE"
+><I
+>список_выборки</I
+></TT
+> ...</PRE
+><P> (Чтобы явно включить поведение по умолчанию, когда возвращаются все строки, вместо <TT
+CLASS="LITERAL"
+>DISTINCT</TT
+> можно указать ключевое слово <TT
+CLASS="LITERAL"
+>ALL</TT
+>.)</P
+><P
+>Две строки считаются разными, если они содержат различные значения минимум в одной колонке. При этом значения NULL полагаются равными.</P
+><P
+>Кроме того, можно явно определить, какие строки будут считаться различными, следующим образом: </P><PRE
+CLASS="SYNOPSIS"
+>SELECT DISTINCT ON (<TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> ...</SPAN
+>]) <TT
+CLASS="REPLACEABLE"
+><I
+>список_выборки</I
+></TT
+> ...</PRE
+><P> Здесь <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> &mdash; обычное выражение значения, вычисляемое для всех строк. Строки, для которых перечисленные выражения дают один результат, считаются дублирующимися и возвращается только первая строка из такого набора. Заметьте, что <SPAN
+CLASS="QUOTE"
+>"первая строка"</SPAN
+> набора может быть любой, если только запрос не включает сортировку, гарантирующую однозначный порядок строк, поступающих в фильтр <TT
+CLASS="LITERAL"
+>DISTINCT</TT
+>. (Обработка <TT
+CLASS="LITERAL"
+>DISTINCT ON</TT
+> производится после сортировки <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+>.)</P
+><P
+>Предложение <TT
+CLASS="LITERAL"
+>DISTINCT ON</TT
+> не описано в стандарте SQL и иногда его применение считается плохим стилем из-за возможной неопределённости в результатах. При разумном использовании <TT
+CLASS="LITERAL"
+>GROUP BY</TT
+> и подзапросов во <TT
+CLASS="LITERAL"
+>FROM</TT
+> можно обойтись без этой конструкции, но часто она бывает удобнее.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="queries-table-expressions.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="queries-union.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Табличные выражения</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="queries.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Сочетание запросов</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

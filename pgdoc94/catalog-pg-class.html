@@ -1,0 +1,996 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>          pg_class
+        </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Системные каталоги"
+HREF="catalogs.html"><LINK
+REL="PREVIOUS"
+TITLE="          pg_cast
+        "
+HREF="catalog-pg-cast.html"><LINK
+REL="NEXT"
+TITLE="          pg_collation
+        "
+HREF="catalog-pg-collation.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="          pg_cast
+        "
+HREF="catalog-pg-cast.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 48. Системные каталоги</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="          pg_collation
+        "
+HREF="catalog-pg-collation.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CATALOG-PG-CLASS"
+>48.11. <TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+></A
+></H1
+><P
+>В каталоге <TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+> описываются таблицы и практически всё, что имеет колонки или каким-то образом подобно таблице. Сюда входят индексы (но смотрите также <TT
+CLASS="STRUCTNAME"
+>pg_index</TT
+>), последовательности, представления, материализованные представления, составные типы и таблицы TOAST; см. <TT
+CLASS="STRUCTFIELD"
+>relkind</TT
+>. Далее, подразумевая все эти типы объектов, мы будем говорить об <SPAN
+CLASS="QUOTE"
+>"отношениях"</SPAN
+>. Не все колонки здесь имеют смысл для всех типов отношений.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="AEN96106"
+></A
+><P
+><B
+>Таблица 48-11. Колонки <TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип</TH
+><TH
+>Ссылки</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Идентификатор строки (скрытый атрибут; должен выбираться явно)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>relname</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>name</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Имя таблицы, индекса, представления и т. п.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>relnamespace</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-namespace.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_namespace</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>OID пространства имён, содержащего это отношение</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>reltype</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-type.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_type</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>OID типа данных, соответствующего типу строки этой таблицы, если таковой есть (ноль для индексов, так как они не имеют записи в <TT
+CLASS="STRUCTNAME"
+>pg_type</TT
+>)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>reloftype</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-type.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_type</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Для типизированных таблиц, OID нижележащего составного типа, или ноль для всех других отношений</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>relowner</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-authid.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_authid</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Владелец отношения</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>relam</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-am.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_am</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Если это индекс, применяемый метод доступа (B-дерево, хеш и т. д.)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>relfilenode</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Имя файла на диске с этим отношением; ноль означает, что это <SPAN
+CLASS="QUOTE"
+>"отображённое"</SPAN
+> представление, имя файла для которого определяется состоянием на нижнем уровне</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>reltablespace</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-tablespace.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_tablespace</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Табличное пространство, в котором хранится это отношение. Если ноль, подразумевается пространство базы данных по умолчанию. (Не имеет значения, если с отношением не связан файл на диске.)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>relpages</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int4</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Размер представления этой таблицы на диске (в страницах размера <TT
+CLASS="SYMBOL"
+>BLCKSZ</TT
+>). Это лишь примерная оценка, используемая планировщиком. Она обновляется командами <TT
+CLASS="COMMAND"
+>VACUUM</TT
+>, <TT
+CLASS="COMMAND"
+>ANALYZE</TT
+> и несколькими командами DDL, например, <TT
+CLASS="COMMAND"
+>CREATE INDEX</TT
+>.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>reltuples</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>float4</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Число строк в таблице. Это лишь примерная оценка, используемая планировщиком. Она обновляется командами <TT
+CLASS="COMMAND"
+>VACUUM</TT
+>, <TT
+CLASS="COMMAND"
+>ANALYZE</TT
+> и несколькими командами DDL, например, <TT
+CLASS="COMMAND"
+>CREATE INDEX</TT
+>.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>relallvisible</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int4</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Число страниц, помеченных как &laquo;полностью видимые&raquo; в карте видимости таблицы. Это лишь примерная оценка, используемая планировщиком. Она обновляется командами <TT
+CLASS="COMMAND"
+>VACUUM</TT
+>, <TT
+CLASS="COMMAND"
+>ANALYZE</TT
+> и несколькими командами DDL, например, <TT
+CLASS="COMMAND"
+>CREATE INDEX</TT
+>.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>reltoastrelid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-class.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>OID таблицы TOAST, связанной с данной таблицей, или 0, если таковой нет. В таблицу TOAST, как во вторичную, <SPAN
+CLASS="QUOTE"
+>"выносятся"</SPAN
+> большие атрибуты.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>relhasindex</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>True, если это таблица и она имеет (или недавно имела) индексы</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>relisshared</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>True, если эта таблица разделяется всеми базами данных в кластере. Разделяемыми являются только некоторые системные каталоги (как например, <TT
+CLASS="STRUCTNAME"
+>pg_database</TT
+>).</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>relpersistence</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>char</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+><TT
+CLASS="LITERAL"
+>p</TT
+> = постоянная таблица (permanent), <TT
+CLASS="LITERAL"
+>u</TT
+> = нежурналируемая таблица (unlogged), <TT
+CLASS="LITERAL"
+>t</TT
+> = временная таблица (temporary)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>relkind</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>char</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+><TT
+CLASS="LITERAL"
+>r</TT
+> = обычная таблица, <TT
+CLASS="LITERAL"
+>i</TT
+> = индекс (index), <TT
+CLASS="LITERAL"
+>S</TT
+> = последовательность (sequence), <TT
+CLASS="LITERAL"
+>v</TT
+> = представление (view), <TT
+CLASS="LITERAL"
+>m</TT
+> = материализованное представление (materialized view), <TT
+CLASS="LITERAL"
+>c</TT
+> = составной тип (composite), <TT
+CLASS="LITERAL"
+>t</TT
+> = таблица TOAST, <TT
+CLASS="LITERAL"
+>f</TT
+> = сторонняя таблица (foreign)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>relnatts</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int2</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Число пользовательских колонок в отношении (системные колонки не считаются). Столько же соответствующих строк должно быть в <TT
+CLASS="STRUCTNAME"
+>pg_attribute</TT
+>. См. также <TT
+CLASS="LITERAL"
+>pg_attribute.attnum</TT
+>.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>relchecks</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int2</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Число ограничений <TT
+CLASS="LITERAL"
+>CHECK</TT
+> в таблице; см. каталог <A
+HREF="catalog-pg-constraint.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_constraint</TT
+></A
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>relhasoids</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>True, если для каждой строки отношения генерируется OID</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>relhaspkey</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>True, если в таблице имеется (или имелся) первичный ключ</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>relhasrules</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>True, если для таблицы определены (или были определены) правила; см. каталог <A
+HREF="catalog-pg-rewrite.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_rewrite</TT
+></A
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>relhastriggers</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>True, если для таблицы определены (или были определены) триггеры; см. каталог <A
+HREF="catalog-pg-trigger.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_trigger</TT
+></A
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>relhassubclass</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>True, если у таблицы есть (или были) потомки в иерархии наследования</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>relispopulated</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>True, если отношение наполнено данными (это истинно для всех отношений, кроме некоторых материализованных представлений)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>relreplident</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>char</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Колонки, формирующие <SPAN
+CLASS="QUOTE"
+>"идентификатор реплики"</SPAN
+> для строк: <TT
+CLASS="LITERAL"
+>d</TT
+> = по умолчанию (первичный ключ, если есть), <TT
+CLASS="LITERAL"
+>n</TT
+> = никакие (nothing), <TT
+CLASS="LITERAL"
+>f</TT
+> = все колонки, <TT
+CLASS="LITERAL"
+>i</TT
+> = индекс (index), если задано значение <TT
+CLASS="STRUCTFIELD"
+>indisreplident</TT
+>, либо набор по умолчанию</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>relfrozenxid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>xid</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Идентификаторы транзакций, предшествующие данному, в этой таблице заменены постоянным (<SPAN
+CLASS="QUOTE"
+>"замороженным"</SPAN
+>) идентификатором транзакции. Это нужно для определения, когда требуется очищать таблицу для предотвращения зацикливания идентификаторов или для сокращения объёма <TT
+CLASS="LITERAL"
+>pg_clog</TT
+>. Если это отношение — не таблица, значение равно нулю (<TT
+CLASS="SYMBOL"
+>InvalidTransactionId</TT
+>).</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>relminmxid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>xid</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Идентификаторы мультитранзакций, предшествующие данному, в этой таблице заменены другим идентификатором транзакции. Это нужно для определения, когда требуется очищать таблицу для предотвращения зацикливания идентификаторов мультитранзакций или для сокращения объёма <TT
+CLASS="LITERAL"
+>pg_multixact</TT
+>. Если это отношение — не таблица, значение равно нулю (<TT
+CLASS="SYMBOL"
+>InvalidMultiXactId</TT
+>).</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>relacl</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>aclitem[]</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Права доступа; за подробностями обратитесь к описанию <A
+HREF="sql-grant.html"
+>GRANT</A
+> и <A
+HREF="sql-revoke.html"
+>REVOKE</A
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>reloptions</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text[]</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Специальные параметры для методов доступа, в виде строк <SPAN
+CLASS="QUOTE"
+>"ключ=значение"</SPAN
+></TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Некоторые логические флаги в <TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+> поддерживаются не строго: гарантируется, что они будут установлены при переходе в определённое состояние, но они могут не сбрасываться немедленно, когда условия поменяются. Например, <TT
+CLASS="STRUCTFIELD"
+>relhasindex</TT
+> устанавливается командой <TT
+CLASS="COMMAND"
+>CREATE INDEX</TT
+>, но никогда не сбрасывается командой <TT
+CLASS="COMMAND"
+>DROP INDEX</TT
+>. Вместо этого, флаг <TT
+CLASS="STRUCTFIELD"
+>relhasindex</TT
+> сбрасывается командой <TT
+CLASS="COMMAND"
+>VACUUM</TT
+>, если она находит, что в таблице нет индексов. Такая организация позволяет избежать состояния гонки и способствует параллельному использованию.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="catalog-pg-cast.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="catalog-pg-collation.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_cast</TT
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_collation</TT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

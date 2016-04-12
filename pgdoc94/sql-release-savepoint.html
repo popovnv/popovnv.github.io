@@ -1,0 +1,306 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>RELEASE SAVEPOINT</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="REINDEX"
+HREF="sql-reindex.html"><LINK
+REL="NEXT"
+TITLE="RESET"
+HREF="sql-reset.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="REINDEX"
+HREF="sql-reindex.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="RESET"
+HREF="sql-reset.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-RELEASE-SAVEPOINT"
+></A
+>RELEASE SAVEPOINT</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN82467"
+></A
+><H2
+>Название</H2
+>RELEASE SAVEPOINT&nbsp;--&nbsp;высвободить ранее определённую точку сохранения</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN82470"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>RELEASE [ SAVEPOINT ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_точки_сохранения</I
+></TT
+></PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN82473"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>RELEASE SAVEPOINT</TT
+> уничтожает точку сохранения, определённую ранее в текущей транзакции.</P
+><P
+>После уничтожения точка сохранения становится неприменимой в качестве точки возврата, но никаких других проявлений, видимых для пользователя, эта команда не имеет. Она не отменяет эффекта команд, выполненных после установки точки сохранения. (Для этого предназначена команда <A
+HREF="sql-rollback-to.html"
+>ROLLBACK TO SAVEPOINT</A
+>.) Уничтожение точки сохранения, когда она становится не нужна, позволяет системе освобождать некоторые ресурсы раньше, чем завершается транзакция.</P
+><P
+><TT
+CLASS="COMMAND"
+>RELEASE SAVEPOINT</TT
+> также уничтожает все точки сохранения, установленные после заданной точки.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN82481"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_точки_сохранения</I
+></TT
+></DT
+><DD
+><P
+>Имя точки сохранения, подлежащей уничтожению.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN82489"
+></A
+><H2
+>Замечания</H2
+><P
+>Указание имени точки сохранения, не определённой ранее, считается ошибкой.</P
+><P
+>Освободить точку сохранения в транзакции, находящейся в прерванном состоянии, нельзя.</P
+><P
+>Если одно имя дано нескольким точкам сохранения, освобождена будет только последняя из них.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN82494"
+></A
+><H2
+>Примеры</H2
+><P
+>Этот пример показывает, как установить и затем уничтожить точку сохранения: </P><PRE
+CLASS="PROGRAMLISTING"
+>BEGIN;
+    INSERT INTO table1 VALUES (3);
+    SAVEPOINT my_savepoint;
+    INSERT INTO table1 VALUES (4);
+    RELEASE SAVEPOINT my_savepoint;
+COMMIT;</PRE
+><P> Данная транзакция вставит значения 3 и 4.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN82498"
+></A
+><H2
+>Совместимость</H2
+><P
+>Эта команда соответствует стандарту <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>. В стандарте говорится, что ключевое слово <TT
+CLASS="LITERAL"
+>SAVEPOINT</TT
+> является обязательным, но <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> позволяет опускать его.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN82504"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-begin.html"
+>BEGIN</A
+>, <A
+HREF="sql-commit.html"
+>COMMIT</A
+>, <A
+HREF="sql-rollback.html"
+>ROLLBACK</A
+>, <A
+HREF="sql-rollback-to.html"
+>ROLLBACK TO SAVEPOINT</A
+>, <A
+HREF="sql-savepoint.html"
+>SAVEPOINT</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-reindex.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-reset.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>REINDEX</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>RESET</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

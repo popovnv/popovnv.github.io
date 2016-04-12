@@ -1,0 +1,318 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Клиент-серверный протокол</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Внутреннее устройство"
+HREF="internals.html"><LINK
+REL="PREVIOUS"
+TITLE="          pg_views
+        "
+HREF="view-pg-views.html"><LINK
+REL="NEXT"
+TITLE="Обзор"
+HREF="protocol-overview.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="CHAPTER"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="          pg_views
+        "
+HREF="view-pg-views.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="internals.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Обзор"
+HREF="protocol-overview.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="PROTOCOL"
+></A
+>Глава 49. Клиент-серверный протокол</H1
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Содержание</B
+></DT
+><DT
+>49.1. <A
+HREF="protocol-overview.html"
+>Обзор</A
+></DT
+><DD
+><DL
+><DT
+>49.1.1. <A
+HREF="protocol-overview.html#PROTOCOL-MESSAGE-CONCEPTS"
+>Обзор обмена сообщениями</A
+></DT
+><DT
+>49.1.2. <A
+HREF="protocol-overview.html#PROTOCOL-QUERY-CONCEPTS"
+>Обзор расширенных запросов</A
+></DT
+><DT
+>49.1.3. <A
+HREF="protocol-overview.html#PROTOCOL-FORMAT-CODES"
+>Форматы и коды форматов</A
+></DT
+></DL
+></DD
+><DT
+>49.2. <A
+HREF="protocol-flow.html"
+>Поток сообщений</A
+></DT
+><DD
+><DL
+><DT
+>49.2.1. <A
+HREF="protocol-flow.html#AEN102720"
+>Запуск</A
+></DT
+><DT
+>49.2.2. <A
+HREF="protocol-flow.html#AEN102795"
+>Простой запрос</A
+></DT
+><DT
+>49.2.3. <A
+HREF="protocol-flow.html#PROTOCOL-FLOW-EXT-QUERY"
+>Расширенный запрос</A
+></DT
+><DT
+>49.2.4. <A
+HREF="protocol-flow.html#AEN102906"
+>Вызов функций</A
+></DT
+><DT
+>49.2.5. <A
+HREF="protocol-flow.html#PROTOCOL-COPY"
+>Операции COPY</A
+></DT
+><DT
+>49.2.6. <A
+HREF="protocol-flow.html#PROTOCOL-ASYNC"
+>Асинхронные операции</A
+></DT
+><DT
+>49.2.7. <A
+HREF="protocol-flow.html#AEN102992"
+>Отмена выполняющихся запросов</A
+></DT
+><DT
+>49.2.8. <A
+HREF="protocol-flow.html#AEN103000"
+>Завершение</A
+></DT
+><DT
+>49.2.9. <A
+HREF="protocol-flow.html#AEN103009"
+>Защита сеанса с <ACRONYM
+CLASS="ACRONYM"
+>SSL</ACRONYM
+></A
+></DT
+></DL
+></DD
+><DT
+>49.3. <A
+HREF="protocol-replication.html"
+>Протокол потоковой репликации</A
+></DT
+><DT
+>49.4. <A
+HREF="protocol-message-types.html"
+>Типы данных в сообщениях</A
+></DT
+><DT
+>49.5. <A
+HREF="protocol-message-formats.html"
+>Форматы сообщений</A
+></DT
+><DT
+>49.6. <A
+HREF="protocol-error-fields.html"
+>Поля сообщений с ошибками и замечаниями</A
+></DT
+><DT
+>49.7. <A
+HREF="protocol-changes.html"
+>Сводка изменений по сравнению с протоколом версии 2.0</A
+></DT
+></DL
+></DIV
+><P
+>Клиенты и серверы <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> взаимодействуют друг с другом, используя специальный протокол, основанный на сообщениях. Этот протокол поддерживается для соединений по <ACRONYM
+CLASS="ACRONYM"
+>TCP/IP</ACRONYM
+> и через доменные сокеты Unix. Для серверов, поддерживающих этот протокол, в IANA зарезервирован номер TCP-порта 5432, но на практике можно задействовать любой порт, не требующий особых привилегий.</P
+><P
+>В этой документации описана версия 3.0 этого протокола, реализованная в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> версии 7.4 и новее. За описанием предыдущих версий протокола обратитесь к документации более ранних выпусков <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Один сервер способен поддерживать несколько версий протокола. Из стартового сообщения при установлении соединения сервер узнаёт, какую версию протокола пытается использовать клиент, и если сервер поддерживает запрошенную версию, он продолжает обмен по этому протоколу.</P
+><P
+>Чтобы эффективно обслуживать множество клиентов, сервер запускает отдельный <SPAN
+CLASS="QUOTE"
+>"обслуживающий"</SPAN
+> процесс для каждого клиента. В текущей реализации новый дочерний процесс запускается немедленно после обнаружения входящего подключения. Однако это происходит прозрачно для протокола. С точки зрения протокола, термины <SPAN
+CLASS="QUOTE"
+>"обслуживающий процесс"</SPAN
+>, <SPAN
+CLASS="QUOTE"
+>"процесс заднего плана"</SPAN
+> и <SPAN
+CLASS="QUOTE"
+>"сервер"</SPAN
+> взаимозаменяемы, как и <SPAN
+CLASS="QUOTE"
+>"приложение переднего плана"</SPAN
+> и <SPAN
+CLASS="QUOTE"
+>"клиент"</SPAN
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="view-pg-views.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="protocol-overview.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_views</TT
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="internals.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Обзор</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

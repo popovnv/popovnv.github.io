@@ -1,0 +1,1121 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Словари</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Полнотекстовый поиск"
+HREF="textsearch.html"><LINK
+REL="PREVIOUS"
+TITLE="Анализаторы"
+HREF="textsearch-parsers.html"><LINK
+REL="NEXT"
+TITLE="Пример конфигурации"
+HREF="textsearch-configuration.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Анализаторы"
+HREF="textsearch-parsers.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="textsearch.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 12. Полнотекстовый поиск</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Пример конфигурации"
+HREF="textsearch-configuration.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="TEXTSEARCH-DICTIONARIES"
+>12.6. Словари</A
+></H1
+><P
+>Словари полнотекстового поиска предназначены для исключения <I
+CLASS="FIRSTTERM"
+>стоп-слов</I
+> (слов, которые не должны учитываться при поиске) и <I
+CLASS="FIRSTTERM"
+>нормализации</I
+> слов, чтобы разные словоформы считались совпадающими. Успешно нормализованное слово называется <I
+CLASS="FIRSTTERM"
+>лексемой</I
+>. Нормализация и исключение стоп-слов не только улучшает качество поиска, но и уменьшает размер представления документа в формате <TT
+CLASS="TYPE"
+>tsvector</TT
+>, и, как следствие, увеличивает быстродействие. Нормализация не всегда имеет лингвистический смысл, обычно она зависит от требований приложения.</P
+><P
+>Несколько примеров нормализации: <P
+></P
+></P><UL
+COMPACT="COMPACT"
+><LI
+STYLE="list-style-type: disc"
+><P
+>Лингвистическая нормализация &mdash; словари Ispell пытаются свести слова на входе к нормализованной форме, а стеммеры убирают окончания слов</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Адреса <ACRONYM
+CLASS="ACRONYM"
+>URL</ACRONYM
+> могут быть канонизированы, чтобы например следующие адреса считались одинаковыми: <P
+></P
+></P><UL
+COMPACT="COMPACT"
+><LI
+STYLE="list-style-type: disc"
+><P
+>http://www.pgsql.ru/db/mw/index.html</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>http://www.pgsql.ru/db/mw/</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>http://www.pgsql.ru/db/../db/mw/index.html</P
+></LI
+></UL
+><P></P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Названия цветов могут быть заменены их шестнадцатеричными значениями, например <TT
+CLASS="LITERAL"
+>red, green, blue, magenta -&gt; FF0000, 00FF00, 0000FF, FF00FF</TT
+></P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>При индексировании чисел можно отбросить цифры в дробной части для сокращения множества всевозможных чисел, чтобы например <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>3.14</I
+></SPAN
+>159265359, <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>3.14</I
+></SPAN
+>15926 и <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>3.14</I
+></SPAN
+> стали одинаковыми после нормализации, при которой после точки останутся только две цифры.</P
+></LI
+></UL
+><P></P
+><P
+>Словарь &mdash; это программа, которая принимает на вход фрагмент и возвращает: <P
+></P
+></P><UL
+COMPACT="COMPACT"
+><LI
+STYLE="list-style-type: disc"
+><P
+>массив лексем, если входной фрагмент известен в словаре (заметьте, один фрагмент может породить несколько лексем)</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>одну лексему с установленным флагом <TT
+CLASS="LITERAL"
+>TSL_FILTER</TT
+> для замены исходного фрагмента новым, чтобы следующие словари работали с новым вариантом (словарь, который делает это, называется <I
+CLASS="FIRSTTERM"
+>фильтрующим словарём</I
+>)</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>пустой массив, если словарь воспринимает этот фрагмент, но считает его стоп-словом</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+><TT
+CLASS="LITERAL"
+>NULL</TT
+>, если словарь не воспринимает полученный фрагмент</P
+></LI
+></UL
+><P></P
+><P
+>В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> встроены стандартные словари для многих языков. Есть также несколько предопределённых шаблонов, на основании которых можно создавать новые словари с изменёнными параметрами. Все эти шаблоны описаны ниже. Если же ни один из них не подходит, можно создать и свои собственные шаблоны. Соответствующие примеры можно найти в каталоге <TT
+CLASS="FILENAME"
+>contrib/</TT
+> инсталляции <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+><P
+>Конфигурация текстового поиска связывает анализатор с набором словарей, которые будут обрабатывать выделенные им фрагменты. Для каждого типа фрагментов, выданных анализатором, в конфигурации задаётся отдельный список словарей. Найденный анализатором фрагмент проходит через все словари по порядку, пока какой-либо словарь не увидит в нём знакомое для него слово. Если он окажется стоп-словом или его не распознает ни один словарь, этот фрагмент не будет учитываться при индексации и поиске. Обычно результат определяет первый же словарь, который возвращает не <TT
+CLASS="LITERAL"
+>NULL</TT
+>, и остальные словари уже не проверяются; однако фильтрующий словарь может заменить полученное слово другим, которое и будет передано следующим словарям.</P
+><P
+>Общее правило настройки списка словарей заключается в том, чтобы поставить наиболее частные и специфические словари в начале, затем перечислить более общие и закончить самым общим словарём, например стеммером <SPAN
+CLASS="APPLICATION"
+>Snowball</SPAN
+> или словарём <TT
+CLASS="LITERAL"
+>simple</TT
+>, который распознаёт всё. Например, для поиска по теме астрономии (конфигурация <TT
+CLASS="LITERAL"
+>astro_en</TT
+>) тип фрагментов <TT
+CLASS="TYPE"
+>asciiword</TT
+> (слово из букв ASCII) можно связать со словарём синонимов астрономических терминов, затем с обычным английским словарём и наконец со стеммером английских окончаний <SPAN
+CLASS="APPLICATION"
+>Snowball</SPAN
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER TEXT SEARCH CONFIGURATION astro_en
+    ADD MAPPING FOR asciiword WITH astrosyn, english_ispell, english_stem;</PRE
+><P></P
+><P
+>Фильтрующий словарь можно включить в любом месте списка, кроме конца, где он будет бесполезен. Фильтрующие словари бывают полезны для частичной нормализации слов и упрощения задачи следующих словарей. Например, фильтрующий словарь может удалить из текста диакритические знаки, как это делает модуль <A
+HREF="unaccent.html"
+>unaccent</A
+>.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="TEXTSEARCH-STOPWORDS"
+>12.6.1. Стоп-слова</A
+></H2
+><P
+>Стоп-словами называются слова, которые встречаются очень часто, практически в каждом документе, и поэтому не имеют различительной ценности. Таким образом, при полнотекстовом поиске их можно игнорировать. Например, в каждом английском тексте содержатся артикли <TT
+CLASS="LITERAL"
+>a</TT
+> и <TT
+CLASS="LITERAL"
+>the</TT
+>, так что хранить их в индексе бессмысленно. Однако стоп-слова влияют на позиции лексем в значении <TT
+CLASS="TYPE"
+>tsvector</TT
+>, от чего, в свою очередь, зависит ранжирование: </P><PRE
+CLASS="SCREEN"
+>SELECT to_tsvector('english','in the list of stop words');
+        to_tsvector
+----------------------------
+ 'list':3 'stop':5 'word':6</PRE
+><P> В результате отсутствуют позиции 1,2,4, потому что фрагменты в этих позициях оказались стоп-словами. Ранги, вычисленные для документов со стоп-словами и без них, могут значительно различаться: </P><PRE
+CLASS="SCREEN"
+>SELECT ts_rank_cd (to_tsvector('english','in the list of stop words'),
+  to_tsquery('list &amp; stop'));
+ ts_rank_cd
+------------
+       0.05
+
+SELECT ts_rank_cd (to_tsvector('english','list stop words'),
+  to_tsquery('list &amp; stop'));
+ ts_rank_cd
+------------
+        0.1</PRE
+><P></P
+><P
+>Как именно обрабатывать стоп-слова, определяет сам словарь. Например, словари <TT
+CLASS="LITERAL"
+>ispell</TT
+> сначала нормализуют слова, а затем просматривают список стоп-слов, тогда как стеммеры <TT
+CLASS="LITERAL"
+>Snowball</TT
+> просматривают свой список стоп-слов в первую очередь. Это различие в поведении объясняется стремлением уменьшить шум.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="TEXTSEARCH-SIMPLE-DICTIONARY"
+>12.6.2. Простой словарь</A
+></H2
+><P
+>Работа шаблона словарей <TT
+CLASS="LITERAL"
+>simple</TT
+> сводится к преобразованию входного фрагмента в нижний регистр и проверки результата по файлу со списком стоп-слов. Если это слово находится в файле, словарь возвращает пустой массив и фрагмент исключается из дальнейшего рассмотрения. В противном случае словарь возвращает в качестве нормализованной лексемы слово в нижнем регистре. Этот словарь можно настроить и так, чтобы все слова, кроме стоп-слов, считались неопознанными и передавались следующему словарю в списке.</P
+><P
+>Определить словарь на основе шаблона <TT
+CLASS="LITERAL"
+>simple</TT
+> можно так: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TEXT SEARCH DICTIONARY public.simple_dict (
+    TEMPLATE = pg_catalog.simple,
+    STOPWORDS = english
+);</PRE
+><P> Здесь <TT
+CLASS="LITERAL"
+>english</TT
+> &mdash; базовое имя файла со стоп-словами. Полным именем файла будет <TT
+CLASS="FILENAME"
+>$SHAREDIR/tsearch_data/english.stop</TT
+>, где <TT
+CLASS="LITERAL"
+>$SHAREDIR</TT
+> указывает на каталог с общими данными <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, часто это <TT
+CLASS="FILENAME"
+>/usr/local/share/postgresql</TT
+> (точно узнать его можно с помощью команды <TT
+CLASS="COMMAND"
+>pg_config --sharedir</TT
+>). Этот текстовый файл должен содержать просто список слов, по одному слову в строке. Пустые строки и окружающие пробелы игнорируются, все символы переводятся в нижний регистр и на этом обработка файла заканчивается.</P
+><P
+>Теперь мы можем проверить наш словарь: </P><PRE
+CLASS="SCREEN"
+>SELECT ts_lexize('public.simple_dict','YeS');
+ ts_lexize
+-----------
+ {yes}
+
+SELECT ts_lexize('public.simple_dict','The');
+ ts_lexize
+-----------
+ {}</PRE
+><P></P
+><P
+>Мы также можем настроить словарь так, чтобы он возвращал <TT
+CLASS="LITERAL"
+>NULL</TT
+> вместо слова в нижнем регистре, если оно не находится в файле стоп-слов. Для этого нужно присвоить параметру <TT
+CLASS="LITERAL"
+>Accept</TT
+> значение <TT
+CLASS="LITERAL"
+>false</TT
+>. Продолжая наш пример: </P><PRE
+CLASS="SCREEN"
+>ALTER TEXT SEARCH DICTIONARY public.simple_dict ( Accept = false );
+
+SELECT ts_lexize('public.simple_dict','YeS');
+ ts_lexize
+-----------
+
+
+SELECT ts_lexize('public.simple_dict','The');
+ ts_lexize
+-----------
+ {}</PRE
+><P></P
+><P
+>Со значением <TT
+CLASS="LITERAL"
+>Accept</TT
+> = <TT
+CLASS="LITERAL"
+>true</TT
+> (по умолчанию) словарь <TT
+CLASS="LITERAL"
+>simple</TT
+> имеет смысл включать только в конце списка словарей, так как он никогда не передаст фрагмент следующему словарю. И напротив, <TT
+CLASS="LITERAL"
+>Accept</TT
+> = <TT
+CLASS="LITERAL"
+>false</TT
+> имеет смысл, только если за ним следует ещё минимум один словарь.</P
+><DIV
+CLASS="CAUTION"
+><P
+></P
+><TABLE
+CLASS="CAUTION"
+BORDER="1"
+WIDTH="100%"
+><TR
+><TD
+ALIGN="CENTER"
+><B
+>Предостережение</B
+></TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+><P
+>Большинство словарей работают с дополнительными файлами, например, файлами стоп-слов. Содержимое этих файлов <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>должно</I
+></SPAN
+> иметь кодировку UTF-8. Если база данных работает в другой кодировке, они будут переведены в неё, когда сервер будет загружать их.</P
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="CAUTION"
+><P
+></P
+><TABLE
+CLASS="CAUTION"
+BORDER="1"
+WIDTH="100%"
+><TR
+><TD
+ALIGN="CENTER"
+><B
+>Предостережение</B
+></TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+><P
+>Обычно в рамках одного сеанса дополнительный файл словаря загружается только один раз, при первом использовании. Если же вы измените его и захотите, чтобы существующие сеансы работали с новым содержимым, выполните для этого словаря команду <TT
+CLASS="COMMAND"
+>ALTER TEXT SEARCH DICTIONARY</TT
+>. Это обновление словаря может быть <SPAN
+CLASS="QUOTE"
+>"фиктивным"</SPAN
+>, фактически не меняющим значения никаких параметров.</P
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="TEXTSEARCH-SYNONYM-DICTIONARY"
+>12.6.3. Словарь синонимов</A
+></H2
+><P
+>Этот шаблон словарей используется для создания словарей, заменяющих слова синонимами. Словосочетания такие словари не поддерживают (используйте для этого тезаурус (<A
+HREF="textsearch-dictionaries.html#TEXTSEARCH-THESAURUS"
+>Подраздел 12.6.4</A
+>)). Словарь синонимов может помочь в преодолении лингвистических проблем, например, не дать стеммеру английского уменьшить слово <SPAN
+CLASS="QUOTE"
+>"Paris"</SPAN
+> до <SPAN
+CLASS="QUOTE"
+>"pari"</SPAN
+>. Для этого достаточно поместить в словарь синонимов строку <TT
+CLASS="LITERAL"
+>Paris paris</TT
+> и поставить этот словарь перед словарём <TT
+CLASS="LITERAL"
+>english_stem</TT
+>. Например: </P><PRE
+CLASS="SCREEN"
+>SELECT * FROM ts_debug('english', 'Paris');
+   alias  |   description  | token|  dictionaries |  dictionary | lexemes
+----------+----------------+------+---------------+-------------+--------
+ asciiword| Word, all ASCII| Paris| {english_stem}| english_stem| {pari}
+
+CREATE TEXT SEARCH DICTIONARY my_synonym (
+    TEMPLATE = synonym,
+    SYNONYMS = my_synonyms
+);
+
+ALTER TEXT SEARCH CONFIGURATION english
+    ALTER MAPPING FOR asciiword
+    WITH my_synonym, english_stem;
+
+SELECT * FROM ts_debug('english', 'Paris');
+   alias  |   description  | token| dictionaries | dictionary| lexemes
+----------+----------------+------+--------------+-----------+--------
+ asciiword| Word, all ASCII| Paris| {my_synonym, | my_synonym| {paris}
+          |                |      | english_stem}|           |</PRE
+><P></P
+><P
+>Шаблон <TT
+CLASS="LITERAL"
+>synonym</TT
+> принимает единственный параметр, <TT
+CLASS="LITERAL"
+>SYNONYMS</TT
+>, в котором задаётся базовое имя его файла конфигурации &mdash; в данном примере это <TT
+CLASS="LITERAL"
+>my_synonyms</TT
+>. Полным именем файла будет <TT
+CLASS="FILENAME"
+>$SHAREDIR/tsearch_data/my_synonyms.syn</TT
+> (где <TT
+CLASS="LITERAL"
+>$SHAREDIR</TT
+> указывает на каталог общих данных <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>). Содержимое этого файла должны составлять строки с двумя словами в каждой (первое &mdash; заменяемое слово, а второе &mdash; его синоним), разделёнными пробелами. Пустые строки и окружающие пробелы при разборе этого файла игнорируются.</P
+><P
+>Шаблон <TT
+CLASS="LITERAL"
+>synonym</TT
+> также принимает необязательный параметр <TT
+CLASS="LITERAL"
+>CaseSensitive</TT
+>, который по умолчанию имеет значение <TT
+CLASS="LITERAL"
+>false</TT
+>. Когда <TT
+CLASS="LITERAL"
+>CaseSensitive</TT
+> равен <TT
+CLASS="LITERAL"
+>false</TT
+>, слова в файле синонимов переводятся в нижний регистр, вместе с проверяемыми фрагментами. Если же он не равен <TT
+CLASS="LITERAL"
+>true</TT
+>, регистр слов в файле и проверяемых фрагментов не меняются, они сравниваются &laquo;как есть&raquo;.</P
+><P
+>В конце синонима в этом файле можно добавить звёздочку (<TT
+CLASS="LITERAL"
+>*</TT
+>), тогда этот синоним будет рассматриваться как префикс. Эта звёздочка будет игнорироваться в <CODE
+CLASS="FUNCTION"
+>to_tsvector()</CODE
+>, но <CODE
+CLASS="FUNCTION"
+>to_tsquery()</CODE
+> изменит результат, добавив в него маркер сопоставления префикса (см. <A
+HREF="textsearch-controls.html#TEXTSEARCH-PARSING-QUERIES"
+>Подраздел 12.3.2</A
+>). Например, предположим, что файл <TT
+CLASS="FILENAME"
+>$SHAREDIR/tsearch_data/synonym_sample.syn</TT
+> имеет следующее содержание: </P><PRE
+CLASS="PROGRAMLISTING"
+>postgres        pgsql
+postgresql      pgsql
+postgre pgsql
+gogle   googl
+indices index*</PRE
+><P> С ним мы получим такие результаты: </P><PRE
+CLASS="SCREEN"
+>mydb=# CREATE TEXT SEARCH DICTIONARY
+  syn (template=synonym, synonyms='synonym_sample');
+mydb=# SELECT ts_lexize('syn','indices');
+ ts_lexize
+-----------
+ {index}
+(1 row)
+
+mydb=# CREATE TEXT SEARCH CONFIGURATION tst (copy=simple);
+mydb=# ALTER TEXT SEARCH CONFIGURATION tst ALTER MAPPING FOR asciiword
+  WITH syn;
+mydb=# SELECT to_tsvector('tst','indices');
+ to_tsvector
+-------------
+ 'index':1
+(1 row)
+
+mydb=# SELECT to_tsquery('tst','indices');
+ to_tsquery
+------------
+ 'index':*
+(1 row)
+
+mydb=# SELECT 'indexes are very useful'::tsvector;
+            tsvector             
+---------------------------------
+ 'are' 'indexes' 'useful' 'very'
+(1 row)
+
+mydb=# SELECT 'indexes are very useful'::tsvector @@
+  to_tsquery('tst','indices');
+ ?column?
+----------
+ t
+(1 row)</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="TEXTSEARCH-THESAURUS"
+>12.6.4. Тезаурус</A
+></H2
+><P
+>Тезаурус (или сокращённо <ACRONYM
+CLASS="ACRONYM"
+>TZ</ACRONYM
+>) содержит набор слов и информацию о связях слов и словосочетаний, то есть более широкие понятия (Broader Terms, <ACRONYM
+CLASS="ACRONYM"
+>BT</ACRONYM
+>), более узкие понятия (Narrow Terms, <ACRONYM
+CLASS="ACRONYM"
+>NT</ACRONYM
+>), предпочитаемые названия, исключаемые названия, связанные понятия и т. д.</P
+><P
+>В основном тезаурус заменяет исключаемые слова и словосочетания предпочитаемыми и может также сохранить исходные слова для индексации. Текущая реализация тезауруса в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> представляет собой расширение словаря синонимов с поддержкой <I
+CLASS="FIRSTTERM"
+>фраз</I
+>. Конфигурация тезауруса определяется файлом следующего формата: </P><PRE
+CLASS="PROGRAMLISTING"
+># это комментарий
+образец слов(а) : индексируемые слова
+другой образец слов(а) : другие индексируемые слова
+...</PRE
+><P> Здесь двоеточие (<TT
+CLASS="SYMBOL"
+>:</TT
+>) служит разделителем между исходной фразой и её заменой.</P
+><P
+>Прежде чем проверять соответствие фраз, тезаурус нормализует файл конфигурации, используя <I
+CLASS="FIRSTTERM"
+>внутренний словарь</I
+> (который указывается в конфигурации словаря-тезауруса). Этот внутренний словарь для тезауруса может быть только одним. Если он не сможет распознать какое-либо слово, произойдёт ошибка. В этом случае необходимо либо исключить это слово, либо добавить его во внутренний словарь. Также можно добавить звёздочку (<TT
+CLASS="SYMBOL"
+>*</TT
+>) перед индексируемыми словами, чтобы они не проверялись по внутреннему словарю, но все слова-образцы <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>должны</I
+></SPAN
+> быть известны внутреннему словарю.</P
+><P
+>Если входному фрагменту соответствуют несколько фраз в этом списке, тезаурус выберет самое длинное определение, а если таких окажется несколько, самое последнее из них.</P
+><P
+>Выделить во фразе какие-то стоп-слова нельзя; вместо этого можно вставить <TT
+CLASS="LITERAL"
+>?</TT
+> в том месте, где может оказаться стоп-слово. Например, в предположении, что <TT
+CLASS="LITERAL"
+>a</TT
+> и <TT
+CLASS="LITERAL"
+>the</TT
+> &mdash; стоп-слова по внутреннему словарю: </P><PRE
+CLASS="PROGRAMLISTING"
+>? one ? two : swsw</PRE
+><P> соответствует входным строкам <TT
+CLASS="LITERAL"
+>a one the two</TT
+> и <TT
+CLASS="LITERAL"
+>the one a two</TT
+>, так что обе эти строки будут заменены на <TT
+CLASS="LITERAL"
+>swsw</TT
+>.</P
+><P
+>Как и обычный словарь, тезаурус должен привязываться к лексемам определённых типов. Так как тезаурус может распознавать фразы, он должен запоминать своё состояние и взаимодействовать с анализатором. Учитывая свои привязки, он может либо обрабатывать следующий фрагмент, либо прекратить накопление фразы. Поэтому настройка тезаурусов в системе требует особого внимания. Например, если привязать тезаурус только к типу фрагментов <TT
+CLASS="LITERAL"
+>asciiword</TT
+>, тогда определение в тезаурусе <TT
+CLASS="LITERAL"
+>one 7</TT
+> не будет работать, так как этот тезаурус не связан с типом <TT
+CLASS="LITERAL"
+>uint</TT
+>.</P
+><DIV
+CLASS="CAUTION"
+><P
+></P
+><TABLE
+CLASS="CAUTION"
+BORDER="1"
+WIDTH="100%"
+><TR
+><TD
+ALIGN="CENTER"
+><B
+>Предостережение</B
+></TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+><P
+>Тезаурусы используются при индексации, поэтому при любом изменении параметров или содержимого тезауруса <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>необходима</I
+></SPAN
+> переиндексация. Для большинства других типов словарей при небольших изменениях, таких как удаление и добавление стоп-слов, переиндексация не требуется.</P
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="TEXTSEARCH-THESAURUS-CONFIG"
+>12.6.4.1. Конфигурация тезауруса</A
+></H3
+><P
+>Для создания нового словаря-тезауруса используется шаблон <TT
+CLASS="LITERAL"
+>thesaurus</TT
+>. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TEXT SEARCH DICTIONARY thesaurus_simple (
+    TEMPLATE = thesaurus,
+    DictFile = mythesaurus,
+    Dictionary = pg_catalog.english_stem
+);</PRE
+><P> Здесь: <P
+></P
+></P><UL
+COMPACT="COMPACT"
+><LI
+STYLE="list-style-type: disc"
+><P
+><TT
+CLASS="LITERAL"
+>thesaurus_simple</TT
+> &mdash; имя нового словаря</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+><TT
+CLASS="LITERAL"
+>mythesaurus</TT
+> &mdash; базовое имя файла конфигурации тезауруса. (Полным путём к файлу будет <TT
+CLASS="FILENAME"
+>$SHAREDIR/tsearch_data/mythesaurus.ths</TT
+>, где <TT
+CLASS="LITERAL"
+>$SHAREDIR</TT
+> указывает на каталог общих данных <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.)</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+><TT
+CLASS="LITERAL"
+>pg_catalog.english_stem</TT
+> &mdash; внутренний словарь (в данном случае, это стеммер Snowball для английского) для нормализации тезауруса. Заметьте, что внутренний словарь имеет собственную конфигурацию (например, список стоп-слов), но здесь она не рассматривается.</P
+></LI
+></UL
+><P> Теперь тезаурус <TT
+CLASS="LITERAL"
+>thesaurus_simple</TT
+> можно связать с желаемыми типами фрагментов в конфигурации, например так: </P><PRE
+CLASS="PROGRAMLISTING"
+>ALTER TEXT SEARCH CONFIGURATION english
+    ALTER MAPPING FOR asciiword, asciihword, hword_asciipart
+    WITH thesaurus_simple;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="TEXTSEARCH-THESAURUS-EXAMPLES"
+>12.6.4.2. Пример тезауруса</A
+></H3
+><P
+>Давайте рассмотрим простой астрономический тезаурус <TT
+CLASS="LITERAL"
+>thesaurus_astro</TT
+>, содержащий несколько астрономических терминов: </P><PRE
+CLASS="PROGRAMLISTING"
+>supernovae stars : sn
+crab nebulae : crab</PRE
+><P> Ниже мы создадим словарь и привяжем некоторые типы фрагментов к астрономическому тезаурусу и английскому стеммеру: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TEXT SEARCH DICTIONARY thesaurus_astro (
+    TEMPLATE = thesaurus,
+    DictFile = thesaurus_astro,
+    Dictionary = english_stem
+);
+
+ALTER TEXT SEARCH CONFIGURATION russian
+    ALTER MAPPING FOR asciiword, asciihword, hword_asciipart
+    WITH thesaurus_astro, english_stem;</PRE
+><P> Теперь можно проверить, как он работает. Функция <CODE
+CLASS="FUNCTION"
+>ts_lexize</CODE
+> не очень полезна для проверки тезауруса, так как она обрабатывает входную строку как один фрагмент. Вместо неё мы можем использовать функции <CODE
+CLASS="FUNCTION"
+>plainto_tsquery</CODE
+> и <CODE
+CLASS="FUNCTION"
+>to_tsvector</CODE
+>, которые разбивают входную строку на несколько фрагментов: </P><PRE
+CLASS="SCREEN"
+>SELECT plainto_tsquery('supernova star');
+ plainto_tsquery
+-----------------
+ 'sn'
+
+SELECT to_tsvector('supernova star');
+ to_tsvector
+-------------
+ 'sn':1</PRE
+><P> В принципе так же можно использовать <CODE
+CLASS="FUNCTION"
+>to_tsquery</CODE
+>, если заключить аргумент в кавычки: </P><PRE
+CLASS="SCREEN"
+>SELECT to_tsquery(' ''supernova star''');
+ to_tsquery
+------------
+ 'sn'</PRE
+><P> Заметьте, что <TT
+CLASS="LITERAL"
+>supernova star</TT
+> совпадает с <TT
+CLASS="LITERAL"
+>supernovae stars</TT
+> в <TT
+CLASS="LITERAL"
+>thesaurus_astro</TT
+>, так как мы подключили стеммер <TT
+CLASS="LITERAL"
+>english_stem</TT
+> в определении тезауруса. Этот стеммер удалил конечные буквы <TT
+CLASS="LITERAL"
+>e</TT
+> и <TT
+CLASS="LITERAL"
+>s</TT
+>.</P
+><P
+>Чтобы проиндексировать исходную фразу вместе с заменой, её нужно просто добавить в правую часть соответствующего определения: </P><PRE
+CLASS="SCREEN"
+>supernovae stars : sn supernovae stars
+
+SELECT plainto_tsquery('supernova star');
+       plainto_tsquery
+-----------------------------
+ 'sn' &amp; 'supernova' &amp; 'star'</PRE
+><P></P
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="TEXTSEARCH-ISPELL-DICTIONARY"
+>12.6.5. Словарь <SPAN
+CLASS="APPLICATION"
+>Ispell</SPAN
+></A
+></H2
+><P
+>Шаблон словарей <SPAN
+CLASS="APPLICATION"
+>Ispell</SPAN
+> поддерживает <I
+CLASS="FIRSTTERM"
+>морфологические словари</I
+>, которые могут сводить множество разных лингвистических форм слова к одной лексеме. Например, английский словарь <SPAN
+CLASS="APPLICATION"
+>Ispell</SPAN
+> может связать вместе все склонения и спряжения ключевого слова <TT
+CLASS="LITERAL"
+>bank</TT
+>: <TT
+CLASS="LITERAL"
+>banking</TT
+>, <TT
+CLASS="LITERAL"
+>banked</TT
+>, <TT
+CLASS="LITERAL"
+>banks</TT
+>, <TT
+CLASS="LITERAL"
+>banks'</TT
+>,<TT
+CLASS="LITERAL"
+>bank's</TT
+> и т. п.</P
+><P
+>Стандартный дистрибутив <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> не включает файлы конфигурации <SPAN
+CLASS="APPLICATION"
+>Ispell</SPAN
+>. Загрузить словари для множества языков можно со страницы <A
+HREF="http://ficus-www.cs.ucla.edu/geoff/ispell.html"
+TARGET="_top"
+>Ispell</A
+>. Кроме того, поддерживаются и другие современные форматы словарей: <A
+HREF="http://en.wikipedia.org/wiki/MySpell"
+TARGET="_top"
+>MySpell</A
+> (OO &lt; 2.0.1) и <A
+HREF="http://sourceforge.net/projects/hunspell/"
+TARGET="_top"
+>Hunspell</A
+> (OO &gt;= 2.0.2). Большой набор соответствующих словарей можно найти на странице <A
+HREF="http://wiki.services.openoffice.org/wiki/Dictionaries"
+TARGET="_top"
+>OpenOffice Wiki</A
+>.</P
+><P
+>Для создания словаря <SPAN
+CLASS="APPLICATION"
+>Ispell</SPAN
+> следует использовать встроенный шаблон <TT
+CLASS="LITERAL"
+>ispell</TT
+> и определить ряд параметров:</P
+><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TEXT SEARCH DICTIONARY english_ispell (
+    TEMPLATE = ispell,
+    DictFile = english,
+    AffFile = english,
+    StopWords = english
+);</PRE
+><P
+>Здесь параметры <TT
+CLASS="LITERAL"
+>DictFile</TT
+>, <TT
+CLASS="LITERAL"
+>AffFile</TT
+> и <TT
+CLASS="LITERAL"
+>StopWords</TT
+> определяют базовые имена файлов словаря, аффиксов и стоп-слов. Файл стоп-слов должен иметь тот же формат, что рассматривался выше в описании словаря <TT
+CLASS="LITERAL"
+>simple</TT
+>. Формат других файлов здесь не рассматривается, но его можно узнать по вышеуказанным веб-адресам.</P
+><P
+>Словари Ispell обычно воспринимают ограниченный набор слов, так что за ними следует подключить другой, более общий словарь, например, Snowball, который принимает всё.</P
+><P
+>Словари Ispell поддерживают разделение составных слов, что бывает полезно. Заметьте, что для этого в файле аффиксов нужно пометить специальным оператором <TT
+CLASS="LITERAL"
+>compoundwords controlled</TT
+> слова, которые могут участвовать в составных образованиях: </P><PRE
+CLASS="PROGRAMLISTING"
+>compoundwords  controlled z</PRE
+><P> Вот как это работает для норвежского языка: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT ts_lexize('norwegian_ispell',
+  'overbuljongterningpakkmesterassistent');
+   {over,buljong,terning,pakk,mester,assistent}
+SELECT ts_lexize('norwegian_ispell', 'sjokoladefabrikk');
+   {sjokoladefabrikk,sjokolade,fabrikk}</PRE
+><P></P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Словарь <SPAN
+CLASS="APPLICATION"
+>MySpell</SPAN
+> не поддерживает составные слова. С другой стороны, <SPAN
+CLASS="APPLICATION"
+>Hunspell</SPAN
+> поддерживает множество операции с ними, но в настоящее время <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> использует только самые простые из этого множества.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="TEXTSEARCH-SNOWBALL-DICTIONARY"
+>12.6.6. Словарь <SPAN
+CLASS="APPLICATION"
+>Snowball</SPAN
+></A
+></H2
+><P
+>Шаблон словарей <SPAN
+CLASS="APPLICATION"
+>Snowball</SPAN
+> основан на проекте Мартина Потера, изобретателя популярного алгоритма стемминга для английского языка. Сейчас Snowball предлагает алгоритмы и для многих других языков (за подробностями обратитесь на сайт <A
+HREF="http://snowball.tartarus.org"
+TARGET="_top"
+>Snowball</A
+>). Каждый алгоритм знает, как для данного языка свести распространённые словоформы к начальной форме. Для словаря Snowball задаётся обязательный параметр <TT
+CLASS="LITERAL"
+>language</TT
+>, определяющий, какой именно стеммер использовать, и может задаваться параметр <TT
+CLASS="LITERAL"
+>stopword</TT
+>, указывающий файл со списком исключаемых слов. (Стандартные списки стоп-слов <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> используется также в и проекте Snowball.) Например, встроенное определение выглядит так </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TEXT SEARCH DICTIONARY english_stem (
+    TEMPLATE = snowball,
+    Language = english,
+    StopWords = english
+);</PRE
+><P> Формат файла стоп-слов не отличается от рассмотренного ранее.</P
+><P
+>Словарь <SPAN
+CLASS="APPLICATION"
+>Snowball</SPAN
+> распознаёт любые фрагменты, даже если он не может упростить слова, так что он должен быть самым последним в списке словарей. Помещать его перед другими словарями нет смысла, так как после него никакой фрагмент не будет передан следующему словарю.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="textsearch-parsers.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="textsearch-configuration.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Анализаторы</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="textsearch.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Пример конфигурации</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,252 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Отслеживание зависимостей</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Определение данных"
+HREF="ddl.html"><LINK
+REL="PREVIOUS"
+TITLE="Другие объекты баз данных"
+HREF="ddl-others.html"><LINK
+REL="NEXT"
+TITLE="Модификация данных"
+HREF="dml.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Другие объекты баз данных"
+HREF="ddl-others.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ddl.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 5. Определение данных</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Модификация данных"
+HREF="dml.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="DDL-DEPEND"
+>5.12. Отслеживание зависимостей</A
+></H1
+><P
+>Когда вы создаёте сложные структуры баз данных, включающие множество таблиц с внешними ключами, представлениями, триггерами, функциями и т. п., вы неявно создаёте сеть зависимостей между объектами. Например, таблица с ограничением внешнего ключа зависит от таблицы, на которую она ссылается.</P
+><P
+>Чтобы обеспечить целостность всей структуры базы данных, <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> не позволяет удалять объекты, от которых зависят другие. Например, попытка удалить таблицу products (мы рассматривали её в <A
+HREF="ddl-constraints.html#DDL-CONSTRAINTS-FK"
+>Подразделе 5.3.5</A
+>), от которой зависит таблица orders, приведёт к ошибке примерно такого содержания: </P><PRE
+CLASS="SCREEN"
+>DROP TABLE products;
+
+ЗАМЕЧАНИЕ:  ограничение orders_product_no_fkey зависит от объекта
+  "таблица products"
+ОШИБКА:  удалить объект "таблица products" нельзя, так как от него зависят другие
+  объекты
+ПОДСКАЗКА:  Для удаления зависимых объектов используйте DROP ... CASCADE.</PRE
+><P> Сообщение об ошибке включает полезную подсказку: если вы не хотите заниматься ликвидацией зависимостей по отдельности, вы можете выполнить: </P><PRE
+CLASS="SCREEN"
+>DROP TABLE products CASCADE;</PRE
+><P> и все зависимые объекты будут удалены. В этом случае таблица orders останется, а будет удалено только её ограничение внешнего ключа. (Если вы хотите проверить, что произойдёт при выполнении <TT
+CLASS="COMMAND"
+>DROP ... CASCADE</TT
+>, запустите <TT
+CLASS="COMMAND"
+>DROP</TT
+> без <TT
+CLASS="LITERAL"
+>CASCADE</TT
+> и прочитайте <TT
+CLASS="LITERAL"
+>ЗАМЕЧАНИЕ</TT
+> (NOTICE).)</P
+><P
+>Все команды DROP в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> поддерживают указание <TT
+CLASS="LITERAL"
+>CASCADE</TT
+>. Конечно, вид возможных зависимостей зависит от типа объекта. Вы также можете написать <TT
+CLASS="LITERAL"
+>RESTRICT</TT
+> вместо <TT
+CLASS="LITERAL"
+>CASCADE</TT
+>, чтобы включить поведение по умолчанию, когда объект можно удалить, только если от него не зависят никакие другие.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Стандарт SQL требует явного указания <TT
+CLASS="LITERAL"
+>RESTRICT</TT
+> или <TT
+CLASS="LITERAL"
+>CASCADE</TT
+>. Но это требование на самом деле не выполняется ни в одной СУБД, при этом одни системы по умолчанию подразумевают <TT
+CLASS="LITERAL"
+>RESTRICT</TT
+>, а другие &mdash; <TT
+CLASS="LITERAL"
+>CASCADE</TT
+>.</P
+></BLOCKQUOTE
+></DIV
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Зависимости внешнего ключа и колонки последовательности, созданные в версиях <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> до 7.3 <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>не</I
+></SPAN
+> поддерживаются и не воссоздаются в процессе обновления. Все другие типы зависимостей будут созданы должным образом при обновлении таких старых версий.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ddl-others.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="dml.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Другие объекты баз данных</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ddl.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Модификация данных</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

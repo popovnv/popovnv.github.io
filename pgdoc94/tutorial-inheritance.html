@@ -1,0 +1,313 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Наследование</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Расширенные возможности"
+HREF="tutorial-advanced.html"><LINK
+REL="PREVIOUS"
+TITLE="Оконные функции"
+HREF="tutorial-window.html"><LINK
+REL="NEXT"
+TITLE="Заключение"
+HREF="tutorial-conclusion.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Оконные функции"
+HREF="tutorial-window.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="tutorial-advanced.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 3. Расширенные возможности</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Заключение"
+HREF="tutorial-conclusion.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="TUTORIAL-INHERITANCE"
+>3.6. Наследование</A
+></H1
+><P
+>Наследование &mdash; это концепция, взятая из объектно-ориентированных баз данных. Она открывает множество интересных возможностей при проектировании баз данных.</P
+><P
+>Давайте создадим две таблицы: <CODE
+CLASS="CLASSNAME"
+>cities</CODE
+> (города) и <CODE
+CLASS="CLASSNAME"
+>capitals</CODE
+> (столицы штатов). Естественно, столицы штатов также являются городами, поэтому нам нужно явным образом добавлять их в результат, когда мы хотим просмотреть все города. Если вы проявите смекалку, вы можете предложить, например, такое решение: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE capitals (
+  name       text,
+  population real,
+  altitude   int,    -- (высота в футах)
+  state      char(2)
+);
+
+CREATE TABLE non_capitals (
+  name       text,
+  population real,
+  altitude   int     -- (высота в футах)
+);
+
+CREATE VIEW cities AS
+  SELECT name, population, altitude FROM capitals
+    UNION
+  SELECT name, population, altitude FROM non_capitals;</PRE
+><P> Оно может устраивать, пока мы извлекаем данные, но если нам потребуется изменить несколько строк, это будет выглядеть некрасиво.</P
+><P
+>Поэтому есть лучшее решение: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE cities (
+  name       text,
+  population real,
+  altitude   int     -- (высота в футах)
+);
+
+CREATE TABLE capitals (
+  state      char(2)
+) INHERITS (cities);</PRE
+><P></P
+><P
+>В данном случае строка таблицы <CODE
+CLASS="CLASSNAME"
+>capitals</CODE
+> <I
+CLASS="FIRSTTERM"
+>наследует</I
+> все колонки (<TT
+CLASS="STRUCTFIELD"
+>name</TT
+>, <TT
+CLASS="STRUCTFIELD"
+>population</TT
+> и <TT
+CLASS="STRUCTFIELD"
+>altitude</TT
+>) от <I
+CLASS="FIRSTTERM"
+>родительской таблицы</I
+> <CODE
+CLASS="CLASSNAME"
+>cities</CODE
+>. Колонка <TT
+CLASS="STRUCTFIELD"
+>name</TT
+> имеет тип <TT
+CLASS="TYPE"
+>text</TT
+>, собственный тип <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> для текстовых строк переменной длины. А в таблицу столиц добавлена дополнительная колонка <TT
+CLASS="STRUCTFIELD"
+>state</TT
+>, в которой будет указан штат. В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> таблица может наследоваться от нуля или нескольких других таблиц.</P
+><P
+>Например, следующий запрос выведет названия всех городов, включая столицы, находящихся выше 500 футов над уровнем моря: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT name, altitude
+  FROM cities
+  WHERE altitude &gt; 500;</PRE
+><P> Результат его выполнения: </P><PRE
+CLASS="SCREEN"
+>   name    | altitude
+-----------+----------
+ Las Vegas |     2174
+ Mariposa  |     1953
+ Madison   |      845
+(3 rows)</PRE
+><P></P
+><P
+>А следующий запрос находит все города, которые не являются столицами штатов, но также находятся выше 500 футов: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT name, altitude
+    FROM ONLY cities
+    WHERE altitude &gt; 500;</PRE
+><P>
+
+</P><PRE
+CLASS="SCREEN"
+>   name    | altitude
+-----------+----------
+ Las Vegas |     2174
+ Mariposa  |     1953
+(2 rows)</PRE
+><P></P
+><P
+>Здесь слово <TT
+CLASS="LITERAL"
+>ONLY</TT
+> перед названием таблицы <TT
+CLASS="LITERAL"
+>cities</TT
+> указывает, что запрос следует выполнять только для строк таблицы <CODE
+CLASS="CLASSNAME"
+>cities</CODE
+>, не включая таблицы, унаследованные от <CODE
+CLASS="CLASSNAME"
+>cities</CODE
+>. Многие операторы, которые мы уже обсудили &mdash; <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> и <TT
+CLASS="COMMAND"
+>DELETE</TT
+> &mdash; поддерживают указание <TT
+CLASS="LITERAL"
+>ONLY</TT
+>.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Хотя наследование часто бывает полезно, оно не интегрировано с ограничениями уникальности и внешними ключами, что ограничивает его применимость. Подробнее это описывается в <A
+HREF="ddl-inherit.html"
+>Разделе 5.8</A
+>.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="tutorial-window.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="tutorial-conclusion.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Оконные функции</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="tutorial-advanced.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Заключение</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

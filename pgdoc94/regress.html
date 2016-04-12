@@ -1,0 +1,285 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Регрессионные тесты</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Администрирование сервера"
+HREF="admin.html"><LINK
+REL="PREVIOUS"
+TITLE="Внутреннее устройство WAL"
+HREF="wal-internals.html"><LINK
+REL="NEXT"
+TITLE="Выполнение тестов"
+HREF="regress-run.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="CHAPTER"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Внутреннее устройство WAL"
+HREF="wal-internals.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="admin.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Выполнение тестов"
+HREF="regress-run.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="REGRESS"
+></A
+>Глава 30. Регрессионные тесты</H1
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Содержание</B
+></DT
+><DT
+>30.1. <A
+HREF="regress-run.html"
+>Выполнение тестов</A
+></DT
+><DD
+><DL
+><DT
+>30.1.1. <A
+HREF="regress-run.html#AEN40333"
+>Запуск тестов на временной инсталляции</A
+></DT
+><DT
+>30.1.2. <A
+HREF="regress-run.html#AEN40352"
+>Запуск тестов на существующей инсталляции</A
+></DT
+><DT
+>30.1.3. <A
+HREF="regress-run.html#AEN40364"
+>Дополнительные пакеты тестов</A
+></DT
+><DT
+>30.1.4. <A
+HREF="regress-run.html#AEN40410"
+>Локаль и кодировка</A
+></DT
+><DT
+>30.1.5. <A
+HREF="regress-run.html#AEN40421"
+>Специальные тесты</A
+></DT
+><DT
+>30.1.6. <A
+HREF="regress-run.html#AEN40429"
+>Тестирование сервера горячего резерва</A
+></DT
+></DL
+></DD
+><DT
+>30.2. <A
+HREF="regress-evaluation.html"
+>Оценка результатов тестирования</A
+></DT
+><DD
+><DL
+><DT
+>30.2.1. <A
+HREF="regress-evaluation.html#AEN40465"
+>Различия в сообщениях об ошибке</A
+></DT
+><DT
+>30.2.2. <A
+HREF="regress-evaluation.html#AEN40470"
+>Разница локалей</A
+></DT
+><DT
+>30.2.3. <A
+HREF="regress-evaluation.html#AEN40481"
+>Разница в дате и времени</A
+></DT
+><DT
+>30.2.4. <A
+HREF="regress-evaluation.html#AEN40487"
+>Разница в числах с плавающей запятой</A
+></DT
+><DT
+>30.2.5. <A
+HREF="regress-evaluation.html#AEN40501"
+>Разница в сортировке строк</A
+></DT
+><DT
+>30.2.6. <A
+HREF="regress-evaluation.html#AEN40513"
+>Недостаточная глубина стека</A
+></DT
+><DT
+>30.2.7. <A
+HREF="regress-evaluation.html#AEN40524"
+>Тест <SPAN
+CLASS="QUOTE"
+>"случайных значений"</SPAN
+></A
+></DT
+><DT
+>30.2.8. <A
+HREF="regress-evaluation.html#AEN40530"
+>Параметры конфигурации</A
+></DT
+></DL
+></DD
+><DT
+>30.3. <A
+HREF="regress-variant.html"
+>Вариативные сравнительные файлы</A
+></DT
+><DT
+>30.4. <A
+HREF="regress-tap.html"
+>Тесты TAP</A
+></DT
+><DT
+>30.5. <A
+HREF="regress-coverage.html"
+>Проверка покрытия теста</A
+></DT
+></DL
+></DIV
+><P
+>Регрессионные тесты представляют собой полный набор проверок реализации SQL в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Они тестируют как стандартные SQL-операции, так и расширенные возможности <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="wal-internals.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="regress-run.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Внутреннее устройство WAL</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="admin.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Выполнение тестов</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

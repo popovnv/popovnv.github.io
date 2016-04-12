@@ -1,0 +1,397 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>          referential_constraints
+        </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Информационная схема"
+HREF="information-schema.html"><LINK
+REL="PREVIOUS"
+TITLE="          parameters
+        "
+HREF="infoschema-parameters.html"><LINK
+REL="NEXT"
+TITLE="          role_column_grants
+        "
+HREF="infoschema-role-column-grants.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="          parameters
+        "
+HREF="infoschema-parameters.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="information-schema.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 34. Информационная схема</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="          role_column_grants
+        "
+HREF="infoschema-role-column-grants.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="INFOSCHEMA-REFERENTIAL-CONSTRAINTS"
+>34.33. <TT
+CLASS="LITERAL"
+>referential_constraints</TT
+></A
+></H1
+><P
+>Представление <TT
+CLASS="LITERAL"
+>referential_constraints</TT
+> содержит все ссылочные ограничения (внешнего ключа) в текущей базе данных. В нём показываются только ограничения, в которых ссылающаяся таблица доступна текущему пользователю на запись (он является её владельцем или имеет не только право <TT
+CLASS="LITERAL"
+>SELECT</TT
+>).</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="AEN51863"
+></A
+><P
+><B
+>Таблица 34-31. Колонки <TT
+CLASS="LITERAL"
+>referential_constraints</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип данных</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>constraint_catalog</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Имя базы данных, содержащей ограничение (всегда текущая база)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>constraint_schema</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Имя схемы, содержащей ограничение</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>constraint_name</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Имя ограничения</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>unique_constraint_catalog</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Имя базы данных, содержащей ограничение уникальности или первичный ключ, на которые ссылается ограничение внешнего ключа (всегда текущая база)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>unique_constraint_schema</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Имя схемы, содержащей ограничение уникальности или первичный ключ, на которые ссылается ограничение внешнего ключа</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>unique_constraint_name</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Имя ограничения уникальности или первичного ключа, на которые ссылается ограничение внешнего ключа</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>match_option</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>character_data</TT
+>
+                </TD
+><TD
+>Тип совпадения для ограничения внешнего ключа: <TT
+CLASS="LITERAL"
+>FULL</TT
+>, <TT
+CLASS="LITERAL"
+>PARTIAL</TT
+> или <TT
+CLASS="LITERAL"
+>NONE</TT
+>.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>update_rule</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>character_data</TT
+>
+                </TD
+><TD
+>Правило изменения для ограничения внешнего ключа: <TT
+CLASS="LITERAL"
+>CASCADE</TT
+>, <TT
+CLASS="LITERAL"
+>SET NULL</TT
+>, <TT
+CLASS="LITERAL"
+>SET DEFAULT</TT
+>, <TT
+CLASS="LITERAL"
+>RESTRICT</TT
+> или <TT
+CLASS="LITERAL"
+>NO ACTION</TT
+>.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>delete_rule</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>character_data</TT
+>
+                </TD
+><TD
+>Правило удаления для ограничения внешнего ключа: <TT
+CLASS="LITERAL"
+>CASCADE</TT
+>, <TT
+CLASS="LITERAL"
+>SET NULL</TT
+>, <TT
+CLASS="LITERAL"
+>SET DEFAULT</TT
+>, <TT
+CLASS="LITERAL"
+>RESTRICT</TT
+> или <TT
+CLASS="LITERAL"
+>NO ACTION</TT
+>.</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="infoschema-parameters.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="infoschema-role-column-grants.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><TT
+CLASS="LITERAL"
+>parameters</TT
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="information-schema.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><TT
+CLASS="LITERAL"
+>role_column_grants</TT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

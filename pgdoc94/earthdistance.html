@@ -1,0 +1,460 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>earthdistance</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Дополнительно поставляемые модули"
+HREF="contrib.html"><LINK
+REL="PREVIOUS"
+TITLE="dummy_seclabel"
+HREF="dummy-seclabel.html"><LINK
+REL="NEXT"
+TITLE="file_fdw"
+HREF="file-fdw.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="dummy_seclabel"
+HREF="dummy-seclabel.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Приложение E. Дополнительно поставляемые модули</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="file_fdw"
+HREF="file-fdw.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="EARTHDISTANCE"
+>E.13. earthdistance</A
+></H1
+><P
+>Модуль <TT
+CLASS="FILENAME"
+>earthdistance</TT
+> реализует два разных варианта вычисления ортодромии (расстояния между точками на поверхности Земли). Описанный первым вариант зависит от модуля <TT
+CLASS="FILENAME"
+>cube</TT
+> (который <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>должен</I
+></SPAN
+> быть установлен, чтобы можно было установить <TT
+CLASS="FILENAME"
+>earthdistance</TT
+>). Второй вариант основан на встроенном типе данных <TT
+CLASS="TYPE"
+>point</TT
+>, в котором в качестве координат задаётся широта и долгота.</P
+><P
+>В этом модуле Земля считается идеальной сферой. (Если для вас это слишком грубо, обратите внимание на проект <SPAN
+CLASS="APPLICATION"
+><A
+HREF="http://www.postgis.org/"
+TARGET="_top"
+>PostGIS</A
+></SPAN
+>.)</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN120489"
+>E.13.1. Земные расстояния по кубам</A
+></H2
+><P
+>Данные хранятся в кубах, представляющих точки (оба угла куба совпадают) по 3 координатам, выражающим смещения x, y и z от центра Земли. Этот модуль предоставляет домен <TT
+CLASS="TYPE"
+>earth</TT
+> на базе <TT
+CLASS="TYPE"
+>cube</TT
+>, включающий проверки того, что значение соответствует этим ограничениям и представляет точку, достаточно близкую к сферической поверхности Земли.</P
+><P
+>Радиус Земли выдаёт функция <CODE
+CLASS="FUNCTION"
+>earth()</CODE
+> (в метрах). Изменив одну эту функцию, вы можете сделать так, чтобы модуль работал с другими единицами, либо выдать другое значение радиуса, которое кажется вам более подходящим.</P
+><P
+>Этот пакет может также применяться и для астрономических расчётов. Астрономы обычно меняют функцию <CODE
+CLASS="FUNCTION"
+>earth()</CODE
+>, чтобы она возвращала радиус, равный <TT
+CLASS="LITERAL"
+>180/pi()</TT
+>, и расстояния в результате выдавались в градусах.</P
+><P
+>В этом модуле реализованы функции для ввода данных, выражающих широту и долготу (в градусах), для вывода ширины и долготы, для вычисления ортодромии между двумя точками и простого указания окружающего прямоугольника, что полезно для поиска по индексу.</P
+><P
+>Предоставляемые этим модулем функции показаны в <A
+HREF="earthdistance.html#EARTHDISTANCE-CUBE-FUNCTIONS"
+>Таблица E-4</A
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="EARTHDISTANCE-CUBE-FUNCTIONS"
+></A
+><P
+><B
+>Таблица E-4. Функции земных расстояний по кубам</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Функция</TH
+><TH
+>Возвращает</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                    <CODE
+CLASS="FUNCTION"
+>earth()</CODE
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>float8</TT
+>
+                  </TD
+><TD
+>Возвращает предполагаемый радиус Земли.</TD
+></TR
+><TR
+><TD
+>                    <CODE
+CLASS="FUNCTION"
+>sec_to_gc(float8)</CODE
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>float8</TT
+>
+                  </TD
+><TD
+>Переводит расстояние по обычной прямой (по секущей) между двумя точками на поверхности Земли в расстояние между ними по сфере.</TD
+></TR
+><TR
+><TD
+>                    <CODE
+CLASS="FUNCTION"
+>gc_to_sec(float8)</CODE
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>float8</TT
+>
+                  </TD
+><TD
+>Переводит расстояние по сфере между двумя точками на поверхности Земли в расстояние по обычной прямой (по секущей) между ними.</TD
+></TR
+><TR
+><TD
+>                    <CODE
+CLASS="FUNCTION"
+>ll_to_earth(float8, float8)</CODE
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>earth</TT
+>
+                  </TD
+><TD
+>Возвращает положение точки на поверхности Земли по заданной широте (аргумент 1) и долготе (аргумент 2) в градусах.</TD
+></TR
+><TR
+><TD
+>                    <CODE
+CLASS="FUNCTION"
+>latitude(earth)</CODE
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>float8</TT
+>
+                  </TD
+><TD
+>Возвращает широту (в градусах) точки на поверхности Земли.</TD
+></TR
+><TR
+><TD
+>                    <CODE
+CLASS="FUNCTION"
+>longitude(earth)</CODE
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>float8</TT
+>
+                  </TD
+><TD
+>Возвращает долготу (в градусах) точки на поверхности Земли.</TD
+></TR
+><TR
+><TD
+>                    <CODE
+CLASS="FUNCTION"
+>earth_distance(earth, earth)</CODE
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>float8</TT
+>
+                  </TD
+><TD
+>Возвращает расстояние по сфере между двумя точками на поверхности Земли.</TD
+></TR
+><TR
+><TD
+>                    <CODE
+CLASS="FUNCTION"
+>earth_box(earth, float8)</CODE
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>cube</TT
+>
+                  </TD
+><TD
+>Возвращает охватывающий куб, подходящий для поиска по индексу с применением оператора кубов <TT
+CLASS="LITERAL"
+>@&gt;</TT
+> точек в пределах заданной ортодромии от цели. Некоторые точки в этом кубе будут отстоять от цели дальше, чем на заданную ортодромию, поэтому в запрос нужно включить вторую проверку с функцией <CODE
+CLASS="FUNCTION"
+>earth_distance</CODE
+>.</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN120577"
+>E.13.2. Земные расстояния по точкам</A
+></H2
+><P
+>Вторая часть этого модуля основана на представлении точек на Земле в виде значений типа <TT
+CLASS="TYPE"
+>point</TT
+>, в которых первый компонент представляет долготу в градусах, а второй — широту. Точки воспринимаются как (долгота, широта), а не наоборот, так как долгота ближе к интуитивному представлению как оси X, а широта — оси Y.</P
+><P
+>В модуле реализован один оператор, показанный в <A
+HREF="earthdistance.html#EARTHDISTANCE-POINT-OPERATORS"
+>Таблице E-5</A
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="EARTHDISTANCE-POINT-OPERATORS"
+></A
+><P
+><B
+>Таблица E-5. Операторы земных расстояний по точкам</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Оператор</TH
+><TH
+>Возвращает</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+><TT
+CLASS="TYPE"
+>point</TT
+> <TT
+CLASS="LITERAL"
+>&lt;@&gt;</TT
+> <TT
+CLASS="TYPE"
+>point</TT
+></TD
+><TD
+>                    <TT
+CLASS="TYPE"
+>float8</TT
+>
+                  </TD
+><TD
+>Выдаёт расстояние в сухопутных милях между точками на поверхности Земли.</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Заметьте, что в этой части модуля, в отличие от части, построенной на <TT
+CLASS="TYPE"
+>cube</TT
+>, единицы зашиты жёстко: изменение функции <CODE
+CLASS="FUNCTION"
+>earth()</CODE
+> не повлияет на результат этого оператора.</P
+><P
+>Представление в виде долготы/широты плохо тем, что вам придётся учитывать граничные условия возле полюсов и в районе +/- 180 градусов долготы. Представление на базе <TT
+CLASS="TYPE"
+>cube</TT
+> лишено таких нарушений непрерывности.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="dummy-seclabel.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="file-fdw.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>dummy_seclabel</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>file_fdw</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

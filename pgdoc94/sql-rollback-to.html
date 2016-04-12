@@ -1,0 +1,361 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>ROLLBACK TO SAVEPOINT</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="ROLLBACK PREPARED"
+HREF="sql-rollback-prepared.html"><LINK
+REL="NEXT"
+TITLE="SAVEPOINT"
+HREF="sql-savepoint.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="ROLLBACK PREPARED"
+HREF="sql-rollback-prepared.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="SAVEPOINT"
+HREF="sql-savepoint.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-ROLLBACK-TO"
+></A
+>ROLLBACK TO SAVEPOINT</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN82818"
+></A
+><H2
+>Название</H2
+>ROLLBACK TO SAVEPOINT&nbsp;--&nbsp;откатиться к точке сохранения</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN82821"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>ROLLBACK [ WORK | TRANSACTION ] TO [ SAVEPOINT ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_точки_сохранения</I
+></TT
+></PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN82824"
+></A
+><H2
+>Описание</H2
+><P
+>Откатывает все команды, выполненные после установления точки сохранения. Точка сохранения остаётся действующей и при необходимости можно снова откатиться к ней позже.</P
+><P
+><TT
+CLASS="COMMAND"
+>ROLLBACK TO SAVEPOINT</TT
+> неявно уничтожает все точки сохранения, установленные после заданной точки.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN82829"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_точки_сохранения</I
+></TT
+></DT
+><DD
+><P
+>Точка сохранения, к которой нужно откатиться.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN82837"
+></A
+><H2
+>Замечания</H2
+><P
+>Чтобы уничтожить точку сохранения, не отменяя действия команд, выполненных после неё, применяется команда <A
+HREF="sql-release-savepoint.html"
+>RELEASE SAVEPOINT</A
+>.</P
+><P
+>Указание имени точки сохранения, не установленной ранее, считается ошибкой.</P
+><P
+>Курсоры проявляют не совсем транзакционное поведение применительно к точкам сохранения. Любой курсор, открытый внутри точки сохранения, будет закрыт при откате к этой точке. Если ранее открытый курсор был перемещён командой <TT
+CLASS="COMMAND"
+>FETCH</TT
+> или <TT
+CLASS="COMMAND"
+>MOVE</TT
+> внутри точки сохранения, к которой затем произошёл откат, курсор остаётся в той позиции, в которой он остался после <TT
+CLASS="COMMAND"
+>FETCH</TT
+> (то есть, перемещение курсора, производимое командой <TT
+CLASS="COMMAND"
+>FETCH</TT
+>, не откатывается). Также при откате не отменяется и закрытие курсора. Однако другие побочные эффекты, вызываемые запросом курсора (например, побочные действия изменчивых функций, вызываемых в запросе) <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>отменяются</I
+></SPAN
+>, если они производятся после точки сохранения, к которой затем происходит откат. Курсор, выполнение которого приводит к прерыванию транзакции, переводится в нерабочее состояние, так что даже если восстановить транзакцию, выполнив <TT
+CLASS="COMMAND"
+>ROLLBACK TO SAVEPOINT</TT
+>, этот курсор нельзя будет использовать.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN82849"
+></A
+><H2
+>Примеры</H2
+><P
+>Отмена действия команд, выполненных после установки точки сохранения <TT
+CLASS="LITERAL"
+>my_savepoint</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>ROLLBACK TO SAVEPOINT my_savepoint;</PRE
+><P></P
+><P
+>Откат к точке сохранения не отражается на положении курсора: </P><PRE
+CLASS="PROGRAMLISTING"
+>BEGIN;
+
+DECLARE foo CURSOR FOR SELECT 1 UNION SELECT 2;
+
+SAVEPOINT foo;
+
+FETCH 1 FROM foo;
+ ?column? 
+----------
+        1
+
+ROLLBACK TO SAVEPOINT foo;
+
+FETCH 1 FROM foo;
+ ?column? 
+----------
+        2
+
+COMMIT;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN82856"
+></A
+><H2
+>Совместимость</H2
+><P
+>В стандарте <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> говорится, что ключевое слово <TT
+CLASS="LITERAL"
+>SAVEPOINT</TT
+> является обязательным, но <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> и <SPAN
+CLASS="PRODUCTNAME"
+>Oracle</SPAN
+> позволяют опускать его. SQL допускает <TT
+CLASS="LITERAL"
+>WORK</TT
+>, но не <TT
+CLASS="LITERAL"
+>TRANSACTION</TT
+>, в качестве избыточного слова после <TT
+CLASS="LITERAL"
+>ROLLBACK</TT
+>. Кроме того, в SQL есть дополнительное предложение <TT
+CLASS="LITERAL"
+>AND [ NO ] CHAIN</TT
+>, которое в настоящее время не поддерживается в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. В остальном эта команда соответствует стандарту SQL.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN82868"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-begin.html"
+>BEGIN</A
+>, <A
+HREF="sql-commit.html"
+>COMMIT</A
+>, <A
+HREF="sql-release-savepoint.html"
+>RELEASE SAVEPOINT</A
+>, <A
+HREF="sql-rollback.html"
+>ROLLBACK</A
+>, <A
+HREF="sql-savepoint.html"
+>SAVEPOINT</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-rollback-prepared.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-savepoint.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>ROLLBACK PREPARED</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>SAVEPOINT</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

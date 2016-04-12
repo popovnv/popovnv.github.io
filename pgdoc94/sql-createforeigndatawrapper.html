@@ -1,0 +1,425 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>CREATE FOREIGN DATA WRAPPER</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="CREATE EXTENSION"
+HREF="sql-createextension.html"><LINK
+REL="NEXT"
+TITLE="CREATE FOREIGN TABLE"
+HREF="sql-createforeigntable.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="CREATE EXTENSION"
+HREF="sql-createextension.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="CREATE FOREIGN TABLE"
+HREF="sql-createforeigntable.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-CREATEFOREIGNDATAWRAPPER"
+></A
+>CREATE FOREIGN DATA WRAPPER</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN73240"
+></A
+><H2
+>Название</H2
+>CREATE FOREIGN DATA WRAPPER&nbsp;--&nbsp;создать новую обёртку сторонних данных</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN73243"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>CREATE FOREIGN DATA WRAPPER <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+>
+    [ HANDLER <TT
+CLASS="REPLACEABLE"
+><I
+>функция_обработчик</I
+></TT
+> | NO HANDLER ]
+    [ VALIDATOR <TT
+CLASS="REPLACEABLE"
+><I
+>функция_проверки</I
+></TT
+> | NO VALIDATOR ]
+    [ OPTIONS ( <TT
+CLASS="REPLACEABLE"
+><I
+>параметр</I
+></TT
+> '<TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+>' [, ... ] ) ]</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN73250"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>CREATE FOREIGN DATA WRAPPER</TT
+> создаёт обёртку сторонних данных. Владельцем обёртки становится создавший её пользователь.</P
+><P
+>Имя обёртки сторонних данных должно быть уникальным в базе данных.</P
+><P
+>Создавать обёртки сторонних данных могут только суперпользователи.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN73256"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></DT
+><DD
+><P
+>Имя создаваемой обёртки сторонних данных.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>HANDLER <TT
+CLASS="REPLACEABLE"
+><I
+>функция_обработчик</I
+></TT
+></TT
+></DT
+><DD
+><P
+>В аргументе <TT
+CLASS="REPLACEABLE"
+><I
+>функция_обработчик</I
+></TT
+> указывается имя ранее зарегистрированной функции, которая будет вызываться для получения функций, реализующих обращения к сторонним таблицам. Функция-обработчик не принимает аргументы и возвращает результат типа <TT
+CLASS="TYPE"
+>fdw_handler</TT
+>.</P
+><P
+>Обёртку сторонних таблиц можно создать и без функции-обработчика, но через такую обёртку нельзя будет использовать сторонние таблицы, хотя объявить их вполне возможно.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>VALIDATOR <TT
+CLASS="REPLACEABLE"
+><I
+>функция_проверки</I
+></TT
+></TT
+></DT
+><DD
+><P
+>В аргументе <TT
+CLASS="REPLACEABLE"
+><I
+>функция_проверки</I
+></TT
+> указывается имя ранее зарегистрированной функции, которая будет вызываться для проверки общих параметров, передаваемых обёртке сторонних данных, а также параметров сторонних серверов, сопоставлений пользователей и сторонних таблиц, доступных через эту обёртку. Если функция проверки не задана или указано <TT
+CLASS="LITERAL"
+>NO VALIDATOR</TT
+>, параметры не будут проверяться во время создания объектов. (Обёртка сторонних данных может игнорировать или не принимать неверные указания параметров во время выполнения, в зависимости от реализации.) Функция проверки должна принимать два аргумента: первый типа <TT
+CLASS="TYPE"
+>text[]</TT
+> (в нём содержится массив параметров, хранящихся в системном каталоге), а второй типа <TT
+CLASS="TYPE"
+>oid</TT
+> (в нём указывается OID системного каталога с этими параметрами). Возвращаемое значение игнорируется; функция проверки должна сообщать о неверных параметрах, вызывая системную функцию <CODE
+CLASS="FUNCTION"
+>ereport(ERROR)</CODE
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>OPTIONS ( <TT
+CLASS="REPLACEABLE"
+><I
+>параметр</I
+></TT
+> '<TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+>' [, ... ] )</TT
+></DT
+><DD
+><P
+>Это предложение определяет параметры для создаваемой обёртки сторонних данных. Набор допустимых параметров и значений для каждой обёртки свой, контроль их правильности осуществляет функция проверки сторонних данных. Имена параметров должны быть уникальными.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN73291"
+></A
+><H2
+>Замечания</H2
+><P
+>Функциональность <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> по работе со сторонними данными продолжает активно развиваться. На данный момент выполняется только примитивная оптимизация запросов (и по большей части это тоже делает обёртка), так что в этом направлении есть поле для улучшения производительности.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN73295"
+></A
+><H2
+>Примеры</H2
+><P
+>Создание бесполезной обёртки сторонних данных <TT
+CLASS="LITERAL"
+>dummy</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FOREIGN DATA WRAPPER dummy;</PRE
+><P></P
+><P
+>Создание обёртки сторонних данных <TT
+CLASS="LITERAL"
+>file</TT
+> с функцией-обработчиком <TT
+CLASS="LITERAL"
+>file_fdw_handler</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FOREIGN DATA WRAPPER file HANDLER file_fdw_handler;</PRE
+><P></P
+><P
+>Создание обёртки сторонних данных <TT
+CLASS="LITERAL"
+>mywrapper</TT
+> с параметрами: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FOREIGN DATA WRAPPER mywrapper
+    OPTIONS (debug 'true');</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN73307"
+></A
+><H2
+>Совместимость</H2
+><P
+><TT
+CLASS="COMMAND"
+>CREATE FOREIGN DATA WRAPPER</TT
+> соответствует стандарту ISO/IEC 9075-9 (SQL/MED), за исключением того, что предложения <TT
+CLASS="LITERAL"
+>HANDLER</TT
+> и <TT
+CLASS="LITERAL"
+>VALIDATOR</TT
+> стандартом не предусмотрены, а предложения <TT
+CLASS="LITERAL"
+>LIBRARY</TT
+> и <TT
+CLASS="LITERAL"
+>LANGUAGE</TT
+>, напротив, не реализованы в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+><P
+>Учтите, однако, что функциональность SQL/MED в целом ещё не обеспечивается.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN73317"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-alterforeigndatawrapper.html"
+>ALTER FOREIGN DATA WRAPPER</A
+>, <A
+HREF="sql-dropforeigndatawrapper.html"
+>DROP FOREIGN DATA WRAPPER</A
+>, <A
+HREF="sql-createserver.html"
+>CREATE SERVER</A
+>, <A
+HREF="sql-createusermapping.html"
+>CREATE USER MAPPING</A
+>, <A
+HREF="sql-createforeigntable.html"
+>CREATE FOREIGN TABLE</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-createextension.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-createforeigntable.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>CREATE EXTENSION</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>CREATE FOREIGN TABLE</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

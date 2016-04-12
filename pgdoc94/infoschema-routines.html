@@ -1,0 +1,1784 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>          routines
+        </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Информационная схема"
+HREF="information-schema.html"><LINK
+REL="PREVIOUS"
+TITLE="          routine_privileges
+        "
+HREF="infoschema-routine-privileges.html"><LINK
+REL="NEXT"
+TITLE="          schemata
+        "
+HREF="infoschema-schemata.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="          routine_privileges
+        "
+HREF="infoschema-routine-privileges.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="information-schema.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 34. Информационная схема</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="          schemata
+        "
+HREF="infoschema-schemata.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="INFOSCHEMA-ROUTINES"
+>34.40. <TT
+CLASS="LITERAL"
+>routines</TT
+></A
+></H1
+><P
+>Представление <TT
+CLASS="LITERAL"
+>routines</TT
+> показывает все функции в текущей базе данных. В нём показываются только функции, к которым имеет доступ текущий пользователь (являясь владельцем или имея некоторые права).</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="AEN52400"
+></A
+><P
+><B
+>Таблица 34-38. Колонки <TT
+CLASS="LITERAL"
+>routines</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип данных</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>specific_catalog</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Имя базы данных, содержащей функцию (всегда текущая база)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>specific_schema</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Имя схемы, содержащей функцию</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>specific_name</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+><SPAN
+CLASS="QUOTE"
+>"Однозначное имя"</SPAN
+> функции. Это имя однозначным образом идентифицирует функцию в схеме, даже если реальное имя функции перегружено. Формат однозначных имён не определён, так что его следует использовать только для сравнения с другими экземплярами однозначных имён подпрограмм.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>routine_catalog</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Имя базы данных, содержащей функцию (всегда текущая база)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>routine_schema</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Имя схемы, содержащей функцию</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>routine_name</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Имя функции (может дублироваться в случае перегрузки)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>routine_type</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>character_data</TT
+>
+                </TD
+><TD
+>Всегда <TT
+CLASS="LITERAL"
+>FUNCTION</TT
+> (в будущем могут появиться и другие типы подпрограмм.)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>module_catalog</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>module_schema</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>module_name</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>udt_catalog</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>udt_schema</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>udt_name</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>data_type</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>character_data</TT
+>
+                </TD
+><TD
+>Тип данных результата функции, если это встроенный тип, либо <TT
+CLASS="LITERAL"
+>ARRAY</TT
+>, если это массив (в этом случае обратитесь к представлению <TT
+CLASS="LITERAL"
+>element_types</TT
+>), иначе — <TT
+CLASS="LITERAL"
+>USER-DEFINED</TT
+> (в этом случае тип определяется в <TT
+CLASS="LITERAL"
+>type_udt_name</TT
+> и связанных колонках).</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>character_maximum_length</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>cardinal_number</TT
+>
+                </TD
+><TD
+>Всегда NULL, так как эта информация неприменима к типам результатов в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>character_octet_length</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>cardinal_number</TT
+>
+                </TD
+><TD
+>Всегда NULL, так как эта информация неприменима к типам результатов в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>character_set_catalog</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>character_set_schema</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>character_set_name</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>collation_catalog</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Всегда NULL, так как эта информация неприменима к типам результатов в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>collation_schema</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Всегда NULL, так как эта информация неприменима к типам результатов в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>collation_name</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Всегда NULL, так как эта информация неприменима к типам результатов в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>numeric_precision</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>cardinal_number</TT
+>
+                </TD
+><TD
+>Всегда NULL, так как эта информация неприменима к типам результатов в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>numeric_precision_radix</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>cardinal_number</TT
+>
+                </TD
+><TD
+>Всегда NULL, так как эта информация неприменима к типам результатов в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>numeric_scale</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>cardinal_number</TT
+>
+                </TD
+><TD
+>Всегда NULL, так как эта информация неприменима к типам результатов в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>datetime_precision</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>cardinal_number</TT
+>
+                </TD
+><TD
+>Всегда NULL, так как эта информация неприменима к типам результатов в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>interval_type</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>character_data</TT
+>
+                </TD
+><TD
+>Всегда NULL, так как эта информация неприменима к типам результатов в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>interval_precision</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>cardinal_number</TT
+>
+                </TD
+><TD
+>Всегда NULL, так как эта информация неприменима к типам результатов в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>type_udt_catalog</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Имя базы данных, в которой определён тип данных результата функции (всегда текущая база)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>type_udt_schema</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Имя схемы, в которой определён тип данных результата функции</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>type_udt_name</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Имя типа данных результата функции</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>scope_catalog</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>scope_schema</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>scope_name</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>maximum_cardinality</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>cardinal_number</TT
+>
+                </TD
+><TD
+>Всегда NULL, так как массивы имеют неограниченную максимальную ёмкость в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>dtd_identifier</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Идентификатор дескриптора типа данных результата функции, уникальный среди всех дескрипторов типов, относящихся к функции. Он в основном полезен для соединения с другими экземплярами таких идентификаторов. (Конкретный формат идентификатора не определён и не гарантируется, что он останется неизменным в будущих версиях.)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>routine_body</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>character_data</TT
+>
+                </TD
+><TD
+>Если функция написана на SQL, это поле содержит <TT
+CLASS="LITERAL"
+>SQL</TT
+>, иначе <TT
+CLASS="LITERAL"
+>EXTERNAL</TT
+>.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>routine_definition</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>character_data</TT
+>
+                </TD
+><TD
+>Исходный текст функции (NULL, если функция не принадлежит текущей активной роли). (Согласно стандарту SQL, эта колонка актуальна, только если в <TT
+CLASS="LITERAL"
+>routine_body</TT
+> указано <TT
+CLASS="LITERAL"
+>SQL</TT
+>, но в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> она будет содержать любой исходный текст, заданный при создании функции.)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>external_name</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>character_data</TT
+>
+                </TD
+><TD
+>Если это функция на C, эта колонка содержит внешнее имя (объектный символ) функции, иначе NULL. (Это будет то же значение, что содержит колонка <TT
+CLASS="LITERAL"
+>routine_definition</TT
+>.)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>external_language</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>character_data</TT
+>
+                </TD
+><TD
+>Язык, на котором написана функция</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>parameter_style</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>character_data</TT
+>
+                </TD
+><TD
+>Всегда <TT
+CLASS="LITERAL"
+>GENERAL</TT
+> (В стандарте SQL определены и другие стили параметров, но в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> они отсутствуют.)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>is_deterministic</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>yes_or_no</TT
+>
+                </TD
+><TD
+>Если функция объявлена как постоянная (IMMUTABLE) (в стандарте SQL она называется детерминированной), эта колонка содержит <TT
+CLASS="LITERAL"
+>YES</TT
+>, иначе — <TT
+CLASS="LITERAL"
+>NO</TT
+>. (Получить другие уровни переменности функций, имеющиеся в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, через информационную схему нельзя.)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>sql_data_access</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>character_data</TT
+>
+                </TD
+><TD
+>Всегда <TT
+CLASS="LITERAL"
+>MODIFIES</TT
+>, что означает, что функция может модифицировать данные SQL. Для <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> эта информация бесполезна.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>is_null_call</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>yes_or_no</TT
+>
+                </TD
+><TD
+>Если функция автоматически возвращает NULL, когда один из аргументов NULL, эта колонка содержит <TT
+CLASS="LITERAL"
+>YES</TT
+>, иначе — <TT
+CLASS="LITERAL"
+>NO</TT
+>.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>sql_path</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>character_data</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>schema_level_routine</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>yes_or_no</TT
+>
+                </TD
+><TD
+>Всегда <TT
+CLASS="LITERAL"
+>YES</TT
+> (Другое значение было бы у методов пользовательских типов, но в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> их нет.)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>max_dynamic_result_sets</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>cardinal_number</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>is_user_defined_cast</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>yes_or_no</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>is_implicitly_invocable</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>yes_or_no</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>security_type</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>character_data</TT
+>
+                </TD
+><TD
+>Если функция выполняется с правами вызывающими пользователя, эта колонка содержит <TT
+CLASS="LITERAL"
+>INVOKER</TT
+>, а если с правами пользователя, создавшего её, то — <TT
+CLASS="LITERAL"
+>DEFINER</TT
+>.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_sql_specific_catalog</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_sql_specific_schema</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_sql_specific_name</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>as_locator</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>yes_or_no</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>created</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>time_stamp</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>last_altered</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>time_stamp</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>new_savepoint_level</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>yes_or_no</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>is_udt_dependent</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>yes_or_no</TT
+>
+                </TD
+><TD
+>В настоящее время всегда <TT
+CLASS="LITERAL"
+>NO</TT
+>. Альтернативное значение <TT
+CLASS="LITERAL"
+>YES</TT
+> связано с возможностями, отсутствующими в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>result_cast_from_data_type</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>character_data</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>result_cast_as_locator</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>yes_or_no</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>result_cast_char_max_length</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>cardinal_number</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>result_cast_char_octet_length</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>character_data</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>result_cast_char_set_catalog</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>result_cast_char_set_schema</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>result_cast_char_set_name</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>result_cast_collation_catalog</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>result_cast_collation_schema</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>result_cast_collation_name</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>result_cast_numeric_precision</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>cardinal_number</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>result_cast_numeric_precision_radix</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>cardinal_number</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>result_cast_numeric_scale</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>cardinal_number</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>result_cast_datetime_precision</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>character_data</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>result_cast_interval_type</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>character_data</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>result_cast_interval_precision</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>cardinal_number</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>result_cast_type_udt_catalog</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>result_cast_type_udt_schema</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>result_cast_type_udt_name</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>result_cast_scope_catalog</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>result_cast_scope_schema</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>result_cast_scope_name</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>result_cast_maximum_cardinality</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>cardinal_number</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>result_cast_dtd_identifier</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>sql_identifier</TT
+>
+                </TD
+><TD
+>Относится к функциональности, отсутствующей в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="infoschema-routine-privileges.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="infoschema-schemata.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><TT
+CLASS="LITERAL"
+>routine_privileges</TT
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="information-schema.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><TT
+CLASS="LITERAL"
+>schemata</TT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,260 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>SPI_fnumber</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Вспомогательные интерфейсные функции"
+HREF="spi-interface-support.html"><LINK
+REL="PREVIOUS"
+TITLE="SPI_fname"
+HREF="spi-spi-fname.html"><LINK
+REL="NEXT"
+TITLE="SPI_getvalue"
+HREF="spi-spi-getvalue.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="SPI_fname"
+HREF="spi-spi-fname.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="spi-interface-support.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="SPI_getvalue"
+HREF="spi-spi-getvalue.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SPI-SPI-FNUMBER"
+></A
+>SPI_fnumber</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN65523"
+></A
+><H2
+>Название</H2
+>SPI_fnumber&nbsp;--&nbsp;определить номер колонки с заданным именем</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN65526"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>int SPI_fnumber(TupleDesc <TT
+CLASS="PARAMETER"
+>rowdesc</TT
+>, const char * <TT
+CLASS="PARAMETER"
+>colname</TT
+>)</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN65530"
+></A
+><H2
+>Описание</H2
+><P
+><CODE
+CLASS="FUNCTION"
+>SPI_fnumber</CODE
+> возвращает номер колонки, имеющей заданное имя.</P
+><P
+>Если <TT
+CLASS="PARAMETER"
+>colname</TT
+> ссылается на системную колонку (например, <TT
+CLASS="LITERAL"
+>oid</TT
+>), возвращается соответствующий отрицательный номер колонки. Вызывающий должен проверять, не была ли возвращена ошибка, сравнивая значение результата именно с <TT
+CLASS="SYMBOL"
+>SPI_ERROR_NOATTRIBUTE</TT
+>; проверка результата по условию меньше или равно нулю не будет корректной, если только системные колонки не должны исключаться.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN65538"
+></A
+><H2
+>Аргументы</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>TupleDesc <TT
+CLASS="PARAMETER"
+>rowdesc</TT
+></TT
+></DT
+><DD
+><P
+>описание строк</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>const char * <TT
+CLASS="PARAMETER"
+>colname</TT
+></TT
+></DT
+><DD
+><P
+>имя колонки</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN65553"
+></A
+><H2
+>Возвращаемое значение</H2
+><P
+>Номер колонки (начиная с 1), либо <TT
+CLASS="SYMBOL"
+>SPI_ERROR_NOATTRIBUTE</TT
+>, если колонка с заданным именем не найдена.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="spi-spi-fname.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="spi-spi-getvalue.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>SPI_fname</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="spi-interface-support.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>SPI_getvalue</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

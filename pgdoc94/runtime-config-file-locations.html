@@ -1,0 +1,336 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Расположения файлов</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Настройка сервера"
+HREF="runtime-config.html"><LINK
+REL="PREVIOUS"
+TITLE="Изменение параметров"
+HREF="config-setting.html"><LINK
+REL="NEXT"
+TITLE="Подключения и аутентификация"
+HREF="runtime-config-connection.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Изменение параметров"
+HREF="config-setting.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="runtime-config.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 18. Настройка сервера</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Подключения и аутентификация"
+HREF="runtime-config-connection.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="RUNTIME-CONFIG-FILE-LOCATIONS"
+>18.2. Расположения файлов</A
+></H1
+><P
+>В дополнение к вышеупомянутому <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+>, <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> обрабатывает два редактируемых вручную файла конфигурации, в которых настраивается аутентификация клиентов (их использование рассматривается в <A
+HREF="client-authentication.html"
+>Главе 19</A
+>). По умолчанию все три файла конфигурации размещаются в каталоге данных кластера БД. Параметры, описанные в этом разделе, позволяют разместить их и в любом другом месте. (Это позволяет упростить администрирование, в частности, выполнять резервное копирование этих файлов обычно проще, когда они хранятся отдельно.)</P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="GUC-DATA-DIRECTORY"
+></A
+><TT
+CLASS="VARNAME"
+>data_directory</TT
+> (<TT
+CLASS="TYPE"
+>string</TT
+>) </DT
+><DD
+><P
+>Задаёт каталог, в котором хранятся данные. Этот параметр можно задать только при запуске сервера.</P
+></DD
+><DT
+><A
+NAME="GUC-CONFIG-FILE"
+></A
+><TT
+CLASS="VARNAME"
+>config_file</TT
+> (<TT
+CLASS="TYPE"
+>string</TT
+>) </DT
+><DD
+><P
+>Задаёт основной файл конфигурации сервера (его стандартное имя — <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+>). Этот параметр можно задать только в командной строке <TT
+CLASS="COMMAND"
+>postgres</TT
+>.</P
+></DD
+><DT
+><A
+NAME="GUC-HBA-FILE"
+></A
+><TT
+CLASS="VARNAME"
+>hba_file</TT
+> (<TT
+CLASS="TYPE"
+>string</TT
+>) </DT
+><DD
+><P
+>Задаёт файл конфигурации для аутентификации по сетевым узлам (его стандартное имя — <TT
+CLASS="FILENAME"
+>pg_hba.conf</TT
+>). Этот параметр можно задать только при старте сервера.</P
+></DD
+><DT
+><A
+NAME="GUC-IDENT-FILE"
+></A
+><TT
+CLASS="VARNAME"
+>ident_file</TT
+> (<TT
+CLASS="TYPE"
+>string</TT
+>) </DT
+><DD
+><P
+>Задаёт файл конфигурации для сопоставлений имён пользователей (см. <A
+HREF="auth-username-maps.html"
+>Раздел 19.2</A
+>) (его стандартное имя — <TT
+CLASS="FILENAME"
+>pg_ident.conf</TT
+>). Этот параметр можно задать только при запуске сервера.</P
+></DD
+><DT
+><A
+NAME="GUC-EXTERNAL-PID-FILE"
+></A
+><TT
+CLASS="VARNAME"
+>external_pid_file</TT
+> (<TT
+CLASS="TYPE"
+>string</TT
+>) </DT
+><DD
+><P
+>Задаёт имя дополнительного файла с идентификатором процесса (PID), который будет создавать сервер для использования программами администрирования. Этот параметр можно задать только при запуске сервера.</P
+></DD
+></DL
+></DIV
+><P
+>При стандартной установке ни один из этих параметров не задаётся явно. Вместо них задаётся только каталог данных, аргументом командной строки <TT
+CLASS="OPTION"
+>-D</TT
+> или переменной окружения <TT
+CLASS="ENVAR"
+>PGDATA</TT
+>, и все необходимые файлы конфигурации загружаются из этого каталога.</P
+><P
+>Если вы хотите разместить файлы конфигурации не в каталоге данных, то аргумент командной строки <TT
+CLASS="COMMAND"
+>postgres</TT
+> <TT
+CLASS="OPTION"
+>-D</TT
+> или переменная окружения <TT
+CLASS="ENVAR"
+>PGDATA</TT
+> должны указывать на каталог, содержащий файлы конфигурации, а в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+> (или в командной строке) должен задаваться параметр <TT
+CLASS="VARNAME"
+>data_directory</TT
+>, указывающий, где фактически находятся данные. Учтите, что <TT
+CLASS="VARNAME"
+>data_directory</TT
+> переопределяет путь, задаваемый в <TT
+CLASS="OPTION"
+>-D</TT
+> или <TT
+CLASS="ENVAR"
+>PGDATA</TT
+> как путь каталога данных, но не расположение файлов конфигурации.</P
+><P
+>При желании вы можете задать имена и расположение файлов конфигурации по отдельности, воспользовавшись параметрами <TT
+CLASS="VARNAME"
+>config_file</TT
+>, <TT
+CLASS="VARNAME"
+>hba_file</TT
+> и/или <TT
+CLASS="VARNAME"
+>ident_file</TT
+>. Параметр <TT
+CLASS="VARNAME"
+>config_file</TT
+> можно задать только в командной строке <TT
+CLASS="COMMAND"
+>postgres</TT
+>, тогда как остальные можно задать и в основном файле конфигурации. Если явно заданы все три эти параметра плюс <TT
+CLASS="VARNAME"
+>data_directory</TT
+>, то задавать <TT
+CLASS="OPTION"
+>-D</TT
+> или <TT
+CLASS="ENVAR"
+>PGDATA</TT
+> не нужно.</P
+><P
+>Во всех этих параметрах относительный путь должен задаваться от каталога, в котором запускается <TT
+CLASS="COMMAND"
+>postgres</TT
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="config-setting.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="runtime-config-connection.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Изменение параметров</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="runtime-config.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Подключения и аутентификация</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

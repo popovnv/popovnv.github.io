@@ -1,0 +1,682 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>          pg_locks
+        </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Системные каталоги"
+HREF="catalogs.html"><LINK
+REL="PREVIOUS"
+TITLE="          pg_indexes
+        "
+HREF="view-pg-indexes.html"><LINK
+REL="NEXT"
+TITLE="          pg_matviews
+        "
+HREF="view-pg-matviews.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="          pg_indexes
+        "
+HREF="view-pg-indexes.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 48. Системные каталоги</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="          pg_matviews
+        "
+HREF="view-pg-matviews.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="VIEW-PG-LOCKS"
+>48.60. <TT
+CLASS="STRUCTNAME"
+>pg_locks</TT
+></A
+></H1
+><P
+>Представление <TT
+CLASS="STRUCTNAME"
+>pg_locks</TT
+> даёт доступ к информации о блокировках, удерживаемых открытыми транзакциями на сервере баз данных. Подробнее блокировки рассматриваются в <A
+HREF="mvcc.html"
+>Главе 13</A
+>.</P
+><P
+>Представление <TT
+CLASS="STRUCTNAME"
+>pg_locks</TT
+> содержит одну строку для каждого активного блокируемого объекта, запрошенного режима блокировки и запрашивающей транзакции. Таким образом, один и тот же блокируемый объект может фигурировать в этом представлении неоднократно, если его блокируют или ожидают блокировки несколько транзакций. Однако объекты, свободные от блокировок, в этом представлении отсутствуют вовсе.</P
+><P
+>Существует несколько различных типов блокируемых объектов: отношения целиком (например, таблицы), отдельные страницы отношений, отдельные кортежи отношений, идентификаторы транзакций (виртуальные и постоянные) и произвольные объекты баз данных (идентифицируемые по OID класса и OID объекта, так же как в <TT
+CLASS="STRUCTNAME"
+>pg_description</TT
+> или <TT
+CLASS="STRUCTNAME"
+>pg_depend</TT
+>). Кроме того, в виде отдельного блокируемого объекта представлено право расширения отношения. Также могут быть установлены <SPAN
+CLASS="QUOTE"
+>"рекомендательные"</SPAN
+> блокировки, не имеющие предопределённого значения.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="AEN101200"
+></A
+><P
+><B
+>Таблица 48-61. Колонки <TT
+CLASS="STRUCTNAME"
+>pg_locks</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип</TH
+><TH
+>Ссылки</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>locktype</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Тип блокируемого объекта: <TT
+CLASS="LITERAL"
+>relation</TT
+> (отношение), <TT
+CLASS="LITERAL"
+>extend</TT
+> (расширение отношения), <TT
+CLASS="LITERAL"
+>page</TT
+> (страница), <TT
+CLASS="LITERAL"
+>tuple</TT
+> (кортеж), <TT
+CLASS="LITERAL"
+>transactionid</TT
+> (идентификатор транзакции), <TT
+CLASS="LITERAL"
+>virtualxid</TT
+> (виртуальный идентификатор), <TT
+CLASS="LITERAL"
+>object</TT
+> (объект), <TT
+CLASS="LITERAL"
+>userlock</TT
+> (пользовательская блокировка) или <TT
+CLASS="LITERAL"
+>advisory</TT
+> (рекомендательная)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>database</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-database.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_database</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>OID базы данных, к которой относится цель блокировки, ноль, если это разделяемый объект, либо NULL, если целью является идентификатор транзакции</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>relation</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-class.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>OID отношения, являющегося целью блокировки, либо NULL, если цель блокировки — не отношение или часть отношения</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>page</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>integer</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Номер страницы в отношении, являющейся целью блокировки, либо NULL, если цель блокировки — не страница или кортеж отношения</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>tuple</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>smallint</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Номер кортежа на странице, являющегося целью блокировки, либо NULL, если цель блокировки — не кортеж</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>virtualxid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Виртуальный идентификатор транзакции, являющийся целью блокировки, либо NULL, если цель блокировки — другой объект</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>transactionid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>xid</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Идентификатор транзакции, являющийся целью блокировки, либо NULL, если цель блокировки — другой объект</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>classid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-class.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>OID системного каталога, содержащего цель блокировки, либо NULL, если цель блокировки — не обычный объект базы данных</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>objid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>любая колонка OID</TD
+><TD
+>OID цели блокировки в соответствующем системном каталоге, либо NULL, если цель блокировки — не обычный объект базы данных</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>objsubid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>smallint</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Номер колонки, являющейся целью блокировки (на саму таблицу указывают <TT
+CLASS="STRUCTFIELD"
+>classid</TT
+> и <TT
+CLASS="STRUCTFIELD"
+>objid</TT
+>), ноль, если это некоторый другой обычный объект базы данных, либо NULL, если цель не обычный объект</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>virtualtransaction</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Виртуальный идентификатор транзакции, удерживающей или ожидающей блокировку</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>pid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>integer</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Идентификатор серверного процесса (PID, Process ID), удерживающего или ожидающего эту блокировку, либо NULL, если блокировка удерживается подготовленной транзакцией</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>mode</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Режим, в котором удерживается или запрашивается блокировка этим процессом (см. <A
+HREF="explicit-locking.html#LOCKING-TABLES"
+>Подраздел 13.3.1</A
+> и <A
+HREF="transaction-iso.html#XACT-SERIALIZABLE"
+>Подраздел 13.2.3</A
+>)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>granted</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>True, если блокировка получена, и false, если она ожидается</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>fastpath</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>boolean</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>True, если блокировка получена по короткому пути, и false, если она получена через основную таблицу блокировок</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Признак <TT
+CLASS="STRUCTFIELD"
+>granted</TT
+> устанавливается в строке, представляющей блокировку, удерживаемую указанной транзакцией. Если он сброшен, эта транзакция ждёт блокировки, из чего следует, что некоторая другая транзакция удерживает блокировку того же объекта в конфликтующем режиме. Ожидающая транзакция будет приостановлена до освобождения другой блокировки (или выявления ситуации взаимоблокировки). Одна транзакция в один момент времени может ожидать получения максимум одной блокировки.</P
+><P
+>Каждая транзакция удерживает исключительную блокировку для собственного виртуального идентификатора транзакции на всём своём протяжении. Если транзакции назначается постоянный идентификатор (что обычно происходит, только если транзакция изменяет состояние базы данных), она также удерживает до своего завершения блокировку этого постоянного идентификатора. Когда одна транзакция находит необходимым ожидать именно какую-то другую транзакцию, она делает это, запрашивая разделяемую блокировку для идентификатора другой транзакции (виртуального или постоянного, в зависимости от ситуации). Этот запрос будет выполнен, только когда другая транзакция завершится и освободит свои блокировки.</P
+><P
+>Хотя кортежи тоже представляют собой блокируемый объект, информация о блокировках строк хранится на диске, а не в памяти, поэтому такие блокировки обычно не показываются в этом представлении. Если транзакция ожидает блокировки на уровне строки, она обычно видна в нём как ожидающая постоянного идентификатора транзакции текущего владельца этой блокировки.</P
+><P
+>Рекомендательные блокировки могут быть получены по ключам, состоящим из одного значения <TT
+CLASS="TYPE"
+>bigint</TT
+> или из двух значений integer. Старшая половина <TT
+CLASS="TYPE"
+>bigint</TT
+> выводится в колонке <TT
+CLASS="STRUCTFIELD"
+>classid</TT
+>, а младшая половина в колонке <TT
+CLASS="STRUCTFIELD"
+>objid</TT
+>, и <TT
+CLASS="STRUCTFIELD"
+>objsubid</TT
+> равен 1. Исходное значение <TT
+CLASS="TYPE"
+>bigint</TT
+> может быть восстановлено выражением <TT
+CLASS="LITERAL"
+>(classid::bigint &lt;&lt; 32) | objid::bigint</TT
+>. Для ключей integer первая часть ключа находится в <TT
+CLASS="STRUCTFIELD"
+>classid</TT
+>, а вторая часть в <TT
+CLASS="STRUCTFIELD"
+>objid</TT
+>, и <TT
+CLASS="STRUCTFIELD"
+>objsubid</TT
+> равна 2. Конкретное предназначение этих ключей определяет пользователь. Рекомендательные блокировки существуют в рамках базы данных, поэтому колонка <TT
+CLASS="STRUCTFIELD"
+>database</TT
+> имеет значение для таких блокировок.</P
+><P
+>Представление <TT
+CLASS="STRUCTNAME"
+>pg_locks</TT
+> даёт общую информацию по всем блокировкам в кластере баз данных, а не только по тем, что относятся к текущей базе. Хотя соединив <TT
+CLASS="STRUCTFIELD"
+>relation</TT
+> с <TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+>.<TT
+CLASS="STRUCTFIELD"
+>oid</TT
+>, можно получить заблокированные отношения, это будет работать корректно только для отношений в текущей базе данных (для тех, в блокировках которых колонка <TT
+CLASS="STRUCTFIELD"
+>database</TT
+> содержит OID текущей базы данных или ноль).</P
+><P
+>Соединив колонку <TT
+CLASS="STRUCTFIELD"
+>pid</TT
+> с колонкой <TT
+CLASS="STRUCTFIELD"
+>pid</TT
+> представления <A
+HREF="monitoring-stats.html#PG-STAT-ACTIVITY-VIEW"
+><TT
+CLASS="STRUCTNAME"
+>pg_stat_activity</TT
+></A
+>, можно получить дополнительную информацию о сеансах, удерживающих блокировки, например так: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT * FROM pg_locks pl LEFT JOIN pg_stat_activity psa
+    ON pl.pid = psa.pid;</PRE
+><P> Также, если вы используете подготовленные транзакции, колонку <TT
+CLASS="STRUCTFIELD"
+>virtualtransaction</TT
+> можно соединить с колонкой <TT
+CLASS="STRUCTFIELD"
+>transaction</TT
+> представления <A
+HREF="view-pg-prepared-xacts.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_prepared_xacts</TT
+></A
+> для получения дополнительной информации о подготовленных транзакциях, удерживающих блокировки. (Подготовленная транзакция не может ожидать блокировок, но она может продолжать удерживать блокировки, полученные ей в процессе выполнения.) Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT * FROM pg_locks pl LEFT JOIN pg_prepared_xacts ppx
+    ON pl.virtualtransaction = '-1/' || ppx.transaction;</PRE
+><P></P
+><P
+>В представлении <TT
+CLASS="STRUCTNAME"
+>pg_locks</TT
+> показываются данные и из менеджера обычных блокировок, и из менеджера предикатных блокировок, которые являются отдельными механизмами; кроме того, менеджер обычных блокировок подразделяет свои блокировки на обычные и полученные <I
+CLASS="FIRSTTERM"
+>быстрым путём</I
+>. Абсолютная согласованность всех этих данных не гарантируется. При обращении к этому представлению данные блокировок по быстрому пути (с <TT
+CLASS="STRUCTFIELD"
+>fastpath</TT
+> = <TT
+CLASS="LITERAL"
+>true</TT
+>) собираются по очереди с каждого серверного процесса, без замораживания состояния всего менеджера блокировок, так что существует возможность, что в процессе сбора этой информации блокировки будут освобождены или получены. Заметьте, однако, что эти блокировки не должны конфликтовать с любыми другими актуальными блокировками. После того как от всех процессов получены блокировки по быстрому пути, менеджер обычных блокировок замораживается целиком и информация обо всех оставшихся блокировках собирается в атомарной операции. После размораживания этого менеджера, также замораживается менеджер предикатных блокировок, и информация об этих блокировках собирается атомарно. Таким образом, за исключением блокировок по быстрому пути, каждый менеджер блокировок выдаёт согласованный набор результатов, но так как мы не блокируем оба этих менеджера одновременно, блокировки могут быть получены или освобождены после того, как опрашивается менеджер обычных блокировок, и до того, как опрашивается менеджер предикатных блокировок.</P
+><P
+>Блокировка менеджера обычных или предикатных блокировок может отразиться на производительности базы данных, если обращаться к этому представлению часто. Эта блокировка удерживается не дольше, чем необходимо для получения данных от менеджеров, но это не исключает возможность снижения производительности.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="view-pg-indexes.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="view-pg-matviews.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_indexes</TT
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_matviews</TT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,280 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Python 2 и Python 3</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="PL/Python — процедурный язык Python"
+HREF="plpython.html"><LINK
+REL="PREVIOUS"
+TITLE="PL/Python — процедурный язык Python"
+HREF="plpython.html"><LINK
+REL="NEXT"
+TITLE="Функции на PL/Python"
+HREF="plpython-funcs.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="PL/Python — процедурный язык Python"
+HREF="plpython.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="plpython.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 43. PL/Python — процедурный язык Python</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Функции на PL/Python"
+HREF="plpython-funcs.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="PLPYTHON-PYTHON23"
+>43.1. Python 2 и Python 3</A
+></H1
+><P
+>PL/Python поддерживает две вариации языка: Python 2 и Python 3. (Более точная информация о поддерживаемых второстепенных версиях Python может содержаться в инструкциях по установке PostgreSQL.) Так как языки Python 2 и Python 3 несовместимы в некоторых важных аспектах, во избежание смешения их в PL/Python применяется следующая схема именования: <P
+></P
+></P><UL
+><LI
+><P
+>Язык PostgreSQL с именем <TT
+CLASS="LITERAL"
+>plpython2u</TT
+> представляет реализацию PL/Python, основанную на вариации языка Python 2.</P
+></LI
+><LI
+><P
+>Язык PostgreSQL с именем <TT
+CLASS="LITERAL"
+>plpython3u</TT
+> представляет реализацию PL/Python, основанную на вариации языка Python 3.</P
+></LI
+><LI
+><P
+>Язык с именем <TT
+CLASS="LITERAL"
+>plpythonu</TT
+> представляет реализацию PL/Python, основанную на версии Python по умолчанию, в данный момент это Python 2. (Этот выбор по умолчанию не зависит от того, какая версия считается локальной версией <SPAN
+CLASS="QUOTE"
+>"по умолчанию"</SPAN
+>, например, на какую версию указывает <TT
+CLASS="FILENAME"
+>/usr/bin/python</TT
+>.) Выбор по умолчанию в отдалённом будущем выпуске PostgreSQL может быть сменён на Python 3, в зависимости от того, как будет происходить переход на Python 3 в сообществе Python.</P
+></LI
+></UL
+><P> Эта схема аналогична рекомендациям, данным в <A
+HREF="http://www.python.org/dev/peps/pep-0394/"
+TARGET="_top"
+>PEP 394</A
+>, по выбору имени команды <TT
+CLASS="COMMAND"
+>python</TT
+> и переходу с версии на версию.</P
+><P
+>Будет ли доступен PL/Python для Python 2 или для Python 3, либо сразу для обеих версий, зависит от конфигурации сборки или установленных пакетов.</P
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>Какая вариация будет собрана, зависит от того, как версия Python будет найдена при установке или будет задана в переменной окружения <TT
+CLASS="ENVAR"
+>PYTHON</TT
+>; см. <A
+HREF="install-procedure.html"
+>Раздел 15.4</A
+>. Чтобы в одной инсталляции присутствовали обе вариации PL/Python, необходимо сконфигурировать и настроить дерево исходного кода дважды.</P
+></BLOCKQUOTE
+></DIV
+><P
+>В результате формируется такая стратегия использования и смены определённой версии: <P
+></P
+></P><UL
+><LI
+><P
+>Существующие пользователи и пользователи, которым в настоящее время неинтересен Python 3, могут выбрать имя языка <TT
+CLASS="LITERAL"
+>plpythonu</TT
+> и им не придётся ничего менять в обозримом будущем. Чтобы упростить миграцию на Python 3, которая произойдёт в конце концов, рекомендуется постепенно проверять <SPAN
+CLASS="QUOTE"
+>"готовность к будущему"</SPAN
+> кода, обновляя его до версий Python 2.6/2.7.</P
+><P
+>На практике многие функции PL/Python можно мигрировать на Python 3 с минимальными изменениями или вовсе без изменений.</P
+></LI
+><LI
+><P
+>Пользователи, знающие, что их код очень сильно зависит от Python 2, и не планирующие когда-либо менять его, могут использовать имя языка <TT
+CLASS="LITERAL"
+>plpython2u</TT
+>. Это будет работать ещё очень и очень долго, пока в PostgreSQL не будет полностью ликвидирована поддержка Python 2.</P
+></LI
+><LI
+><P
+>Пользователи, желающие погрузиться в Python 3, могут выбрать имя языка <TT
+CLASS="LITERAL"
+>plpython3u</TT
+>, и их код будет работать всегда, по сегодняшним стандартам. В отдалённом будущем, когда версией по умолчанию может стать Python 3, цифру <SPAN
+CLASS="QUOTE"
+>"3"</SPAN
+> из имени языка можно будет убрать из эстетических соображений.</P
+></LI
+><LI
+><P
+>Смельчаки, желающие уже сегодня получить операционное окружение только с Python 3, могут модифицировать <A
+HREF="catalog-pg-pltemplate.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_pltemplate</TT
+></A
+>, чтобы имя <TT
+CLASS="LITERAL"
+>plpythonu</TT
+> было равнозначно <TT
+CLASS="LITERAL"
+>plpython3u</TT
+>, отдавая себе отчёт в том, что такая инсталляция будет несовместима с остальным миром.</P
+></LI
+></UL
+><P></P
+><P
+>Дополнительную информацию о переходе на Python 3 можно также найти в описании <A
+HREF="http://docs.python.org/py3k/whatsnew/3.0.html"
+TARGET="_top"
+>Что нового в Python 3.0</A
+>.</P
+><P
+>Использовать PL/Python на базе Python 2 и PL/Python на базе Python 3 в одном сеансе нельзя, так как это приведёт к конфликту символов в динамических модулях, что может повлечь сбой серверного процесса PostgreSQL. В системе есть проверка, предотвращающая смешение основных версий Python в одном сеансе, которая прервёт сеанс при выявлении расхождения. Однако использовать обе вариации в одной базе данных всё же возможно, обращаясь к ним в разных сеансах.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="plpython.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="plpython-funcs.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>PL/Python — процедурный язык Python</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="plpython.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Функции на PL/Python</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

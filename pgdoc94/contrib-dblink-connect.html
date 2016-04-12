@@ -1,0 +1,356 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>dblink_connect</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="dblink"
+HREF="dblink.html"><LINK
+REL="PREVIOUS"
+TITLE="dblink"
+HREF="dblink.html"><LINK
+REL="NEXT"
+TITLE="dblink_connect_u"
+HREF="contrib-dblink-connect-u.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="dblink"
+HREF="dblink.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="dblink.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="dblink_connect_u"
+HREF="contrib-dblink-connect-u.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="CONTRIB-DBLINK-CONNECT"
+></A
+>dblink_connect</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN119521"
+></A
+><H2
+>Название</H2
+>dblink_connect&nbsp;--&nbsp;открывает постоянное подключение к удалённой базе данных</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN119524"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>dblink_connect(text connstr) returns text
+dblink_connect(text connname, text connstr) returns text</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN119526"
+></A
+><H2
+>Описание</H2
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>dblink_connect()</CODE
+> устанавливает подключение к удалённой базе данных <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Целевой сервер и база данных указываются в стандартной строке подключения <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>. Если требуется, этому подключению можно назначить имя. В один момент времени могут быть открытыми несколько именованных подключений, но только одно подключение без имени. Подключение будет сохраняться, пока не будет закрыто или до завершения сеанса базы данных.</P
+><P
+>В строке подключения также может задаваться имя существующего стороннего сервера. Для определения стороннего сервера рекомендуется использовать обёртку сторонних данных <TT
+CLASS="LITERAL"
+>dblink_fdw</TT
+>. См. пример ниже, а также <A
+HREF="sql-createserver.html"
+>CREATE SERVER</A
+> и <A
+HREF="sql-createusermapping.html"
+>CREATE USER MAPPING</A
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN119536"
+></A
+><H2
+>Аргументы</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="PARAMETER"
+>conname</TT
+></DT
+><DD
+><P
+>Имя, назначаемое этому подключению; если опускается, открывается безымянное подключение, заменяющее ранее существующее безымянное подключение.</P
+></DD
+><DT
+><TT
+CLASS="PARAMETER"
+>connstr</TT
+></DT
+><DD
+><P
+>Строка подключения в стиле <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>, например <TT
+CLASS="LITERAL"
+>hostaddr=127.0.0.1 port=5432 dbname=mydb user=postgres password=mypasswd</TT
+>. За подробностями обратитесь к <A
+HREF="libpq-connect.html#LIBPQ-CONNSTRING"
+>Подразделу 31.1.1</A
+>. В ней также может задаваться имя стороннего сервера.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN119552"
+></A
+><H2
+>Возвращаемое значение</H2
+><P
+>Возвращает состояние (это всегда строка <TT
+CLASS="LITERAL"
+>OK</TT
+>, так как в случае любой ошибки функция прерывается, выдавая исключение).</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN119556"
+></A
+><H2
+>Замечания</H2
+><P
+>Создавать подключения, не требующие аутентификации по паролю, с помощью <CODE
+CLASS="FUNCTION"
+>dblink_connect</CODE
+> разрешено только суперпользователям. Если эта возможность нужна обычным пользователям, следует воспользоваться функцией <CODE
+CLASS="FUNCTION"
+>dblink_connect_u</CODE
+>.</P
+><P
+>Использовать в именах подключений знаки &laquo;равно&raquo; не рекомендуется, так как при этом возможна путаница со строками подключений в других функциях <TT
+CLASS="FILENAME"
+>dblink</TT
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN119563"
+></A
+><H2
+>Примеры</H2
+><PRE
+CLASS="SCREEN"
+>SELECT dblink_connect('dbname=postgres');
+ dblink_connect
+----------------
+ OK
+(1 row)
+
+SELECT dblink_connect('myconn', 'dbname=postgres');
+ dblink_connect
+----------------
+ OK
+(1 row)
+
+-- Функциональность обёртки сторонних данных (FOREIGN DATA WRAPPER)
+-- Замечание: чтобы это работало, для локальных подключений требуется аутентификация по паролю
+--       В противном случае, вызвав dblink_connect(), вы получите:
+--       ----------------------------------------------------------------------
+--       ERROR:  password is required
+--       DETAIL:  Non-superuser cannot connect if the server does not request a password.
+--       HINT:  Target server's authentication method must be changed.
+--
+--       ОШИБКА:  требуется пароль
+--       ПОДРОБНОСТИ:  Обычный пользователь не может подключиться, если сервер не требует пароль.
+--       ПОДСКАЗКА:  Необходимо изменить метод аутентификации целевого сервера.
+
+CREATE SERVER fdtest FOREIGN DATA WRAPPER dblink_fdw OPTIONS (hostaddr '127.0.0.1', dbname 'contrib_regression');
+
+CREATE USER dblink_regression_test WITH PASSWORD 'secret';
+CREATE USER MAPPING FOR dblink_regression_test SERVER fdtest OPTIONS (user 'dblink_regression_test', password 'secret');
+GRANT USAGE ON FOREIGN SERVER fdtest TO dblink_regression_test;
+GRANT SELECT ON TABLE foo TO dblink_regression_test;
+
+\set ORIGINAL_USER :USER
+\c - dblink_regression_test
+SELECT dblink_connect('myconn', 'fdtest');
+ dblink_connect 
+----------------
+ OK
+(1 row)
+
+SELECT * FROM dblink('myconn','SELECT * FROM foo') AS t(a int, b text, c text[]);
+ a  | b |       c       
+----+---+---------------
+  0 | a | {a0,b0,c0}
+  1 | b | {a1,b1,c1}
+  2 | c | {a2,b2,c2}
+  3 | d | {a3,b3,c3}
+  4 | e | {a4,b4,c4}
+  5 | f | {a5,b5,c5}
+  6 | g | {a6,b6,c6}
+  7 | h | {a7,b7,c7}
+  8 | i | {a8,b8,c8}
+  9 | j | {a9,b9,c9}
+ 10 | k | {a10,b10,c10}
+(11 rows)
+
+\c - :ORIGINAL_USER
+REVOKE USAGE ON FOREIGN SERVER fdtest FROM dblink_regression_test;
+REVOKE SELECT ON TABLE foo FROM dblink_regression_test;
+DROP USER MAPPING FOR dblink_regression_test SERVER fdtest;
+DROP USER dblink_regression_test;
+DROP SERVER fdtest;</PRE
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="dblink.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="contrib-dblink-connect-u.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>dblink</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="dblink.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>dblink_connect_u</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

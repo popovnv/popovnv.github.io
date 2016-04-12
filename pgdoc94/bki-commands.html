@@ -1,0 +1,641 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Команды BKI</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Внутренний интерфейс BKI"
+HREF="bki.html"><LINK
+REL="PREVIOUS"
+TITLE="Формат файла BKI"
+HREF="bki-format.html"><LINK
+REL="NEXT"
+TITLE="Структура файла BKI"
+HREF="bki-structure.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Формат файла BKI"
+HREF="bki-format.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="bki.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 60. Внутренний интерфейс <ACRONYM
+CLASS="ACRONYM"
+>BKI</ACRONYM
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Структура файла BKI"
+HREF="bki-structure.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="BKI-COMMANDS"
+>60.2. Команды <ACRONYM
+CLASS="ACRONYM"
+>BKI</ACRONYM
+></A
+></H1
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>create</TT
+>
+     <TT
+CLASS="REPLACEABLE"
+><I
+>имя_таблицы</I
+></TT
+>
+     <TT
+CLASS="REPLACEABLE"
+><I
+>oid_таблицы</I
+></TT
+>
+     [<SPAN
+CLASS="OPTIONAL"
+><TT
+CLASS="LITERAL"
+>bootstrap</TT
+></SPAN
+>]
+     [<SPAN
+CLASS="OPTIONAL"
+><TT
+CLASS="LITERAL"
+>shared_relation</TT
+></SPAN
+>]
+     [<SPAN
+CLASS="OPTIONAL"
+><TT
+CLASS="LITERAL"
+>without_oids</TT
+></SPAN
+>]
+     [<SPAN
+CLASS="OPTIONAL"
+><TT
+CLASS="LITERAL"
+>rowtype_oid</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>oid</I
+></TT
+></SPAN
+>] (<TT
+CLASS="REPLACEABLE"
+><I
+>имя1</I
+></TT
+> = <TT
+CLASS="REPLACEABLE"
+><I
+>тип1</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>имя2</I
+></TT
+> = <TT
+CLASS="REPLACEABLE"
+><I
+>тип2</I
+></TT
+>, ...</SPAN
+>])</DT
+><DD
+><P
+>Создать таблицу <TT
+CLASS="REPLACEABLE"
+><I
+>имя_таблицы</I
+></TT
+> с заданным <TT
+CLASS="REPLACEABLE"
+><I
+>oid_таблицы</I
+></TT
+> и колонками, указанными в скобках.</P
+><P
+>Непосредственно <TT
+CLASS="FILENAME"
+>bootstrap.c</TT
+> поддерживает следующие типы колонок: <TT
+CLASS="TYPE"
+>bool</TT
+>, <TT
+CLASS="TYPE"
+>bytea</TT
+>, <TT
+CLASS="TYPE"
+>char</TT
+> (1 байт), <TT
+CLASS="TYPE"
+>name</TT
+>, <TT
+CLASS="TYPE"
+>int2</TT
+>, <TT
+CLASS="TYPE"
+>int4</TT
+>, <TT
+CLASS="TYPE"
+>regproc</TT
+>, <TT
+CLASS="TYPE"
+>regclass</TT
+>, <TT
+CLASS="TYPE"
+>regtype</TT
+>, <TT
+CLASS="TYPE"
+>text</TT
+>, <TT
+CLASS="TYPE"
+>oid</TT
+>, <TT
+CLASS="TYPE"
+>tid</TT
+>, <TT
+CLASS="TYPE"
+>xid</TT
+>, <TT
+CLASS="TYPE"
+>cid</TT
+>, <TT
+CLASS="TYPE"
+>int2vector</TT
+>, <TT
+CLASS="TYPE"
+>oidvector</TT
+>, <TT
+CLASS="TYPE"
+>_int4</TT
+> (массив), <TT
+CLASS="TYPE"
+>_text</TT
+> (массив), <TT
+CLASS="TYPE"
+>_oid</TT
+> (массив), <TT
+CLASS="TYPE"
+>_char</TT
+> (массив), <TT
+CLASS="TYPE"
+>_aclitem</TT
+> (массив). Хотя возможно создать таблицы, содержащие колонки и других типов, это нельзя сделать, пока не будет создан и заполнен соответствующими записями каталог <TT
+CLASS="STRUCTNAME"
+>pg_type</TT
+>. (Это по сути означает, что только эти типы колонок могут быть в таблицах, создаваемых в таком режиме, хотя каталоги, создаваемые позже, могут содержать любые встроенные типы.)</P
+><P
+>С указанием <TT
+CLASS="LITERAL"
+>bootstrap</TT
+> таблица будет создана только на диске; никакие записи о ней не будут добавлены в <TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+>, <TT
+CLASS="STRUCTNAME"
+>pg_attribute</TT
+> и т. д. Таким образом, таблица не будет доступна для обычных операций SQL, пока такие записи не будут добавлены явно (командами <TT
+CLASS="LITERAL"
+>insert</TT
+>). Это указание применяется для создания самой структуры <TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+> и подобных ей.</P
+><P
+>Если добавлено указание <TT
+CLASS="LITERAL"
+>shared_relation</TT
+>, таблица создаётся как общая. Она будет содержать колонку OID, если отсутствует указание <TT
+CLASS="LITERAL"
+>without_oids</TT
+>. Дополнительным предложением <TT
+CLASS="LITERAL"
+>rowtype_oid</TT
+> может быть задан OID типа строки (OID записи в <TT
+CLASS="STRUCTNAME"
+>pg_type</TT
+>); если он не указан, OID генерируется автоматически. (Предложение <TT
+CLASS="LITERAL"
+>rowtype_oid</TT
+> бесполезно, если присутствует указание <TT
+CLASS="LITERAL"
+>bootstrap</TT
+>, но его всё равно можно добавить для документирования.)</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>open</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>имя_таблицы</I
+></TT
+></DT
+><DD
+><P
+>Открыть таблицу <TT
+CLASS="REPLACEABLE"
+><I
+>имя_таблицы</I
+></TT
+> для добавления данных. Любая другая таблица, открытая в данный момент, закрывается.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>close</TT
+> [<SPAN
+CLASS="OPTIONAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_таблицы</I
+></TT
+></SPAN
+>]</DT
+><DD
+><P
+>Закрыть открытую таблицу. Имя таблицы может задаваться для перепроверки, но это не требуется.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>insert</TT
+> [<SPAN
+CLASS="OPTIONAL"
+><TT
+CLASS="LITERAL"
+>OID =</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>значение_oid</I
+></TT
+></SPAN
+>] <TT
+CLASS="LITERAL"
+>(</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>значение1</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>значение2</I
+></TT
+> ... <TT
+CLASS="LITERAL"
+>)</TT
+></DT
+><DD
+><P
+>Вставить новую строку в открытую таблицу, установив <TT
+CLASS="REPLACEABLE"
+><I
+>значение1</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>значение2</I
+></TT
+> и т. д. в качестве значений колонок и <TT
+CLASS="REPLACEABLE"
+><I
+>значение_oid</I
+></TT
+> в качестве OID. Если <TT
+CLASS="REPLACEABLE"
+><I
+>значение_oid</I
+></TT
+> равно нулю (0) или это указание опущено, а таблица при этом содержит OID, строке назначается следующий свободный OID.</P
+><P
+>Значения NULL могут задаваться специальным ключевым словом <TT
+CLASS="LITERAL"
+>_null_</TT
+>. Значения, содержащие пробелы, должны заключаться в двойные кавычки.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>declare</TT
+> [<SPAN
+CLASS="OPTIONAL"
+><TT
+CLASS="LITERAL"
+>unique</TT
+></SPAN
+>]
+     <TT
+CLASS="LITERAL"
+>index</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>имя_индекса</I
+></TT
+>
+     <TT
+CLASS="REPLACEABLE"
+><I
+>oid_индекса</I
+></TT
+>
+     <TT
+CLASS="LITERAL"
+>on</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>имя_таблицы</I
+></TT
+>
+     <TT
+CLASS="LITERAL"
+>using</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>имя_метода_доступа</I
+></TT
+>
+     <TT
+CLASS="LITERAL"
+>(</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>класс_оп1</I
+></TT
+>
+     <TT
+CLASS="REPLACEABLE"
+><I
+>имя1</I
+></TT
+>
+     [<SPAN
+CLASS="OPTIONAL"
+>, ...</SPAN
+>] <TT
+CLASS="LITERAL"
+>)</TT
+></DT
+><DD
+><P
+>Создать индекс <TT
+CLASS="REPLACEABLE"
+><I
+>имя_индекса</I
+></TT
+> с OID, равным <TT
+CLASS="REPLACEABLE"
+><I
+>oid_индекса</I
+></TT
+>, в таблице <TT
+CLASS="REPLACEABLE"
+><I
+>имя_таблицы</I
+></TT
+>, с методом доступа <TT
+CLASS="REPLACEABLE"
+><I
+>имя_метода_доступа</I
+></TT
+>. Индекс строится по полям <TT
+CLASS="REPLACEABLE"
+><I
+>имя1</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>имя2</I
+></TT
+> и т. д., и для них используются соответственно классы операторов <TT
+CLASS="REPLACEABLE"
+><I
+>класс_оп1</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>класс_оп2</I
+></TT
+> и т. д. Эта команда создаёт файл индекса и добавляет соответствующие записи в каталог, но не инициализирует содержимое индекса.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>declare toast</TT
+>
+     <TT
+CLASS="REPLACEABLE"
+><I
+>oid_таблицы_toast</I
+></TT
+>
+     <TT
+CLASS="REPLACEABLE"
+><I
+>oid_индекса_toast</I
+></TT
+>
+     <TT
+CLASS="LITERAL"
+>on</TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>имя_таблицы</I
+></TT
+></DT
+><DD
+><P
+>Создаёт таблицу TOAST для таблицы <TT
+CLASS="REPLACEABLE"
+><I
+>имя_таблицы</I
+></TT
+>. Таблице TOAST назначается OID, равный <TT
+CLASS="REPLACEABLE"
+><I
+>oid_таблицы_toast</I
+></TT
+>, а её индексу назначается OID, равный <TT
+CLASS="REPLACEABLE"
+><I
+>oid_индекса_toast</I
+></TT
+>. Как и с <TT
+CLASS="LITERAL"
+>declare index</TT
+>, заполнение индекса откладывается.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>build indices</TT
+></DT
+><DD
+><P
+>Заполнить индексы, объявленные ранее.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="bki-format.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="bki-structure.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Формат файла <ACRONYM
+CLASS="ACRONYM"
+>BKI</ACRONYM
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="bki.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Структура файла <ACRONYM
+CLASS="ACRONYM"
+>BKI</ACRONYM
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

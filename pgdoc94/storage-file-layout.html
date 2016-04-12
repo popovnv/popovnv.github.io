@@ -1,0 +1,689 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Размещение файлов базы данных</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Физическое хранение базы данных"
+HREF="storage.html"><LINK
+REL="PREVIOUS"
+TITLE="Физическое хранение базы данных"
+HREF="storage.html"><LINK
+REL="NEXT"
+TITLE="TOAST"
+HREF="storage-toast.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Физическое хранение базы данных"
+HREF="storage.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="storage.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 59. Физическое хранение базы данных</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="TOAST"
+HREF="storage-toast.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="STORAGE-FILE-LAYOUT"
+>59.1. Размещение файлов базы данных</A
+></H1
+><P
+>Этот раздел описывает формат хранения на уровне файлов и каталогов.</P
+><P
+>Файлы конфигурации и файлы данных, используемые кластером базы данных, традиционно хранятся вместе в каталоге данных кластера, который обычно называют <TT
+CLASS="VARNAME"
+>PGDATA</TT
+> (по имени переменной среды, которую можно использовать для его определения). Обычно <TT
+CLASS="VARNAME"
+>PGDATA</TT
+> находится в <TT
+CLASS="FILENAME"
+>/var/lib/pgsql/data</TT
+>. На одной и той же машине может находиться множество кластеров, управляемых различными экземплярами сервера.</P
+><P
+>В каталоге <TT
+CLASS="VARNAME"
+>PGDATA</TT
+> содержится несколько подкаталогов и управляющих файлов, как показано в <A
+HREF="storage-file-layout.html#PGDATA-CONTENTS-TABLE"
+>Таблице 59-1</A
+>. В дополнение к этим обязательным элементам конфигурационные файлы кластера <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+>, <TT
+CLASS="FILENAME"
+>pg_hba.conf</TT
+> и <TT
+CLASS="FILENAME"
+>pg_ident.conf</TT
+> традиционно хранятся в <TT
+CLASS="VARNAME"
+>PGDATA</TT
+>, хотя их можно разместить и в другом месте.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="PGDATA-CONTENTS-TABLE"
+></A
+><P
+><B
+>Таблица 59-1. Содержание <TT
+CLASS="VARNAME"
+>PGDATA</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+>Элемент</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="FILENAME"
+>PG_VERSION</TT
+>
+                </TD
+><TD
+>Файл, содержащий номер основной версии <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="FILENAME"
+>base</TT
+>
+                </TD
+><TD
+>Подкаталог, содержащий подкаталоги для каждой базы данных</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="FILENAME"
+>global</TT
+>
+                </TD
+><TD
+>Подкаталог, содержащий общие таблицы кластера, такие как <TT
+CLASS="STRUCTNAME"
+>pg_database</TT
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="FILENAME"
+>pg_clog</TT
+>
+                </TD
+><TD
+>Подкаталог, содержащий данные о состоянии транзакции</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="FILENAME"
+>pg_dynshmem</TT
+>
+                </TD
+><TD
+>Подкаталог, содержащий файлы, используемые подсистемой динамически разделяемой памяти</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="FILENAME"
+>pg_logical</TT
+>
+                </TD
+><TD
+>Подкаталог, содержащий данные о состоянии для логического декодирования</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="FILENAME"
+>pg_multixact</TT
+>
+                </TD
+><TD
+>Подкаталог, содержащий данные о состоянии мультитранзакций (используемые для разделяемой блокировки строк)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="FILENAME"
+>pg_notify</TT
+>
+                </TD
+><TD
+>Подкаталог, содержащий данные состояния прослушивания и нотификации (LISTEN/NOTIFY)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="FILENAME"
+>pg_replslot</TT
+>
+                </TD
+><TD
+>Подкаталог, содержащий данные слота репликации</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="FILENAME"
+>pg_serial</TT
+>
+                </TD
+><TD
+>Подкаталог, содержащий информацию о выполненных сериализуемых транзакциях.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="FILENAME"
+>pg_snapshots</TT
+>
+                </TD
+><TD
+>Подкаталог, содержащий экспортированные снимки (snapshots)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="FILENAME"
+>pg_stat</TT
+>
+                </TD
+><TD
+>Подкаталог, содержащий постоянные файлы для подсистемы статистики.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="FILENAME"
+>pg_stat_tmp</TT
+>
+                </TD
+><TD
+>Подкаталог, содержащий временные файлы для подсистемы статистики</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="FILENAME"
+>pg_subtrans</TT
+>
+                </TD
+><TD
+>Подкаталог, содержащий данные о состоянии подтранзакций</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="FILENAME"
+>pg_tblspc</TT
+>
+                </TD
+><TD
+>Подкаталог, содержащий символические ссылки на табличные пространства</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="FILENAME"
+>pg_twophase</TT
+>
+                </TD
+><TD
+>Подкаталог, содержащий файлы состояний для подготовленных транзакций</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="FILENAME"
+>pg_xlog</TT
+>
+                </TD
+><TD
+>Подкаталог, содержащий файлы WAL (журнал упреждающей записи)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="FILENAME"
+>postgresql.auto.conf</TT
+>
+                </TD
+><TD
+>Файл, используемый для хранения параметров конфигурации, которые устанавливаются при помощи <TT
+CLASS="COMMAND"
+>ALTER SYSTEM</TT
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="FILENAME"
+>postmaster.opts</TT
+>
+                </TD
+><TD
+>Файл, записывающий параметры командной строки, с которыми сервер был запущен в последний раз</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="FILENAME"
+>postmaster.pid</TT
+>
+                </TD
+><TD
+>Файл блокировки, записывающий идентификатор (ID) текущего управляющего процесса (PID), путь к каталогу данных кластера, временную метку запуска управляющего процесса, номер порта, путь к каталогу сокетов Unix (пустой для Windows), первый корректный адрес прослушивания (listen_address) (IP-адрес или <TT
+CLASS="LITERAL"
+>*</TT
+>, либо пустое значение в случае отсутствия прослушивания по TCP), и ID сегмента разделяемой памяти (этот файл отсутствует после остановки сервера).</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Для каждой базы данных в кластере существует подкаталог внутри <TT
+CLASS="VARNAME"
+>PGDATA</TT
+><TT
+CLASS="FILENAME"
+>/base</TT
+>, названный по OID базы данных в <TT
+CLASS="STRUCTNAME"
+>pg_database</TT
+>. Этот подкаталог по умолчанию является местом хранения файлов базы данных; в частности, там хранятся её системные каталоги.</P
+><P
+>Каждая таблица и индекс хранятся в отдельном файле. Для обычных отношений, эти файлы получают имя по номеру <I
+CLASS="FIRSTTERM"
+>файлового узла</I
+> таблицы или индекса, который содержится в <TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+>.<TT
+CLASS="STRUCTFIELD"
+>relfilenode</TT
+>. Но для временных отношений, имя файла имеет форму <TT
+CLASS="LITERAL"
+>t<TT
+CLASS="REPLACEABLE"
+><I
+>BBB</I
+></TT
+>_<TT
+CLASS="REPLACEABLE"
+><I
+>FFF</I
+></TT
+></TT
+>, где <TT
+CLASS="REPLACEABLE"
+><I
+>BBB</I
+></TT
+> - идентификатор серверного процесса сервера, который создал данный файл, а <TT
+CLASS="REPLACEABLE"
+><I
+>FFF</I
+></TT
+> — номер файлового узла. В обоих случаях, помимо главного файла (также называемого основным слоем), у каждой таблицы и индекса есть <I
+CLASS="FIRSTTERM"
+>карта свободного пространства</I
+> (см. <A
+HREF="storage-fsm.html"
+>Раздел 59.3</A
+>), в которой хранится информация о свободном пространстве в данном отношении. Имя файла карты свободного пространства образуется из номера файлового узла с суффиксом <TT
+CLASS="LITERAL"
+>_fsm</TT
+>. Также таблицы имеют <I
+CLASS="FIRSTTERM"
+>карту видимости</I
+>, хранящуюся в слое с суффиксом <TT
+CLASS="LITERAL"
+>_vm</TT
+>, для отслеживания страниц, не содержащих мёртвых записей. Карта видимости подробнее описана в <A
+HREF="storage-vm.html"
+>Разделе 59.4</A
+>. Нежурналируемые таблицы и индексы имеют третий слой, так называемый слой инициализации, имя которого содержит суффикс <TT
+CLASS="LITERAL"
+>_init</TT
+> (см. <A
+HREF="storage-init.html"
+>Раздел 59.5</A
+>).</P
+><DIV
+CLASS="CAUTION"
+><P
+></P
+><TABLE
+CLASS="CAUTION"
+BORDER="1"
+WIDTH="100%"
+><TR
+><TD
+ALIGN="CENTER"
+><B
+>Предостережение</B
+></TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+><P
+>Заметьте, что хотя номер файла таблицы часто совпадает с её OID, так бывает <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>не</I
+></SPAN
+> всегда; некоторые операции, например, <TT
+CLASS="COMMAND"
+>TRUNCATE</TT
+>, <TT
+CLASS="COMMAND"
+>REINDEX</TT
+>, <TT
+CLASS="COMMAND"
+>CLUSTER</TT
+> и некоторые формы команды <TT
+CLASS="COMMAND"
+>ALTER TABLE</TT
+> могут изменить номер файла, но при этом сохранят OID. Не следует рассчитывать, что номер файлового узла и OID таблицы совпадают. Кроме того, для некоторых системных каталогов, включая и <TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+>, в <TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+>.<TT
+CLASS="STRUCTFIELD"
+>relfilenode</TT
+> содержится ноль. Фактический номер файлового узла для них хранится в низкоуровневой структуре данных, и его можно получить при помощи функции <CODE
+CLASS="FUNCTION"
+>pg_relation_filenode()</CODE
+>.</P
+></TD
+></TR
+></TABLE
+></DIV
+><P
+>Когда объём таблицы или индекса превышает 1 GB, они делятся на <I
+CLASS="FIRSTTERM"
+>сегменты</I
+> размером в один гигабайт. Файл первого сегмента называется по номеру файлового узла (filenode); последующие сегменты получают имена filenode.1, filenode.2 и т. д. При такой организации хранения не возникает проблем на платформах, имеющих ограничения по размеру файлов. (На самом деле, 1 GB является лишь стандартным размером сегмента. Размер сегмента можно изменить, используя параметр конфигурации <TT
+CLASS="OPTION"
+>--with-segsize</TT
+> при создании <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.) В принципе, карты свободного пространства и карты видимости также могут занимать нескольких сегментов, хотя на практике это маловероятно.</P
+><P
+>У таблицы, столбцы которой могут содержать данные большого объёма, будет иметься собственная таблица <I
+CLASS="FIRSTTERM"
+>TOAST</I
+>, предназначенная для отдельного хранения значений, которые слишком велики для хранения в строках самой таблицы. Основная таблица связывается с её таблицей <ACRONYM
+CLASS="ACRONYM"
+>TOAST</ACRONYM
+> (если таковая имеется) через <TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+>.<TT
+CLASS="STRUCTFIELD"
+>reltoastrelid</TT
+>. За подробной информацией обратитесь к <A
+HREF="storage-toast.html"
+>Разделу 59.2</A
+>.</P
+><P
+>Содержание таблиц и индексов рассматривается ниже (см. <A
+HREF="storage-page-layout.html"
+>Раздел 59.6</A
+>).</P
+><P
+>Табличное пространство делает сценарий более сложным. Каждое пользовательское табличное пространство имеет символическую ссылку внутри каталога <TT
+CLASS="VARNAME"
+>PGDATA</TT
+><TT
+CLASS="FILENAME"
+>/pg_tblspc</TT
+>, указывающую на физический каталог табличного пространства (т. е., положение, указанное в команде табличного пространства <TT
+CLASS="COMMAND"
+>CREATE TABLESPACE</TT
+>). Эта символическая ссылка получает имя по OID табличного пространства. Внутри физического каталога табличного пространства имеется подкаталог, имя которого зависит от версии сервера <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, как например <TT
+CLASS="LITERAL"
+>PG_9.0_201008051</TT
+>. (Этот подкаталог используется для того, чтобы последующие версии базы данных могли свободно использовать одно и то местоположение, заданное в <TT
+CLASS="COMMAND"
+>CREATE TABLESPACE</TT
+>.) Внутри каталога конкретной версии находится подкаталог для каждой базы данных, которая имеет элементы в табличном пространстве, названный по OID базы данных. Таблицы и индексы хранятся внутри этого каталога, используя схему именования файловых узлов. Табличное пространство <TT
+CLASS="LITERAL"
+>pg_default</TT
+> недоступно через <TT
+CLASS="FILENAME"
+>pg_tblspc</TT
+>, но соответствует <TT
+CLASS="VARNAME"
+>PGDATA</TT
+><TT
+CLASS="FILENAME"
+>/base</TT
+>. Подобным же образом, табличное пространство <TT
+CLASS="LITERAL"
+>pg_global</TT
+> недоступно через <TT
+CLASS="FILENAME"
+>pg_tblspc</TT
+>, но соответствует <TT
+CLASS="VARNAME"
+>PGDATA</TT
+><TT
+CLASS="FILENAME"
+>/global</TT
+>.</P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>pg_relation_filepath()</CODE
+> показывает полный путь (относительно <TT
+CLASS="VARNAME"
+>PGDATA</TT
+>) для любого отношения. Часто это избавляет от необходимости запоминать многие из приведённых выше правил. Но следует помнить, что эта функция выдаёт лишь имя первого сегмента основного слоя отношения, т. е. возможно, понадобится добавить номер сегмента и/или <TT
+CLASS="LITERAL"
+>_fsm</TT
+>, <TT
+CLASS="LITERAL"
+>_vm</TT
+> или <TT
+CLASS="LITERAL"
+>_init</TT
+>, чтобы найти все файлы, связанные с отношением.</P
+><P
+>Временные файлы (для таких операций, как сортировка объёма данных большего, чем может уместиться в памяти) создаются внутри <TT
+CLASS="VARNAME"
+>PGDATA</TT
+><TT
+CLASS="FILENAME"
+>/base/pgsql_tmp</TT
+> или внутри подкаталога <TT
+CLASS="FILENAME"
+>pgsql_tmp</TT
+> каталога табличного пространства, если для них определено табличное пространство, отличное от <TT
+CLASS="LITERAL"
+>pg_default</TT
+>. Имя временного файла имеет форму <TT
+CLASS="FILENAME"
+>pgsql_tmp<TT
+CLASS="REPLACEABLE"
+><I
+>PPP</I
+></TT
+>.<TT
+CLASS="REPLACEABLE"
+><I
+>NNN</I
+></TT
+></TT
+>, где <TT
+CLASS="REPLACEABLE"
+><I
+>PPP</I
+></TT
+> — PID серверного процесса, а <TT
+CLASS="REPLACEABLE"
+><I
+>NNN</I
+></TT
+> служит для разделения различных временных файлов этого серверного процесса.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="storage.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="storage-toast.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Физическое хранение базы данных</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="storage.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>TOAST</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

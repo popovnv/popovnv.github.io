@@ -1,0 +1,289 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Выключение сервера</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Подготовка к работе и сопровождение сервера"
+HREF="runtime.html"><LINK
+REL="PREVIOUS"
+TITLE="Управление ресурсами ядра"
+HREF="kernel-resources.html"><LINK
+REL="NEXT"
+TITLE="Обновление кластера PostgreSQL"
+HREF="upgrading.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Управление ресурсами ядра"
+HREF="kernel-resources.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="runtime.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 17. Подготовка к работе и сопровождение сервера</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Обновление кластера PostgreSQL"
+HREF="upgrading.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="SERVER-SHUTDOWN"
+>17.5. Выключение сервера</A
+></H1
+><P
+>Сервер баз данных можно отключить несколькими способами. Вы выбираете тот или иной вариант отключения, посылая разные сигналы главному процессу <TT
+CLASS="COMMAND"
+>postgres</TT
+>. <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><SPAN
+CLASS="SYSTEMITEM"
+>SIGTERM</SPAN
+></DT
+><DD
+><P
+>Запускает так называемое <I
+CLASS="FIRSTTERM"
+>умное выключение</I
+>. Получив <SPAN
+CLASS="SYSTEMITEM"
+>SIGTERM</SPAN
+>, сервер перестаёт принимать новые подключения, но позволяет всем существующим сеансам закончить работу в штатном режиме. Сервер будет отключён только после завершения всех сеансов. Если сервер находится в режиме архивации, сервер дополнительно ожидает выхода из этого режима. При этом в данном случае сервер позволяет устанавливать новые подключения, но только для суперпользователей (это исключение позволяет суперпользователю подключиться и прервать архивацию). Если получая этот сигнал, сервер находится в процессе восстановления, восстановление и потоковая репликация будут прерваны только после завершения всех обычных сеансов.</P
+></DD
+><DT
+><SPAN
+CLASS="SYSTEMITEM"
+>SIGINT</SPAN
+></DT
+><DD
+><P
+>Запускает <I
+CLASS="FIRSTTERM"
+>быстрое выключение</I
+>. Сервер запрещает новые подключения и посылает всем работающим серверным процессам сигнал <SPAN
+CLASS="SYSTEMITEM"
+>SIGTERM</SPAN
+>, в результате чего их транзакции прерываются и сами процессы завершаются. Управляющий процесс ждёт, пока будут завершены все эти процессы и затем завершается сам. Если сервер находится в режиме архивации, архивация прерывается, так что архив оказывается неполным.</P
+></DD
+><DT
+><SPAN
+CLASS="SYSTEMITEM"
+>SIGQUIT</SPAN
+></DT
+><DD
+><P
+>Запускает <I
+CLASS="FIRSTTERM"
+>немедленное выключение</I
+>. Сервер отправляет всем дочерним процессам сигнал <SPAN
+CLASS="SYSTEMITEM"
+>SIGQUIT</SPAN
+> и ждёт их завершения. Если какие-либо процессы не завершаются в течение 5 секунд, главный процесс <TT
+CLASS="COMMAND"
+>postgres</TT
+> посылает им <SPAN
+CLASS="SYSTEMITEM"
+>SIGKILL</SPAN
+>, чтобы прервать их немедленно. В результате при последующем запуске будет запущен процесс восстановления (воспроизведения изменений из журнала). Такой вариант выключения рекомендуется только в экстренных ситуациях.</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>Удобную возможность отправлять эти сигналы, отключающие сервер, предоставляет программа <A
+HREF="app-pg-ctl.html"
+>            <SPAN
+CLASS="APPLICATION"
+>pg_ctl</SPAN
+>
+          </A
+>. Кроме того, в системах, отличных от Windows, соответствующий сигнал можно отправить с помощью команды <TT
+CLASS="COMMAND"
+>kill</TT
+>. <ACRONYM
+CLASS="ACRONYM"
+>PID</ACRONYM
+> основного процесса <TT
+CLASS="COMMAND"
+>postgres</TT
+> можно узнать, воспользовавшись программой <TT
+CLASS="COMMAND"
+>ps</TT
+>, либо прочитав файл <TT
+CLASS="FILENAME"
+>postmaster.pid</TT
+> в каталоге данных. Например, можно выполнить быстрое выключение так: </P><PRE
+CLASS="SCREEN"
+>$ <KBD
+CLASS="USERINPUT"
+>kill -INT `head -1 /usr/local/pgsql/data/postmaster.pid`</KBD
+></PRE
+><P></P
+><DIV
+CLASS="IMPORTANT"
+><BLOCKQUOTE
+CLASS="IMPORTANT"
+><P
+><B
+>Важно: </B
+>Для выключения сервера не следует использовать сигнал <SPAN
+CLASS="SYSTEMITEM"
+>SIGKILL</SPAN
+>. При таком выключении сервер не сможет освободить разделяемую память и семафоры, и, возможно, это придётся делать вручную, чтобы сервер мог запуститься снова. Кроме того, при уничтожении главного процесса <TT
+CLASS="COMMAND"
+>postgres</TT
+> сигналом <SPAN
+CLASS="SYSTEMITEM"
+>SIGKILL</SPAN
+>, он не успеет передать этот сигнал своим дочерним процессам, так что может потребоваться завершать их так же вручную.</P
+></BLOCKQUOTE
+></DIV
+><P
+>Чтобы завершить отдельный сеанс, не прерывая работу других сеансов, воспользуйтесь функцией <CODE
+CLASS="FUNCTION"
+>pg_terminate_backend()</CODE
+> (см. <A
+HREF="functions-admin.html#FUNCTIONS-ADMIN-SIGNAL-TABLE"
+>Таблицу 9-64</A
+>) или отправьте сигнал <SPAN
+CLASS="SYSTEMITEM"
+>SIGTERM</SPAN
+> дочернему процессу, обслуживающему этот сеанс.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="kernel-resources.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="upgrading.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Управление ресурсами ядра</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="runtime.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Обновление кластера <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,223 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Внешние ключи</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Расширенные возможности"
+HREF="tutorial-advanced.html"><LINK
+REL="PREVIOUS"
+TITLE="Представления"
+HREF="tutorial-views.html"><LINK
+REL="NEXT"
+TITLE="Транзакции"
+HREF="tutorial-transactions.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Представления"
+HREF="tutorial-views.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="tutorial-advanced.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 3. Расширенные возможности</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Транзакции"
+HREF="tutorial-transactions.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="TUTORIAL-FK"
+>3.3. Внешние ключи</A
+></H1
+><P
+>Вспомните таблицы <CODE
+CLASS="CLASSNAME"
+>weather</CODE
+> и <CODE
+CLASS="CLASSNAME"
+>cities</CODE
+> из <A
+HREF="tutorial-sql.html"
+>Главы 2</A
+>. Давайте рассмотрим следующую задачу: вы хотите добиться, чтобы никто не мог вставить в таблицу <CODE
+CLASS="CLASSNAME"
+>weather</CODE
+> строки, для которых не находится соответствующая строка в таблице <CODE
+CLASS="CLASSNAME"
+>cities</CODE
+>. Это называется обеспечением <I
+CLASS="FIRSTTERM"
+>ссылочной целостности</I
+> данных. В простых СУБД это пришлось бы реализовать (если это вообще возможно) так: сначала явно проверить, есть ли соответствующие записи в таблице <CODE
+CLASS="CLASSNAME"
+>cities</CODE
+>, а затем отклонить или вставить новые записи в таблицу <CODE
+CLASS="CLASSNAME"
+>weather</CODE
+>. Этот подход очень проблематичен и неудобен, поэтому всё это <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> может сделать за вас.</P
+><P
+>Новое объявление таблицы будет выглядеть так: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE cities (
+        city     varchar(80) primary key,
+        location point
+);
+
+CREATE TABLE weather (
+        city      varchar(80) references cities(city),
+        temp_lo   int,
+        temp_hi   int,
+        prcp      real,
+        date      date
+);</PRE
+><P> Теперь попробуйте вставить недопустимую запись: </P><PRE
+CLASS="PROGRAMLISTING"
+>INSERT INTO weather VALUES ('Berkeley', 45, 53, 0.0, '1994-11-28');</PRE
+><P>
+
+</P><PRE
+CLASS="SCREEN"
+>ОШИБКА:  INSERT или UPDATE в таблице "weather" нарушает ограничение внешнего
+  ключа "weather_city_fkey"
+ПОДРОБНОСТИ:  Ключ (city)=(Berkeley) отсутствует в таблице "cities".</PRE
+><P></P
+><P
+>Поведение внешних ключей можно подстроить согласно требованиям вашего приложения. Мы не будем усложнять этот простой пример в данном введении, но вы можете обратиться за дополнительной информацией к <A
+HREF="ddl.html"
+>Главе 5</A
+>. Правильно применяя внешние ключи, вы определённо создадите более качественные приложения, поэтому мы настоятельно рекомендуем изучить их.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="tutorial-views.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="tutorial-transactions.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Представления</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="tutorial-advanced.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Транзакции</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

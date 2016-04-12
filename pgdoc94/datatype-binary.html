@@ -1,0 +1,636 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Двоичные типы данных</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Типы данных"
+HREF="datatype.html"><LINK
+REL="PREVIOUS"
+TITLE="Символьные типы"
+HREF="datatype-character.html"><LINK
+REL="NEXT"
+TITLE="Типы даты/времени"
+HREF="datatype-datetime.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Символьные типы"
+HREF="datatype-character.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="datatype.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 8. Типы данных</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Типы даты/времени"
+HREF="datatype-datetime.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="DATATYPE-BINARY"
+>8.4. Двоичные типы данных</A
+></H1
+><P
+>Для хранения двоичных данных предназначен тип <TT
+CLASS="TYPE"
+>bytea</TT
+>; см. <A
+HREF="datatype-binary.html#DATATYPE-BINARY-TABLE"
+>Таблицу 8-6</A
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="DATATYPE-BINARY-TABLE"
+></A
+><P
+><B
+>Таблица 8-6. Двоичные типы данных</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Размер</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>bytea</TT
+>
+                </TD
+><TD
+>1 или 4 байта плюс сама двоичная строка</TD
+><TD
+>двоичная строка переменной длины</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Двоичные строки представляют собой последовательность октетов (байт) и имеют два отличия от текстовых строк. Во-первых, в двоичных строках можно хранить байты с кодом 0 и другими <SPAN
+CLASS="QUOTE"
+>"непечатаемыми"</SPAN
+> значениями (обычно это значения вне диапазона 32..126). В текстовых строках нельзя сохранять нулевые байты, а также значения и последовательности значений, не соответствующие выбранной кодировке базы данных. Во-вторых, в операциях с двоичными строками обрабатываются байты в чистом виде, тогда как текстовые строки обрабатываются в зависимости от языковых стандартов. То есть, двоичные строки больше подходят для данных, которые программист видит как <SPAN
+CLASS="QUOTE"
+>"просто байты"</SPAN
+>, а символьные строки &mdash; для хранения текста.</P
+><P
+>Тип <TT
+CLASS="TYPE"
+>bytea</TT
+> поддерживает два внешних формата ввода и вывода: традиционный для <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> формат <SPAN
+CLASS="QUOTE"
+>"спецпоследовательностей"</SPAN
+> и <SPAN
+CLASS="QUOTE"
+>"шестнадцатеричный"</SPAN
+>. Входные данные принимаются в обоих форматах, а формат выходных данных зависит от параметра конфигурации <A
+HREF="runtime-config-client.html#GUC-BYTEA-OUTPUT"
+>bytea_output</A
+>; по умолчанию выбран шестнадцатеричный. (Заметьте, что шестнадцатеричный формат был введён в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> 9.0; в ранних версиях и некоторых программах он не будет работать.)</P
+><P
+>Стандарт <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> определяет другой тип двоичных данных, <TT
+CLASS="TYPE"
+>BLOB</TT
+> (<TT
+CLASS="TYPE"
+>BINARY LARGE OBJECT</TT
+>, большой двоичный объект). Его входной формат отличается от форматов <TT
+CLASS="TYPE"
+>bytea</TT
+>, но функции и операторы в основном те же.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN5481"
+>8.4.1. Шестнадцатеричный формат <TT
+CLASS="TYPE"
+>bytea</TT
+></A
+></H2
+><P
+>В <SPAN
+CLASS="QUOTE"
+>"шестнадцатеричном"</SPAN
+> формате двоичные данные кодируются двумя шестнадцатеричными цифрами на байт, при этом первая цифра соответствует старшим 4 битам. К полученной строке добавляется префикс <TT
+CLASS="LITERAL"
+>\x</TT
+> (чтобы она отличалась от формата спецпоследовательности). В некоторых контекстах обратную косую черту нужно выделить, продублировав её, в тех же случаях это нужно сделать для формата спецпоследовательности; подробнее это описано ниже. Шестнадцатеричные цифры могут быть в любом регистре, а между парами цифр допускаются пробельные символы (но не внутри пары и не в начале последовательности <TT
+CLASS="LITERAL"
+>\x</TT
+>). Этот формат совместим со множеством внешних приложений и протоколов, к тому же обычно преобразуется быстрее, поэтому предпочтительнее использовать его.</P
+><P
+>Пример: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT E'\\xDEADBEEF';</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN5490"
+>8.4.2. Формат спецпоследовательностей <TT
+CLASS="TYPE"
+>bytea</TT
+></A
+></H2
+><P
+>Формат <SPAN
+CLASS="QUOTE"
+>"спецпоследовательностей"</SPAN
+> традиционно использовался в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> для значений типа <TT
+CLASS="TYPE"
+>bytea</TT
+>. В нём двоичная строка представляется в виде последовательности ASCII-символов, а байты, непредставимые в виде ASCII-символов, передаются в виде спецпоследовательностей. Этот формат может быть удобен, если с точки зрения приложения представление байт в виде символов имеет смысл. Но на практике это обычно создаёт путаницу, так как двоичные и символьные строки могут выглядеть одинаково, а кроме того выбранный механизм спецпоследовательностей довольно неуклюж. Поэтому в новых приложениях этот формат обычно не стоит использовать.</P
+><P
+>Передавая значения <TT
+CLASS="TYPE"
+>bytea</TT
+> в формате спецпоследовательности, байты с определёнными значениями <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>необходимо</I
+></SPAN
+> записывать специальным образом, хотя так <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>можно</I
+></SPAN
+> записывать и все значения. В общем виде для этого значение байта нужно преобразовать в трёхзначное восьмеричное число и добавить перед ним обратную косую черту (и продублировать её, если значение записывается в текстовой спецстроке). Саму обратную косую черту (символ с кодом 92) можно записать в виде двух таких символов. В <A
+HREF="datatype-binary.html#DATATYPE-BINARY-SQLESC"
+>Таблице 8-7</A
+> перечислены символы, которые нужно записывать спецпоследовательностями, и приведены альтернативные варианты записи там, где они возможны.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="DATATYPE-BINARY-SQLESC"
+></A
+><P
+><B
+>Таблица 8-7. Спецпоследовательности записи значений <TT
+CLASS="TYPE"
+>bytea</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Десятичное значение байта</TH
+><TH
+>Описание</TH
+><TH
+>Спецпоследова-
+тельность ввода</TH
+><TH
+>Пример</TH
+><TH
+>Выводимое представление</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>0</TD
+><TD
+>нулевой байт</TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>E'\\000'</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>SELECT E'\\000'​::bytea;</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>\000</TT
+>
+                  </TD
+></TR
+><TR
+><TD
+>39</TD
+><TD
+>апостроф</TD
+><TD
+><TT
+CLASS="LITERAL"
+>''''</TT
+> или <TT
+CLASS="LITERAL"
+>E'\\047'</TT
+></TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>SELECT E'\''::bytea;</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>'</TT
+>
+                  </TD
+></TR
+><TR
+><TD
+>92</TD
+><TD
+>обратная косая черта</TD
+><TD
+><TT
+CLASS="LITERAL"
+>E'\\\\'</TT
+> или <TT
+CLASS="LITERAL"
+>E'\\134'</TT
+></TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>SELECT E'\\\\'​::bytea;</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>\\</TT
+>
+                  </TD
+></TR
+><TR
+><TD
+>от 0 до 31 и от 127 до 255</TD
+><TD
+><SPAN
+CLASS="QUOTE"
+>"непечатаемые"</SPAN
+> байты</TD
+><TD
+><TT
+CLASS="LITERAL"
+>E'\\<TT
+CLASS="REPLACEABLE"
+><I
+>xxx'</I
+></TT
+></TT
+> (значение байта)</TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>SELECT E'\\001'​::bytea;</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>\001</TT
+>
+                  </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Набор <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>непечатаемых</I
+></SPAN
+> символов, которые нужно записывать спецпоследовательностями, определяется языковыми стандартами. В некоторых случаях можно оставить в буквальном виде и другие символы. Заметьте, что во всех примерах в <A
+HREF="datatype-binary.html#DATATYPE-BINARY-SQLESC"
+>Таблице 8-7</A
+> задаётся значение ровно одного байта, хотя выходное представление может состоять из нескольких символов.</P
+><P
+>Необходимость дублирования обратных косых черт в записи спецпоследовательностей, показанного в <A
+HREF="datatype-binary.html#DATATYPE-BINARY-SQLESC"
+>Таблице 8-7</A
+>, объясняется тем, что строковая константа должна пройти два этапа разбора на сервере <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Первая обратная косая черта из каждой пары воспринимается анализатором строки как спецсимвол (если используется синтаксис спецпоследовательностей) и таким образом пропускается, оставляя только вторую косую черту. (Для избавления от этой вложенности можно использовать строки в долларах.) Оставшаяся обратная косая черта затем распознаётся функцией ввода <TT
+CLASS="TYPE"
+>bytea</TT
+> как спецсимвол, предваряющий трёхзначное восьмеричное значение или следующий спецсимвол. Например, переданная серверу строковая константа <TT
+CLASS="LITERAL"
+>E'\\001'</TT
+> преобразуется в <TT
+CLASS="LITERAL"
+>\001</TT
+>, проходя через анализатор спецстрок. Затем строка <TT
+CLASS="LITERAL"
+>\001</TT
+> передаётся функции ввода типа <TT
+CLASS="TYPE"
+>bytea</TT
+>, где она преобразуется в один байт с десятичным значением 1. Заметьте, что символ апостроф для функции ввода <TT
+CLASS="TYPE"
+>bytea</TT
+> не отличается от остальных, поэтому он записывается как обычно принято в строках. (См. также <A
+HREF="sql-syntax-lexical.html#SQL-SYNTAX-STRINGS"
+>Подраздел 4.1.2.1</A
+>.)</P
+><P
+>Данные <TT
+CLASS="TYPE"
+>bytea</TT
+> иногда выводятся также в спецпоследовательностях. При этом каждый <SPAN
+CLASS="QUOTE"
+>"непечатаемый"</SPAN
+> байт представляется в виде трёхзначного восьмеричного значения после обратной косой черты. Большинство <SPAN
+CLASS="QUOTE"
+>"печатаемых"</SPAN
+> байт представляются обычными символами из клиентского набора символов. Байт с десятичным кодом 92 (обратная косая черта) при выводе дублируется. Это иллюстрирует <A
+HREF="datatype-binary.html#DATATYPE-BINARY-RESESC"
+>Таблица 8-8</A
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="DATATYPE-BINARY-RESESC"
+></A
+><P
+><B
+>Таблица 8-8. Спецпоследовательности выходных значений <TT
+CLASS="TYPE"
+>bytea</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Десятичное значение байта</TH
+><TH
+>Описание</TH
+><TH
+>Спецпоследовательность вывода</TH
+><TH
+>Пример</TH
+><TH
+>Выводимый результат</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>92</TD
+><TD
+>обратная косая черта</TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>\\</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>SELECT E'\\134'::bytea;</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>\\</TT
+>
+                  </TD
+></TR
+><TR
+><TD
+>от 0 до 31 и от 127 до 255</TD
+><TD
+><SPAN
+CLASS="QUOTE"
+>"непечатаемые"</SPAN
+> байты</TD
+><TD
+><TT
+CLASS="LITERAL"
+>\<TT
+CLASS="REPLACEABLE"
+><I
+>xxx</I
+></TT
+></TT
+> (значение байта)</TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>SELECT E'\\001'​::bytea;</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>\001</TT
+>
+                  </TD
+></TR
+><TR
+><TD
+>от 32 до 126</TD
+><TD
+><SPAN
+CLASS="QUOTE"
+>"печатаемые"</SPAN
+> байты</TD
+><TD
+>представление из клиентского набора символов</TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>SELECT E'\\176'::bytea;</TT
+>
+                  </TD
+><TD
+>                    <TT
+CLASS="LITERAL"
+>~</TT
+>
+                  </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>В зависимости от применяемой клиентской библиотеки <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, для преобразования значений <TT
+CLASS="TYPE"
+>bytea</TT
+> в спецстроки и обратно могут потребоваться дополнительные действия. Например, если приложение сохраняет в строках символы перевода строк, возможно их также нужно будет представить спецпоследовательностями.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="datatype-character.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="datatype-datetime.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Символьные типы</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="datatype.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Типы даты/времени</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

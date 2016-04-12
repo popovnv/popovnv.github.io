@@ -1,0 +1,328 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>CREATE TEXT SEARCH DICTIONARY</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="CREATE TEXT SEARCH CONFIGURATION"
+HREF="sql-createtsconfig.html"><LINK
+REL="NEXT"
+TITLE="CREATE TEXT SEARCH PARSER"
+HREF="sql-createtsparser.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="CREATE TEXT SEARCH CONFIGURATION"
+HREF="sql-createtsconfig.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="CREATE TEXT SEARCH PARSER"
+HREF="sql-createtsparser.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-CREATETSDICTIONARY"
+></A
+>CREATE TEXT SEARCH DICTIONARY</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN76740"
+></A
+><H2
+>Название</H2
+>CREATE TEXT SEARCH DICTIONARY&nbsp;--&nbsp;создать словарь текстового поиска</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN76743"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>CREATE TEXT SEARCH DICTIONARY <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> (
+    TEMPLATE = <TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+>
+    [, <TT
+CLASS="REPLACEABLE"
+><I
+>параметр</I
+></TT
+> = <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> [, ... ]]
+)</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN76749"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>CREATE TEXT SEARCH DICTIONARY</TT
+> создаёт словарь текстового поиска. Словарь текстового поиска определяет способ выделения слов, представляющих или не представляющих интерес для поиска. Работа словаря зависит от шаблона текстового поиска, в котором определяются функции, собственно выполняющие действия. Обычно словарь задаёт некоторые параметры, управляющие частным поведением функций шаблона.</P
+><P
+>Если указывается имя схемы, словарь текстового поиска создаётся в указанной схеме. В противном случае он создаётся в текущей схеме.</P
+><P
+>Владельцем словаря текстового поиска становится пользователь его создавший.</P
+><P
+>За дополнительными сведениями обратитесь к <A
+HREF="textsearch.html"
+>Главе 12</A
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN76757"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></DT
+><DD
+><P
+>Имя создаваемого словаря текстового поиска, возможно, дополненное схемой.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+></DT
+><DD
+><P
+>Имя шаблона текстового поиска, который будет определять общее поведение этого словаря.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>параметр</I
+></TT
+></DT
+><DD
+><P
+>Имя параметра шаблона, устанавливаемого для данного словаря.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+></DT
+><DD
+><P
+>Значение для параметра, связанного с шаблоном. Если это не простой идентификатор или число, его следует заключить в кавычки (при желании его можно заключать в кавычки всегда).</P
+></DD
+></DL
+></DIV
+><P
+>Параметры могут перечисляться в любом порядке.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN76781"
+></A
+><H2
+>Примеры</H2
+><P
+>Команда в следующем примере создаёт словарь на базе Snowball с нестандартным списком стоп-слов.</P
+><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TEXT SEARCH DICTIONARY my_russian (
+    template = snowball,
+    language = russian,
+    stopwords = myrussian
+);</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN76785"
+></A
+><H2
+>Совместимость</H2
+><P
+>Оператор <TT
+CLASS="COMMAND"
+>CREATE TEXT SEARCH DICTIONARY</TT
+> отсутствует в стандарте SQL.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN76789"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-altertsdictionary.html"
+>ALTER TEXT SEARCH DICTIONARY</A
+>, <A
+HREF="sql-droptsdictionary.html"
+>DROP TEXT SEARCH DICTIONARY</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-createtsconfig.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-createtsparser.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>CREATE TEXT SEARCH CONFIGURATION</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>CREATE TEXT SEARCH PARSER</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

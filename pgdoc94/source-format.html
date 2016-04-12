@@ -1,0 +1,235 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Форматирование</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Соглашения по оформлению кода PostgreSQL"
+HREF="source.html"><LINK
+REL="PREVIOUS"
+TITLE="Соглашения по оформлению кода PostgreSQL"
+HREF="source.html"><LINK
+REL="NEXT"
+TITLE="Вывод сообщений об ошибках в коде сервера"
+HREF="error-message-reporting.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Соглашения по оформлению кода PostgreSQL"
+HREF="source.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="source.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 50. Соглашения по оформлению кода PostgreSQL</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Вывод сообщений об ошибках в коде сервера"
+HREF="error-message-reporting.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="SOURCE-FORMAT"
+>50.1. Форматирование</A
+></H1
+><P
+>Исходный код форматируется с отступом на 4 позиции, с сохранением табуляции (т. е. символы табуляции не разворачиваются в пробелы). Для каждого логического уровня отступа добавляется одна табуляция.</P
+><P
+>Правила оформления (расположения скобок и т. д.) следуют соглашениям BSD. В частности, фигурные скобки для управляемых ими блоков <TT
+CLASS="LITERAL"
+>if</TT
+>, <TT
+CLASS="LITERAL"
+>while</TT
+>, <TT
+CLASS="LITERAL"
+>switch</TT
+> и т. д. размещаются в отдельных строках.</P
+><P
+>Ограничьте размеры строк, чтобы код можно было читать в окне шириной 80 символов. (Это не значит, что никогда нельзя заходить за 80 символов. Например, не стоит разбивать длинную строку сообщения в произвольных местах, просто чтобы код умещался в 80 символов, так как это в результате скорее всего не сделает код более читабельным.)</P
+><P
+>Не используйте комментарии в стиле C++ (комментарии <TT
+CLASS="LITERAL"
+>//</TT
+>). Строгие компиляторы ANSI C их не принимают. По этой же причине не используйте расширения C++, например, не объявляйте новые переменные в середине блока.</P
+><P
+>Предпочитаемый стиль многострочных блоков выглядит так: </P><PRE
+CLASS="PROGRAMLISTING"
+>/*
+ * текст комментария начинается здесь
+ * и продолжается здесь
+ */</PRE
+><P> Заметьте, что блоки комментариев, начинающиеся с первого символа, будут сохраняться утилитой <SPAN
+CLASS="APPLICATION"
+>pgindent</SPAN
+> как есть, но содержимое блоков комментариев с отступами будет переразбито по строкам как обычный текст. Если вы хотите сохранить разрывы строк в блоке с отступом, добавьте минусы следующим образом: </P><PRE
+CLASS="PROGRAMLISTING"
+>    /*----------
+     * текст комментария начинается здесь
+     * и продолжается здесь
+     *----------
+     */</PRE
+><P></P
+><P
+>Хотя предлагаемые правки кода не обязательно должны следовать этим правилам форматирования, лучше их придерживаться. Ваш код будет пропущен через <SPAN
+CLASS="APPLICATION"
+>pgindent</SPAN
+> перед следующим выпуском, поэтому нет смысла наводить в нём красоту по другим правилам. Для правок есть хорошее правило: <SPAN
+CLASS="QUOTE"
+>"оформляйте новый код так же, как выглядит существующий код вокруг"</SPAN
+>.</P
+><P
+>В каталоге <TT
+CLASS="FILENAME"
+>src/tools</TT
+> содержатся примеры файлов настройки, которые можно использовать с редакторами <SPAN
+CLASS="PRODUCTNAME"
+>emacs</SPAN
+>, <SPAN
+CLASS="PRODUCTNAME"
+>xemacs</SPAN
+> или <SPAN
+CLASS="PRODUCTNAME"
+>vim</SPAN
+> для упрощения задачи форматирования кода в соответствии с описанными соглашениями.</P
+><P
+>Чтобы табуляция показывалась должным образом в средствах просмотра текста <SPAN
+CLASS="APPLICATION"
+>more</SPAN
+> и <SPAN
+CLASS="APPLICATION"
+>less</SPAN
+>, их можно вызвать так: </P><PRE
+CLASS="PROGRAMLISTING"
+>more -x4
+less -x4</PRE
+><P></P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="source.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="error-message-reporting.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Соглашения по оформлению кода PostgreSQL</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="source.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Вывод сообщений об ошибках в коде сервера</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

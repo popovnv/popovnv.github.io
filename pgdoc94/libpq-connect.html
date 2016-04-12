@@ -1,0 +1,2002 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Функции управления подключением к базе данных</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="libpq — библиотека для языка C"
+HREF="libpq.html"><LINK
+REL="PREVIOUS"
+TITLE="libpq — библиотека для языка C"
+HREF="libpq.html"><LINK
+REL="NEXT"
+TITLE="Функции, описывающие текущее состояние подключения"
+HREF="libpq-status.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="libpq — библиотека для языка C"
+HREF="libpq.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="libpq.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 31. <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> — библиотека для языка C</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Функции, описывающие текущее состояние подключения"
+HREF="libpq-status.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="LIBPQ-CONNECT"
+>31.1. Функции управления подключением к базе данных</A
+></H1
+><P
+>Следующие функции имеют дело с созданием подключения к серверу <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Прикладная программа может иметь несколько подключений к серверу, открытых одновременно. (Одна из причин этого заключается в необходимости доступа к более чем одной базе данных.) Каждое соединение представляется объектом <TT
+CLASS="STRUCTNAME"
+>PGconn</TT
+>, который можно получить от функций <CODE
+CLASS="FUNCTION"
+>PQconnectdb</CODE
+>, <CODE
+CLASS="FUNCTION"
+>PQconnectdbParams</CODE
+> или <CODE
+CLASS="FUNCTION"
+>PQsetdbLogin</CODE
+>. Обратите внимание, что эти функции всегда возвратят ненулевой указатель на объект, если только, возможно, не осталось слишком мало памяти даже для того, чтобы выделить её для объекта <TT
+CLASS="STRUCTNAME"
+>PGconn</TT
+>. Прежде чем передавать запросы через объект подключения, следует вызвать функцию <CODE
+CLASS="FUNCTION"
+>PQstatus</CODE
+> для проверки возвращаемого значения в случае успешного подключения. <DIV
+CLASS="WARNING"
+><P
+></P
+><TABLE
+CLASS="WARNING"
+BORDER="1"
+WIDTH="100%"
+><TR
+><TD
+ALIGN="CENTER"
+><B
+>Внимание</B
+></TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+><P
+>В системе Unix создание дочернего процесса на основе процесса, уже имеющего открытые подключения с помощью libpq, может привести к непредсказуемым результатам, потому что родительский и дочерний процессы совместно используют одни и те же сокеты и ресурсы операционной системы. По этой причине подобный подход не рекомендуется. Однако использование системного вызова <CODE
+CLASS="FUNCTION"
+>exec</CODE
+> из дочернего процесса для загрузки нового исполняемого файла является безопасным.</P
+></TD
+></TR
+></TABLE
+></DIV
+>
+
+   </P><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>В системе Windows существует способ повышения производительности, при котором единственное соединение с базой данных повторно стартует и останавливается. На внутреннем уровне libpq вызывает <CODE
+CLASS="FUNCTION"
+>WSAStartup()</CODE
+> и <CODE
+CLASS="FUNCTION"
+>WSACleanup()</CODE
+> для старта и остановки соединения соответственно. <CODE
+CLASS="FUNCTION"
+>WSAStartup()</CODE
+> увеличивает на единицу внутренний счётчик ссылок в библиотеке Windows, который уменьшается на единицу при вызове <CODE
+CLASS="FUNCTION"
+>WSACleanup()</CODE
+>. Когда счётчик ссылок равен единице, вызов <CODE
+CLASS="FUNCTION"
+>WSACleanup()</CODE
+> освобождает все ресурсы, и все библиотеки DLL выгружаются. Это дорогостоящая операция. Для её избежания приложение может "вручную" вызвать <CODE
+CLASS="FUNCTION"
+>WSAStartup()</CODE
+>, чтобы ресурсы не были освобождены, когда закрыто последнее соединение с базой данных.</P
+></BLOCKQUOTE
+></DIV
+><P>
+
+   <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="LIBPQ-PQCONNECTDBPARAMS"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQconnectdbParams</CODE
+></DT
+><DD
+><P
+>Создаёт новое подключение к серверу баз данных. </P><PRE
+CLASS="SYNOPSIS"
+>PGconn *PQconnectdbParams(const char * const *keywords,
+                          const char * const *values,
+                          int expand_dbname);</PRE
+><P></P
+><P
+>Эта функция открывает новое соединение с базой данных, используя параметры, содержащиеся в двух массивах, завершающихся символом <TT
+CLASS="SYMBOL"
+>NULL</TT
+>. Первый из них, <TT
+CLASS="LITERAL"
+>keywords</TT
+>, определяется как массив строк, каждая из которых представляет собой ключевое слово. Второй, <TT
+CLASS="LITERAL"
+>values</TT
+>, даёт значение для каждого ключевого слова. В отличие от <CODE
+CLASS="FUNCTION"
+>PQsetdbLogin</CODE
+>, описываемой ниже, набор параметров может быть расширен без изменения сигнатуры функции, поэтому использование данной функции (или её неблокирующих аналогов <CODE
+CLASS="FUNCTION"
+>PQconnectStartParams</CODE
+> и <CODE
+CLASS="FUNCTION"
+>PQconnectPoll</CODE
+>) является предпочтительным при разработке новых приложений.</P
+><P
+>Ключевые слова-параметры, распознаваемые в настоящее время, приведены в <A
+HREF="libpq-connect.html#LIBPQ-PARAMKEYWORDS"
+>Подразделе 31.1.2</A
+>.</P
+><P
+>Когда <TT
+CLASS="LITERAL"
+>expand_dbname</TT
+> имеет ненулевое значение, тогда в качестве значения, соответствующего ключевому слову <TT
+CLASS="PARAMETER"
+>dbname</TT
+>, может быть указана строка подключения. Только первый экземпляр <TT
+CLASS="PARAMETER"
+>dbname</TT
+> расширяется таким образом, а все последующие значения <TT
+CLASS="PARAMETER"
+>dbname</TT
+> будут обработаны как обычные имена базы данных. Дополнительные сведения о возможных форматах строки подключения можно найти в <A
+HREF="libpq-connect.html#LIBPQ-CONNSTRING"
+>Подразделе 31.1.1</A
+>.</P
+><P
+>Передаваемые массивы могут быть пустыми. В этом случае используются все параметры по умолчанию. Массивы могут также содержать один или более элементов и должны быть согласованы по длине. Обработка прекращается, когда найден первый элемент со значением <TT
+CLASS="SYMBOL"
+>NULL</TT
+> в массиве <TT
+CLASS="LITERAL"
+>keywords</TT
+>.</P
+><P
+>Если какой-либо параметр имеет значение <TT
+CLASS="SYMBOL"
+>NULL</TT
+> или является пустой строкой, то проверяется значение соответствующей переменной из системного окружения (см. <A
+HREF="libpq-envars.html"
+>Раздел 31.14</A
+>). Если переменная системного окружения также не установлена, тогда используется встроенное значение по умолчанию.</P
+><P
+>В общем случае ключевые слова обрабатываются в индексном порядке, начиная с начала этих массивов. Вследствие такого подхода, когда ключевые слова повторяются, сохраняется последнее обработанное значение. Следовательно, за счёт соответствующего расположения ключевого слова <TT
+CLASS="PARAMETER"
+>dbname</TT
+> можно регулировать, что может быть переопределено строкой <TT
+CLASS="PARAMETER"
+>conninfo</TT
+>, а что не может.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQCONNECTDB"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQconnectdb</CODE
+></DT
+><DD
+><P
+>Создаёт новое подключение к серверу баз данных. </P><PRE
+CLASS="SYNOPSIS"
+>PGconn *PQconnectdb(const char *conninfo);</PRE
+><P></P
+><P
+>Эта функция открывает новое соединение с базой данных, используя параметры, полученные из строки <TT
+CLASS="LITERAL"
+>conninfo</TT
+>.</P
+><P
+>Передаваемая строка может быть пустой. В этом случае используются все параметры по умолчанию. Она также может содержать одно или более значений параметров, разделённых пробелами, или <ACRONYM
+CLASS="ACRONYM"
+>URI</ACRONYM
+>. За подробностями обратитесь к <A
+HREF="libpq-connect.html#LIBPQ-CONNSTRING"
+>Подразделу 31.1.1</A
+>.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQSETDBLOGIN"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQsetdbLogin</CODE
+></DT
+><DD
+><P
+>Создаёт новое подключение к серверу баз данных. </P><PRE
+CLASS="SYNOPSIS"
+>PGconn *PQsetdbLogin(const char *pghost,
+                     const char *pgport,
+                     const char *pgoptions,
+                     const char *pgtty,
+                     const char *dbName,
+                     const char *login,
+                     const char *pwd);</PRE
+><P></P
+><P
+>Это предшественница функции <CODE
+CLASS="FUNCTION"
+>PQconnectdb</CODE
+> с фиксированным набором параметров. Она имеет такую же функциональность, за исключением того, что непереданные параметры всегда принимают значения по умолчанию. Подставьте <TT
+CLASS="SYMBOL"
+>NULL</TT
+> или пустую строку в качестве любого из фиксированных параметров, которые должны принять значения по умолчанию.</P
+><P
+>Если параметр <TT
+CLASS="PARAMETER"
+>dbName</TT
+> содержит знак <TT
+CLASS="SYMBOL"
+>=</TT
+> или имеет допустимый префикс <ACRONYM
+CLASS="ACRONYM"
+>URI</ACRONYM
+> для подключения, то он воспринимается в качестве строки <TT
+CLASS="PARAMETER"
+>conninfo</TT
+> точно таким же образом, как если бы он был передан функции <CODE
+CLASS="FUNCTION"
+>PQconnectdb</CODE
+>, а оставшиеся параметры затем применяются, как указано для <CODE
+CLASS="FUNCTION"
+>PQconnectdbParams</CODE
+>.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQSETDB"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQsetdb</CODE
+></DT
+><DD
+><P
+>Создаёт новое подключение к серверу баз данных. </P><PRE
+CLASS="SYNOPSIS"
+>PGconn *PQsetdb(char *pghost,
+                char *pgport,
+                char *pgoptions,
+                char *pgtty,
+                char *dbName);</PRE
+><P></P
+><P
+>Это макрос, который вызывает <CODE
+CLASS="FUNCTION"
+>PQsetdbLogin</CODE
+> с нулевыми указателями в качестве значений параметров <TT
+CLASS="PARAMETER"
+>login</TT
+> и <TT
+CLASS="PARAMETER"
+>pwd</TT
+>. Обеспечивает обратную совместимость с очень старыми программами.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQCONNECTSTARTPARAMS"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQconnectStartParams</CODE
+><BR><CODE
+CLASS="FUNCTION"
+>PQconnectStart</CODE
+><BR><CODE
+CLASS="FUNCTION"
+>PQconnectPoll</CODE
+></DT
+><DD
+><P
+> Создают подключение к серверу баз данных неблокирующим способом. </P><PRE
+CLASS="SYNOPSIS"
+>PGconn *PQconnectStartParams(const char * const *keywords,
+                             const char * const *values,
+                             int expand_dbname);
+
+PGconn *PQconnectStart(const char *conninfo);
+
+PostgresPollingStatusType PQconnectPoll(PGconn *conn);</PRE
+><P></P
+><P
+>Три эти функции используются для того, чтобы открыть подключение к серверу баз данных таким образом, чтобы поток исполнения вашего приложения не был заблокирован при выполнении удалённой операции ввода/вывода в процессе подключения. Суть этого подхода в том, чтобы ожидание завершения операций ввода/вывода могло происходить в главном цикле приложения, а не в внутри функций <CODE
+CLASS="FUNCTION"
+>PQconnectdbParams</CODE
+> или <CODE
+CLASS="FUNCTION"
+>PQconnectdb</CODE
+>, с тем, чтобы приложение могло управлять этой операцией параллельно с другой работой.</P
+><P
+>С помощью функции <CODE
+CLASS="FUNCTION"
+>PQconnectStartParams</CODE
+> подключение к базе данных выполняется, используя параметры, взятые из массивов <TT
+CLASS="LITERAL"
+>keywords</TT
+> и <TT
+CLASS="LITERAL"
+>values</TT
+>, а управление осуществляется с помощью <TT
+CLASS="LITERAL"
+>expand_dbname</TT
+>, как описано выше для <CODE
+CLASS="FUNCTION"
+>PQconnectdbParams</CODE
+>.</P
+><P
+>С помощью функции <CODE
+CLASS="FUNCTION"
+>PQconnectStart</CODE
+> подключение к базе данных выполняется, используя параметры, взятые из строки <TT
+CLASS="LITERAL"
+>conninfo</TT
+>, как описано выше для <CODE
+CLASS="FUNCTION"
+>PQconnectdb</CODE
+>.</P
+><P
+>Ни <CODE
+CLASS="FUNCTION"
+>PQconnectStartParams</CODE
+>, ни <CODE
+CLASS="FUNCTION"
+>PQconnectStart</CODE
+>, ни <CODE
+CLASS="FUNCTION"
+>PQconnectPoll</CODE
+> не заблокируются до тех пор, пока выполняется ряд ограничений: <P
+></P
+></P><UL
+><LI
+><P
+>Параметры <TT
+CLASS="LITERAL"
+>hostaddr</TT
+> и <TT
+CLASS="LITERAL"
+>host</TT
+> используются надлежащим образом, чтобы прямой и обратный DNS-запросы не выполнялись. Подробнее эти параметры описаны в <A
+HREF="libpq-connect.html#LIBPQ-PARAMKEYWORDS"
+>Подразделе 31.1.2</A
+>.</P
+></LI
+><LI
+><P
+>Если вы вызываете <CODE
+CLASS="FUNCTION"
+>PQtrace</CODE
+>, обеспечьте, чтобы поток, в который выводится трассировочная информация, не заблокировался.</P
+></LI
+><LI
+><P
+>Вы обеспечиваете, чтобы сокет находился в соответствующем состоянии перед вызовом <CODE
+CLASS="FUNCTION"
+>PQconnectPoll</CODE
+>, как описано ниже.</P
+></LI
+></UL
+><P></P
+><P
+>Примечание: использование <CODE
+CLASS="FUNCTION"
+>PQconnectStartParams</CODE
+> аналогично использованию <CODE
+CLASS="FUNCTION"
+>PQconnectStart</CODE
+>, показанному ниже.</P
+><P
+>Чтобы начать неблокирующий запрос на подключение, вызовите <TT
+CLASS="LITERAL"
+>conn = PQconnectStart("<TT
+CLASS="REPLACEABLE"
+><I
+>connection_info_string</I
+></TT
+>")</TT
+>. Если значение <TT
+CLASS="VARNAME"
+>conn</TT
+> пустое, то, значит, <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> не смогла распределить память для новой структуры <TT
+CLASS="STRUCTNAME"
+>PGconn</TT
+>. В противном случае будет возвращён корректный указатель <TT
+CLASS="STRUCTNAME"
+>PGconn</TT
+> (хотя ещё и не представляющий действительного подключения к базе данных). После возврата из <CODE
+CLASS="FUNCTION"
+>PQconnectStart</CODE
+> вызовите <TT
+CLASS="LITERAL"
+>status = PQstatus(conn)</TT
+>. Если <TT
+CLASS="VARNAME"
+>status</TT
+> имеет значение <TT
+CLASS="SYMBOL"
+>CONNECTION_BAD</TT
+>, то, значит, вызов <CODE
+CLASS="FUNCTION"
+>PQconnectStart</CODE
+> завершился сбоем.</P
+><P
+>Если вызов <CODE
+CLASS="FUNCTION"
+>PQconnectStart</CODE
+> был успешным, теперь нужно опросить <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>, чтобы она могла возобновить процесс подключения. Используйте <CODE
+CLASS="FUNCTION"
+>PQsocket(conn)</CODE
+> для получения дескриптора сокета, лежащего в основе соединения с базой данных. Организуйте цикл таким образом: если <CODE
+CLASS="FUNCTION"
+>PQconnectPoll(conn)</CODE
+> в последний раз возвратила <TT
+CLASS="SYMBOL"
+>PGRES_POLLING_READING</TT
+>, то подождите, пока сокет не станет готовым к выполнению операции чтения (это покажет функция <CODE
+CLASS="FUNCTION"
+>select()</CODE
+>, <CODE
+CLASS="FUNCTION"
+>poll()</CODE
+> или подобная системная функция). Затем вызовите <CODE
+CLASS="FUNCTION"
+>PQconnectPoll(conn)</CODE
+> опять. И наоборот, если <CODE
+CLASS="FUNCTION"
+>PQconnectPoll(conn)</CODE
+> в последний раз возвратила <TT
+CLASS="SYMBOL"
+>PGRES_POLLING_WRITING</TT
+>, то подождите, пока сокет не станет готовым к выполнению операции записи, затем вызовите <CODE
+CLASS="FUNCTION"
+>PQconnectPoll(conn)</CODE
+> снова. Если вам всё же приходится вызвать <CODE
+CLASS="FUNCTION"
+>PQconnectPoll</CODE
+>, то есть сразу после вызова <CODE
+CLASS="FUNCTION"
+>PQconnectStart</CODE
+>, поступайте так, как будто она в последний раз возвратила <TT
+CLASS="SYMBOL"
+>PGRES_POLLING_WRITING</TT
+>. Продолжайте этот цикл до тех пор, пока <CODE
+CLASS="FUNCTION"
+>PQconnectPoll(conn)</CODE
+> не возвратит <TT
+CLASS="SYMBOL"
+>PGRES_POLLING_FAILED</TT
+>, показывая, что процедура подключения завершилась сбоем, или <TT
+CLASS="SYMBOL"
+>PGRES_POLLING_OK</TT
+>, показывая, что соединение было успешно установлено.</P
+><P
+>В любое время в процессе подключения его состояние можно проверить, вызвав <CODE
+CLASS="FUNCTION"
+>PQstatus</CODE
+>. Если этот вызов возвратит <TT
+CLASS="SYMBOL"
+>CONNECTION_BAD</TT
+>, значит, процедура подключения завершилась сбоем; если вызов возвратит <CODE
+CLASS="FUNCTION"
+>CONNECTION_OK</CODE
+>, значит, соединение готово. Оба эти состояния можно определить на основе возвращаемого значения функции <CODE
+CLASS="FUNCTION"
+>PQconnectPoll</CODE
+>, описанной выше. Другие состояния могут также иметь место в течение (и только в течение) асинхронной процедуры подключения. Они показывают текущую стадию процедуры подключения и могут быть полезны, например, для предоставления обратной связи пользователю. Вот эти состояния: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="LIBPQ-CONNECTION-STARTED"
+></A
+><TT
+CLASS="SYMBOL"
+>CONNECTION_STARTED</TT
+></DT
+><DD
+><P
+>Ожидание, пока соединение будет установлено.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-CONNECTION-MADE"
+></A
+><TT
+CLASS="SYMBOL"
+>CONNECTION_MADE</TT
+></DT
+><DD
+><P
+>Соединение установлено; ожидание отправки.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-CONNECTION-AWAITING-RESPONSE"
+></A
+><TT
+CLASS="SYMBOL"
+>CONNECTION_AWAITING_RESPONSE</TT
+></DT
+><DD
+><P
+>Ожидание ответа от сервера.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-CONNECTION-AUTH-OK"
+></A
+><TT
+CLASS="SYMBOL"
+>CONNECTION_AUTH_OK</TT
+></DT
+><DD
+><P
+>Аутентификация получена; ожидание завершения запуска серверной части.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-CONNECTION-SSL-STARTUP"
+></A
+><TT
+CLASS="SYMBOL"
+>CONNECTION_SSL_STARTUP</TT
+></DT
+><DD
+><P
+>Согласование SSL-шифрования.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-CONNECTION-SETENV"
+></A
+><TT
+CLASS="SYMBOL"
+>CONNECTION_SETENV</TT
+></DT
+><DD
+><P
+>Согласование значений параметров, зависящих от программной среды.</P
+></DD
+></DL
+></DIV
+><P> Заметьте, что, хотя эти константы и сохранятся (для поддержания совместимости), приложение никогда не должно полагаться на то, что они появятся в каком-то конкретном порядке или вообще появятся, а также на то, что состояние всегда примет одно из этих документированных значений. Приложение может сделать что-то наподобие: </P><PRE
+CLASS="PROGRAMLISTING"
+>switch(PQstatus(conn))
+{
+        case CONNECTION_STARTED:
+            feedback = "Подключение...";
+            break;
+
+        case CONNECTION_MADE:
+            feedback = "Подключён к серверу...";
+            break;
+.
+.
+.
+        default:
+            feedback = "Подключение...";
+}</PRE
+><P></P
+><P
+>Параметр подключения <TT
+CLASS="LITERAL"
+>connect_timeout</TT
+> игнорируется, когда используется <CODE
+CLASS="FUNCTION"
+>PQconnectPoll</CODE
+>; именно приложение отвечает за принятие решения о том, является ли истекшее время чрезмерным. В противном случае вызов <CODE
+CLASS="FUNCTION"
+>PQconnectStart</CODE
+> с последующим вызовом <CODE
+CLASS="FUNCTION"
+>PQconnectPoll в цикле</CODE
+> будут эквивалентны вызову <CODE
+CLASS="FUNCTION"
+>PQconnectdb</CODE
+>.</P
+><P
+>Заметьте, что если <CODE
+CLASS="FUNCTION"
+>PQconnectStart</CODE
+> возвращает ненулевой указатель, вы должны вызвать <CODE
+CLASS="FUNCTION"
+>PQfinish</CODE
+> для завершения, чтобы ликвидировать структуру и любые связанные с ней блоки памяти. Это должно быть сделано, даже если попытка подключения не была успешной или была прекращена.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQCONNDEFAULTS"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQconndefaults</CODE
+></DT
+><DD
+><P
+>Возвращает значения по умолчанию для параметров подключения. </P><PRE
+CLASS="SYNOPSIS"
+>PQconninfoOption *PQconndefaults(void);
+
+typedef struct
+{
+    char   *keyword;   /* Ключевое слово для данного параметра */
+    char   *envvar;    /* Имя альтернативной переменной окружения */
+    char   *compiled;  /* Альтернативное значение по умолчанию, назначенное при компиляции */
+    char   *val;       /* Текущее значение параметра или NULL */
+    char   *label;     /* Обозначение этого поля в диалоге подключения */
+    char   *dispchar;  /* Показывает, как отображать это поле
+                          в диалоге подключения. Значения следующие:
+                          ""        Отображать введённое значение "как есть"
+                          "*"       Поле пароля — скрывать значение
+                          "D"       Параметр отладки — не показывать по умолчанию */
+    int     dispsize;  /* Размер поля в символах для диалога */
+} PQconninfoOption;</PRE
+><P></P
+><P
+>Возвращает массив параметров подключения. Он может использоваться для определения всех возможных параметров <CODE
+CLASS="FUNCTION"
+>PQconnectdb</CODE
+> и их текущих значений по умолчанию. Возвращаемое значение указывает на массив структур <TT
+CLASS="STRUCTNAME"
+>PQconninfoOption</TT
+>, который завершается элементом, имеющим нулевой указатель <TT
+CLASS="STRUCTFIELD"
+>keyword</TT
+>. Если выделить память не удалось, то возвращается нулевой указатель. Обратите внимание, что текущие значения по умолчанию (поля <TT
+CLASS="STRUCTFIELD"
+>val</TT
+>) будут зависеть от переменных среды и другого контекста. Отсутствующий или неверный сервисный файл будет молча проигнорирован. Вызывающие функции должны рассматривать данные параметров по умолчанию как "только для чтения".</P
+><P
+>После обработки массива параметров освободите память, передав его функции <CODE
+CLASS="FUNCTION"
+>PQconninfoFree</CODE
+>. Если этого не делать, то при каждом вызове функции <CODE
+CLASS="FUNCTION"
+>PQconndefaults</CODE
+> будут происходить небольшие "утечки" памяти.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQCONNINFO"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQconninfo</CODE
+></DT
+><DD
+><P
+>Возвращает параметры подключения, используемые действующим соединением. </P><PRE
+CLASS="SYNOPSIS"
+>PQconninfoOption *PQconninfo(PGconn *conn);</PRE
+><P></P
+><P
+>Возвращает массив параметров подключения. Он может использоваться для определения всех возможных параметров <CODE
+CLASS="FUNCTION"
+>PQconnectdb</CODE
+> и значений, которые были использованы для подключения к серверу. Возвращаемое значение указывает на массив структур <TT
+CLASS="STRUCTNAME"
+>PQconninfoOption</TT
+>, который завершается элементом, имеющим нулевой указатель <TT
+CLASS="STRUCTFIELD"
+>keyword</TT
+>. Все замечания, приведённые выше для <CODE
+CLASS="FUNCTION"
+>PQconndefaults</CODE
+>, также справедливы и для результата <CODE
+CLASS="FUNCTION"
+>PQconninfo</CODE
+>.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQCONNINFOPARSE"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQconninfoParse</CODE
+></DT
+><DD
+><P
+>Возвращает разобранные параметры подключения, переданные в строке подключения. </P><PRE
+CLASS="SYNOPSIS"
+>PQconninfoOption *PQconninfoParse(const char *conninfo, char **errmsg);</PRE
+><P></P
+><P
+>Разбирает строку подключения и возвращает результирующие параметры в виде массива; возвращает <TT
+CLASS="SYMBOL"
+>NULL</TT
+>, если возникают проблемы при разборе строки подключения. Эту функцию можно использовать для извлечения параметров функции <CODE
+CLASS="FUNCTION"
+>PQconnectdb</CODE
+> из предоставленной строки подключения. Возвращаемое значение указывает на массив структур <TT
+CLASS="STRUCTNAME"
+>PQconninfoOption</TT
+>, который завершается элементом, имеющим нулевой указатель <TT
+CLASS="STRUCTFIELD"
+>keyword</TT
+>.</P
+><P
+>Все разрешённые параметры будут присутствовать в результирующем массиве, но <TT
+CLASS="LITERAL"
+>PQconninfoOption</TT
+> для любого параметра, не присутствующего в строке подключения, будет иметь значение <TT
+CLASS="LITERAL"
+>NULL</TT
+> в поле <TT
+CLASS="LITERAL"
+>val</TT
+>; значения по умолчанию не подставляются.</P
+><P
+>Если <TT
+CLASS="LITERAL"
+>errmsg</TT
+> не равно <TT
+CLASS="SYMBOL"
+>NULL</TT
+>, тогда в случае успеха <TT
+CLASS="LITERAL"
+>*errmsg</TT
+> присваивается <TT
+CLASS="SYMBOL"
+>NULL</TT
+>, а в противном случае -- адрес строки сообщения об ошибке, объясняющего проблему. Память для этой строки выделяет функция <CODE
+CLASS="FUNCTION"
+>malloc</CODE
+>. (Также возможна ситуация, когда <TT
+CLASS="LITERAL"
+>*errmsg</TT
+> будет установлено в <TT
+CLASS="SYMBOL"
+>NULL</TT
+>, и при этом функция возвращает <TT
+CLASS="SYMBOL"
+>NULL</TT
+>. Это указывает на нехватку памяти.)</P
+><P
+>После обработки массива параметров освободите память, передав его функции <CODE
+CLASS="FUNCTION"
+>PQconninfoFree</CODE
+>. Если этого не делать, тогда некоторое количество памяти будет утекать при каждом вызове <CODE
+CLASS="FUNCTION"
+>PQconninfoParse</CODE
+>. И наоборот, если произошла ошибка и <TT
+CLASS="LITERAL"
+>errmsg</TT
+> не равно <TT
+CLASS="SYMBOL"
+>NULL</TT
+>, обязательно освободите память, занимаемую строкой сообщения об ошибке, используя <CODE
+CLASS="FUNCTION"
+>PQfreemem</CODE
+>.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQFINISH"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQfinish</CODE
+></DT
+><DD
+><P
+>Закрывает соединение с сервером. Также освобождает память, используемую объектом <TT
+CLASS="STRUCTNAME"
+>PGconn</TT
+>. </P><PRE
+CLASS="SYNOPSIS"
+>void PQfinish(PGconn *conn);</PRE
+><P></P
+><P
+>Обратите внимание, что даже если попытка подключения к серверу потерпела неудачу (как показывает <CODE
+CLASS="FUNCTION"
+>PQstatus</CODE
+>), приложение все равно должно вызвать <CODE
+CLASS="FUNCTION"
+>PQfinish</CODE
+>, чтобы освободить память, используемую объектом <TT
+CLASS="STRUCTNAME"
+>PGconn</TT
+>. Указатель <TT
+CLASS="STRUCTNAME"
+>PGconn</TT
+> не должен использоваться повторно после того, как была вызвана функция <CODE
+CLASS="FUNCTION"
+>PQfinish</CODE
+>.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQRESET"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQreset</CODE
+></DT
+><DD
+><P
+>Переустанавливает канал связи с сервером. </P><PRE
+CLASS="SYNOPSIS"
+>void PQreset(PGconn *conn);</PRE
+><P></P
+><P
+>Эта функция закроет подключение к серверу, а потом попытается восстановить подключение к тому же серверу, используя все те же параметры, которые использовались прежде. Это может быть полезным для восстановления после ошибки, если работающее соединение оказалось потерянным.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQRESETSTART"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQresetStart</CODE
+><BR><CODE
+CLASS="FUNCTION"
+>PQresetPoll</CODE
+></DT
+><DD
+><P
+>Переустанавливает канал связи с сервером неблокирующим способом. </P><PRE
+CLASS="SYNOPSIS"
+>int PQresetStart(PGconn *conn);
+
+PostgresPollingStatusType PQresetPoll(PGconn *conn);</PRE
+><P></P
+><P
+>Эти функции закроют подключение к серверу, а потом попытаются восстановить подключение к тому же серверу, используя все те же параметры, которые использовались прежде. Это может быть полезным для восстановления после ошибки, если работающее соединение оказалось потерянным. Они отличаются от <CODE
+CLASS="FUNCTION"
+>PQreset</CODE
+> (см. выше) тем, что действуют неблокирующим способом. На эти функции налагаются те же ограничения, что и на <CODE
+CLASS="FUNCTION"
+>PQconnectStartParams</CODE
+>, <CODE
+CLASS="FUNCTION"
+>PQconnectStart</CODE
+> и <CODE
+CLASS="FUNCTION"
+>PQconnectPoll</CODE
+>.</P
+><P
+>Чтобы приступить к переустановке подключения, вызовите <CODE
+CLASS="FUNCTION"
+>PQresetStart</CODE
+>. Если она возвратит 0, переустановка завершилась неудачно. Если она возвратит 1, опросите результат переустановки, используя <CODE
+CLASS="FUNCTION"
+>PQresetPoll</CODE
+>, точно таким же образом, как если бы вы создавали подключение, используя <CODE
+CLASS="FUNCTION"
+>PQconnectPoll</CODE
+>.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQPINGPARAMS"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQpingParams</CODE
+></DT
+><DD
+><P
+><CODE
+CLASS="FUNCTION"
+>PQpingParams</CODE
+> сообщает состояние сервера. Она принимает параметры подключения, идентичные тем, что получает функция <CODE
+CLASS="FUNCTION"
+>PQconnectdbParams</CODE
+>, описанная выше. Нет необходимости предоставлять корректные имя пользователя, пароль или имя базы данных, чтобы получить состояние сервера. Однако, если предоставлены некорректные значения, сервер занесет в журнал неудачную попытку подключения.</P><PRE
+CLASS="SYNOPSIS"
+>PGPing PQpingParams(const char * const *keywords,
+                    const char * const *values,
+                    int expand_dbname);</PRE
+><P> Функция возвращает одно из следующих значений: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="LIBPQ-PQPINGPARAMS-PQPING-OK"
+></A
+><TT
+CLASS="LITERAL"
+>PQPING_OK</TT
+></DT
+><DD
+><P
+>Сервер работает и, по-видимому, принимает подключения.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQPINGPARAMS-PQPING-REJECT"
+></A
+><TT
+CLASS="LITERAL"
+>PQPING_REJECT</TT
+></DT
+><DD
+><P
+>Сервер работает, но находится в состоянии, которое запрещает подключения (запуск, завершение работы или восстановление после аварийного отказа).</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQPINGPARAMS-PQPING-NO-RESPONSE"
+></A
+><TT
+CLASS="LITERAL"
+>PQPING_NO_RESPONSE</TT
+></DT
+><DD
+><P
+>Контакт с сервером не удался. Это может указывать на то, что сервер не запущен или что-то не в порядке с параметрами данного подключения (например, неверный номер порта), или имеет место проблема с возможностью соединения по сети (например, брандмауэр блокирует запрос на подключение).</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQPINGPARAMS-PQPING-NO-ATTEMPT"
+></A
+><TT
+CLASS="LITERAL"
+>PQPING_NO_ATTEMPT</TT
+></DT
+><DD
+><P
+>Никакой попытки установить контакт с сервером сделано не было, поскольку предоставленные параметры были явно некорректными, или имела место какая-то проблема на стороне клиента (например, нехватка памяти).</P
+></DD
+></DL
+></DIV
+><P></P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQPING"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQping</CODE
+></DT
+><DD
+><P
+><CODE
+CLASS="FUNCTION"
+>PQping</CODE
+> сообщает состояние сервера. Она принимает параметры подключения, идентичные тем, что получает функция <CODE
+CLASS="FUNCTION"
+>PQconnectdb</CODE
+>, описанная выше. Нет необходимости предоставлять корректные имя пользователя, пароль или имя базы данных, чтобы получить состояние сервера. Однако, если предоставлены некорректные значения, сервер занесет в журнал неудачную попытку подключения. </P><PRE
+CLASS="SYNOPSIS"
+>PGPing PQping(const char *conninfo);</PRE
+><P></P
+><P
+>Возвращаемые значения такие же, как и для <CODE
+CLASS="FUNCTION"
+>PQpingParams</CODE
+>.</P
+></DD
+></DL
+></DIV
+><P></P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="LIBPQ-CONNSTRING"
+>31.1.1. Строки параметров подключения</A
+></H2
+><P
+>Несколько функций <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> занимаются разбором строки, заданной пользователем, чтобы получить параметры подключения. Для этих строк существует два общепринятых формата: простые строки вида <TT
+CLASS="LITERAL"
+>keyword = value</TT
+> и URI в соответствии с <A
+HREF="http://www.ietf.org/rfc/rfc3986.txt"
+TARGET="_top"
+>RFC 3986</A
+>.</P
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN41036"
+>31.1.1.1. Строки параметров подключения вида "ключ/значение"</A
+></H3
+><P
+>Согласно первому формату, установка каждого параметры выполняется в форме <TT
+CLASS="LITERAL"
+>keyword = value</TT
+>. Пробелы вокруг знака равенства не являются обязательными. Для записи пустого значения или значения, содержащего пробелы, заключите его в одинарные кавычки, например, <TT
+CLASS="LITERAL"
+>keyword = 'a value'</TT
+>. Одинарные кавычки и символы обратной косой черты внутри значения нужно обязательно экранировать с помощью символа обратной косой черты, т. е., <TT
+CLASS="LITERAL"
+>\'</TT
+> и <TT
+CLASS="LITERAL"
+>\\</TT
+>.</P
+><P
+>Пример: </P><PRE
+CLASS="PROGRAMLISTING"
+>host=localhost port=5432 dbname=mydb connect_timeout=10</PRE
+><P></P
+><P
+>Ключевые слова-параметры, распознаваемые в настоящее время, приведены в <A
+HREF="libpq-connect.html#LIBPQ-PARAMKEYWORDS"
+>Подразделе 31.1.2</A
+>.</P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="AEN41047"
+>31.1.1.2. URI для подключения</A
+></H3
+><P
+>Общая форма <ACRONYM
+CLASS="ACRONYM"
+>URI</ACRONYM
+> для подключения такова: </P><PRE
+CLASS="SYNOPSIS"
+>postgresql://[user[:password]@][netloc][:port][/dbname][?param1=value1&amp;...]</PRE
+><P></P
+><P
+>В качестве обозначения схемы <ACRONYM
+CLASS="ACRONYM"
+>URI</ACRONYM
+> может использоваться либо <TT
+CLASS="LITERAL"
+>postgresql://</TT
+>, либо <TT
+CLASS="LITERAL"
+>postgres://</TT
+>. Каждая из частей <ACRONYM
+CLASS="ACRONYM"
+>URI</ACRONYM
+> является необязательной. В следующих примерах показано правильное использование синтаксиса <ACRONYM
+CLASS="ACRONYM"
+>URI</ACRONYM
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>postgresql://
+postgresql://localhost
+postgresql://localhost:5433
+postgresql://localhost/mydb
+postgresql://user@localhost
+postgresql://user:secret@localhost
+postgresql://other@localhost/otherdb?connect_timeout=10&amp;application_name=myapp</PRE
+><P> Компоненты иерархической части <ACRONYM
+CLASS="ACRONYM"
+>URI</ACRONYM
+> можно также передавать в виде параметров. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>postgresql:///mydb?host=localhost&amp;port=5433</PRE
+><P></P
+><P
+>Для включения символов, имеющих специальное значение, в любой части <ACRONYM
+CLASS="ACRONYM"
+>URI</ACRONYM
+> можно применять URL-кодирование (с использованием символа %).</P
+><P
+>Любые параметры соединения, не соответствующие ключевым словам, приведённым в <A
+HREF="libpq-connect.html#LIBPQ-PARAMKEYWORDS"
+>Подразделе 31.1.2</A
+>, игнорируются, а предупреждающее сообщение об этом направляется на <TT
+CLASS="FILENAME"
+>stderr</TT
+>.</P
+><P
+>Для улучшения совместимости с теми <ACRONYM
+CLASS="ACRONYM"
+>URI</ACRONYM
+>, которые служат для подключения через JDBC, все экземпляры параметра <TT
+CLASS="LITERAL"
+>ssl=true</TT
+> преобразуются в <TT
+CLASS="LITERAL"
+>sslmode=require</TT
+>.</P
+><P
+>Сервер можно представить либо доменным именем, либо IP-адресом. При использовании протокола IPv6 нужно заключить адрес в квадратные скобки: </P><PRE
+CLASS="SYNOPSIS"
+>postgresql://[2001:db8::1234]/database</PRE
+><P></P
+><P
+>Компонент "host" интерпретируется в соответствии с описанием параметра <A
+HREF="libpq-connect.html#LIBPQ-CONNECT-HOST"
+>host</A
+>. В частности, если этот компонент пуст или начинается с символа косой черты, выбирается соединение через доменные сокеты Unix, а в противном случае инициируется соединение по TCP/IP. Обратите внимание, однако, что символ косой черты в иерархической части URI является зарезервированным. Поэтому, чтобы указать нестандартный каталог Unix-сокета, нужно поступить одним из двух способов: не задавать сервер в URI и указать сервер в качестве параметра, либо закодировать путь в компоненте "host" с процентами: </P><PRE
+CLASS="PROGRAMLISTING"
+>postgresql:///dbname?host=/var/lib/postgresql
+postgresql://%2Fvar%2Flib%2Fpostgresql/dbname</PRE
+><P></P
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="LIBPQ-PARAMKEYWORDS"
+>31.1.2. Ключевые слова-параметры</A
+></H2
+><P
+>Ключевые слова-параметры, распознаваемые в настоящее время, следующие: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="LIBPQ-CONNECT-HOST"
+></A
+><TT
+CLASS="LITERAL"
+>host</TT
+></DT
+><DD
+><P
+>Имя компьютера для подключения. Если оно начинается с косой черты, то тогда предписывается установление связи через домен Unix, а не посредством TCP/IP; значением является имя каталога, в котором создаётся файл сокета. По умолчанию, когда <TT
+CLASS="LITERAL"
+>host</TT
+> не указан, подключение производится к доменному сокету Unix  в каталоге <TT
+CLASS="FILENAME"
+>/tmp</TT
+> (или в том каталоге, который был назначен при сборке <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>). В системах, не поддерживающих доменные сокеты Unix, подключение по умолчанию производится к <TT
+CLASS="LITERAL"
+>localhost</TT
+>.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-CONNECT-HOSTADDR"
+></A
+><TT
+CLASS="LITERAL"
+>hostaddr</TT
+></DT
+><DD
+><P
+>Числовой IP-адрес компьютера для подключения. Он должен быть представлен в стандартном формате адресов IPv4, например, <TT
+CLASS="LITERAL"
+>172.28.40.9</TT
+>. Если ваша машина поддерживает IPv6, вы можете использовать и эти адреса. Связь по протоколу TCP/IP используется всегда, когда в качестве этого параметра передана непустая строка.</P
+><P
+>Использование <TT
+CLASS="LITERAL"
+>hostaddr</TT
+> вместо <TT
+CLASS="LITERAL"
+>host</TT
+> позволяет приложению избежать поиска на сервере имён, что может быть важно для приложений, имеющих временные ограничения. Однако, имя компьютера требуется для методов аутентификации GSSAPI или SSPI, а также для проверки полномочий на основе SSL-сертификатов в режиме <TT
+CLASS="LITERAL"
+>verify-full</TT
+>. Используются следующие правила: <P
+></P
+></P><UL
+><LI
+><P
+>Если <TT
+CLASS="LITERAL"
+>host</TT
+> указан, а <TT
+CLASS="LITERAL"
+>hostaddr</TT
+> не указан, тогда выполняется поиск на сервере имён.</P
+></LI
+><LI
+><P
+>Если указан <TT
+CLASS="LITERAL"
+>hostaddr</TT
+>, а <TT
+CLASS="LITERAL"
+>host</TT
+> не указан, тогда значение <TT
+CLASS="LITERAL"
+>hostaddr</TT
+> даёт сетевой адрес сервера. Попытка подключения завершится неудачей, если метод аутентификации требует наличия имени компьютера.</P
+></LI
+><LI
+><P
+>Если указаны как <TT
+CLASS="LITERAL"
+>host</TT
+>, так и <TT
+CLASS="LITERAL"
+>hostaddr</TT
+>, тогда значение <TT
+CLASS="LITERAL"
+>hostaddr</TT
+> даёт сетевой адрес сервера, а значение <TT
+CLASS="LITERAL"
+>host</TT
+> игнорируется, если только метод аутентификации его не потребует. В таком случае оно будет использоваться в качестве имени компьютера.</P
+></LI
+></UL
+><P> Заметьте, что аутентификация может завершится неудачей, если <TT
+CLASS="LITERAL"
+>host</TT
+> не является именем сервера, имеющего сетевой адрес <TT
+CLASS="LITERAL"
+>hostaddr</TT
+>. Заметьте также, что <TT
+CLASS="LITERAL"
+>host</TT
+>, а не <TT
+CLASS="LITERAL"
+>hostaddr</TT
+> используется для того, чтобы идентифицировать соединение в <TT
+CLASS="FILENAME"
+>~/.pgpass</TT
+> (см. <A
+HREF="libpq-pgpass.html"
+>Раздел 31.15</A
+>).</P
+><P
+>Если не указаны ни имя компьютера, ни его адрес, <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> будет производить подключение, используя локальный доменный сокет Unix; в системах, не поддерживающих сокеты Unix, она будет пытаться подключиться к <TT
+CLASS="LITERAL"
+>localhost</TT
+>.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-CONNECT-PORT"
+></A
+><TT
+CLASS="LITERAL"
+>port</TT
+></DT
+><DD
+><P
+>Номер порта для подключения на сервере или расширение имени файла-сокета для подключений на основе домена Unix.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-CONNECT-DBNAME"
+></A
+><TT
+CLASS="LITERAL"
+>dbname</TT
+></DT
+><DD
+><P
+>Имя базы данных. По умолчанию оно совпадает с именем пользователя. В определённых контекстах это значение проверяется на соответствие расширенным форматам; см. <A
+HREF="libpq-connect.html#LIBPQ-CONNSTRING"
+>Подраздел 31.1.1</A
+> для получения подробной информации.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-CONNECT-USER"
+></A
+><TT
+CLASS="LITERAL"
+>user</TT
+></DT
+><DD
+><P
+>Имя пользователя <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, используемое для подключения. По умолчанию используется то же имя, которое имеет в операционной системе пользователь, от лица которого выполняется приложение.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-CONNECT-PASSWORD"
+></A
+><TT
+CLASS="LITERAL"
+>password</TT
+></DT
+><DD
+><P
+>Пароль, используемый в случае, когда сервер требует аутентификации по паролю.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-CONNECT-CONNECT-TIMEOUT"
+></A
+><TT
+CLASS="LITERAL"
+>connect_timeout</TT
+></DT
+><DD
+><P
+>Максимальный период ожидания подключения, в секундах (записывается в виде строки, представляющей десятичное целое число).</P
+></DD
+><DT
+><A
+NAME="LIBPQ-CONNECT-CLIENT-ENCODING"
+></A
+><TT
+CLASS="LITERAL"
+>client_encoding</TT
+></DT
+><DD
+><P
+>Этим устанавливается конфигурационный параметр <TT
+CLASS="VARNAME"
+>client_encoding</TT
+> для данного подключения. В дополнение к значениям, которые принимает соответствующий параметр сервера, вы можете использовать значение <TT
+CLASS="LITERAL"
+>auto</TT
+>. В этом случае правильная кодировка определяется на основе текущей локали на стороне клиента (в системах Unix это переменная системного окружения <TT
+CLASS="ENVAR"
+>LC_CTYPE</TT
+>).</P
+></DD
+><DT
+><A
+NAME="LIBPQ-CONNECT-OPTIONS"
+></A
+><TT
+CLASS="LITERAL"
+>options</TT
+></DT
+><DD
+><P
+>Добавляет параметры командной строки для отправки серверу в процессе работы. Например, выражение <TT
+CLASS="LITERAL"
+>-c geqo=off</TT
+> назначает параметру <TT
+CLASS="VARNAME"
+>geqo</TT
+> значение <TT
+CLASS="LITERAL"
+>off</TT
+> на время текущего сеанса работы. Подробное обсуждение доступных параметров приведено в <A
+HREF="runtime-config.html"
+>Главе 18</A
+>.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-CONNECT-APPLICATION-NAME"
+></A
+><TT
+CLASS="LITERAL"
+>application_name</TT
+></DT
+><DD
+><P
+>Устанавливает значение для конфигурационного параметра <A
+HREF="runtime-config-logging.html#GUC-APPLICATION-NAME"
+>application_name</A
+>.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-CONNECT-FALLBACK-APPLICATION-NAME"
+></A
+><TT
+CLASS="LITERAL"
+>fallback_application_name</TT
+></DT
+><DD
+><P
+>Устанавливает альтернативное значение для конфигурационного параметра <A
+HREF="runtime-config-logging.html#GUC-APPLICATION-NAME"
+>application_name</A
+>. Это значение будет использоваться, если для параметра <TT
+CLASS="LITERAL"
+>application_name</TT
+> не было передано никакого значения с помощью параметров подключения или переменной системного окружения <TT
+CLASS="ENVAR"
+>PGAPPNAME</TT
+>. Задание альтернативного имени полезно для универсальных программ-утилит, которые желают установить имя приложения по умолчанию, но позволяют пользователю изменить его.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-KEEPALIVES"
+></A
+><TT
+CLASS="LITERAL"
+>keepalives</TT
+></DT
+><DD
+><P
+>Управляет использованием сообщений keepalive протокола TCP на стороне клиента. Значение по умолчанию равно 1, что означает использование сообщений. Вы можете изменить его на 0, если эти сообщения не нужны. Для соединений, установленных через доменный сокет Unix, этот параметр игнорируется.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-KEEPALIVES-IDLE"
+></A
+><TT
+CLASS="LITERAL"
+>keepalives_idle</TT
+></DT
+><DD
+><P
+>Управляет длительностью периода отсутствия активности, выраженного числом секунд, по истечение которого TCP должен отправить сообщение keepalive серверу. Нулевое значение этого параметра означает, что будет использоваться системное значение по умолчанию. Этот параметр игнорируется, если подключение выполнено через доменный сокет Unix или если сообщения keepalive отключены. Он поддерживается только в системах, где для сокетов доступны параметры <TT
+CLASS="SYMBOL"
+>TCP_KEEPIDLE</TT
+> или <TT
+CLASS="SYMBOL"
+>TCP_KEEPALIVE</TT
+>, а также в системе Windows; в других системах он не имеет никакого влияния.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-KEEPALIVES-INTERVAL"
+></A
+><TT
+CLASS="LITERAL"
+>keepalives_interval</TT
+></DT
+><DD
+><P
+>Управляет количеством секунд, по прошествии которых keepalive-сообщение протокола TCP, получение которого не подтверждено сервером, должно быть отправлено повторно. Нулевое значение этого параметра указывает, что будет использоваться системное значение по умолчанию. Этот параметр игнорируется для соединений, установленных через сокеты домена Unix, или если keepalive-сообщения отключены. Он поддерживается только в системах, где для сокетов предусмотрен параметр <TT
+CLASS="SYMBOL"
+>TCP_KEEPINTVL</TT
+>, а также в системе Windows; в других системах он не имеет никакого влияния.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-KEEPALIVES-COUNT"
+></A
+><TT
+CLASS="LITERAL"
+>keepalives_count</TT
+></DT
+><DD
+><P
+>Управляет количеством keepalive-сообщений протокола TCP, которые могут быть потеряны, прежде чем соединение клиента с сервером будет признано неработающим. Нулевое значение этого параметра указывает, что будет использоваться системное значение по умолчанию. Этот параметр игнорируется для соединений, установленных через сокеты домена Unix, или если keepalive-сообщения отключены. Он поддерживается только в системах, где для сокетов предусмотрен параметр <TT
+CLASS="SYMBOL"
+>TCP_KEEPCNT</TT
+>; в других системах он не имеет никакого влияния.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-CONNECT-TTY"
+></A
+><TT
+CLASS="LITERAL"
+>tty</TT
+></DT
+><DD
+><P
+>Игнорируется (прежде он указывал, куда направить вывод отладочных сообщений сервера).</P
+></DD
+><DT
+><A
+NAME="LIBPQ-CONNECT-SSLMODE"
+></A
+><TT
+CLASS="LITERAL"
+>sslmode</TT
+></DT
+><DD
+><P
+>Этот параметр определяет, будет ли согласовываться с сервером защищённое <ACRONYM
+CLASS="ACRONYM"
+>SSL</ACRONYM
+>-соединение по протоколу TCP/IP, и если да, то в какой очередности. Всего предусмотрено шесть режимов: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>disable</TT
+></DT
+><DD
+><P
+>следует пытаться установить только соединение без использования <ACRONYM
+CLASS="ACRONYM"
+>SSL</ACRONYM
+></P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>allow</TT
+></DT
+><DD
+><P
+>сначала следует попытаться установить соединение без использования <ACRONYM
+CLASS="ACRONYM"
+>SSL</ACRONYM
+>; если попытка будет неудачной, нужно попытаться установить <ACRONYM
+CLASS="ACRONYM"
+>SSL</ACRONYM
+>-соединение</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>prefer</TT
+> (по умолчанию)</DT
+><DD
+><P
+>сначала следует попытаться установить <ACRONYM
+CLASS="ACRONYM"
+>SSL</ACRONYM
+>-соединение; если попытка будет неудачной, нужно попытаться установить соединение без использования <ACRONYM
+CLASS="ACRONYM"
+>SSL</ACRONYM
+></P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>require</TT
+></DT
+><DD
+><P
+>следует попытаться установить только <ACRONYM
+CLASS="ACRONYM"
+>SSL</ACRONYM
+>-соединение. Если присутствует файл корневого центра сертификации, то нужно верифицировать сертификат таким же способом, как будто был указан параметр <TT
+CLASS="LITERAL"
+>verify-ca</TT
+></P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>verify-ca</TT
+></DT
+><DD
+><P
+>следует попытаться установить только <ACRONYM
+CLASS="ACRONYM"
+>SSL</ACRONYM
+>-соединение, при этом проконтролировать, чтобы сертификат сервера был выпущен доверенным центром сертификации (<ACRONYM
+CLASS="ACRONYM"
+>CA</ACRONYM
+>)</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>verify-full</TT
+></DT
+><DD
+><P
+>следует попытаться установить только <ACRONYM
+CLASS="ACRONYM"
+>SSL</ACRONYM
+>-соединение при этом проконтролировать, чтобы сертификат сервера был выпущен доверенным центром сертификации (<ACRONYM
+CLASS="ACRONYM"
+>CA</ACRONYM
+>) и чтобы имя сервера соответствовало имени в сертификате</P
+></DD
+></DL
+></DIV
+><P> В <A
+HREF="libpq-ssl.html"
+>Разделе 31.18</A
+> приведено подробное описание работы этих режимов.</P
+><P
+><TT
+CLASS="LITERAL"
+>sslmode</TT
+> игнорируется при использовании сокетов домена Unix. Если <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> скомпилирован без поддержки SSL, использование параметров <TT
+CLASS="LITERAL"
+>require</TT
+>, <TT
+CLASS="LITERAL"
+>verify-ca</TT
+> или <TT
+CLASS="LITERAL"
+>verify-full</TT
+> приведёт к ошибке, в то время как параметры <TT
+CLASS="LITERAL"
+>allow</TT
+> и <TT
+CLASS="LITERAL"
+>prefer</TT
+> будут приняты, но <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> в действительности не будет пытаться установить <ACRONYM
+CLASS="ACRONYM"
+>SSL</ACRONYM
+>-соединение.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-CONNECT-REQUIRESSL"
+></A
+><TT
+CLASS="LITERAL"
+>requiressl</TT
+></DT
+><DD
+><P
+>Использовать этот параметр не рекомендуется, в качестве замены предлагается установить <TT
+CLASS="LITERAL"
+>sslmode</TT
+>.</P
+><P
+>Если установлено значение 1, то требуется <ACRONYM
+CLASS="ACRONYM"
+>SSL</ACRONYM
+>-соединение с сервером (это эквивалентно <TT
+CLASS="LITERAL"
+>sslmode</TT
+>
+        <TT
+CLASS="LITERAL"
+>require</TT
+>). <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> в таком случае откажется подключаться, если сервер не принимает <ACRONYM
+CLASS="ACRONYM"
+>SSL</ACRONYM
+>-соединений. Если установлено значение 0 (по умолчанию), тогда <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> будет согласовывать тип подключения с сервером (эквивалентно <TT
+CLASS="LITERAL"
+>sslmode</TT
+>
+ <TT
+CLASS="LITERAL"
+>prefer</TT
+>). Этот параметр доступен, если только <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> скомпилирован с поддержкой SSL.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-CONNECT-SSLCOMPRESSION"
+></A
+><TT
+CLASS="LITERAL"
+>sslcompression</TT
+></DT
+><DD
+><P
+>Если установлено значение 1 (по умолчанию), данные, пересылаемые через SSL-соединения, будут сжиматься (это требует <SPAN
+CLASS="PRODUCTNAME"
+>OpenSSL</SPAN
+> версии 0.9.8 или более поздней). Если установлено значение 0, сжатие будет отключено (это требует <SPAN
+CLASS="PRODUCTNAME"
+>OpenSSL</SPAN
+> версии 1.0.0 или более поздней). Этот параметр игнорируется, если выполнено подключение без SSL, или если используемая версия <SPAN
+CLASS="PRODUCTNAME"
+>OpenSSL</SPAN
+> не поддерживает его.</P
+><P
+>Сжатие требует процессорного времени, но может улучшить пропускную способность, если узким местом является сеть. Отключение сжатия может улучшить время отклика и пропускную способность, если ограничивающим фактором является производительность CPU.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-CONNECT-SSLCERT"
+></A
+><TT
+CLASS="LITERAL"
+>sslcert</TT
+></DT
+><DD
+><P
+>Этот параметр предписывает имя файла для SSL-сертификата клиента, заменяющего файл по умолчанию <TT
+CLASS="FILENAME"
+> ~/.postgresql/postgresql.crt</TT
+>. Этот параметр игнорируется, если SSL-подключение не выполнено.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-CONNECT-SSLKEY"
+></A
+><TT
+CLASS="LITERAL"
+>sslkey</TT
+></DT
+><DD
+><P
+>Этот параметр предписывает местоположение секретного ключа, используемого для сертификата клиента. Он может либо указывать имя файла, которое будет использоваться вместо имени по умолчанию <TT
+CLASS="FILENAME"
+> ~/.postgresql/postgresql.key</TT
+>, либо он может указывать ключ, полученный от внешнего <SPAN
+CLASS="QUOTE"
+>"криптомодуля"</SPAN
+> (криптомодули — это загружаемые модули <SPAN
+CLASS="PRODUCTNAME"
+>OpenSSL</SPAN
+>). Спецификация внешнего криптомодуля должна состоять из имени модуля и ключевого идентификатора, зависящего от конкретного модуля, разделённых двоеточием. Этот параметр игнорируется, если SSL-подключение не выполнено.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-CONNECT-SSLROOTCERT"
+></A
+><TT
+CLASS="LITERAL"
+>sslrootcert</TT
+></DT
+><DD
+><P
+>Этот параметр указывает имя файла, содержащего SSL-сертификаты, выданные Центром сертификации (<ACRONYM
+CLASS="ACRONYM"
+>CA</ACRONYM
+>). Если файл существует, сертификат сервера будет проверен на предмет его подписания одним из этих центров. Имя по умолчанию — <TT
+CLASS="FILENAME"
+> ~/.postgresql/root.crt</TT
+>.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-CONNECT-SSLCRL"
+></A
+><TT
+CLASS="LITERAL"
+>sslcrl</TT
+></DT
+><DD
+><P
+>Этот параметр указывает имя файла, содержащего список отозванных SSL-сертификатов (CRL). Сертификаты, перечисленные в этом файле, если он существует, будут отвергаться при попытке установить подлинность сертификата сервера. Имя по умолчанию такое <TT
+CLASS="FILENAME"
+>~/.postgresql/root.crl</TT
+>.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-CONNECT-REQUIREPEER"
+></A
+><TT
+CLASS="LITERAL"
+>requirepeer</TT
+></DT
+><DD
+><P
+>Этот параметр указывает имя пользователя операционной системы, предназначенное для сервера, например, <TT
+CLASS="LITERAL"
+>requirepeer=postgres</TT
+>. При создании подключения через сокет домена Unix, если этот параметр установлен, клиент проверяет в самом начале процедуры подключения, что серверный процесс запущен от имени указанного пользователя; если это не так, соединение аварийно прерывается с ошибкой. Этот параметр можно использовать, чтобы обеспечить аутентификацию сервера, подобную той, которая доступна с помощью SSL-сертификатов при соединениях по протоколу TCP/IP. (Заметьте, что если сокет домена Unix находится в каталоге <TT
+CLASS="FILENAME"
+>/tmp</TT
+> или в другом каталоге, запись в который разрешена всем пользователям, тогда любой пользователь сможет запустить сервер, прослушивающий сокет в том каталоге. Используйте этот параметр, чтобы гарантировать, что вы подключены к серверу, запущенному доверенным пользователем.) Он поддерживается только на платформах, для которых реализован метод аутентификации <TT
+CLASS="LITERAL"
+>peer</TT
+>; см. <A
+HREF="auth-methods.html#AUTH-PEER"
+>Подраздел 19.3.6</A
+>.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-CONNECT-KRBSRVNAME"
+></A
+><TT
+CLASS="LITERAL"
+>krbsrvname</TT
+></DT
+><DD
+><P
+>Имя сервиса Kerberos, предназначенное для использования при аутентификации на основе GSSAPI. Оно должно соответствовать имени сервиса, указанному в конфигурации сервера, чтобы аутентификация на основе Kerberos прошла успешно. (См. также <A
+HREF="auth-methods.html#GSSAPI-AUTH"
+>Подраздел 19.3.3</A
+>.)</P
+></DD
+><DT
+><A
+NAME="LIBPQ-CONNECT-GSSLIB"
+></A
+><TT
+CLASS="LITERAL"
+>gsslib</TT
+></DT
+><DD
+><P
+>Библиотека GSS, предназначенная для использования при аутентификации на основе GSSAPI. Используется только в системе Windows. Назначьте значение <TT
+CLASS="LITERAL"
+>gssapi</TT
+>, чтобы заставить libpq использовать для аутентификации библиотеку GSSAPI вместо SSPI, применяемого по умолчанию.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-CONNECT-SERVICE"
+></A
+><TT
+CLASS="LITERAL"
+>service</TT
+></DT
+><DD
+><P
+>Имя сервиса, используемое для задания дополнительных параметров. Оно указывает имя сервиса в файле <TT
+CLASS="FILENAME"
+>pg_service.conf</TT
+>, который содержит дополнительные параметры подключения. Это позволяет приложениям указывать только имя сервиса, поскольку параметры подключения могут поддерживаться централизованно. См. <A
+HREF="libpq-pgservice.html"
+>Раздел 31.16</A
+>.</P
+></DD
+></DL
+></DIV
+><P></P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="libpq.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="libpq-status.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> — библиотека для языка C</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="libpq.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Функции, описывающие текущее состояние подключения</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

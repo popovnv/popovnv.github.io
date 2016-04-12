@@ -1,0 +1,958 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>          pg_proc
+        </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Системные каталоги"
+HREF="catalogs.html"><LINK
+REL="PREVIOUS"
+TITLE="          pg_pltemplate
+        "
+HREF="catalog-pg-pltemplate.html"><LINK
+REL="NEXT"
+TITLE="          pg_range
+        "
+HREF="catalog-pg-range.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="          pg_pltemplate
+        "
+HREF="catalog-pg-pltemplate.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 48. Системные каталоги</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="          pg_range
+        "
+HREF="catalog-pg-range.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CATALOG-PG-PROC"
+>48.36. <TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+></A
+></H1
+><P
+>В каталоге <TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+> хранится информация о функциях (или процедурах). За дополнительными сведениями обратитесь к описанию <A
+HREF="sql-createfunction.html"
+>CREATE FUNCTION</A
+> и <A
+HREF="xfunc.html"
+>Разделу 35.3</A
+>.</P
+><P
+>В этой таблице содержатся данные и агрегатных, и обычных функций. Если признак <TT
+CLASS="STRUCTFIELD"
+>proisagg</TT
+> равен true, для этой функции должна быть ещё строка в <TT
+CLASS="STRUCTFIELD"
+>pg_aggregate</TT
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="AEN98654"
+></A
+><P
+><B
+>Таблица 48-36. Колонки <TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип</TH
+><TH
+>Ссылки</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Идентификатор строки (скрытый атрибут; должен выбираться явно)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>proname</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>name</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Имя функции</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>pronamespace</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-namespace.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_namespace</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>OID пространства имён, содержащего эту функцию</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>proowner</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-authid.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_authid</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Владелец функции</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>prolang</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-language.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_language</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Язык реализации или интерфейс вызова для этой функции</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>procost</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>float4</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Примерная стоимость выполнения (в единицах <A
+HREF="runtime-config-query.html#GUC-CPU-OPERATOR-COST"
+>cpu_operator_cost</A
+>); если установлен признак <TT
+CLASS="STRUCTFIELD"
+>proretset</TT
+>, это стоимость выдачи одной строки</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>prorows</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>float4</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Примерное число возвращаемых строк (ноль, если признак <TT
+CLASS="STRUCTFIELD"
+>proretset</TT
+> не установлен)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>provariadic</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-type.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_type</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Тип данных элементов переменного массива параметров, либо 0, если функция не принимает переменное число параметров</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>protransform</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>regproc</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-proc.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Вызовы этой функции могут быть упрощены заданной функцией (см. <A
+HREF="xfunc-c.html#XFUNC-TRANSFORM-FUNCTIONS"
+>Подраздел 35.9.11</A
+>)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>proisagg</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Функция является агрегатной</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>proiswindow</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Функция является оконной</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>prosecdef</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Функция определяет контекст безопасности (т. е. это функция <SPAN
+CLASS="QUOTE"
+>"setuid"</SPAN
+>)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>proleakproof</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Функция не имеет побочных эффектов. Никакая информация о её аргументах не выдаётся, кроме как через возвращаемое значение. Любая функция, которая может выдать ошибку, в зависимости от значений аргументов, не является герметичной.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>proisstrict</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Функция возвращает NULL, если любой из аргументов при вызове NULL. В этом случае функция фактически не будет вызываться вовсе. Функции, не являющиеся <SPAN
+CLASS="QUOTE"
+>"строгими"</SPAN
+>, должны быть готовы принять значения NULL.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>proretset</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Функция возвращает множество (т. е. множество значений указанного типа данных)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>provolatile</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>char</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Свойство <TT
+CLASS="STRUCTFIELD"
+>provolatile</TT
+> говорит, зависит ли результат функции только от её входных аргументов, либо на него влияют внешние факторы. Буквой <TT
+CLASS="LITERAL"
+>i</TT
+> обозначаются постоянные функции (<SPAN
+CLASS="QUOTE"
+>"immutable"</SPAN
+>), которые всегда возвращают один результат для одних и тех же аргументов. Буквой <TT
+CLASS="LITERAL"
+>s</TT
+> обозначаются стабильные функции (<SPAN
+CLASS="QUOTE"
+>"stable"</SPAN
+>), результаты которых (для одних и тех же аргументов) не меняются в ходе одного сканирования. Буквой <TT
+CLASS="LITERAL"
+>v</TT
+> обозначаются изменчивые функции (<SPAN
+CLASS="QUOTE"
+>"volatile"</SPAN
+>), результаты которых могут меняться в любое время. (Так же <TT
+CLASS="LITERAL"
+>v</TT
+> следует выбирать для функций с побочными эффектами, чтобы система не оптимизировала их вызовы.)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>pronargs</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int2</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Число входных аргументов</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>pronargdefaults</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int2</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Число аргументов, для которых определены значения по умолчанию</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>prorettype</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-type.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_type</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Тип данных возвращаемого значения</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>proargtypes</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oidvector</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-type.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_type</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Массив с типами данных аргументов функции. В нём учитываются только входные аргументы функции (включая аргументы <TT
+CLASS="LITERAL"
+>INOUT</TT
+> и <TT
+CLASS="LITERAL"
+>VARIADIC</TT
+>), так что он представляет сигнатуру вызова функции.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>proallargtypes</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid[]</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-type.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_type</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Массив с типами данных аргументов функции. В нём учитываются все аргументы (включая аргументы <TT
+CLASS="LITERAL"
+>OUT</TT
+> и <TT
+CLASS="LITERAL"
+>INOUT</TT
+>); однако, если все аргументы только входные (<TT
+CLASS="LITERAL"
+>IN</TT
+>), это поле будет содержать NULL. Заметьте, что индексы в нём начинаются с 1, тогда как в <TT
+CLASS="STRUCTFIELD"
+>proargtypes</TT
+> по историческим причинами они начинаются с 0.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>proargmodes</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>char[]</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Массив с режимами аргументов функций, закодированными как <TT
+CLASS="LITERAL"
+>i</TT
+> для входных аргументов (<TT
+CLASS="LITERAL"
+>IN</TT
+>), <TT
+CLASS="LITERAL"
+>o</TT
+> для выходных аргументов (<TT
+CLASS="LITERAL"
+>OUT</TT
+>), <TT
+CLASS="LITERAL"
+>b</TT
+> для аргументов входных и выходных одновременно (<TT
+CLASS="LITERAL"
+>INOUT</TT
+>), <TT
+CLASS="LITERAL"
+>v</TT
+> для переменных аргументов (<TT
+CLASS="LITERAL"
+>VARIADIC</TT
+>) и <TT
+CLASS="LITERAL"
+>t</TT
+> для табличных аргументов (<TT
+CLASS="LITERAL"
+>TABLE</TT
+>). Если все аргументы являются аргументами <TT
+CLASS="LITERAL"
+>IN</TT
+>, это поле может содержать NULL. Заметьте, что индексы в этом массиве соответствуют позициям в <TT
+CLASS="STRUCTFIELD"
+>proallargtypes</TT
+>, а не в <TT
+CLASS="STRUCTFIELD"
+>proargtypes</TT
+>.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>proargnames</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text[]</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Массив с именами аргументов функции. Для аргументов без имени в этом массиве задаются пустые строки. Если все аргументы функции безымянные, это поле может содержать NULL. Заметьте, что индексы в этом массиве соответствуют позициям в <TT
+CLASS="STRUCTFIELD"
+>proallargtypes</TT
+>, а не в <TT
+CLASS="STRUCTFIELD"
+>proargtypes</TT
+>.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>proargdefaults</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>pg_node_tree</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Деревья выражений (в представлении <CODE
+CLASS="FUNCTION"
+>nodeToString()</CODE
+>) для значений аргументов по умолчанию. Это список, содержащий <TT
+CLASS="STRUCTFIELD"
+>pronargdefaults</TT
+> элементов, соответствующих последним <TT
+CLASS="REPLACEABLE"
+><I
+>N</I
+></TT
+> <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>входным</I
+></SPAN
+> аргументам (т. е., последним <TT
+CLASS="REPLACEABLE"
+><I
+>N</I
+></TT
+> позициям в <TT
+CLASS="STRUCTFIELD"
+>proargtypes</TT
+>). Если значение по умолчанию не имеет никакой аргумент, это поле может содержать NULL.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>prosrc</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Это значение говорит обработчику функции, как вызывать данную функцию. Это может быть собственно исходный код функции для интерпретируемых языков, объектный символ, имя файла или что-то другое, в зависимости от языка реализации/соглашения о вызовах.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>probin</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Дополнительная информация о том, как вызывать функцию. Интерпретация этого значения так же зависит от языка.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>proconfig</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text[]</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Локальные присвоения конфигурационных переменных времени выполнения, действующие в рамках функции</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>proacl</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>aclitem[]</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Права доступа; за подробностями обратитесь к описанию <A
+HREF="sql-grant.html"
+>GRANT</A
+> и <A
+HREF="sql-revoke.html"
+>REVOKE</A
+></TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Для скомпилированных функций, как встроенных, так и динамически загружаемых, поле <TT
+CLASS="STRUCTFIELD"
+>prosrc</TT
+> содержит имя функции на языке C (объектный символ). Для всех других известных сегодня типов языков поле <TT
+CLASS="STRUCTFIELD"
+>prosrc</TT
+> содержит исходный код функции. Поле <TT
+CLASS="STRUCTFIELD"
+>probin</TT
+> используется только для динамически загружаемых функций на C, для которых оно задаёт имя разделяемой библиотеки, содержащей эти функции.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="catalog-pg-pltemplate.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="catalog-pg-range.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_pltemplate</TT
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_range</TT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

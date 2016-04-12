@@ -1,0 +1,578 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>          pg_statistic
+        </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Системные каталоги"
+HREF="catalogs.html"><LINK
+REL="PREVIOUS"
+TITLE="          pg_shseclabel
+        "
+HREF="catalog-pg-shseclabel.html"><LINK
+REL="NEXT"
+TITLE="          pg_tablespace
+        "
+HREF="catalog-pg-tablespace.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="          pg_shseclabel
+        "
+HREF="catalog-pg-shseclabel.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 48. Системные каталоги</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="          pg_tablespace
+        "
+HREF="catalog-pg-tablespace.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CATALOG-PG-STATISTIC"
+>48.44. <TT
+CLASS="STRUCTNAME"
+>pg_statistic</TT
+></A
+></H1
+><P
+>В каталоге <TT
+CLASS="STRUCTNAME"
+>pg_statistic</TT
+> хранится статистическая информация о содержимом базы данных. Записи в нём создаются командой <A
+HREF="sql-analyze.html"
+>ANALYZE</A
+>, а затем используются планировщиком запросов. Заметьте, что все эти данные по природе своей неточные, даже если предполагается, что они актуальны.</P
+><P
+>Обычно для каждой колонки, подлежащей анализу, в этом каталоге есть одна запись со значением <TT
+CLASS="STRUCTFIELD"
+>stainherit</TT
+> = <TT
+CLASS="LITERAL"
+>false</TT
+>. Если у таблицы имеются потомки в иерархии наследования, также создаётся вторая запись с <TT
+CLASS="STRUCTFIELD"
+>stainherit</TT
+> = <TT
+CLASS="LITERAL"
+>true</TT
+>. Эта строка представляет статистику по колонке в дереве наследования, то есть статистику по данным, которые возвратит запрос <TT
+CLASS="LITERAL"
+>SELECT <TT
+CLASS="REPLACEABLE"
+><I
+>колонка</I
+></TT
+> FROM <TT
+CLASS="REPLACEABLE"
+><I
+>table</I
+></TT
+>*</TT
+>, тогда как строка с <TT
+CLASS="STRUCTFIELD"
+>stainherit</TT
+> = <TT
+CLASS="LITERAL"
+>false</TT
+> представляет результаты запроса <TT
+CLASS="LITERAL"
+>SELECT <TT
+CLASS="REPLACEABLE"
+><I
+>колонка</I
+></TT
+> FROM ONLY <TT
+CLASS="REPLACEABLE"
+><I
+>таблица</I
+></TT
+></TT
+>.</P
+><P
+>В <TT
+CLASS="STRUCTNAME"
+>pg_statistic</TT
+> также хранится статистическая информация о значениях выражений индексов. Она описывается так же, как если бы это были колонки данных; в частности, <TT
+CLASS="STRUCTFIELD"
+>starelid</TT
+> ссылается на индекс. Однако для колонок, задействуемых в индексе без выражений, дополнительная запись не добавляется, так как она повторяла бы запись для нижележащей колонки таблицы. В настоящее время во всех записях для выражений индексов <TT
+CLASS="STRUCTFIELD"
+>stainherit</TT
+> = <TT
+CLASS="LITERAL"
+>false</TT
+>.</P
+><P
+>Так как для различных типов данных могут быть уместны различные типы статистики, в каталоге <TT
+CLASS="STRUCTNAME"
+>pg_statistic</TT
+> не делается конкретных предположений о том, какая статистика в нём хранится. Отдельные колонки в <TT
+CLASS="STRUCTNAME"
+>pg_statistic</TT
+> выделены только для самых общих свойств (например, доля NULL). Всё остальное хранится в <SPAN
+CLASS="QUOTE"
+>"слотах"</SPAN
+>, представляющих собой группы связанных колонок, содержимое которых определяется кодовым числом в одной из колонок слотов. За подробностями обратитесь к <TT
+CLASS="FILENAME"
+>src/include/catalog/pg_statistic.h</TT
+>.</P
+><P
+>Каталог <TT
+CLASS="STRUCTNAME"
+>pg_statistic</TT
+> не должен быть доступен на чтение всем, так как даже статистическая информация о содержимом таблицы может считаться конфиденциальной. (Например, довольно интересны могут быть минимальные и максимальные значения в колонке зарплаты.) Поэтому существует <A
+HREF="view-pg-stats.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_stats</TT
+></A
+> — доступное всем для чтения представление на базе <TT
+CLASS="STRUCTNAME"
+>pg_statistic</TT
+>, в котором выдаётся информация только по тем таблицам, которые может читать текущий пользователь.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="AEN99525"
+></A
+><P
+><B
+>Таблица 48-44. Колонки <TT
+CLASS="STRUCTNAME"
+>pg_statistic</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип</TH
+><TH
+>Ссылки</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>starelid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-class.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Таблица (или индекс), к которой принадлежит описываемая колонка</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>staattnum</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int2</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-attribute.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_attribute</TT
+></A
+>.attnum</TT
+>
+                </TD
+><TD
+>Номер описываемой колонки</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>stainherit</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Если true, в статистике учитываются значения в дочерних колонках, а не только в указанном отношении</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>stanullfrac</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>float4</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Доля записей, в которых эта колонка содержит NULL</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>stawidth</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int4</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Средний размер хранения элементов не-NULL, в байтах</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>stadistinct</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>float4</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Число различных и отличных от NULL значений в колонке. Число, большее нуля, представляет фактическое количество различных значений. Если это число меньше нуля, его модуль представляет множитель для общего количества строк в таблице; например, для колонки, значения в которой в среднем повторяются дважды, можно задать <TT
+CLASS="STRUCTFIELD"
+>stadistinct</TT
+> = -0.5. Ноль означает, что количество различных значений неизвестно.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>stakind<TT
+CLASS="REPLACEABLE"
+><I
+>N</I
+></TT
+></TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int2</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Кодовое число, определяющее род статистики, хранящейся в <TT
+CLASS="REPLACEABLE"
+><I
+>N</I
+></TT
+>-ном <SPAN
+CLASS="QUOTE"
+>"слоте"</SPAN
+> строки <TT
+CLASS="STRUCTNAME"
+>pg_statistic</TT
+> row.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>staop<TT
+CLASS="REPLACEABLE"
+><I
+>N</I
+></TT
+></TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-operator.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_operator</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Оператор, с которым была получена статистика, хранящаяся в <TT
+CLASS="REPLACEABLE"
+><I
+>N</I
+></TT
+>-ном <SPAN
+CLASS="QUOTE"
+>"слоте"</SPAN
+>. Например, для слота гистограммы это будет оператор <TT
+CLASS="LITERAL"
+>&lt;</TT
+>, определяющий порядок сортировки данных.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>stanumbers<TT
+CLASS="REPLACEABLE"
+><I
+>N</I
+></TT
+></TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>float4[]</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Численная статистика соответствующего рода для <TT
+CLASS="REPLACEABLE"
+><I
+>N</I
+></TT
+>-ного <SPAN
+CLASS="QUOTE"
+>"слота"</SPAN
+>, либо NULL, если с этим родом слота не связаны числовые значения</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>stavalues<TT
+CLASS="REPLACEABLE"
+><I
+>N</I
+></TT
+></TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>anyarray</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Значения колонок соответствующего рода для <TT
+CLASS="REPLACEABLE"
+><I
+>N</I
+></TT
+>-го <SPAN
+CLASS="QUOTE"
+>"слота"</SPAN
+>, либо NULL, если для этого рода слота не хранятся никакие значения. Все значения элементов массива фактически имеют тип данных колонки или связанный тип, например, тип элемента массива, так что определить типы эти колонок более конкретно, чем <TT
+CLASS="TYPE"
+>anyarray</TT
+>, нельзя.</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="catalog-pg-shseclabel.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="catalog-pg-tablespace.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_shseclabel</TT
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_tablespace</TT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

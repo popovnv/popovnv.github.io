@@ -1,0 +1,304 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Вариативные сравнительные файлы</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Регрессионные тесты"
+HREF="regress.html"><LINK
+REL="PREVIOUS"
+TITLE="Оценка результатов тестирования"
+HREF="regress-evaluation.html"><LINK
+REL="NEXT"
+TITLE="Тесты TAP"
+HREF="regress-tap.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Оценка результатов тестирования"
+HREF="regress-evaluation.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="regress.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 30. Регрессионные тесты</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Тесты TAP"
+HREF="regress-tap.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="REGRESS-VARIANT"
+>30.3. Вариативные сравнительные файлы</A
+></H1
+><P
+>Поскольку некоторые тесты по сути выдают результаты, зависящие от окружения, мы предлагаем несколько вариантов <SPAN
+CLASS="QUOTE"
+>"ожидаемых"</SPAN
+> файлов результата. Каждый регрессионный тест может иметь несколько сравнительных файлов, показывающих возможные результаты на разных платформах. Существует два независимых механизма для определения, какой именно сравнительный файл будет выбран для каждого теста.</P
+><P
+>Первый механизм позволяет выбирать сравнительный файл для конкретной платформы. Есть файл сопоставления <TT
+CLASS="FILENAME"
+>src/test/regress/resultmap</TT
+>, в котором определяется, какой сравнительный файл выбирать для каждой платформы. Чтобы устранить ложные <SPAN
+CLASS="QUOTE"
+>"сбои"</SPAN
+> тестирования для конкретной платформы, для начала вы должны выбрать или создать вариант сравнительного файла, а потом добавить строку в файл <TT
+CLASS="FILENAME"
+>resultmap</TT
+>.</P
+><P
+>Каждая строка в файле сопоставления выглядит как </P><PRE
+CLASS="SYNOPSIS"
+>testname:output:platformpattern=comparisonfilename</PRE
+><P> Имя теста (<TT
+CLASS="LITERAL"
+>testname</TT
+>) здесь - просто название конкретного модуля регрессионного теста. Значение <TT
+CLASS="LITERAL"
+>output</TT
+> показывает, вывод какого файла проверять. Для стандартного регрессионного теста это всегда <TT
+CLASS="LITERAL"
+>out</TT
+>. Значение соответствует расширению выходного файла. <TT
+CLASS="LITERAL"
+>platformpattern</TT
+> представляет собой шаблон в стиле Unix-утилиты <TT
+CLASS="COMMAND"
+>expr</TT
+> (т. е. регулярное выражение с неявным <TT
+CLASS="LITERAL"
+>^</TT
+> якорем в начале). Этот шаблон сравнивается с именем платформы, которое выводится из <TT
+CLASS="COMMAND"
+>config.guess</TT
+>. <TT
+CLASS="LITERAL"
+>comparisonfilename</TT
+> это имя сравнительного файла, который будет использован.</P
+><P
+>Например: некоторые системы интерпретируют очень маленькие числа с плавающей запятой как ноль, а не как ошибку потери значимости. Это приводит к разночтениям в регрессионных тестах для <TT
+CLASS="FILENAME"
+>float8</TT
+>. Поэтому мы предлагаем вариант сравнительного файла <TT
+CLASS="FILENAME"
+>float8-small-is-zero.out</TT
+>, который включает в себя результат, ожидаемый для таких систем. Чтобы замаскировать сообщение о ложном <SPAN
+CLASS="QUOTE"
+>"сбое"</SPAN
+> на платформе <SPAN
+CLASS="SYSTEMITEM"
+>OpenBSD</SPAN
+>, файл <TT
+CLASS="FILENAME"
+>resultmap</TT
+> включает в себя: </P><PRE
+CLASS="PROGRAMLISTING"
+>float8:out:i.86-.*-openbsd=float8-small-is-zero.out</PRE
+><P> который сработает на любой машине, где выходное значение <TT
+CLASS="COMMAND"
+>config.guess</TT
+> соответствует <TT
+CLASS="LITERAL"
+>i.86-.*-openbsd</TT
+>. Другие строки в <TT
+CLASS="FILENAME"
+>resultmap</TT
+> выбирают вариант сравнительного файла для других платформ, если это целесообразно.</P
+><P
+>Второй механизм выбора более автоматический: он просто выбирает <SPAN
+CLASS="QUOTE"
+>"подходящую пару"</SPAN
+> из нескольких предлагаемых сравнительных файлов. Драйвер скрипта регрессионного теста рассматривает стандартный сравнительный файл для теста, <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>testname</I
+></TT
+>.out</TT
+>, вариативный файл <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>testname</I
+></TT
+>_<TT
+CLASS="REPLACEABLE"
+><I
+>digit</I
+></TT
+>.out</TT
+> (где <TT
+CLASS="REPLACEABLE"
+><I
+>digit</I
+></TT
+> любое одиночное число от <TT
+CLASS="LITERAL"
+>0</TT
+> до <TT
+CLASS="LITERAL"
+>9</TT
+>). Если какой-нибудь из этих файлов полностью совпадает, тест считается пройденным. В противном случае, для отчёта об ошибке выбирается файл с наименьшим различием. (Если <TT
+CLASS="FILENAME"
+>resultmap</TT
+> включает вводные для конкретного теста, то в этом случае <TT
+CLASS="REPLACEABLE"
+><I
+>testname</I
+></TT
+> подменное имя, взятое из файла <TT
+CLASS="FILENAME"
+>resultmap</TT
+>.)</P
+><P
+>Например, для теста <TT
+CLASS="LITERAL"
+>char</TT
+> сравнительный файл <TT
+CLASS="FILENAME"
+>char.out</TT
+> содержит результаты, ожидаемые для локалей <TT
+CLASS="LITERAL"
+>C</TT
+> и <TT
+CLASS="LITERAL"
+>POSIX</TT
+>, тогда как файл <TT
+CLASS="FILENAME"
+>char_1.out</TT
+> содержит результаты, характерные для многих других локалей.</P
+><P
+>Механизм "лучшей пары" был разработан, чтобы справляться с результатами, зависящими от локали, но он может применяться в любой ситуации, когда сложно предсказать результаты, исходя только из названия платформы. Ограниченность этого метода проявляется лишь в том, что драйвер теста не может сказать, какой вариант правилен для данного окружения; просто выбирается вариант, который кажется наиболее подходящим. Поэтому безопаснее всего использовать этот метод только для вариативных результатов, которые вы хотели бы видеть одинаково надёжными для любого контекста.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="regress-evaluation.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="regress-tap.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Оценка результатов тестирования</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="regress.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Тесты TAP</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

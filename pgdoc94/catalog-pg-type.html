@@ -1,0 +1,1440 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>          pg_type
+        </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Системные каталоги"
+HREF="catalogs.html"><LINK
+REL="PREVIOUS"
+TITLE="          pg_ts_template
+        "
+HREF="catalog-pg-ts-template.html"><LINK
+REL="NEXT"
+TITLE="          pg_user_mapping
+        "
+HREF="catalog-pg-user-mapping.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="          pg_ts_template
+        "
+HREF="catalog-pg-ts-template.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 48. Системные каталоги</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="          pg_user_mapping
+        "
+HREF="catalog-pg-user-mapping.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CATALOG-PG-TYPE"
+>48.52. <TT
+CLASS="STRUCTNAME"
+>pg_type</TT
+></A
+></H1
+><P
+>В каталоге <TT
+CLASS="STRUCTNAME"
+>pg_type</TT
+> хранится информация о типах данных. Базовые типы и типы-перечисления (скалярные типы) создаются командой <A
+HREF="sql-createtype.html"
+>CREATE TYPE</A
+>, а домены — командой <A
+HREF="sql-createdomain.html"
+>CREATE DOMAIN</A
+>. При добавлении любой таблицы в базу данных автоматически создаётся составной тип, представляющий структуру строки таблицы. Также возможно создавать составные типы с помощью команды <TT
+CLASS="COMMAND"
+>CREATE TYPE AS</TT
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="AEN100238"
+></A
+><P
+><B
+>Таблица 48-52. Колонки <TT
+CLASS="STRUCTNAME"
+>pg_type</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип</TH
+><TH
+>Ссылки</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Идентификатор строки (скрытый атрибут; должен выбираться явно)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>typname</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>name</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Имя типа данных</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>typnamespace</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-namespace.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_namespace</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>OID пространства имён, содержащего этот тип</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>typowner</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-authid.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_authid</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Владелец типа</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>typlen</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int2</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Для типа фиксированного размера в <TT
+CLASS="STRUCTFIELD"
+>typlen</TT
+> задаётся число байт во внутреннем представлении типа. Но для типов переменной длины, <TT
+CLASS="STRUCTFIELD"
+>typlen</TT
+> будет отрицательным. Значение -1 обозначает тип <SPAN
+CLASS="QUOTE"
+>"varlena"</SPAN
+> (он содержит машинное слово, определяющее длину), а -2 обозначает строку в стиле C, оканчивающуюся нулём.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>typbyval</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Поле <TT
+CLASS="STRUCTFIELD"
+>typbyval</TT
+> определяет, будут ли внутренние процедуры передавать переменные этого типа по значению или по ссылке. Полю <TT
+CLASS="STRUCTFIELD"
+>typbyval</TT
+> лучше присвоить false, если длина <TT
+CLASS="STRUCTFIELD"
+>typlen</TT
+> не равна 1, 2 или 4 (либо 8, на 64-битных машинах). Типы переменной длины всегда передаются по ссылке. Заметьте, что <TT
+CLASS="STRUCTFIELD"
+>typbyval</TT
+> может быть false, даже если размер типа позволяет передачу по значению.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>typtype</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>char</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Поле <TT
+CLASS="STRUCTFIELD"
+>typtype</TT
+> принимает значение <TT
+CLASS="LITERAL"
+>b</TT
+> для базового типа (base), <TT
+CLASS="LITERAL"
+>c</TT
+> для составного (composite), то есть типа строки таблицы, <TT
+CLASS="LITERAL"
+>d</TT
+> для домена (domain), <TT
+CLASS="LITERAL"
+>e</TT
+> для перечисления (enum), <TT
+CLASS="LITERAL"
+>p</TT
+> для псевдотипа (pseudo-type) или <TT
+CLASS="LITERAL"
+>r</TT
+> для диапазона (range). См. также <TT
+CLASS="STRUCTFIELD"
+>typrelid</TT
+> и <TT
+CLASS="STRUCTFIELD"
+>typbasetype</TT
+>.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>typcategory</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>char</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>В поле <TT
+CLASS="STRUCTFIELD"
+>typcategory</TT
+> задаётся произвольная классификация типов данных, на основе которой анализатор запросов может определить, какие неявные приведения будут <SPAN
+CLASS="QUOTE"
+>"предпочитаемыми"</SPAN
+>. См. <A
+HREF="catalog-pg-type.html#CATALOG-TYPCATEGORY-TABLE"
+>Таблицу 48-53</A
+>.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>typispreferred</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>True, если этот тип является предпочитаемым целевым типом в своей категории (<TT
+CLASS="STRUCTFIELD"
+>typcategory</TT
+>)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>typisdefined</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>True, если тип определён, и false, если это тип-заготовка для ещё не определённого типа. Когда значение <TT
+CLASS="STRUCTFIELD"
+>typisdefined</TT
+> — false, можно полагаться только на заданное имя, пространство имён и OID типа.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>typdelim</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>char</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Символ, разделяющий два значения этого типа при разборе вводимого массива. Заметьте, что этот разделитель связывается с типом данных элемента массива, а не с типом самого массива.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>typrelid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-class.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Если это составной тип (см. <TT
+CLASS="STRUCTFIELD"
+>typtype</TT
+>), эта колонка указывает на запись <TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+>, определяющую соответствующую таблицу. (Для независимого составного типа запись в <TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+> на самом деле не представляет таблицу, но она всё равно нужна для связывания с записями <TT
+CLASS="STRUCTNAME"
+>pg_attribute</TT
+> этого типа.) Для не составных типов содержит ноль.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>typelem</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-type.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_type</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Если значение <TT
+CLASS="STRUCTFIELD"
+>typelem</TT
+> не 0, оно указывает на другую строку в <TT
+CLASS="STRUCTNAME"
+>pg_type</TT
+>. В этом случае к текущему типу можно обращаться по индексу, как к массиву, и получать значения типа <TT
+CLASS="STRUCTFIELD"
+>typelem</TT
+>. <SPAN
+CLASS="QUOTE"
+>"Настоящий"</SPAN
+> тип массива имеет переменную длину (<TT
+CLASS="STRUCTFIELD"
+>typlen</TT
+> = -1), но для некоторых типов фиксированной длины (<TT
+CLASS="STRUCTFIELD"
+>typlen</TT
+> &gt; 0) также определяется <TT
+CLASS="STRUCTFIELD"
+>typelem</TT
+>, например, для <TT
+CLASS="TYPE"
+>name</TT
+> и <TT
+CLASS="TYPE"
+>point</TT
+>. Если для типа фиксированной длины определён <TT
+CLASS="STRUCTFIELD"
+>typelem</TT
+>, его внутренним представлением будет некоторое количество значений типа <TT
+CLASS="STRUCTFIELD"
+>typelem</TT
+>, без других данных. Типы массивов переменной длины также содержат заголовок, определяемый подпрограммами массива.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>typarray</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-type.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_type</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Если поле <TT
+CLASS="STRUCTFIELD"
+>typarray</TT
+> не равно 0, оно указывает на другую запись в <TT
+CLASS="STRUCTNAME"
+>pg_type</TT
+>, описывающую <SPAN
+CLASS="QUOTE"
+>"настоящий"</SPAN
+> тип массива, в которой этот тип будет элементом</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>typinput</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>regproc</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-proc.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Функция преобразования ввода (из текстового формата)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>typoutput</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>regproc</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-proc.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Функция преобразования вывода (в текстовый формат)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>typreceive</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>regproc</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-proc.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Функция преобразования ввода (из двоичного формата), либо 0, если её нет</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>typsend</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>regproc</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-proc.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Функция преобразования вывода (в двоичный формат), либо 0, если её нет</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>typmodin</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>regproc</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-proc.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Функция ввода модификатора типа, либо 0, если тип не поддерживает модификаторы</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>typmodout</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>regproc</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-proc.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Функция вывода модификатора типа, либо 0 для использования стандартного формата</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>typanalyze</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>regproc</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-proc.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_proc</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>Нестандартная функция <TT
+CLASS="COMMAND"
+>ANALYZE</TT
+>, либо 0 для использования стандартной функции</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>typalign</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>char</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+><P
+>Переменная <TT
+CLASS="STRUCTFIELD"
+>typalign</TT
+> определяет выравнивание, требуемое при хранении значения этого типа. Эта величина применяется при хранении на диске, а также для большинства представлений значений внутри <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Когда последовательно хранятся несколько значений, как например в представлении полной строки на диске, дополнительные байты добавляются перед значением этого типа, чтобы оно начиналось с указанной границы. Заданное выравнивание определяет смещение первого элемента последовательности.</P
+>
+
+      <P
+>Возможные значения: <P
+></P
+></P><UL
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>c</TT
+> = выравнивание по символам (<TT
+CLASS="TYPE"
+>char</TT
+>), то есть выравнивание не требуется.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>s</TT
+> = выравнивание по коротким словам (<TT
+CLASS="TYPE"
+>short</TT
+>), 2 байта для большинства машин.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>i</TT
+> = выравнивание по целым (<TT
+CLASS="TYPE"
+>int</TT
+>), 4 байта для большинства машин.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>d</TT
+> = выравнивание по двойным словам (<TT
+CLASS="TYPE"
+>double</TT
+>), 8 байт для большинства машин, но не для всех.</P
+></LI
+></UL
+><P></P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Для типов, используемых в системных таблицах, важно, чтобы размер и выравнивание, определённые в <TT
+CLASS="STRUCTNAME"
+>pg_type</TT
+>, согласовывались с тем, как компилятор располагает эту колонку в структуре, представляющей строку таблицы.</P
+></BLOCKQUOTE
+></DIV
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>typstorage</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>char</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>                  <P
+>Значение <TT
+CLASS="STRUCTFIELD"
+>typstorage</TT
+> для типов varlena (типов с <TT
+CLASS="STRUCTFIELD"
+>typlen</TT
+> = -1) говорит, готов ли тип для помещения в TOAST, и какова стратегия по умолчанию для атрибутов этого типа. Возможные значения: <P
+></P
+></P><UL
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>p</TT
+>: Значение всегда должно храниться простым образом (plain).</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>e</TT
+>: Значение может храниться во <SPAN
+CLASS="QUOTE"
+>"вторичном"</SPAN
+> отношении (если оно есть, см. <TT
+CLASS="LITERAL"
+>pg_class.reltoastrelid</TT
+>).</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>m</TT
+>: Значение может храниться сжатым внутри строки.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>x</TT
+>: Значение может храниться сжатым внутри строки или во <SPAN
+CLASS="QUOTE"
+>"вторичном"</SPAN
+> хранилище.</P
+></LI
+></UL
+><P> Заметьте, что колонки <TT
+CLASS="LITERAL"
+>m</TT
+> тоже могут быть перемещены во вторичное хранилище, но только в качестве последней меры (колонки <TT
+CLASS="LITERAL"
+>e</TT
+> и <TT
+CLASS="LITERAL"
+>x</TT
+> перемещаются в первую очередь).</P
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>typnotnull</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>                  <P
+>Поле <TT
+CLASS="STRUCTFIELD"
+>typnotnull</TT
+> представляет ограничение &laquo;не NULL&raquo; для типа. Применяется только для доменов.</P
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>typbasetype</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-type.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_type</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>                  <P
+>Если это домен (см. <TT
+CLASS="STRUCTFIELD"
+>typtype</TT
+>), то <TT
+CLASS="STRUCTFIELD"
+>typbasetype</TT
+> указывает на тип, на котором он основан. Ноль, если это не домен.</P
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>typtypmod</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int4</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>                  <P
+>Домены используют <TT
+CLASS="STRUCTFIELD"
+>typtypmod</TT
+> для записи модификатора (<TT
+CLASS="LITERAL"
+>typmod</TT
+>), применяемого к их базовому типу (-1, если базовый тип не использует <TT
+CLASS="LITERAL"
+>typmod</TT
+>). Если тип не является доменом, принимает значение -1.</P
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>typndims</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int4</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>                  <P
+>Значение <TT
+CLASS="STRUCTFIELD"
+>typndims</TT
+> задаёт число размерностей массива для домена, определённого поверх массива (то есть, когда <TT
+CLASS="STRUCTFIELD"
+>typbasetype</TT
+> — тип массива). Для типов, отличных от доменов поверх типов массивов, принимает значение 0.</P
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>typcollation</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+><A
+HREF="catalog-pg-collation.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_collation</TT
+></A
+>.oid</TT
+>
+                </TD
+><TD
+>                  <P
+>Значение <TT
+CLASS="STRUCTFIELD"
+>typcollation</TT
+> задаёт правило сортировки для типа. Если тип не поддерживает сортировки, оно должно быть нулевым. У базового типа, поддерживающего сортировки, в этом поле будет <TT
+CLASS="SYMBOL"
+>DEFAULT_COLLATION_OID</TT
+>. Домен на базе сортируемого типа может иметь другой OID правила сортировки, если оно было изменено для домена.</P
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>typdefaultbin</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>pg_node_tree</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>                  <P
+>Если поле <TT
+CLASS="STRUCTFIELD"
+>typdefaultbin</TT
+> не NULL, в нём содержится представление выражения по умолчанию для этого типа (совместимое с <CODE
+CLASS="FUNCTION"
+>nodeToString()</CODE
+>. Это поле используется только для доменов.</P
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>typdefault</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>                  <P
+>Поле <TT
+CLASS="STRUCTFIELD"
+>typdefault</TT
+> содержит NULL, если с типом не связано значение по умолчанию. Если <TT
+CLASS="STRUCTFIELD"
+>typdefaultbin</TT
+> не NULL, <TT
+CLASS="STRUCTFIELD"
+>typdefault</TT
+> должно содержать понятную человеку версию выражения значения по умолчанию, записанного в <TT
+CLASS="STRUCTFIELD"
+>typdefaultbin</TT
+>. Если <TT
+CLASS="STRUCTFIELD"
+>typdefaultbin</TT
+> содержит NULL, а <TT
+CLASS="STRUCTFIELD"
+>typdefault</TT
+> нет, то в <TT
+CLASS="STRUCTFIELD"
+>typdefault</TT
+> находится внешнее представление значения по умолчанию, которое можно передать функции преобразования ввода и получить константу.</P
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>typacl</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>aclitem[]</TT
+>
+                </TD
+><TD
+>&nbsp;</TD
+><TD
+>Права доступа; за подробностями обратитесь к описанию <A
+HREF="sql-grant.html"
+>GRANT</A
+> и <A
+HREF="sql-revoke.html"
+>REVOKE</A
+></TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>В <A
+HREF="catalog-pg-type.html#CATALOG-TYPCATEGORY-TABLE"
+>Таблице 48-53</A
+> перечисляются определённые в системе значения <TT
+CLASS="STRUCTFIELD"
+>typcategory</TT
+>. Если этот список будет дополняться в будущем, в него будут добавляться тоже буквы ASCII в верхнем регистре. Все другие символы ASCII зарезервированы для категорий, определяемых пользователями.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="CATALOG-TYPCATEGORY-TABLE"
+></A
+><P
+><B
+>Таблица 48-53. Коды <TT
+CLASS="STRUCTFIELD"
+>typcategory</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+>Код</TH
+><TH
+>Категория</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>A</TT
+>
+                </TD
+><TD
+>Типы массивов</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>B</TT
+>
+                </TD
+><TD
+>Логические типы</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>C</TT
+>
+                </TD
+><TD
+>Составные типы</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>D</TT
+>
+                </TD
+><TD
+>Типы даты/времени</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>E</TT
+>
+                </TD
+><TD
+>Типы-перечисления</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>G</TT
+>
+                </TD
+><TD
+>Геометрические типы</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>I</TT
+>
+                </TD
+><TD
+>Типы, описывающие сетевые адреса</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>N</TT
+>
+                </TD
+><TD
+>Числовые типы</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>P</TT
+>
+                </TD
+><TD
+>Псевдотипы</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>R</TT
+>
+                </TD
+><TD
+>Диапазонные типы</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>S</TT
+>
+                </TD
+><TD
+>Строковые типы</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>T</TT
+>
+                </TD
+><TD
+>Интервальные типы</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>U</TT
+>
+                </TD
+><TD
+>Пользовательские типы</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>V</TT
+>
+                </TD
+><TD
+>Типы битовых строк</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>X</TT
+>
+                </TD
+><TD
+>Неизвестный тип (<TT
+CLASS="TYPE"
+>unknown</TT
+>)</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="catalog-pg-ts-template.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="catalog-pg-user-mapping.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_ts_template</TT
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_user_mapping</TT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

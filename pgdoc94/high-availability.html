@@ -1,0 +1,319 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Отказоустойчивость, балансировка нагрузки и репликация</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Администрирование сервера"
+HREF="admin.html"><LINK
+REL="PREVIOUS"
+TITLE="Непрерывное архивирование и восстановление на момент времени (Point-in-Time Recovery, PITR)"
+HREF="continuous-archiving.html"><LINK
+REL="NEXT"
+TITLE="Сравнение различных решений"
+HREF="different-replication-solutions.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="CHAPTER"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Непрерывное архивирование и восстановление на момент времени (Point-in-Time Recovery, PITR)"
+HREF="continuous-archiving.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="admin.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Сравнение различных решений"
+HREF="different-replication-solutions.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="HIGH-AVAILABILITY"
+></A
+>Глава 25. Отказоустойчивость, балансировка нагрузки и репликация</H1
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Содержание</B
+></DT
+><DT
+>25.1. <A
+HREF="different-replication-solutions.html"
+>Сравнение различных решений</A
+></DT
+><DT
+>25.2. <A
+HREF="warm-standby.html"
+>Трансляция журналов на резервные серверы</A
+></DT
+><DD
+><DL
+><DT
+>25.2.1. <A
+HREF="warm-standby.html#STANDBY-PLANNING"
+>Планирование</A
+></DT
+><DT
+>25.2.2. <A
+HREF="warm-standby.html#STANDBY-SERVER-OPERATION"
+>Работа резервного сервера</A
+></DT
+><DT
+>25.2.3. <A
+HREF="warm-standby.html#PREPARING-MASTER-FOR-STANDBY"
+>Подготовка главного сервера для работы с резервными</A
+></DT
+><DT
+>25.2.4. <A
+HREF="warm-standby.html#STANDBY-SERVER-SETUP"
+>Настройка резервного сервера</A
+></DT
+><DT
+>25.2.5. <A
+HREF="warm-standby.html#STREAMING-REPLICATION"
+>Потоковая репликация</A
+></DT
+><DT
+>25.2.6. <A
+HREF="warm-standby.html#STREAMING-REPLICATION-SLOTS"
+>Слоты репликации</A
+></DT
+><DT
+>25.2.7. <A
+HREF="warm-standby.html#CASCADING-REPLICATION"
+>Каскадная репликация</A
+></DT
+><DT
+>25.2.8. <A
+HREF="warm-standby.html#SYNCHRONOUS-REPLICATION"
+>Синхронная репликация</A
+></DT
+></DL
+></DD
+><DT
+>25.3. <A
+HREF="warm-standby-failover.html"
+>Отработка отказа</A
+></DT
+><DT
+>25.4. <A
+HREF="log-shipping-alternative.html"
+>Другие методы трансляции журнала</A
+></DT
+><DD
+><DL
+><DT
+>25.4.1. <A
+HREF="log-shipping-alternative.html#WARM-STANDBY-CONFIG"
+>Реализация</A
+></DT
+><DT
+>25.4.2. <A
+HREF="log-shipping-alternative.html#WARM-STANDBY-RECORD"
+>Построчная трансляция журнала</A
+></DT
+></DL
+></DD
+><DT
+>25.5. <A
+HREF="hot-standby.html"
+>Горячий резерв</A
+></DT
+><DD
+><DL
+><DT
+>25.5.1. <A
+HREF="hot-standby.html#HOT-STANDBY-USERS"
+>Краткий пользовательский обзор</A
+></DT
+><DT
+>25.5.2. <A
+HREF="hot-standby.html#HOT-STANDBY-CONFLICT"
+>Обработка конфликтов запросов</A
+></DT
+><DT
+>25.5.3. <A
+HREF="hot-standby.html#HOT-STANDBY-ADMIN"
+>Обзор административной части</A
+></DT
+><DT
+>25.5.4. <A
+HREF="hot-standby.html#HOT-STANDBY-PARAMETERS"
+>Ссылки на параметры горячего резерва</A
+></DT
+><DT
+>25.5.5. <A
+HREF="hot-standby.html#HOT-STANDBY-CAVEATS"
+>Ограничения</A
+></DT
+></DL
+></DD
+></DL
+></DIV
+><P
+>Серверы базы данных могут работать совместно для обеспечения возможности быстрого переключения на другой сервер в случае отказа первого (отказоустойчивость) или для обеспечения возможности нескольким серверам БД обрабатывать один набор данных (балансировка нагрузки). В идеале, серверы БД могут работать вместе прозрачно для клиента. Веб-серверы, обрабатывающие статические страницы, можно совместить достаточно легко посредством простого распределения запросов на несколько машин. Фактически серверы баз данных только для чтения тоже могут быть совмещены достаточно легко. К сожалению, большинство серверов баз данных получают смешанные запросы на чтение/запись, а серверы с доступом на чтение/запись совместить гораздо сложнее. Это объясняется тем, что данные только для чтения достаточно единожды разместить на каждом сервере, а запись на любой из серверов должна распространиться на все остальные серверы, чтобы будущие запросы на чтение возвращали согласованные результаты.</P
+><P
+>Проблема синхронизации является главным препятствием для совместной работы серверов. Так как единственного решения, устраняющего проблему синхронизации во всех случаях, не существует, предлагается несколько решений. Разные решения подходят к проблеме по-разному и минимизируют её влияние в разных рабочих условиях.</P
+><P
+>Некоторые решения применяют синхронизацию, позволяя только одному серверу изменять данные. Сервер, который может изменять данные, называется сервером чтения/записи, <I
+CLASS="FIRSTTERM"
+>главным</I
+> или <I
+CLASS="FIRSTTERM"
+>ведущим</I
+> сервером. Сервер, который отслеживает изменения на главном, называется <I
+CLASS="FIRSTTERM"
+>резервным</I
+> или <I
+CLASS="FIRSTTERM"
+>ведомым</I
+> сервером. Резервный сервер, к которому нельзя подключаться до тех пор, пока он не будет повышен до главного, называется сервером <I
+CLASS="FIRSTTERM"
+>тёплого резерва</I
+>, а тот, который может принимать соединения и обрабатывать запросы только на чтение, называется сервером <I
+CLASS="FIRSTTERM"
+>горячего резерва</I
+>.</P
+><P
+>Некоторые решения являются синхронными, при которых транзакция, модифицирующая данные, не считается подтверждённой, пока все серверы не подтвердят транзакцию. Это гарантирует, что при отработке отказа не произойдёт потеря данных и что все балансирующие серверы возвращают целостные данные вне зависимости от того, к какому серверу был запрос. Асинхронное решение, напротив, допускает некоторую задержку между временем подтверждения транзакции и её передачей на другие серверы, допуская возможность, что некоторые транзакции могут быть потеряны в момент переключения на резервный сервер и что балансирующие серверы могут вернуть слегка устаревшие данные. Асинхронная передача используется, когда синхронная будет слишком медленной.</P
+><P
+>Решения могут так же разделяться по степени детализации. Некоторые решения работают только на уровне всего сервера БД целиком, в то время как другие позволяют работать на уровне таблиц или уровне БД.</P
+><P
+>В любом случае необходимо принимать во внимание быстродействие. Обычно выбирается компромисс между функциональностью и производительностью. Например, полностью синхронное решение в медленной сети может снизить производительность больше чем наполовину, в то время как асинхронное решение будет оказывать минимальное воздействие.</P
+><P
+>В завершение этого раздела вынесены различные решения по организации отказоустойчивости, репликации и балансировки нагрузки. Так же доступен <A
+HREF="http://www.postgres-r.org/documentation/terms"
+TARGET="_top"
+>глоссарий</A
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="continuous-archiving.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="different-replication-solutions.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Непрерывное архивирование и восстановление на момент времени (Point-in-Time Recovery, PITR)</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="admin.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Сравнение различных решений</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

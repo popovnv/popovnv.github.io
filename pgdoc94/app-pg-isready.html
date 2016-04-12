@@ -1,0 +1,559 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>            pg_isready
+          </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Клиентские приложения PostgreSQL"
+HREF="reference-client.html"><LINK
+REL="PREVIOUS"
+TITLE="            pg_dumpall
+          "
+HREF="app-pg-dumpall.html"><LINK
+REL="NEXT"
+TITLE="pg_receivexlog"
+HREF="app-pgreceivexlog.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="            pg_dumpall
+          "
+HREF="app-pg-dumpall.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="reference-client.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="pg_receivexlog"
+HREF="app-pgreceivexlog.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="APP-PG-ISREADY"
+></A
+><SPAN
+CLASS="APPLICATION"
+>pg_isready</SPAN
+></H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN88995"
+></A
+><H2
+>Название</H2
+>pg_isready&nbsp;--&nbsp;проверить соединение с сервером <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN88999"
+></A
+><H2
+>Синтаксис</H2
+><P
+><TT
+CLASS="COMMAND"
+>pg_isready</TT
+> [              <TT
+CLASS="REPLACEABLE"
+><I
+>параметр-подключения</I
+></TT
+>
+            ...] [              <TT
+CLASS="REPLACEABLE"
+><I
+>параметр</I
+></TT
+>
+            ...]</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="APP-PG-ISREADY-DESCRIPTION"
+></A
+><H2
+>Описание</H2
+><P
+>Утилита <SPAN
+CLASS="APPLICATION"
+>pg_isready</SPAN
+> предназначена для проверки соединения с сервером баз данных <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Результат проверки передаётся в коде завершения.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="APP-PG-ISREADY-OPTIONS"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="OPTION"
+>-d <TT
+CLASS="REPLACEABLE"
+><I
+>база_данных</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--dbname=<TT
+CLASS="REPLACEABLE"
+><I
+>база_данных</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Задаёт имя базы данных, к которой нужно подключиться.</P
+><P
+>Если этот параметр содержит знак <TT
+CLASS="SYMBOL"
+>=</TT
+> или начинается с допустимого префикса <ACRONYM
+CLASS="ACRONYM"
+>URI</ACRONYM
+> (<TT
+CLASS="LITERAL"
+>postgresql://</TT
+> или <TT
+CLASS="LITERAL"
+>postgres://</TT
+>), он воспринимается как строка <TT
+CLASS="PARAMETER"
+>conninfo</TT
+>. За дополнительными сведениями обратитесь к <A
+HREF="libpq-connect.html#LIBPQ-CONNSTRING"
+>Подразделу 31.1.1</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-h <TT
+CLASS="REPLACEABLE"
+><I
+>компьютер</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--host=<TT
+CLASS="REPLACEABLE"
+><I
+>компьютер</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Указывает имя компьютера, на котором запущен сервер. Если значение начинается с косой черты, оно интерпретируется как имя каталога с доменным сокетом Unix.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-p <TT
+CLASS="REPLACEABLE"
+><I
+>порт</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--port=<TT
+CLASS="REPLACEABLE"
+><I
+>порт</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Задаёт TCP-порт или файл локального доменного сокета Unix, через который сервер принимает подключения. Значение по умолчанию определяется переменной среды <TT
+CLASS="ENVAR"
+>PGPORT</TT
+>, а если она не установлена, выбирается порт, указанный при компиляции, обычно 5432.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-q</TT
+><BR><TT
+CLASS="OPTION"
+>--quiet</TT
+></DT
+><DD
+><P
+>Не выводить сообщение о состоянии. Это полезно в скриптах.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-t <TT
+CLASS="REPLACEABLE"
+><I
+>секунды</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--timeout=<TT
+CLASS="REPLACEABLE"
+><I
+>секунды</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Максимальное время ожидания (в секундах) при попытке подключения, по истечении которого констатируется, что сервер не отвечает. Значение по умолчанию — 3 секунды.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-U <TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--username=<TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Подключиться к базе данных с заданным именем пользователя вместо подразумеваемого по умолчанию.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-V</TT
+><BR><TT
+CLASS="OPTION"
+>--version</TT
+></DT
+><DD
+><P
+>Сообщить версию <SPAN
+CLASS="APPLICATION"
+>pg_isready</SPAN
+> и завершиться.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-?</TT
+><BR><TT
+CLASS="OPTION"
+>--help</TT
+></DT
+><DD
+><P
+>Показать справку по аргументам командной строки <SPAN
+CLASS="APPLICATION"
+>pg_isready</SPAN
+> и завершиться.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN89090"
+></A
+><H2
+>Код завершения</H2
+><P
+>Утилита <SPAN
+CLASS="APPLICATION"
+>pg_isready</SPAN
+> возвращает в оболочку <TT
+CLASS="LITERAL"
+>0</TT
+>, если сервер принимает подключения, <TT
+CLASS="LITERAL"
+>1</TT
+>, если он сбрасывает подключения (например, во время загрузки), <TT
+CLASS="LITERAL"
+>2</TT
+>, если при попытке подключения не получен ответ, и <TT
+CLASS="LITERAL"
+>3</TT
+>, если попытки подключения не было (например, из-за некорректных параметров).</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN89098"
+></A
+><H2
+>Переменные окружения</H2
+><P
+>Как и большинство других утилит <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, <TT
+CLASS="COMMAND"
+>pg_isready</TT
+> также использует переменные среды, поддерживаемые <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> (см. <A
+HREF="libpq-envars.html"
+>Раздел 31.14</A
+>).</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="APP-PG-ISREADY-NOTES"
+></A
+><H2
+>Замечания</H2
+><P
+>Чтобы получить состояние сервера, передавать имя пользователя, пароль и имя базы данных не требуется; но если передать некорректные значения, сервер выведет в журнал сообщение о неудачной попытке подключения.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="APP-PG-ISREADY-EXAMPLES"
+></A
+><H2
+>Примеры</H2
+><P
+>Обычное использование: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>pg_isready</KBD
+>
+<SAMP
+CLASS="COMPUTEROUTPUT"
+>/tmp:5432 - accepting connections</SAMP
+>
+<SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>echo $?</KBD
+>
+<SAMP
+CLASS="COMPUTEROUTPUT"
+>0</SAMP
+></PRE
+><P></P
+><P
+>Запуск с параметрами подключения, во время загрузки кластера <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$ </SAMP
+><KBD
+CLASS="USERINPUT"
+>pg_isready -h localhost -p 5433</KBD
+>
+<SAMP
+CLASS="COMPUTEROUTPUT"
+>localhost:5433 - rejecting connections</SAMP
+>
+<SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>echo $?</KBD
+>
+<SAMP
+CLASS="COMPUTEROUTPUT"
+>1</SAMP
+></PRE
+><P></P
+><P
+>Запуск с параметрами подключения, в случае, когда кластер <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> недоступен: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$ </SAMP
+><KBD
+CLASS="USERINPUT"
+>pg_isready -h someremotehost</KBD
+>
+<SAMP
+CLASS="COMPUTEROUTPUT"
+>someremotehost:5432 - no response</SAMP
+>
+<SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>echo $?</KBD
+>
+<SAMP
+CLASS="COMPUTEROUTPUT"
+>2</SAMP
+></PRE
+><P></P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="app-pg-dumpall.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="app-pgreceivexlog.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><SPAN
+CLASS="APPLICATION"
+>pg_dumpall</SPAN
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="reference-client.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>pg_receivexlog</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,697 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>ALTER OPERATOR FAMILY</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="ALTER OPERATOR CLASS"
+HREF="sql-alteropclass.html"><LINK
+REL="NEXT"
+TITLE="ALTER ROLE"
+HREF="sql-alterrole.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="ALTER OPERATOR CLASS"
+HREF="sql-alteropclass.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="ALTER ROLE"
+HREF="sql-alterrole.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-ALTEROPFAMILY"
+></A
+>ALTER OPERATOR FAMILY</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN68653"
+></A
+><H2
+>Название</H2
+>ALTER OPERATOR FAMILY&nbsp;--&nbsp;изменить определение семейства операторов</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN68656"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>ALTER OPERATOR FAMILY <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> USING <TT
+CLASS="REPLACEABLE"
+><I
+>метод_индекса</I
+></TT
+> ADD
+  {  OPERATOR <TT
+CLASS="REPLACEABLE"
+><I
+>номер_стратегии</I
+></TT
+> <TT
+CLASS="REPLACEABLE"
+><I
+>имя_оператора</I
+></TT
+> ( <TT
+CLASS="REPLACEABLE"
+><I
+>тип_операнда</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>тип_операнда</I
+></TT
+> ) [ FOR SEARCH | FOR ORDER BY <TT
+CLASS="REPLACEABLE"
+><I
+>семейство_сортировки</I
+></TT
+> ]
+   | FUNCTION <TT
+CLASS="REPLACEABLE"
+><I
+>номер_опорной_функции</I
+></TT
+> [ ( <TT
+CLASS="REPLACEABLE"
+><I
+>тип_операнда</I
+></TT
+> [ , <TT
+CLASS="REPLACEABLE"
+><I
+>тип_операнда</I
+></TT
+> ] ) ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя_функции</I
+></TT
+> ( <TT
+CLASS="REPLACEABLE"
+><I
+>тип_аргумента</I
+></TT
+> [, ...] )
+  } [, ... ]
+ALTER OPERATOR FAMILY <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> USING <TT
+CLASS="REPLACEABLE"
+><I
+>метод_индекса</I
+></TT
+> DROP
+  {  OPERATOR <TT
+CLASS="REPLACEABLE"
+><I
+>номер_стратегии</I
+></TT
+> ( <TT
+CLASS="REPLACEABLE"
+><I
+>тип_операнда</I
+></TT
+> [ , <TT
+CLASS="REPLACEABLE"
+><I
+>тип_операнда</I
+></TT
+> ] )
+   | FUNCTION <TT
+CLASS="REPLACEABLE"
+><I
+>номер_опорной_функции</I
+></TT
+> ( <TT
+CLASS="REPLACEABLE"
+><I
+>тип_операнда</I
+></TT
+> [ , <TT
+CLASS="REPLACEABLE"
+><I
+>тип_операнда</I
+></TT
+> ] )
+  } [, ... ]
+ALTER OPERATOR FAMILY <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> USING <TT
+CLASS="REPLACEABLE"
+><I
+>метод_индекса</I
+></TT
+> RENAME TO <TT
+CLASS="REPLACEABLE"
+><I
+>новое_имя</I
+></TT
+>
+ALTER OPERATOR FAMILY <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> USING <TT
+CLASS="REPLACEABLE"
+><I
+>метод_индекса</I
+></TT
+> OWNER TO <TT
+CLASS="REPLACEABLE"
+><I
+>новый_владелец</I
+></TT
+>
+ALTER OPERATOR FAMILY <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> USING <TT
+CLASS="REPLACEABLE"
+><I
+>метод_индекса</I
+></TT
+> SET SCHEMA <TT
+CLASS="REPLACEABLE"
+><I
+>новая_схема</I
+></TT
+></PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN68687"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>ALTER OPERATOR FAMILY</TT
+> меняет определение семейства операторов. Она позволяет добавлять в семейство операторы и опорные функции, удалять их из семейства или менять имя и владельца семейства операторов.</P
+><P
+>Когда операторы и опорные функции добавляются в семейство с помощью <TT
+CLASS="COMMAND"
+>ALTER OPERATOR FAMILY</TT
+>, они не становятся частью какого-либо определённого класса операторов в семействе, а просто считаются <SPAN
+CLASS="QUOTE"
+>"слабосвязанными"</SPAN
+> с семейством. Это показывает, что эти операторы и функции семантически совместимы с семейством, но не требуются для корректной работы какого-либо индекса. (Операторы и функции, которые действительно требуются для этого, должны быть включены не в семейство, а в класс операторов; см. <A
+HREF="sql-createopclass.html"
+>CREATE OPERATOR CLASS</A
+>.) <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> позволяет удалять слабосвязанные члены из семейства в любое время, но члены класса операторов не могут быть удалены, пока не будет удалён весь класс и все зависимые от него индексы. Обычно в классы операторов включаются операторы и функции, работающие с одним типом данным (так как они нужны для поддержки индексов данных такого типа), а функции и операторы, работающие с разными типами, становятся слабосвязанными членами семейства.</P
+><P
+>Выполнить <TT
+CLASS="COMMAND"
+>ALTER OPERATOR FAMILY</TT
+> может только суперпользователь. (Это ограничение введено потому, что ошибочное определение семейства операторов может вызвать нарушения или даже сбой в работе сервера.)</P
+><P
+><TT
+CLASS="COMMAND"
+>ALTER OPERATOR FAMILY</TT
+> в настоящее время не проверяет, включает ли определение семейства операторов все операторы и функции, требуемые для индексного метода, и образуют ли они целостный набор. Ответственность за правильность определения семейства лежит на пользователе.</P
+><P
+>За дополнительными сведениями обратитесь к <A
+HREF="xindex.html"
+>Разделу 35.14</A
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN68702"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></DT
+><DD
+><P
+>Имя (возможно, дополненное схемой) существующего семейства операторов.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>метод_индекса</I
+></TT
+></DT
+><DD
+><P
+>Имя индексного метода, для которого предназначено это семейство операторов.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>номер_стратегии</I
+></TT
+></DT
+><DD
+><P
+>Номер стратегии индексного метода для оператора, связанного с данным семейством операторов.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_оператора</I
+></TT
+></DT
+><DD
+><P
+>Имя (возможно, дополненное схемой) оператора, связанного с данным семейством операторов.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>тип_операнда</I
+></TT
+></DT
+><DD
+><P
+>В предложении <TT
+CLASS="LITERAL"
+>OPERATOR</TT
+> указывается тип(ы) данных оператора или <TT
+CLASS="LITERAL"
+>NONE</TT
+>, если это левый или правый унарный оператор. В отличие от похожего синтаксиса в <TT
+CLASS="COMMAND"
+>CREATE OPERATOR CLASS</TT
+>, здесь типы операндов должны указываться всегда.</P
+><P
+>В предложении <TT
+CLASS="LITERAL"
+>ADD FUNCTION</TT
+> это тип данных, который должна поддерживать эта функция, если он отличается от входного типа данных функции. Для функций сравнения B-деревьев и хеш-функций указывать <TT
+CLASS="REPLACEABLE"
+><I
+>тип_операнда</I
+></TT
+> необязательно, так как их входные типы данных всегда будут верными. Однако для функций поддержки сортировки B-деревьев и всех функций в классах операторов GiST, SP-GiST и GIN необходимо указать тип(ы) операндов, с которыми будут использоваться эти функции.</P
+><P
+>В предложении <TT
+CLASS="LITERAL"
+>DROP FUNCTION</TT
+> тип операнда, который должна поддерживать эта функция.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>семейство_сортировки</I
+></TT
+></DT
+><DD
+><P
+>Имя (возможно, дополненное схемой) существующего семейства операторов <TT
+CLASS="LITERAL"
+>btree</TT
+>, описывающего порядок сортировки, связанный с оператором сортировки.</P
+><P
+>Если не указано ни <TT
+CLASS="LITERAL"
+>FOR SEARCH</TT
+> (для поиска), ни <TT
+CLASS="LITERAL"
+>FOR ORDER BY</TT
+> (для сортировки), подразумевается <TT
+CLASS="LITERAL"
+>FOR SEARCH</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>номер_опорной_функции</I
+></TT
+></DT
+><DD
+><P
+>Номер опорной процедуры индексного метода для функции, связанной с данным семейством операторов.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_функции</I
+></TT
+></DT
+><DD
+><P
+>Имя (возможно, дополненное схемой) функции, которая является опорной процедурой индексного метода для данного семейства операторов.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>тип_аргумента</I
+></TT
+></DT
+><DD
+><P
+>Тип данных параметра функции.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>новое_имя</I
+></TT
+></DT
+><DD
+><P
+>Новое имя семейства операторов.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>новый_владелец</I
+></TT
+></DT
+><DD
+><P
+>Новый владелец семейства операторов.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>новая_схема</I
+></TT
+></DT
+><DD
+><P
+>Новая схема семейства операторов.</P
+></DD
+></DL
+></DIV
+><P
+>Предложения <TT
+CLASS="LITERAL"
+>OPERATOR</TT
+> и <TT
+CLASS="LITERAL"
+>FUNCTION</TT
+> могут указываться в любом порядке.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN68781"
+></A
+><H2
+>Замечания</H2
+><P
+>Заметьте, что в синтаксисе <TT
+CLASS="LITERAL"
+>DROP</TT
+> указывается только <SPAN
+CLASS="QUOTE"
+>"слот"</SPAN
+> в семействе операторов, по номеру стратегии или опорной функции, и входные типы данных. Имя оператора или функции, занимающих этот слот, не упоминается. Также учтите, что в <TT
+CLASS="LITERAL"
+>DROP FUNCTION</TT
+> указываются типы входных данных, которые должна поддерживать функция, но для индексов GiST, SP-GiST и GIN они могут не иметь ничего общего с типами фактических аргументов функции.</P
+><P
+>Так как механизмы индексов не проверяют права доступа к функциям прежде чем вызывать их, включение функций или операторов в семейство операторов по сути даёт всем право на выполнение их. Обычно это не проблема для таких функций, какие бывают полезны в семействе операторов.</P
+><P
+>Операторы не должны реализовываться в функциях на языке SQL. SQL-функция вероятнее всего будет встроена в вызывающий запрос, что помешает оптимизатору понять, что этот запрос соответствует индексу.</P
+><P
+>До <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> 8.4 предложение <TT
+CLASS="LITERAL"
+>OPERATOR</TT
+> могло включать указание <TT
+CLASS="LITERAL"
+>RECHECK</TT
+>. Теперь это не поддерживается, так как оператор индекса может быть <SPAN
+CLASS="QUOTE"
+>"неточным"</SPAN
+> и это определяется на ходу в момент выполнения. Это позволяет эффективно справляться с ситуациями, когда оператор может быть или не быть неточным.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN68794"
+></A
+><H2
+>Примеры</H2
+><P
+>Следующий пример добавляет опорные функции и операторы смешанных типов в семейство операторов, уже содержащее классы операторов B-дерева для типов данных <TT
+CLASS="TYPE"
+>int4</TT
+> и <TT
+CLASS="TYPE"
+>int2</TT
+>.</P
+><PRE
+CLASS="PROGRAMLISTING"
+>ALTER OPERATOR FAMILY integer_ops USING btree ADD
+
+  -- int4 и int2
+  OPERATOR 1 &lt; (int4, int2) ,
+  OPERATOR 2 &lt;= (int4, int2) ,
+  OPERATOR 3 = (int4, int2) ,
+  OPERATOR 4 &gt;= (int4, int2) ,
+  OPERATOR 5 &gt; (int4, int2) ,
+  FUNCTION 1 btint42cmp(int4, int2) ,
+
+  -- int2 и int4
+  OPERATOR 1 &lt; (int2, int4) ,
+  OPERATOR 2 &lt;= (int2, int4) ,
+  OPERATOR 3 = (int2, int4) ,
+  OPERATOR 4 &gt;= (int2, int4) ,
+  OPERATOR 5 &gt; (int2, int4) ,
+  FUNCTION 1 btint24cmp(int2, int4) ;</PRE
+><P
+>Удаление этих же элементов:</P
+><PRE
+CLASS="PROGRAMLISTING"
+>ALTER OPERATOR FAMILY integer_ops USING btree DROP
+
+  -- int4 vs int2
+  OPERATOR 1 (int4, int2) ,
+  OPERATOR 2 (int4, int2) ,
+  OPERATOR 3 (int4, int2) ,
+  OPERATOR 4 (int4, int2) ,
+  OPERATOR 5 (int4, int2) ,
+  FUNCTION 1 (int4, int2) ,
+
+  -- int2 vs int4
+  OPERATOR 1 (int2, int4) ,
+  OPERATOR 2 (int2, int4) ,
+  OPERATOR 3 (int2, int4) ,
+  OPERATOR 4 (int2, int4) ,
+  OPERATOR 5 (int2, int4) ,
+  FUNCTION 1 (int2, int4) ;</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN68802"
+></A
+><H2
+>Совместимость</H2
+><P
+>Команда <TT
+CLASS="COMMAND"
+>ALTER OPERATOR FAMILY</TT
+> отсутствует в стандарте SQL.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN68806"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-createopfamily.html"
+>CREATE OPERATOR FAMILY</A
+>, <A
+HREF="sql-dropopfamily.html"
+>DROP OPERATOR FAMILY</A
+>, <A
+HREF="sql-createopclass.html"
+>CREATE OPERATOR CLASS</A
+>, <A
+HREF="sql-alteropclass.html"
+>ALTER OPERATOR CLASS</A
+>, <A
+HREF="sql-dropopclass.html"
+>DROP OPERATOR CLASS</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-alteropclass.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-alterrole.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>ALTER OPERATOR CLASS</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>ALTER ROLE</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

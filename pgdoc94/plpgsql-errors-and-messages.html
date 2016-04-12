@@ -1,0 +1,620 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Сообщения и ошибки</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="PL/pgSQL — процедурный язык SQL"
+HREF="plpgsql.html"><LINK
+REL="PREVIOUS"
+TITLE="Курсоры"
+HREF="plpgsql-cursors.html"><LINK
+REL="NEXT"
+TITLE="Триггерные процедуры"
+HREF="plpgsql-trigger.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Курсоры"
+HREF="plpgsql-cursors.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="plpgsql.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 40. <SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> — процедурный язык <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Триггерные процедуры"
+HREF="plpgsql-trigger.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="PLPGSQL-ERRORS-AND-MESSAGES"
+>40.8. Сообщения и ошибки</A
+></H1
+><P
+>Команда <TT
+CLASS="COMMAND"
+>RAISE</TT
+> предназначена для вывода сообщений и вызова ошибок. </P><PRE
+CLASS="SYNOPSIS"
+>RAISE [<SPAN
+CLASS="OPTIONAL"
+> <TT
+CLASS="REPLACEABLE"
+><I
+>level</I
+></TT
+> </SPAN
+>] '<TT
+CLASS="REPLACEABLE"
+><I
+>format</I
+></TT
+>' [<SPAN
+CLASS="OPTIONAL"
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>expression</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, ... </SPAN
+>]</SPAN
+>] [<SPAN
+CLASS="OPTIONAL"
+> USING <TT
+CLASS="REPLACEABLE"
+><I
+>option</I
+></TT
+> = <TT
+CLASS="REPLACEABLE"
+><I
+>expression</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, ... </SPAN
+>] </SPAN
+>];
+RAISE [<SPAN
+CLASS="OPTIONAL"
+> <TT
+CLASS="REPLACEABLE"
+><I
+>level</I
+></TT
+> </SPAN
+>] <TT
+CLASS="REPLACEABLE"
+><I
+>condition_name</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+> USING <TT
+CLASS="REPLACEABLE"
+><I
+>option</I
+></TT
+> = <TT
+CLASS="REPLACEABLE"
+><I
+>expression</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, ... </SPAN
+>] </SPAN
+>];
+RAISE [<SPAN
+CLASS="OPTIONAL"
+> <TT
+CLASS="REPLACEABLE"
+><I
+>level</I
+></TT
+> </SPAN
+>] SQLSTATE '<TT
+CLASS="REPLACEABLE"
+><I
+>sqlstate</I
+></TT
+>' [<SPAN
+CLASS="OPTIONAL"
+> USING <TT
+CLASS="REPLACEABLE"
+><I
+>option</I
+></TT
+> = <TT
+CLASS="REPLACEABLE"
+><I
+>expression</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, ... </SPAN
+>] </SPAN
+>];
+RAISE [<SPAN
+CLASS="OPTIONAL"
+> <TT
+CLASS="REPLACEABLE"
+><I
+>level</I
+></TT
+> </SPAN
+>] USING <TT
+CLASS="REPLACEABLE"
+><I
+>option</I
+></TT
+> = <TT
+CLASS="REPLACEABLE"
+><I
+>expression</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, ... </SPAN
+>];
+RAISE ;</PRE
+><P> <TT
+CLASS="REPLACEABLE"
+><I
+>level</I
+></TT
+> задаёт уровень важности ошибки. Возможные значения: <TT
+CLASS="LITERAL"
+>DEBUG</TT
+>, <TT
+CLASS="LITERAL"
+>LOG</TT
+>, <TT
+CLASS="LITERAL"
+>INFO</TT
+>, <TT
+CLASS="LITERAL"
+>NOTICE</TT
+>, <TT
+CLASS="LITERAL"
+>WARNING</TT
+> и <TT
+CLASS="LITERAL"
+>EXCEPTION</TT
+>. По умолчанию используется <TT
+CLASS="LITERAL"
+>EXCEPTION</TT
+>. <TT
+CLASS="LITERAL"
+>EXCEPTION</TT
+> вызывает ошибку (что обычно прерывает текущую транзакцию), остальные значения <TT
+CLASS="REPLACEABLE"
+><I
+>level</I
+></TT
+> только генерируют сообщения с различными уровнями приоритета. Будут ли сообщения конкретного приоритета переданы клиенту, или записаны в журнал сервера, или и то и другое, зависит от конфигурационных переменных <A
+HREF="runtime-config-logging.html#GUC-LOG-MIN-MESSAGES"
+>log_min_messages</A
+> и <A
+HREF="runtime-config-logging.html#GUC-CLIENT-MIN-MESSAGES"
+>client_min_messages</A
+>. За дополнительными сведениями обратитесь к <A
+HREF="runtime-config.html"
+>Главе 18</A
+>.</P
+><P
+>После <TT
+CLASS="REPLACEABLE"
+><I
+>level</I
+></TT
+> можно записать <TT
+CLASS="REPLACEABLE"
+><I
+>format</I
+></TT
+> (это должна быть простая символьная строка, не являющаяся выражением). Строка <TT
+CLASS="REPLACEABLE"
+><I
+>format</I
+></TT
+> задаёт текст сообщения об ошибке. После <TT
+CLASS="REPLACEABLE"
+><I
+>format</I
+></TT
+> может следовать список необязательных аргументов выражений для вставки в текст сообщения. Внутри строки <TT
+CLASS="REPLACEABLE"
+><I
+>format</I
+></TT
+> символ <TT
+CLASS="LITERAL"
+>%</TT
+> заменяется на текстовое представление следующего необязательного значения аргумента. Чтобы вставить символ <TT
+CLASS="LITERAL"
+>%</TT
+>, используйте <TT
+CLASS="LITERAL"
+>%%</TT
+>.</P
+><P
+>В следующем примере символ <TT
+CLASS="LITERAL"
+>%</TT
+> будет заменён на значение <TT
+CLASS="LITERAL"
+>v_job_id</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>RAISE NOTICE 'Вызов функции cs_create_job(%)', v_job_id;</PRE
+><P></P
+><P
+>При помощи <TT
+CLASS="LITERAL"
+>USING</TT
+> и последующих элементов <TT
+CLASS="REPLACEABLE"
+><I
+>option</I
+></TT
+> = <TT
+CLASS="REPLACEABLE"
+><I
+>expression</I
+></TT
+> можно добавить дополнительную информацию к отчёту об ошибке. Все <TT
+CLASS="REPLACEABLE"
+><I
+>expression</I
+></TT
+> представляют собой строковые выражения. Возможные ключевые слова для <TT
+CLASS="REPLACEABLE"
+><I
+>option</I
+></TT
+> следующие: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>MESSAGE</TT
+></DT
+><DD
+><P
+>Устанавливает текст сообщения об ошибке. Этот параметр не может использоваться, если в команде <TT
+CLASS="COMMAND"
+>RAISE</TT
+> присутствует <TT
+CLASS="REPLACEABLE"
+><I
+>format</I
+></TT
+> перед <TT
+CLASS="LITERAL"
+>USING</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>DETAIL</TT
+></DT
+><DD
+><P
+>Предоставляет детальное сообщение об ошибке.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>HINT</TT
+></DT
+><DD
+><P
+>Предоставляет подсказку по вызванной ошибке.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>ERRCODE</TT
+></DT
+><DD
+><P
+>Устанавливает код ошибки (<TT
+CLASS="LITERAL"
+>SQLSTATE</TT
+>). Код ошибки задаётся либо по имени, как показано в <A
+HREF="errcodes-appendix.html"
+>Приложении A</A
+>, или напрямую, пятисимвольный код <TT
+CLASS="LITERAL"
+>SQLSTATE</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>COLUMN</TT
+><BR><TT
+CLASS="LITERAL"
+>CONSTRAINT</TT
+><BR><TT
+CLASS="LITERAL"
+>DATATYPE</TT
+><BR><TT
+CLASS="LITERAL"
+>TABLE</TT
+><BR><TT
+CLASS="LITERAL"
+>SCHEMA</TT
+></DT
+><DD
+><P
+>Предоставляет имя соответствующего объекта, связанного с ошибкой.</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>Этот пример прерывает транзакцию и устанавливает сообщение об ошибке с подсказкой: </P><PRE
+CLASS="PROGRAMLISTING"
+>RAISE EXCEPTION 'Несуществующий ID --&gt; %', user_id
+      USING HINT = 'Проверьте ваш пользовательский ID';</PRE
+><P></P
+><P
+>Следующие два примера демонстрируют эквивалентные способы задания <TT
+CLASS="LITERAL"
+>SQLSTATE</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>RAISE 'Duplicate user ID: %', user_id USING ERRCODE = 'unique_violation';
+RAISE 'Duplicate user ID: %', user_id USING ERRCODE = '23505';</PRE
+><P></P
+><P
+>У команды <TT
+CLASS="COMMAND"
+>RAISE</TT
+> есть и другой синтаксис, в котором в качестве главного аргумента используется имя или код <TT
+CLASS="LITERAL"
+>SQLSTATE</TT
+> ошибки. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>RAISE division_by_zero;
+RAISE SQLSTATE '22012';</PRE
+><P> Предложение <TT
+CLASS="LITERAL"
+>USING</TT
+> в этом синтаксисе можно использовать для того, чтобы переопределить стандартное сообщение об ошибке, детальное сообщение, подсказку. Ещё один вариант предыдущего примера: </P><PRE
+CLASS="PROGRAMLISTING"
+>RAISE unique_violation USING MESSAGE = 'ID пользователя уже существует: ' || user_id;</PRE
+><P></P
+><P
+>Ещё один вариант — использовать <TT
+CLASS="LITERAL"
+>RAISE USING</TT
+> или <TT
+CLASS="LITERAL"
+>RAISE <TT
+CLASS="REPLACEABLE"
+><I
+>level</I
+></TT
+> USING</TT
+>, а всё остальное записать в списке <TT
+CLASS="LITERAL"
+>USING</TT
+>.</P
+><P
+>И заключительный вариант, в котором <TT
+CLASS="COMMAND"
+>RAISE</TT
+> не имеет параметров вообще. Эта форма может использоваться только в секции <TT
+CLASS="LITERAL"
+>EXCEPTION</TT
+> блока и предназначена для того, чтобы повторно вызвать ошибку, которая сейчас перехвачена и обрабатывается.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>До версии <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> 9.1 команда <TT
+CLASS="COMMAND"
+>RAISE</TT
+> без параметров всегда вызывала ошибку с выходом из блока, содержащего активную секцию <TT
+CLASS="LITERAL"
+>EXCEPTION</TT
+>. Эту ошибку нельзя было перехватить, даже если <TT
+CLASS="COMMAND"
+>RAISE</TT
+> в секции <TT
+CLASS="LITERAL"
+>EXCEPTION</TT
+> поместить во вложенный блок со своей секцией <TT
+CLASS="LITERAL"
+>EXCEPTION</TT
+>. Это было сочтено удивительным и не совместимым с Oracle PL/SQL.</P
+></BLOCKQUOTE
+></DIV
+><P
+>Если в команде <TT
+CLASS="COMMAND"
+>RAISE EXCEPTION</TT
+> не задано ни имя, ни <TT
+CLASS="LITERAL"
+>SQLSTATE</TT
+> код, то по умолчанию используются <TT
+CLASS="LITERAL"
+>RAISE_EXCEPTION</TT
+> (<TT
+CLASS="LITERAL"
+>P0001</TT
+>). В качестве текста сообщения об ошибке (если не задан) используется имя или <TT
+CLASS="LITERAL"
+>SQLSTATE</TT
+> код.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>При задании <TT
+CLASS="LITERAL"
+>SQLSTATE</TT
+> кода необязательно использовать только список предопределённых кодов ошибок. В качестве кода ошибки может быть любое пятисимвольное значение, состоящее из цифр и/или ASCII символов в верхнем регистре, кроме <TT
+CLASS="LITERAL"
+>00000</TT
+>. Не рекомендуется использовать коды ошибок, которые заканчиваются на <TT
+CLASS="LITERAL"
+>000</TT
+>, потому что так обозначаются коды категорий. И чтобы их перехватить, нужно перехватывать целую категорию.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="plpgsql-cursors.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="plpgsql-trigger.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Курсоры</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="plpgsql.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Триггерные процедуры</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

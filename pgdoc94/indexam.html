@@ -1,0 +1,237 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Определение интерфейса для методов доступа индекса</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Внутреннее устройство"
+HREF="internals.html"><LINK
+REL="PREVIOUS"
+TITLE="Дополнительные источники информации"
+HREF="geqo-biblio.html"><LINK
+REL="NEXT"
+TITLE="Записи каталога для индексов"
+HREF="index-catalog.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="CHAPTER"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Дополнительные источники информации"
+HREF="geqo-biblio.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="internals.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Записи каталога для индексов"
+HREF="index-catalog.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="INDEXAM"
+></A
+>Глава 55. Определение интерфейса для методов доступа индекса</H1
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Содержание</B
+></DT
+><DT
+>55.1. <A
+HREF="index-catalog.html"
+>Записи каталога для индексов</A
+></DT
+><DT
+>55.2. <A
+HREF="index-functions.html"
+>Функции для метода доступа индекса</A
+></DT
+><DT
+>55.3. <A
+HREF="index-scanning.html"
+>Сканирование индекса</A
+></DT
+><DT
+>55.4. <A
+HREF="index-locking.html"
+>Замечания о блокировке с индексами</A
+></DT
+><DT
+>55.5. <A
+HREF="index-unique-checks.html"
+>Проверки уникальности в индексе</A
+></DT
+><DT
+>55.6. <A
+HREF="index-cost-estimation.html"
+>Функции оценки стоимости индекса</A
+></DT
+></DL
+></DIV
+><P
+>В этой главе описывается интерфейс между ядром системы <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> и <I
+CLASS="FIRSTTERM"
+>методами доступа индексов</I
+>, которые управляют отдельными типами индексов. Ядро системы не знает об индексах ничего, кроме того, что описано здесь; благодаря этому можно реализовывать абсолютно новые типы индексов, разрабатывая код в виде расширения.</P
+><P
+>Все индексы <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> являются, говоря на техническом уровне, <I
+CLASS="FIRSTTERM"
+>вторичными индексами</I
+>; то есть, они физически отделены от файла таблицы, к которой относятся. Каждый индекс хранится в собственном отдельном физическом <I
+CLASS="FIRSTTERM"
+>отношении</I
+> и описывается в отдельной записи в каталоге <TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+>. Содержимое индекса находится полностью под контролем соответствующего метода доступа. На практике все методы доступа индексов делят индексы на страницы стандартного размера, чтобы для обращения к содержимому индекса можно было задействовать обычный менеджер хранилища и менеджер буферов. (Более того, все существующие методы доступа используют одну структуру страницы, описанную в <A
+HREF="storage-page-layout.html"
+>Разделе 59.6</A
+>, и одинаковый формат заголовков кортежей индекса; но эти решения методам доступа не навязываются.)</P
+><P
+>Индекс по сути представляет собой сопоставление некоторых значений ключей данных с <I
+CLASS="FIRSTTERM"
+>идентификаторами кортежей</I
+>, <ACRONYM
+CLASS="ACRONYM"
+>TID</ACRONYM
+> (Tuple Identifier), или версиями строк в основной таблице индекса. TID состоит из номера блока и номера записи в этом блоке (см. <A
+HREF="storage-page-layout.html"
+>Раздел 59.6</A
+>). Этой информации достаточно, чтобы выбрать определённую версию строки из таблицы. Индексы сами по себе не знают, что в модели MVCC у одной логической строки может быть несколько существующих версий; для индекса каждый кортеж — независимый объект, которому нужна своя запись в индексе. Таким образом, при изменении строки для неё всегда заново создаются новые записи индекса, даже если значения ключа не изменились. (Кортежи HOT представляют собой исключение из этого утверждения; но индексы всё равно не имеют с этим дела.) Записи индексов для мёртвых кортежей высвобождаются (при очистке), когда высвобождаются сами мёртвые кортежи.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="geqo-biblio.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="index-catalog.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Дополнительные источники информации</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="internals.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Записи каталога для индексов</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

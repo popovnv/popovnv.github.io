@@ -1,0 +1,310 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Управление памятью</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Интерфейс программирования сервера"
+HREF="spi.html"><LINK
+REL="PREVIOUS"
+TITLE="SPI_getnspname"
+HREF="spi-spi-getnspname.html"><LINK
+REL="NEXT"
+TITLE="SPI_palloc"
+HREF="spi-spi-palloc.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="SPI_getnspname"
+HREF="spi-spi-getnspname.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="spi.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 44. Интерфейс программирования сервера</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="SPI_palloc"
+HREF="spi-spi-palloc.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="SPI-MEMORY"
+>44.3. Управление памятью</A
+></H1
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Содержание</B
+></DT
+><DT
+><A
+HREF="spi-spi-palloc.html"
+>SPI_palloc</A
+>&nbsp;--&nbsp;выделить память в верхнем контексте исполнителя</DT
+><DT
+><A
+HREF="spi-realloc.html"
+>SPI_repalloc</A
+>&nbsp;--&nbsp;поменять блок памяти в верхнем контексте исполнителя</DT
+><DT
+><A
+HREF="spi-spi-pfree.html"
+>SPI_pfree</A
+>&nbsp;--&nbsp;освободить память в верхнем контексте исполнителя</DT
+><DT
+><A
+HREF="spi-spi-copytuple.html"
+>SPI_copytuple</A
+>&nbsp;--&nbsp;скопировать строку в верхнем контексте исполнителя</DT
+><DT
+><A
+HREF="spi-spi-returntuple.html"
+>SPI_returntuple</A
+>&nbsp;--&nbsp;подготовить строку для возврата в виде Datum</DT
+><DT
+><A
+HREF="spi-spi-modifytuple.html"
+>SPI_modifytuple</A
+>&nbsp;--&nbsp;создать строку, заменяя отдельные поля в данной</DT
+><DT
+><A
+HREF="spi-spi-freetuple.html"
+>SPI_freetuple</A
+>&nbsp;--&nbsp;освободить строку, размещённую в верхнем контексте исполнителя</DT
+><DT
+><A
+HREF="spi-spi-freetupletable.html"
+>SPI_freetuptable</A
+>&nbsp;--&nbsp;освободить набор строк, созданный <CODE
+CLASS="FUNCTION"
+>SPI_execute</CODE
+> или подобной функцией</DT
+><DT
+><A
+HREF="spi-spi-freeplan.html"
+>SPI_freeplan</A
+>&nbsp;--&nbsp;освободить ранее сохранённый подготовленный оператор</DT
+></DL
+></DIV
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> выделяет память в <I
+CLASS="FIRSTTERM"
+>контекстах памяти</I
+>, и тем самым реализует удобный способ управления выделением памяти в различных местах, с разными сроками жизни выделенной памяти. При уничтожении контекста освобождается вся выделенная в нём память. Таким образом, нет необходимости контролировать каждый отдельный объект во избежание утечек памяти; вместо этого достаточно управлять только небольшим числом контекстов. Функция <CODE
+CLASS="FUNCTION"
+>palloc</CODE
+> и родственные ей освобождают память из <SPAN
+CLASS="QUOTE"
+>"текущего"</SPAN
+> контекста.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>SPI_connect</CODE
+> создаёт новый контекст памяти и делает его текущим. <CODE
+CLASS="FUNCTION"
+>SPI_finish</CODE
+> восстанавливает контекст, который был текущим до этого, и уничтожает контекст, созданный функцией <CODE
+CLASS="FUNCTION"
+>SPI_connect</CODE
+>. Эти действия обеспечивают при выходе из вашей процедуры освобождение временной памяти, выделенной внутри процедуры, во избежание утечки памяти.</P
+><P
+>Однако, если ваша процедура должна вернуть объект в выделенной памяти (как значение типа, передаваемого по ссылке), эту память нельзя выделять через <CODE
+CLASS="FUNCTION"
+>palloc</CODE
+>, как минимум пока установлено подключение к SPI. Если вы попытаетесь это сделать, объект будет освобождён при вызове <CODE
+CLASS="FUNCTION"
+>SPI_finish</CODE
+> и ваша процедура не будет работать надёжно. Для решения этой проблемы выделяйте память для возвращаемого объекта, используя <CODE
+CLASS="FUNCTION"
+>SPI_palloc</CODE
+>. <CODE
+CLASS="FUNCTION"
+>SPI_palloc</CODE
+> выделяет память в <SPAN
+CLASS="QUOTE"
+>"верхнем контексте исполнителя"</SPAN
+>, то есть, в контексте памяти, который был текущим при вызове <CODE
+CLASS="FUNCTION"
+>SPI_connect</CODE
+>; именно этот контекст подходит для значения, возвращаемого из процедуры.</P
+><P
+>Если <CODE
+CLASS="FUNCTION"
+>SPI_palloc</CODE
+> вызывается, когда процедура не подключена к SPI, она действует как обычная функция <CODE
+CLASS="FUNCTION"
+>palloc</CODE
+>. До подключения процедуры к менеджеру SPI текущим контекстом является верхний контекст исполнителя, так что все операции выделения памяти, выполняемые процедурой через <CODE
+CLASS="FUNCTION"
+>palloc</CODE
+> или служебные функции SPI, производятся в этом контексте.</P
+><P
+>Когда вызывается <CODE
+CLASS="FUNCTION"
+>SPI_connect</CODE
+>, текущим контекстом становится частный контекст процедуры, создаваемый в <CODE
+CLASS="FUNCTION"
+>SPI_connect</CODE
+>. Все операции выделения памяти, выполняемые функциями <CODE
+CLASS="FUNCTION"
+>palloc</CODE
+>, <CODE
+CLASS="FUNCTION"
+>repalloc</CODE
+> или служебными функциями SPI (за исключением <CODE
+CLASS="FUNCTION"
+>SPI_copytuple</CODE
+>, <CODE
+CLASS="FUNCTION"
+>SPI_returntuple</CODE
+>, <CODE
+CLASS="FUNCTION"
+>SPI_modifytuple</CODE
+> и <CODE
+CLASS="FUNCTION"
+>SPI_palloc</CODE
+>), производятся в этом контексте. Когда процедура отключается от менеджера SPI (выполняя <CODE
+CLASS="FUNCTION"
+>SPI_finish</CODE
+>), текущим контекстом снова становится верхний контекст исполнителя, а вся память, выделенная в контексте процедуры, освобождается, так что использовать её дальше нельзя.</P
+><P
+>Все функции, описанные в этом разделе, могут использоваться и в подключённых, и в неподключённых процедурах. В неподключённой процедуре они действуют как обычные низкоуровневые серверные функции (<CODE
+CLASS="FUNCTION"
+>palloc</CODE
+> и т. д.).</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="spi-spi-getnspname.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="spi-spi-palloc.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>SPI_getnspname</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="spi.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>SPI_palloc</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

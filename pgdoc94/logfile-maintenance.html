@@ -1,0 +1,301 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Обслуживание журнала</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Регламентные задачи обслуживания базы данных"
+HREF="maintenance.html"><LINK
+REL="PREVIOUS"
+TITLE="Регулярная переиндексация"
+HREF="routine-reindex.html"><LINK
+REL="NEXT"
+TITLE="Резервное копирование и восстановление"
+HREF="backup.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Регулярная переиндексация"
+HREF="routine-reindex.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="maintenance.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 23. Регламентные задачи обслуживания базы данных</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Резервное копирование и восстановление"
+HREF="backup.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="LOGFILE-MAINTENANCE"
+>23.3. Обслуживание журнала</A
+></H1
+><P
+>Журнал сервера базы данных желательно сохранять где-либо, а не просто сбрасывать его в <TT
+CLASS="FILENAME"
+>/dev/null</TT
+>. Этот журнал бесценен при диагностике проблем. Однако он может быть очень объёмным (особенно при высоких уровнях отладки), так что хранить его неограниченно долго вы вряд ли захотите. Поэтому необходимо организовать <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>ротацию</I
+></SPAN
+> журнальных файлов так, чтобы новые файлы создавались, а старые удалялись через разумный промежуток времени.</P
+><P
+>Если просто направить <SPAN
+CLASS="SYSTEMITEM"
+>stderr</SPAN
+> команды <TT
+CLASS="COMMAND"
+>postgres</TT
+> в файл, вы получите в нём журнал сообщений, но очистить этот файл можно будет, только если остановить и перезапустить сервер. Это может быть допустимо при использовании <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> в среде разработки, но вряд ли такой вариант будет приемлемым в производственной среде.</P
+><P
+>Лучшим подходом будет перенаправление вывода сервера <SPAN
+CLASS="SYSTEMITEM"
+>stderr</SPAN
+> в какую-либо программу ротации журнальных файлов. Существует и встроенное средство ротации журнальных файлов, которое можно использовать, установив для параметра <TT
+CLASS="VARNAME"
+>logging_collector</TT
+> значение <TT
+CLASS="LITERAL"
+>true</TT
+> в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+>. Параметры, управляющие этой программой, описаны в <A
+HREF="runtime-config-logging.html#RUNTIME-CONFIG-LOGGING-WHERE"
+>Подразделе 18.8.1</A
+>. Этот подход также можно использовать для получения содержимого журнала в формате <ACRONYM
+CLASS="ACRONYM"
+>CSV</ACRONYM
+> (значения, разделённые запятыми).</P
+><P
+>Вы также можете использовать внешнюю программу для ротации журнальных файлов, если уже применяете такое приложение для других серверных приложений. Например, утилиту <SPAN
+CLASS="APPLICATION"
+>rotatelogs</SPAN
+>, включённую в дистрибутив <SPAN
+CLASS="PRODUCTNAME"
+>Apache</SPAN
+>, можно использовать и с <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Для этого просто направьте вывод <SPAN
+CLASS="SYSTEMITEM"
+>stderr</SPAN
+> сервера в желаемую программу. Если вы запускаете сервер, используя <TT
+CLASS="COMMAND"
+>pg_ctl</TT
+>, то <SPAN
+CLASS="SYSTEMITEM"
+>stderr</SPAN
+> уже будет перенаправлен в <SPAN
+CLASS="SYSTEMITEM"
+>stdout</SPAN
+>, так что будет достаточно просто применить конвейер, например: </P><PRE
+CLASS="PROGRAMLISTING"
+>pg_ctl start | rotatelogs /var/log/pgsql_log 86400</PRE
+><P></P
+><P
+>Ещё одно решение промышленного уровня заключается в передаче журнала в <SPAN
+CLASS="APPLICATION"
+>syslog</SPAN
+>, чтобы ротацией файлов занималась уже служба <SPAN
+CLASS="APPLICATION"
+>syslog</SPAN
+>. Для этого присвойте параметру конфигурации <TT
+CLASS="VARNAME"
+>log_destination</TT
+> значение <TT
+CLASS="LITERAL"
+>syslog</TT
+> (для вывода журнала только в <SPAN
+CLASS="APPLICATION"
+>syslog</SPAN
+>) в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+>. Затем вы сможете посылать сигнал <TT
+CLASS="LITERAL"
+>SIGHUP</TT
+> службе <SPAN
+CLASS="APPLICATION"
+>syslog</SPAN
+>, когда захотите принудительно начать запись нового журнального файла. Если вы хотите автоматизировать ротацию журнальных файлов, программу <SPAN
+CLASS="APPLICATION"
+>logrotate</SPAN
+> можно настроить и для работы с журнальными файлами, которые формирует <SPAN
+CLASS="APPLICATION"
+>syslog</SPAN
+>.</P
+><P
+>Однако во многих системах, а особенно c большими сообщениями, <SPAN
+CLASS="APPLICATION"
+>syslog</SPAN
+> работает не очень надёжно; он может обрезать или терять сообщения как раз тогда, когда они вам нужны. Кроме того, в <SPAN
+CLASS="PRODUCTNAME"
+>Linux</SPAN
+>, <SPAN
+CLASS="APPLICATION"
+>syslog</SPAN
+>&gt; сбрасывает каждое сообщение на диск, от чего страдает производительность. (Для отключения этой синхронной записи можно добавить <SPAN
+CLASS="QUOTE"
+>"<TT
+CLASS="LITERAL"
+>-</TT
+>"</SPAN
+> перед именем файла в файле конфигурации <SPAN
+CLASS="APPLICATION"
+>syslog</SPAN
+>.)</P
+><P
+>Обратите внимание, что все описанные выше решения обеспечивают создание новых журнальных файлов через задаваемые промежутки времени, но не удаление старых, ставших бесполезными файлов журналов. Возможно, вы захотите создать задание для периодического удаления старых файлов. Кроме того, вы можете настроить программу ротации файлов так, чтобы старые файлы журналов циклически перезаписывались.</P
+><P
+>Также вам может быть полезен <A
+HREF="http://dalibo.github.io/pgbadger/"
+TARGET="_top"
+><SPAN
+CLASS="PRODUCTNAME"
+>pgBadger</SPAN
+></A
+> — инструмент для сложного анализа файлов журнала. Кроме того, <A
+HREF="http://bucardo.org/wiki/Check_postgres"
+TARGET="_top"
+><SPAN
+CLASS="PRODUCTNAME"
+>check_postgres</SPAN
+></A
+> может посылать уведомления в Nagios, когда в журнале появляются важные сообщения, а также при обнаружении других нестандартных ситуаций.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="routine-reindex.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="backup.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Регулярная переиндексация</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="maintenance.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Резервное копирование и восстановление</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

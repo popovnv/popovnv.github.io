@@ -1,0 +1,482 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Функции на PL/Perl и их аргументы</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="PL/Perl — процедурный язык Perl"
+HREF="plperl.html"><LINK
+REL="PREVIOUS"
+TITLE="PL/Perl — процедурный язык Perl"
+HREF="plperl.html"><LINK
+REL="NEXT"
+TITLE="Значения в PL/Perl"
+HREF="plperl-data.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="PL/Perl — процедурный язык Perl"
+HREF="plperl.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="plperl.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 42. PL/Perl — процедурный язык Perl</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Значения в PL/Perl"
+HREF="plperl-data.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="PLPERL-FUNCS"
+>42.1. Функции на PL/Perl и их аргументы</A
+></H1
+><P
+>Чтобы создать функцию на языке PL/Perl, используйте стандартный синтаксис <A
+HREF="sql-createfunction.html"
+>CREATE FUNCTION</A
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION <TT
+CLASS="REPLACEABLE"
+><I
+>имя_функции</I
+></TT
+> (<TT
+CLASS="REPLACEABLE"
+><I
+>типы-аргументов</I
+></TT
+>) RETURNS <TT
+CLASS="REPLACEABLE"
+><I
+>тип-результата</I
+></TT
+> AS $$
+    # Тело функции на PL/Perl
+$$ LANGUAGE plperl;</PRE
+><P> Тело функции содержит обычный код Perl. Фактически, код обвязки PL/Perl помещает этот код в подпрограмму Perl. Функция PL/Perl вызывается в скалярном контексте, так что она не может вернуть список. Не скалярные значения (массивы, записи и множества) можно вернуть по ссылке, как описывается ниже.</P
+><P
+>PL/Perl также поддерживает анонимные блоки кода, которые выполняются оператором <A
+HREF="sql-do.html"
+>DO</A
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>DO $$
+    # Код PL/Perl
+$$ LANGUAGE plperl;</PRE
+><P> Анонимный блок кода не принимает аргументы, а любое значение, которое он мог бы вернуть, отбрасывается. В остальном он работает подобно коду функции.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Использовать вложенные именованные подпрограммы в Perl опасно, особенно если они обращаются к лексическим переменным в окружающей области. Так как функция PL/Perl оборачивается в подпрограмму, любая именованная функция внутри неё будет вложенной. Вообще гораздо безопаснее создавать анонимные подпрограммы и вызывать их по ссылке на код. Дополнительную информацию вы можете получить на странице руководства man <SPAN
+CLASS="CITEREFENTRY"
+><SPAN
+CLASS="REFENTRYTITLE"
+>perldiag</SPAN
+></SPAN
+>, в описании ошибок <TT
+CLASS="LITERAL"
+>Variable "%s" will not stay shared</TT
+> (Переменная "%s" не останется разделяемой) и <TT
+CLASS="LITERAL"
+>Variable "%s" is not available</TT
+> (Переменная "%s" недоступна), либо найти в Интернете по ключевым словам <SPAN
+CLASS="QUOTE"
+>"perl nested named subroutine"</SPAN
+> (perl вложенная именованная подпрограмма).</P
+></BLOCKQUOTE
+></DIV
+><P
+>Синтаксис команды <TT
+CLASS="COMMAND"
+>CREATE FUNCTION</TT
+> требует, чтобы тело функции было записано как строковая константа. Обычно для этого удобнее всего заключать строковую константу в доллары (см. <A
+HREF="sql-syntax-lexical.html#SQL-SYNTAX-DOLLAR-QUOTING"
+>Подраздел 4.1.2.4</A
+>). Если вы решите применять синтаксис спецпоследовательностей <TT
+CLASS="LITERAL"
+>E''</TT
+>, вам придётся дублировать апострофы (<TT
+CLASS="LITERAL"
+>'</TT
+>) и обратную косую черту (<TT
+CLASS="LITERAL"
+>\</TT
+>) в теле функции (см. <A
+HREF="sql-syntax-lexical.html#SQL-SYNTAX-STRINGS"
+>Подраздел 4.1.2.1</A
+>).</P
+><P
+>Аргументы и результат обрабатываются как и в любой другой подпрограмме на Perl: аргументы передаются в <TT
+CLASS="VARNAME"
+>@_</TT
+>, а результирующим значением будет указанное в <TT
+CLASS="LITERAL"
+>return</TT
+> или полученное в последнем выражении, вычисленном в функции.</P
+><P
+>Например, функцию, возвращающую большее из двух целых чисел, можно определить так: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION perl_max (integer, integer) RETURNS integer AS $$
+    if ($_[0] &gt; $_[1]) { return $_[0]; }
+    return $_[1];
+$$ LANGUAGE plperl;</PRE
+><P></P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Аргументы будут преобразованы из кодировки базы данных в UTF-8 для использования в PL/Perl, а при выходе снова будут преобразованы из UTF-8 в кодировку базы данных.</P
+></BLOCKQUOTE
+></DIV
+><P
+>Если функции передаётся NULL-значение SQL, значением аргумента в Perl станет <SPAN
+CLASS="QUOTE"
+>"undefined"</SPAN
+>. Показанное выше определение функции будет не очень хорошо обрабатывать значения NULL (в действительности они будут восприняты как нули). Мы могли бы добавить указание <TT
+CLASS="LITERAL"
+>STRICT</TT
+> в это определение, чтобы <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> поступал немного разумнее: при передаче значения NULL функция вовсе не будет вызываться, будет сразу возвращён результат NULL. С другой стороны, мы могли бы проверить значения undefined в теле функции. Например, предположим, что нам нужна функция <CODE
+CLASS="FUNCTION"
+>perl_max</CODE
+>, которая с одним аргументом NULL и вторым аргументом не NULL должна возвращать не NULL, а второй аргумент: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION perl_max (integer, integer) RETURNS integer AS $$
+    my ($x, $y) = @_;
+    if (not defined $x) {
+        return undef if not defined $y;
+        return $y;
+    }
+    return $x if not defined $y;
+    return $x if $x &gt; $y;
+    return $y;
+$$ LANGUAGE plperl;</PRE
+><P> Как показано выше, чтобы выдать значение SQL NULL, нужно вернуть значение undefined. Это можно сделать и в строгой, и в нестрогой функции.</P
+><P
+>Всё в аргументах функции, что не является ссылкой, является строкой, то есть стандартным для <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> внешним текстовым представлением соответствующего типа данных. В случае с обычными числовыми или текстовыми типами, Perl просто воспринимает их должным образом, и программист, как правило, может об этом не думать. Однако в более сложных случаях может потребоваться преобразовать аргумент в форму, подходящую для использования в Perl. Например, для преобразования типа <TT
+CLASS="TYPE"
+>bytea</TT
+> в двоичное значение можно использовать функцию <CODE
+CLASS="FUNCTION"
+>decode_bytea</CODE
+>.</P
+><P
+>Аналогично, значения, передаваемые в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, должны быть в формате внешнего текстового представления. Например, для подготовки двоичных данных к возврату в значении <TT
+CLASS="TYPE"
+>bytea</TT
+> можно воспользоваться функцией <CODE
+CLASS="FUNCTION"
+>encode_bytea</CODE
+>.</P
+><P
+>Perl может возвращать массивы <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> как ссылки на массивы Perl. Например, так: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE OR REPLACE function returns_array()
+RETURNS text[][] AS $$
+    return [['a"b','c,d'],['e\\f','g']];
+$$ LANGUAGE plperl;
+
+select returns_array();</PRE
+><P></P
+><P
+>Perl передаёт массивы <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> как объект, сопоставленный с <TT
+CLASS="TYPE"
+>PostgreSQL::InServer::ARRAY</TT
+>. С этим объектом можно работать как со ссылкой на массив или строкой, что допускает обратную совместимость с кодом Perl, написанным для <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> версии до 9.1. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE OR REPLACE FUNCTION concat_array_elements(text[]) RETURNS TEXT AS $$
+    my $arg = shift;
+    my $result = "";
+    return undef if (!defined $arg);
+
+    # в качестве ссылки на массив
+    for (@$arg) {
+        $result .= $_;
+    }
+
+    # также работает со строкой
+    $result .= $arg;
+
+    return $result;
+$$ LANGUAGE plperl;
+
+SELECT concat_array_elements(ARRAY['PL','/','Perl']);</PRE
+><P>
+
+  </P><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Многомерные массивы представляются как ссылки на массивы меньшей размерности со ссылками — этот способ хорошо знаком каждому программисту на Perl.</P
+></BLOCKQUOTE
+></DIV
+><P></P
+><P
+>Аргументы составного типа передаются функции как ссылки на хеши. Ключами хеша являются имена атрибутов составного типа. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE employee (
+    name text,
+    basesalary integer,
+    bonus integer
+);
+
+CREATE FUNCTION empcomp(employee) RETURNS integer AS $$
+    my ($emp) = @_;
+    return $emp-&gt;{basesalary} + $emp-&gt;{bonus};
+$$ LANGUAGE plperl;
+
+SELECT name, empcomp(employee.*) FROM employee;</PRE
+><P></P
+><P
+>Функция на PL/Perl может вернуть результат составного типа, применяя тот же подход: возвратить ссылку на хеш с требуемыми атрибутами. Например, так: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TYPE testrowperl AS (f1 integer, f2 text, f3 text);
+
+CREATE OR REPLACE FUNCTION perl_row() RETURNS testrowperl AS $$
+    return {f2 =&gt; 'hello', f1 =&gt; 1, f3 =&gt; 'world'};
+$$ LANGUAGE plperl;
+
+SELECT * FROM perl_row();</PRE
+><P> Колонки объявленного типа результата, отсутствующие в хеше, будут возвращены как значения NULL.</P
+><P
+>Функции на PL/Perl могут также возвращать множества со скалярными или составными типами. Обычно желательно возвращать результат по одной строке, чтобы сократить время подготовки с одной стороны, и чтобы не потребовалось накапливать весь набор данных в памяти, с другой. Это можно реализовать с помощью функции <CODE
+CLASS="FUNCTION"
+>return_next</CODE
+>, как показано ниже. Заметьте, что после последнего вызова <CODE
+CLASS="FUNCTION"
+>return_next</CODE
+>, нужно поместить <TT
+CLASS="LITERAL"
+>return</TT
+> или (что лучше) <TT
+CLASS="LITERAL"
+>return undef</TT
+>. </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE OR REPLACE FUNCTION perl_set_int(int)
+RETURNS SETOF INTEGER AS $$
+    foreach (0..$_[0]) {
+        return_next($_);
+    }
+    return undef;
+$$ LANGUAGE plperl;
+
+SELECT * FROM perl_set_int(5);
+
+CREATE OR REPLACE FUNCTION perl_set()
+RETURNS SETOF testrowperl AS $$
+    return_next({ f1 =&gt; 1, f2 =&gt; 'Hello', f3 =&gt; 'World' });
+    return_next({ f1 =&gt; 2, f2 =&gt; 'Hello', f3 =&gt; 'PostgreSQL' });
+    return_next({ f1 =&gt; 3, f2 =&gt; 'Hello', f3 =&gt; 'PL/Perl' });
+    return undef;
+$$ LANGUAGE plperl;</PRE
+><P> Для небольших наборов данных можно также вернуть ссылку на массив, содержащий скаляры, ссылки на массивы, либо ссылки на хеши для простых типов, типов массивов и составных типов, соответственно. Ниже приведена пара простых примеров, показывающих, как возвратить весь набор данных в виде ссылки на массив: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE OR REPLACE FUNCTION perl_set_int(int) RETURNS SETOF INTEGER AS $$
+    return [0..$_[0]];
+$$ LANGUAGE plperl;
+
+SELECT * FROM perl_set_int(5);
+
+CREATE OR REPLACE FUNCTION perl_set() RETURNS SETOF testrowperl AS $$
+    return [
+        { f1 =&gt; 1, f2 =&gt; 'Hello', f3 =&gt; 'World' },
+        { f1 =&gt; 2, f2 =&gt; 'Hello', f3 =&gt; 'PostgreSQL' },
+        { f1 =&gt; 3, f2 =&gt; 'Hello', f3 =&gt; 'PL/Perl' }
+    ];
+$$ LANGUAGE plperl;
+
+SELECT * FROM perl_set();</PRE
+><P></P
+><P
+>Если вы хотите использовать в своём коде <TT
+CLASS="LITERAL"
+>strict</TT
+>, у вас есть несколько вариантов. Для временного глобального использования вы можете задать для <TT
+CLASS="LITERAL"
+>plperl.use_strict</TT
+> значение true командой <TT
+CLASS="COMMAND"
+>SET</TT
+>. Это повлияет на компилируемые впоследствии функции <SPAN
+CLASS="APPLICATION"
+>PL/Perl</SPAN
+>, но не на функции, уже скомпилированные в текущем сеансе. Для постоянного глобального использования вы можете присвоить параметру <TT
+CLASS="LITERAL"
+>plperl.use_strict</TT
+> значение true в файле <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+>.</P
+><P
+>Для постоянного использования strict в опредёлённых функциях вы можете просто написать: </P><PRE
+CLASS="PROGRAMLISTING"
+>use strict;</PRE
+><P> в начале тела этих функций.</P
+><P
+>Вы также можете использовать указания <TT
+CLASS="LITERAL"
+>feature</TT
+> в <CODE
+CLASS="FUNCTION"
+>use</CODE
+>, если используете Perl версии 5.10.0 или новее.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="plperl.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="plperl-data.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>PL/Perl — процедурный язык Perl</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="plperl.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Значения в PL/Perl</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

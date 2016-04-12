@@ -1,0 +1,512 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Наследование</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Определение данных"
+HREF="ddl.html"><LINK
+REL="PREVIOUS"
+TITLE="Схемы"
+HREF="ddl-schemas.html"><LINK
+REL="NEXT"
+TITLE="Секционирование"
+HREF="ddl-partitioning.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Схемы"
+HREF="ddl-schemas.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ddl.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 5. Определение данных</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Секционирование"
+HREF="ddl-partitioning.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="DDL-INHERIT"
+>5.8. Наследование</A
+></H1
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> реализует наследование таблиц, что может быть полезно для проектировщиков баз данных. (Стандарт SQL:1999 и более поздние версии определяют возможность наследования типов, но это во многом отличается от того, что описано здесь.)</P
+><P
+>Давайте начнём со следующего примера: предположим, что мы создаём модель данных для городов. В каждом штате есть множество городов, но лишь одна столица. Мы хотим иметь возможность быстро получать город-столицу для любого штата. Это можно сделать, создав две таблицы: одну для столиц штатов, а другую для городов, не являющихся столицами. Однако, что делать, если нам нужно получить информацию о любом городе, будь то столица штата или нет? В решении этой проблемы может помочь наследование. Мы определим таблицу <TT
+CLASS="STRUCTNAME"
+>capitals</TT
+> как наследника <TT
+CLASS="STRUCTNAME"
+>cities</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE cities (
+    name            text,
+    population      float,
+    altitude        int     -- в футах
+);
+
+CREATE TABLE capitals (
+    state           char(2)
+) INHERITS (cities);</PRE
+><P> В этом случае таблица <TT
+CLASS="STRUCTNAME"
+>capitals</TT
+> <I
+CLASS="FIRSTTERM"
+>наследует</I
+> все колонки своей родительской таблицы, <TT
+CLASS="STRUCTNAME"
+>cities</TT
+>. Столицы штатов также имеют дополнительную колонку <TT
+CLASS="STRUCTFIELD"
+>state</TT
+>, в которой будет указан штат.</P
+><P
+>В <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> таблица может наследоваться от нуля или нескольких других таблиц, а запросы могут выбирать все строки родительской таблицы или все строки родительской и всех дочерних таблиц. По умолчанию принят последний вариант. Например, следующий запрос найдёт названия всех городов, включая столицы штатов, расположенных выше 500 футов: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT name, altitude
+    FROM cities
+    WHERE altitude &gt; 500;</PRE
+><P> Для данных из введения (см. <A
+HREF="tutorial-sql-intro.html"
+>Раздел 2.1</A
+>) он выдаст: </P><PRE
+CLASS="PROGRAMLISTING"
+>   name    | altitude
+-----------+----------
+ Las Vegas |     2174
+ Mariposa  |     1953
+ Madison   |      845</PRE
+><P></P
+><P
+>А следующий запрос находит все города, которые не являются столицами штатов, но также находятся на высоте выше 500 футов: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT name, altitude
+    FROM ONLY cities
+    WHERE altitude &gt; 500;
+
+   name    | altitude
+-----------+----------
+ Las Vegas |     2174
+ Mariposa  |     1953</PRE
+><P></P
+><P
+>Здесь ключевое слово <TT
+CLASS="LITERAL"
+>ONLY</TT
+> указывает, что запрос должен применяться только к таблице <TT
+CLASS="STRUCTNAME"
+>cities</TT
+>, но не к таблицам, расположенным ниже <TT
+CLASS="STRUCTNAME"
+>cities</TT
+> в иерархии наследования. Многие операторы, которые мы уже обсудили, &mdash; <TT
+CLASS="COMMAND"
+>SELECT</TT
+>, <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> и <TT
+CLASS="COMMAND"
+>DELETE</TT
+> &mdash; поддерживают ключевое слово <TT
+CLASS="LITERAL"
+>ONLY</TT
+>.</P
+><P
+>Вы также можете добавить после имени таблицы <TT
+CLASS="LITERAL"
+>*</TT
+>, чтобы обрабатывались и все дочерние таблицы: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT name, altitude
+    FROM cities*
+    WHERE altitude &gt; 500;</PRE
+><P> Указывать <TT
+CLASS="LITERAL"
+>*</TT
+> не обязательно, так как теперь это поведение подразумевается по умолчанию (если только вы не измените параметр конфигурации <A
+HREF="runtime-config-compatible.html#GUC-SQL-INHERITANCE"
+>sql_inheritance</A
+>). Однако такая запись может быть полезна тем, что подчеркнёт использование дополнительных таблиц.</P
+><P
+>В некоторых ситуациях бывает необходимо узнать, из какой таблицы выбрана конкретная строка. Для этого вы можете воспользоваться системной колонкой <TT
+CLASS="STRUCTFIELD"
+>tableoid</TT
+>, присутствующей в каждой таблице: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT c.tableoid, c.name, c.altitude
+FROM cities c
+WHERE c.altitude &gt; 500;</PRE
+><P> этот запрос выдаст: </P><PRE
+CLASS="PROGRAMLISTING"
+> tableoid |   name    | altitude
+----------+-----------+----------
+   139793 | Las Vegas |     2174
+   139793 | Mariposa  |     1953
+   139798 | Madison   |      845</PRE
+><P> (Если вы попытаетесь выполнить его у себя, скорее всего вы получите другие значения OID.) Собственно имена таблиц вы можете получить, обратившись к <TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT p.relname, c.name, c.altitude
+FROM cities c, pg_class p
+WHERE c.altitude &gt; 500 AND c.tableoid = p.oid;</PRE
+><P> в результате вы получите: </P><PRE
+CLASS="PROGRAMLISTING"
+> relname  |   name    | altitude
+----------+-----------+----------
+ cities   | Las Vegas |     2174
+ cities   | Mariposa  |     1953
+ capitals | Madison   |      845</PRE
+><P></P
+><P
+>Механизм наследования не способен автоматически распределять данные команд <TT
+CLASS="COMMAND"
+>INSERT</TT
+> или <TT
+CLASS="COMMAND"
+>COPY</TT
+> по таблицам в иерархии наследования. Поэтому в нашем примере этот оператор <TT
+CLASS="COMMAND"
+>INSERT</TT
+> не выполнится: </P><PRE
+CLASS="PROGRAMLISTING"
+>INSERT INTO cities (name, population, altitude, state)
+VALUES ('New York', NULL, NULL, 'NY');</PRE
+><P> Мы могли надеяться на то, что данные каким-то образом попадут в таблицу <TT
+CLASS="STRUCTNAME"
+>capitals</TT
+>, но этого не происходит: <TT
+CLASS="COMMAND"
+>INSERT</TT
+> всегда вставляет данные непосредственно в указанную таблицу. В некоторых случаях добавляемые данные можно перенаправлять, используя правила (см. <A
+HREF="rules.html"
+>Главу 38</A
+>). Однако в нашем случае это не поможет, так как таблица <TT
+CLASS="STRUCTNAME"
+>cities</TT
+> не содержит колонки <TT
+CLASS="STRUCTFIELD"
+>state</TT
+> и команда будет отвергнута до применения правила.</P
+><P
+>Дочерние таблицы автоматически наследуют от родительской таблицы ограничения-проверки и ограничения NOT NULL. Все остальные ограничения (уникальности, первичный ключ и внешние ключи) не наследуются.</P
+><P
+>Таблица может наследоваться от нескольких родительских таблиц, в этом случае она будет объединять в себе все колонки этих таблиц, а также колонки, описанные непосредственно в её определении. Если в определениях родительских и дочерней таблиц встретятся колонки с одним именем, эти колонки будут <SPAN
+CLASS="QUOTE"
+>"объединены"</SPAN
+>, так что в дочерней таблице окажется только одна колонка. Чтобы такое объединение было возможно, колонки должны иметь одинаковый тип данных, в противном случае произойдёт ошибка. В определении объединённой колонки будут собраны все ограничения-проверки объединяемых колонок, а также ограничение NOT NULL, если оно было задано для них.</P
+><P
+>Отношение наследования между таблицами обычно устанавливается при создании дочерней таблицы с использованием предложения <TT
+CLASS="LITERAL"
+>INHERITS</TT
+> оператора <A
+HREF="sql-createtable.html"
+>CREATE TABLE</A
+>. Другой способ добавить такое отношение для таблицы, определённой подходящим образом &mdash; использовать <TT
+CLASS="LITERAL"
+>INHERIT</TT
+> с оператором <A
+HREF="sql-altertable.html"
+>ALTER TABLE</A
+>. Для этого будущая дочерняя таблица должна уже включать те же колонки (с совпадающими именами и типами), что и родительская таблица. Также она должна включать аналогичные ограничения-проверки (с теми же именами и выражениями). Удалить отношение наследования можно с помощью указания <TT
+CLASS="LITERAL"
+>NO INHERIT</TT
+> оператора <TT
+CLASS="COMMAND"
+>ALTER TABLE</TT
+>. Динамическое добавление и удаление отношений наследования может быть полезно при реализации секционирования таблиц (см. <A
+HREF="ddl-partitioning.html"
+>Раздел 5.9</A
+>).</P
+><P
+>Для создания таблицы, которая затем может стать наследником другой, удобно воспользоваться предложением <TT
+CLASS="LITERAL"
+>LIKE</TT
+> оператора <TT
+CLASS="COMMAND"
+>CREATE TABLE</TT
+>. Такая команда создаст новую таблицу с теми же колонками, что и исходная. Если в исходной таблицы определены ограничения <TT
+CLASS="LITERAL"
+>CHECK</TT
+>, для создания полностью совместимой таблицы их тоже нужно скопировать, и это можно сделать, добавив к предложению <TT
+CLASS="LITERAL"
+>LIKE</TT
+> параметр <TT
+CLASS="LITERAL"
+>INCLUDING CONSTRAINTS</TT
+>.</P
+><P
+>Родительскую таблицу нельзя удалить, пока существуют унаследованные от неё. Так же как в дочерних таблицах нельзя удалять или модифицировать колонки или ограничения-проверки, унаследованные от родительских таблиц. Если вы хотите удалить таблицу вместе со всеми её потомками, это легко сделать, добавив в команду удаления родительской таблицы параметр <TT
+CLASS="LITERAL"
+>CASCADE</TT
+>.</P
+><P
+>При изменениях определений и ограничений колонок команда <A
+HREF="sql-altertable.html"
+>ALTER TABLE</A
+> распространяет эти изменения вниз в иерархии наследования. Однако удалить колонки, унаследованные дочерними таблицами, можно только с помощью параметра <TT
+CLASS="LITERAL"
+>CASCADE</TT
+>. При создании отношений наследования команда <TT
+CLASS="COMMAND"
+>ALTER TABLE</TT
+> следует тем же правилам объединения дублирующихся колонок, что и <TT
+CLASS="COMMAND"
+>CREATE TABLE</TT
+>.</P
+><P
+>Обратите внимание на ситуацию с правами доступа. При запросе к родительской таблице данные всех дочерних таблиц будут возвращены без дополнительной проверки прав. Так создаётся представление, что эти данные (тоже) находятся в родительской таблице. Однако права не распространяются автоматически на все дочерние таблицы, и поэтому для обращения к ним права доступа должны назначаться отдельно.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="DDL-INHERIT-CAVEATS"
+>5.8.1. Ограничения</A
+></H2
+><P
+>Заметьте, что не все SQL-команды могут работать с иерархиями наследования. Команды, выполняющие выборку данных, изменение данных или модификацию схемы (например <TT
+CLASS="LITERAL"
+>SELECT</TT
+>, <TT
+CLASS="LITERAL"
+>UPDATE</TT
+>, <TT
+CLASS="LITERAL"
+>DELETE</TT
+>, большинство вариантов <TT
+CLASS="LITERAL"
+>ALTER TABLE</TT
+>, но не <TT
+CLASS="LITERAL"
+>INSERT</TT
+> и <TT
+CLASS="LITERAL"
+>ALTER TABLE ... RENAME</TT
+>), обычно по умолчанию обрабатывают данные дочерних таблиц и могут исключать их, если поддерживают указание <TT
+CLASS="LITERAL"
+>ONLY</TT
+>. Команды для обслуживания и настройки базы данных (например <TT
+CLASS="LITERAL"
+>REINDEX</TT
+> и <TT
+CLASS="LITERAL"
+>VACUUM</TT
+>) обычно работают только с отдельными физическими таблицами и не поддерживают рекурсивную обработку отношений наследования. Соответствующее поведение каждой команды описано в её справке (<A
+HREF="sql-commands.html"
+>Ссылка I, <I
+>Команды SQL</I
+></A
+>).</P
+><P
+>Возможности наследования серьёзно ограничены тем, что индексы (включая ограничения уникальности) и ограничения внешних ключей относятся только к отдельным таблицам, но не к их потомкам. Это касается обеих сторон ограничений внешних ключей. Таким образом, применительно к нашему примеру: <P
+></P
+></P><UL
+><LI
+><P
+>Если мы объявим <TT
+CLASS="STRUCTNAME"
+>cities</TT
+>.<TT
+CLASS="STRUCTFIELD"
+>name</TT
+> с ограничением <TT
+CLASS="LITERAL"
+>UNIQUE</TT
+> или <TT
+CLASS="LITERAL"
+>PRIMARY KEY</TT
+>, это не помешает добавить в таблицу <TT
+CLASS="STRUCTNAME"
+>capitals</TT
+> строки с названиями городов, уже существующими в таблице <TT
+CLASS="STRUCTNAME"
+>cities</TT
+>. И эти дублирующиеся строки по умолчанию будут выводиться в результате запросов к <TT
+CLASS="STRUCTNAME"
+>cities</TT
+>. На деле таблица <TT
+CLASS="STRUCTNAME"
+>capitals</TT
+> по умолчанию вообще не будет содержать ограничение уникальности, так что в ней могут оказаться несколько строк с одним названием. Хотя вы можете добавить в <TT
+CLASS="STRUCTNAME"
+>capitals</TT
+> соответствующее ограничение, но это не предотвратит дублирование при объединении с <TT
+CLASS="STRUCTNAME"
+>cities</TT
+>.</P
+></LI
+><LI
+><P
+>Подобным образом, если мы укажем, что <TT
+CLASS="STRUCTNAME"
+>cities</TT
+>.<TT
+CLASS="STRUCTFIELD"
+>name</TT
+> ссылается (<TT
+CLASS="LITERAL"
+>REFERENCES</TT
+>) на какую-то другую таблицу, это ограничение не будет автоматически распространено на <TT
+CLASS="STRUCTNAME"
+>capitals</TT
+>. В этом случае решением может стать явное добавление такого же ограничения <TT
+CLASS="LITERAL"
+>REFERENCES</TT
+> в таблицу <TT
+CLASS="STRUCTNAME"
+>capitals</TT
+>.</P
+></LI
+><LI
+><P
+>Если вы сделаете, чтобы колонка другой таблицы ссылалась на <TT
+CLASS="LITERAL"
+>cities(name)</TT
+>, в этой колонке можно будет указывать только названия городов, но не столиц. В этом случае хорошего решения нет.</P
+></LI
+></UL
+><P> Возможно, в будущем эти недостатки будут исправлены, но в настоящее время вам следует тщательно взвесить все за и против, прежде чем использовать наследование в своих приложениях.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ddl-schemas.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ddl-partitioning.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Схемы</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ddl.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Секционирование</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

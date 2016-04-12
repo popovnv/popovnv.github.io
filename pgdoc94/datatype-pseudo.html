@@ -1,0 +1,424 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Псевдотипы</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Типы данных"
+HREF="datatype.html"><LINK
+REL="PREVIOUS"
+TITLE="          Тип pg_lsn
+        "
+HREF="datatype-pg-lsn.html"><LINK
+REL="NEXT"
+TITLE="Функции и операторы"
+HREF="functions.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="          Тип pg_lsn
+        "
+HREF="datatype-pg-lsn.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="datatype.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 8. Типы данных</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Функции и операторы"
+HREF="functions.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="DATATYPE-PSEUDO"
+>8.20. Псевдотипы</A
+></H1
+><P
+>В систему типов <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> включены несколько специальных элементов, которые в совокупности называются <I
+CLASS="FIRSTTERM"
+>псевдотипами</I
+>. Псевдотип нельзя использовать в качестве типа данных колонки, но можно объявить функцию с аргументом или результатом такого типа. Каждый из существующих псевдотипов полезен в ситуациях, когда характер функции не позволяет просто получить или вернуть определённый тип данных <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>. Все существующие псевдотипы перечислены в <A
+HREF="datatype-pseudo.html#DATATYPE-PSEUDOTYPES-TABLE"
+>Таблице 8-25</A
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="DATATYPE-PSEUDOTYPES-TABLE"
+></A
+><P
+><B
+>Таблица 8-25. Псевдотипы</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>any</TT
+>
+                </TD
+><TD
+>Указывает, что функция принимает любой вводимый тип данных.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>anyelement</TT
+>
+                </TD
+><TD
+>Указывает, что функция принимает любой тип данных (см. <A
+HREF="extend-type-system.html#EXTEND-TYPES-POLYMORPHIC"
+>Подраздел 35.2.5</A
+>).</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>anyarray</TT
+>
+                </TD
+><TD
+>Указывает, что функция принимает любой тип массива (см. <A
+HREF="extend-type-system.html#EXTEND-TYPES-POLYMORPHIC"
+>Подраздел 35.2.5</A
+>).</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>anynonarray</TT
+>
+                </TD
+><TD
+>Указывает, что функция принимает любой тип данных, кроме массивов (см. <A
+HREF="extend-type-system.html#EXTEND-TYPES-POLYMORPHIC"
+>Подраздел 35.2.5</A
+>).</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>anyenum</TT
+>
+                </TD
+><TD
+>Указывает, что функция принимает любое перечисление (см. <A
+HREF="extend-type-system.html#EXTEND-TYPES-POLYMORPHIC"
+>Подраздел 35.2.5</A
+> и <A
+HREF="datatype-enum.html"
+>Раздел 8.7</A
+>).</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>anyrange</TT
+>
+                </TD
+><TD
+>Указывает, что функция принимает любой диапазонный тип данных (см. <A
+HREF="extend-type-system.html#EXTEND-TYPES-POLYMORPHIC"
+>Подраздел 35.2.5</A
+> и <A
+HREF="rangetypes.html"
+>Раздел 8.17</A
+>).</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>cstring</TT
+>
+                </TD
+><TD
+>Указывает, что функция принимает или возвращает строку в стиле C.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>internal</TT
+>
+                </TD
+><TD
+>Указывает, что функция принимает или возвращает внутренний серверный тип данных.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>language_handler</TT
+>
+                </TD
+><TD
+>Обработчик процедурного языка объявляется как возвращающий тип <TT
+CLASS="TYPE"
+>language_handler</TT
+>.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>fdw_handler</TT
+>
+                </TD
+><TD
+>Обработчик обёртки сторонних данных объявляется как возвращающий тип <TT
+CLASS="TYPE"
+>fdw_handler</TT
+>.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>record</TT
+>
+                </TD
+><TD
+>Указывает функцию, возвращающую неопределённый тип строки.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>trigger</TT
+>
+                </TD
+><TD
+>Триггерная функция объявляется как возвращающая тип <TT
+CLASS="TYPE"
+>trigger</TT
+>.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>void</TT
+>
+                </TD
+><TD
+>Указывает, что функция не возвращает значение.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="TYPE"
+>opaque</TT
+>
+                </TD
+><TD
+>Устаревший тип, который раньше использовался во всех вышеперечисленных случаях.</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Функции, написанные на языке C (встроенные или динамически загружаемые), могут быть объявлены с параметрами или результатами любого из этих типов. Ответственность за безопасное поведение функции с аргументами таких типов ложится на разработчика функции.</P
+><P
+>Функции, написанные на процедурных языках, могут использовать псевдотипы, только если это позволяет соответствующий язык. В настоящее время все процедурные языки запрещают использовать псевдотипы в качестве типа аргумента и позволяют использовать для результатов только типы <TT
+CLASS="TYPE"
+>void</TT
+> и <TT
+CLASS="TYPE"
+>record</TT
+> (и <TT
+CLASS="TYPE"
+>trigger</TT
+>, когда функция работает как триггер). Некоторые языки также поддерживают полиморфные функции с типами <TT
+CLASS="TYPE"
+>anyelement</TT
+>, <TT
+CLASS="TYPE"
+>anyarray</TT
+>, <TT
+CLASS="TYPE"
+>anynonarray</TT
+>, <TT
+CLASS="TYPE"
+>anyenum</TT
+> и <TT
+CLASS="TYPE"
+>anyrange</TT
+>.</P
+><P
+>Псевдотип <TT
+CLASS="TYPE"
+>internal</TT
+> используется в объявлениях функций, предназначенных только для внутреннего использования в СУБД, но не для прямого вызова в запросах <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>. Если у функции есть как хотя бы один аргумент типа <TT
+CLASS="TYPE"
+>internal</TT
+>, её нельзя будет вызывать из <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>. Чтобы сохранить типобезопасность при таком ограничении, следуйте важному правилу: не создавайте функцию, возвращающую результат типа <TT
+CLASS="TYPE"
+>internal</TT
+>, если у неё нет ни одного аргумента <TT
+CLASS="TYPE"
+>internal</TT
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="datatype-pg-lsn.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><ACRONYM
+CLASS="ACRONYM"
+>Тип pg_lsn</ACRONYM
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="datatype.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Функции и операторы</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

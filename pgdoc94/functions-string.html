@@ -1,0 +1,5941 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Строковые функции и операторы</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Функции и операторы"
+HREF="functions.html"><LINK
+REL="PREVIOUS"
+TITLE="Математические функции и операторы"
+HREF="functions-math.html"><LINK
+REL="NEXT"
+TITLE="Функции и операторы двоичных строк"
+HREF="functions-binarystring.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Математические функции и операторы"
+HREF="functions-math.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 9. Функции и операторы</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Функции и операторы двоичных строк"
+HREF="functions-binarystring.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="FUNCTIONS-STRING"
+>9.4. Строковые функции и операторы</A
+></H1
+><P
+>В этом разделе описаны функции и операторы для работы с текстовыми строками. Под строками в данном контексте подразумеваются значения типов <TT
+CLASS="TYPE"
+>character</TT
+>, <TT
+CLASS="TYPE"
+>character varying</TT
+> и <TT
+CLASS="TYPE"
+>text</TT
+>. Если не отмечено обратное, все нижеперечисленные функции работают со всеми этими типами, хотя с типом <TT
+CLASS="TYPE"
+>character</TT
+> следует учитывать возможные эффекты автоматического дополнения строк пробелами. Некоторые из этих функций также поддерживают битовые строки.</P
+><P
+>В <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> определены несколько строковых функций, в которых аргументы разделяются не запятыми, а ключевыми словами. Они перечислены в <A
+HREF="functions-string.html#FUNCTIONS-STRING-SQL"
+>Таблице 9-6</A
+>. <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> также предоставляет варианты этих функций с синтаксисом, обычным для функций (см. <A
+HREF="functions-string.html#FUNCTIONS-STRING-OTHER"
+>Таблицу 9-7</A
+>).</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>До версии 8.3 в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> эти функции также прозрачно принимали значения некоторых не строковых типов, неявно приводя эти значения к типу <TT
+CLASS="TYPE"
+>text</TT
+>. Сейчас такие приведения исключены, так как они часто приводили к неожиданным результатам. Однако оператор конкатенации строк (<TT
+CLASS="LITERAL"
+>||</TT
+>) по-прежнему принимает не только строковые данные, если хотя бы один аргумент имеет строковый тип, как показано в <A
+HREF="functions-string.html#FUNCTIONS-STRING-SQL"
+>Таблице 9-6</A
+>. Во всех остальных случаях для повторения предыдущего поведения потребуется добавить явное преобразование в <TT
+CLASS="TYPE"
+>text</TT
+>.</P
+></BLOCKQUOTE
+></DIV
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-STRING-SQL"
+></A
+><P
+><B
+>Таблица 9-6. Строковые функции и операторы языка <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Функция</TH
+><TH
+>Тип результата</TH
+><TH
+>Описание</TH
+><TH
+>Пример</TH
+><TH
+>Результат</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+><TT
+CLASS="PARAMETER"
+>string</TT
+> <TT
+CLASS="LITERAL"
+>||</TT
+>
+        <TT
+CLASS="PARAMETER"
+>string</TT
+></TT
+>
+                </TD
+><TD
+> <TT
+CLASS="TYPE"
+>text</TT
+> </TD
+><TD
+>Конкатенация строк </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'Post' || 'greSQL'</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>PostgreSQL</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><TT
+CLASS="PARAMETER"
+>string</TT
+> <TT
+CLASS="LITERAL"
+>||</TT
+>
+        <TT
+CLASS="PARAMETER"
+>не string</TT
+></TT
+> или <TT
+CLASS="LITERAL"
+><TT
+CLASS="PARAMETER"
+>не string</TT
+> <TT
+CLASS="LITERAL"
+>||</TT
+>
+        <TT
+CLASS="PARAMETER"
+>string</TT
+></TT
+></TD
+><TD
+> <TT
+CLASS="TYPE"
+>text</TT
+> </TD
+><TD
+>Конкатенация строк с одним не строковым операндом</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'Value: ' || 42</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>Value: 42</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>bit_length(​<TT
+CLASS="PARAMETER"
+>string</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int</TT
+>
+                </TD
+><TD
+>Число бит в строке</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>bit_length(​'jose')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>32</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>char_length(​<TT
+CLASS="PARAMETER"
+>string</TT
+>)</CODE
+></TT
+> или <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>character_​length(​<TT
+CLASS="PARAMETER"
+>string</TT
+>)</CODE
+></TT
+></TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int</TT
+>
+                </TD
+><TD
+>Число символов в строке </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>char_length(​'jose')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>4</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>lower(<TT
+CLASS="PARAMETER"
+>string</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Переводит символы строки в нижний регистр</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>lower('TOM')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>tom</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>octet_length(​<TT
+CLASS="PARAMETER"
+>string</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int</TT
+>
+                </TD
+><TD
+>Число байт в строке</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>octet_length(​'jose')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>4</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>overlay(<TT
+CLASS="PARAMETER"
+>string</TT
+> placing <TT
+CLASS="PARAMETER"
+>string</TT
+> from <TT
+CLASS="TYPE"
+>int</TT
+> [<SPAN
+CLASS="OPTIONAL"
+>for <TT
+CLASS="TYPE"
+>int</TT
+></SPAN
+>])</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Заменяет подстроку</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>overlay(​'Txxxxas' placing 'hom' from 2 for 4)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>Thomas</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>position(​<TT
+CLASS="PARAMETER"
+>substring</TT
+> in <TT
+CLASS="PARAMETER"
+>string</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int</TT
+>
+                </TD
+><TD
+>Положение указанной подстроки</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>position(​'om' in 'Thomas')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>3</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>substring(​<TT
+CLASS="PARAMETER"
+>string</TT
+> [<SPAN
+CLASS="OPTIONAL"
+>from <TT
+CLASS="TYPE"
+>int</TT
+></SPAN
+>] [<SPAN
+CLASS="OPTIONAL"
+>for <TT
+CLASS="TYPE"
+>int</TT
+></SPAN
+>])</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Извлекает подстроку</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>substring(​'Thomas' from 2 for 3)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>hom</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>substring(​<TT
+CLASS="PARAMETER"
+>string</TT
+> from <TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Извлекает подстроку, соответствующую регулярному выражению в стиле POSIX. Подробно шаблоны описаны в <A
+HREF="functions-matching.html"
+>Разделе 9.7</A
+>.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>substring(​'Thomas' from '...$')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>mas</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>substring(​<TT
+CLASS="PARAMETER"
+>string</TT
+> from <TT
+CLASS="REPLACEABLE"
+><I
+>шаблон</I
+></TT
+> for <TT
+CLASS="REPLACEABLE"
+><I
+>спецсимвол</I
+></TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Извлекает подстроку, соответствующую регулярному выражению в стиле <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>. Подробно шаблоны описаны в <A
+HREF="functions-matching.html"
+>Разделе 9.7</A
+>.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>substring(​'Thomas' from '%#"o_a#"_' for '#')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>oma</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>trim(​[<SPAN
+CLASS="OPTIONAL"
+>leading | trailing | both</SPAN
+>]
+        [<SPAN
+CLASS="OPTIONAL"
+><TT
+CLASS="PARAMETER"
+>characters</TT
+></SPAN
+>] from <TT
+CLASS="PARAMETER"
+>string</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Удаляет наибольшую подстроку, содержащую только символы <TT
+CLASS="PARAMETER"
+>characters</TT
+> (по умолчанию пробелы), с начала, с конца или с обеих сторон строки <TT
+CLASS="PARAMETER"
+>string</TT
+></TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>trim(​both 'x' from 'xTomxx')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>Tom</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>        <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>trim([<SPAN
+CLASS="OPTIONAL"
+>leading | trailing | both</SPAN
+>] [<SPAN
+CLASS="OPTIONAL"
+>from</SPAN
+>]
+        <TT
+CLASS="PARAMETER"
+>string</TT
+>
+        [<SPAN
+CLASS="OPTIONAL"
+><TT
+CLASS="PARAMETER"
+>, characters</TT
+></SPAN
+>] )</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Нестандартная версия <CODE
+CLASS="FUNCTION"
+>trim()</CODE
+></TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>trim(​both from 'xTomxx', 'x')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>Tom</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>upper(<TT
+CLASS="PARAMETER"
+>string</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Переводит символы строки в верхний регистр</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>upper('tom')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>TOM</TT
+>
+                </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Кроме этого, в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> есть и другие функции для работы со строками, перечисленные в <A
+HREF="functions-string.html#FUNCTIONS-STRING-OTHER"
+>Таблице 9-7</A
+>. Некоторые из них используются в качестве внутренней реализации стандартных строковых функций <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>, приведённых в <A
+HREF="functions-string.html#FUNCTIONS-STRING-SQL"
+>Таблице 9-6</A
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-STRING-OTHER"
+></A
+><P
+><B
+>Таблица 9-7. Другие строковые функции</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Функция</TH
+><TH
+>Тип результата</TH
+><TH
+>Описание</TH
+><TH
+>Пример</TH
+><TH
+>Результат</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>ascii(<TT
+CLASS="PARAMETER"
+>string</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int</TT
+>
+                </TD
+><TD
+>Возвращает <ACRONYM
+CLASS="ACRONYM"
+>ASCII</ACRONYM
+>-код первого символа аргумента. Для <ACRONYM
+CLASS="ACRONYM"
+>UTF8</ACRONYM
+> возвращает код символа в Unicode. Для других многобайтных кодировок аргумент должен быть <ACRONYM
+CLASS="ACRONYM"
+>ASCII</ACRONYM
+>-символом.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>ascii('x')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>120</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>btrim(​<TT
+CLASS="PARAMETER"
+>string</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>
+        [<SPAN
+CLASS="OPTIONAL"
+>, <TT
+CLASS="PARAMETER"
+>characters</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+></SPAN
+>])</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Удаляет наибольшую подстроку, состоящую только из символов <TT
+CLASS="PARAMETER"
+>characters</TT
+> (по умолчанию пробелов), с начала и с конца строки <TT
+CLASS="PARAMETER"
+>string</TT
+></TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>btrim(​'xyxtrimyyx', 'xy')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>trim</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>chr(<TT
+CLASS="TYPE"
+>int</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Возвращает символ с данным кодом. Для <ACRONYM
+CLASS="ACRONYM"
+>UTF8</ACRONYM
+> аргумент воспринимается как код символа Unicode, а для других кодировок он должен указывать на <ACRONYM
+CLASS="ACRONYM"
+>ASCII</ACRONYM
+>-символ. Код 0 (NULL) не допускается, так как байты с нулевым кодом в текстовых строках сохранить нельзя.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>chr(65)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>A</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>concat(​<TT
+CLASS="PARAMETER"
+>str</TT
+> <TT
+CLASS="TYPE"
+>"any"</TT
+> [, <TT
+CLASS="PARAMETER"
+>str</TT
+> <TT
+CLASS="TYPE"
+>"any"</TT
+> [, ...] ])</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Соединяет текстовые представления всех аргументов, игнорируя NULL.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>concat(​'abcde', 2, NULL, 22)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>abcde222</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>concat_ws(​<TT
+CLASS="PARAMETER"
+>sep</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>, <TT
+CLASS="PARAMETER"
+>str</TT
+> <TT
+CLASS="TYPE"
+>"any"</TT
+> [, <TT
+CLASS="PARAMETER"
+>str</TT
+> <TT
+CLASS="TYPE"
+>"any"</TT
+> [, ...] ])</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Соединяет все аргументы, кроме первого, через разделитель, игнорируя аргументы NULL. Разделитель указывается в первом аргументе.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>concat_ws(​',', 'abcde', 2, NULL, 22)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>abcde,2,22</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>convert(​<TT
+CLASS="PARAMETER"
+>string</TT
+> <TT
+CLASS="TYPE"
+>bytea</TT
+>, <TT
+CLASS="PARAMETER"
+>src_encoding</TT
+> <TT
+CLASS="TYPE"
+>name</TT
+>, <TT
+CLASS="PARAMETER"
+>dest_encoding</TT
+> <TT
+CLASS="TYPE"
+>name</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bytea</TT
+>
+                </TD
+><TD
+>Преобразует строку <TT
+CLASS="PARAMETER"
+>string</TT
+> из кодировки <TT
+CLASS="PARAMETER"
+>src_encoding</TT
+> в <TT
+CLASS="PARAMETER"
+>dest_encoding</TT
+>. Переданная строка должна быть допустимой для исходной кодировки. Преобразования могут быть определены с помощью <TT
+CLASS="COMMAND"
+>CREATE CONVERSION</TT
+>. Все встроенные преобразования перечислены в <A
+HREF="functions-string.html#CONVERSION-NAMES"
+>Таблице 9-8</A
+>.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>convert(​'text_in_utf8'​, 'UTF8', 'LATIN1')</TT
+>
+                </TD
+><TD
+>строка <TT
+CLASS="LITERAL"
+>text_in_utf8</TT
+>, представленная в кодировке Latin-1 (ISO 8859-1)</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>convert_from(​<TT
+CLASS="PARAMETER"
+>string</TT
+> <TT
+CLASS="TYPE"
+>bytea</TT
+>, <TT
+CLASS="PARAMETER"
+>src_encoding</TT
+> <TT
+CLASS="TYPE"
+>name</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Преобразует строку <TT
+CLASS="PARAMETER"
+>string</TT
+> из кодировки <TT
+CLASS="PARAMETER"
+>src_encoding</TT
+> в кодировку базы данных. Переданная строка должна быть допустимой для исходной кодировки.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>convert_from(​'text_in_utf8'​, 'UTF8')</TT
+>
+                </TD
+><TD
+>строка <TT
+CLASS="LITERAL"
+>text_in_utf8</TT
+>, представленная в кодировке текущей базы данных</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>convert_to(​<TT
+CLASS="PARAMETER"
+>string</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>, <TT
+CLASS="PARAMETER"
+>dest_encoding</TT
+> <TT
+CLASS="TYPE"
+>name</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bytea</TT
+>
+                </TD
+><TD
+>Преобразует строку в кодировку <TT
+CLASS="PARAMETER"
+>dest_encoding</TT
+>.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>convert_to(​'некоторый текст', 'UTF8')</TT
+>
+                </TD
+><TD
+><TT
+CLASS="LITERAL"
+>некоторый текст</TT
+>, представленный в кодировке UTF8</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>decode(​<TT
+CLASS="PARAMETER"
+>string</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>, <TT
+CLASS="PARAMETER"
+>format</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bytea</TT
+>
+                </TD
+><TD
+>Получает двоичные данные из текстового представления в <TT
+CLASS="PARAMETER"
+>string</TT
+>. Значения параметра <TT
+CLASS="PARAMETER"
+>format</TT
+> те же, что и для функции <CODE
+CLASS="FUNCTION"
+>encode</CODE
+>.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>decode(​'MTIzAAE=', 'base64')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>\x3132330001</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>encode(​<TT
+CLASS="PARAMETER"
+>data</TT
+> <TT
+CLASS="TYPE"
+>bytea</TT
+>, <TT
+CLASS="PARAMETER"
+>format</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Переводит двоичные данные в текстовое представление в одном из форматов: <TT
+CLASS="LITERAL"
+>base64</TT
+>, <TT
+CLASS="LITERAL"
+>hex</TT
+>, <TT
+CLASS="LITERAL"
+>escape</TT
+>. Формат <TT
+CLASS="LITERAL"
+>escape</TT
+> преобразует нулевые байты и байты с 1 в старшем бите в восьмеричные последовательности <TT
+CLASS="LITERAL"
+>\nnn</TT
+> и дублирует обратную косую черту.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>encode(​E'123​\\000​\\001', 'base64')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>MTIzAAE=</TT
+>
+                </TD
+></TR
+><TR
+><A
+NAME="FORMAT"
+></A
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>format</CODE
+>(​<TT
+CLASS="PARAMETER"
+>formatstr</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+> [, <TT
+CLASS="PARAMETER"
+>formatarg</TT
+> <TT
+CLASS="TYPE"
+>"any"</TT
+> [, ...] ])</TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Форматирует аргумент в соответствии со строкой формата. Эта функция работает подобно <CODE
+CLASS="FUNCTION"
+>sprintf</CODE
+> в языке C. См. <A
+HREF="functions-string.html#FUNCTIONS-STRING-FORMAT"
+>Подраздел 9.4.1</A
+>.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>format(​'Hello %s, %1$s', 'World')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>Hello World, World</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>initcap(<TT
+CLASS="PARAMETER"
+>string</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Переводит первую букву каждого слова в строке в верхний регистр, а остальные &mdash; в нижний. Словами считаются последовательности алфавитно-цифровых символов, разделённые любыми другими символами.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>initcap(​'hi THOMAS')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>Hi Thomas</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>left(​<TT
+CLASS="PARAMETER"
+>str</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>, <TT
+CLASS="PARAMETER"
+>n</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Возвращает первые <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+> символов в строке. Когда <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+> меньше нуля, возвращаются все символы слева, кроме последних |<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>|.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>left(​'abcde', 2)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>ab</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>length(​<TT
+CLASS="PARAMETER"
+>string</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int</TT
+>
+                </TD
+><TD
+>Число символов в строке <TT
+CLASS="PARAMETER"
+>string</TT
+></TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>length(​'jose')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>4</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>length(​<TT
+CLASS="PARAMETER"
+>string</TT
+> <TT
+CLASS="TYPE"
+>bytea</TT
+>, <TT
+CLASS="PARAMETER"
+>encoding</TT
+> <TT
+CLASS="TYPE"
+>name</TT
+> )</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int</TT
+>
+                </TD
+><TD
+>Число символов, которые содержит строка <TT
+CLASS="PARAMETER"
+>string</TT
+> в заданной кодировке <TT
+CLASS="PARAMETER"
+>encoding</TT
+>. Переданная строка должна быть допустимой в этой кодировке.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>length('jose', 'UTF8')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>4</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>lpad(<TT
+CLASS="PARAMETER"
+>string</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>, <TT
+CLASS="PARAMETER"
+>length</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>
+        [<SPAN
+CLASS="OPTIONAL"
+>, <TT
+CLASS="PARAMETER"
+>fill</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+></SPAN
+>])</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Дополняет строку <TT
+CLASS="PARAMETER"
+>string</TT
+> слева до длины <TT
+CLASS="PARAMETER"
+>length</TT
+> символами <TT
+CLASS="PARAMETER"
+>fill</TT
+> (по умолчанию пробелами). Если длина строки уже больше заданной, она обрезается справа.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>lpad('hi', 5, 'xy')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>xyxhi</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>ltrim(<TT
+CLASS="PARAMETER"
+>string</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>
+        [<SPAN
+CLASS="OPTIONAL"
+>, <TT
+CLASS="PARAMETER"
+>characters</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+></SPAN
+>])</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Удаляет наибольшую подстроку, содержащую только символы <TT
+CLASS="PARAMETER"
+>characters</TT
+> (по умолчанию пробелы), с начала строки <TT
+CLASS="PARAMETER"
+>string</TT
+></TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>ltrim(​'zzzytrim', 'xyz')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>trim</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>md5(<TT
+CLASS="PARAMETER"
+>string</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Вычисляет MD5-хеш строки <TT
+CLASS="PARAMETER"
+>string</TT
+> и возвращает результат в 16-ричном виде</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>md5('abc')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>90015098​3cd24fb0 d6963f7d​28e17f72</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>pg_client_​encoding()</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>name</TT
+>
+                </TD
+><TD
+>Возвращает имя текущей клиентской кодировки</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>pg_client_​encoding()</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>SQL_ASCII</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>quote_ident(​<TT
+CLASS="PARAMETER"
+>string</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Переданная строка оформляется для использования в качестве идентификатора в <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> -операторе. При необходимости идентификатор заключается в кавычки (например, если он содержит символы, недопустимые в открытом виде, или буквы в разном регистре). Если переданная строка содержит кавычки, они дублируются. См. также <A
+HREF="plpgsql-statements.html#PLPGSQL-QUOTE-LITERAL-EXAMPLE"
+>Пример 40-1</A
+>.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>quote_ident(​'Foo bar')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>"Foo bar"</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>quote_literal(​<TT
+CLASS="PARAMETER"
+>string</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Переданная строка оформляется для использования в качестве текстовой строки в <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>-операторе. Включённые символы апостроф и обратная косая черта при этом дублируются. Заметьте, что <CODE
+CLASS="FUNCTION"
+>quote_literal</CODE
+> возвращает NULL, когда на вход ей передаётся строка NULL; если же нужно получить представление и такого аргумента, лучше использовать <CODE
+CLASS="FUNCTION"
+>quote_nullable</CODE
+>. См. также <A
+HREF="plpgsql-statements.html#PLPGSQL-QUOTE-LITERAL-EXAMPLE"
+>Пример 40-1</A
+>.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>quote_literal(​E'O\'Reilly')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'O''Reilly'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>quote_literal(​<TT
+CLASS="PARAMETER"
+>value</TT
+> <TT
+CLASS="TYPE"
+>anyelement</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Переводит данное значение в текстовый вид и заключает в апострофы как текстовую строку. Символы апостроф и обратная косая черта при этом дублируются.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>quote_literal(​42.5)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'42.5'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>quote_nullable(​<TT
+CLASS="PARAMETER"
+>string</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Переданная строка оформляется для использования в качестве текстовой строки в <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>-операторе; при этом для аргумента NULL возвращается строка <TT
+CLASS="LITERAL"
+>NULL</TT
+>. Символы апостроф и обратная косая черта дублируются должным образом. См. также <A
+HREF="plpgsql-statements.html#PLPGSQL-QUOTE-LITERAL-EXAMPLE"
+>Пример 40-1</A
+>.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>quote_nullable(​NULL)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>NULL</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>                    <CODE
+CLASS="FUNCTION"
+>quote_nullable(​<TT
+CLASS="PARAMETER"
+>value</TT
+> <TT
+CLASS="TYPE"
+>anyelement</TT
+>)</CODE
+>
+                  </TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Переводит данное значение в текстовый вид и заключает в апострофы как текстовую строку, при этом для аргумента NULL возвращается строка <TT
+CLASS="LITERAL"
+>NULL</TT
+>. Символы апостроф и обратная косая черта дублируются должным образом.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>quote_nullable(​42.5)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>'42.5'</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>regexp_matches​(​<TT
+CLASS="PARAMETER"
+>string</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>, <TT
+CLASS="PARAMETER"
+>pattern</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+> [, <TT
+CLASS="PARAMETER"
+>flags</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>])</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>setof text[]</TT
+>
+                </TD
+><TD
+>Возвращает все подходящие подстроки, полученные в результате применения регулярного выражения в стиле POSIX к <TT
+CLASS="PARAMETER"
+>string</TT
+>. Подробности описаны в <A
+HREF="functions-matching.html#FUNCTIONS-POSIX-REGEXP"
+>Подразделе 9.7.3</A
+>.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>regexp_matches​(​'foobar​bequebaz', '(bar)(beque)')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>{bar,beque}</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>regexp_replace​(​<TT
+CLASS="PARAMETER"
+>string</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>, <TT
+CLASS="PARAMETER"
+>pattern</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>, <TT
+CLASS="PARAMETER"
+>replacement</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+> [, <TT
+CLASS="PARAMETER"
+>flags</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>])</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Заменяет подстроки, соответствующие заданному регулярному выражению в стиле POSIX. Подробности описаны в <A
+HREF="functions-matching.html#FUNCTIONS-POSIX-REGEXP"
+>Подразделе 9.7.3</A
+>.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>regexp_replace(​'Thomas', '.[mN]a.', 'M')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>ThM</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>regexp_split_​to_array(​<TT
+CLASS="PARAMETER"
+>string</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>, <TT
+CLASS="PARAMETER"
+>pattern</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+> [, <TT
+CLASS="PARAMETER"
+>flags</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+> ])</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text[]</TT
+>
+                </TD
+><TD
+>Разделяет содержимое <TT
+CLASS="PARAMETER"
+>string</TT
+> на элементы, используя в качестве разделителя регулярное выражение POSIX. Подробности описаны в <A
+HREF="functions-matching.html#FUNCTIONS-POSIX-REGEXP"
+>Подразделе 9.7.3</A
+>.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>regexp_split_​to_array(​'hello world', E'\\s+')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>{hello,world}</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>regexp_split_​to_table(​<TT
+CLASS="PARAMETER"
+>string</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>, <TT
+CLASS="PARAMETER"
+>pattern</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+> [, <TT
+CLASS="PARAMETER"
+>flags</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>])</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>setof text</TT
+>
+                </TD
+><TD
+>Разделяет содержимое <TT
+CLASS="PARAMETER"
+>string</TT
+> на элементы, используя в качестве разделителя регулярное выражение POSIX. Подробности описаны в <A
+HREF="functions-matching.html#FUNCTIONS-POSIX-REGEXP"
+>Подразделе 9.7.3</A
+>.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>regexp_split_​to_table(​'hello world', E'\\s+')</TT
+>
+                </TD
+><TD
+><TT
+CLASS="LITERAL"
+>hello</TT
+> <P
+><TT
+CLASS="LITERAL"
+>world</TT
+></P
+> (2 строки)</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>repeat(​<TT
+CLASS="PARAMETER"
+>string</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>, <TT
+CLASS="PARAMETER"
+>number</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Повторяет содержимое <TT
+CLASS="PARAMETER"
+>string</TT
+> указанное число (<TT
+CLASS="PARAMETER"
+>number</TT
+>) раз</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>repeat(​'Pg', 4)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>PgPgPgPg</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>replace(​<TT
+CLASS="PARAMETER"
+>string</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>, <TT
+CLASS="PARAMETER"
+>from</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>, <TT
+CLASS="PARAMETER"
+>to</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Заменяет все вхождения в <TT
+CLASS="PARAMETER"
+>string</TT
+> подстроки <TT
+CLASS="PARAMETER"
+>from</TT
+> подстрокой <TT
+CLASS="PARAMETER"
+>to</TT
+></TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>replace(​'abcdefabcdef', 'cd', 'XX')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>abXXefabXXef</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>reverse(​<TT
+CLASS="PARAMETER"
+>str</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Возвращает перевёрнутую строку</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>reverse(​'abcde')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>edcba</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>right(​<TT
+CLASS="PARAMETER"
+>str</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>, <TT
+CLASS="PARAMETER"
+>n</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Возвращает последние <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+> символов в строке. Когда <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+> меньше нуля, возвращаются все символы справа, кроме первых |<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>|.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>right(​'abcde', 2)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>de</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>rpad(<TT
+CLASS="PARAMETER"
+>string</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>, <TT
+CLASS="PARAMETER"
+>length</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>
+        [<SPAN
+CLASS="OPTIONAL"
+>, <TT
+CLASS="PARAMETER"
+>fill</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+></SPAN
+>])</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Дополняет строку <TT
+CLASS="PARAMETER"
+>string</TT
+> справа до длины <TT
+CLASS="PARAMETER"
+>length</TT
+> символами <TT
+CLASS="PARAMETER"
+>fill</TT
+> (по умолчанию пробелами). Если длина строки уже больше заданной, она обрезается.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>rpad(​'hi', 5, 'xy')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>hixyx</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>rtrim(​<TT
+CLASS="PARAMETER"
+>string</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>
+         [<SPAN
+CLASS="OPTIONAL"
+>, <TT
+CLASS="PARAMETER"
+>characters</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+></SPAN
+>])</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Удаляет наибольшую подстроку, содержащую только символы <TT
+CLASS="PARAMETER"
+>characters</TT
+> (по умолчанию пробелы), с конца строки <TT
+CLASS="PARAMETER"
+>string</TT
+></TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>rtrim(​'trimxxxx', 'x')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>trim</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>split_part(​<TT
+CLASS="PARAMETER"
+>string</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>, <TT
+CLASS="PARAMETER"
+>delimiter</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>, <TT
+CLASS="PARAMETER"
+>field</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Разделяет строку <TT
+CLASS="PARAMETER"
+>string</TT
+> по символу <TT
+CLASS="PARAMETER"
+>delimiter</TT
+> и возвращает элемент по заданному номеру (считая с 1)</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>split_part(​'abc~@~def​~@~ghi', '~@~', 2)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>def</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>strpos(​<TT
+CLASS="PARAMETER"
+>string</TT
+>, <TT
+CLASS="PARAMETER"
+>substring</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int</TT
+>
+                </TD
+><TD
+>Возвращает положение указанной подстроки (подобно <TT
+CLASS="LITERAL"
+>position(​<TT
+CLASS="PARAMETER"
+>substring</TT
+> in <TT
+CLASS="PARAMETER"
+>string</TT
+>)</TT
+>, но с другим порядком аргументов)</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>strpos(​'high', 'ig')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>2</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>substr(​<TT
+CLASS="PARAMETER"
+>string</TT
+>, <TT
+CLASS="PARAMETER"
+>from</TT
+> [<SPAN
+CLASS="OPTIONAL"
+>, <TT
+CLASS="PARAMETER"
+>count</TT
+></SPAN
+>])</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Извлекает подстроку (подобно <TT
+CLASS="LITERAL"
+>substring(​<TT
+CLASS="PARAMETER"
+>string</TT
+> from <TT
+CLASS="PARAMETER"
+>from</TT
+> for <TT
+CLASS="PARAMETER"
+>count</TT
+>)</TT
+>)</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>substr(​'alphabet', 3, 2)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>ph</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>to_ascii(<TT
+CLASS="PARAMETER"
+>string</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>
+        [<SPAN
+CLASS="OPTIONAL"
+>, <TT
+CLASS="PARAMETER"
+>encoding</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+></SPAN
+>])</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Преобразует <TT
+CLASS="PARAMETER"
+>string</TT
+> в <ACRONYM
+CLASS="ACRONYM"
+>ASCII</ACRONYM
+> из кодировки <TT
+CLASS="PARAMETER"
+>encoding</TT
+> (​поддерживаются только <TT
+CLASS="LITERAL"
+>LATIN1</TT
+>, <TT
+CLASS="LITERAL"
+>LATIN2</TT
+>, <TT
+CLASS="LITERAL"
+>LATIN9</TT
+> и <TT
+CLASS="LITERAL"
+>WIN1250</TT
+>)</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_ascii(​'Karel')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>Karel</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>to_hex(​<TT
+CLASS="PARAMETER"
+>number</TT
+> <TT
+CLASS="TYPE"
+>int</TT
+> или <TT
+CLASS="TYPE"
+>bigint</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Преобразует число <TT
+CLASS="PARAMETER"
+>number</TT
+> в 16-ричный вид</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>to_hex(​2147483647)</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>7fffffff</TT
+>
+                </TD
+></TR
+><TR
+><TD
+><TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>translate(​<TT
+CLASS="PARAMETER"
+>string</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>, <TT
+CLASS="PARAMETER"
+>from</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>, <TT
+CLASS="PARAMETER"
+>to</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>)</CODE
+></TT
+>
+       </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Заменяет символы в <TT
+CLASS="PARAMETER"
+>string</TT
+>, найденные в наборе <TT
+CLASS="PARAMETER"
+>from</TT
+>, на соответствующие символы в множестве <TT
+CLASS="PARAMETER"
+>to</TT
+>. Если строка <TT
+CLASS="PARAMETER"
+>from</TT
+> длиннее <TT
+CLASS="PARAMETER"
+>to</TT
+>, найденные в исходной строке лишние символы <TT
+CLASS="PARAMETER"
+>from</TT
+> удаляются.</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>translate(​'12345', '143', 'ax')</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>a2x5</TT
+>
+                </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Функции <CODE
+CLASS="FUNCTION"
+>concat</CODE
+>, <CODE
+CLASS="FUNCTION"
+>concat_ws</CODE
+> и <CODE
+CLASS="FUNCTION"
+>format</CODE
+> принимают переменное число аргументов, так что им для объединения или форматирования можно передавать значения в виде массива, помеченного ключевым словом <TT
+CLASS="LITERAL"
+>VARIADIC</TT
+> (см. <A
+HREF="xfunc-sql.html#XFUNC-SQL-VARIADIC-FUNCTIONS"
+>Подраздел 35.4.5</A
+>). Элементы такого массива обрабатываются, как если бы они были обычными аргументами функции. Если вместо массива в соответствующем аргументе передаётся NULL, функции <CODE
+CLASS="FUNCTION"
+>concat</CODE
+> и <CODE
+CLASS="FUNCTION"
+>concat_ws</CODE
+> возвращают NULL, а <CODE
+CLASS="FUNCTION"
+>format</CODE
+> воспринимает NULL как массив нулевого размера.</P
+><P
+>См. также агрегатную функцию <CODE
+CLASS="FUNCTION"
+>string_agg</CODE
+> в <A
+HREF="functions-aggregate.html"
+>Разделе 9.20</A
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="CONVERSION-NAMES"
+></A
+><P
+><B
+>Таблица 9-8. Встроенные преобразования</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя преобразования <A
+NAME="AEN10378"
+HREF="#FTN.AEN10378"
+><SPAN
+CLASS="footnote"
+>[a]</SPAN
+></A
+></TH
+><TH
+>Исходная кодировка</TH
+><TH
+>Целевая кодировка</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>ascii_to_mic</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>SQL_ASCII</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>MULE_INTERNAL</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>ascii_to_utf8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>SQL_ASCII</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>big5_to_euc_tw</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>BIG5</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>EUC_TW</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>big5_to_mic</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>BIG5</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>MULE_INTERNAL</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>big5_to_utf8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>BIG5</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>euc_cn_to_mic</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>EUC_CN</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>MULE_INTERNAL</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>euc_cn_to_utf8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>EUC_CN</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>euc_jp_to_mic</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>EUC_JP</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>MULE_INTERNAL</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>euc_jp_to_sjis</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>EUC_JP</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>SJIS</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>euc_jp_to_utf8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>EUC_JP</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>euc_kr_to_mic</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>EUC_KR</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>MULE_INTERNAL</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>euc_kr_to_utf8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>EUC_KR</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>euc_tw_to_big5</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>EUC_TW</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>BIG5</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>euc_tw_to_mic</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>EUC_TW</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>MULE_INTERNAL</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>euc_tw_to_utf8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>EUC_TW</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>gb18030_to_utf8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>GB18030</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>gbk_to_utf8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>GBK</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>iso_8859_10_to_utf8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>LATIN6</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>iso_8859_13_to_utf8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>LATIN7</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>iso_8859_14_to_utf8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>LATIN8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>iso_8859_15_to_utf8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>LATIN9</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>iso_8859_16_to_utf8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>LATIN10</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>iso_8859_1_to_mic</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>LATIN1</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>MULE_INTERNAL</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>iso_8859_1_to_utf8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>LATIN1</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>iso_8859_2_to_mic</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>LATIN2</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>MULE_INTERNAL</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>iso_8859_2_to_utf8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>LATIN2</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>iso_8859_2_to_​windows_1250</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>LATIN2</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>WIN1250</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>iso_8859_3_to_mic</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>LATIN3</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>MULE_INTERNAL</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>iso_8859_3_to_utf8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>LATIN3</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>iso_8859_4_to_mic</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>LATIN4</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>MULE_INTERNAL</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>iso_8859_4_to_utf8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>LATIN4</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>iso_8859_5_to_koi8_r</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>ISO_8859_5</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>KOI8R</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>iso_8859_5_to_mic</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>ISO_8859_5</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>MULE_INTERNAL</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>iso_8859_5_to_utf8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>ISO_8859_5</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>iso_8859_5_to_​windows_1251</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>ISO_8859_5</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>WIN1251</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>iso_8859_5_to_​windows_866</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>ISO_8859_5</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>WIN866</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>iso_8859_6_to_utf8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>ISO_8859_6</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>iso_8859_7_to_utf8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>ISO_8859_7</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>iso_8859_8_to_utf8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>ISO_8859_8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>iso_8859_9_to_utf8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>LATIN5</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>johab_to_utf8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>JOHAB</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>koi8_r_to_iso_8859_5</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>KOI8R</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>ISO_8859_5</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>koi8_r_to_mic</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>KOI8R</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>MULE_INTERNAL</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>koi8_r_to_utf8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>KOI8R</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>koi8_r_to_windows_1251</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>KOI8R</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>WIN1251</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>koi8_r_to_windows_866</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>KOI8R</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>WIN866</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>koi8_u_to_utf8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>KOI8U</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>mic_to_ascii</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>MULE_INTERNAL</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>SQL_ASCII</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>mic_to_big5</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>MULE_INTERNAL</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>BIG5</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>mic_to_euc_cn</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>MULE_INTERNAL</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>EUC_CN</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>mic_to_euc_jp</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>MULE_INTERNAL</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>EUC_JP</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>mic_to_euc_kr</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>MULE_INTERNAL</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>EUC_KR</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>mic_to_euc_tw</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>MULE_INTERNAL</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>EUC_TW</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>mic_to_iso_8859_1</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>MULE_INTERNAL</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>LATIN1</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>mic_to_iso_8859_2</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>MULE_INTERNAL</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>LATIN2</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>mic_to_iso_8859_3</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>MULE_INTERNAL</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>LATIN3</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>mic_to_iso_8859_4</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>MULE_INTERNAL</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>LATIN4</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>mic_to_iso_8859_5</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>MULE_INTERNAL</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>ISO_8859_5</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>mic_to_koi8_r</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>MULE_INTERNAL</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>KOI8R</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>mic_to_sjis</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>MULE_INTERNAL</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>SJIS</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>mic_to_windows_1250</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>MULE_INTERNAL</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>WIN1250</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>mic_to_windows_1251</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>MULE_INTERNAL</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>WIN1251</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>mic_to_windows_866</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>MULE_INTERNAL</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>WIN866</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>sjis_to_euc_jp</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>SJIS</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>EUC_JP</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>sjis_to_mic</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>SJIS</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>MULE_INTERNAL</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>sjis_to_utf8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>SJIS</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>tcvn_to_utf8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>WIN1258</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>uhc_to_utf8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UHC</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>utf8_to_ascii</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>SQL_ASCII</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>utf8_to_big5</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>BIG5</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>utf8_to_euc_cn</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>EUC_CN</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>utf8_to_euc_jp</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>EUC_JP</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>utf8_to_euc_kr</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>EUC_KR</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>utf8_to_euc_tw</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>EUC_TW</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>utf8_to_gb18030</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>GB18030</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>utf8_to_gbk</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>GBK</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>utf8_to_iso_8859_1</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>LATIN1</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>utf8_to_iso_8859_10</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>LATIN6</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>utf8_to_iso_8859_13</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>LATIN7</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>utf8_to_iso_8859_14</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>LATIN8</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>utf8_to_iso_8859_15</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>LATIN9</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>utf8_to_iso_8859_16</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>LATIN10</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>utf8_to_iso_8859_2</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>LATIN2</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>utf8_to_iso_8859_3</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>LATIN3</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>utf8_to_iso_8859_4</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>LATIN4</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>utf8_to_iso_8859_5</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>ISO_8859_5</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>utf8_to_iso_8859_6</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>ISO_8859_6</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>utf8_to_iso_8859_7</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>ISO_8859_7</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>utf8_to_iso_8859_8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>ISO_8859_8</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>utf8_to_iso_8859_9</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>LATIN5</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>utf8_to_johab</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>JOHAB</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>utf8_to_koi8_r</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>KOI8R</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>utf8_to_koi8_u</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>KOI8U</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>utf8_to_sjis</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>SJIS</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>utf8_to_tcvn</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>WIN1258</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>utf8_to_uhc</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UHC</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>utf8_to_windows_1250</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>WIN1250</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>utf8_to_windows_1251</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>WIN1251</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>utf8_to_windows_1252</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>WIN1252</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>utf8_to_windows_1253</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>WIN1253</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>utf8_to_windows_1254</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>WIN1254</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>utf8_to_windows_1255</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>WIN1255</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>utf8_to_windows_1256</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>WIN1256</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>utf8_to_windows_1257</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>WIN1257</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>utf8_to_windows_866</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>WIN866</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>utf8_to_windows_874</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>WIN874</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>windows_1250_to_​iso_8859_2</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>WIN1250</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>LATIN2</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>windows_1250_to_mic</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>WIN1250</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>MULE_INTERNAL</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>windows_1250_to_utf8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>WIN1250</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>windows_1251_to_​iso_8859_5</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>WIN1251</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>ISO_8859_5</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>windows_1251_to_koi8_r</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>WIN1251</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>KOI8R</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>windows_1251_to_mic</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>WIN1251</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>MULE_INTERNAL</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>windows_1251_to_utf8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>WIN1251</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>windows_1251_to_​windows_866</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>WIN1251</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>WIN866</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>windows_1252_to_utf8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>WIN1252</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>windows_1256_to_utf8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>WIN1256</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>windows_866_to_​iso_8859_5</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>WIN866</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>ISO_8859_5</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>windows_866_to_koi8_r</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>WIN866</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>KOI8R</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>windows_866_to_mic</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>WIN866</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>MULE_INTERNAL</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>windows_866_to_utf8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>WIN866</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>windows_866_to_​windows_1251</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>WIN866</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>WIN</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>windows_874_to_utf8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>WIN874</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>euc_jis_2004_to_utf8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>EUC_JIS_2004</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>utf8_to_euc_jis_2004</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>EUC_JIS_2004</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>shift_jis_2004_to_utf8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>SHIFT_JIS_2004</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>utf8_to_shift_jis_2004</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>UTF8</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>SHIFT_JIS_2004</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>euc_jis_2004_to_​shift_jis_2004</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>EUC_JIS_2004</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>SHIFT_JIS_2004</TT
+>
+                </TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="LITERAL"
+>shift_jis_2004_to_​euc_jis_2004</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>SHIFT_JIS_2004</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>EUC_JIS_2004</TT
+>
+                </TD
+></TR
+></TBODY
+><TR
+><TD
+COLSPAN="3"
+>Примечания:<BR><A
+NAME="FTN.AEN10378"
+>a. </A
+>Имена преобразований следуют стандартной схеме именования. К официальному названию исходной кодировки, в котором все не алфавитно-цифровые символы заменяются подчёркиваниями, добавляется <TT
+CLASS="LITERAL"
+>_to_</TT
+>, а за ним аналогично подготовленное имя целевой кодировки. Таким образом, имена кодировок могут не совпадать буквально с общепринятыми названиями.<BR></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="FUNCTIONS-STRING-FORMAT"
+>9.4.1. <CODE
+CLASS="FUNCTION"
+>format</CODE
+></A
+></H2
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>format</CODE
+> выдаёт текст, отформатированный в соответствии со строкой формата, подобно функции <CODE
+CLASS="FUNCTION"
+>sprintf</CODE
+> в C.</P
+><P
+></P><PRE
+CLASS="SYNOPSIS"
+><CODE
+CLASS="FUNCTION"
+>format</CODE
+>(<TT
+CLASS="PARAMETER"
+>formatstr</TT
+> <TT
+CLASS="TYPE"
+>text</TT
+> [, <TT
+CLASS="PARAMETER"
+>formatarg</TT
+> <TT
+CLASS="TYPE"
+>"any"</TT
+> [, ...] ])</PRE
+><P>
+     <TT
+CLASS="REPLACEABLE"
+><I
+>formatstr</I
+></TT
+> &mdash; строка, определяющая, как будет форматироваться результат. Обычный текст в строке формата непосредственно копируется в результат, за исключением <I
+CLASS="FIRSTTERM"
+>спецификаторов формата</I
+>. Спецификаторы формата представляют собой местозаполнители, определяющие, как должны форматироваться и выводиться в результате аргументы функции. Каждый аргумент <TT
+CLASS="REPLACEABLE"
+><I
+>formatarg</I
+></TT
+> преобразуется в текст по правилам выводам своего типа данных, а затем форматируется и вставляется в результирующую строку согласно спецификаторам формата.</P
+><P
+>Спецификаторы формата предваряются символом <TT
+CLASS="LITERAL"
+>%</TT
+> и имеют форму </P><PRE
+CLASS="SYNOPSIS"
+>%[<TT
+CLASS="REPLACEABLE"
+><I
+>позиция</I
+></TT
+>][<TT
+CLASS="REPLACEABLE"
+><I
+>флаги</I
+></TT
+>][<TT
+CLASS="REPLACEABLE"
+><I
+>ширина</I
+></TT
+>]<TT
+CLASS="REPLACEABLE"
+><I
+>тип</I
+></TT
+></PRE
+><P> Здесь: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>позиция</I
+></TT
+> (необязателен)</DT
+><DD
+><P
+>Строка вида <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>$</TT
+>, где <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+> &mdash; индекс выводимого аргумента. Индекс, равный 1, выбирает первый аргумент после <TT
+CLASS="REPLACEABLE"
+><I
+>formatstr</I
+></TT
+>. Если <TT
+CLASS="REPLACEABLE"
+><I
+>позиция</I
+></TT
+> опускается, по умолчанию используется следующий аргумент по порядку.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>флаги</I
+></TT
+> (необязателен)</DT
+><DD
+><P
+>Дополнительные параметры, управляющие форматированием данного спецификатора. В настоящее время поддерживается только знак минус (<TT
+CLASS="LITERAL"
+>-</TT
+>), который выравнивает результата спецификатора по левому краю. Он работает, только если также определена <TT
+CLASS="REPLACEABLE"
+><I
+>ширина</I
+></TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>ширина</I
+></TT
+> (необязателен)</DT
+><DD
+><P
+>Задаёт <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>минимальное</I
+></SPAN
+> число символов, которое будет занимать результат данного спецификатора. Выводимое значение выравнивается по правой или левой стороне (в зависимости от флага <TT
+CLASS="LITERAL"
+>-</TT
+>) с дополнением необходимым числом пробелов. Если ширина слишком мала, она просто игнорируется, т. е. результат не усекается. Ширину можно обозначить положительным целым, звёздочкой (<TT
+CLASS="LITERAL"
+>*</TT
+>), тогда ширина будет получена из следующего аргумента функции, или строкой вида <TT
+CLASS="LITERAL"
+>*<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>$</TT
+>, тогда ширина будет задаваться в <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>-ом аргументе функции.</P
+><P
+>Если ширина передаётся в аргументе функции, этот аргумент выбирается до аргумента, используемого для спецификатора. Если аргумент ширины отрицательный, результат выравнивается по левой стороне (как если бы был указан флаг <TT
+CLASS="LITERAL"
+>-</TT
+>) в рамках поля длины <CODE
+CLASS="FUNCTION"
+>abs</CODE
+>(<TT
+CLASS="REPLACEABLE"
+><I
+>ширина</I
+></TT
+>).</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>тип</I
+></TT
+> (обязателен)</DT
+><DD
+><P
+>Тип спецификатора определяет преобразование соответствующего выводимого значения. Поддерживаются следующие типы: <P
+></P
+></P><UL
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>s</TT
+> форматирует значение аргумента как простую строку. Значение NULL представляется пустой строкой.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>I</TT
+> обрабатывает значение аргумента как SQL-идентификатор, при необходимости заключая его в кавычки. Значение NULL для такого преобразования считается ошибочным.</P
+></LI
+><LI
+><P
+><TT
+CLASS="LITERAL"
+>L</TT
+> заключает значение аргумента в апострофы, как строку SQL. Значение NULL выводится буквально, как <TT
+CLASS="LITERAL"
+>NULL</TT
+>, без кавычек.</P
+></LI
+></UL
+><P></P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>В дополнение к спецификаторам, описанным выше, можно использовать спецпоследовательность <TT
+CLASS="LITERAL"
+>%%</TT
+>, которая просто выведет символ <TT
+CLASS="LITERAL"
+>%</TT
+>.</P
+><P
+>Несколько пример простых преобразований формата: </P><PRE
+CLASS="SCREEN"
+>SELECT format('Hello %s', 'World');
+<I
+CLASS="LINEANNOTATION"
+>Результат: </I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>Hello World</SAMP
+>
+
+SELECT format('Testing %s, %s, %s, %%', 'one', 'two', 'three');
+<I
+CLASS="LINEANNOTATION"
+>Результат: </I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>Testing one, two, three, %</SAMP
+>
+
+SELECT format('INSERT INTO %I VALUES(%L)', 'Foo bar', E'O\'Reilly');
+<I
+CLASS="LINEANNOTATION"
+>Результат: </I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>INSERT INTO "Foo bar" VALUES('O''Reilly')</SAMP
+>
+
+SELECT format('INSERT INTO %I VALUES(%L)', 'locations', E'C:\\Program Files');
+<I
+CLASS="LINEANNOTATION"
+>Результат: </I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>INSERT INTO locations VALUES(E'C:\\Program Files')</SAMP
+></PRE
+><P></P
+><P
+>Следующие примеры иллюстрируют использование поля <TT
+CLASS="REPLACEABLE"
+><I
+>ширина</I
+></TT
+> и флага <TT
+CLASS="LITERAL"
+>-</TT
+>: </P><PRE
+CLASS="SCREEN"
+>SELECT format('|%10s|', 'foo');
+<I
+CLASS="LINEANNOTATION"
+>Результат: </I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>|       foo|</SAMP
+>
+
+SELECT format('|%-10s|', 'foo');
+<I
+CLASS="LINEANNOTATION"
+>Результат: </I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>|foo       |</SAMP
+>
+
+SELECT format('|%*s|', 10, 'foo');
+<I
+CLASS="LINEANNOTATION"
+>Результат: </I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>|       foo|</SAMP
+>
+
+SELECT format('|%*s|', -10, 'foo');
+<I
+CLASS="LINEANNOTATION"
+>Результат: </I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>|foo       |</SAMP
+>
+
+SELECT format('|%-*s|', 10, 'foo');
+<I
+CLASS="LINEANNOTATION"
+>Результат: </I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>|foo       |</SAMP
+>
+
+SELECT format('|%-*s|', -10, 'foo');
+<I
+CLASS="LINEANNOTATION"
+>Результат: </I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>|foo       |</SAMP
+></PRE
+><P></P
+><P
+>Эти примеры показывают применение полей <TT
+CLASS="REPLACEABLE"
+><I
+>позиция</I
+></TT
+>: </P><PRE
+CLASS="SCREEN"
+>SELECT format('Testing %3$s, %2$s, %1$s', 'one', 'two', 'three');
+<I
+CLASS="LINEANNOTATION"
+>Результат: </I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>Testing three, two, one</SAMP
+>
+
+SELECT format('|%*2$s|', 'foo', 10, 'bar');
+<I
+CLASS="LINEANNOTATION"
+>Результат: </I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>|       bar|</SAMP
+>
+
+SELECT format('|%1$*2$s|', 'foo', 10, 'bar');
+<I
+CLASS="LINEANNOTATION"
+>Результат: </I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>|       foo|</SAMP
+></PRE
+><P></P
+><P
+>В отличие от стандартной функции C <CODE
+CLASS="FUNCTION"
+>sprintf</CODE
+>, функция <CODE
+CLASS="FUNCTION"
+>format</CODE
+> в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> позволяет комбинировать в одной строке спецификаторы с полями <TT
+CLASS="REPLACEABLE"
+><I
+>позиция</I
+></TT
+> и без них. Спецификатор формата без поля <TT
+CLASS="REPLACEABLE"
+><I
+>позиция</I
+></TT
+> всегда использует следующий аргумент после последнего выбранного. Кроме того, функция <CODE
+CLASS="FUNCTION"
+>format</CODE
+> не требует, чтобы в строке формата использовались все аргументы функции. Пример этого поведения: </P><PRE
+CLASS="SCREEN"
+>SELECT format('Testing %3$s, %2$s, %s', 'one', 'two', 'three');
+<I
+CLASS="LINEANNOTATION"
+>Результат: </I
+><SAMP
+CLASS="COMPUTEROUTPUT"
+>Testing three, two, three</SAMP
+></PRE
+><P></P
+><P
+>Спецификаторы формата <TT
+CLASS="LITERAL"
+>%I</TT
+> и <TT
+CLASS="LITERAL"
+>%L</TT
+> особенно полезны для безопасного составления динамических операторов SQL. См. <A
+HREF="plpgsql-statements.html#PLPGSQL-QUOTE-LITERAL-EXAMPLE"
+>Пример 40-1</A
+>.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions-math.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="functions-binarystring.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Математические функции и операторы</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Функции и операторы двоичных строк</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

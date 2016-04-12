@@ -1,0 +1,458 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Функции и операторы для работы с битовыми строками</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Функции и операторы"
+HREF="functions.html"><LINK
+REL="PREVIOUS"
+TITLE="Функции и операторы двоичных строк"
+HREF="functions-binarystring.html"><LINK
+REL="NEXT"
+TITLE="Поиск по шаблону"
+HREF="functions-matching.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Функции и операторы двоичных строк"
+HREF="functions-binarystring.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 9. Функции и операторы</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Поиск по шаблону"
+HREF="functions-matching.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="FUNCTIONS-BITSTRING"
+>9.6. Функции и операторы для работы с битовыми строками</A
+></H1
+><P
+>В этом разделе описываются функции и операторы, предназначенные для работы с битовыми строками, то есть с данными типов <TT
+CLASS="TYPE"
+>bit</TT
+> и <TT
+CLASS="TYPE"
+>bit varying</TT
+>. Помимо обычных операторов сравнения, с такими данными можно использовать операторы, перечисленные в <A
+HREF="functions-bitstring.html#FUNCTIONS-BIT-STRING-OP-TABLE"
+>Таблице 9-11</A
+>. Заметьте, что операторы <TT
+CLASS="LITERAL"
+>&amp;</TT
+>, <TT
+CLASS="LITERAL"
+>|</TT
+> и <TT
+CLASS="LITERAL"
+>#</TT
+> работают только с двоичными строками одинаковой длины. Операторы побитового сдвига сохраняют длины исходных строк, как показано в примерах.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="FUNCTIONS-BIT-STRING-OP-TABLE"
+></A
+><P
+><B
+>Таблица 9-11. Операторы для работы с битовыми строками</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Оператор</TH
+><TH
+>Описание</TH
+><TH
+>Пример</TH
+><TH
+>Результат</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>||</TT
+> </TD
+><TD
+>конкатенация</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>B'10001' || B'011'</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>10001011</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>&amp;</TT
+> </TD
+><TD
+>битовый AND</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>B'10001' &amp; B'01101'</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>00001</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>|</TT
+> </TD
+><TD
+>битовый OR</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>B'10001' | B'01101'</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>11101</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>#</TT
+> </TD
+><TD
+>битовый XOR</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>B'10001' # B'01101'</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>11100</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>~</TT
+> </TD
+><TD
+>битовый NOT</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>~ B'10001'</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>01110</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>&lt;&lt;</TT
+> </TD
+><TD
+>битовый сдвиг влево</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>B'10001' &lt;&lt; 3</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>01000</TT
+>
+                </TD
+></TR
+><TR
+><TD
+> <TT
+CLASS="LITERAL"
+>&gt;&gt;</TT
+> </TD
+><TD
+>битовый сдвиг вправо</TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>B'10001' &gt;&gt; 2</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="LITERAL"
+>00100</TT
+>
+                </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Следующие функции языка <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> работают как с символьными, так и с битовыми строками: <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>length</CODE
+></TT
+>, <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>bit_length</CODE
+></TT
+>, <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>octet_length</CODE
+></TT
+>, <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>position</CODE
+></TT
+>, <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>substring</CODE
+></TT
+>, <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>overlay</CODE
+></TT
+>.</P
+><P
+>С битовыми и двоичными строками работают функции <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>get_bit</CODE
+></TT
+> и <TT
+CLASS="LITERAL"
+><CODE
+CLASS="FUNCTION"
+>set_bit</CODE
+></TT
+>. При работе с битовыми строками эти функции нумеруют биты слева направо и самый левый бит считается нулевым.</P
+><P
+>Кроме того, целые значения можно преобразовать в тип <TT
+CLASS="TYPE"
+>bit</TT
+> и обратно. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>44::bit(10)                    <I
+CLASS="LINEANNOTATION"
+>0000101100</I
+>
+44::bit(3)                     <I
+CLASS="LINEANNOTATION"
+>100</I
+>
+cast(-44 as bit(12))           <I
+CLASS="LINEANNOTATION"
+>111111010100</I
+>
+'1110'::bit(4)::integer        <I
+CLASS="LINEANNOTATION"
+>14</I
+></PRE
+><P> Заметьте, что приведение к типу <SPAN
+CLASS="QUOTE"
+>"bit"</SPAN
+> без длины будет означать приведение к <TT
+CLASS="LITERAL"
+>bit(1)</TT
+>, и в результате будет получен только один менее значащий бит числа.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Приведение целого числа к типу <TT
+CLASS="TYPE"
+>bit(n)</TT
+> копирует правые <TT
+CLASS="LITERAL"
+>n</TT
+> бит числа. Если же целое преобразуется в битовую строку большей длины, чем требуется для этого числа, она дополняется слева битами знака числа.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="functions-binarystring.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="functions-matching.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Функции и операторы двоичных строк</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="functions.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Поиск по шаблону</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

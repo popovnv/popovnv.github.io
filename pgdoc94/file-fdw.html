@@ -1,0 +1,458 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>file_fdw</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Дополнительно поставляемые модули"
+HREF="contrib.html"><LINK
+REL="PREVIOUS"
+TITLE="earthdistance"
+HREF="earthdistance.html"><LINK
+REL="NEXT"
+TITLE="fuzzystrmatch"
+HREF="fuzzystrmatch.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="earthdistance"
+HREF="earthdistance.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Приложение E. Дополнительно поставляемые модули</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="fuzzystrmatch"
+HREF="fuzzystrmatch.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="FILE-FDW"
+>E.14. file_fdw</A
+></H1
+><P
+>Модуль <TT
+CLASS="FILENAME"
+>file_fdw</TT
+> представляет собой обёртку сторонних данных <CODE
+CLASS="FUNCTION"
+>file_fdw</CODE
+> для доступа к файлам на сервере. Файлы должны быть в формате, который понимает команда <TT
+CLASS="COMMAND"
+>COPY FROM</TT
+>; он рассматривается в описании <A
+HREF="sql-copy.html"
+>COPY</A
+>. В настоящий момент файлы доступны только для чтения.</P
+><P
+>Для сторонней таблицы, создаваемой через эту обёртку, можно задать следующие параметры:</P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>filename</TT
+></DT
+><DD
+><P
+>Имя файла данных. Указывается обязательно. Значение представляет собой абсолютный путь к файлу.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>format</TT
+></DT
+><DD
+><P
+>Формат файла. Аналогично указанию <TT
+CLASS="LITERAL"
+>FORMAT</TT
+> в команде <TT
+CLASS="COMMAND"
+>COPY</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>header</TT
+></DT
+><DD
+><P
+>Показывает, что файл содержит строку заголовка с именами колонок. Аналогично указанию <TT
+CLASS="LITERAL"
+>HEADER</TT
+> в команде <TT
+CLASS="COMMAND"
+>COPY</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>delimiter</TT
+></DT
+><DD
+><P
+>Задаёт символ, разделяющий колонки в строках файла. Аналогично указанию <TT
+CLASS="LITERAL"
+>DELIMITER</TT
+> в команде <TT
+CLASS="COMMAND"
+>COPY</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>quote</TT
+></DT
+><DD
+><P
+>Задаёт символ, используемый для заключения данных в кавычки. Аналогично указанию <TT
+CLASS="LITERAL"
+>QUOTE</TT
+> в команде <TT
+CLASS="COMMAND"
+>COPY</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>escape</TT
+></DT
+><DD
+><P
+>Задаёт символ, который будет выводиться перед символом данных, совпавшим со значением <TT
+CLASS="LITERAL"
+>QUOTE</TT
+>. Аналогично указанию <TT
+CLASS="LITERAL"
+>ESCAPE</TT
+> в команде <TT
+CLASS="COMMAND"
+>COPY</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>null</TT
+></DT
+><DD
+><P
+>Определяет строку, задающую значение <TT
+CLASS="LITERAL"
+>NULL</TT
+>. Аналогично указанию <TT
+CLASS="LITERAL"
+>NULL</TT
+> в команде <TT
+CLASS="COMMAND"
+>COPY</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>encoding</TT
+></DT
+><DD
+><P
+>Задаёт кодировку файла. Аналогично указанию <TT
+CLASS="LITERAL"
+>ENCODING</TT
+> в команде <TT
+CLASS="COMMAND"
+>COPY</TT
+>.</P
+></DD
+></DL
+></DIV
+><P
+>Заметьте, что хотя <TT
+CLASS="COMMAND"
+>COPY</TT
+> принимает указания, такие как OIDS и HEADER, без соответствующего значения, синтаксис обёртки сторонних данных требует, чтобы значение присутствовало во всех случаях. Чтобы активировать указания <TT
+CLASS="COMMAND"
+>COPY</TT
+>, которым значение обычно не передаётся, им можно просто передать значение TRUE.</P
+><P
+>Для столбцов сторонней таблицы, создаваемой через эту обёртку, можно задать следующие параметры:</P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>force_not_null</TT
+></DT
+><DD
+><P
+>Логическое значение. Если true, то значение колонки не должно сверяться со значением NULL (заданным в параметре <TT
+CLASS="LITERAL"
+>null</TT
+>). Аналогично включению столбца в список указания <TT
+CLASS="LITERAL"
+>FORCE_NOT_NULL</TT
+> команды <TT
+CLASS="COMMAND"
+>COPY</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>force_null</TT
+></DT
+><DD
+><P
+>Логическое значение. Если true, значения колонок нужно сверять со значением NULL (заданным в параметре <TT
+CLASS="LITERAL"
+>NULL</TT
+>), даже если они заключены в кавычки. Без этого параметра только значения без кавычек, соответствующие значению <TT
+CLASS="LITERAL"
+>null</TT
+>, будут возвращаться как NULL. Аналогично включению столбца в список указания <TT
+CLASS="LITERAL"
+>FORCE_NULL</TT
+> команды <TT
+CLASS="COMMAND"
+>COPY</TT
+>.</P
+></DD
+></DL
+></DIV
+><P
+>В настоящий момент <TT
+CLASS="LITERAL"
+>file_fdw</TT
+> не поддерживает указания <TT
+CLASS="LITERAL"
+>OIDS</TT
+> и <TT
+CLASS="LITERAL"
+>FORCE_QUOTE</TT
+> команды <TT
+CLASS="COMMAND"
+>COPY</TT
+>.</P
+><P
+>Перечисленные параметры применимы только для сторонних таблиц или их столбцов. Их нельзя указать для обёртки сторонних данных <TT
+CLASS="LITERAL"
+>file_fdw</TT
+>, серверов или сопоставлений пользователей, использующих эту обёртку.</P
+><P
+>Для изменения параметров, определяемых для таблицы, требуются права суперпользователя. Это сделано в целях безопасности: только суперпользователь должен решать, какой файл использовать. В принципе, доступ на изменение остальных параметров можно предоставить и не суперпользователям, но в настоящий момент это не реализовано.</P
+><P
+>Для сторонних таблиц, работающих через <TT
+CLASS="LITERAL"
+>file_fdw</TT
+>, команда <TT
+CLASS="COMMAND"
+>EXPLAIN</TT
+> показывает имя используемого файла. Если не указывать <TT
+CLASS="LITERAL"
+>COSTS OFF</TT
+>, то выводится и размер файла (в байтах).</P
+><DIV
+CLASS="EXAMPLE"
+><A
+NAME="AEN120706"
+></A
+><P
+><B
+>Пример E-1. Создание сторонней таблицы для журнала сервера PostgreSQL</B
+></P
+><P
+>Одно из очевидных применений <TT
+CLASS="LITERAL"
+>file_fdw</TT
+> это предоставление доступа к журналу сервера как к таблице. Предварительно нужно убедиться, что журнал сервера пишется в формате CSV. Далее в примере он называется <TT
+CLASS="LITERAL"
+>pglog.csv</TT
+>. Для начала установите расширение <TT
+CLASS="LITERAL"
+>file_fdw</TT
+>:</P
+><PRE
+CLASS="PROGRAMLISTING"
+>CREATE EXTENSION file_fdw;</PRE
+><P
+>Затем создайте сторонний сервер: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE SERVER pglog FOREIGN DATA WRAPPER file_fdw;</PRE
+><P></P
+><P
+>Всё готово для создания сторонней таблицы. В команде <TT
+CLASS="COMMAND"
+>CREATE FOREIGN TABLE</TT
+> нужно перечислить столбцы таблицы, указать файл CSV и его формат:</P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FOREIGN TABLE pglog (
+  log_time timestamp(3) with time zone,
+  user_name text,
+  database_name text,
+  process_id integer,
+  connection_from text,
+  session_id text,
+  session_line_num bigint,
+  command_tag text,
+  session_start_time timestamp with time zone,
+  virtual_transaction_id text,
+  transaction_id bigint,
+  error_severity text,
+  sql_state_code text,
+  message text,
+  detail text,
+  hint text,
+  internal_query text,
+  internal_query_pos integer,
+  context text,
+  query text,
+  query_pos integer,
+  location text,
+  application_name text
+) SERVER pglog
+OPTIONS ( filename '/home/josh/9.1/data/pg_log/pglog.csv', format 'csv' );</PRE
+><P></P
+><P
+>Вот и всё. Теперь для просмотра журнала сервера можно просто выполнять запросы к таблице. В производственной среде, разумеется, ещё потребуется как-то учесть ротацию файлов журнала.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="earthdistance.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="fuzzystrmatch.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>earthdistance</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>fuzzystrmatch</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,418 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Тип XML</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Типы данных"
+HREF="datatype.html"><LINK
+REL="PREVIOUS"
+TITLE="Тип UUID"
+HREF="datatype-uuid.html"><LINK
+REL="NEXT"
+TITLE="Типы JSON"
+HREF="datatype-json.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Тип UUID"
+HREF="datatype-uuid.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="datatype.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 8. Типы данных</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Типы JSON"
+HREF="datatype-json.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="DATATYPE-XML"
+>8.13. Тип <ACRONYM
+CLASS="ACRONYM"
+>XML</ACRONYM
+></A
+></H1
+><P
+>Тип <TT
+CLASS="TYPE"
+>xml</TT
+> предназначен для хранения XML-данных. Его преимущество по сравнению с обычным типом <TT
+CLASS="TYPE"
+>text</TT
+> в том, что он проверяет вводимые значения на допустимость по правилам XML и для работы с ним есть типобезопасные функции; см. <A
+HREF="functions-xml.html"
+>Раздел 9.14</A
+>. Для использования этого типа дистрибутив должен быть скомпилирован в конфигурации <TT
+CLASS="COMMAND"
+>configure --with-libxml</TT
+>.</P
+><P
+>Тип <TT
+CLASS="TYPE"
+>xml</TT
+> может сохранять правильно оформленные <SPAN
+CLASS="QUOTE"
+>"документы"</SPAN
+>, в соответствии со стандартом XML, а также фрагменты <SPAN
+CLASS="QUOTE"
+>"содержимого"</SPAN
+>, описанные как <TT
+CLASS="LITERAL"
+>содержимое</TT
+> элементов в стандарте XML. Другими словами, это означает, что фрагменты содержимого могут содержать несколько элементов верхнего уровня или текстовых узлов. Определить, является ли определённое значение типа <TT
+CLASS="TYPE"
+>xml</TT
+> полным документом или фрагментом содержимого, позволяет выражение <TT
+CLASS="LITERAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>xmlvalue</I
+></TT
+> IS DOCUMENT</TT
+>.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN7250"
+>8.13.1. Создание XML-значений</A
+></H2
+><P
+>Чтобы получить значение типа <TT
+CLASS="TYPE"
+>xml</TT
+> из текстовой строки, используйте функцию <CODE
+CLASS="FUNCTION"
+>xmlparse</CODE
+>:</P><PRE
+CLASS="SYNOPSIS"
+>XMLPARSE ( { DOCUMENT | CONTENT } <TT
+CLASS="REPLACEABLE"
+><I
+>value</I
+></TT
+>)</PRE
+><P> Примеры: </P><PRE
+CLASS="PROGRAMLISTING"
+>XMLPARSE (DOCUMENT '&lt;?xml version="1.0"?&gt;&lt;book&gt;&lt;title&gt;Manual&lt;/title&gt;
+  &lt;chapter&gt;...&lt;/chapter&gt;&lt;/book&gt;')
+XMLPARSE (CONTENT 'abc&lt;foo&gt;bar&lt;/foo&gt;&lt;bar&gt;foo&lt;/bar&gt;')</PRE
+><P> Хотя в стандарте SQL описан только один способ преобразования текстовых строк в XML-значения, специфический синтаксис PostgreSQL: </P><PRE
+CLASS="PROGRAMLISTING"
+>xml '&lt;foo&gt;bar&lt;/foo&gt;'
+'&lt;foo&gt;bar&lt;/foo&gt;'::xml</PRE
+><P> тоже допустим.</P
+><P
+>Тип <TT
+CLASS="TYPE"
+>xml</TT
+> не проверяет вводимые значения по схеме DTD (Document Type Declaration, Объявления типа документа), даже если в них присутствуют ссылка на DTD. В настоящее время в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> также нет встроенной поддержки других разновидностей схем, например XML Schema.</P
+><P
+>Обратная операция, получение текстовой строки из <TT
+CLASS="TYPE"
+>xml</TT
+>, выполняется с помощью функции <CODE
+CLASS="FUNCTION"
+>xmlserialize</CODE
+>:</P><PRE
+CLASS="SYNOPSIS"
+>XMLSERIALIZE ( { DOCUMENT | CONTENT } <TT
+CLASS="REPLACEABLE"
+><I
+>значение</I
+></TT
+> AS <TT
+CLASS="REPLACEABLE"
+><I
+>тип</I
+></TT
+> )</PRE
+><P>
+Здесь допустимый <TT
+CLASS="REPLACEABLE"
+><I
+>тип</I
+></TT
+> &mdash; <TT
+CLASS="TYPE"
+>character</TT
+>, <TT
+CLASS="TYPE"
+>character varying</TT
+> или <TT
+CLASS="TYPE"
+>text</TT
+> (или их псевдонимы). И в данном случае стандарт SQL предусматривает только один способ преобразования <TT
+CLASS="TYPE"
+>xml</TT
+> в тип текстовых строк, но PostgreSQL позволяет просто привести значение к нужному типу.</P
+><P
+>При преобразовании текстовой строки в тип <TT
+CLASS="TYPE"
+>xml</TT
+> или наоборот без использования функций <TT
+CLASS="TYPE"
+>XMLPARSE</TT
+> и <TT
+CLASS="TYPE"
+>XMLSERIALIZE</TT
+>, выбор режима <TT
+CLASS="LITERAL"
+>DOCUMENT</TT
+> или <TT
+CLASS="LITERAL"
+>CONTENT</TT
+> определяется параметром конфигурации сеанса <SPAN
+CLASS="QUOTE"
+>"XML option"</SPAN
+>, установить который можно следующей стандартной командой: </P><PRE
+CLASS="SYNOPSIS"
+>SET XML OPTION { DOCUMENT | CONTENT };</PRE
+><P> или такой командой в духе PostgreSQL:</P><PRE
+CLASS="SYNOPSIS"
+>SET xmloption TO { DOCUMENT | CONTENT };</PRE
+><P> По умолчанию этот параметр имеет значение <TT
+CLASS="LITERAL"
+>CONTENT</TT
+>, так что допускаются все формы XML-данных.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Когда параметр XML option имеет значение по умолчанию, текстовые строки нельзя напрямую привести к типу <TT
+CLASS="TYPE"
+>xml</TT
+>, если они содержат объявление типа документа, так как такие объявления не допускаются во фрагментах. Для выполнения преобразования в таких случаях следует использовать <TT
+CLASS="LITERAL"
+>XMLPARSE</TT
+> или изменить параметр XML option.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN7295"
+>8.13.2. Обработка кодировки</A
+></H2
+><P
+>Если на стороне сервера и клиента и в XML-данных используются разные кодировки символов, с этим могут возникать проблемы. Когда запросы передаются на сервер, а их результаты возвращаются клиенту в обычном текстовом режиме, PostgreSQL преобразует все передаваемые текстовые данные в кодировку для соответствующей стороны; см. <A
+HREF="multibyte.html"
+>Раздел 22.3</A
+>. В том числе это происходит и со строковыми представлениями XML-данных, подобными тем, что показаны в предыдущих примерах. Обычно это означает, что объявления кодировки, содержащиеся в XML-данных, могут не соответствовать действительности, когда текстовая строка преобразуется из одной кодировки в другую при передаче данных между клиентом и сервером, так как подобные включённые в данные объявления не будут изменены автоматически. Для решения этой проблемы объявления кодировки, содержащиеся в текстовых строках, вводимых в тип <TT
+CLASS="TYPE"
+>xml</TT
+>, просто <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>игнорируются</I
+></SPAN
+> и предполагается, что XML-содержимое представлено в текущей кодировке сервера. Как следствие, для правильной обработки таких строк с XML-данными клиент должен передавать их в своей текущей кодировке. Для сервера не важно, будет ли клиент для этого преобразовывать документы в свою кодировку, или изменит её, прежде чем передавать ему данные. При выводе значения типа <TT
+CLASS="TYPE"
+>xml</TT
+> не содержат объявления кодировки, а клиент должен предполагать, что все данные поступают в его текущей кодировке.</P
+><P
+>Если параметры запроса передаются на сервер и он возвращает результаты клиенту в двоичном режиме, кодировка символов не преобразуется, так что возникает другая ситуация. В этом случае объявление кодировки в XML принимается во внимание, а если его нет, то предполагается, что данные закодированы в UTF-8 (это соответствует стандарту XML; заметьте, что PostgreSQL не поддерживает UTF-16). При выводе в данные будет добавлено объявление кодировки, выбранной на стороне клиента (но если это UTF-8, объявление будет опущено).</P
+><P
+>Само собой, XML-данные в PostgreSQL будут обрабатываться гораздо эффективнее, когда и в XML-данных, и на стороне клиента, и на стороне сервера используется одна кодировка. Так как внутри XML-данные представляются в UTF-8, оптимальный вариант, когда на сервере также выбрана кодировка UTF-8.</P
+><DIV
+CLASS="CAUTION"
+><P
+></P
+><TABLE
+CLASS="CAUTION"
+BORDER="1"
+WIDTH="100%"
+><TR
+><TD
+ALIGN="CENTER"
+><B
+>Предостережение</B
+></TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+><P
+>Некоторые XML-функции могут вовсе не работать с данными не-ASCII, если кодировка сервера &mdash; не UTF-8. В частности, это известная особенность функции <CODE
+CLASS="FUNCTION"
+>xpath()</CODE
+>.</P
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN7307"
+>8.13.3. Обращение к XML-значениям</A
+></H2
+><P
+>Тип <TT
+CLASS="TYPE"
+>xml</TT
+> отличается от других тем, что для него не определены никакие операторы сравнения, так как чётко определённого и универсального алгоритма сравнения XML-данных не существует. Одно из следствий этого &mdash; нельзя отфильтровать строки таблицы, сравнив колонку <TT
+CLASS="TYPE"
+>xml</TT
+> с искомым значением. Поэтому обычно XML-значения должны дополняться отдельным ключевым полем, например ID. Можно также сравнивать XML-значения, преобразовав их сначала в текстовые строки, но заметьте, что с учётом специфики XML-данных этот метод практически бесполезен.</P
+><P
+>Из-за отсутствия операторов сравнения для типа <TT
+CLASS="TYPE"
+>xml</TT
+>, для колонки этого типа также нельзя создать индекс. Поэтому когда требуется быстрый поиск в XML данных, обойти это ограничение можно, приведя данные к типу текстовой строки и проиндексировав эти строки, либо проиндексировав выражение XPath. Конечно сам запрос при этом следует изменить, чтобы поиск выполнялся по индексированному выражению.</P
+><P
+>Для ускорения поиска в XML-данных также можно использовать функции полнотекстового поиска в PostgreSQL. Однако это требует определённой подготовки данных, что дистрибутив PostgreSQL пока не поддерживает.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="datatype-uuid.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="datatype-json.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Тип <ACRONYM
+CLASS="ACRONYM"
+>UUID</ACRONYM
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="datatype.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Типы <ACRONYM
+CLASS="ACRONYM"
+>JSON</ACRONYM
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,754 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>pgstattuple</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Дополнительно поставляемые модули"
+HREF="contrib.html"><LINK
+REL="PREVIOUS"
+TITLE="pg_stat_statements"
+HREF="pgstatstatements.html"><LINK
+REL="NEXT"
+TITLE="pg_trgm"
+HREF="pgtrgm.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="pg_stat_statements"
+HREF="pgstatstatements.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Приложение E. Дополнительно поставляемые модули</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="pg_trgm"
+HREF="pgtrgm.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="PGSTATTUPLE"
+>E.30. pgstattuple</A
+></H1
+><P
+>Модуль <TT
+CLASS="FILENAME"
+>pgstattuple</TT
+> предоставляет различные функции для получения статистики на уровне кортежей.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN123947"
+>E.30.1. Функции</A
+></H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><CODE
+CLASS="FUNCTION"
+>pgstattuple(regclass) returns record</CODE
+></DT
+><DD
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>pgstattuple</CODE
+> возвращает физическую длину отношения, процент <SPAN
+CLASS="QUOTE"
+>"мёртвых"</SPAN
+> кортежей и другую информацию. Она может быть полезна для принятия решения о необходимости очистки. В аргументе передаётся имя (возможно, дополненное схемой) или OID целевого отношения. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>test=&gt; SELECT * FROM pgstattuple('pg_catalog.pg_proc');
+-[ RECORD 1 ]------+-------
+table_len          | 458752
+tuple_count        | 1470
+tuple_len          | 438896
+tuple_percent      | 95.67
+dead_tuple_count   | 11
+dead_tuple_len     | 3157
+dead_tuple_percent | 0.69
+free_space         | 8932
+free_percent       | 1.95</PRE
+><P> Колонки результата описаны в <A
+HREF="pgstattuple.html#PGSTATTUPLE-COLUMNS"
+>Таблице E-21</A
+>.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="PGSTATTUPLE-COLUMNS"
+></A
+><P
+><B
+>Таблица E-21. Колонки результата <CODE
+CLASS="FUNCTION"
+>pgstattuple</CODE
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Колонка</TH
+><TH
+>Тип</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                          <TT
+CLASS="STRUCTFIELD"
+>table_len</TT
+>
+                        </TD
+><TD
+>                          <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                        </TD
+><TD
+>Физическая длина отношения в байтах</TD
+></TR
+><TR
+><TD
+>                          <TT
+CLASS="STRUCTFIELD"
+>tuple_count</TT
+>
+                        </TD
+><TD
+>                          <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                        </TD
+><TD
+>Количество &laquo;живых&raquo; кортежей</TD
+></TR
+><TR
+><TD
+>                          <TT
+CLASS="STRUCTFIELD"
+>tuple_len</TT
+>
+                        </TD
+><TD
+>                          <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                        </TD
+><TD
+>Общая длина &laquo;живых&raquo; кортежей в байтах</TD
+></TR
+><TR
+><TD
+>                          <TT
+CLASS="STRUCTFIELD"
+>tuple_percent</TT
+>
+                        </TD
+><TD
+>                          <TT
+CLASS="TYPE"
+>float8</TT
+>
+                        </TD
+><TD
+>Процент &laquo;живых&raquo; кортежей</TD
+></TR
+><TR
+><TD
+>                          <TT
+CLASS="STRUCTFIELD"
+>dead_tuple_count</TT
+>
+                        </TD
+><TD
+>                          <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                        </TD
+><TD
+>Количество &laquo;мёртвых&raquo; кортежей</TD
+></TR
+><TR
+><TD
+>                          <TT
+CLASS="STRUCTFIELD"
+>dead_tuple_len</TT
+>
+                        </TD
+><TD
+>                          <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                        </TD
+><TD
+>Общая длина &laquo;мёртвых&raquo; кортежей в байтах</TD
+></TR
+><TR
+><TD
+>                          <TT
+CLASS="STRUCTFIELD"
+>dead_tuple_percent</TT
+>
+                        </TD
+><TD
+>                          <TT
+CLASS="TYPE"
+>float8</TT
+>
+                        </TD
+><TD
+>Процент &laquo;мёртвых&raquo; кортежей</TD
+></TR
+><TR
+><TD
+>                          <TT
+CLASS="STRUCTFIELD"
+>free_space</TT
+>
+                        </TD
+><TD
+>                          <TT
+CLASS="TYPE"
+>bigint</TT
+>
+                        </TD
+><TD
+>Общий объём свободного пространства в байтах</TD
+></TR
+><TR
+><TD
+>                          <TT
+CLASS="STRUCTFIELD"
+>free_percent</TT
+>
+                        </TD
+><TD
+>                          <TT
+CLASS="TYPE"
+>float8</TT
+>
+                        </TD
+><TD
+>Процент свободного пространства</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>pgstattuple</CODE
+> получает блокировку отношения только для чтения. Таким образом, её результаты отражают не мгновенный снимок; на них будут влиять параллельные изменения.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>pgstattuple</CODE
+> считает кортеж <SPAN
+CLASS="QUOTE"
+>"мёртвым"</SPAN
+>, если <CODE
+CLASS="FUNCTION"
+>HeapTupleSatisfiesDirty</CODE
+> возвращает false.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>pgstattuple(text) returns record</CODE
+></DT
+><DD
+><P
+>Эта функция равнозначна функции <CODE
+CLASS="FUNCTION"
+>pgstattuple(regclass)</CODE
+> за исключением того, что для неё целевое отношение задаётся в текстовом виде. Данная функция оставлена для обратной совместимости, в будущем она может перейти в разряд устаревших.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>pgstatindex(regclass) returns record</CODE
+></DT
+><DD
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>pgstatindex</CODE
+> возвращает запись с информацией об индексе типа B-дерево. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>test=&gt; SELECT * FROM pgstatindex('pg_cast_oid_index');
+-[ RECORD 1 ]------+------
+version            | 2
+tree_level         | 0
+index_size         | 8192
+root_block_no      | 1
+internal_pages     | 0
+leaf_pages         | 1
+empty_pages        | 0
+deleted_pages      | 0
+avg_leaf_density   | 50.27
+leaf_fragmentation | 0</PRE
+><P></P
+><P
+>Колонки результата: <DIV
+CLASS="INFORMALTABLE"
+><P
+></P
+><A
+NAME="AEN124047"
+></A
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Колонка</TH
+><TH
+>Тип</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+><TT
+CLASS="STRUCTFIELD"
+>version</TT
+></TD
+><TD
+><TT
+CLASS="TYPE"
+>integer</TT
+></TD
+><TD
+>Номер версии B-дерева</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="STRUCTFIELD"
+>tree_level</TT
+></TD
+><TD
+><TT
+CLASS="TYPE"
+>integer</TT
+></TD
+><TD
+>Уровень корневой страницы в дереве</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="STRUCTFIELD"
+>index_size</TT
+></TD
+><TD
+><TT
+CLASS="TYPE"
+>bigint</TT
+></TD
+><TD
+>Общее количество страниц в индексе</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="STRUCTFIELD"
+>root_block_no</TT
+></TD
+><TD
+><TT
+CLASS="TYPE"
+>bigint</TT
+></TD
+><TD
+>Расположение блока корня</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="STRUCTFIELD"
+>internal_pages</TT
+></TD
+><TD
+><TT
+CLASS="TYPE"
+>bigint</TT
+></TD
+><TD
+>Количество <SPAN
+CLASS="QUOTE"
+>"внутренних"</SPAN
+> страниц (верхнего уровня)</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="STRUCTFIELD"
+>leaf_pages</TT
+></TD
+><TD
+><TT
+CLASS="TYPE"
+>bigint</TT
+></TD
+><TD
+>Количество страниц на уровне листьев</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="STRUCTFIELD"
+>empty_pages</TT
+></TD
+><TD
+><TT
+CLASS="TYPE"
+>bigint</TT
+></TD
+><TD
+>Количество пустых страниц</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="STRUCTFIELD"
+>deleted_pages</TT
+></TD
+><TD
+><TT
+CLASS="TYPE"
+>bigint</TT
+></TD
+><TD
+>Количество удалённых страниц</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="STRUCTFIELD"
+>avg_leaf_density</TT
+></TD
+><TD
+><TT
+CLASS="TYPE"
+>float8</TT
+></TD
+><TD
+>Средняя плотность страниц на уровне листьев</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="STRUCTFIELD"
+>leaf_fragmentation</TT
+></TD
+><TD
+><TT
+CLASS="TYPE"
+>float8</TT
+></TD
+><TD
+>Фрагментация на уровне листьев</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></P
+><P
+>Как и <CODE
+CLASS="FUNCTION"
+>pgstattuple</CODE
+>, эта функция собирает данные страница за страницей и не следует ожидать, что её результат представляет мгновенный снимок всего индекса.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>pgstatindex(text) returns record</CODE
+></DT
+><DD
+><P
+>Эта функция равнозначна функции <CODE
+CLASS="FUNCTION"
+>pgstatindex(regclass)</CODE
+> за исключением того, что для неё целевое отношение задаётся в текстовом виде. Данная функция оставлена для обратной совместимости, в будущем она может перейти в разряд устаревших.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>pgstatginindex(regclass) returns record</CODE
+></DT
+><DD
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>pgstatginindex</CODE
+> возвращает запись с информацией об индексе типа GIN. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>test=&gt; SELECT * FROM pgstatginindex('test_gin_index');
+-[ RECORD 1 ]--+--
+version        | 1
+pending_pages  | 0
+pending_tuples | 0</PRE
+><P></P
+><P
+>Колонки результата: <DIV
+CLASS="INFORMALTABLE"
+><P
+></P
+><A
+NAME="AEN124134"
+></A
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Колонка</TH
+><TH
+>Тип</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+><TT
+CLASS="STRUCTFIELD"
+>version</TT
+></TD
+><TD
+><TT
+CLASS="TYPE"
+>integer</TT
+></TD
+><TD
+>Номер версии GIN</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="STRUCTFIELD"
+>pending_pages</TT
+></TD
+><TD
+><TT
+CLASS="TYPE"
+>integer</TT
+></TD
+><TD
+>Количество страниц в списке ожидающих обработки</TD
+></TR
+><TR
+><TD
+><TT
+CLASS="STRUCTFIELD"
+>pending_tuples</TT
+></TD
+><TD
+><TT
+CLASS="TYPE"
+>bigint</TT
+></TD
+><TD
+>Количество кортежей в списке ожидающих обработки</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>pg_relpages(regclass) returns bigint</CODE
+></DT
+><DD
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>pg_relpages</CODE
+> возвращает число страниц в отношении.</P
+></DD
+><DT
+><CODE
+CLASS="FUNCTION"
+>pg_relpages(text) returns bigint</CODE
+></DT
+><DD
+><P
+>Эта функция равнозначна функции <CODE
+CLASS="FUNCTION"
+>pg_relpages(regclass)</CODE
+> за исключением того, что для неё целевое отношение задаётся в текстовом виде. Данная функция оставлена для обратной совместимости, в будущем она может перейти в разряд устаревших.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN124174"
+>E.30.2. Авторы</A
+></H2
+><P
+>Тацуо Исии и Сатоши Нагаясу</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="pgstatstatements.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="pgtrgm.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>pg_stat_statements</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>pg_trgm</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

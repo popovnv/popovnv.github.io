@@ -1,0 +1,1028 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Подпрограммы обёртки сторонних данных</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Написание обёртки сторонних данных"
+HREF="fdwhandler.html"><LINK
+REL="PREVIOUS"
+TITLE="Функции обёрток сторонних данных"
+HREF="fdw-functions.html"><LINK
+REL="NEXT"
+TITLE="Вспомогательные функции для обёрток сторонних данных"
+HREF="fdw-helpers.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Функции обёрток сторонних данных"
+HREF="fdw-functions.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="fdwhandler.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 53. Написание обёртки сторонних данных</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Вспомогательные функции для обёрток сторонних данных"
+HREF="fdw-helpers.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="FDW-CALLBACKS"
+>53.2. Подпрограммы обёртки сторонних данных</A
+></H1
+><P
+>Функция-обработчик FDW возвращает структуру <TT
+CLASS="STRUCTNAME"
+>FdwRoutine</TT
+> (выделенную с помощью palloc), содержащую указатели на подпрограммы, которые реализуют описанные ниже функции. Из всех функций обязательными являются только те, что касаются сканирования, а остальные могут отсутствовать.</P
+><P
+>Тип структуры <TT
+CLASS="STRUCTNAME"
+>FdwRoutine</TT
+> объявлен в <TT
+CLASS="FILENAME"
+>src/include/foreign/fdwapi.h</TT
+>, там же можно узнать дополнительные подробности.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="FDW-CALLBACKS-SCAN"
+>53.2.1. Подпрограммы FDW для сканирования сторонних таблиц</A
+></H2
+><P
+></P><PRE
+CLASS="PROGRAMLISTING"
+>void
+GetForeignRelSize (PlannerInfo *root,
+                   RelOptInfo *baserel,
+                   Oid foreigntableid);</PRE
+><P> Выдаёт оценку размера отношения для сторонней таблицы. Она вызывается в начале планирования запроса, в котором сканируется сторонняя таблица. В параметре <TT
+CLASS="LITERAL"
+>root</TT
+> передаётся общая информация планировщика о запросе, в <TT
+CLASS="LITERAL"
+>baserel</TT
+> — информация о данной таблице, а в <TT
+CLASS="LITERAL"
+>foreigntableid</TT
+> — OID записи в <TT
+CLASS="STRUCTNAME"
+>pg_class</TT
+> для данной таблицы. (Значение <TT
+CLASS="LITERAL"
+>foreigntableid</TT
+> можно получить и из структуры данных планировщика, но простоты ради оно передаётся явно.)</P
+><P
+>Эта функция должна записать в <TT
+CLASS="LITERAL"
+>baserel-&gt;rows</TT
+> ожидаемое число строк, которое будет получено при сканировании таблицы, с учётом фильтра, заданного ограничением выборки. Изначально в <TT
+CLASS="LITERAL"
+>baserel-&gt;rows</TT
+> содержится просто постоянная оценка по умолчанию, которую следует заменить, если это вообще возможно. Функция также может поменять значение <TT
+CLASS="LITERAL"
+>baserel-&gt;width</TT
+>, если она может дать лучшую оценку средней ширины строки результата.</P
+><P
+>За дополнительными сведениями обратитесь к <A
+HREF="fdw-planning.html"
+>Разделу 53.4</A
+>.</P
+><P
+></P><PRE
+CLASS="PROGRAMLISTING"
+>void
+GetForeignPaths (PlannerInfo *root,
+                 RelOptInfo *baserel,
+                 Oid foreigntableid);</PRE
+><P> Формирует возможные пути доступа для сканирования сторонней таблицы. Эта функция вызывается при планировании запроса. Ей передаются те же параметры, что и функции <CODE
+CLASS="FUNCTION"
+>GetForeignRelSize</CODE
+>, которая к этому времени уже будет вызвана.</P
+><P
+>Эта функция должна выдать минимум один путь доступа (узел <TT
+CLASS="STRUCTNAME"
+>ForeignPath</TT
+>) для сканирования сторонней таблицы и должна вызвать <CODE
+CLASS="FUNCTION"
+>add_path</CODE
+>, чтобы добавить каждый такой путь в <TT
+CLASS="LITERAL"
+>baserel-&gt;pathlist</TT
+>. Для формирования узлов <TT
+CLASS="STRUCTNAME"
+>ForeignPath</TT
+> рекомендуется вызывать <CODE
+CLASS="FUNCTION"
+>create_foreignscan_path</CODE
+>. Данная функция может выдавать несколько путей доступа, то есть путей, для которых по заданным <TT
+CLASS="LITERAL"
+>pathkeys</TT
+> можно получить уже отсортированный результат. Каждый путь доступа должен содержать оценки стоимости и может содержать любую частную информацию FDW, необходимую для выбора целевого метода сканирования.</P
+><P
+>За дополнительными сведениями обратитесь к <A
+HREF="fdw-planning.html"
+>Разделу 53.4</A
+>.</P
+><P
+></P><PRE
+CLASS="PROGRAMLISTING"
+>ForeignScan *
+GetForeignPlan (PlannerInfo *root,
+                RelOptInfo *baserel,
+                Oid foreigntableid,
+                ForeignPath *best_path,
+                List *tlist,
+                List *scan_clauses);</PRE
+><P> Создаёт узел плана <TT
+CLASS="STRUCTNAME"
+>ForeignScan</TT
+> из выбранного пути доступа к сторонней таблице. Эта функция вызывается в конце планирования запроса. Ей передаются те же параметры, что и <CODE
+CLASS="FUNCTION"
+>GetForeignRelSize</CODE
+>, плюс выбранный путь <TT
+CLASS="STRUCTNAME"
+>ForeignPath</TT
+> (до этого сформированный функцией <CODE
+CLASS="FUNCTION"
+>GetForeignPaths</CODE
+>), целевой список, который должен быть выдан этим узлом планирования, и условия ограничений, которые должны применяться для данного узла плана.</P
+><P
+>Эта функция должна создать и выдать узел плана <TT
+CLASS="STRUCTNAME"
+>ForeignScan</TT
+>; для формирования этого узла рекомендуется использовать <CODE
+CLASS="FUNCTION"
+>make_foreignscan</CODE
+>.</P
+><P
+>За дополнительными сведениями обратитесь к <A
+HREF="fdw-planning.html"
+>Разделу 53.4</A
+>.</P
+><P
+></P><PRE
+CLASS="PROGRAMLISTING"
+>void
+BeginForeignScan (ForeignScanState *node,
+                  int eflags);</PRE
+><P> Начинает сканирование сторонней таблицы. Эта функция вызывается при запуске исполнителя. Она должна выполнить все подготовительные действия, необходимые для осуществления сканирования, но не должна собственно производить сканирование (оно должно начаться с первым вызовом <CODE
+CLASS="FUNCTION"
+>IterateForeignScan</CODE
+>). Узел <TT
+CLASS="STRUCTNAME"
+>ForeignScanState</TT
+> уже был создан, но его поле <TT
+CLASS="STRUCTFIELD"
+>fdw_state</TT
+> по-прежнему NULL. Информацию о сканируемой таблице можно получить через узел <TT
+CLASS="STRUCTNAME"
+>ForeignScanState</TT
+> (в частности, из нижележащего узла <TT
+CLASS="STRUCTNAME"
+>ForeignScan</TT
+>, содержащего частную информацию FDW, заданную функцией <CODE
+CLASS="FUNCTION"
+>GetForeignPlan</CODE
+>). Параметр <TT
+CLASS="LITERAL"
+>eflags</TT
+> содержит битовые флаги, описывающее режим работы исполнителя для этого узла плана.</P
+><P
+>Заметьте, что когда <TT
+CLASS="LITERAL"
+>(eflags &amp; EXEC_FLAG_EXPLAIN_ONLY)</TT
+> не равно нулю, эта функция не должна выполнять какие-либо внешне проявляющиеся действия; она должна сделать только то, что необходимо для получения состояния узла, подходящего для <CODE
+CLASS="FUNCTION"
+>ExplainForeignScan</CODE
+> и <CODE
+CLASS="FUNCTION"
+>EndForeignScan</CODE
+>.</P
+><P
+></P><PRE
+CLASS="PROGRAMLISTING"
+>TupleTableSlot *
+IterateForeignScan (ForeignScanState *node);</PRE
+><P> Выбирает одну строку из стороннего источника и возвращает её в слоте таблицы кортежей (для этой цели должен использоваться <TT
+CLASS="STRUCTFIELD"
+>ScanTupleSlot</TT
+>). Когда строки заканчиваются, возвращает NULL. Инфраструктура слотов таблицы кортежей позволяет возвращать как физические, так и виртуальные кортежи; в большинстве случаев второй вариант предпочтительнее с точки зрения производительности. Заметьте, что эта функция вызывается в контексте кратковременной памяти, который будет сбрасываться между вызовами. Если вам нужна более долгоживущая память, создайте соответствующий контекст в <CODE
+CLASS="FUNCTION"
+>BeginForeignScan</CODE
+>, либо используйте <TT
+CLASS="STRUCTFIELD"
+>es_query_cxt</TT
+> узла <TT
+CLASS="STRUCTNAME"
+>EState</TT
+>.</P
+><P
+>Возвращаемые строки должны соответствовать сигнатуре колонок сканируемой сторонней таблицы. Если вы решите для оптимизации не возвращать ненужные колонки, в их позиции нужно будет вставить NULL.</P
+><P
+>Заметьте, что для исполнителя <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> не важно, удовлетворяют ли возвращаемые строки каким-либо ограничениям <TT
+CLASS="LITERAL"
+>NOT NULL</TT
+>, определённым для колонок сторонней таблицы &mdash; но это важно для планировщика, так что запросы могут оптимизироваться некорректно, если значения <TT
+CLASS="LITERAL"
+>NULL</TT
+> окажутся в колонке, объявление которой их не допускает. Если значение <TT
+CLASS="LITERAL"
+>NULL</TT
+> встречается, когда пользователь объявил, что его не должно быть, может быть уместно сообщить об ошибке (точно так же, как и при несовпадении типов данных).</P
+><P
+></P><PRE
+CLASS="PROGRAMLISTING"
+>void
+ReScanForeignScan (ForeignScanState *node);</PRE
+><P> Перезапускает сканирование с начала. Заметьте, что значения параметров, от которых зависит сканирование, могли измениться, так что новое сканирование не обязательно вернёт те же строки.</P
+><P
+></P><PRE
+CLASS="PROGRAMLISTING"
+>void
+EndForeignScan (ForeignScanState *node);</PRE
+><P> Завершает сканирование и освобождает ресурсы. Обычно при этом не нужно освобождать память, выделенную через palloc, но например, открытые файлы и подключения к удалённым серверам следует закрыть.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="FDW-CALLBACKS-UPDATE"
+>53.2.2. Подпрограммы FDW для изменения данных в сторонних таблицах</A
+></H2
+><P
+>Если FDW поддерживает запись в сторонние таблицы, она должна предоставить некоторые или все подпрограммы, реализующие следующие функции, в зависимости от потребностей и возможностей FDW:</P
+><P
+></P><PRE
+CLASS="PROGRAMLISTING"
+>void
+AddForeignUpdateTargets (Query *parsetree,
+                         RangeTblEntry *target_rte,
+                         Relation target_relation);</PRE
+><P>
+
+     Операции <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> и <TT
+CLASS="COMMAND"
+>DELETE</TT
+> выполняются со строками, ранее выбранными функциями сканирования таблицы. FDW может потребоваться дополнительная информация, например, ID строки или значения колонок первичного ключа, чтобы точно знать, какую именно строку нужно изменить или удалить. Для этого данная функция может добавить дополнительные скрытые или <SPAN
+CLASS="QUOTE"
+>"отбросовые"</SPAN
+> целевые колонки в список колонок, которые должны быть получены из сторонней таблицы во время <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> или <TT
+CLASS="COMMAND"
+>DELETE</TT
+>.</P
+><P
+>Для этого добавьте в <TT
+CLASS="LITERAL"
+>parsetree-&gt;targetList</TT
+> элементы <TT
+CLASS="STRUCTNAME"
+>TargetEntry</TT
+>, содержащие выражения для дополнительных выбираемых значений. У каждой такой записи должен быть признак <TT
+CLASS="STRUCTFIELD"
+>resjunk</TT
+> = <TT
+CLASS="LITERAL"
+>true</TT
+> и должно быть отдельное собственное имя <TT
+CLASS="STRUCTFIELD"
+>resname</TT
+>, по которому она будет идентифицироваться во время выполнения. Избегайте использования имён вида <TT
+CLASS="LITERAL"
+>ctid<TT
+CLASS="REPLACEABLE"
+><I
+>N</I
+></TT
+></TT
+>, <TT
+CLASS="LITERAL"
+>wholerow</TT
+> или <TT
+CLASS="LITERAL"
+>wholerow<TT
+CLASS="REPLACEABLE"
+><I
+>N</I
+></TT
+></TT
+>, так как колонки с такими именами может генерировать ядро системы.</P
+><P
+>Эта функция вызывается механизмом перезаписи запросов, а не планировщиком, так что ей доступна информация, несколько отличающаяся от той, что получают подпрограммы на этапе планирования. В <TT
+CLASS="LITERAL"
+>parsetree</TT
+> передаётся дерево разбора команды <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> или <TT
+CLASS="COMMAND"
+>DELETE</TT
+>, а параметры <TT
+CLASS="LITERAL"
+>target_rte</TT
+> и <TT
+CLASS="LITERAL"
+>target_relation</TT
+> описывают целевую стороннюю таблицу.</P
+><P
+>Если указатель <CODE
+CLASS="FUNCTION"
+>AddForeignUpdateTargets</CODE
+> равен <TT
+CLASS="LITERAL"
+>NULL</TT
+>, дополнительные целевые выражения не добавляются. (Это делает невозможным реализацию операций <TT
+CLASS="COMMAND"
+>DELETE</TT
+>, хотя операция <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> может быть всё же возможна, если FDW идентифицирует строки, полагаясь на то, что первичный ключ не меняется.)</P
+><P
+></P><PRE
+CLASS="PROGRAMLISTING"
+>List *
+PlanForeignModify (PlannerInfo *root,
+                   ModifyTable *plan,
+                   Index resultRelation,
+                   int subplan_index);</PRE
+><P> Выполняет любые дополнительные действия планирования, необходимые для добавления, изменения или удаления в сторонней таблице. Эта функция формирует частную информацию FDW, которая будет добавлена в узел плана <TT
+CLASS="STRUCTNAME"
+>ModifyTable</TT
+>, осуществляющий изменение. Эта информация должна возвращаться в списке (<TT
+CLASS="LITERAL"
+>List</TT
+>); она будет доставлена в функцию <CODE
+CLASS="FUNCTION"
+>BeginForeignModify</CODE
+> на стадии выполнения.</P
+><P
+>В <TT
+CLASS="LITERAL"
+>root</TT
+> передаётся общая информация планировщика о запросе, а в <TT
+CLASS="LITERAL"
+>plan</TT
+> — узел плана <TT
+CLASS="STRUCTNAME"
+>ModifyTable</TT
+>, заполненный, не считая поля <TT
+CLASS="STRUCTFIELD"
+>fdwPrivLists</TT
+>. Параметр <TT
+CLASS="LITERAL"
+>resultRelation</TT
+> указывает на целевую стороннюю таблицу по номеру в списке отношений, а <TT
+CLASS="LITERAL"
+>subplan_index</TT
+> определяет целевое отношение в данном узле <TT
+CLASS="STRUCTNAME"
+>ModifyTable</TT
+>, начиная с нуля; воспользуйтесь этим индексом, обращаясь к <TT
+CLASS="LITERAL"
+>plan-&gt;plans</TT
+> или другой вложенной структуре узла <TT
+CLASS="LITERAL"
+>plan</TT
+>.</P
+><P
+>За дополнительными сведениями обратитесь к <A
+HREF="fdw-planning.html"
+>Разделу 53.4</A
+>.</P
+><P
+>Если указатель <CODE
+CLASS="FUNCTION"
+>PlanForeignModify</CODE
+> равен <TT
+CLASS="LITERAL"
+>NULL</TT
+>, дополнительные действия во время планирования не предпринимаются, и в качестве <TT
+CLASS="LITERAL"
+>fdw_private</TT
+> в <CODE
+CLASS="FUNCTION"
+>BeginForeignModify</CODE
+> поступит NULL.</P
+><P
+></P><PRE
+CLASS="PROGRAMLISTING"
+>void
+BeginForeignModify (ModifyTableState *mtstate,
+                    ResultRelInfo *rinfo,
+                    List *fdw_private,
+                    int subplan_index,
+                    int eflags);</PRE
+><P> Начинает выполнение операции изменения данных в сторонней таблице. Эта подпрограмма выполняется при запуске исполнителя. Она должна выполнять любые подготовительные действия, необходимые для того, чтобы собственно произвести изменения в таблице. Впоследствии для каждого кортежа, который будет вставляться, изменяться или удаляться, будет вызываться <CODE
+CLASS="FUNCTION"
+>ExecForeignInsert</CODE
+>, <CODE
+CLASS="FUNCTION"
+>ExecForeignUpdate</CODE
+> или <CODE
+CLASS="FUNCTION"
+>ExecForeignDelete</CODE
+>.</P
+><P
+>В параметре <TT
+CLASS="LITERAL"
+>mtstate</TT
+> передаётся общее состояние выполняемого плана узла <TT
+CLASS="STRUCTNAME"
+>ModifyTable</TT
+>; через эту структуру доступны глобальные сведения о плане и состояние выполнения. В <TT
+CLASS="LITERAL"
+>rinfo</TT
+> передаётся структура <TT
+CLASS="STRUCTNAME"
+>ResultRelInfo</TT
+>, описывающая целевую стороннюю таблицу. (Если FDW нужно сохранить частное состояние, необходимое для этой операции, она может воспользоваться полем <TT
+CLASS="STRUCTFIELD"
+>ri_FdwState</TT
+> структуры <TT
+CLASS="STRUCTNAME"
+>ResultRelInfo</TT
+>.) В <TT
+CLASS="LITERAL"
+>fdw_private</TT
+> передаются частные данные, если они были сформированы процедурой <CODE
+CLASS="FUNCTION"
+>PlanForeignModify</CODE
+>. Параметр <TT
+CLASS="LITERAL"
+>subplan_index</TT
+> определяет целевое отношение в данном узле <TT
+CLASS="STRUCTNAME"
+>ModifyTable</TT
+>, а в <TT
+CLASS="LITERAL"
+>eflags</TT
+> передаются битовые флаги, описывающие режим работы исполнителя для этого узла плана.</P
+><P
+>Заметьте, что когда <TT
+CLASS="LITERAL"
+>(eflags &amp; EXEC_FLAG_EXPLAIN_ONLY)</TT
+> не равно нулю, эта функция не должна выполнять какие-либо внешне проявляющиеся действия; она должна сделать только то, что необходимо для получения состояния узла, подходящего для <CODE
+CLASS="FUNCTION"
+>ExplainForeignModify</CODE
+> и <CODE
+CLASS="FUNCTION"
+>EndForeignModify</CODE
+>.</P
+><P
+>Если указатель на <CODE
+CLASS="FUNCTION"
+>BeginForeignModify</CODE
+> равен <TT
+CLASS="LITERAL"
+>NULL</TT
+>, никакое действие при запуске исполнителя не выполняется.</P
+><P
+></P><PRE
+CLASS="PROGRAMLISTING"
+>TupleTableSlot *
+ExecForeignInsert (EState *estate,
+                   ResultRelInfo *rinfo,
+                   TupleTableSlot *slot,
+                   TupleTableSlot *planSlot);</PRE
+><P> Вставляет один кортеж в стороннюю таблицу. В <TT
+CLASS="LITERAL"
+>estate</TT
+> передаётся глобальное состояние выполнения запроса, а в <TT
+CLASS="LITERAL"
+>rinfo</TT
+> — структура <TT
+CLASS="STRUCTNAME"
+>ResultRelInfo</TT
+>, описывающая целевую стороннюю таблицу. Параметр <TT
+CLASS="LITERAL"
+>slot</TT
+> содержит кортеж, который должен быть вставлен; он будет соответствовать определению типа строки сторонней таблицы. Параметр <TT
+CLASS="LITERAL"
+>planSlot</TT
+> содержит кортеж, сформированный вложенным планом узла <TT
+CLASS="STRUCTNAME"
+>ModifyTable</TT
+>; он отличается от <TT
+CLASS="LITERAL"
+>slot</TT
+> тем, что может содержать дополнительные <SPAN
+CLASS="QUOTE"
+>"отбросовые"</SPAN
+> колонки. (Значение <TT
+CLASS="LITERAL"
+>planSlot</TT
+> обычно не очень интересно для операций <TT
+CLASS="COMMAND"
+>INSERT</TT
+>, но оно представлено для полноты.)</P
+><P
+>Возвращаемым значением будет либо слот, содержащий данные, которые были фактически вставлены (они могут отличаться от переданных данных, например, в результате действий триггеров), либо NULL, если никакая строка фактически не была вставлена (опять же, обычно в результате действий триггеров). Чтобы вернуть результат, также можно использовать передаваемый на вход <TT
+CLASS="LITERAL"
+>slot</TT
+>.</P
+><P
+>Данные в возвращаемом слоте используются, только если запрос <TT
+CLASS="COMMAND"
+>INSERT</TT
+> содержит предложение <TT
+CLASS="LITERAL"
+>RETURNING</TT
+> или для сторонней таблицы определён триггер <TT
+CLASS="LITERAL"
+>AFTER ROW</TT
+>. Триггерам нужны все колонки, но для предложения <TT
+CLASS="LITERAL"
+>RETURNING</TT
+> FDW может ради оптимизации не возвращать некоторые или все колонки, в зависимости от его содержания. Так или иначе, какой-либо слот необходимо вернуть, чтобы отметить, что операция успешна, иначе возвращённое число строк будет неверным.</P
+><P
+>Если указатель на <CODE
+CLASS="FUNCTION"
+>ExecForeignInsert</CODE
+> равен <TT
+CLASS="LITERAL"
+>NULL</TT
+>, вставить данные в стороннюю таблицу не удастся, в ответ будет выдаваться сообщение об ошибке.</P
+><P
+></P><PRE
+CLASS="PROGRAMLISTING"
+>TupleTableSlot *
+ExecForeignUpdate (EState *estate,
+                   ResultRelInfo *rinfo,
+                   TupleTableSlot *slot,
+                   TupleTableSlot *planSlot);</PRE
+><P> Изменяет один кортеж в сторонней таблице. В <TT
+CLASS="LITERAL"
+>estate</TT
+> передаётся глобальное состояние выполнения запроса, а в <TT
+CLASS="LITERAL"
+>rinfo</TT
+> — структура <TT
+CLASS="STRUCTNAME"
+>ResultRelInfo</TT
+>, описывающая целевую стороннюю таблицу. Параметр <TT
+CLASS="LITERAL"
+>slot</TT
+> содержит новые данные для кортежа; он будет соответствовать определению типа строки сторонней таблицы. Параметр <TT
+CLASS="LITERAL"
+>planSlot</TT
+> содержит кортеж, сформированный вложенным планом узла <TT
+CLASS="STRUCTNAME"
+>ModifyTable</TT
+>; он отличается от <TT
+CLASS="LITERAL"
+>slot</TT
+> тем, что может содержать дополнительные <SPAN
+CLASS="QUOTE"
+>"отбросовые"</SPAN
+> колонки. В частности, в этом слоте можно получить любые отбросовые колонки, запрошенные в <CODE
+CLASS="FUNCTION"
+>AddForeignUpdateTargets</CODE
+>.</P
+><P
+>Возвращаемым значением будет либо слот, содержащий строку в состоянии после изменения (её содержимое может отличаться от переданного, например, в результате действий триггеров), либо NULL, если никакая строка фактически не была изменена (опять же, обычно в результате действий триггеров). Чтобы вернуть результат, также можно использовать передаваемый на вход <TT
+CLASS="LITERAL"
+>slot</TT
+>.</P
+><P
+>Данные в возвращаемом слоте используются, только если запрос <TT
+CLASS="COMMAND"
+>UPDATE</TT
+> содержит предложение <TT
+CLASS="LITERAL"
+>RETURNING</TT
+> или для сторонней таблицы определён триггер <TT
+CLASS="LITERAL"
+>AFTER ROW</TT
+>. Триггерам нужны все колонки, но для предложения <TT
+CLASS="LITERAL"
+>RETURNING</TT
+> FDW может ради оптимизации не возвращать некоторые или все колонки, в зависимости от его содержания. Так или иначе, какой-либо слот необходимо вернуть, чтобы отметить, что операция успешна, иначе возвращённое число строк будет неверным.</P
+><P
+>Если указатель на <CODE
+CLASS="FUNCTION"
+>ExecForeignUpdate</CODE
+> равен <TT
+CLASS="LITERAL"
+>NULL</TT
+>, изменить данные в сторонней таблице не удастся, а в ответ будет выдаваться сообщение об ошибке.</P
+><P
+></P><PRE
+CLASS="PROGRAMLISTING"
+>TupleTableSlot *
+ExecForeignDelete (EState *estate,
+                   ResultRelInfo *rinfo,
+                   TupleTableSlot *slot,
+                   TupleTableSlot *planSlot);</PRE
+><P> Удаляет один кортеж из сторонней таблицы. В <TT
+CLASS="LITERAL"
+>estate</TT
+> передаётся глобальное состояние выполнения запроса, а в <TT
+CLASS="LITERAL"
+>rinfo</TT
+> — структура <TT
+CLASS="STRUCTNAME"
+>ResultRelInfo</TT
+>, описывающая целевую стороннюю таблицу. Параметр <TT
+CLASS="LITERAL"
+>slot</TT
+> при вызове не содержит ничего полезного, но в эту структуру можно поместить возвращаемый кортеж. Параметр <TT
+CLASS="LITERAL"
+>planSlot</TT
+> содержит кортеж, сформированный вложенным планом узла <TT
+CLASS="STRUCTNAME"
+>ModifyTable</TT
+>; в частности, в нём могут содержаться отбросовые колонки, запрошенные в <CODE
+CLASS="FUNCTION"
+>AddForeignUpdateTargets</CODE
+>. Отбросовые колонки необходимы, чтобы определить, какой именно кортеж удалять.</P
+><P
+>Возвращаемым значением будет либо слот, содержащий строку, которая была удалена, либо NULL, если не удалена никакая строка (обычно в результате действия триггеров). Для размещения возвращаемого кортежа можно использовать передаваемый на вход <TT
+CLASS="LITERAL"
+>slot</TT
+>.</P
+><P
+>Данные в возвращаемом слоте используются, только если запрос <TT
+CLASS="COMMAND"
+>DELETE</TT
+> содержит предложение <TT
+CLASS="LITERAL"
+>RETURNING</TT
+> или для сторонней таблицы определён триггер <TT
+CLASS="LITERAL"
+>AFTER ROW</TT
+>. Триггерам нужны все колонки, но для предложения <TT
+CLASS="LITERAL"
+>RETURNING</TT
+> FDW может ради оптимизации не возвращать некоторые или все колонки, в зависимости от его содержания. Так или иначе, какой-либо слот необходимо вернуть, чтобы отметить, что операция успешна, иначе возвращённое число строк будет неверным.</P
+><P
+>Если указатель на <CODE
+CLASS="FUNCTION"
+>ExecForeignDelete</CODE
+> равен <TT
+CLASS="LITERAL"
+>NULL</TT
+>, удалить данные из сторонней таблицы не удастся, а в ответ будет выдаваться сообщение об ошибке.</P
+><P
+></P><PRE
+CLASS="PROGRAMLISTING"
+>void
+EndForeignModify (EState *estate,
+                  ResultRelInfo *rinfo);</PRE
+><P> Завершает изменение данных в таблице и освобождает ресурсы. Обычно при этом не нужно освобождать память, выделенную через palloc, но например, открытые файлы и подключения к удалённым серверам следует закрыть.</P
+><P
+>Если указатель на <CODE
+CLASS="FUNCTION"
+>EndForeignModify</CODE
+> равен <TT
+CLASS="LITERAL"
+>NULL</TT
+>, никакое действие при завершении исполнителя не выполняется.</P
+><P
+></P><PRE
+CLASS="PROGRAMLISTING"
+>int
+IsForeignRelUpdatable (Relation rel);</PRE
+><P> Сообщает, какие операции изменения данных поддерживает указанная сторонняя таблица. Возвращаемое значение должно быть битовой маской кодов событий, обозначающих операции, поддерживаемые таблицей, и заданных в перечислении <TT
+CLASS="LITERAL"
+>CmdType</TT
+>; то есть, <TT
+CLASS="LITERAL"
+>(1 &lt;&lt; CMD_UPDATE) = 4</TT
+> для <TT
+CLASS="COMMAND"
+>UPDATE</TT
+>, <TT
+CLASS="LITERAL"
+>(1 &lt;&lt; CMD_INSERT) = 8</TT
+> для <TT
+CLASS="COMMAND"
+>INSERT</TT
+> и <TT
+CLASS="LITERAL"
+>(1 &lt;&lt; CMD_DELETE) = 16</TT
+> для <TT
+CLASS="COMMAND"
+>DELETE</TT
+>.</P
+><P
+>Если указатель на <CODE
+CLASS="FUNCTION"
+>IsForeignRelUpdatable</CODE
+> равен <TT
+CLASS="LITERAL"
+>NULL</TT
+>, предполагается, что сторонние таблицы позволяют добавлять, изменять и удалять строки, если FDW предоставляет процедуры для функций <CODE
+CLASS="FUNCTION"
+>ExecForeignInsert</CODE
+>, <CODE
+CLASS="FUNCTION"
+>ExecForeignUpdate</CODE
+> или <CODE
+CLASS="FUNCTION"
+>ExecForeignDelete</CODE
+>, соответственно. Данная функция необходима, только если FDW поддерживает операции изменения для одних таблиц и не поддерживает для других. (Хотя для этого можно выдать ошибку в подпрограмме, выполняющей операцию, а не задействовать эту функцию. Однако данная функция позволяет корректно отражать поддержку изменений в представлениях <TT
+CLASS="LITERAL"
+>information_schema</TT
+>.)</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="FDW-CALLBACKS-EXPLAIN"
+>53.2.3. Подпрограммы FDW для <TT
+CLASS="COMMAND"
+>EXPLAIN</TT
+></A
+></H2
+><P
+></P><PRE
+CLASS="PROGRAMLISTING"
+>void
+ExplainForeignScan (ForeignScanState *node,
+                    ExplainState *es);</PRE
+><P> Дополняет вывод <TT
+CLASS="COMMAND"
+>EXPLAIN</TT
+> для сканирования сторонней таблицы. Эта функция может вызывать <CODE
+CLASS="FUNCTION"
+>ExplainPropertyText</CODE
+> и связанные функции и добавлять поля в вывод <TT
+CLASS="COMMAND"
+>EXPLAIN</TT
+>. Поля флагов в <TT
+CLASS="LITERAL"
+>es</TT
+> позволяют определить, что именно выводить, а для выдачи статистики времени выполнения в случае с <TT
+CLASS="COMMAND"
+>EXPLAIN ANALYZE</TT
+> можно проанализировать состояние узла <TT
+CLASS="STRUCTNAME"
+>ForeignScanState</TT
+>.</P
+><P
+>Если указатель <CODE
+CLASS="FUNCTION"
+>ExplainForeignScan</CODE
+> равен <TT
+CLASS="LITERAL"
+>NULL</TT
+>, никакая дополнительная информация при <TT
+CLASS="COMMAND"
+>EXPLAIN</TT
+> не выводится.</P
+><P
+></P><PRE
+CLASS="PROGRAMLISTING"
+>void
+ExplainForeignModify (ModifyTableState *mtstate,
+                      ResultRelInfo *rinfo,
+                      List *fdw_private,
+                      int subplan_index,
+                      struct ExplainState *es);</PRE
+><P> Дополняет вывод <TT
+CLASS="COMMAND"
+>EXPLAIN</TT
+> для изменений в сторонней таблице. Эта функция может вызывать <CODE
+CLASS="FUNCTION"
+>ExplainPropertyText</CODE
+> и связанные функции и добавлять поля в вывод <TT
+CLASS="COMMAND"
+>EXPLAIN</TT
+>. Поля флагов в <TT
+CLASS="LITERAL"
+>es</TT
+> позволяют определить, что именно выводить, а для выдачи статистики времени выполнения в случае с <TT
+CLASS="COMMAND"
+>EXPLAIN ANALYZE</TT
+> можно проанализировать состояние узла <TT
+CLASS="STRUCTNAME"
+>ModifyTableState</TT
+>. Первые четыре аргумента у этой функции те же, что и у <CODE
+CLASS="FUNCTION"
+>BeginForeignModify</CODE
+>.</P
+><P
+>Если указатель <CODE
+CLASS="FUNCTION"
+>ExplainForeignModify</CODE
+> равен <TT
+CLASS="LITERAL"
+>NULL</TT
+>, никакая дополнительная информация при <TT
+CLASS="COMMAND"
+>EXPLAIN</TT
+> не выводится.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="FDW-CALLBACKS-ANALYZE"
+>53.2.4. Подпрограммы FDW для <TT
+CLASS="COMMAND"
+>ANALYZE</TT
+></A
+></H2
+><P
+></P><PRE
+CLASS="PROGRAMLISTING"
+>bool
+AnalyzeForeignTable (Relation relation,
+                     AcquireSampleRowsFunc *func,
+                     BlockNumber *totalpages);</PRE
+><P> Эта функция вызывается, когда для сторонней таблицы выполняется <A
+HREF="sql-analyze.html"
+>ANALYZE</A
+>. Если FDW может собрать статистику для этой сторонней таблицы, эта функция должна вернуть <TT
+CLASS="LITERAL"
+>true</TT
+> и передать в <TT
+CLASS="PARAMETER"
+>func</TT
+> указатель на функцию, которая будет выдавать строки выборки из таблицы, а в <TT
+CLASS="PARAMETER"
+>totalpages</TT
+> ожидаемый размер таблицы в страницах. В противном случае эта функция должна вернуть <TT
+CLASS="LITERAL"
+>false</TT
+>.</P
+><P
+>Если FDW не поддерживает сбор статистики ни для каких таблиц, в <CODE
+CLASS="FUNCTION"
+>AnalyzeForeignTable</CODE
+> можно установить значение <TT
+CLASS="LITERAL"
+>NULL</TT
+>.</P
+><P
+>Функция выдачи выборки, если она предоставляется, должна иметь следующую сигнатуру: </P><PRE
+CLASS="PROGRAMLISTING"
+>int
+AcquireSampleRowsFunc (Relation relation, int elevel,
+                       HeapTuple *rows, int targrows,
+                       double *totalrows,
+                       double *totaldeadrows);</PRE
+><P> Она должна выбирать из таблицы максимум <TT
+CLASS="PARAMETER"
+>targrows</TT
+> строк и помещать их в переданный вызывающим кодом массив <TT
+CLASS="PARAMETER"
+>rows</TT
+>. Возвращать она должна фактическое число выбранных строк. Кроме того, эта функция должна сохранить общее количество актуальных и &laquo;мёртвых&raquo;строк в таблице в выходных параметрах <TT
+CLASS="PARAMETER"
+>totalrows</TT
+> и <TT
+CLASS="PARAMETER"
+>totaldeadrows</TT
+>, соответственно. (Если для данной FDW нет понятия &laquo;мёртвых&raquo; строк, в <TT
+CLASS="PARAMETER"
+>totaldeadrows</TT
+> нужно записать 0.)</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="fdw-functions.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="fdw-helpers.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Функции обёрток сторонних данных</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="fdwhandler.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Вспомогательные функции для обёрток сторонних данных</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

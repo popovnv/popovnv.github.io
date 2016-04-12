@@ -1,0 +1,444 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Пользовательские типы</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Расширение SQL"
+HREF="extend.html"><LINK
+REL="PREVIOUS"
+TITLE="Пользовательские агрегатные функции"
+HREF="xaggr.html"><LINK
+REL="NEXT"
+TITLE="Пользовательские операторы"
+HREF="xoper.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Пользовательские агрегатные функции"
+HREF="xaggr.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="extend.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 35. Расширение <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Пользовательские операторы"
+HREF="xoper.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="XTYPES"
+>35.11. Пользовательские типы</A
+></H1
+><P
+>Как описывалось в <A
+HREF="extend-type-system.html"
+>Разделе 35.2</A
+>, <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> может расширяться и поддерживать новые типы данных. В этом разделе описывается, как определить новые базовые типы, то есть типы данных, описанные ниже уровня языка <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+>. Для создания нового базового типа необходимо реализовать функции, работающие с этим типом, на языке низкого уровня, обычно C.</P
+><P
+>Примеры, рассматриваемые в этой главе, можно найти в <TT
+CLASS="FILENAME"
+>complex.sql</TT
+> и в <TT
+CLASS="FILENAME"
+>complex.c</TT
+> в каталоге <TT
+CLASS="FILENAME"
+>src/tutorial</TT
+> пакета с исходным кодом. Инструкции по запуску этих примеров можно найти в файле <TT
+CLASS="FILENAME"
+>README</TT
+> в том же каталоге.</P
+><P
+> Пользовательский тип должен всегда иметь функции ввода и вывода. Эти функции определяют, как тип будет выглядеть в строковом виде (при вводе и выводе для пользователя) и как этот тип размещается в памяти. Функция ввода принимает в качестве аргумента строку символов, заканчивающуюся нулём, и возвращает внутреннее представление типа (в памяти). Функция вывода принимает в качестве аргумента внутреннее представление типа и возвращает строку символов, заканчивающуюся нулём. Если мы хотим не просто сохранить тип, но делать с ним нечто большее, мы должны предоставить дополнительные функции, реализующие все операции, которые мы хотели бы иметь для этого типа.</P
+><P
+>Предположим, что нам нужен тип <TT
+CLASS="TYPE"
+>complex</TT
+>, представляющий комплексные числа. Естественным образом комплексное число можно представить в памяти в виде следующей структуры C: </P><PRE
+CLASS="PROGRAMLISTING"
+>typedef struct Complex {
+    double      x;
+    double      y;
+} Complex;</PRE
+><P> Нам нужно будет передавать этот тип по ссылке, так как он слишком велик, чтобы уместиться в одном значении <TT
+CLASS="TYPE"
+>Datum</TT
+>.</P
+><P
+>В качестве внешнего строкового представления типа мы выберем строку вида <TT
+CLASS="LITERAL"
+>(x,y)</TT
+>.</P
+><P
+>Функции ввода и вывода обычно несложно написать, особенно функцию вывода. Но определяя внешнее строковое представление типа, помните, что в конце концов вам придётся реализовать законченный и надёжный метод разбора этого представления в функции ввода. Например, так: </P><PRE
+CLASS="PROGRAMLISTING"
+>PG_FUNCTION_INFO_V1(complex_in);
+
+Datum
+complex_in(PG_FUNCTION_ARGS)
+{
+    char       *str = PG_GETARG_CSTRING(0);
+    double      x,
+                y;
+    Complex    *result;
+
+    if (sscanf(str, " ( %lf , %lf )", &amp;x, &amp;y) != 2)
+        ereport(ERROR,
+                (errcode(ERRCODE_INVALID_TEXT_REPRESENTATION),
+                 errmsg("invalid input syntax for complex: \"%s\"",
+                        str)));
+
+    result = (Complex *) palloc(sizeof(Complex));
+    result-&gt;x = x;
+    result-&gt;y = y;
+    PG_RETURN_POINTER(result);
+}</PRE
+><P> Функция вывода может быть простой: </P><PRE
+CLASS="PROGRAMLISTING"
+>PG_FUNCTION_INFO_V1(complex_out);
+
+Datum
+complex_out(PG_FUNCTION_ARGS)
+{
+    Complex    *complex = (Complex *) PG_GETARG_POINTER(0);
+    char       *result;
+
+    result = psprintf("(%g,%g)", complex-&gt;x, complex-&gt;y);
+    PG_RETURN_CSTRING(result);
+}</PRE
+><P></P
+><P
+>Вам нужно позаботиться о том, чтобы функции ввода и вывода были обратными друг к другу. В противном случае вы столкнётесь с проблемами, когда вам потребуется выгрузить данные в файл, а затем прочитать их. Это особенно распространённая проблема, когда дело касается чисел с плавающей точкой.</P
+><P
+>Дополнительно пользовательский тип может предоставлять функции для ввода и вывода в двоичном виде. Двоичный ввод/вывод обычно работает быстрее, но хуже портируется, чем текстовый. Как и с текстовым представлением, выбор, каким будет двоичное представление, остаётся за вами. Многие встроенные типы данных стараются обеспечить двоичное представление, независимое от машинной архитектуры. Для типа <TT
+CLASS="TYPE"
+>complex</TT
+> мы воспользуемся функциями двоичного ввода/вывода типа <TT
+CLASS="TYPE"
+>float8</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>PG_FUNCTION_INFO_V1(complex_recv);
+
+Datum
+complex_recv(PG_FUNCTION_ARGS)
+{
+    StringInfo  buf = (StringInfo) PG_GETARG_POINTER(0);
+    Complex    *result;
+
+    result = (Complex *) palloc(sizeof(Complex));
+    result-&gt;x = pq_getmsgfloat8(buf);
+    result-&gt;y = pq_getmsgfloat8(buf);
+    PG_RETURN_POINTER(result);
+}
+
+PG_FUNCTION_INFO_V1(complex_send);
+
+Datum
+complex_send(PG_FUNCTION_ARGS)
+{
+    Complex    *complex = (Complex *) PG_GETARG_POINTER(0);
+    StringInfoData buf;
+
+    pq_begintypsend(&amp;buf);
+    pq_sendfloat8(&amp;buf, complex-&gt;x);
+    pq_sendfloat8(&amp;buf, complex-&gt;y);
+    PG_RETURN_BYTEA_P(pq_endtypsend(&amp;buf));
+}</PRE
+><P></P
+><P
+>Написав функции ввода/вывода и скомпилировав их в разделяемую библиотеку, мы можем определить тип <TT
+CLASS="TYPE"
+>complex</TT
+> в SQL. Сначала мы объявим его как тип-пустышку: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TYPE complex;</PRE
+><P> Это позволит нам ссылаться на этот тип, определяя для него функции ввода/вывода. Теперь мы определим функции ввода/вывода: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE FUNCTION complex_in(cstring)
+    RETURNS complex
+    AS '<TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+>'
+    LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION complex_out(complex)
+    RETURNS cstring
+    AS '<TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+>'
+    LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION complex_recv(internal)
+   RETURNS complex
+   AS '<TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+>'
+   LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION complex_send(complex)
+   RETURNS bytea
+   AS '<TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+>'
+   LANGUAGE C IMMUTABLE STRICT;</PRE
+><P></P
+><P
+>Наконец, мы можем предоставить полное определение типа данных: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TYPE complex (
+   internallength = 16,
+   input = complex_in,
+   output = complex_out,
+   receive = complex_recv,
+   send = complex_send,
+   alignment = double
+);</PRE
+><P></P
+><P
+> Когда определяется новый базовый тип, <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> автоматически обеспечивает поддержку массивов с элементами такого типа. Тип массива обычно получает имя по имени базового типа с добавленным спереди символом подчёркивания (<TT
+CLASS="LITERAL"
+>_</TT
+>).</P
+><P
+>Когда тип данных определён, мы можем объявить дополнительные функции для выполнения полезных операций с этим типом. Затем поверх этих функций могут быть определены операторы, а если потребуется, и классы операторов, для поддержки индексации этого типа. Эти дополнительные уровни обсуждаются в следующих разделах.</P
+><P
+> Если значения вашего типа данных могут быть разного размера (во внутренней форме), для такого типа следует реализовать поддержку <ACRONYM
+CLASS="ACRONYM"
+>TOAST</ACRONYM
+> (см. <A
+HREF="storage-toast.html"
+>Раздел 59.2</A
+>). Это следует делать, даже если размер данных слишком мал для сжатия или внешнего хранения, так как <ACRONYM
+CLASS="ACRONYM"
+>TOAST</ACRONYM
+> позволяет сэкономить пространство и с данными маленького размера, сокращая издержки в заголовке.</P
+><P
+>Для этого внутреннее представление должно соответствовать стандартной схеме данных переменной длины: первые четыре байта должно занимать поле <TT
+CLASS="TYPE"
+>char[4]</TT
+>, к которому никогда не следует обращаться напрямую (по обыкновению названное <TT
+CLASS="STRUCTFIELD"
+>vl_len_</TT
+>). Чтобы сохранить размер элемента в этом поле, вы должны использовать макрос <CODE
+CLASS="FUNCTION"
+>SET_VARSIZE()</CODE
+>, а чтобы получить его — макрос <CODE
+CLASS="FUNCTION"
+>VARSIZE()</CODE
+>. Функции на C, работающие с таким типом данных, должны позаботиться о распаковке поступивших им данных в формате TOAST, используя макрос <CODE
+CLASS="FUNCTION"
+>PG_DETOAST_DATUM</CODE
+>. (Эту внутреннюю особенность обычно скрывает дополнительный, определяемый для типа макрос <CODE
+CLASS="FUNCTION"
+>GETARG_DATATYPE_P</CODE
+>.) Затем, выполняя команду <TT
+CLASS="COMMAND"
+>CREATE TYPE</TT
+>, укажите в качестве внутренней длины <TT
+CLASS="LITERAL"
+>variable</TT
+> и выберите подходящий вариант хранения.</P
+><P
+>Если выравнивание не имеет значения (либо только для некоторой функции, либо потому что для типа данных в любом случае применяется выравнивание по байтам), некоторых издержек, связанных с макросом <CODE
+CLASS="FUNCTION"
+>PG_DETOAST_DATUM</CODE
+>, можно избежать. Вместо него можно использовать <CODE
+CLASS="FUNCTION"
+>PG_DETOAST_DATUM_PACKED</CODE
+> (его обычно скрывает определяемый для типа макрос <CODE
+CLASS="FUNCTION"
+>GETARG_DATATYPE_PP</CODE
+>) и воспользоваться макросами <CODE
+CLASS="FUNCTION"
+>VARSIZE_ANY_EXHDR</CODE
+> и <CODE
+CLASS="FUNCTION"
+>VARDATA_ANY</CODE
+> для обращения к потенциально сжатым данным. Стоит ещё раз отметить, что данные, возвращаемые этими макросами, не выравниваются, даже если выравнивание задано в определении типа. Если выравнивание важно, вы должны задействовать обычный интерфейс <CODE
+CLASS="FUNCTION"
+>PG_DETOAST_DATUM</CODE
+>.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>В старом коде поле <TT
+CLASS="STRUCTFIELD"
+>vl_len_</TT
+> часто объявлялось как <TT
+CLASS="TYPE"
+>int32</TT
+>, а не <TT
+CLASS="TYPE"
+>char[4]</TT
+>. Это ничем не чревато до той поры, пока в определении структуры имеются другие поля с выравниванием как минимум <TT
+CLASS="TYPE"
+>int32</TT
+>. Но с потенциально невыровненными данными такое определение структуры опасно; компилятор может воспринять его как право полагать, что данные выровнены, что может привести к аварийным сбоям в архитектурах, строгих к выравниванию.</P
+></BLOCKQUOTE
+></DIV
+><P
+>За дополнительными подробностями обратитесь к команде <A
+HREF="sql-createtype.html"
+>CREATE TYPE</A
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="xaggr.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="xoper.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Пользовательские агрегатные функции</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="extend.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Пользовательские операторы</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

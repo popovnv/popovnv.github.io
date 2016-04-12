@@ -1,0 +1,628 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Документация по PostgreSQL 9.4.1</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="NEXT"
+TITLE="Предисловие"
+HREF="preface.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="BOOK"
+><DIV
+CLASS="BOOK"
+><A
+NAME="POSTGRES"
+></A
+><DIV
+CLASS="TITLEPAGE"
+><H1
+CLASS="TITLE"
+><A
+NAME="POSTGRES"
+>Документация по PostgreSQL 9.4.1</A
+></H1
+><H3
+CLASS="CORPAUTHOR"
+>The PostgreSQL Global Development Group</H3
+><P
+CLASS="COPYRIGHT"
+><A
+HREF="LEGALNOTICE.html"
+>Copyright</A
+> &copy; 1996-2015 The PostgreSQL Global Development Group</P
+><HR></DIV
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Содержание</B
+></DT
+><DT
+><A
+HREF="preface.html"
+>Предисловие</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="intro-whatis.html"
+>Что такое <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>?</A
+></DT
+><DT
+><A
+HREF="history.html"
+>Краткая история <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></A
+></DT
+><DT
+><A
+HREF="notation.html"
+>Соглашения</A
+></DT
+><DT
+><A
+HREF="resources.html"
+>Полезные ресурсы</A
+></DT
+><DT
+><A
+HREF="bug-reporting.html"
+>Как правильно сообщить об ошибке</A
+></DT
+></DL
+></DD
+><DT
+>I. <A
+HREF="tutorial.html"
+>Введение</A
+></DT
+><DD
+><DL
+><DT
+>1. <A
+HREF="tutorial-start.html"
+>Начало</A
+></DT
+><DT
+>2. <A
+HREF="tutorial-sql.html"
+>Язык <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+></A
+></DT
+><DT
+>3. <A
+HREF="tutorial-advanced.html"
+>Расширенные возможности</A
+></DT
+></DL
+></DD
+><DT
+>II. <A
+HREF="sql.html"
+>Язык SQL</A
+></DT
+><DD
+><DL
+><DT
+>4. <A
+HREF="sql-syntax.html"
+>Синтаксис SQL</A
+></DT
+><DT
+>5. <A
+HREF="ddl.html"
+>Определение данных</A
+></DT
+><DT
+>6. <A
+HREF="dml.html"
+>Модификация данных</A
+></DT
+><DT
+>7. <A
+HREF="queries.html"
+>Запросы</A
+></DT
+><DT
+>8. <A
+HREF="datatype.html"
+>Типы данных</A
+></DT
+><DT
+>9. <A
+HREF="functions.html"
+>Функции и операторы</A
+></DT
+><DT
+>10. <A
+HREF="typeconv.html"
+>Преобразование типов</A
+></DT
+><DT
+>11. <A
+HREF="indexes.html"
+>Индексы</A
+></DT
+><DT
+>12. <A
+HREF="textsearch.html"
+>Полнотекстовый поиск</A
+></DT
+><DT
+>13. <A
+HREF="mvcc.html"
+>Управление конкурентным доступом</A
+></DT
+><DT
+>14. <A
+HREF="performance-tips.html"
+>Оптимизация производительности</A
+></DT
+></DL
+></DD
+><DT
+>III. <A
+HREF="admin.html"
+>Администрирование сервера</A
+></DT
+><DD
+><DL
+><DT
+>15. <A
+HREF="installation.html"
+>Установка из исходного кода</A
+></DT
+><DT
+>16. <A
+HREF="install-windows.html"
+>Установка из исходного кода в <SPAN
+CLASS="PRODUCTNAME"
+>Windows</SPAN
+></A
+></DT
+><DT
+>17. <A
+HREF="runtime.html"
+>Подготовка к работе и сопровождение сервера</A
+></DT
+><DT
+>18. <A
+HREF="runtime-config.html"
+>Настройка сервера</A
+></DT
+><DT
+>19. <A
+HREF="client-authentication.html"
+>Аутентификация клиентского приложения</A
+></DT
+><DT
+>20. <A
+HREF="user-manag.html"
+>Роли базы данных</A
+></DT
+><DT
+>21. <A
+HREF="managing-databases.html"
+>Управление базами данных</A
+></DT
+><DT
+>22. <A
+HREF="charset.html"
+>Локализация</A
+></DT
+><DT
+>23. <A
+HREF="maintenance.html"
+>Регламентные задачи обслуживания базы данных</A
+></DT
+><DT
+>24. <A
+HREF="backup.html"
+>Резервное копирование и восстановление</A
+></DT
+><DT
+>25. <A
+HREF="high-availability.html"
+>Отказоустойчивость, балансировка нагрузки и репликация</A
+></DT
+><DT
+>26. <A
+HREF="recovery-config.html"
+>Конфигурация восстановления</A
+></DT
+><DT
+>27. <A
+HREF="monitoring.html"
+>Мониторинг работы СУБД</A
+></DT
+><DT
+>28. <A
+HREF="diskusage.html"
+>Мониторинг использования диска</A
+></DT
+><DT
+>29. <A
+HREF="wal.html"
+>Надёжность и журнал упреждающей записи</A
+></DT
+><DT
+>30. <A
+HREF="regress.html"
+>Регрессионные тесты</A
+></DT
+></DL
+></DD
+><DT
+>IV. <A
+HREF="client-interfaces.html"
+>Клиентские интерфейсы</A
+></DT
+><DD
+><DL
+><DT
+>31. <A
+HREF="libpq.html"
+><SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> — библиотека для языка C</A
+></DT
+><DT
+>32. <A
+HREF="largeobjects.html"
+>Большие объекты</A
+></DT
+><DT
+>33. <A
+HREF="ecpg.html"
+><SPAN
+CLASS="APPLICATION"
+>ECPG</SPAN
+> — встраиваемый <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> в C</A
+></DT
+><DT
+>34. <A
+HREF="information-schema.html"
+>Информационная схема</A
+></DT
+></DL
+></DD
+><DT
+>V. <A
+HREF="server-programming.html"
+>Серверное программирование</A
+></DT
+><DD
+><DL
+><DT
+>35. <A
+HREF="extend.html"
+>Расширение <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+></A
+></DT
+><DT
+>36. <A
+HREF="triggers.html"
+>Триггеры</A
+></DT
+><DT
+>37. <A
+HREF="event-triggers.html"
+>Триггеры событий</A
+></DT
+><DT
+>38. <A
+HREF="rules.html"
+>Система правил</A
+></DT
+><DT
+>39. <A
+HREF="xplang.html"
+>Процедурные языки</A
+></DT
+><DT
+>40. <A
+HREF="plpgsql.html"
+><SPAN
+CLASS="APPLICATION"
+>PL/pgSQL</SPAN
+> — процедурный язык <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+></A
+></DT
+><DT
+>41. <A
+HREF="pltcl.html"
+>PL/Tcl — процедурный язык Tcl</A
+></DT
+><DT
+>42. <A
+HREF="plperl.html"
+>PL/Perl — процедурный язык Perl</A
+></DT
+><DT
+>43. <A
+HREF="plpython.html"
+>PL/Python — процедурный язык Python</A
+></DT
+><DT
+>44. <A
+HREF="spi.html"
+>Интерфейс программирования сервера</A
+></DT
+><DT
+>45. <A
+HREF="bgworker.html"
+>Фоновые рабочие процессы</A
+></DT
+><DT
+>46. <A
+HREF="logicaldecoding.html"
+>Логическое декодирование</A
+></DT
+></DL
+></DD
+><DT
+>VI. <A
+HREF="reference.html"
+>Справочное руководство</A
+></DT
+><DD
+><DL
+><DT
+>I. <A
+HREF="sql-commands.html"
+>Команды SQL</A
+></DT
+><DT
+>II. <A
+HREF="reference-client.html"
+>Клиентские приложения PostgreSQL</A
+></DT
+><DT
+>III. <A
+HREF="reference-server.html"
+>Серверные утилиты PostgreSQL</A
+></DT
+></DL
+></DD
+><DT
+>VII. <A
+HREF="internals.html"
+>Внутреннее устройство</A
+></DT
+><DD
+><DL
+><DT
+>47. <A
+HREF="overview.html"
+>Обзор внутреннего устройства PostgreSQL</A
+></DT
+><DT
+>48. <A
+HREF="catalogs.html"
+>Системные каталоги</A
+></DT
+><DT
+>49. <A
+HREF="protocol.html"
+>Клиент-серверный протокол</A
+></DT
+><DT
+>50. <A
+HREF="source.html"
+>Соглашения по оформлению кода PostgreSQL</A
+></DT
+><DT
+>51. <A
+HREF="nls.html"
+>Языковая поддержка</A
+></DT
+><DT
+>52. <A
+HREF="plhandler.html"
+>Написание обработчика процедурного языка</A
+></DT
+><DT
+>53. <A
+HREF="fdwhandler.html"
+>Написание обёртки сторонних данных</A
+></DT
+><DT
+>54. <A
+HREF="geqo.html"
+>Генетический оптимизатор запросов</A
+></DT
+><DT
+>55. <A
+HREF="indexam.html"
+>Определение интерфейса для методов доступа индекса</A
+></DT
+><DT
+>56. <A
+HREF="gist.html"
+>Индексы GiST</A
+></DT
+><DT
+>57. <A
+HREF="spgist.html"
+>Индексы SP-GiST</A
+></DT
+><DT
+>58. <A
+HREF="gin.html"
+>Индексы GIN</A
+></DT
+><DT
+>59. <A
+HREF="storage.html"
+>Физическое хранение базы данных</A
+></DT
+><DT
+>60. <A
+HREF="bki.html"
+>Внутренний интерфейс <ACRONYM
+CLASS="ACRONYM"
+>BKI</ACRONYM
+></A
+></DT
+><DT
+>61. <A
+HREF="planner-stats-details.html"
+>Как планировщик использует статистику</A
+></DT
+></DL
+></DD
+><DT
+>VIII. <A
+HREF="appendixes.html"
+>Приложения</A
+></DT
+><DD
+><DL
+><DT
+>A. <A
+HREF="errcodes-appendix.html"
+>Коды ошибок <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></A
+></DT
+><DT
+>B. <A
+HREF="datetime-appendix.html"
+>Поддержка даты и времени</A
+></DT
+><DT
+>C. <A
+HREF="sql-keywords-appendix.html"
+>Ключевые слова <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+></A
+></DT
+><DT
+>D. <A
+HREF="features.html"
+>Соответствие стандарту SQL</A
+></DT
+><DT
+>E. <A
+HREF="contrib.html"
+>Дополнительно поставляемые модули</A
+></DT
+><DT
+>F. <A
+HREF="contrib-prog.html"
+>Дополнительно поставляемые программы</A
+></DT
+><DT
+>G. <A
+HREF="external-projects.html"
+>Внешние проекты</A
+></DT
+><DT
+>H. <A
+HREF="sourcerepo.html"
+>Репозиторий исходного кода</A
+></DT
+><DT
+>I. <A
+HREF="docguide.html"
+>Документация</A
+></DT
+><DT
+>J. <A
+HREF="acronyms.html"
+>Сокращения</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="biblio.html"
+>Библиография</A
+></DT
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="preface.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Предисловие</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

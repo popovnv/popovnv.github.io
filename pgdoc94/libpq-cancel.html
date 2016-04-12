@@ -1,0 +1,334 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Отмена запросов в процессе выполнения</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="libpq — библиотека для языка C"
+HREF="libpq.html"><LINK
+REL="PREVIOUS"
+TITLE="Построчное извлечение результатов запроса"
+HREF="libpq-single-row-mode.html"><LINK
+REL="NEXT"
+TITLE="Интерфейс быстрого пути"
+HREF="libpq-fastpath.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Построчное извлечение результатов запроса"
+HREF="libpq-single-row-mode.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="libpq.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 31. <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> — библиотека для языка C</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Интерфейс быстрого пути"
+HREF="libpq-fastpath.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="LIBPQ-CANCEL"
+>31.6. Отмена запросов в процессе выполнения</A
+></H1
+><P
+>Клиентское приложение может запросить отмену команды, которая ещё обрабатывается сервером, используя функции, описанные в этом разделе. <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="LIBPQ-PQGETCANCEL"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQgetCancel</CODE
+></DT
+><DD
+><P
+>Создаёт структуру данных, содержащую информацию, необходимую для отмены команды, запущенной через конкретное подключение к базе данных.</P><PRE
+CLASS="SYNOPSIS"
+>PGcancel *PQgetCancel(PGconn *conn);</PRE
+><P></P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>PQgetCancel</CODE
+> создаёт объект <TT
+CLASS="STRUCTNAME"
+>PGcancel</TT
+>, получив объект <TT
+CLASS="STRUCTNAME"
+>PGconn</TT
+>, описывающий подключение. Она возвратит <TT
+CLASS="SYMBOL"
+>NULL</TT
+>, если данный параметр <TT
+CLASS="PARAMETER"
+>conn</TT
+> равен <TT
+CLASS="SYMBOL"
+>NULL</TT
+> или представляет собой недействительное подключения. Объект <TT
+CLASS="STRUCTNAME"
+>PGcancel</TT
+> является непрозрачной структурой, которая не предназначена для того, чтобы приложение обращалось к ней напрямую; её можно только передавать функции <CODE
+CLASS="FUNCTION"
+>PQcancel</CODE
+> или <CODE
+CLASS="FUNCTION"
+>PQfreeCancel</CODE
+>.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQFREECANCEL"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQfreeCancel</CODE
+></DT
+><DD
+><P
+>Освобождает память, занимаемую структурой данных, созданной функцией <CODE
+CLASS="FUNCTION"
+>PQgetCancel</CODE
+>. </P><PRE
+CLASS="SYNOPSIS"
+>void PQfreeCancel(PGcancel *cancel);</PRE
+><P></P
+><P
+><CODE
+CLASS="FUNCTION"
+>PQfreeCancel</CODE
+> освобождает память, занимаемую объектом, предварительно созданным функцией <CODE
+CLASS="FUNCTION"
+>PQgetCancel</CODE
+>.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQCANCEL"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQcancel</CODE
+></DT
+><DD
+><P
+>Требует, чтобы сервер прекратил обработку текущей команды. </P><PRE
+CLASS="SYNOPSIS"
+>int PQcancel(PGcancel *cancel, char *errbuf, int errbufsize);</PRE
+><P></P
+><P
+>Возвращаемое значение равно 1, если запрос на отмену был успешно отправлен, и 0 в противном случае. В случае неудачной отправки <TT
+CLASS="PARAMETER"
+>errbuf</TT
+> заполняется пояснительным сообщением об ошибке. <TT
+CLASS="PARAMETER"
+>errbuf</TT
+> должен быть массивом символов, имеющим размер <TT
+CLASS="PARAMETER"
+>errbufsize</TT
+> (рекомендуемый размер составляет 256 байтов).</P
+><P
+>Успешная отправка ещё не является гарантией того, что запрос будет иметь какой-то эффект. Если отмена сработала, текущая команда завершится досрочно и возвратит в качестве результата ошибку. Если же отмена не получится (например, потому, что сервер уже завершил обработку команды), тогда вообще не будет видимого результата.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>PQcancel</CODE
+> можно безопасно вызывать из обработчика сигнала, если <TT
+CLASS="PARAMETER"
+>errbuf</TT
+> является локальной переменной в обработчике сигнала. Объект <TT
+CLASS="STRUCTNAME"
+>PGcancel</TT
+> доступен только в режиме чтения, пока речь идёт о функции <CODE
+CLASS="FUNCTION"
+>PQcancel</CODE
+>, поэтому её можно также вызывать из потока, отдельного от того, который управляет объектом <TT
+CLASS="STRUCTNAME"
+>PGconn</TT
+>.</P
+></DD
+></DL
+></DIV
+><P>
+
+   <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="LIBPQ-PQREQUESTCANCEL"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQrequestCancel</CODE
+></DT
+><DD
+><P
+><CODE
+CLASS="FUNCTION"
+>PQrequestCancel</CODE
+> является нерекомендуемым вариантом функции <CODE
+CLASS="FUNCTION"
+>PQcancel</CODE
+>. </P><PRE
+CLASS="SYNOPSIS"
+>int PQrequestCancel(PGconn *conn);</PRE
+><P></P
+><P
+>Выдаёт запрос на то, чтобы сервер прекратил обработку текущей команды. Функция работает напрямую с объектом <TT
+CLASS="STRUCTNAME"
+>PGconn</TT
+> и в случае сбоя сохраняет сообщение об ошибке в объекте <TT
+CLASS="STRUCTNAME"
+>PGconn</TT
+> (откуда его можно извлечь с помощью <CODE
+CLASS="FUNCTION"
+>PQerrorMessage</CODE
+>). Хотя функциональность та же самая, этот подход создаёт риски для многопоточных программ и обработчиков сигналов, поскольку возможно, что перезапись сообщения об ошибке, хранящегося в объекте <TT
+CLASS="STRUCTNAME"
+>PGconn</TT
+>, внесет путаницу в текущую операцию, выполняемую на данном подключении.</P
+></DD
+></DL
+></DIV
+><P></P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="libpq-single-row-mode.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="libpq-fastpath.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Построчное извлечение результатов запроса</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="libpq.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Интерфейс быстрого пути</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

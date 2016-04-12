@@ -1,0 +1,334 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>UNLISTEN</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="TRUNCATE"
+HREF="sql-truncate.html"><LINK
+REL="NEXT"
+TITLE="UPDATE"
+HREF="sql-update.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="TRUNCATE"
+HREF="sql-truncate.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="UPDATE"
+HREF="sql-update.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-UNLISTEN"
+></A
+>UNLISTEN</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN85073"
+></A
+><H2
+>Название</H2
+>UNLISTEN&nbsp;--&nbsp;прекратить ожидание уведомления</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN85076"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>UNLISTEN { <TT
+CLASS="REPLACEABLE"
+><I
+>канал</I
+></TT
+> | * }</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN85079"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>UNLISTEN</TT
+> применяется для отмены существующей подписки на получение событий <TT
+CLASS="COMMAND"
+>NOTIFY</TT
+>. <TT
+CLASS="COMMAND"
+>UNLISTEN</TT
+> отменяет существующую подписку в текущем сеансе <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> на канал уведомлений с именем <TT
+CLASS="REPLACEABLE"
+><I
+>канал</I
+></TT
+>. Специальный знак <TT
+CLASS="LITERAL"
+>*</TT
+> отменяет все подписки в текущем сеансе.</P
+><P
+>В описании <A
+HREF="sql-notify.html"
+>NOTIFY</A
+> использование <TT
+CLASS="COMMAND"
+>LISTEN</TT
+> и <TT
+CLASS="COMMAND"
+>NOTIFY</TT
+> рассматривается более подробно.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN85092"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>канал</I
+></TT
+></DT
+><DD
+><P
+>Имя канала уведомлений (любой идентификатор).</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>*</TT
+></DT
+><DD
+><P
+>Отменяются все текущие подписки на уведомления для активного сеанса.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN85105"
+></A
+><H2
+>Замечания</H2
+><P
+>Вы можете также попытаться отменить подписку на канал, на который не подписаны; предупреждений или ошибки при этом не будет.</P
+><P
+><TT
+CLASS="COMMAND"
+>UNLISTEN *</TT
+> автоматически выполняется в конце каждого сеанса.</P
+><P
+>Транзакция, выполнившая <TT
+CLASS="COMMAND"
+>UNLISTEN</TT
+>, не может быть подготовлена для двухфазной фиксации.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN85112"
+></A
+><H2
+>Примеры</H2
+><P
+>Подписка на получение события: </P><PRE
+CLASS="PROGRAMLISTING"
+>LISTEN virtual;
+NOTIFY virtual;
+Asynchronous notification "virtual" received from server process with PID 8448.</PRE
+><P></P
+><P
+>Сразу после выполнения <TT
+CLASS="COMMAND"
+>UNLISTEN</TT
+> последующие сообщения <TT
+CLASS="COMMAND"
+>NOTIFY</TT
+> игнорируются: </P><PRE
+CLASS="PROGRAMLISTING"
+>UNLISTEN virtual;
+NOTIFY virtual;
+-- событие NOTIFY не поступает</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN85120"
+></A
+><H2
+>Совместимость</H2
+><P
+>Команда <TT
+CLASS="COMMAND"
+>UNLISTEN</TT
+> отсутствует в стандарте SQL.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN85124"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-listen.html"
+>LISTEN</A
+>, <A
+HREF="sql-notify.html"
+>NOTIFY</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-truncate.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-update.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>TRUNCATE</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>UPDATE</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

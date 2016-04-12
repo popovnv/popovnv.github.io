@@ -1,0 +1,313 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>REASSIGN OWNED</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="PREPARE TRANSACTION"
+HREF="sql-prepare-transaction.html"><LINK
+REL="NEXT"
+TITLE="REFRESH MATERIALIZED VIEW"
+HREF="sql-refreshmaterializedview.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="PREPARE TRANSACTION"
+HREF="sql-prepare-transaction.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="REFRESH MATERIALIZED VIEW"
+HREF="sql-refreshmaterializedview.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-REASSIGN-OWNED"
+></A
+>REASSIGN OWNED</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN82219"
+></A
+><H2
+>Название</H2
+>REASSIGN OWNED&nbsp;--&nbsp;сменить владельца объектов базы данных, принадлежащих заданной роли</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN82222"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>REASSIGN OWNED BY <TT
+CLASS="REPLACEABLE"
+><I
+>старая_роль</I
+></TT
+> [, ...] TO <TT
+CLASS="REPLACEABLE"
+><I
+>новая_роль</I
+></TT
+></PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN82226"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>REASSIGN OWNED</TT
+> указывает системе сменить владельца объектов базы данных, принадлежащих одной из старых_ролей, на новую_роль.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN82230"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>старая_роль</I
+></TT
+></DT
+><DD
+><P
+>Имя роли. Все объекты в текущей базе данных и все общие объекты (базы данных, табличные пространства), принадлежащие этой роли, станут принадлежать <TT
+CLASS="REPLACEABLE"
+><I
+>новой_роли</I
+></TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>новая_роль</I
+></TT
+></DT
+><DD
+><P
+>Имя роли, которая станет новым владельцем затронутых объектов.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN82244"
+></A
+><H2
+>Замечания</H2
+><P
+><TT
+CLASS="COMMAND"
+>REASSIGN OWNED</TT
+> часто применяется при подготовке к удалению одной или нескольких ролей. Так как команда <TT
+CLASS="COMMAND"
+>REASSIGN OWNED</TT
+> затрагивает объекты только в текущей базе данных, обычно её нужно выполнять в каждой базе данных, которая содержит объекты, принадлежащие удаляемой роли.</P
+><P
+>Для выполнения <TT
+CLASS="COMMAND"
+>REASSIGN OWNED</TT
+> требуются права и для исходной, и для целевой роли.</P
+><P
+>Команда <A
+HREF="sql-drop-owned.html"
+>DROP OWNED</A
+> даёт альтернативную возможность — удалить все объекты базы данных, принадлежащие одной или нескольким ролям. Заметьте также, что <TT
+CLASS="COMMAND"
+>DROP OWNED</TT
+> требует права только для исходной роли.</P
+><P
+>Команда <TT
+CLASS="COMMAND"
+>REASSIGN OWNED</TT
+> не затрагивает права, которые даны старым_ролям для объектов, им не принадлежащих. Отозвать эти права можно, воспользовавшись командой <TT
+CLASS="COMMAND"
+>DROP OWNED</TT
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN82257"
+></A
+><H2
+>Совместимость</H2
+><P
+>Оператор <TT
+CLASS="COMMAND"
+>REASSIGN OWNED</TT
+> является расширением <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN82262"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-drop-owned.html"
+>DROP OWNED</A
+>, <A
+HREF="sql-droprole.html"
+>DROP ROLE</A
+>, <A
+HREF="sql-alterdatabase.html"
+>ALTER DATABASE</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-prepare-transaction.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-refreshmaterializedview.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>PREPARE TRANSACTION</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>REFRESH MATERIALIZED VIEW</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

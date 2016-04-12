@@ -1,0 +1,781 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>            reindexdb
+          </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Клиентские приложения PostgreSQL"
+HREF="reference-client.html"><LINK
+REL="PREVIOUS"
+TITLE="            psql
+          "
+HREF="app-psql.html"><LINK
+REL="NEXT"
+TITLE="            vacuumdb
+          "
+HREF="app-vacuumdb.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="            psql
+          "
+HREF="app-psql.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="reference-client.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="            vacuumdb
+          "
+HREF="app-vacuumdb.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="APP-REINDEXDB"
+></A
+><SPAN
+CLASS="APPLICATION"
+>reindexdb</SPAN
+></H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN92390"
+></A
+><H2
+>Название</H2
+>reindexdb&nbsp;--&nbsp;переиндексировать базу данных <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN92394"
+></A
+><H2
+>Синтаксис</H2
+><P
+><TT
+CLASS="COMMAND"
+>reindexdb</TT
+> [              <TT
+CLASS="REPLACEABLE"
+><I
+>параметр-подключения</I
+></TT
+>
+            ...]       [       <TT
+CLASS="OPTION"
+>--table</TT
+> | <TT
+CLASS="OPTION"
+>-t</TT
+> 
+     <TT
+CLASS="REPLACEABLE"
+><I
+>таблица</I
+></TT
+>
+    ]
+   ...        [       <TT
+CLASS="OPTION"
+>--index</TT
+> | <TT
+CLASS="OPTION"
+>-i</TT
+> 
+     <TT
+CLASS="REPLACEABLE"
+><I
+>индекс</I
+></TT
+>
+    ]
+   ...  [              <TT
+CLASS="REPLACEABLE"
+><I
+>база_данных</I
+></TT
+>
+            ]</P
+><P
+><TT
+CLASS="COMMAND"
+>reindexdb</TT
+> [              <TT
+CLASS="REPLACEABLE"
+><I
+>параметр-подключения</I
+></TT
+>
+            ...]                  <TT
+CLASS="OPTION"
+>--all</TT
+>
+               |                 <TT
+CLASS="OPTION"
+>-a</TT
+>
+               </P
+><P
+><TT
+CLASS="COMMAND"
+>reindexdb</TT
+> [              <TT
+CLASS="REPLACEABLE"
+><I
+>параметр-подключения</I
+></TT
+>
+            ...]                  <TT
+CLASS="OPTION"
+>--system</TT
+>
+               |                 <TT
+CLASS="OPTION"
+>-s</TT
+>
+                [              <TT
+CLASS="REPLACEABLE"
+><I
+>база_данных</I
+></TT
+>
+            ]</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN92437"
+></A
+><H2
+>Описание</H2
+><P
+>Утилита <SPAN
+CLASS="APPLICATION"
+>reindexdb</SPAN
+> предназначена для перестроения индексов в базе данных <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+><P
+>Утилита <SPAN
+CLASS="APPLICATION"
+>reindexdb</SPAN
+> представляет собой обёртку SQL-команды <A
+HREF="sql-reindex.html"
+>REINDEX</A
+>. Переиндексация базы данных с её помощью по сути не отличается от переиндексации при обращении к серверу другими способами.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN92445"
+></A
+><H2
+>Параметры</H2
+><P
+><SPAN
+CLASS="APPLICATION"
+>reindexdb</SPAN
+> принимает следующие аргументы командной строки: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="OPTION"
+>-a</TT
+><BR><TT
+CLASS="OPTION"
+>--all</TT
+></DT
+><DD
+><P
+>Переиндексировать все базы данных.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>[<SPAN
+CLASS="OPTIONAL"
+>-d</SPAN
+>] <TT
+CLASS="REPLACEABLE"
+><I
+>база_данных</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>[<SPAN
+CLASS="OPTIONAL"
+>--dbname=</SPAN
+>]<TT
+CLASS="REPLACEABLE"
+><I
+>база_данных</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Задаёт имя базы данных, подлежащей переиндексации. Если это имя не задано и отсутствует параметр <TT
+CLASS="OPTION"
+>-a</TT
+> (или <TT
+CLASS="OPTION"
+>--all</TT
+>), имя базы данных берётся из переменной окружения <TT
+CLASS="ENVAR"
+>PGDATABASE</TT
+>. Если и эта переменная не задана, выбирается имя подключающегося пользователя.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-e</TT
+><BR><TT
+CLASS="OPTION"
+>--echo</TT
+></DT
+><DD
+><P
+>Выводить команды, которые <SPAN
+CLASS="APPLICATION"
+>reindexdb</SPAN
+> генерирует и передаёт серверу.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-i <TT
+CLASS="REPLACEABLE"
+><I
+>индекс</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--index=<TT
+CLASS="REPLACEABLE"
+><I
+>индекс</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Пересоздать только указанный <TT
+CLASS="REPLACEABLE"
+><I
+>индекс</I
+></TT
+>. Добавив дополнительные ключи <TT
+CLASS="OPTION"
+>-i</TT
+>, можно пересоздать несколько индексов.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-q</TT
+><BR><TT
+CLASS="OPTION"
+>--quiet</TT
+></DT
+><DD
+><P
+>Подавлять вывод сообщений о прогрессе выполнения.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-s</TT
+><BR><TT
+CLASS="OPTION"
+>--system</TT
+></DT
+><DD
+><P
+>Переиндексировать системные каталоги базы данных.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-t <TT
+CLASS="REPLACEABLE"
+><I
+>таблица</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--table=<TT
+CLASS="REPLACEABLE"
+><I
+>таблица</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Переиндексировать только указанную <TT
+CLASS="REPLACEABLE"
+><I
+>таблицу</I
+></TT
+>. Добавив дополнительные ключи <TT
+CLASS="OPTION"
+>-t</TT
+>, можно переиндексировать несколько таблиц.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-V</TT
+><BR><TT
+CLASS="OPTION"
+>--version</TT
+></DT
+><DD
+><P
+>Сообщить версию <SPAN
+CLASS="APPLICATION"
+>reindexdb</SPAN
+> и завершиться.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-?</TT
+><BR><TT
+CLASS="OPTION"
+>--help</TT
+></DT
+><DD
+><P
+>Показать справку по аргументам командной строки <SPAN
+CLASS="APPLICATION"
+>reindexdb</SPAN
+> и завершиться.</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>Утилита <SPAN
+CLASS="APPLICATION"
+>reindexdb</SPAN
+> также принимает следующие аргументы командной строки в качестве параметров подключения: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="OPTION"
+>-h <TT
+CLASS="REPLACEABLE"
+><I
+>host</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--host=<TT
+CLASS="REPLACEABLE"
+><I
+>host</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Указывает имя компьютера, на котором запущен сервер. Если значение начинается с косой черты, оно интерпретируется как имя каталога с доменным сокетом Unix.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-p <TT
+CLASS="REPLACEABLE"
+><I
+>порт</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--port=<TT
+CLASS="REPLACEABLE"
+><I
+>порт</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Указывает TCP-порт или расширение файла Unix-сокета, на котором сервер слушает подключения.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-U <TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--username=<TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Имя пользователя, под которым производится подключение.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-w</TT
+><BR><TT
+CLASS="OPTION"
+>--no-password</TT
+></DT
+><DD
+><P
+>Не выдавать запрос на ввод пароля. Если сервер требует аутентификацию по паролю и пароль не доступен с помощью других средств, таких как файл <TT
+CLASS="FILENAME"
+>.pgpass</TT
+>, попытка соединения не удастся. Этот параметр может быть полезен в пакетных заданиях и скриптах, где нет пользователя, который вводит пароль.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-W</TT
+><BR><TT
+CLASS="OPTION"
+>--password</TT
+></DT
+><DD
+><P
+>Принудительно запрашивать пароль перед подключением к базе данных.</P
+><P
+>Это несущественный параметр, так как <SPAN
+CLASS="APPLICATION"
+>reindexdb</SPAN
+> запрашивает пароль автоматически, если сервер проверяет подлинность по паролю. Однако, чтобы понять это, <SPAN
+CLASS="APPLICATION"
+>reindexdb</SPAN
+> лишний раз подключается к серверу. Поэтому иногда имеет смысл ввести <TT
+CLASS="OPTION"
+>-W</TT
+>, чтобы исключить эту ненужную попытку подключения.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>--maintenance-db=<TT
+CLASS="REPLACEABLE"
+><I
+>база_данных</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Задаёт имя базы данных, через подключение к которой будут находиться другие базы, подлежащие переиндексации. По умолчанию используется <TT
+CLASS="LITERAL"
+>postgres</TT
+>, а в случае её отсутствия — <TT
+CLASS="LITERAL"
+>template1</TT
+>.</P
+></DD
+></DL
+></DIV
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN92588"
+></A
+><H2
+>Переменные окружения</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="ENVAR"
+>PGDATABASE</TT
+><BR><TT
+CLASS="ENVAR"
+>PGHOST</TT
+><BR><TT
+CLASS="ENVAR"
+>PGPORT</TT
+><BR><TT
+CLASS="ENVAR"
+>PGUSER</TT
+></DT
+><DD
+><P
+>Параметры подключения по умолчанию</P
+></DD
+></DL
+></DIV
+><P
+>Эта утилита, как и большинство других утилит <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, также использует переменные среды, поддерживаемые <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> (см. <A
+HREF="libpq-envars.html"
+>Раздел 31.14</A
+>).</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN92606"
+></A
+><H2
+>Диагностика</H2
+><P
+>В случае возникновения трудностей, обратитесь к описаниям <A
+HREF="sql-reindex.html"
+>REINDEX</A
+> и <A
+HREF="app-psql.html"
+>            <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>
+          </A
+>, где обсуждаются потенциальные проблемы и сообщения об ошибках. Учтите, что на целевом компьютере должен работать сервер баз данных. При этом применяются все свойства подключения по умолчанию и переменные окружения, которые использует клиентская библиотека <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN92612"
+></A
+><H2
+>Замечания</H2
+><P
+>Утилите <SPAN
+CLASS="APPLICATION"
+>reindexdb</SPAN
+> может потребоваться подключаться к серверу <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> несколько раз, и при этом она будет каждый раз запрашивать пароль. В таких случаях удобно иметь файл <TT
+CLASS="FILENAME"
+>~/.pgpass</TT
+>. За дополнительными сведениями обратитесь к <A
+HREF="libpq-pgpass.html"
+>Разделу 31.15</A
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN92619"
+></A
+><H2
+>Примеры</H2
+><P
+>Переиндексирование базы данных <TT
+CLASS="LITERAL"
+>test</TT
+>: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$ </SAMP
+><KBD
+CLASS="USERINPUT"
+>reindexdb test</KBD
+></PRE
+><P></P
+><P
+>Переиндексирование таблицы <TT
+CLASS="LITERAL"
+>foo</TT
+> и индекса <TT
+CLASS="LITERAL"
+>bar</TT
+> в базе данных <TT
+CLASS="LITERAL"
+>abcd</TT
+>: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$ </SAMP
+><KBD
+CLASS="USERINPUT"
+>reindexdb --table foo --index bar abcd</KBD
+></PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN92633"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-reindex.html"
+>REINDEX</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="app-psql.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="app-vacuumdb.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="reference-client.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><SPAN
+CLASS="APPLICATION"
+>vacuumdb</SPAN
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,823 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Тестирование и отладка текстового поиска</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Полнотекстовый поиск"
+HREF="textsearch.html"><LINK
+REL="PREVIOUS"
+TITLE="Пример конфигурации"
+HREF="textsearch-configuration.html"><LINK
+REL="NEXT"
+TITLE="Типы индексов GiST и GIN"
+HREF="textsearch-indexes.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Пример конфигурации"
+HREF="textsearch-configuration.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="textsearch.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 12. Полнотекстовый поиск</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Типы индексов GiST и GIN"
+HREF="textsearch-indexes.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="TEXTSEARCH-DEBUGGING"
+>12.8. Тестирование и отладка текстового поиска</A
+></H1
+><P
+>Поведение нестандартной конфигурации текстового поиска по мере её усложнения может стать непонятным. В этом разделе описаны функции, полезные для тестирования объектов текстового поиска. Вы можете тестировать конфигурацию как целиком, так и по частям, отлаживая анализаторы и словари по отдельности.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="TEXTSEARCH-CONFIGURATION-TESTING"
+>12.8.1. Тестирование конфигурации</A
+></H2
+><P
+>Созданную конфигурацию текстового поиска можно легко протестировать с помощью функции <CODE
+CLASS="FUNCTION"
+>ts_debug</CODE
+>.</P
+><PRE
+CLASS="SYNOPSIS"
+>ts_debug([<SPAN
+CLASS="OPTIONAL"
+><TT
+CLASS="REPLACEABLE"
+><I
+>конфигурация</I
+></TT
+> <TT
+CLASS="TYPE"
+>regconfig</TT
+>,</SPAN
+>] <TT
+CLASS="REPLACEABLE"
+><I
+>документ</I
+></TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>,
+         OUT <TT
+CLASS="REPLACEABLE"
+><I
+>псевдоним</I
+></TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>,
+         OUT <TT
+CLASS="REPLACEABLE"
+><I
+>описание</I
+></TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>,
+         OUT <TT
+CLASS="REPLACEABLE"
+><I
+>фрагмент</I
+></TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>,
+         OUT <TT
+CLASS="REPLACEABLE"
+><I
+>словари</I
+></TT
+> <TT
+CLASS="TYPE"
+>regdictionary[]</TT
+>,
+         OUT <TT
+CLASS="REPLACEABLE"
+><I
+>словарь</I
+></TT
+> <TT
+CLASS="TYPE"
+>regdictionary</TT
+>,
+         OUT <TT
+CLASS="REPLACEABLE"
+><I
+>лексемы</I
+></TT
+> <TT
+CLASS="TYPE"
+>text[]</TT
+>)
+         returns setof record</PRE
+><P
+><CODE
+CLASS="FUNCTION"
+>ts_debug</CODE
+> выводит информацию обо всех фрагментах данного документа, которые были выданы анализатором и обработаны настроенными словарями. Она использует конфигурацию, указанную в аргументе <TT
+CLASS="REPLACEABLE"
+><I
+>config</I
+></TT
+>, или <TT
+CLASS="VARNAME"
+>default_text_search_config</TT
+>, если этот аргумент опущен.</P
+><P
+><CODE
+CLASS="FUNCTION"
+>ts_debug</CODE
+> возвращает по одной строке для каждого фрагмента, найденного в тексте анализатором. Эта строка содержит следующие колонки: <P
+></P
+></P><UL
+COMPACT="COMPACT"
+><LI
+STYLE="list-style-type: disc"
+><P
+><TT
+CLASS="REPLACEABLE"
+><I
+>синоним</I
+></TT
+> <TT
+CLASS="TYPE"
+>text</TT
+> &mdash; краткое имя типа фрагмента</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+><TT
+CLASS="REPLACEABLE"
+><I
+>описание</I
+></TT
+> <TT
+CLASS="TYPE"
+>text</TT
+> &mdash; описание типа фрагмента</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+><TT
+CLASS="REPLACEABLE"
+><I
+>фрагмент</I
+></TT
+> <TT
+CLASS="TYPE"
+>text</TT
+> &mdash; текст фрагмента</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+><TT
+CLASS="REPLACEABLE"
+><I
+>словари</I
+></TT
+> <TT
+CLASS="TYPE"
+>regdictionary[]</TT
+> &mdash; словари, назначенные в конфигурации для фрагментов такого типа</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+><TT
+CLASS="REPLACEABLE"
+><I
+>словарь</I
+></TT
+> <TT
+CLASS="TYPE"
+>regdictionary</TT
+> &mdash; словарь, распознавший этот фрагмент, или <TT
+CLASS="LITERAL"
+>NULL</TT
+>, если подходящего словаря не нашлось</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+><TT
+CLASS="REPLACEABLE"
+><I
+>лексемы</I
+></TT
+> <TT
+CLASS="TYPE"
+>text[]</TT
+> &mdash; лексемы, выданные словарём, распознавшим фрагмент, или <TT
+CLASS="LITERAL"
+>NULL</TT
+>, если подходящий словарь не нашёлся; может быть также пустым массивом (<TT
+CLASS="LITERAL"
+>{}</TT
+>), если фрагмент распознан как стоп-слово</P
+></LI
+></UL
+><P></P
+><P
+>Простой пример: </P><PRE
+CLASS="SCREEN"
+>SELECT * FROM ts_debug('english',
+  'a fat  cat sat on a mat - it ate a fat rats');
+   alias  |   description  | token|  dictionaries |  dictionary |lexemes
+----------+----------------+------+---------------+-------------+-------
+ asciiword| Word, all ASCII| a    | {english_stem}| english_stem| {}
+ blank    | Space symbols  |      | {}            |             | 
+ asciiword| Word, all ASCII| fat  | {english_stem}| english_stem| {fat}
+ blank    | Space symbols  |      | {}            |             | 
+ asciiword| Word, all ASCII| cat  | {english_stem}| english_stem| {cat}
+ blank    | Space symbols  |      | {}            |             | 
+ asciiword| Word, all ASCII| sat  | {english_stem}| english_stem| {sat}
+ blank    | Space symbols  |      | {}            |             | 
+ asciiword| Word, all ASCII| on   | {english_stem}| english_stem| {}
+ blank    | Space symbols  |      | {}            |             | 
+ asciiword| Word, all ASCII| a    | {english_stem}| english_stem| {}
+ blank    | Space symbols  |      | {}            |             | 
+ asciiword| Word, all ASCII| mat  | {english_stem}| english_stem| {mat}
+ blank    | Space symbols  |      | {}            |             | 
+ blank    | Space symbols  | -    | {}            |             | 
+ asciiword| Word, all ASCII| it   | {english_stem}| english_stem| {}
+ blank    | Space symbols  |      | {}            |             | 
+ asciiword| Word, all ASCII| ate  | {english_stem}| english_stem| {ate}
+ blank    | Space symbols  |      | {}            |             | 
+ asciiword| Word, all ASCII| a    | {english_stem}| english_stem| {}
+ blank    | Space symbols  |      | {}            |             | 
+ asciiword| Word, all ASCII| fat  | {english_stem}| english_stem| {fat}
+ blank    | Space symbols  |      | {}            |             | 
+ asciiword| Word, all ASCII| rats | {english_stem}| english_stem| {rat}</PRE
+><P></P
+><P
+>Для более полной демонстрации мы сначала создадим конфигурацию <TT
+CLASS="LITERAL"
+>public.english</TT
+> и словарь Ispell для английского языка:</P
+><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TEXT SEARCH CONFIGURATION public.english
+  ( COPY = pg_catalog.english );
+
+CREATE TEXT SEARCH DICTIONARY english_ispell (
+    TEMPLATE = ispell,
+    DictFile = english,
+    AffFile = english,
+    StopWords = english
+);
+
+ALTER TEXT SEARCH CONFIGURATION public.english
+   ALTER MAPPING FOR asciiword WITH english_ispell, english_stem;</PRE
+><PRE
+CLASS="SCREEN"
+>SELECT * FROM ts_debug('public.english','The Brightest supernovaes');
+  alias  | description |   token   |  dictionaries |dictionary| lexemes   
+---------+-------------+-----------+----------- ---+----------+-----------
+asciiword|Word,        |The        |{english_ispell|english_  |{}
+         | all ASCII   |           |,english_stem} |ispell    |
+blank    |Space symbols|           |{}             |          |
+         |             |           |               |          |
+asciiword|Word,        |Brightest  |{english_ispell|english_  |{bright}
+         |all ASCII    |           |,english_stem} |ispell    |
+blank    |Space symbols|           | {}            |          |
+         |             |           |               |          |
+asciiword|Word,        |supernovaes|{english_ispell|english_  |{supernova}
+         |all ASCII    |           |,english_stem} |stem      |</PRE
+><P
+>В этом примере слово <TT
+CLASS="LITERAL"
+>Brightest</TT
+> было воспринято анализатором как фрагмент <TT
+CLASS="LITERAL"
+>ASCII word</TT
+> (синоним <TT
+CLASS="LITERAL"
+>asciiword</TT
+>). Для этого типа фрагментов список словарей включает <TT
+CLASS="LITERAL"
+>english_ispell</TT
+> и <TT
+CLASS="LITERAL"
+>english_stem</TT
+>. Данное слово было распознано словарём <TT
+CLASS="LITERAL"
+>english_ispell</TT
+>, который свёл его к <TT
+CLASS="LITERAL"
+>bright</TT
+>. Слово <TT
+CLASS="LITERAL"
+>supernovaes</TT
+> оказалось незнакомо словарю <TT
+CLASS="LITERAL"
+>english_ispell</TT
+>, так что оно было передано следующему словарю, который его благополучно распознал (на самом деле <TT
+CLASS="LITERAL"
+>english_stem</TT
+> &mdash; это стеммер Snowball, который распознаёт всё, поэтому он включён в список словарей последним).</P
+><P
+>Слово <TT
+CLASS="LITERAL"
+>The</TT
+> было распознано словарём <TT
+CLASS="LITERAL"
+>english_ispell</TT
+> как стоп-слово (см. <A
+HREF="textsearch-dictionaries.html#TEXTSEARCH-STOPWORDS"
+>Подраздел 12.6.1</A
+>) и поэтому не будет индексироваться. Пробелы тоже отбрасываются, так как в данной конфигурации для них нет словарей.</P
+><P
+>Вы можете уменьшить ширину вывода, явно перечислив только те колонки, которые вы хотите видеть: </P><PRE
+CLASS="SCREEN"
+>SELECT alias, token, dictionary, lexemes
+FROM ts_debug('public.english','The Brightest supernovaes');
+   alias   |    token    |   dictionary   |   lexemes   
+-----------+-------------+----------------+-------------
+ asciiword | The         | english_ispell | {}
+ blank     |             |                | 
+ asciiword | Brightest   | english_ispell | {bright}
+ blank     |             |                | 
+ asciiword | supernovaes | english_stem   | {supernova}</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="TEXTSEARCH-PARSER-TESTING"
+>12.8.2. Тестирование анализатора</A
+></H2
+><P
+>Следующие функции позволяют непосредственно протестировать анализатор текстового поиска.</P
+><PRE
+CLASS="SYNOPSIS"
+>ts_parse(<TT
+CLASS="REPLACEABLE"
+><I
+>имя_анализатора</I
+></TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>документ</I
+></TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>,
+         OUT <TT
+CLASS="REPLACEABLE"
+><I
+>код_фрагмента</I
+></TT
+> <TT
+CLASS="TYPE"
+>integer</TT
+>, OUT <TT
+CLASS="REPLACEABLE"
+><I
+>фрагмент</I
+></TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>) returns <TT
+CLASS="TYPE"
+>setof record</TT
+>
+ts_parse(<TT
+CLASS="REPLACEABLE"
+><I
+>oid_анализатора</I
+></TT
+> <TT
+CLASS="TYPE"
+>oid</TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>документ</I
+></TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>,
+         OUT <TT
+CLASS="REPLACEABLE"
+><I
+>код_фрагмента</I
+></TT
+> <TT
+CLASS="TYPE"
+>integer</TT
+>, OUT <TT
+CLASS="REPLACEABLE"
+><I
+>фрагмент</I
+></TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>) returns <TT
+CLASS="TYPE"
+>setof record</TT
+></PRE
+><P
+><CODE
+CLASS="FUNCTION"
+>ts_parse</CODE
+> разбирает данный документ и возвращает набор записей, по одной для каждого извлечённого фрагмента. Каждая запись содержит <TT
+CLASS="VARNAME"
+>код_фрагмента</TT
+>, код назначенного типа фрагмента, и <TT
+CLASS="VARNAME"
+>фрагмент</TT
+>, собственно текст фрагмента. Например: </P><PRE
+CLASS="SCREEN"
+>SELECT * FROM ts_parse('default', '123 - a number');
+ tokid | token
+-------+--------
+    22 | 123
+    12 |
+    12 | -
+     1 | a
+    12 |
+     1 | number</PRE
+><P></P
+><PRE
+CLASS="SYNOPSIS"
+>ts_token_type(<TT
+CLASS="REPLACEABLE"
+><I
+>имя_анализатора</I
+></TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>, OUT <TT
+CLASS="REPLACEABLE"
+><I
+>код_фрагмента</I
+></TT
+> <TT
+CLASS="TYPE"
+>integer</TT
+>,
+              OUT <TT
+CLASS="REPLACEABLE"
+><I
+>псевдоним</I
+></TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>, OUT <TT
+CLASS="REPLACEABLE"
+><I
+>описание</I
+></TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>) returns <TT
+CLASS="TYPE"
+>setof record</TT
+>
+ts_token_type(<TT
+CLASS="REPLACEABLE"
+><I
+>oid_анализатора</I
+></TT
+> <TT
+CLASS="TYPE"
+>oid</TT
+>, OUT <TT
+CLASS="REPLACEABLE"
+><I
+>код_фрагмента</I
+></TT
+> <TT
+CLASS="TYPE"
+>integer</TT
+>,
+              OUT <TT
+CLASS="REPLACEABLE"
+><I
+>псевдоним</I
+></TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>, OUT <TT
+CLASS="REPLACEABLE"
+><I
+>описание</I
+></TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>) returns <TT
+CLASS="TYPE"
+>setof record</TT
+></PRE
+><P
+><CODE
+CLASS="FUNCTION"
+>ts_token_type</CODE
+> возвращает таблицу, описывающую все типы фрагментов, которые может распознать анализатор. Для каждого типа в этой таблице указывается его целочисленный <TT
+CLASS="VARNAME"
+>код_фрагмента</TT
+>, <TT
+CLASS="VARNAME"
+>псевдоним </TT
+>, с которым этот тип фигурирует в командах, и краткое <TT
+CLASS="VARNAME"
+>description</TT
+>. Например: </P><PRE
+CLASS="SCREEN"
+>SELECT * FROM ts_token_type('default');
+ tokid |      alias      |               description                
+-------+-----------------+------------------------------------------
+     1 | asciiword       | Word, all ASCII
+     2 | word            | Word, all letters
+     3 | numword         | Word, letters and digits
+     4 | email           | Email address
+     5 | url             | URL
+     6 | host            | Host
+     7 | sfloat          | Scientific notation
+     8 | version         | Version number
+     9 | hword_numpart   | Hyphenated word part, letters and digits
+    10 | hword_part      | Hyphenated word part, all letters
+    11 | hword_asciipart | Hyphenated word part, all ASCII
+    12 | blank           | Space symbols
+    13 | tag             | XML tag
+    14 | protocol        | Protocol head
+    15 | numhword        | Hyphenated word, letters and digits
+    16 | asciihword      | Hyphenated word, all ASCII
+    17 | hword           | Hyphenated word, all letters
+    18 | url_path        | URL path
+    19 | file            | File or path name
+    20 | float           | Decimal notation
+    21 | int             | Signed integer
+    22 | uint            | Unsigned integer
+    23 | entity          | XML entity</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="TEXTSEARCH-DICTIONARY-TESTING"
+>12.8.3. Тестирование словаря</A
+></H2
+><P
+>Для тестирования словаря предназначена функция <CODE
+CLASS="FUNCTION"
+>ts_lexize</CODE
+>.</P
+><PRE
+CLASS="SYNOPSIS"
+>ts_lexize(<TT
+CLASS="REPLACEABLE"
+><I
+>словарь</I
+></TT
+> <TT
+CLASS="TYPE"
+>regdictionary</TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>фрагмент</I
+></TT
+> <TT
+CLASS="TYPE"
+>text</TT
+>) returns <TT
+CLASS="TYPE"
+>text[]</TT
+></PRE
+><P
+><CODE
+CLASS="FUNCTION"
+>ts_lexize</CODE
+> возвращает массив лексем, если входной <TT
+CLASS="REPLACEABLE"
+><I
+>фрагмент</I
+></TT
+> известен словарю, либо пустой массив, если этот фрагмент считается в словаре стоп-словом, либо <TT
+CLASS="LITERAL"
+>NULL</TT
+>, если он не был распознан.</P
+><P
+>Примеры: </P><PRE
+CLASS="SCREEN"
+>SELECT ts_lexize('english_stem', 'stars');
+ ts_lexize
+-----------
+ {star}
+
+SELECT ts_lexize('english_stem', 'a');
+ ts_lexize
+-----------
+ {}</PRE
+><P></P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Функция <CODE
+CLASS="FUNCTION"
+>ts_lexize</CODE
+> принимает одиночный <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>фрагмент</I
+></SPAN
+>, а не просто текст. Вот пример возможного заблуждения: </P><PRE
+CLASS="SCREEN"
+>SELECT ts_lexize('thesaurus_astro','supernovae stars') is null;
+ ?column?
+----------
+ t</PRE
+><P> Хотя фраза <TT
+CLASS="LITERAL"
+>supernovae stars</TT
+> есть в тезаурусе <TT
+CLASS="LITERAL"
+>thesaurus_astro</TT
+>, <CODE
+CLASS="FUNCTION"
+>ts_lexize</CODE
+> не работает, так как она не разбирает входной текст, а воспринимает его как один фрагмент. Поэтому для проверки тезаурусов следует использовать функции <CODE
+CLASS="FUNCTION"
+>plainto_tsquery</CODE
+> и <CODE
+CLASS="FUNCTION"
+>to_tsvector</CODE
+>, например: </P><PRE
+CLASS="SCREEN"
+>SELECT plainto_tsquery('supernovae stars');
+ plainto_tsquery
+-----------------
+ 'sn'</PRE
+><P></P
+></BLOCKQUOTE
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="textsearch-configuration.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="textsearch-indexes.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Пример конфигурации</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="textsearch.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Типы индексов GiST и GIN</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

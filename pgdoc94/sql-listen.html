@@ -1,0 +1,348 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>LISTEN</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="INSERT"
+HREF="sql-insert.html"><LINK
+REL="NEXT"
+TITLE="LOAD"
+HREF="sql-load.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="INSERT"
+HREF="sql-insert.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="LOAD"
+HREF="sql-load.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-LISTEN"
+></A
+>LISTEN</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN81655"
+></A
+><H2
+>Название</H2
+>LISTEN&nbsp;--&nbsp;ожидать уведомления</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN81658"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>LISTEN <TT
+CLASS="REPLACEABLE"
+><I
+>канал</I
+></TT
+></PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN81661"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>LISTEN</TT
+> регистрирует текущий сеанс для получения уведомления через канал с заданным именем (<TT
+CLASS="REPLACEABLE"
+><I
+>канал</I
+></TT
+>). Если текущий сеанс уже зарегистрирован и ожидает уведомления через этот канал, ничего не происходит.</P
+><P
+>Когда вызывается команда <TT
+CLASS="COMMAND"
+>NOTIFY <TT
+CLASS="REPLACEABLE"
+><I
+>канал</I
+></TT
+></TT
+> (в текущем или другом сеансе, подключённом к той же базе данных), все сеансы, ожидающие уведомления через заданный канал, получают уведомление и каждый, в свою очередь, передаёт его подключённому клиентскому приложению.</P
+><P
+>Сеанс может отказаться от получения уведомлений через определённый канал с помощью команды <TT
+CLASS="COMMAND"
+>UNLISTEN</TT
+>. Кроме того, подписка на любые уведомления автоматически отменяется при завершении сеанса.</P
+><P
+>Способ получения уведомлений клиентским приложением определяется программным интерфейсом <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, который оно использует. Приложение, использующее библиотеку <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>, выполняет команду <TT
+CLASS="COMMAND"
+>LISTEN</TT
+> как обычную команду SQL, а затем оно должно периодически вызывать функцию <CODE
+CLASS="FUNCTION"
+>PQnotifies</CODE
+>, чтобы проверить, не поступили ли новые уведомления. Другие интерфейсы, например <SPAN
+CLASS="APPLICATION"
+>libpgtcl</SPAN
+>, предоставляют более высокоуровневые методы для обработки событий уведомлений; на самом деле с <SPAN
+CLASS="APPLICATION"
+>libpgtcl</SPAN
+> разработчик приложения даже не должен непосредственно выполнять команды <TT
+CLASS="COMMAND"
+>LISTEN</TT
+> и <TT
+CLASS="COMMAND"
+>UNLISTEN</TT
+>. За дополнительными подробностями обратитесь к документации интерфейса, который вы используете.</P
+><P
+>В описании <A
+HREF="sql-notify.html"
+>NOTIFY</A
+> использование <TT
+CLASS="COMMAND"
+>LISTEN</TT
+> и <TT
+CLASS="COMMAND"
+>NOTIFY</TT
+> рассматривается более подробно.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN81684"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>канал</I
+></TT
+></DT
+><DD
+><P
+>Имя канала уведомлений (любой идентификатор).</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN81692"
+></A
+><H2
+>Замечания</H2
+><P
+><TT
+CLASS="COMMAND"
+>LISTEN</TT
+> начинает действовать при фиксировании транзакции. Если <TT
+CLASS="COMMAND"
+>LISTEN</TT
+> или <TT
+CLASS="COMMAND"
+>UNLISTEN</TT
+> выполняется в транзакции, которая затем откатывается, состояние подписки этого сеанса на уведомления не меняется.</P
+><P
+>Транзакция, в которой выполняется <TT
+CLASS="COMMAND"
+>LISTEN</TT
+>, не может быть подготовлена для двухфазной фиксации.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN81700"
+></A
+><H2
+>Примеры</H2
+><P
+>Демонстрация процедуры ожидания/получения уведомления в <SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>LISTEN virtual;
+NOTIFY virtual;
+Asynchronous notification "virtual" received from server process with PID 8448.</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN81705"
+></A
+><H2
+>Совместимость</H2
+><P
+>Оператор <TT
+CLASS="COMMAND"
+>LISTEN</TT
+> отсутствует в стандарте SQL.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN81709"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-notify.html"
+>NOTIFY</A
+>, <A
+HREF="sql-unlisten.html"
+>UNLISTEN</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-insert.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-load.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>INSERT</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>LOAD</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

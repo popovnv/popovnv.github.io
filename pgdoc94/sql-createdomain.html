@@ -1,0 +1,448 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>CREATE DOMAIN</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="CREATE DATABASE"
+HREF="sql-createdatabase.html"><LINK
+REL="NEXT"
+TITLE="CREATE EVENT TRIGGER"
+HREF="sql-createeventtrigger.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="CREATE DATABASE"
+HREF="sql-createdatabase.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="CREATE EVENT TRIGGER"
+HREF="sql-createeventtrigger.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-CREATEDOMAIN"
+></A
+>CREATE DOMAIN</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN72955"
+></A
+><H2
+>Название</H2
+>CREATE DOMAIN&nbsp;--&nbsp;создать домен</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN72958"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>CREATE DOMAIN <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> [ AS ] <TT
+CLASS="REPLACEABLE"
+><I
+>тип_данных</I
+></TT
+>
+    [ COLLATE <TT
+CLASS="REPLACEABLE"
+><I
+>правило_сортировки</I
+></TT
+> ]
+    [ DEFAULT <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+> ]
+    [ <TT
+CLASS="REPLACEABLE"
+><I
+>ограничение</I
+></TT
+> [ ... ] ]
+
+<SPAN
+CLASS="phrase"
+><SPAN
+CLASS="PHRASE"
+>Здесь <TT
+CLASS="REPLACEABLE"
+><I
+>ограничение</I
+></TT
+>:</SPAN
+></SPAN
+>
+
+[ CONSTRAINT <TT
+CLASS="REPLACEABLE"
+><I
+>имя_ограничения</I
+></TT
+> ]
+{ NOT NULL | NULL | CHECK (<TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+>) }</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN72969"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>CREATE DOMAIN</TT
+> создаёт новый домен. Домен по сути представляет собой тип данных с дополнительными условиями (ограничивающими допустимый набор значений). Владельцем домена становится пользователь его создавший.</P
+><P
+>Если задаётся имя схемы (например, <TT
+CLASS="LITERAL"
+>CREATE DOMAIN myschema.mydomain ...</TT
+>), домен создаётся в указанной схеме, в противном случае — в текущей. Имя домена должно быть уникальным среди имён типов и доменов, существующих в этой схеме.</P
+><P
+>Домены полезны для абстрагирования и вынесения общих характеристик разных полей в единое место для упрощения сопровождения. Например, в нескольких таблицах может присутствовать колонка, содержащая электронный адрес, и для всех требуются одинаковые ограничения CHECK, проверяющие синтаксис адреса. В этом случае лучше определить домен, а не задавать для каждой таблицы отдельные ограничения.</P
+><P
+>Чтобы создать домен, необходимо иметь право <TT
+CLASS="LITERAL"
+>USAGE</TT
+> для нижележащего типа.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN72978"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></DT
+><DD
+><P
+>Имя (возможно, дополненное схемой) создаваемого домена.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>тип_данных</I
+></TT
+></DT
+><DD
+><P
+>Нижележащий тип данных домена (может включать определение массива с этим типом).</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>правило_сортировки</I
+></TT
+></DT
+><DD
+><P
+>Необязательное указание правила сортировки для домена. Если это указание отсутствует, используется правило сортировки по умолчанию нижележащего типа данных. Указать <TT
+CLASS="LITERAL"
+>COLLATE</TT
+> можно, только если нижележащий тип данных является сортируемым.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>DEFAULT <TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Предложение <TT
+CLASS="LITERAL"
+>DEFAULT</TT
+> определяет значение по умолчанию для колонок, типом данных которых является этот домен. Значением может быть любое выражение без переменных (подзапросы также не допускаются). Тип данных этого выражения должен соответствовать типу данных домена. Если значение по умолчанию не указано, им будет значение NULL.</P
+><P
+>Значение по умолчанию будет использоваться в любой операции добавления строк, в которой не задано значение для этой колонки. Если значение по умолчанию установлено для конкретной колонки, оно будет переопределять значение по умолчанию, связанное с доменом. В свою очередь, значение по умолчанию для домена переопределяет любое значение по умолчанию, связанное с нижележащим типом данных.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>CONSTRAINT <TT
+CLASS="REPLACEABLE"
+><I
+>имя_ограничения</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Имя ограничения. Если не указано явно, имя будет сгенерировано системой.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>NOT NULL</TT
+></DT
+><DD
+><P
+>Такой домен как правило не принимает значения NULL. Однако домен с таким ограничением всё же может принимать значение NULL, если ему присваивается такой же тип домена, который оказался равным NULL, например, в результате LEFT OUTER JOIN или <TT
+CLASS="COMMAND"
+>INSERT INTO tab (domcol) VALUES ((SELECT domcol FROM tab WHERE false))</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>NULL</TT
+></DT
+><DD
+><P
+>Этот домен может содержать значение NULL. Это свойство домена по умолчанию.</P
+><P
+>Это предложение предназначено только для совместимости с нестандартными базами данных SQL. Использовать его в новых приложениях не рекомендуется.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>CHECK (<TT
+CLASS="REPLACEABLE"
+><I
+>выражение</I
+></TT
+>)</TT
+></DT
+><DD
+><P
+>Предложения <TT
+CLASS="LITERAL"
+>CHECK</TT
+> задают ограничения целостности или проверки, которым должны удовлетворять значения домена. Каждое ограничение должно представлять собой выражение, выдающее результат типа Boolean. Проверяемое значение в этом выражении обозначается ключевым словом <TT
+CLASS="LITERAL"
+>VALUE</TT
+>.</P
+><P
+>В настоящее время выражения <TT
+CLASS="LITERAL"
+>CHECK</TT
+> не могут содержать переменные, кроме <TT
+CLASS="LITERAL"
+>VALUE</TT
+>, и подзапросы.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN73034"
+></A
+><H2
+>Примеры</H2
+><P
+>В этом примере создаётся тип данных <TT
+CLASS="TYPE"
+>us_postal_code</TT
+> (почтовый индекс США), который затем используется в определении таблицы. Для проверки значения на соответствие формату почтовых индексов США применяется проверка с регулярными выражениями: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE DOMAIN us_postal_code AS TEXT
+CHECK(
+   VALUE ~ '^\d{5}$'
+OR VALUE ~ '^\d{5}-\d{4}$'
+);
+
+CREATE TABLE us_snail_addy (
+  address_id SERIAL PRIMARY KEY,
+  street1 TEXT NOT NULL,
+  street2 TEXT,
+  street3 TEXT,
+  city TEXT NOT NULL,
+  postal us_postal_code NOT NULL
+);</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="SQL-CREATEDOMAIN-COMPATIBILITY"
+></A
+><H2
+>Совместимость</H2
+><P
+>Команда <TT
+CLASS="COMMAND"
+>CREATE DOMAIN</TT
+> соответствует стандарту SQL.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="SQL-CREATEDOMAIN-SEE-ALSO"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-alterdomain.html"
+>ALTER DOMAIN</A
+>, <A
+HREF="sql-dropdomain.html"
+>DROP DOMAIN</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-createdatabase.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-createeventtrigger.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>CREATE DATABASE</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>CREATE EVENT TRIGGER</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

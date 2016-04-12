@@ -1,0 +1,256 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Обработка замечаний</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="libpq — библиотека для языка C"
+HREF="libpq.html"><LINK
+REL="PREVIOUS"
+TITLE="Функции разного назначения"
+HREF="libpq-misc.html"><LINK
+REL="NEXT"
+TITLE="Система событий"
+HREF="libpq-events.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Функции разного назначения"
+HREF="libpq-misc.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="libpq.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 31. <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> — библиотека для языка C</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Система событий"
+HREF="libpq-events.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="LIBPQ-NOTICE-PROCESSING"
+>31.12. Обработка замечаний</A
+></H1
+><P
+>Сообщения с замечаниями и предупреждениями, выдаваемые сервером, не возвращаются функциями, выполняющими запросы, так как они не свидетельствуют об ошибке в запросе. Вместо этого они передаются функции обработки замечаний и после завершения этой функции выполнение продолжается как обычно. Стандартная функция обработки замечаний выводит сообщение в <TT
+CLASS="FILENAME"
+>stderr</TT
+>, но приложение может переопределить это поведение, предоставив собственный обработчик.</P
+><P
+>По историческим причинам обработка замечаний выполняется на двух уровнях, приёмником замечаний и обработчиком замечаний. По умолчанию приёмник замечаний форматирует замечание и передаёт сформированную строку обработчику замечаний для вывода. Однако приложения, которые реализуют свой приёмник замечаний, обычно просто игнорируют слой обработчика и выполняют все действия в коде приёмника.</P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>PQsetNoticeReceiver</CODE
+> устанавливает или возвращает текущий приёмник замечаний для объекта соединения. Подобным образом, <CODE
+CLASS="FUNCTION"
+>PQsetNoticeProcessor</CODE
+> устанавливает или возвращает текущий обработчик замечаний. </P><PRE
+CLASS="SYNOPSIS"
+>typedef void (*PQnoticeReceiver) (void *arg, const PGresult *res);
+
+PQnoticeReceiver
+PQsetNoticeReceiver(PGconn *conn,
+                    PQnoticeReceiver proc,
+                    void *arg);
+
+typedef void (*PQnoticeProcessor) (void *arg, const char *message);
+
+PQnoticeProcessor
+PQsetNoticeProcessor(PGconn *conn,
+                     PQnoticeProcessor proc,
+                     void *arg);</PRE
+><P> Каждая из этих функций возвращает указатель на ранее установленный приёмник или обработчик замечаний и устанавливает новый указатель. Если ей передаётся нулевой указатель, она ничего не делает, только возвращает текущий указатель.</P
+><P
+>Когда сообщение с замечанием или предупреждением поступает от сервера, либо выдаётся самой библиотекой <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>, вызывается функция приёмника замечания. Сообщение передаётся ей в виде состояния <TT
+CLASS="SYMBOL"
+>PGRES_NONFATAL_ERROR</TT
+> объекта 
+   <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+>. (Это позволяет приёмнику извлечь из него отдельные поля, используя <CODE
+CLASS="FUNCTION"
+>PQresultErrorField</CODE
+>, либо получить полное подготовленное сообщение, вызвав <CODE
+CLASS="FUNCTION"
+>PQresultErrorMessage</CODE
+>.) Ей также передаётся тот же неопределённый указатель, что был передан функции <CODE
+CLASS="FUNCTION"
+>PQsetNoticeReceiver</CODE
+>. (Этот указатель может пригодиться для обращения к внутреннему состоянию приложения при необходимости.)</P
+><P
+>Стандартный приёмник замечаний просто извлекает сообщение (вызывая <CODE
+CLASS="FUNCTION"
+>PQresultErrorMessage</CODE
+>) и передаёт его обработчику замечаний.</P
+><P
+>Обработчик замечаний отвечает за обработку сообщения с замечанием или предупреждением в текстовом виде. Ему передаётся строка с текстом сообщения (включающая завершающий символ новой строки) и неопределённый указатель, который был передан функции <CODE
+CLASS="FUNCTION"
+>PQsetNoticeProcessor</CODE
+>. (Этот указатель может пригодиться для обращения к внутреннему состоянию приложения при необходимости.)</P
+><P
+>Стандартный обработчик замечаний прост: </P><PRE
+CLASS="PROGRAMLISTING"
+>static void
+defaultNoticeProcessor(void *arg, const char *message)
+{
+    fprintf(stderr, "%s", message);
+}</PRE
+><P></P
+><P
+>Установив приёмник или обработчик замечаний, вы можете ожидать, что эта функция будет вызываться, пока будут существовать объект <TT
+CLASS="STRUCTNAME"
+>PGconn</TT
+> или объекты <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+>, созданные с ней. Когда создаётся <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+>, указатели текущих обработчиков замечаний, установленные в <TT
+CLASS="STRUCTNAME"
+>PGconn</TT
+>, копируются в <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+> для возможного использования функциями вроде <CODE
+CLASS="FUNCTION"
+>PQgetvalue</CODE
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="libpq-misc.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="libpq-events.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Функции разного назначения</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="libpq.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Система событий</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,628 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Параметры для разработчиков</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Настройка сервера"
+HREF="runtime-config.html"><LINK
+REL="PREVIOUS"
+TITLE="Внесистемные параметры"
+HREF="runtime-config-custom.html"><LINK
+REL="NEXT"
+TITLE="Краткие аргументы"
+HREF="runtime-config-short.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Внесистемные параметры"
+HREF="runtime-config-custom.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="runtime-config.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 18. Настройка сервера</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Краткие аргументы"
+HREF="runtime-config-short.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="RUNTIME-CONFIG-DEVELOPER"
+>18.17. Параметры для разработчиков</A
+></H1
+><P
+>Следующие параметры предназначены для работы над исходным кодом <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, а в некоторых случаях они могут помочь восстановить сильно повреждённые базы данных. Для использования их в производственной среде не должно быть причин, поэтому они исключены из примера файла <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+>. Заметьте, что для работы с многими из этих параметров требуются специальные флаги компиляции.</P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="GUC-ALLOW-SYSTEM-TABLE-MODS"
+></A
+><TT
+CLASS="VARNAME"
+>allow_system_table_mods</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Разрешает модификацию структуры системных таблиц. Этот параметр используется командой <TT
+CLASS="COMMAND"
+>initdb</TT
+>. Задать этот параметр можно только при запуске сервера.</P
+></DD
+><DT
+><A
+NAME="GUC-DEBUG-ASSERTIONS"
+></A
+><TT
+CLASS="VARNAME"
+>debug_assertions</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Включает различные проверочные утверждения, полезные при отладке. Если вы столкнулись со странными проблемами или сбоями, имеет смысл включить этот параметр, так как это может помочь в выявлении программных ошибок. Чтобы этот параметр действовал, должен быть определён макрос <TT
+CLASS="SYMBOL"
+>USE_ASSERT_CHECKING</TT
+> при сборке сервера <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> (для этого у <TT
+CLASS="COMMAND"
+>configure</TT
+> есть аргумент <TT
+CLASS="OPTION"
+>--enable-cassert</TT
+>). Заметьте, что если <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> был собран с поддержкой проверочных утверждений, параметр <TT
+CLASS="VARNAME"
+>debug_assertions</TT
+> по умолчанию имеет значение <TT
+CLASS="LITERAL"
+>on</TT
+>.</P
+></DD
+><DT
+><A
+NAME="GUC-IGNORE-SYSTEM-INDEXES"
+></A
+><TT
+CLASS="VARNAME"
+>ignore_system_indexes</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Отключает использование индексов при чтении системных таблиц (при этом индексы всё же будут изменяться при записи в эти таблицы). Это полезно для восстановления работоспособности при повреждённых системных индексах. Этот параметр нельзя изменить после запуска сеанса.</P
+></DD
+><DT
+><A
+NAME="GUC-POST-AUTH-DELAY"
+></A
+><TT
+CLASS="VARNAME"
+>post_auth_delay</TT
+> (<TT
+CLASS="TYPE"
+>integer</TT
+>) </DT
+><DD
+><P
+>При ненулевом значении этот параметр задаёт задержку (в секундах) при запуске нового серверного процесса после выполнения процедуры аутентификации. Он предназначен для того, чтобы разработчики имели возможность подключить отладчик к серверному процессу. Этот параметр нельзя изменить после начала сеанса.</P
+></DD
+><DT
+><A
+NAME="GUC-PRE-AUTH-DELAY"
+></A
+><TT
+CLASS="VARNAME"
+>pre_auth_delay</TT
+> (<TT
+CLASS="TYPE"
+>integer</TT
+>) </DT
+><DD
+><P
+>При ненулевом значении этот параметр задаёт задержку (в секундах), добавляемую сразу после порождения нового серверного процесса, до выполнения процедуры аутентификации. Он предназначен для того, чтобы разработчики имели возможность подключить отладчик к серверному процессу при решении проблем с аутентификацией. Задать этот параметр можно только в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+> или в командной строке при запуске сервера.</P
+></DD
+><DT
+><A
+NAME="GUC-TRACE-NOTIFY"
+></A
+><TT
+CLASS="VARNAME"
+>trace_notify</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Включает вывод очень подробной отладочной информации при выполнении команд <TT
+CLASS="COMMAND"
+>LISTEN</TT
+> и <TT
+CLASS="COMMAND"
+>NOTIFY</TT
+>. Чтобы эти сообщения передавались клиенту или в журнал сервера, параметр <A
+HREF="runtime-config-logging.html#GUC-CLIENT-MIN-MESSAGES"
+>client_min_messages</A
+> или <A
+HREF="runtime-config-logging.html#GUC-LOG-MIN-MESSAGES"
+>log_min_messages</A
+>, соответственно, должен иметь значение <TT
+CLASS="LITERAL"
+>DEBUG1</TT
+> или ниже.</P
+></DD
+><DT
+><A
+NAME="GUC-TRACE-RECOVERY-MESSAGES"
+></A
+><TT
+CLASS="VARNAME"
+>trace_recovery_messages</TT
+> (<TT
+CLASS="TYPE"
+>enum</TT
+>) </DT
+><DD
+><P
+>Включает вывод в журнал отладочных сообщений, связанных с восстановлением, которые иначе не выводятся. Этот параметр позволяет пользователю переопределить обычное значение <A
+HREF="runtime-config-logging.html#GUC-LOG-MIN-MESSAGES"
+>log_min_messages</A
+>, но только для специфических сообщений. Он предназначен для отладки режима горячего резерва. Допустимые значения: <TT
+CLASS="LITERAL"
+>DEBUG5</TT
+>, <TT
+CLASS="LITERAL"
+>DEBUG4</TT
+>, <TT
+CLASS="LITERAL"
+>DEBUG3</TT
+>, <TT
+CLASS="LITERAL"
+>DEBUG2</TT
+>, <TT
+CLASS="LITERAL"
+>DEBUG1</TT
+> и <TT
+CLASS="LITERAL"
+>LOG</TT
+>. Значение по умолчанию, <TT
+CLASS="LITERAL"
+>LOG</TT
+>, никак не влияет на запись этих сообщений в журнал. С другими значениями отладочные сообщения, связанные с восстановлением, имеющие заданный приоритет или выше, выводятся, как если бы они имели приоритет <TT
+CLASS="LITERAL"
+>LOG</TT
+>; при стандартных значениях <TT
+CLASS="VARNAME"
+>log_min_messages</TT
+> это означает, что они будут фиксироваться в журнале сервера. Задать этот параметр можно только в <TT
+CLASS="FILENAME"
+>postgresql.conf</TT
+> или в командной строке при запуске сервера.</P
+></DD
+><DT
+><A
+NAME="GUC-TRACE-SORT"
+></A
+><TT
+CLASS="VARNAME"
+>trace_sort</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Включает вывод информации об использовании ресурсов во время операций сортировки. Этот параметр доступен, только если при сборке <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> был определён макрос <TT
+CLASS="SYMBOL"
+>TRACE_SORT</TT
+>. (По умолчанию макрос <TT
+CLASS="SYMBOL"
+>TRACE_SORT</TT
+> определён.)</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>trace_locks</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Включает вывод подробной информации о блокировках. Она содержит вид операции блокировки, тип блокировки и уникальный идентификатор объекта, который блокируется или разблокируется. Кроме того, в её составе выводятся битовые маски для типов блокировок, уже полученных для данного объекта, и для типов блокировок, ожидающих его освобождения. В дополнение к этому выводится количество полученных и ожидающих блокировок для каждого типа блокировок, а также их общее количество. Ниже показан пример вывода в журнал: </P><PRE
+CLASS="SCREEN"
+>LOG:  LockAcquire: new: lock(0xb7acd844) id(24688,24696,0,0,0,1)
+      grantMask(0) req(0,0,0,0,0,0,0)=0 grant(0,0,0,0,0,0,0)=0
+      wait(0) type(AccessShareLock)
+LOG:  GrantLock: lock(0xb7acd844) id(24688,24696,0,0,0,1)
+      grantMask(2) req(1,0,0,0,0,0,0)=1 grant(1,0,0,0,0,0,0)=1
+      wait(0) type(AccessShareLock)
+LOG:  UnGrantLock: updated: lock(0xb7acd844) id(24688,24696,0,0,0,1)
+      grantMask(0) req(0,0,0,0,0,0,0)=0 grant(0,0,0,0,0,0,0)=0
+      wait(0) type(AccessShareLock)
+LOG:  CleanUpLock: deleting: lock(0xb7acd844) id(24688,24696,0,0,0,1)
+      grantMask(0) req(0,0,0,0,0,0,0)=0 grant(0,0,0,0,0,0,0)=0
+      wait(0) type(INVALID)</PRE
+><P> Подробнее о структуре выводимой информации можно узнать в <TT
+CLASS="FILENAME"
+>src/include/storage/lock.h</TT
+>.</P
+><P
+>Этот параметр доступен, только если при компиляции <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> был определён макрос <TT
+CLASS="SYMBOL"
+>LOCK_DEBUG</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>trace_lwlocks</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Включает вывод информации об использовании легковесных блокировок. Такие блокировки предназначены в основном для взаимоисключающего доступа к общим структурам данных в памяти.</P
+><P
+>Этот параметр доступен, только если при компиляции <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> был определён макрос <TT
+CLASS="SYMBOL"
+>LOCK_DEBUG</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>trace_userlocks</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Включает вывод информации об использовании пользовательских блокировок. Она выводится в том же формате, что и с <TT
+CLASS="SYMBOL"
+>trace_locks</TT
+>, но по рекомендательным блокировкам.</P
+><P
+>Этот параметр доступен, только если при компиляции <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> был определён макрос <TT
+CLASS="SYMBOL"
+>LOCK_DEBUG</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>trace_lock_oidmin</TT
+> (<TT
+CLASS="TYPE"
+>integer</TT
+>) </DT
+><DD
+><P
+>Если этот параметр установлен, при трассировке блокировок не будут отслеживаться таблицы с OID меньше заданного (это используется для исключения из трассировки системных таблиц).</P
+><P
+>Этот параметр доступен, только если при компиляции <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> был определён макрос <TT
+CLASS="SYMBOL"
+>LOCK_DEBUG</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>trace_lock_table</TT
+> (<TT
+CLASS="TYPE"
+>integer</TT
+>) </DT
+><DD
+><P
+>Безусловно трассировать блокировки для таблицы с заданным OID.</P
+><P
+>Этот параметр доступен, только если при компиляции <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> был определён макрос <TT
+CLASS="SYMBOL"
+>LOCK_DEBUG</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>debug_deadlocks</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Включает вывод информации обо всех текущих блокировках при таймауте взаимоблокировки.</P
+><P
+>Этот параметр доступен, только если при компиляции <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> был определён макрос <TT
+CLASS="SYMBOL"
+>LOCK_DEBUG</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>log_btree_build_stats</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Включает вывод статистики использования системных ресурсов (памяти и процессора) при различных операциях с B-деревом.</P
+><P
+>Этот параметр доступен, только если при компиляции <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> был определён макрос <TT
+CLASS="SYMBOL"
+>BTREE_BUILD_STATS</TT
+>.</P
+></DD
+><DT
+><A
+NAME="GUC-WAL-DEBUG"
+></A
+><TT
+CLASS="VARNAME"
+>wal_debug</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Включает вывод отладочной информации, связанной с WAL. Этот параметр доступен, только если при компиляции <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> был определён макрос <TT
+CLASS="SYMBOL"
+>WAL_DEBUG</TT
+>.</P
+></DD
+><DT
+><A
+NAME="GUC-IGNORE-CHECKSUM-FAILURE"
+></A
+><TT
+CLASS="VARNAME"
+>ignore_checksum_failure</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>Этот параметр действует, только если включён <A
+HREF="app-initdb.html#APP-INITDB-DATA-CHECKSUMS"
+>data checksums</A
+>.</P
+><P
+>При обнаружении ошибок контрольных сумм при чтении <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> обычно сообщает об ошибке и прерывает текущую транзакцию. Если параметр <TT
+CLASS="VARNAME"
+>ignore_checksum_failure</TT
+> включён, система игнорирует проблему (но всё же предупреждает о ней) и продолжает обработку. Это поведение может <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>привести к краху, распространению или сокрытию повреждения данных и другим серьёзными проблемам</I
+></SPAN
+>. Однако, включив его, вы можете обойти ошибку и получить неповреждённые данные, которые могут находиться в таблице, если цел заголовок блока. Если же повреждён заголовок, будет выдана ошибка, даже когда этот параметр включён. По умолчанию этот параметр отключён (имеет значение <TT
+CLASS="LITERAL"
+>off</TT
+>) и изменить его состояние может только суперпользователь.</P
+></DD
+><DT
+><A
+NAME="GUC-ZERO-DAMAGED-PAGES"
+></A
+><TT
+CLASS="VARNAME"
+>zero_damaged_pages</TT
+> (<TT
+CLASS="TYPE"
+>boolean</TT
+>) </DT
+><DD
+><P
+>При выявлении повреждённого заголовка страницы <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> обычно сообщает об ошибке и прерывает текущую транзакцию. Если параметр <TT
+CLASS="VARNAME"
+>zero_damaged_pages</TT
+> включён, вместо этого система выдаёт предупреждение, обнуляет повреждённую страницу в памяти и продолжает обработку. Это поведение <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>разрушает данные</I
+></SPAN
+>, а именно все строки в повреждённой странице. Однако, включив его, вы можете обойти ошибку и получить строки из неповреждённых страниц, которые могут находиться в таблице. Это бывает полезно для восстановления данных, испорченных в результате аппаратной или программной ошибки. Обычно включать его следует только тогда, когда не осталось никакой другой надежды на восстановление данных в повреждённых страницах таблицы. Обнулённые страницы не сохраняются на диск, поэтому прежде чем выключать этот параметр, рекомендуется пересоздать проблемные таблицы или индексы. По умолчанию этот параметр отключён (имеет значение <TT
+CLASS="LITERAL"
+>off</TT
+>) и изменить его состояние может только суперпользователь.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="runtime-config-custom.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="runtime-config-short.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Внесистемные параметры</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="runtime-config.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Краткие аргументы</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

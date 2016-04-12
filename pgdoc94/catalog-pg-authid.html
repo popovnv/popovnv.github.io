@@ -1,0 +1,469 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>          pg_authid
+        </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Системные каталоги"
+HREF="catalogs.html"><LINK
+REL="PREVIOUS"
+TITLE="          pg_attribute
+        "
+HREF="catalog-pg-attribute.html"><LINK
+REL="NEXT"
+TITLE="          pg_auth_members
+        "
+HREF="catalog-pg-auth-members.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="          pg_attribute
+        "
+HREF="catalog-pg-attribute.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 48. Системные каталоги</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="          pg_auth_members
+        "
+HREF="catalog-pg-auth-members.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CATALOG-PG-AUTHID"
+>48.8. <TT
+CLASS="STRUCTNAME"
+>pg_authid</TT
+></A
+></H1
+><P
+>В каталоге <TT
+CLASS="STRUCTNAME"
+>pg_authid</TT
+> содержится информация об идентификаторах для авторизации (ролях). Роль включает в себя концепции <SPAN
+CLASS="QUOTE"
+>"пользователей"</SPAN
+> и <SPAN
+CLASS="QUOTE"
+>"групп"</SPAN
+>. Пользователь по существу представляет собой частный случай роли, с флагом <TT
+CLASS="STRUCTFIELD"
+>rolcanlogin</TT
+>. Любая роль (с или без флага <TT
+CLASS="STRUCTFIELD"
+>rolcanlogin</TT
+>) может включать другие роли в качестве членов; см. <A
+HREF="catalog-pg-auth-members.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_auth_members</TT
+></A
+>.</P
+><P
+>Так как в этом каталоге содержатся пароли, он не должен быть открыт для всех. Для общего пользования предназначено представление <A
+HREF="view-pg-roles.html"
+><TT
+CLASS="STRUCTNAME"
+>pg_roles</TT
+></A
+> на базе <TT
+CLASS="STRUCTNAME"
+>pg_authid</TT
+>, в котором поле пароля очищено.</P
+><P
+>За подробной информацией о пользователях и управлении правами обратитесь к <A
+HREF="user-manag.html"
+>Главе 20</A
+>.</P
+><P
+>Так как пользователи определяются глобально, каталог <TT
+CLASS="STRUCTNAME"
+>pg_authid</TT
+> разделяется всеми базами данных кластера; есть только единственная копия <TT
+CLASS="STRUCTNAME"
+>pg_authid</TT
+> в кластере, а не отдельные в каждой базе данных.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="AEN95850"
+></A
+><P
+><B
+>Таблица 48-8. Колонки <TT
+CLASS="STRUCTNAME"
+>pg_authid</TT
+></B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Имя</TH
+><TH
+>Тип</TH
+><TH
+>Описание</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>oid</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>oid</TT
+>
+                </TD
+><TD
+>Идентификатор строки (скрытый атрибут; должен выбираться явно)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>rolname</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>name</TT
+>
+                </TD
+><TD
+>Имя роли</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>rolsuper</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>Роли имеет права суперпользователя</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>rolinherit</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>Роль автоматически наследует права ролей, в которые она включена</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>rolcreaterole</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>Роль может создавать другие роли</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>rolcreatedb</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>Роль может создавать базы данных</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>rolcatupdate</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>Роль может напрямую модифицировать системные каталоги. (Это не разрешено даже суперпользователю, если данное поле не равно true)</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>rolcanlogin</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>Роль может подключаться к серверу. То есть эта роль может быть указана в качестве начального идентификатора авторизации сеанса</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>rolreplication</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>bool</TT
+>
+                </TD
+><TD
+>Роль является ролью репликации. То есть эта роль может запускать потоковую репликацию (см. <A
+HREF="warm-standby.html#STREAMING-REPLICATION"
+>Подраздел 25.2.5</A
+>) и включать/отключать режим резервного копирования, вызывая функции <CODE
+CLASS="FUNCTION"
+>pg_start_backup</CODE
+> и <CODE
+CLASS="FUNCTION"
+>pg_stop_backup</CODE
+></TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>rolconnlimit</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>int4</TT
+>
+                </TD
+><TD
+>Для ролей, которые могут подключаться к серверу, это значение задаёт максимально разрешённое для этой роли число одновременных подключений. При значении -1 ограничения нет.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>rolpassword</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>text</TT
+>
+                </TD
+><TD
+>Пароль (возможно, зашифрованный) или NULL, если его нет. Если пароль зашифрован, это значение начинается со строки <TT
+CLASS="LITERAL"
+>md5</TT
+>, за которой идёт 32-символьный шестнадцатеричный хеш MD5. Хеш MD5 вычисляется для пароля пользователя с добавленным за ним его именем. Например, если у пользователя <TT
+CLASS="LITERAL"
+>joe</TT
+> пароль <TT
+CLASS="LITERAL"
+>xyzzy</TT
+>, <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> сохранит в этом поле md5-хеш строки <TT
+CLASS="LITERAL"
+>xyzzyjoe</TT
+>. Если пароль не соответствует этому формату, считается, что он не зашифрован.</TD
+></TR
+><TR
+><TD
+>                  <TT
+CLASS="STRUCTFIELD"
+>rolvaliduntil</TT
+>
+                </TD
+><TD
+>                  <TT
+CLASS="TYPE"
+>timestamptz</TT
+>
+                </TD
+><TD
+>Срок действия пароля (используется только при аутентификации по паролю); NULL, если срок действия не ограничен</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="catalog-pg-attribute.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="catalog-pg-auth-members.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_attribute</TT
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="catalogs.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><TT
+CLASS="STRUCTNAME"
+>pg_auth_members</TT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

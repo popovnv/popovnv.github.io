@@ -1,0 +1,401 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>spi</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Дополнительно поставляемые модули"
+HREF="contrib.html"><LINK
+REL="PREVIOUS"
+TITLE="sepgsql"
+HREF="sepgsql.html"><LINK
+REL="NEXT"
+TITLE="sslinfo"
+HREF="sslinfo.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="sepgsql"
+HREF="sepgsql.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Приложение E. Дополнительно поставляемые модули</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="sslinfo"
+HREF="sslinfo.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CONTRIB-SPI"
+>E.35. spi</A
+></H1
+><P
+>Модуль <SPAN
+CLASS="APPLICATION"
+>spi</SPAN
+> предоставляет несколько рабочих примеров использования SPI и триггеров. Хотя эти функцию имеют некоторую ценность сами по себе, они ещё более полезны как заготовки, которые можно приспособить под собственные нужды. Эти функции достаточно общие, чтобы работать с любой таблицей, но вы должны явно указать имена таблицы и полей (как описано ниже) при создании триггера.</P
+><P
+>Каждая группа функций, описанная ниже, представлена в виде отдельно устанавливаемого расширения.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN125119"
+>E.35.1. refint &mdash; функции для реализации ссылочной целостности</A
+></H2
+><P
+>Функции <CODE
+CLASS="FUNCTION"
+>check_primary_key()</CODE
+> и <CODE
+CLASS="FUNCTION"
+>check_foreign_key()</CODE
+> применяются для проверки ограничений внешних ключей. (Эта функциональность уже давно вытеснена встроенным механизмом внешних ключей, но этот модуль всё ещё полезен в качестве примера.)</P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>check_primary_key()</CODE
+> проверяет ссылающуюся таблицу. Чтобы воспользоваться ей, создайте триггер <TT
+CLASS="LITERAL"
+>BEFORE INSERT OR UPDATE</TT
+> с этой функцией для таблицы, ссылающейся на другую. Укажите в аргументах триггера: имена колонок ссылающейся таблицы, образующих внешний ключ, имя целевой таблицы и имена колонок в ней, образующих первичный/уникальный ключ. Чтобы контролировать несколько внешних ключей, создайте триггер для каждой такой ссылки.</P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>check_foreign_key()</CODE
+> проверяет целевую таблицу. Чтобы использовать её, создайте триггер <TT
+CLASS="LITERAL"
+>BEFORE DELETE OR UPDATE</TT
+> с этой функцией для таблицы, на которую ссылаются другие. Укажите в аргументах триггера: число ссылающихся таблиц, для которых функция должна выполнить проверки, действие в случае обнаружения ссылающегося ключа (<TT
+CLASS="LITERAL"
+>cascade</TT
+> &mdash; удалить ссылающуюся строку, <TT
+CLASS="LITERAL"
+>restrict</TT
+> &mdash; прервать транзакцию, <TT
+CLASS="LITERAL"
+>setnull</TT
+> &mdash; установить в ссылающихся полях значения NULL), имена колонок целевой таблицы, образующих первичный/уникальный ключ, а затем имена таблиц и колонок (в количестве, задаваемом первым аргументом). Заметьте, что поля первичных/уникальных колонок должны иметь пометку NOT NULL и по ним должен быть создан индекс.</P
+><P
+>Примеры приведены в <TT
+CLASS="FILENAME"
+>refint.example</TT
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN125135"
+>E.35.2. timetravel &mdash; функции для реализации перемещений во времени</A
+></H2
+><P
+>В далёком прошлом в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> была встроенная возможность перемещений во времени, для которой фиксировалось время добавления и удаления каждого кортежа. Эти функции позволяют её имитировать. Чтобы использовать их, вы должны добавить в таблицу две колонки типа <TT
+CLASS="TYPE"
+>abstime</TT
+>, в которых будет храниться дата/время, когда кортеж был вставлен (start_date) и когда изменён/удалён (stop_date): </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE mytab (
+        ...             ...
+        start_date      abstime,
+        stop_date       abstime
+        ...             ...
+);</PRE
+><P> Эти колонки могут называться как угодно, но в данном описании они называются start_date и stop_date.</P
+><P
+>Когда вставляется новая строка, в start_date обычно устанавливается текущее время, а в stop_date — <TT
+CLASS="LITERAL"
+>infinity</TT
+> (бесконечность). Триггер автоматически подставит эти значения, если добавляемая строка содержит NULL в этих колонках. Обычно не-NULL в этих колонках может оказаться только при загрузке в базу выгруженных данных.</P
+><P
+>Кортежи, в которых поле stop_date равно <TT
+CLASS="LITERAL"
+>infinity</TT
+>, считаются <SPAN
+CLASS="QUOTE"
+>"актуальными сейчас"</SPAN
+> и могут быть изменены. Кортежи с определённой датой stop_date больше не могут быть изменены &mdash; триггер будет препятствовать этому. (Если вам нужно сделать это, вы можете отключить машину времени как показано ниже.)</P
+><P
+>Если кортеж является изменяемым, при модификации в нём меняется только stop_date (на текущее время), но в таблицу вставляется новый кортеж с модифицированными данными. В поле start_date в этом новом кортеже записывается текущее время, а в stop_date записывается <TT
+CLASS="LITERAL"
+>infinity</TT
+>.</P
+><P
+>При удалении кортеж на самом деле не удаляется; в нём только записывается текущее время в stop_date.</P
+><P
+>Чтобы запросить кортежи <SPAN
+CLASS="QUOTE"
+>"актуальные сейчас"</SPAN
+>, добавьте <TT
+CLASS="LITERAL"
+>stop_date = 'infinity'</TT
+> в условие WHERE вашего запроса. (Возможно, вы захотите завернуть это условие в представление.) Аналогичным образом вы можете запрашивать кортежи, которые были актуальны в любой момент в прошлом, задав подходящие условия для start_date и stop_date.</P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>timetravel()</CODE
+> реализует код универсального триггера, поддерживающего это поведение. Чтобы использовать её, создайте триггер <TT
+CLASS="LITERAL"
+>BEFORE INSERT OR UPDATE OR DELETE</TT
+> с этой функцией для каждой таблицы, перемещающейся во времени. Передайте триггеру два аргумента: фактические имена колонок start_date и stop_date. Вы также можете дополнительно передать от одного до трёх аргументов, задающих имена колонок типа <TT
+CLASS="TYPE"
+>text</TT
+>. Данный триггер сохранит имя текущего пользователя в первую из этих колонок при INSERT, во вторую — при UPDATE, и в третью — при DELETE.</P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>set_timetravel()</CODE
+> позволяет включить или отключить машину времени для таблицы. Вызов <TT
+CLASS="LITERAL"
+>set_timetravel('mytab', 1)</TT
+> включает машину времени для таблицы <TT
+CLASS="LITERAL"
+>mytab</TT
+>, а <TT
+CLASS="LITERAL"
+>set_timetravel('mytab', 0)</TT
+> — отключает её для таблицы <TT
+CLASS="LITERAL"
+>mytab</TT
+>. В обоих случаях возвращается прежнее состояние. Когда машина времени выключена, вы можете свободно модифицировать колонки start_date и stop_date. Заметьте, что состояние активности машины является локальным для текущего сеанса базы данных &mdash; в новых сеансах машина времени всегда включена для всех таблиц.</P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>get_timetravel()</CODE
+> возвращает состояние перемещения во времени для таблицы, не меняя его.</P
+><P
+>Пример приведён в <TT
+CLASS="FILENAME"
+>timetravel.example</TT
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN125166"
+>E.35.3. autoinc &mdash; функции для автоувеличения полей</A
+></H2
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>autoinc()</CODE
+> реализует код триггера, сохраняющего следующее значение последовательности в целочисленном поле. Это в некоторой степени пересекается со встроенной функциональностью колонки <SPAN
+CLASS="QUOTE"
+>"serial"</SPAN
+>, но есть и отличия: <CODE
+CLASS="FUNCTION"
+>autoinc()</CODE
+> препятствует попыткам вставить другое значение поля при добавлении строк и может увеличивать значение поля при изменениях.</P
+><P
+>Чтобы использовать её, создайте триггер <TT
+CLASS="LITERAL"
+>BEFORE INSERT</TT
+> (или <TT
+CLASS="LITERAL"
+>BEFORE INSERT OR UPDATE</TT
+>) с этой функцией. Передайте триггеру два аргумента: имя целочисленной колонки, которая будет меняться, и имя объекта последовательности, который будет поставлять значения. (Вообще вы можете задать любое число пар таких имён, если хотите поддерживать несколько автоувеличивающихся колонок.)</P
+><P
+>Пример приведён в <TT
+CLASS="FILENAME"
+>autoinc.example</TT
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN125177"
+>E.35.4. insert_username &mdash; функции для отслеживания пользователя, вносящего изменения</A
+></H2
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>insert_username()</CODE
+> реализует код триггера, сохраняющего имя текущего пользователя в текстовом поле. Это может быть полезно для отслеживания пользователя, изменившего конкретную строку таблицы последним.</P
+><P
+>Чтобы использовать её, создайте триггер <TT
+CLASS="LITERAL"
+>BEFORE INSERT</TT
+> и/или <TT
+CLASS="LITERAL"
+>UPDATE</TT
+> с этой функцией. Передайте триггеру один аргумент: имя целевой текстовой колонки.</P
+><P
+>Пример приведён в <TT
+CLASS="FILENAME"
+>insert_username.example</TT
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN125186"
+>E.35.5. moddatetime &mdash; функции для отслеживания времени последнего изменения</A
+></H2
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>moddatetime()</CODE
+> реализует код триггера, сохраняющего текущее время в поле типа <TT
+CLASS="TYPE"
+>timestamp</TT
+>. Это может быть полезно для отслеживания времени последней модификации конкретной строки таблицы.</P
+><P
+>Чтобы использовать её, создайте триггер <TT
+CLASS="LITERAL"
+>BEFORE UPDATE</TT
+> с этой функцией. Передайте триггеру один аргумент: имя целевой колонки. Колонка должна иметь тип <TT
+CLASS="TYPE"
+>timestamp</TT
+> или <TT
+CLASS="TYPE"
+>timestamp with time zone</TT
+>.</P
+><P
+>Пример приведён в <TT
+CLASS="FILENAME"
+>moddatetime.example</TT
+>.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sepgsql.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sslinfo.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>sepgsql</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="contrib.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>sslinfo</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

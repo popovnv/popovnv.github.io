@@ -1,0 +1,206 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Введение</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Индексы SP-GiST"
+HREF="spgist.html"><LINK
+REL="PREVIOUS"
+TITLE="Индексы SP-GiST"
+HREF="spgist.html"><LINK
+REL="NEXT"
+TITLE="Встроенные классы операторов"
+HREF="spgist-builtin-opclasses.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Индексы SP-GiST"
+HREF="spgist.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="spgist.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 57. Индексы SP-GiST</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Встроенные классы операторов"
+HREF="spgist-builtin-opclasses.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="SPGIST-INTRO"
+>57.1. Введение</A
+></H1
+><P
+>Аббревиатура <ACRONYM
+CLASS="ACRONYM"
+>SP-GiST</ACRONYM
+> расшифровывается как <SPAN
+CLASS="QUOTE"
+>"Space-Partitioned <ACRONYM
+CLASS="ACRONYM"
+>GiST</ACRONYM
+>"</SPAN
+> (GiST с разбиением пространства). <ACRONYM
+CLASS="ACRONYM"
+>SP-GiST</ACRONYM
+> поддерживает деревья поиска с разбиением, что облегчает разработку широкого спектра различных несбалансированных структур данных, в том числе деревьев квадрантов, деревьев k-d и цифровых деревьев. Общей характеристикой этих структур является то, что они последовательно разбивают пространство поиска на сегменты, которые не обязательно должны быть равного размера. При этом поиск, хорошо соответствующий правилу разбиения, с таким индексом может быть очень быстрым.</P
+><P
+>Эти популярные структуры данных изначально конструировались для работы в памяти. При таком применении они обычно представляются в виде набора динамически выделяемых узлов, связываемых указателями. Однако подобную схему нельзя в таком виде перенести на диск, так как цепочки указателей могут быть довольно длинными, и поэтому потребуется слишком много обращений к диску. Структуры данных для хранения на диске, напротив, должны иметь большую разветвлённость для минимизации объёма ввода/вывода. Для решения этой задачи <ACRONYM
+CLASS="ACRONYM"
+>SP-GiST</ACRONYM
+> сопоставляет узлы дерева поиска со страницами на диске так, чтобы при поиске требовалось обращаться только к нескольким страницам на диске, даже если при этом нужно просмотреть множество узлов.</P
+><P
+>Как и <ACRONYM
+CLASS="ACRONYM"
+>GiST</ACRONYM
+>, <ACRONYM
+CLASS="ACRONYM"
+>SP-GiST</ACRONYM
+> призван дать возможность разрабатывать дополнительные типы данных с соответствующими методами доступа экспертам в предметной области типа данных, а не специалистам по СУБД.</P
+><P
+>Представленная здесь информация частично позаимствована с <A
+HREF="http://www.cs.purdue.edu/spgist/"
+TARGET="_top"
+>сайта</A
+> Проекта индексации SP-GiST Университета Пердью. Сопровождением реализации <ACRONYM
+CLASS="ACRONYM"
+>SP-GiST</ACRONYM
+> в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> в основном занимаются Фёдор Сигаев и Олег Бартунов; дополнительные сведения можно получить на их <A
+HREF="http://www.sai.msu.su/~megera/wiki/spgist_dev"
+TARGET="_top"
+>сайте</A
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="spgist.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="spgist-builtin-opclasses.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Индексы SP-GiST</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="spgist.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Встроенные классы операторов</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

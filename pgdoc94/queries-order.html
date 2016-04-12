@@ -1,0 +1,360 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Сортировка строк</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Запросы"
+HREF="queries.html"><LINK
+REL="PREVIOUS"
+TITLE="Сочетание запросов"
+HREF="queries-union.html"><LINK
+REL="NEXT"
+TITLE="LIMIT и OFFSET"
+HREF="queries-limit.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Сочетание запросов"
+HREF="queries-union.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="queries.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 7. Запросы</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="LIMIT и OFFSET"
+HREF="queries-limit.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="QUERIES-ORDER"
+>7.5. Сортировка строк</A
+></H1
+><P
+>После того как запрос выдал таблицу результатов (после обработки списка выборки), её можно отсортировать. Если сортировка не задана, строки возвращаются в неопределённом порядке. Фактический порядок строк в этом случае будет зависеть от плана соединения и сканирования, а также от порядка данных на диске, поэтому полагаться на него нельзя. Определённый порядок выводимых строк гарантируется, только если этап сортировки задан явно.</P
+><P
+>Порядок сортировки определяет предложение <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+>: </P><PRE
+CLASS="SYNOPSIS"
+>SELECT <TT
+CLASS="REPLACEABLE"
+><I
+>список_выборки</I
+></TT
+>
+    FROM <TT
+CLASS="REPLACEABLE"
+><I
+>табличное_выражение</I
+></TT
+>
+    ORDER BY <TT
+CLASS="REPLACEABLE"
+><I
+>выражение_сортировки1</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>ASC | DESC</SPAN
+>] [<SPAN
+CLASS="OPTIONAL"
+>NULLS { FIRST | LAST }</SPAN
+>]
+             [<SPAN
+CLASS="OPTIONAL"
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>выражение_сортировки2</I
+></TT
+> [<SPAN
+CLASS="OPTIONAL"
+>ASC | DESC</SPAN
+>] [<SPAN
+CLASS="OPTIONAL"
+>NULLS { FIRST | LAST }</SPAN
+>] ...</SPAN
+>]</PRE
+><P> Выражениями сортировки могут быть любые выражения, допустимые в списке выборки запроса. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT a, b FROM table1 ORDER BY a + b, c;</PRE
+><P> Когда указывается несколько выражений, последующие значения позволяют отсортировать строки, в которых совпали все предыдущие значения. Каждое выражение можно дополнить ключевыми словами <TT
+CLASS="LITERAL"
+>ASC</TT
+> или <TT
+CLASS="LITERAL"
+>DESC</TT
+>, которые выбирают сортировку соответственно по возрастанию или убыванию. По умолчанию принят порядок по возрастанию (<TT
+CLASS="LITERAL"
+>ASC</TT
+>). При сортировке по возрастанию сначала идут меньшие значения, где понятие <SPAN
+CLASS="QUOTE"
+>"меньше"</SPAN
+> определяется оператором <TT
+CLASS="LITERAL"
+>&lt;</TT
+>. Подобным образом, сортировка по возрастанию определяется оператором <TT
+CLASS="LITERAL"
+>&gt;</TT
+>. <A
+NAME="AEN4344"
+HREF="#FTN.AEN4344"
+><SPAN
+CLASS="footnote"
+>[1]</SPAN
+></A
+></P
+><P
+>Для определения места значений NULL можно использовать указания <TT
+CLASS="LITERAL"
+>NULLS FIRST</TT
+> и <TT
+CLASS="LITERAL"
+>NULLS LAST</TT
+>, которые помещают значения NULL соответственно до или после значений не NULL. По умолчанию значения NULL считаются больше любых других, то есть подразумевается <TT
+CLASS="LITERAL"
+>NULLS FIRST</TT
+> для порядка <TT
+CLASS="LITERAL"
+>DESC</TT
+> и <TT
+CLASS="LITERAL"
+>NULLS LAST</TT
+> в противном случае.</P
+><P
+>Заметьте, что порядки сортировки определяются независимо для каждой колонки. Например, <TT
+CLASS="LITERAL"
+>ORDER BY x, y DESC</TT
+> означает <TT
+CLASS="LITERAL"
+>ORDER BY x ASC, y DESC</TT
+>, и это не то же самое, что <TT
+CLASS="LITERAL"
+>ORDER BY x DESC, y DESC</TT
+>.</P
+><P
+>Здесь <TT
+CLASS="REPLACEABLE"
+><I
+>выражение_сортировки</I
+></TT
+> может быть меткой колонки или номером выводимой колонки, как в данном примере: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT a + b AS sum, c FROM table1 ORDER BY sum;
+SELECT a, max(b) FROM table1 GROUP BY a ORDER BY 1;</PRE
+><P>Оба эти запроса сортируют результат по первой колонке. Заметьте, что имя выводимой колонки должно оставаться само по себе, его нельзя использовать в выражении. Например, это <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>ошибка</I
+></SPAN
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>SELECT a + b AS sum, c FROM table1 ORDER BY sum + c;          -- неправильно</PRE
+><P> Это ограничение позволяет уменьшить неоднозначность. Тем не менее неоднозначность возможна, когда в <TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> указано простое имя, но оно соответствует и имени выходной колонки, и колонке из табличного выражения. В этом случае используется выходная колонка. Эта ситуация может возникнуть, только когда с помощью <TT
+CLASS="LITERAL"
+>AS</TT
+> выходной колонке назначается то же имя, что имеет колонка в другой таблице.</P
+><P
+><TT
+CLASS="LITERAL"
+>ORDER BY</TT
+> можно применить к результату комбинации <TT
+CLASS="LITERAL"
+>UNION</TT
+>, <TT
+CLASS="LITERAL"
+>INTERSECT</TT
+> и <TT
+CLASS="LITERAL"
+>EXCEPT</TT
+>, но в этом случае возможна сортировка только по номерам или именам колонок, но не по выражениям.</P
+></DIV
+><H3
+CLASS="FOOTNOTES"
+>Примечания</H3
+><TABLE
+BORDER="0"
+CLASS="FOOTNOTES"
+WIDTH="100%"
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+WIDTH="5%"
+><A
+NAME="FTN.AEN4344"
+HREF="queries-order.html#AEN4344"
+><SPAN
+CLASS="footnote"
+>[1]</SPAN
+></A
+></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+WIDTH="95%"
+><P
+>На деле <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> определяет порядок сортировки для <TT
+CLASS="LITERAL"
+>ASC</TT
+> и <TT
+CLASS="LITERAL"
+>DESC</TT
+> по <I
+CLASS="FIRSTTERM"
+>классу оператора B-дерева по умолчанию</I
+> для типа данных выражения. Обычно типы данных создаются так, что этому порядку соответствуют операторы <TT
+CLASS="LITERAL"
+>&lt;</TT
+> и <TT
+CLASS="LITERAL"
+>&gt;</TT
+>, но возможно разработать собственный тип данных, который будет вести себя по-другому.</P
+></TD
+></TR
+></TABLE
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="queries-union.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="queries-limit.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Сочетание запросов</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="queries.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><TT
+CLASS="LITERAL"
+>LIMIT</TT
+> и <TT
+CLASS="LITERAL"
+>OFFSET</TT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

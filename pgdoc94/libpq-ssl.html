@@ -1,0 +1,886 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Поддержка SSL</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="libpq — библиотека для языка C"
+HREF="libpq.html"><LINK
+REL="PREVIOUS"
+TITLE="Получение параметров соединения через LDAP"
+HREF="libpq-ldap.html"><LINK
+REL="NEXT"
+TITLE="Поведение в многопоточных программах"
+HREF="libpq-threading.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Получение параметров соединения через LDAP"
+HREF="libpq-ldap.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="libpq.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 31. <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> — библиотека для языка C</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Поведение в многопоточных программах"
+HREF="libpq-threading.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="LIBPQ-SSL"
+>31.18. Поддержка SSL</A
+></H1
+><P
+><SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> реализует собственную поддержку <ACRONYM
+CLASS="ACRONYM"
+>SSL</ACRONYM
+>-подключений для шифрования клиент-серверного взаимодействия в качестве меры безопасности. Подробнее функциональность <ACRONYM
+CLASS="ACRONYM"
+>SSL</ACRONYM
+> на стороне сервера описывается в <A
+HREF="ssl-tcp.html"
+>Разделе 17.9</A
+>.</P
+><P
+>Библиотека <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> читает системный файл конфигурации <SPAN
+CLASS="PRODUCTNAME"
+>OpenSSL</SPAN
+>. По умолчанию этот файл называется <TT
+CLASS="FILENAME"
+>openssl.cnf</TT
+> и находится в каталоге, который сообщает команда <TT
+CLASS="LITERAL"
+>openssl version -d</TT
+>. Если требуется указать другое расположение файла конфигурации, его можно задать в переменной окружения <TT
+CLASS="ENVAR"
+>OPENSSL_CONF</TT
+>.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="LIBQ-SSL-CERTIFICATES"
+>31.18.1. Проверка сертификатов сервера на стороне клиента</A
+></H2
+><P
+>По умолчанию <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> не выполняет никакие проверки сертификата сервера. Это означает, что клиента можно ввести в заблуждение, подменив сервер (например, изменив запись в DNS или заняв его IP-адрес). Чтобы предотвратить подобную подмену, необходимо включить проверку сертификатов <ACRONYM
+CLASS="ACRONYM"
+>SSL</ACRONYM
+>.</P
+><P
+>Если в <TT
+CLASS="LITERAL"
+>sslmode</TT
+> выбран режим <TT
+CLASS="LITERAL"
+>verify-ca</TT
+>, libpq будет определять, можно ли доверять серверу, проверяя всю цепочку сертификатов до доверенного центра сертификации (<ACRONYM
+CLASS="ACRONYM"
+>ЦС</ACRONYM
+>). Если режим <TT
+CLASS="LITERAL"
+>sslmode</TT
+> — <TT
+CLASS="LITERAL"
+>verify-full</TT
+>, libpq будет <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>также</I
+></SPAN
+> проверять, соответствует ли имя сервера имени в сертификате. Подключение SSL не будет установлено, если проверить сертификат сервера не удастся. В максимально защищённых окружениях рекомендуется использовать режим <TT
+CLASS="LITERAL"
+>verify-full</TT
+>.</P
+><P
+>В режиме <TT
+CLASS="LITERAL"
+>verify-full</TT
+> атрибут <TT
+CLASS="LITERAL"
+>cn</TT
+> (Общее имя) сертификата сверяется с именем компьютера. Если атрибут <TT
+CLASS="LITERAL"
+>cn</TT
+> начинается со звёздочки (<TT
+CLASS="LITERAL"
+>*</TT
+>), он будет воспринят как маска, и этой звёздочке будут соответствовать все символы, <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>кроме</I
+></SPAN
+> точки (<TT
+CLASS="LITERAL"
+>.</TT
+>). Это означает, что такой сертификат не будет соответствовать поддоменам. Если подключение устанавливается по IP-адресу, а не по имени компьютера, проверяться будет IP-адрес (без поиска в DNS).</P
+><P
+>Чтобы можно было проверить сертификат сервера, файл <TT
+CLASS="FILENAME"
+>~/.postgresql/root.crt</TT
+> в домашнем каталоге пользователя должен содержать сертификат(ы) одного или нескольких доверенных <ACRONYM
+CLASS="ACRONYM"
+>ЦС</ACRONYM
+>. Если <TT
+CLASS="FILENAME"
+>root.crt</TT
+> содержит сертификаты промежуточных <ACRONYM
+CLASS="ACRONYM"
+>ЦС</ACRONYM
+>, он также должен содержать цепочки сертификатов до их корневого <ACRONYM
+CLASS="ACRONYM"
+>ЦС</ACRONYM
+>. (В Microsoft Windows этот файл называется <TT
+CLASS="FILENAME"
+>%APPDATA%\postgresql\root.crt</TT
+>.)</P
+><P
+>Если существует файл <TT
+CLASS="FILENAME"
+>~/.postgresql/root.crl</TT
+> (или <TT
+CLASS="FILENAME"
+>%APPDATA%\postgresql\root.crl</TT
+> в Microsoft Windows), при проверке также учитывается содержащийся в нём список отозванных сертификатов (CRL, Certificate Revocation List).</P
+><P
+>Размещение файла корневых сертификатов и CRL можно поменять, задав параметры соединения <TT
+CLASS="LITERAL"
+>sslrootcert</TT
+> и <TT
+CLASS="LITERAL"
+>sslcrl</TT
+> или переменные окружения <TT
+CLASS="ENVAR"
+>PGSSLROOTCERT</TT
+> и <TT
+CLASS="ENVAR"
+>PGSSLCRL</TT
+>, соответственно.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Для обратной совместимости с предыдущими версиями PostgreSQL, при наличии файла с сертификатами корневых ЦС поведение режима <TT
+CLASS="LITERAL"
+>sslmode</TT
+>=<TT
+CLASS="LITERAL"
+>require</TT
+> не отличается от режима <TT
+CLASS="LITERAL"
+>verify-ca</TT
+>, то есть сертификат сервера будет проверяться по сертификату ЦС. Полагаться на это поведение не рекомендуется — приложения, которым нужно проверять сертификат, должны всегда выбирать режим <TT
+CLASS="LITERAL"
+>verify-ca</TT
+> или <TT
+CLASS="LITERAL"
+>verify-full</TT
+>.</P
+></BLOCKQUOTE
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="LIBPQ-SSL-CLIENTCERT"
+>31.18.2. Клиентские сертификаты</A
+></H2
+><P
+>Если сервер запрашивает доверенный клиентский сертификат, <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> передаёт ему сертификат из файла <TT
+CLASS="FILENAME"
+>~/.postgresql/postgresql.crt</TT
+> в домашнем каталоге пользователя. Этот сертификат должен быть подписан одним из центром сертификации (<ACRONYM
+CLASS="ACRONYM"
+>ЦС</ACRONYM
+>), доверенным для сервера. Также должен присутствовать закрытый ключ в файле <TT
+CLASS="FILENAME"
+>~/.postgresql/postgresql.key</TT
+>. Файл закрытого ключа не должен быть доступен всем или группе; этого можно добиться командой <TT
+CLASS="COMMAND"
+>chmod 0600 ~/.postgresql/postgresql.key</TT
+>. В Microsoft Windows эти файлы называются <TT
+CLASS="FILENAME"
+>%APPDATA%\postgresql\postgresql.crt</TT
+> и <TT
+CLASS="FILENAME"
+>%APPDATA%\postgresql\postgresql.key</TT
+>, и никакие специальные проверки не производятся, так как предполагается, что этот каталог безопасен. Размещение файлов сертификата и ключа можно переопределить параметрами соединения <TT
+CLASS="LITERAL"
+>sslcert</TT
+> и <TT
+CLASS="LITERAL"
+>sslkey</TT
+>, либо переменными окружения <TT
+CLASS="ENVAR"
+>PGSSLCERT</TT
+> и <TT
+CLASS="ENVAR"
+>PGSSLKEY</TT
+>, соответственно.</P
+><P
+>В некоторых случаях сертификат клиента может подписываться <SPAN
+CLASS="QUOTE"
+>"промежуточным"</SPAN
+> центром сертификации, сам сертификат не обязательно должен быть доверенным для сервера. Чтобы использовать такой сертификат, нужно добавить в файл <TT
+CLASS="FILENAME"
+>postgresql.crt</TT
+> сертификат выдавшего его центра сертификации, затем сертификат вышестоящего центра и так далее, до сертификата <SPAN
+CLASS="QUOTE"
+>"корневого"</SPAN
+> или <SPAN
+CLASS="QUOTE"
+>"промежуточного"</SPAN
+> центра, которому доверяет сервер. Сервер считает сертификат доверенным, если он подписан сертификатом, содержащимся в его собственном файле <TT
+CLASS="FILENAME"
+>root.crt</TT
+>.</P
+><P
+>Заметьте, что файл <TT
+CLASS="FILENAME"
+>~/.postgresql/root.crt</TT
+> на клиенте содержит сертификаты центров сертификации верхнего уровня, которые считаются доверенными для подписания серверных сертификатов. В принципе в нём может отсутствовать сертификат ЦС, подписавшего сертификат клиента, хотя в большинстве случаев этот ЦС также будет доверенным для клиентских сертификатов.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="LIBPQ-SSL-PROTECTION"
+>31.18.3. Защита, обеспечиваемая в различных режимах</A
+></H2
+><P
+>Разные значения параметра <TT
+CLASS="LITERAL"
+>sslmode</TT
+> обеспечивают разные уровни защиты. SSL позволяет защититься от следующих типов атак: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+>Прослушивание</DT
+><DD
+><P
+>Если третья сторона может прослушивать сетевой трафик между клиентом и сервером, она может получить как информацию соединения (включая имя пользователя и пароль), так и передаваемые данные. Чтобы защититься от этого, <ACRONYM
+CLASS="ACRONYM"
+>SSL</ACRONYM
+> шифрует трафик.</P
+></DD
+><DT
+>Посредник (<ACRONYM
+CLASS="ACRONYM"
+>MITM</ACRONYM
+>)</DT
+><DD
+><P
+>Если третья сторона может модифицировать данные, передаваемые между клиентом и сервером, она может представиться сервером и, таким образом, сможет видеть и модифицировать данные, <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>даже если они зашифрованы</I
+></SPAN
+>. Третья сторона затем может воспроизводить характеристики соединения и данные для подлинного сервера, что сделает невозможным обнаружение этой атаки. Векторами такой атаки может быть &laquo;отравление&raquo; DNS и подмена адресов, в результате чего клиент будет обращаться не к тому серверу, к которому нужно. Также есть несколько других вариантов реализации этой атаки. Для защиты в <ACRONYM
+CLASS="ACRONYM"
+>SSL</ACRONYM
+> применяется проверка сертификатов, в результате которой сервер доказывает свою подлинность клиенту.</P
+></DD
+><DT
+>Олицетворение</DT
+><DD
+><P
+>Если третья сторона может представляться авторизованным клиентом, она может просто обращаться к данным, к которым не должна иметь доступа. Обычно это происходит вследствие небезопасного управления паролями. В <ACRONYM
+CLASS="ACRONYM"
+>SSL</ACRONYM
+> для предотвращения этой угрозы используются клиентские сертификаты, гарантирующие, что к серверу могут обращаться только владельцы действительных сертификатов.</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>Чтобы соединение было гарантированно безопасном, SSL должен быть настроен <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>на клиенте и на сервере</I
+></SPAN
+>, прежде чем будет установлено соединение. Если он настроен только на сервере, клиент может начать передавать важную информацию (например, пароли), до того как поймёт, что сервер требует высокого уровня безопасности. В libpq для установления безопасных соединений нужно задать для параметра <TT
+CLASS="LITERAL"
+>sslmode</TT
+> значение <TT
+CLASS="LITERAL"
+>verify-full</TT
+> или <TT
+CLASS="LITERAL"
+>verify-ca</TT
+> и предоставить системе корневой сертификат для проверки. В качестве аналогии можно привести использование адреса с <TT
+CLASS="LITERAL"
+>https</TT
+> для безопасного просмотра веб-содержимого.</P
+><P
+>Когда подлинность сервера подтверждена, клиент может передавать конфиденциальные данные. Это значит, что до этого момента клиенту не нужно знать, применяются ли сертификаты для аутентификации, так что настройка использования сертификатов только на стороне сервера не угрожает безопасности.</P
+><P
+>Все варианты использования <ACRONYM
+CLASS="ACRONYM"
+>SSL</ACRONYM
+> подразумевают издержки шифрования и обмена ключами, что порождает необходимость выбора между производительностью и безопасностью. В <A
+HREF="libpq-ssl.html#LIBPQ-SSL-SSLMODE-STATEMENTS"
+>Таблица 31-1</A
+> описываются риски, от которых защищают различные варианты <TT
+CLASS="LITERAL"
+>sslmode</TT
+>, и приводятся утверждения относительно защиты и издержек.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="LIBPQ-SSL-SSLMODE-STATEMENTS"
+></A
+><P
+><B
+>Таблица 31-1. Описания режимов SSL</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>                    <TT
+CLASS="LITERAL"
+>sslmode</TT
+>
+                  </TH
+><TH
+>Защита от прослушивания</TH
+><TH
+>Защита от <ACRONYM
+CLASS="ACRONYM"
+>MITM</ACRONYM
+></TH
+><TH
+>Утверждение</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>disable</TT
+>
+                  </TD
+><TD
+>Нет</TD
+><TD
+>Нет</TD
+><TD
+>Мне не важна безопасность и я не приемлю издержки, связанные с шифрованием.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>allow</TT
+>
+                  </TD
+><TD
+>Возможно</TD
+><TD
+>Нет</TD
+><TD
+>Мне не важна безопасность, но я приемлю издержки, связанные с шифрованием, если на этом настаивает сервер.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>prefer</TT
+>
+                  </TD
+><TD
+>Возможно</TD
+><TD
+>Нет</TD
+><TD
+>Мне не важна безопасность, но я предпочитаю шифрование (и приемлю связанные издержки), если это поддерживает сервер.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>require</TT
+>
+                  </TD
+><TD
+>Да</TD
+><TD
+>Нет</TD
+><TD
+>Я хочу, чтобы мои данные шифровались, и я приемлю сопутствующие издержки. Я доверяю сети в том, что она обеспечивает подключение к нужному серверу.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>verify-ca</TT
+>
+                  </TD
+><TD
+>Да</TD
+><TD
+>Зависит от политики <ACRONYM
+CLASS="ACRONYM"
+>ЦС</ACRONYM
+></TD
+><TD
+>Я хочу, чтобы мои данные шифровались, и я приемлю сопутствующие издержки. Мне нужна уверенность в том, что я подключаюсь к доверенному серверу.</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="LITERAL"
+>verify-full</TT
+>
+                  </TD
+><TD
+>Да</TD
+><TD
+>Да</TD
+><TD
+>Я хочу, чтобы мои данные шифровались, и я приемлю сопутствующие издержки. Мне нужна уверенность в том, что я подключаюсь к доверенному серверу и это именно указанный мной сервер.</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Различие вариантов <TT
+CLASS="LITERAL"
+>verify-ca</TT
+> и <TT
+CLASS="LITERAL"
+>verify-full</TT
+> зависит от характера корневого <ACRONYM
+CLASS="ACRONYM"
+>ЦС</ACRONYM
+>. Если используется публичный <ACRONYM
+CLASS="ACRONYM"
+>ЦС</ACRONYM
+>, режим <TT
+CLASS="LITERAL"
+>verify-ca</TT
+> допускает подключение к серверу с сертификатом, который получил <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>кто угодно</I
+></SPAN
+> в этом <ACRONYM
+CLASS="ACRONYM"
+>ЦС</ACRONYM
+>. В такой ситуации нужно всегда использовать режим <TT
+CLASS="LITERAL"
+>verify-full</TT
+>. Если же используется локальный <ACRONYM
+CLASS="ACRONYM"
+>ЦС</ACRONYM
+> или даже самоподписанный сертификат, режим <TT
+CLASS="LITERAL"
+>verify-ca</TT
+> обычно обеспечивает достаточную защиту.</P
+><P
+>По умолчанию параметр <TT
+CLASS="LITERAL"
+>sslmode</TT
+> имеет значение <TT
+CLASS="LITERAL"
+>prefer</TT
+>. Как показано в этой таблице, он не имеет большого смысла с точки зрения безопасности, и даёт только выигрыш в производительности, если это возможно. Он выбран по умолчанию для обратной совместимости и не рекомендуется для защищённых окружений.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="LIBPQ-SSL-FILEUSAGE"
+>31.18.4. Файлы, используемые клиентом SSL</A
+></H2
+><P
+>В <A
+HREF="libpq-ssl.html#LIBPQ-SSL-FILE-USAGE"
+>Таблице 31-2</A
+> перечислены файлы, имеющие отношение к настройке SSL на стороне клиента.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="LIBPQ-SSL-FILE-USAGE"
+></A
+><P
+><B
+>Таблица 31-2. Файлы, используемые клиентом SSL/libpq</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Файл</TH
+><TH
+>Содержимое</TH
+><TH
+>Назначение</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>                    <TT
+CLASS="FILENAME"
+>~/.postgresql/postgresql.crt</TT
+>
+                  </TD
+><TD
+>сертификат клиента</TD
+><TD
+>запрашивается сервером</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="FILENAME"
+>~/.postgresql/postgresql.key</TT
+>
+                  </TD
+><TD
+>закрытый ключ клиента</TD
+><TD
+>подтверждает клиентский сертификат, передаваемый владельцем; не гарантирует, что владелец сертификата заслуживает доверия</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="FILENAME"
+>~/.postgresql/root.crt</TT
+>
+                  </TD
+><TD
+>сертификаты доверенных ЦС</TD
+><TD
+>позволяет проверить, что сертификат сервера подписан доверенным центром сертификации</TD
+></TR
+><TR
+><TD
+>                    <TT
+CLASS="FILENAME"
+>~/.postgresql/root.crl</TT
+>
+                  </TD
+><TD
+>сертификаты, отозванные центрами сертификации</TD
+><TD
+>сертификат сервера должен отсутствовать в этом списке</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="LIBPQ-SSL-INITIALIZE"
+>31.18.5. Инициализация библиотеки SSL</A
+></H2
+><P
+>Если ваше приложение инициализирует библиотеку <TT
+CLASS="LITERAL"
+>libssl</TT
+> и/или <TT
+CLASS="LITERAL"
+>libcrypto</TT
+>, и <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> собрана с поддержкой <ACRONYM
+CLASS="ACRONYM"
+>SSL</ACRONYM
+>, вы должны вызвать <CODE
+CLASS="FUNCTION"
+>PQinitOpenSSL</CODE
+>, чтобы сообщить <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>, что библиотека <TT
+CLASS="LITERAL"
+>libssl</TT
+> и/или <TT
+CLASS="LITERAL"
+>libcrypto</TT
+> уже инициализированы вашим приложением, чтобы <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> не пыталась ещё раз инициализировать их. Более подробно API SSL описано на странице <A
+HREF="http://h71000.www7.hp.com/doc/83final/BA554_90007/ch04.html"
+TARGET="_top"
+>http://h71000.www7.hp.com/doc/83final/BA554_90007/ch04.html</A
+>.</P
+><P
+>   <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="LIBPQ-PQINITOPENSSL"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQinitOpenSSL</CODE
+></DT
+><DD
+><P
+>Позволяет приложениям выбрать, какие библиотеки безопасности нужно инициализировать. </P><PRE
+CLASS="SYNOPSIS"
+>void PQinitOpenSSL(int do_ssl, int do_crypto);</PRE
+><P></P
+><P
+>Когда параметр <TT
+CLASS="PARAMETER"
+>do_ssl</TT
+> отличен от нуля, <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> будет инициализировать библиотеку <SPAN
+CLASS="APPLICATION"
+>OpenSSL</SPAN
+> перед первым подключением к базе данных. Когда параметр <TT
+CLASS="PARAMETER"
+>do_crypto</TT
+> не равен нулю, будет инициализироваться библиотека <TT
+CLASS="LITERAL"
+>libcrypto</TT
+>. По умолчанию (если функция <CODE
+CLASS="FUNCTION"
+>PQinitOpenSSL</CODE
+> не вызывается) инициализируются обе библиотеки. Если поддержка SSL не была скомпилирована, эта функция присутствует, но ничего не делает.</P
+><P
+>Если ваше приложение использует и инициализирует библиотеку <SPAN
+CLASS="APPLICATION"
+>OpenSSL</SPAN
+> или её нижележащую библиотеку <TT
+CLASS="LITERAL"
+>libcrypto</TT
+>, вы <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>должны</I
+></SPAN
+> вызвать эту функцию, передав нули в соответствующих параметрах, перед первым подключением к базе данных. Собственно инициализацию также важно произвести перед установлением подключения.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQINITSSL"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQinitSSL</CODE
+></DT
+><DD
+><P
+>Позволяет приложениям выбрать, какие библиотеки безопасности нужно инициализировать. </P><PRE
+CLASS="SYNOPSIS"
+>void PQinitSSL(int do_ssl);</PRE
+><P></P
+><P
+>Эта функция равнозначна вызову <TT
+CLASS="LITERAL"
+>PQinitOpenSSL(do_ssl, do_ssl)</TT
+>. Приложениям достаточно инициализировать или не инициализировать обе библиотеки <SPAN
+CLASS="APPLICATION"
+>OpenSSL</SPAN
+> и <TT
+CLASS="LITERAL"
+>libcrypto</TT
+> одновременно.</P
+><P
+>Функция <CODE
+CLASS="FUNCTION"
+>PQinitSSL</CODE
+> существует со времён <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> 8.0, тогда как <CODE
+CLASS="FUNCTION"
+>PQinitOpenSSL</CODE
+> появилась в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> 8.4, так что <CODE
+CLASS="FUNCTION"
+>PQinitSSL</CODE
+> может быть предпочтительней для приложений, которым нужно работать с более старыми версиями <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>.</P
+></DD
+></DL
+></DIV
+><P>
+  </P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="libpq-ldap.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="libpq-threading.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Получение параметров соединения через LDAP</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="libpq.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Поведение в многопоточных программах</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

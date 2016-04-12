@@ -1,0 +1,905 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>initdb</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Серверные утилиты PostgreSQL"
+HREF="reference-server.html"><LINK
+REL="PREVIOUS"
+TITLE="Серверные утилиты PostgreSQL"
+HREF="reference-server.html"><LINK
+REL="NEXT"
+TITLE="            pg_controldata
+          "
+HREF="app-pgcontroldata.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Серверные утилиты PostgreSQL"
+HREF="reference-server.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="reference-server.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="            pg_controldata
+          "
+HREF="app-pgcontroldata.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="APP-INITDB"
+></A
+>initdb</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN92935"
+></A
+><H2
+>Название</H2
+>initdb&nbsp;--&nbsp;создание нового кластера баз данных <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN92939"
+></A
+><H2
+>Синтаксис</H2
+><P
+><TT
+CLASS="COMMAND"
+>initdb</TT
+> [              <TT
+CLASS="REPLACEABLE"
+><I
+>параметр</I
+></TT
+>
+            ...]  [                  <TT
+CLASS="OPTION"
+>--pgdata</TT
+>
+                 |                   <TT
+CLASS="OPTION"
+>-D</TT
+>
+                ]<TT
+CLASS="REPLACEABLE"
+><I
+>каталог</I
+></TT
+> </P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="R1-APP-INITDB-1"
+></A
+><H2
+>Описание</H2
+><P
+>Команда <TT
+CLASS="COMMAND"
+>initdb</TT
+> создаёт новый кластер баз данных <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Кластер — это коллекция баз данных под управлением единого экземпляра сервера.</P
+><P
+>Инициализация кластера базы данных заключается в создании каталогов для хранения данных, формировании общих системных таблиц (относящихся ко всему кластеру, а не к какой-либо базе) и создании баз данных <TT
+CLASS="LITERAL"
+>template1</TT
+> и <TT
+CLASS="LITERAL"
+>postgres</TT
+>. Впоследствии все новые базы создаются на основе шаблона <TT
+CLASS="LITERAL"
+>template1</TT
+> (все дополнения, установленные в <TT
+CLASS="LITERAL"
+>template1</TT
+> автоматически копируются в каждую новую базу данных). База <TT
+CLASS="LITERAL"
+>postgres</TT
+> используется пользователями, утилитами и сторонними приложениями по умолчанию.</P
+><P
+>При попытке создать каталог для хранения данных <TT
+CLASS="COMMAND"
+>initdb</TT
+> может столкнуться с нехваткой прав доступа, если этот каталог принадлежит суперпользователю root. В таком случае необходимо назначить пользователя базы данных владельцем этого каталога при помощи <TT
+CLASS="COMMAND"
+>chown</TT
+>. Затем выполнить <TT
+CLASS="COMMAND"
+>su</TT
+> для смены пользователя и дальнейшего выполнения <TT
+CLASS="COMMAND"
+>initdb</TT
+>.</P
+><P
+>Команда <TT
+CLASS="COMMAND"
+>initdb</TT
+> должна выполняться от имени пользователя, под которым будет запускаться сервер, так как ему необходим полный доступ к файлам и каталогам, создаваемым <TT
+CLASS="COMMAND"
+>initdb</TT
+>. Сервер не может запускаться от имени суперпользователя, поэтому выполнение команды <TT
+CLASS="COMMAND"
+>initdb</TT
+> от его лица будет отклонено.</P
+><P
+><TT
+CLASS="COMMAND"
+>initdb</TT
+> инициализирует локали и кодировки баз данных кластера, которые будут использоваться по умолчанию. Кодировка, порядок сортировки (<TT
+CLASS="LITERAL"
+>LC_COLLATE</TT
+>), классы наборов символов (<TT
+CLASS="LITERAL"
+>LC_CTYPE</TT
+>, например, заглавные, строчные буквы, цифры) могут устанавливаться раздельно при создании новой базы данных. <TT
+CLASS="COMMAND"
+>initdb</TT
+> определяет параметры локали для шаблона <TT
+CLASS="LITERAL"
+>template1</TT
+>, которые будут применяться по умолчанию для новых баз.</P
+><P
+>Чтобы изменить порядок сортировки по умолчанию или классы наборов символов, используются параметры <TT
+CLASS="OPTION"
+>--lc-collate</TT
+> и <TT
+CLASS="OPTION"
+>--lc-ctype</TT
+>. Порядок сортировки, отличающийся от <TT
+CLASS="LITERAL"
+>C</TT
+> или <TT
+CLASS="LITERAL"
+>POSIX</TT
+>, оказывает влияние на производительность. Поэтому необходимо тщательно выбирать необходимую и достаточную локаль при выполнении <TT
+CLASS="COMMAND"
+>initdb</TT
+>.</P
+><P
+>Другие категории локали можно изменить и после старта сервера. Также можно использовать параметр <TT
+CLASS="OPTION"
+>--locale</TT
+>, чтобы задать локаль для всех категорий одновременно, включая порядок сортировки и классы наборов символов. Значения локалей сервера (<TT
+CLASS="LITERAL"
+>lc_*</TT
+>) можно вывести командой <TT
+CLASS="COMMAND"
+>SHOW ALL</TT
+>. Узнать об этом больше можно в <A
+HREF="locale.html"
+>Разделе 22.1</A
+>.</P
+><P
+>Для изменения кодировки по умолчанию используется параметр <TT
+CLASS="OPTION"
+>--encoding</TT
+>. Узнать об этом больше можно в <A
+HREF="multibyte.html"
+>Разделе 22.3</A
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN92991"
+></A
+><H2
+>Параметры</H2
+><P
+>    <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="OPTION"
+>-A <TT
+CLASS="REPLACEABLE"
+><I
+>authmethod</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--auth=<TT
+CLASS="REPLACEABLE"
+><I
+>authmethod</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Параметр указывает на метод аутентификации локальных пользователей, используемый в файле <TT
+CLASS="FILENAME"
+>pg_hba.conf</TT
+> (строки <TT
+CLASS="LITERAL"
+>host</TT
+> и <TT
+CLASS="LITERAL"
+>local</TT
+>). Не используйте <TT
+CLASS="LITERAL"
+>trust</TT
+>, если не можете доверять всем системным пользователям ОС.<TT
+CLASS="LITERAL"
+>trust</TT
+> используется по умолчанию для облегчения процесса установки.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>--auth-host=<TT
+CLASS="REPLACEABLE"
+><I
+>authmethod</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Параметр указывает метод аутентификации для локальных пользователей, подключающихся по TCP/IP, используемый в <TT
+CLASS="FILENAME"
+>pg_hba.conf</TT
+> (строки <TT
+CLASS="LITERAL"
+>host</TT
+>).</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>--auth-local=<TT
+CLASS="REPLACEABLE"
+><I
+>authmethod</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Параметр указывает метод аутентификации локальных пользователей подключающихся по доменным Unix-сокетам, используемый в <TT
+CLASS="FILENAME"
+>pg_hba.conf</TT
+> (строки <TT
+CLASS="LITERAL"
+>local</TT
+>).</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-D <TT
+CLASS="REPLACEABLE"
+><I
+>каталог</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--pgdata=<TT
+CLASS="REPLACEABLE"
+><I
+>каталог</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Параметр указывает каталог хранения данных кластера. Это единственный обязательный параметр для команды <TT
+CLASS="COMMAND"
+>initdb</TT
+>. При этом его можно указать в переменной окружения <TT
+CLASS="ENVAR"
+>PGDATA</TT
+>, что будет удобным при дальнейшем использовании (<TT
+CLASS="COMMAND"
+>postgres</TT
+> обращается к этой же переменной).</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-E <TT
+CLASS="REPLACEABLE"
+><I
+>кодировка</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--encoding=<TT
+CLASS="REPLACEABLE"
+><I
+>кодировка</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Устанавливает кодировку шаблона и новых баз данных по умолчанию, если не указать иное при их создании. По умолчанию устанавливается исходя из указанной локали, и далее, если не удалось определить, выбирается <TT
+CLASS="LITERAL"
+>SQL_ASCII</TT
+>. Кодировки, поддерживаемые сервером <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, описаны в <A
+HREF="multibyte.html#MULTIBYTE-CHARSET-SUPPORTED"
+>Подразделе 22.3.1</A
+>.</P
+></DD
+><DT
+><A
+NAME="APP-INITDB-DATA-CHECKSUMS"
+></A
+><TT
+CLASS="OPTION"
+>-k</TT
+><BR><TT
+CLASS="OPTION"
+>--data-checksums</TT
+></DT
+><DD
+><P
+>Указывает на необходимость проверки системой ввода/вывода контрольных сумм страниц для обнаружения повреждённых данных, так как по умолчанию проверка не производится. Включение проверки может в значительной мере оказать влияние на производительность. Устанавливается на этапе развёртывания кластера, и далее не может быть изменена. Когда проверка включена, производится вычисление контрольных сумм для всех объектов всех баз данных кластера.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>--locale=<TT
+CLASS="REPLACEABLE"
+><I
+>локаль</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Устанавливает локаль кластера по умолчанию. Если флаг не указан, локаль устанавливается согласно окружению, в котором исполняется команда <TT
+CLASS="COMMAND"
+>initdb</TT
+>. Поддерживаемые локали описаны в <A
+HREF="locale.html"
+>Разделе 22.1</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>--lc-collate=<TT
+CLASS="REPLACEABLE"
+><I
+>локаль</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--lc-ctype=<TT
+CLASS="REPLACEABLE"
+><I
+>локаль</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--lc-messages=<TT
+CLASS="REPLACEABLE"
+><I
+>локаль</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--lc-monetary=<TT
+CLASS="REPLACEABLE"
+><I
+>локаль</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--lc-numeric=<TT
+CLASS="REPLACEABLE"
+><I
+>локаль</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--lc-time=<TT
+CLASS="REPLACEABLE"
+><I
+>локаль</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Аналогично <TT
+CLASS="OPTION"
+>--locale</TT
+> устанавливает необходимую локаль, но в заданной категории.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>--no-locale</TT
+></DT
+><DD
+><P
+>Аналогично флагу <TT
+CLASS="OPTION"
+>--locale=C</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-N</TT
+><BR><TT
+CLASS="OPTION"
+>--nosync</TT
+></DT
+><DD
+><P
+>По умолчанию <TT
+CLASS="COMMAND"
+>initdb</TT
+> ожидает завершения записи всех файлов в дисковую подсистему. Данный параметр приводит <TT
+CLASS="COMMAND"
+>initdb</TT
+> к немедленному завершению, что быстрее, но не гарантирует успешности создания каталога хранения данных. Обычно он используется при тестировании, для производственной среды он не подходит.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>--pwfile=<TT
+CLASS="REPLACEABLE"
+><I
+>имя_файла</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Принуждает <TT
+CLASS="COMMAND"
+>initdb</TT
+> читать пароль суперпользователя базы данных из файла, первая строка которого используется в качестве пароля.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-S</TT
+><BR><TT
+CLASS="OPTION"
+>--sync-only</TT
+></DT
+><DD
+><P
+>Безопасно записывает все файлы базы на диск и останавливается. Другие операции <SPAN
+CLASS="APPLICATION"
+>initdb</SPAN
+> при этом не выполняются.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-T <TT
+CLASS="REPLACEABLE"
+><I
+>CFG</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--text-search-config=<TT
+CLASS="REPLACEABLE"
+><I
+>CFG</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Устанавливает конфигурацию текстового поиска по умолчанию. За дополнительными сведениями обратитесь к <A
+HREF="runtime-config-client.html#GUC-DEFAULT-TEXT-SEARCH-CONFIG"
+>default_text_search_config</A
+>.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-U <TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--username=<TT
+CLASS="REPLACEABLE"
+><I
+>имя_пользователя</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Устанавливает имя суперпользователя базы данных. По умолчанию используется имя пользователя ОС, запустившего <TT
+CLASS="COMMAND"
+>initdb</TT
+>. По факту, само по себе имя суперпользователя базы данных не важно, но этот параметр позволяет оставить привычное <SPAN
+CLASS="SYSTEMITEM"
+>postgres</SPAN
+>, если имя пользователя ОС другое.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-W</TT
+><BR><TT
+CLASS="OPTION"
+>--pwprompt</TT
+></DT
+><DD
+><P
+>Принуждает <TT
+CLASS="COMMAND"
+>initdb</TT
+> запросить пароль, устанавливаемый для суперпользователя базы данных. Это не важно, если не планируется аутентификация по паролю. В ином случае, использовать её невозможно, пока пароль не задан.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-X <TT
+CLASS="REPLACEABLE"
+><I
+>каталог</I
+></TT
+></TT
+><BR><TT
+CLASS="OPTION"
+>--xlogdir=<TT
+CLASS="REPLACEABLE"
+><I
+>каталог</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Флаг указывает каталог для хранения журналов транзакций.</P
+></DD
+></DL
+></DIV
+><P>
+   </P
+><P
+>Другие реже используемые параметры описаны здесь: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="OPTION"
+>-d</TT
+><BR><TT
+CLASS="OPTION"
+>--debug</TT
+></DT
+><DD
+><P
+>Распечатывает отладочный вывод и некоторую дополнительную информацию при начальной работе загрузчика. Загрузчик это приложение <TT
+CLASS="COMMAND"
+>initdb</TT
+>, используемое для создания каталога таблиц.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-L <TT
+CLASS="REPLACEABLE"
+><I
+>каталог</I
+></TT
+></TT
+></DT
+><DD
+><P
+>Указывает <TT
+CLASS="COMMAND"
+>initdb</TT
+>, где необходимо искать входные файлы для развёртывания кластера. Обычно это не требуется. Приложение само запросит эти данные, если будет необходимо.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-n</TT
+><BR><TT
+CLASS="OPTION"
+>--noclean</TT
+></DT
+><DD
+><P
+>По умолчанию, при выявлении ошибки на этапе развёртывания кластера, <TT
+CLASS="COMMAND"
+>initdb</TT
+> удаляет все файлы, которые к тому моменту были созданы. Параметр предотвращает очистку файлов для целей отладки.</P
+></DD
+></DL
+></DIV
+><P></P
+><P
+>Прочие параметры: <P
+></P
+></P><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="OPTION"
+>-V</TT
+><BR><TT
+CLASS="OPTION"
+>--version</TT
+></DT
+><DD
+><P
+>Выводит версию <SPAN
+CLASS="APPLICATION"
+>initdb</SPAN
+> и останавливается.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-?</TT
+><BR><TT
+CLASS="OPTION"
+>--help</TT
+></DT
+><DD
+><P
+>Показывает помощь по аргументам команды <SPAN
+CLASS="APPLICATION"
+>initdb</SPAN
+> и останавливается.</P
+></DD
+></DL
+></DIV
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN93197"
+></A
+><H2
+>Переменные окружения</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="ENVAR"
+>PGDATA</TT
+></DT
+><DD
+><P
+>Указывает каталог хранения данных кластера, можно изменить параметром <TT
+CLASS="OPTION"
+>-D</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="ENVAR"
+>TZ</TT
+></DT
+><DD
+><P
+>Указывает часовой пояс кластера по умолчанию. Значение — это полное имя часового пояса (см. <A
+HREF="datatype-datetime.html#DATATYPE-TIMEZONES"
+>Подраздел 8.5.3</A
+>).</P
+></DD
+></DL
+></DIV
+><P
+>Эта утилита, как и большинство других утилит <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, также использует переменные среды, поддерживаемые <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> (см. <A
+HREF="libpq-envars.html"
+>Раздел 31.14</A
+>).</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN93216"
+></A
+><H2
+>Замечания</H2
+><P
+><TT
+CLASS="COMMAND"
+>initdb</TT
+> можно выполнить командой <TT
+CLASS="COMMAND"
+>pg_ctl initdb</TT
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN93221"
+></A
+><H2
+>См. также</H2
+><A
+HREF="app-pg-ctl.html"
+>            <SPAN
+CLASS="APPLICATION"
+>pg_ctl</SPAN
+>
+          </A
+>, <A
+HREF="app-postgres.html"
+>            <SPAN
+CLASS="APPLICATION"
+>postgres</SPAN
+>
+          </A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="reference-server.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="app-pgcontroldata.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Серверные утилиты PostgreSQL</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="reference-server.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><SPAN
+CLASS="APPLICATION"
+>pg_controldata</SPAN
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

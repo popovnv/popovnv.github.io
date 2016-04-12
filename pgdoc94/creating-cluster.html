@@ -1,0 +1,426 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Создание кластера баз данных</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Подготовка к работе и сопровождение сервера"
+HREF="runtime.html"><LINK
+REL="PREVIOUS"
+TITLE="Учётная запись пользователя PostgreSQL"
+HREF="postgres-user.html"><LINK
+REL="NEXT"
+TITLE="Запуск сервера баз данных"
+HREF="server-start.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Учётная запись пользователя PostgreSQL"
+HREF="postgres-user.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="runtime.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 17. Подготовка к работе и сопровождение сервера</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Запуск сервера баз данных"
+HREF="server-start.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CREATING-CLUSTER"
+>17.2. Создание кластера баз данных</A
+></H1
+><P
+>Прежде чем вы сможете работать с базами данных, вы должны проинициализировать область хранения баз данных на диске. Мы называем это хранилище <I
+CLASS="FIRSTTERM"
+>кластером баз данных</I
+>. (В <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> применяется термин кластер каталога.) Кластер баз данных представляет собой набор баз, управляемых одним экземпляром работающего сервера. После инициализации кластер будет содержать базу данных с именем <TT
+CLASS="LITERAL"
+>postgres</TT
+>, предназначенную для использования по умолчанию утилитами, пользователями и сторонними приложениями. Сам сервер баз данных не требует наличия базы <TT
+CLASS="LITERAL"
+>postgres</TT
+>, но многие внешние вспомогательные программы рассчитывают на её существование. При инициализации в каждом кластере создаётся ещё одна база, с именем <TT
+CLASS="LITERAL"
+>template1</TT
+>. Как можно понять из имени, она применяется впоследствии в качестве шаблона создаваемых баз данных; использовать её в качестве рабочей не следует. (За информацией о создании новых баз данных в кластере обратитесь к <A
+HREF="managing-databases.html"
+>Главе 21</A
+>.)</P
+><P
+>С точки зрения файловой системы, кластер баз данных представляет собой один каталог, в котором хранятся все данные. Мы называем его <I
+CLASS="FIRSTTERM"
+>каталогом данных</I
+> или <I
+CLASS="FIRSTTERM"
+>областью данных</I
+>. Где именно хранить данные, вы абсолютно свободно можете выбирать сами. Какого-либо стандартного пути не существует, но часто данные размещаются в <TT
+CLASS="FILENAME"
+>/usr/local/pgsql/data</TT
+> или в <TT
+CLASS="FILENAME"
+>/var/lib/pgsql/data</TT
+>. Для инициализации кластера баз данных применяется команда <A
+HREF="app-initdb.html"
+>initdb</A
+>, которая устанавливается в составе <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Расположение кластера базы данных в файловой системе задаётся параметром <TT
+CLASS="OPTION"
+>-D</TT
+>, например: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>initdb -D /usr/local/pgsql/data</KBD
+></PRE
+><P> Заметьте, что эту команду нужно выполнять от имени учётной записи <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>, о которой говорится в предыдущем разделе.</P
+><DIV
+CLASS="TIP"
+><BLOCKQUOTE
+CLASS="TIP"
+><P
+><B
+>Подсказка: </B
+>В качестве альтернативы параметра <TT
+CLASS="OPTION"
+>-D</TT
+> можно установить переменную окружения <TT
+CLASS="ENVAR"
+>PGDATA</TT
+>. </P
+></BLOCKQUOTE
+></DIV
+><P
+>Также можно запустить команду <TT
+CLASS="COMMAND"
+>initdb</TT
+>, воспользовавшись программой <A
+HREF="app-pg-ctl.html"
+>            <SPAN
+CLASS="APPLICATION"
+>pg_ctl</SPAN
+>
+          </A
+>, примерно так: </P><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>$</SAMP
+> <KBD
+CLASS="USERINPUT"
+>pg_ctl -D /usr/local/pgsql/data initdb</KBD
+></PRE
+><P> Этот вариант может быть удобнее, если вы используете <TT
+CLASS="COMMAND"
+>pg_ctl</TT
+> для запуска и остановки сервера (см. <A
+HREF="server-start.html"
+>Раздел 17.3</A
+>), так как <TT
+CLASS="COMMAND"
+>pg_ctl</TT
+> будет единственной командой, с помощью которой вы будете управлять экземпляром сервера баз данных.</P
+><P
+>Команда <TT
+CLASS="COMMAND"
+>initdb</TT
+> попытается создать указанный вами каталог, если он не существует. Скорее всего, для этого ей не хватит прав (если вы последуете нашему совету и создадите непривилегированную учётную запись). В этом случае, вам нужно будет создать каталог самостоятельно (от имени root) и назначить его владельцем пользователя <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Это можно сделать так: </P><PRE
+CLASS="SCREEN"
+>root# <KBD
+CLASS="USERINPUT"
+>mkdir /usr/local/pgsql/data</KBD
+>
+root# <KBD
+CLASS="USERINPUT"
+>chown postgres /usr/local/pgsql/data</KBD
+>
+root# <KBD
+CLASS="USERINPUT"
+>su postgres</KBD
+>
+postgres$ <KBD
+CLASS="USERINPUT"
+>initdb -D /usr/local/pgsql/data</KBD
+></PRE
+><P></P
+><P
+>Команда <TT
+CLASS="COMMAND"
+>initdb</TT
+> не будет работать, если обнаружит, что указанный каталог данных уже проинициализирован.</P
+><P
+>Так как каталог данных содержит все данные базы, очень важно защитить его от неавторизованного доступа. Для этого <TT
+CLASS="COMMAND"
+>initdb</TT
+> лишает прав доступа к нему всех пользователей, кроме пользователя <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>.</P
+><P
+>Однако, даже когда содержимое каталога защищено, если проверка подлинности клиентов настроена по умолчанию, любой локальный пользователь может подключиться к базе данных и даже стать суперпользователем. Если вы не доверяете другим локальным пользователям, мы рекомендуем использовать один из параметров команды <TT
+CLASS="COMMAND"
+>initdb</TT
+>: <TT
+CLASS="OPTION"
+>-W</TT
+>, <TT
+CLASS="OPTION"
+>--pwprompt</TT
+> или <TT
+CLASS="OPTION"
+>--pwfile</TT
+> и назначить пароль суперпользователя баз данных.  Кроме того, воспользуйтесь параметром <TT
+CLASS="OPTION"
+>-A md5</TT
+> или <TT
+CLASS="OPTION"
+>-A password</TT
+> и отключите разрешённый по умолчанию режим аутентификации <TT
+CLASS="LITERAL"
+>trust</TT
+>; либо измените сгенерированный файл <TT
+CLASS="FILENAME"
+>pg_hba.conf</TT
+> после выполнения <TT
+CLASS="COMMAND"
+>initdb</TT
+>, но <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>перед</I
+></SPAN
+> тем, как запустить сервер в первый раз. (Возможны и другие разумные подходы — применить режим проверки подлинности <TT
+CLASS="LITERAL"
+>peer</TT
+> или ограничить подключения на уровне файловой системы. За дополнительными сведениями обратитесь к <A
+HREF="client-authentication.html"
+>Главе 19</A
+>.)</P
+><P
+>Команда <TT
+CLASS="COMMAND"
+>initdb</TT
+> также устанавливает для кластера баз данных локаль  по умолчанию. Обычно она просто берёт параметры локали из текущего окружения и применяет их к инициализируемой базе данных. Однако можно выбрать и другую локаль для базы данных; за дополнительной информацией обратитесь к <A
+HREF="locale.html"
+>Разделу 22.1</A
+>. Команда <TT
+CLASS="COMMAND"
+>initdb</TT
+> задаёт порядок сортировки по умолчанию для применения в определённом кластере баз данных, и хотя новые базы данных могут создаваться с иным порядком сортировки, порядок в базах-шаблонах, создаваемых initdb, можно изменить, только если удалить и пересоздать их. Также учтите, что при использовании локалей, отличных от <TT
+CLASS="LITERAL"
+>C</TT
+> и <TT
+CLASS="LITERAL"
+>POSIX</TT
+>, возможно снижение производительности. Поэтому важно правильно выбрать локаль с самого начала.</P
+><P
+>Команда <TT
+CLASS="COMMAND"
+>initdb</TT
+> также задаёт кодировку символов по умолчанию для кластера баз данных. Обычно она должна соответствовать кодировке локали. За подробностями обратитесь к <A
+HREF="multibyte.html"
+>Разделу 22.3</A
+>.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="CREATING-CLUSTER-NFS"
+>17.2.1. Сетевые файловые системы</A
+></H2
+><P
+>Во многих инсталляциях кластеры баз данных создаются в сетевых файловых ресурсах. Иногда это реализуется с применением сетевой файловой системы (<ACRONYM
+CLASS="ACRONYM"
+>NFS</ACRONYM
+>, Network File System) или сетевых хранилищ (<ACRONYM
+CLASS="ACRONYM"
+>NAS</ACRONYM
+>, Network Attached Storage), использующих <ACRONYM
+CLASS="ACRONYM"
+>NFS</ACRONYM
+> внутри. <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> не делает ничего специфического с файловыми системами <ACRONYM
+CLASS="ACRONYM"
+>NFS</ACRONYM
+>, то есть, он предполагает, что <ACRONYM
+CLASS="ACRONYM"
+>NFS</ACRONYM
+> работает точно так же, как и локальное хранилище (<ACRONYM
+CLASS="ACRONYM"
+>DAS</ACRONYM
+>, Direct Attached Storage). Но если клиент или сервер <ACRONYM
+CLASS="ACRONYM"
+>NFS</ACRONYM
+> реализованы с отклонениями от стандарта, это чревато нестабильной работой (см. <A
+HREF="http://www.time-travellers.org/shane/papers/NFS_considered_harmful.html"
+TARGET="_top"
+>http://www.time-travellers.org/shane/papers/NFS_considered_harmful.html</A
+>). В частности, проблемы со стабильностью могут возникнуть при отложенной (асинхронной) записи на сервер <ACRONYM
+CLASS="ACRONYM"
+>NFS</ACRONYM
+>; если это возможно, во избежание таких проблем, монтируйте файловые системы <ACRONYM
+CLASS="ACRONYM"
+>NFS</ACRONYM
+> в синхронном режиме (без кеширования). Кроме того, не рекомендуется применять мягкое монтирование <ACRONYM
+CLASS="ACRONYM"
+>NFS</ACRONYM
+>. (В сетях хранения данных (<ACRONYM
+CLASS="ACRONYM"
+>SAN</ACRONYM
+>, Storage Area Networks) применяется низкоуровневый сетевой протокол, не <ACRONYM
+CLASS="ACRONYM"
+>NFS</ACRONYM
+>.)</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="postgres-user.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="server-start.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Учётная запись пользователя <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="runtime.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Запуск сервера баз данных</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

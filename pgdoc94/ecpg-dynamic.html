@@ -1,0 +1,309 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Динамический SQL</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="ECPG — встраиваемый SQL в C"
+HREF="ecpg.html"><LINK
+REL="PREVIOUS"
+TITLE="Использование переменных среды"
+HREF="ecpg-variables.html"><LINK
+REL="NEXT"
+TITLE="Библиотека pgtypes"
+HREF="ecpg-pgtypes.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Использование переменных среды"
+HREF="ecpg-variables.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ecpg.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 33. <SPAN
+CLASS="APPLICATION"
+>ECPG</SPAN
+> — встраиваемый <ACRONYM
+CLASS="ACRONYM"
+>SQL</ACRONYM
+> в C</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Библиотека pgtypes"
+HREF="ecpg-pgtypes.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="ECPG-DYNAMIC"
+>33.5. Динамический SQL</A
+></H1
+><P
+>Во многих случаях конкретные операторы SQL, которые должно выполнять приложение, известны в момент написания приложения. В некоторых случаях, однако, операторы SQL формируются во время выполнения или поступают из внешнего источника. В этих случаях операторы SQL нельзя внедрить непосредственно в исходный код C, но есть средство, позволяющее вызывать произвольные операторы SQL, передаваемые в строковой переменной.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="ECPG-DYNAMIC-WITHOUT-RESULT"
+>33.5.1. Выполнение операторов без набора результатов</A
+></H2
+><P
+>Самый простой способ выполнить произвольный оператор SQL — применить команду <TT
+CLASS="COMMAND"
+>EXECUTE IMMEDIATE</TT
+>. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL BEGIN DECLARE SECTION;
+const char *stmt = "CREATE TABLE test1 (...);";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL EXECUTE IMMEDIATE :stmt;</PRE
+><P>
+    <TT
+CLASS="COMMAND"
+>EXECUTE IMMEDIATE</TT
+> можно применять для SQL-операторов, которые не возвращают набор результатов (например, DDL, <TT
+CLASS="COMMAND"
+>INSERT</TT
+>, <TT
+CLASS="COMMAND"
+>UPDATE</TT
+>, <TT
+CLASS="COMMAND"
+>DELETE</TT
+>). Выполнять операторы, которые получают данные, (например, <TT
+CLASS="COMMAND"
+>SELECT</TT
+>) таким образом нельзя. Как выполнять такие операторы, рассказывается в следующем разделе.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="ECPG-DYNAMIC-INPUT"
+>33.5.2. Выполнение оператора с входными параметрами</A
+></H2
+><P
+>Более эффективно выполнять произвольный оператор SQL можно, подготовив его один раз, а затем запуская подготовленный оператор столько, сколько нужно. Также можно подготовить обобщённую версию оператора, а затем выполнять специализированные его версии, подставляя в него параметры. Подготавливая оператор, поставьте знаки вопроса там, где позже хотите подставить параметры. Например: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL BEGIN DECLARE SECTION;
+const char *stmt = "INSERT INTO test1 VALUES(?, ?);";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL PREPARE mystmt FROM :stmt;
+ ...
+EXEC SQL EXECUTE mystmt USING 42, 'foobar';</PRE
+><P></P
+><P
+>Когда подготовленный оператор больше не нужен, его следует освободить: </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL DEALLOCATE PREPARE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+>;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="ECPG-DYNAMIC-WITH-RESULT"
+>33.5.3. Выполнение оператора с набором результатов</A
+></H2
+><P
+>Для выполнения оператора SQL с одной строкой результата можно применить команду <TT
+CLASS="COMMAND"
+>EXECUTE</TT
+>. Чтобы сохранить результат, добавьте предложение <TT
+CLASS="LITERAL"
+>INTO</TT
+>. </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL BEGIN DECLARE SECTION;
+const char *stmt = "SELECT a, b, c FROM test1 WHERE a &gt; ?";
+int v1, v2;
+VARCHAR v3[50];
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL PREPARE mystmt FROM :stmt;
+ ...
+EXEC SQL EXECUTE mystmt INTO :v1, :v2, :v3 USING 37;</PRE
+><P> Команда <TT
+CLASS="COMMAND"
+>EXECUTE</TT
+> может содержать предложение <TT
+CLASS="LITERAL"
+>INTO</TT
+> и/или предложение <TT
+CLASS="LITERAL"
+>USING</TT
+>, либо не содержать ни того, ни другого.</P
+><P
+>Если ожидается, что запрос вернёт более одной строки результата, следует применять курсор, как показано в следующем примере. (Подробно курсоры описываются в <A
+HREF="ecpg-commands.html#ECPG-CURSORS"
+>Подразделе 33.3.2</A
+>.) </P><PRE
+CLASS="PROGRAMLISTING"
+>EXEC SQL BEGIN DECLARE SECTION;
+char dbaname[128];
+char datname[128];
+char *stmt = "SELECT u.usename as dbaname, d.datname "
+             "  FROM pg_database d, pg_user u "
+             "  WHERE d.datdba = u.usesysid";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL CONNECT TO testdb AS con1 USER testuser;
+
+EXEC SQL PREPARE stmt1 FROM :stmt;
+
+EXEC SQL DECLARE cursor1 CURSOR FOR stmt1;
+EXEC SQL OPEN cursor1;
+
+EXEC SQL WHENEVER NOT FOUND DO BREAK;
+
+while (1)
+{
+    EXEC SQL FETCH cursor1 INTO :dbaname,:datname;
+    printf("dbaname=%s, datname=%s\n", dbaname, datname);
+}
+
+EXEC SQL CLOSE cursor1;
+
+EXEC SQL COMMIT;
+EXEC SQL DISCONNECT ALL;</PRE
+><P></P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ecpg-variables.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ecpg-pgtypes.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Использование переменных среды</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ecpg.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Библиотека pgtypes</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

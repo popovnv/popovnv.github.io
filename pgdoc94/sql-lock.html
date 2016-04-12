@@ -1,0 +1,533 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>LOCK</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="LOAD"
+HREF="sql-load.html"><LINK
+REL="NEXT"
+TITLE="MOVE"
+HREF="sql-move.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="LOAD"
+HREF="sql-load.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="MOVE"
+HREF="sql-move.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-LOCK"
+></A
+>LOCK</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN81761"
+></A
+><H2
+>Название</H2
+>LOCK&nbsp;--&nbsp;заблокировать таблицу</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN81764"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>LOCK [ TABLE ] [ ONLY ] <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> [ * ] [, ...] [ IN <TT
+CLASS="REPLACEABLE"
+><I
+>режим_блокировки</I
+></TT
+> MODE ] [ NOWAIT ]
+
+<SPAN
+CLASS="phrase"
+><SPAN
+CLASS="PHRASE"
+>Где возможные варианты <TT
+CLASS="REPLACEABLE"
+><I
+>режим_блокировки</I
+></TT
+>:</SPAN
+></SPAN
+>
+
+    ACCESS SHARE | ROW SHARE | ROW EXCLUSIVE | SHARE UPDATE EXCLUSIVE
+    | SHARE | SHARE ROW EXCLUSIVE | EXCLUSIVE | ACCESS EXCLUSIVE</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN81770"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>LOCK TABLE</TT
+> получает блокировку на уровне таблицы, при необходимости ожидая освобождения таблицы от других конфликтующих блокировок. Если указано <TT
+CLASS="LITERAL"
+>NOWAIT</TT
+>, <TT
+CLASS="COMMAND"
+>LOCK TABLE</TT
+> не ждёт, пока таблица освободится: если блокировку нельзя получить немедленно, команда прерывается и выдаётся ошибка. Как только блокировка получена, она удерживается до завершения текущей транзакции. (Команды <TT
+CLASS="COMMAND"
+>UNLOCK TABLE</TT
+> не существует; блокировки всегда освобождаются в конце транзакции.)</P
+><P
+>Запрашивая автоматические блокировки для команд, работающих с таблицами, <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> всегда выбирает наименее ограничивающий режим блокировки из возможных. Оператор <TT
+CLASS="COMMAND"
+>LOCK TABLE</TT
+> предназначен для случаев, когда требуется более сильная блокировка. Например, предположим, что приложение выполняет транзакцию на уровне изоляции Read Committed и оно должно получать неизменные данные на протяжении всей транзакции. Для достижения этой цели можно получить для таблицы блокировку в режиме <TT
+CLASS="LITERAL"
+>SHARE</TT
+>, прежде чем обращаться к ней. В результате параллельные изменения данных будут исключены и при последующих чтениях будет получено стабильное представление зафиксированных данных, так как режим блокировки <TT
+CLASS="LITERAL"
+>SHARE</TT
+> конфликтует с блокировкой <TT
+CLASS="LITERAL"
+>ROW EXCLUSIVE</TT
+>, запрашиваемой при записи, а <TT
+CLASS="COMMAND"
+>LOCK TABLE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> IN SHARE MODE</TT
+> будет ждать, пока параллельные транзакции с блокировкой <TT
+CLASS="LITERAL"
+>ROW EXCLUSIVE</TT
+> не будут зафиксированы или отменены. Таким образом, в момент получения такой блокировки не останется ни одной открытой незафиксированной операции записи; кроме того, никто не сможет записывать в таблицу, пока блокировка не будет снята.</P
+><P
+>Чтобы получить похожий эффект в транзакции на уровне изоляции <TT
+CLASS="LITERAL"
+>REPEATABLE READ</TT
+> или <TT
+CLASS="LITERAL"
+>SERIALIZABLE</TT
+>, необходимо выполнить оператор <TT
+CLASS="COMMAND"
+>LOCK TABLE</TT
+> перед первым <TT
+CLASS="COMMAND"
+>SELECT</TT
+> или оператором, изменяющим данные. Представление данных для транзакции уровня <TT
+CLASS="LITERAL"
+>REPEATABLE READ</TT
+> или <TT
+CLASS="LITERAL"
+>SERIALIZABLE</TT
+> будет заморожено в момент, когда начнёт выполняться этот запрос. Если команда <TT
+CLASS="COMMAND"
+>LOCK TABLE</TT
+> выполняется в транзакции позже, она так же исключает параллельную запись, но не даёт гарантии, что транзакция будет читать последние зафиксированные данные.</P
+><P
+>Если в транзакции такого рода требуется изменять данные в таблице, для неё следует использовать режим блокировки <TT
+CLASS="LITERAL"
+>SHARE ROW EXCLUSIVE</TT
+> вместо <TT
+CLASS="LITERAL"
+>SHARE</TT
+>. Этот режим гарантирует, что в один момент времени будет выполняться только одна транзакция такого типа. Без этого ограничения возможна взаимоблокировка: две транзакции могут одновременно получить блокировки <TT
+CLASS="LITERAL"
+>SHARE</TT
+>, после чего они не смогут получить блокировку <TT
+CLASS="LITERAL"
+>ROW EXCLUSIVE</TT
+>, чтобы собственно выполнить изменения. (Заметьте, что собственные блокировки транзакции никогда не конфликтуют, так что транзакция может получить блокировку <TT
+CLASS="LITERAL"
+>ROW EXCLUSIVE</TT
+>, когда она владеет блокировкой <TT
+CLASS="LITERAL"
+>SHARE</TT
+> &mdash; но не тогда, когда блокировку <TT
+CLASS="LITERAL"
+>SHARE</TT
+> удерживает другая транзакция.) Чтобы не допустить взаимоблокировок, убедитесь, что все транзакции запрашивают блокировки одних объектов в одинаковом порядке, и если для одного объекта запрашиваются блокировки в разных режимах, транзакции всегда должны запрашивать самую строгую блокировку.</P
+><P
+>Дополнительно о режимах и стратегиях блокировки можно узнать в <A
+HREF="explicit-locking.html"
+>Разделе 13.3</A
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN81804"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></DT
+><DD
+><P
+>Имя (возможно, дополненное схемой) существующей таблицы, для которой запрашивается блокировка. Если перед именем таблицы указано <TT
+CLASS="LITERAL"
+>ONLY</TT
+>, блокируется только заданная таблица. Без <TT
+CLASS="LITERAL"
+>ONLY</TT
+> блокируется и заданная таблица, и все её потомки (если таковые есть). После имени таблицы можно также добавить необязательное указание <TT
+CLASS="LITERAL"
+>*</TT
+>, чтобы явно обозначить, что блокировка затрагивает и все дочерние таблицы.</P
+><P
+>Команда <TT
+CLASS="LITERAL"
+>LOCK TABLE a, b;</TT
+> равнозначна последовательности <TT
+CLASS="LITERAL"
+>LOCK TABLE a; LOCK TABLE b;</TT
+>. Таблицы блокируются по одной в порядке, заданном в команде <TT
+CLASS="COMMAND"
+>LOCK TABLE</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>режим_блокировки</I
+></TT
+></DT
+><DD
+><P
+>Режим блокировки определяет, с какой блокировкой будет конфликтовать данная. Режимы блокировок описаны в <A
+HREF="explicit-locking.html"
+>Разделе 13.3</A
+>.</P
+><P
+>Если режим блокировки не указан, применяется самый строгий режим, <TT
+CLASS="LITERAL"
+>ACCESS EXCLUSIVE</TT
+>.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>NOWAIT</TT
+></DT
+><DD
+><P
+>Указывает, что <TT
+CLASS="COMMAND"
+>LOCK TABLE</TT
+> не должна ожидать освобождения конфликтующих блокировок: если запрошенная блокировка не может быть получена немедленно, транзакция прерывается.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN81833"
+></A
+><H2
+>Замечания</H2
+><P
+><TT
+CLASS="LITERAL"
+>LOCK TABLE ... IN ACCESS SHARE MODE</TT
+> требует наличия права <TT
+CLASS="LITERAL"
+>SELECT</TT
+> в целевой таблице. Все другие формы <TT
+CLASS="COMMAND"
+>LOCK</TT
+> требуют наличия права <TT
+CLASS="LITERAL"
+>UPDATE</TT
+>, <TT
+CLASS="LITERAL"
+>DELETE</TT
+> или <TT
+CLASS="LITERAL"
+>TRUNCATE</TT
+>.</P
+><P
+>Вне блока транзакции команда <TT
+CLASS="COMMAND"
+>LOCK TABLE</TT
+> бесполезна: блокировка сохранится только до завершения операции. Поэтому <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> выдаёт ошибку при попытке применить <TT
+CLASS="COMMAND"
+>LOCK</TT
+> не в блоке транзакции. Чтобы определить блок транзакции, используйте <A
+HREF="sql-begin.html"
+>BEGIN</A
+> и <A
+HREF="sql-commit.html"
+>COMMIT</A
+> (или <A
+HREF="sql-rollback.html"
+>ROLLBACK</A
+>).</P
+><P
+><TT
+CLASS="COMMAND"
+>LOCK TABLE</TT
+> может устанавливать только блокировки на уровне таблицы, так что все имена режимов, включающие слово <TT
+CLASS="LITERAL"
+>ROW</TT
+> (строка), не совсем корректны. Следует воспринимать их так, что в этих режимах пользователь намеревается получать в заблокированной таблице блокировки уровня строк. Также учтите, что в режиме <TT
+CLASS="LITERAL"
+>ROW EXCLUSIVE</TT
+> устанавливается разделяемая блокировка таблицы. Заметьте, что применительно к <TT
+CLASS="COMMAND"
+>LOCK TABLE</TT
+> все режимы блокировки действуют одинаково, отличаются только правила, определяющие, какой режим с каким конфликтует. Чтобы узнать, как получить блокировку именно на уровне строк, обратитесь к <A
+HREF="explicit-locking.html#LOCKING-ROWS"
+>Подразделу 13.3.2</A
+> и <A
+HREF="sql-select.html#SQL-FOR-UPDATE-SHARE"
+><I
+>Предложение блокировки</I
+></A
+> в справочной документации <TT
+CLASS="COMMAND"
+>SELECT</TT
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN81857"
+></A
+><H2
+>Примеры</H2
+><P
+>Получение блокировки <TT
+CLASS="LITERAL"
+>SHARE</TT
+> для первичного ключа таблицы при добавлении записи в подчинённую таблицу: </P><PRE
+CLASS="PROGRAMLISTING"
+>BEGIN WORK;
+LOCK TABLE films IN SHARE MODE;
+SELECT id FROM films
+    WHERE name = 'Star Wars: Episode I - The Phantom Menace';
+-- Если запись не будет возвращена, произойдёт откат транзакции
+INSERT INTO films_user_comments VALUES
+    (_id_, 'GREAT! I was waiting for it for so long!');
+COMMIT WORK;</PRE
+><P></P
+><P
+>Установление блокировки <TT
+CLASS="LITERAL"
+>SHARE ROW EXCLUSIVE</TT
+> в таблице первичного ключа перед выполнением операции удаления: </P><PRE
+CLASS="PROGRAMLISTING"
+>BEGIN WORK;
+LOCK TABLE films IN SHARE ROW EXCLUSIVE MODE;
+DELETE FROM films_user_comments WHERE id IN
+    (SELECT id FROM films WHERE rating &lt; 5);
+DELETE FROM films WHERE rating &lt; 5;
+COMMIT WORK;</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN81865"
+></A
+><H2
+>Совместимость</H2
+><P
+>Команда <TT
+CLASS="COMMAND"
+>LOCK TABLE</TT
+> отсутствует в стандарте SQL, в нём уровни изоляции транзакции определяются командой <TT
+CLASS="COMMAND"
+>SET TRANSACTION</TT
+>. <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> поддерживает и этот вариант; подробнее это описано в <A
+HREF="sql-set-transaction.html"
+>SET TRANSACTION</A
+>.</P
+><P
+>За исключением <TT
+CLASS="LITERAL"
+>ACCESS SHARE</TT
+>, <TT
+CLASS="LITERAL"
+>ACCESS EXCLUSIVE</TT
+> и <TT
+CLASS="LITERAL"
+>SHARE UPDATE EXCLUSIVE</TT
+>, режимы блокировки в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> и синтаксис <TT
+CLASS="COMMAND"
+>LOCK TABLE</TT
+> совместимы с теми, что представлены в СУБД <SPAN
+CLASS="PRODUCTNAME"
+>Oracle</SPAN
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-load.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-move.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>LOAD</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>MOVE</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,387 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Клиентские приложения PostgreSQL</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Справочное руководство"
+HREF="reference.html"><LINK
+REL="PREVIOUS"
+TITLE="VALUES"
+HREF="sql-values.html"><LINK
+REL="NEXT"
+TITLE="            clusterdb
+          "
+HREF="app-clusterdb.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFERENCE"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="VALUES"
+HREF="sql-values.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="reference.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="            clusterdb
+          "
+HREF="app-clusterdb.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="REFERENCE"
+><A
+NAME="REFERENCE-CLIENT"
+></A
+><DIV
+CLASS="TITLEPAGE"
+><H1
+CLASS="TITLE"
+>II. Клиентские приложения PostgreSQL</H1
+><DIV
+CLASS="PARTINTRO"
+><A
+NAME="AEN85592"
+></A
+><P
+>Раздел описывает клиентские приложения и утилиты <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Некоторые из описанных приложений требуют особые привилегии. Основной отличительной особенностью этих приложений является возможность исполнения на любом компьютере, независимо от расположения сервера баз данных.</P
+><P
+>Имя пользователя и базы данных передаются из командной строки на сервер без изменения регистра &mdash; все пробельные и специальные символы необходимо экранировать с помощью кавычек. Имена таблиц и другие идентификаторы передаются регистр-независимо, за исключением отдельно описанных ситуаций, где может требоваться экранирование.</P
+></DIV
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Содержание</B
+></DT
+><DT
+><A
+HREF="app-clusterdb.html"
+><SPAN
+CLASS="APPLICATION"
+>clusterdb</SPAN
+></A
+>&nbsp;--&nbsp;кластеризовать базу данных <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></DT
+><DT
+><A
+HREF="app-createdb.html"
+><SPAN
+CLASS="APPLICATION"
+>createdb</SPAN
+></A
+>&nbsp;--&nbsp;создать базу данных <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></DT
+><DT
+><A
+HREF="app-createlang.html"
+><SPAN
+CLASS="APPLICATION"
+>createlang</SPAN
+></A
+>&nbsp;--&nbsp;установить процедурный язык <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></DT
+><DT
+><A
+HREF="app-createuser.html"
+><SPAN
+CLASS="APPLICATION"
+>createuser</SPAN
+></A
+>&nbsp;--&nbsp;создать новую учётную запись <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></DT
+><DT
+><A
+HREF="app-dropdb.html"
+><SPAN
+CLASS="APPLICATION"
+>dropdb</SPAN
+></A
+>&nbsp;--&nbsp;удалить базу данных <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></DT
+><DT
+><A
+HREF="app-droplang.html"
+><SPAN
+CLASS="APPLICATION"
+>droplang</SPAN
+></A
+>&nbsp;--&nbsp;удалить процедурный язык <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></DT
+><DT
+><A
+HREF="app-dropuser.html"
+><SPAN
+CLASS="APPLICATION"
+>dropuser</SPAN
+></A
+>&nbsp;--&nbsp;удалить учётную запись пользователя <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></DT
+><DT
+><A
+HREF="app-ecpg.html"
+><SPAN
+CLASS="APPLICATION"
+>ecpg</SPAN
+></A
+>&nbsp;--&nbsp;встроенный C-препроцессор SQL</DT
+><DT
+><A
+HREF="app-pgbasebackup.html"
+>pg_basebackup</A
+>&nbsp;--&nbsp;создать резервную копию кластера <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></DT
+><DT
+><A
+HREF="app-pgconfig.html"
+>pg_config</A
+>&nbsp;--&nbsp;вывести информацию об установленной версии <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></DT
+><DT
+><A
+HREF="app-pgdump.html"
+>pg_dump</A
+>&nbsp;--&nbsp;выгрузить базу данных <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> в формате скрипта в файл или архив</DT
+><DT
+><A
+HREF="app-pg-dumpall.html"
+><SPAN
+CLASS="APPLICATION"
+>pg_dumpall</SPAN
+></A
+>&nbsp;--&nbsp;выгрузить кластер баз данных <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> в формате скрипта</DT
+><DT
+><A
+HREF="app-pg-isready.html"
+><SPAN
+CLASS="APPLICATION"
+>pg_isready</SPAN
+></A
+>&nbsp;--&nbsp;проверить соединение с сервером <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></DT
+><DT
+><A
+HREF="app-pgreceivexlog.html"
+>pg_receivexlog</A
+>&nbsp;--&nbsp;получает журналы транзакций с сервера <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></DT
+><DT
+><A
+HREF="app-pgrecvlogical.html"
+><SPAN
+CLASS="APPLICATION"
+>pg_recvlogical</SPAN
+></A
+>&nbsp;--&nbsp;управляет потоками логического декодирования <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></DT
+><DT
+><A
+HREF="app-pgrestore.html"
+>pg_restore</A
+>&nbsp;--&nbsp;восстановить базу данных <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> из файла архива, созданного командой <SPAN
+CLASS="APPLICATION"
+>pg_dump</SPAN
+></DT
+><DT
+><A
+HREF="app-psql.html"
+><SPAN
+CLASS="APPLICATION"
+>psql</SPAN
+></A
+>&nbsp;--&nbsp;интерактивный терминал <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></DT
+><DT
+><A
+HREF="app-reindexdb.html"
+><SPAN
+CLASS="APPLICATION"
+>reindexdb</SPAN
+></A
+>&nbsp;--&nbsp;переиндексировать базу данных <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></DT
+><DT
+><A
+HREF="app-vacuumdb.html"
+><SPAN
+CLASS="APPLICATION"
+>vacuumdb</SPAN
+></A
+>&nbsp;--&nbsp;выполнить очистку и анализ базы данных <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+></DT
+></DL
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-values.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="app-clusterdb.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>VALUES</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="reference.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><SPAN
+CLASS="APPLICATION"
+>clusterdb</SPAN
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

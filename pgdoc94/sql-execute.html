@@ -1,0 +1,318 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>EXECUTE</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="END"
+HREF="sql-end.html"><LINK
+REL="NEXT"
+TITLE="EXPLAIN"
+HREF="sql-explain.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="END"
+HREF="sql-end.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="EXPLAIN"
+HREF="sql-explain.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-EXECUTE"
+></A
+>EXECUTE</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN80730"
+></A
+><H2
+>Название</H2
+>EXECUTE&nbsp;--&nbsp;выполнить подготовленный оператор</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN80733"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>EXECUTE <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> [ ( <TT
+CLASS="REPLACEABLE"
+><I
+>параметр</I
+></TT
+> [, ...] ) ]</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN80737"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>EXECUTE</TT
+> выполняет подготовленный ранее оператор. Так как подготовленные операторы существуют только в рамках сеанса, они должны создаваться командой <TT
+CLASS="COMMAND"
+>PREPARE</TT
+>, выполненной в текущем сеансе ранее.</P
+><P
+>Если команда <TT
+CLASS="COMMAND"
+>PREPARE</TT
+>, создающая оператор, определяет некоторый набор параметров, команде <TT
+CLASS="COMMAND"
+>EXECUTE</TT
+> должны быть переданы подходящие значения этих параметров; в противном случае возникнет ошибка. Заметьте, что подготовленные операторы (в отличие от функций) не перегружаются в зависимости от типа или числа параметров; имя подготовленного оператора должно быть уникальным в рамках текущего сеанса.</P
+><P
+>Чтобы узнать больше о создании и использовании подготовленных операторов, обратитесь к <A
+HREF="sql-prepare.html"
+>PREPARE</A
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN80747"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></DT
+><DD
+><P
+>Имя подготовленного оператора, который будет выполнен.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>параметр</I
+></TT
+></DT
+><DD
+><P
+>Фактическое значение параметра подготовленного оператора. Это может быть выражение, выдающее значение, совместимое с типом данных этого параметра, который был определён при создании подготовленного оператора.</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN80760"
+></A
+><H2
+>Выводимая информация</H2
+><P
+>Метка команды, возвращаемая <TT
+CLASS="COMMAND"
+>EXECUTE</TT
+>, соответствует подготовленному оператору, а не оператору <TT
+CLASS="LITERAL"
+>EXECUTE</TT
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN80765"
+></A
+><H2
+>Примеры</H2
+><P
+>Примеры приведены в разделе <A
+HREF="sql-prepare.html#SQL-PREPARE-EXAMPLES"
+><I
+>Примеры</I
+></A
+> документации по оператору <A
+HREF="sql-prepare.html"
+>PREPARE</A
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN80770"
+></A
+><H2
+>Совместимость</H2
+><P
+>В стандарте SQL есть оператор <TT
+CLASS="COMMAND"
+>EXECUTE</TT
+>, но он предназначен только для применения во встраиваемом SQL. Эта версия оператора <TT
+CLASS="COMMAND"
+>EXECUTE</TT
+> имеет также несколько другой синтаксис.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN80775"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-deallocate.html"
+>DEALLOCATE</A
+>, <A
+HREF="sql-prepare.html"
+>PREPARE</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-end.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-explain.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>END</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>EXPLAIN</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

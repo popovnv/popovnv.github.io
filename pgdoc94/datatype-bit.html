@@ -1,0 +1,290 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Битовые строки</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Типы данных"
+HREF="datatype.html"><LINK
+REL="PREVIOUS"
+TITLE="Типы, описывающие сетевые адреса"
+HREF="datatype-net-types.html"><LINK
+REL="NEXT"
+TITLE="Типы, предназначенные для текстового поиска"
+HREF="datatype-textsearch.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Типы, описывающие сетевые адреса"
+HREF="datatype-net-types.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="datatype.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 8. Типы данных</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Типы, предназначенные для текстового поиска"
+HREF="datatype-textsearch.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="DATATYPE-BIT"
+>8.10. Битовые строки</A
+></H1
+><P
+>Битовые строки представляют собой последовательности из 1 и 0. Их можно использовать для хранения или отображения битовых масок. В SQL есть два битовых типа: <TT
+CLASS="TYPE"
+>bit(<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>)</TT
+> и <TT
+CLASS="TYPE"
+>bit varying(<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>)</TT
+>, где <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+> &mdash; положительное целое число.</P
+><P
+>Длина значения типа <TT
+CLASS="TYPE"
+>bit</TT
+> должна в точности равняться <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>; при попытке сохранить данные длиннее или короче произойдёт ошибка. Данные типа <TT
+CLASS="TYPE"
+>bit varying</TT
+> могут иметь переменную длину, но не превышающую <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>; строки большей длины не будут приняты. Запись <TT
+CLASS="TYPE"
+>bit</TT
+> без указания длины равнозначна записи <TT
+CLASS="LITERAL"
+>bit(1)</TT
+>, тогда как <TT
+CLASS="TYPE"
+>bit varying</TT
+> без указания длины подразумевает строку неограниченной длины.</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>При попытке привести значение битовой строки к типу <TT
+CLASS="TYPE"
+>bit(<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>)</TT
+>, оно будет усечено или дополнено нулями справа до длины ровно <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+> бит, ошибки при этом не будет. Подобным образом, если явно привести значение битовой строки к типу <TT
+CLASS="TYPE"
+>bit varying(<TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+>)</TT
+>, она будет усечена справа, если её длина превышает <TT
+CLASS="REPLACEABLE"
+><I
+>n</I
+></TT
+> бит.</P
+></BLOCKQUOTE
+></DIV
+><P
+>Синтаксис констант битовых строк описан в <A
+HREF="sql-syntax-lexical.html#SQL-SYNTAX-BIT-STRINGS"
+>Подразделе 4.1.2.5</A
+>, а все доступные битовые операторы и функции перечислены в <A
+HREF="functions-bitstring.html"
+>Разделе 9.6</A
+>.</P
+><DIV
+CLASS="EXAMPLE"
+><A
+NAME="AEN7126"
+></A
+><P
+><B
+>Пример 8-3. Использование битовых строк</B
+></P
+><PRE
+CLASS="PROGRAMLISTING"
+>CREATE TABLE test (a BIT(3), b BIT VARYING(5));
+INSERT INTO test VALUES (B'101', B'00');
+INSERT INTO test VALUES (B'10', B'101');
+<SAMP
+CLASS="COMPUTEROUTPUT"
+>ОШИБКА:  длина битовой строки (2) не соответствует типу bit(3)</SAMP
+>
+INSERT INTO test VALUES (B'10'::bit(3), B'101');
+SELECT * FROM test;
+<SAMP
+CLASS="COMPUTEROUTPUT"
+>  a  |  b
+-----+-----
+ 101 | 00
+ 100 | 101</SAMP
+></PRE
+></DIV
+><P
+>Для хранения битовой строки используется по 1 байту для каждой группы из 8 бит, плюс 5 или 8 байт дополнительно в зависимости от длины строки (но длинные строки могут быть сжаты или вынесены отдельно, как описано в <A
+HREF="datatype-character.html"
+>Разделе 8.3</A
+> применительно к символьным строкам).</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="datatype-net-types.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="datatype-textsearch.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Типы, описывающие сетевые адреса</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="datatype.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Типы, предназначенные для текстового поиска</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

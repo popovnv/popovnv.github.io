@@ -1,0 +1,582 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>CREATE OPERATOR</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Команды SQL"
+HREF="sql-commands.html"><LINK
+REL="PREVIOUS"
+TITLE="CREATE MATERIALIZED VIEW"
+HREF="sql-creatematerializedview.html"><LINK
+REL="NEXT"
+TITLE="CREATE OPERATOR CLASS"
+HREF="sql-createopclass.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="CREATE MATERIALIZED VIEW"
+HREF="sql-creatematerializedview.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="CREATE OPERATOR CLASS"
+HREF="sql-createopclass.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SQL-CREATEOPERATOR"
+></A
+>CREATE OPERATOR</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN74420"
+></A
+><H2
+>Название</H2
+>CREATE OPERATOR&nbsp;--&nbsp;создать оператор</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN74423"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>CREATE OPERATOR <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+> (
+    PROCEDURE = <TT
+CLASS="REPLACEABLE"
+><I
+>имя_функции</I
+></TT
+>
+    [, LEFTARG = <TT
+CLASS="REPLACEABLE"
+><I
+>тип_слева</I
+></TT
+> ] [, RIGHTARG = <TT
+CLASS="REPLACEABLE"
+><I
+>тип_справа</I
+></TT
+> ]
+    [, COMMUTATOR = <TT
+CLASS="REPLACEABLE"
+><I
+>коммут_оператор</I
+></TT
+> ] [, NEGATOR = <TT
+CLASS="REPLACEABLE"
+><I
+>обратный_оператор</I
+></TT
+> ]
+    [, RESTRICT = <TT
+CLASS="REPLACEABLE"
+><I
+>процедура_ограничения</I
+></TT
+> ] [, JOIN = <TT
+CLASS="REPLACEABLE"
+><I
+>процедура_соединения</I
+></TT
+> ]
+    [, HASHES ] [, MERGES ]
+)</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN74433"
+></A
+><H2
+>Описание</H2
+><P
+><TT
+CLASS="COMMAND"
+>CREATE OPERATOR</TT
+> определяет новый оператор, <TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+>. Владельцем оператора становится пользователь, его создавший. Если указано имя схемы, оператор создаётся в ней, в противном случае — в текущей схеме.</P
+><P
+>Имя оператора образует последовательность из нескольких символов (не более чем <TT
+CLASS="SYMBOL"
+>NAMEDATALEN</TT
+>-1, по умолчанию 63) из следующего списка: <P
+CLASS="LITERALLAYOUT"
+>+&nbsp;-&nbsp;*&nbsp;/&nbsp;&lt;&nbsp;&gt;&nbsp;=&nbsp;~&nbsp;!&nbsp;@&nbsp;#&nbsp;%&nbsp;^&nbsp;&amp;&nbsp;|&nbsp;`&nbsp;?</P
+> Однако выбор имени ограничен ещё следующими условиями: <P
+></P
+></P><UL
+><LI
+><P
+>Сочетания символов <TT
+CLASS="LITERAL"
+>--</TT
+> и <TT
+CLASS="LITERAL"
+>/*</TT
+> не могут присутствовать в имени оператора, так как они будут обозначать начало комментария.</P
+></LI
+><LI
+><P
+>Многосимвольное имя оператора не может заканчиваться знаками <TT
+CLASS="LITERAL"
+>+</TT
+> или <TT
+CLASS="LITERAL"
+>-</TT
+>, если только оно не содержит также один из этих символов: <P
+CLASS="LITERALLAYOUT"
+>~&nbsp;!&nbsp;@&nbsp;#&nbsp;%&nbsp;^&nbsp;&amp;&nbsp;|&nbsp;`&nbsp;?</P
+> Например, <TT
+CLASS="LITERAL"
+>@-</TT
+> — допустимое имя оператора, а <TT
+CLASS="LITERAL"
+>*-</TT
+> — нет. Благодаря этому ограничению, <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> может разбирать корректные SQL-запросы без пробелов между компонентами.</P
+></LI
+><LI
+><P
+>Использование <TT
+CLASS="LITERAL"
+>=&gt;</TT
+> в качестве имени оператора считается устаревшим и может быть вовсе запрещено в будущих выпусках.</P
+></LI
+></UL
+><P></P
+><P
+>Оператор <TT
+CLASS="LITERAL"
+>!=</TT
+> отображается в <TT
+CLASS="LITERAL"
+>&lt;&gt;</TT
+> при вводе, так что эти два имени всегда равнозначны.</P
+><P
+>Необходимо определить либо <TT
+CLASS="LITERAL"
+>LEFTARG</TT
+>, либо <TT
+CLASS="LITERAL"
+>RIGHTARG</TT
+>, а для бинарных операторов оба аргумента. Для правых унарных операторов должен быть определён только <TT
+CLASS="LITERAL"
+>LEFTARG</TT
+>, а для левых унарных — только <TT
+CLASS="LITERAL"
+>RIGHTARG</TT
+>.</P
+><P
+>Процедура <TT
+CLASS="REPLACEABLE"
+><I
+>имя_функции</I
+></TT
+> должна быть уже определена с помощью <TT
+CLASS="COMMAND"
+>CREATE FUNCTION</TT
+> и иметь соответствующее число аргументов (один или два) указанных типов.</P
+><P
+>Другие предложения определяют дополнительные характеристики оптимизации. Их значение описано в <A
+HREF="xoper-optimization.html"
+>Разделе 35.13</A
+>.</P
+><P
+>Чтобы создать оператор, необходимо иметь право <TT
+CLASS="LITERAL"
+>USAGE</TT
+> для типов аргументов и результата, а также право <TT
+CLASS="LITERAL"
+>EXECUTE</TT
+> для нижележащей функции. Если указывается коммутативный или обратный оператор, нужно быть его владельцем.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN74473"
+></A
+><H2
+>Параметры</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя</I
+></TT
+></DT
+><DD
+><P
+>Имя определяемого оператора. Допустимые в нём символы перечислены ниже. Указанное имя может быть дополнено схемой, например так: <TT
+CLASS="LITERAL"
+>CREATE OPERATOR myschema.+ (...)</TT
+>. Если схема не указана, оператор создаётся в текущей схеме. При этом два оператора в одной схеме могут иметь одно имя, если они работают с разными типами данных. Такое определение операторов называется <I
+CLASS="FIRSTTERM"
+>перегрузкой</I
+>.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>имя_функции</I
+></TT
+></DT
+><DD
+><P
+>Функция, реализующая этот оператор.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>тип_слева</I
+></TT
+></DT
+><DD
+><P
+>Тип данных левого операнда оператора, если он есть. Этот параметр опускается для левых унарных операторов.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>тип_справа</I
+></TT
+></DT
+><DD
+><P
+>Тип данных правого операнда оператора, если он есть. Этот параметр опускается для правых унарных операторов.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>коммут_оператор</I
+></TT
+></DT
+><DD
+><P
+>Оператор, коммутирующий для данного.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>обратный_оператор</I
+></TT
+></DT
+><DD
+><P
+>Оператор, обратный для данного.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>процедура_ограничения</I
+></TT
+></DT
+><DD
+><P
+>Функция оценки избирательности ограничения для данного оператора.</P
+></DD
+><DT
+><TT
+CLASS="REPLACEABLE"
+><I
+>процедура_соединения</I
+></TT
+></DT
+><DD
+><P
+>Функция оценки избирательности соединения для этого оператора.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>HASHES</TT
+></DT
+><DD
+><P
+>Показывает, что этот оператор поддерживает соединение по хешу.</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>MERGES</TT
+></DT
+><DD
+><P
+>Показывает, что этот оператор поддерживает соединение слиянием.</P
+></DD
+></DL
+></DIV
+><P
+>Чтобы задать имя оператора с указанием схемы в <TT
+CLASS="REPLACEABLE"
+><I
+>коммут_оператор</I
+></TT
+> или другом дополнительном аргументе, применяется синтаксис <TT
+CLASS="LITERAL"
+>OPERATOR()</TT
+>, например: </P><PRE
+CLASS="PROGRAMLISTING"
+>COMMUTATOR = OPERATOR(myschema.===) ,</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN74532"
+></A
+><H2
+>Замечания</H2
+><P
+>За дополнительными сведениями обратитесь к <A
+HREF="xoper.html"
+>Разделу 35.12</A
+>.</P
+><P
+>Задать лексический приоритет оператора в команде <TT
+CLASS="COMMAND"
+>CREATE OPERATOR</TT
+> невозможно, так как обработка приоритетов жёстко зашита в анализаторе. Подробнее приоритеты описаны в <A
+HREF="sql-syntax-lexical.html#SQL-PRECEDENCE"
+>Подразделе 4.1.6</A
+>.</P
+><P
+>Устаревшие параметры <TT
+CLASS="LITERAL"
+>SORT1</TT
+>, <TT
+CLASS="LITERAL"
+>SORT2</TT
+>, <TT
+CLASS="LITERAL"
+>LTCMP</TT
+> и <TT
+CLASS="LITERAL"
+>GTCMP</TT
+> ранее использовались для определения имён операторов сортировки, связанных с оператором, применяемым при соединении слиянием. Теперь это не требуется, так как информацию о связанных операторах теперь дают семейства операторов B-дерева. Если в команде отсутствует явное указание <TT
+CLASS="LITERAL"
+>MERGES</TT
+>, все эти параметры игнорируются.</P
+><P
+>Для удаления пользовательских операторов из базы данных применяется <A
+HREF="sql-dropoperator.html"
+>DROP OPERATOR</A
+>, а для изменения их свойств — <A
+HREF="sql-alteroperator.html"
+>ALTER OPERATOR</A
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN74548"
+></A
+><H2
+>Примеры</H2
+><P
+>Следующая команда определяет новый оператор, проверяющий равенство площадей, для типа <TT
+CLASS="TYPE"
+>box</TT
+>: </P><PRE
+CLASS="PROGRAMLISTING"
+>CREATE OPERATOR === (
+    LEFTARG = box,
+    RIGHTARG = box,
+    PROCEDURE = area_equal_procedure,
+    COMMUTATOR = ===,
+    NEGATOR = !==,
+    RESTRICT = area_restriction_procedure,
+    JOIN = area_join_procedure,
+    HASHES, MERGES
+);</PRE
+><P></P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN74553"
+></A
+><H2
+>Совместимость</H2
+><P
+><TT
+CLASS="COMMAND"
+>CREATE OPERATOR</TT
+> является языковым расширением <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. Средства определения пользовательских операторов в стандарте SQL не описаны.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN74558"
+></A
+><H2
+>См. также</H2
+><A
+HREF="sql-alteroperator.html"
+>ALTER OPERATOR</A
+>, <A
+HREF="sql-createopclass.html"
+>CREATE OPERATOR CLASS</A
+>, <A
+HREF="sql-dropoperator.html"
+>DROP OPERATOR</A
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="sql-creatematerializedview.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="sql-createopclass.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>CREATE MATERIALIZED VIEW</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="sql-commands.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>CREATE OPERATOR CLASS</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,572 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Функции разного назначения</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="libpq — библиотека для языка C"
+HREF="libpq.html"><LINK
+REL="PREVIOUS"
+TITLE="Функции управления"
+HREF="libpq-control.html"><LINK
+REL="NEXT"
+TITLE="Обработка замечаний"
+HREF="libpq-notice-processing.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="SECT1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="Функции управления"
+HREF="libpq-control.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="libpq.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+>Глава 31. <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+> — библиотека для языка C</TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="Обработка замечаний"
+HREF="libpq-notice-processing.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="LIBPQ-MISC"
+>31.11. Функции разного назначения</A
+></H1
+><P
+>Как всегда, находятся функции, которые не попадают ни в одну из категорий.</P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><A
+NAME="LIBPQ-PQFREEMEM"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQfreemem</CODE
+></DT
+><DD
+><P
+>Освобождает память, которую выделила <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>. </P><PRE
+CLASS="SYNOPSIS"
+>void PQfreemem(void *ptr);</PRE
+><P></P
+><P
+>Освобождает память, выделенную библиотекой <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>, а именно функциями <CODE
+CLASS="FUNCTION"
+>PQescapeByteaConn</CODE
+>, <CODE
+CLASS="FUNCTION"
+>PQescapeBytea</CODE
+>, <CODE
+CLASS="FUNCTION"
+>PQunescapeBytea</CODE
+> и <CODE
+CLASS="FUNCTION"
+>PQnotifies</CODE
+>. Особенно важно использовать именно эту функцию, а не <CODE
+CLASS="FUNCTION"
+>free()</CODE
+>, в Microsoft Windows. Это связано с тем, что выделение памяти в DLL и освобождение её в приложении будет работать, только если флаги многопоточной/однопоточной, выпускаемой/отладочной или статической/динамической сборки для DLL и приложения полностью совпадают. На других платформах эта функция действует так же, как стандартная библиотечная функция <CODE
+CLASS="FUNCTION"
+>free()</CODE
+>.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQCONNINFOFREE"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQconninfoFree</CODE
+></DT
+><DD
+><P
+>Освобождает структуры данных, выделенные функциями <CODE
+CLASS="FUNCTION"
+>PQconndefaults</CODE
+> и <CODE
+CLASS="FUNCTION"
+>PQconninfoParse</CODE
+>. </P><PRE
+CLASS="SYNOPSIS"
+>void PQconninfoFree(PQconninfoOption *connOptions);</PRE
+><P></P
+><P
+>Простая функция <CODE
+CLASS="FUNCTION"
+>PQfreemem</CODE
+> не подойдёт для этого, так как эти структуры содержат ссылки на подчинённые строки.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQENCRYPTPASSWORD"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQencryptPassword</CODE
+></DT
+><DD
+><P
+>Подготавливает зашифрованную форму пароля <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+>. </P><PRE
+CLASS="SYNOPSIS"
+>char * PQencryptPassword(const char *passwd, const char *user);</PRE
+><P> Эта функция предназначена для клиентских приложений, желающих передавать команды вида <TT
+CLASS="LITERAL"
+>ALTER USER joe PASSWORD 'pwd'</TT
+>. В такой команде лучше не передавать исходный пароль открытым текстом, так как он может появиться в рабочих журналах, мониторе активности и т. д. Вместо этого, воспользуйтесь данной функцией и переведите пароль в зашифрованную форму, прежде чем передавать его. В аргументах ей передаётся пароль в открытом виде и имя пользователя SQL, для которого он предназначен. Возвращает она строку, выделенную функцией <CODE
+CLASS="FUNCTION"
+>malloc</CODE
+>, или <TT
+CLASS="SYMBOL"
+>NULL</TT
+> в случае нехватки памяти. Вызывающий код может рассчитывать на то, что в этой строке не будет специальных символов, требующих экранирования. Завершив работу с этой строкой, вызовите <CODE
+CLASS="FUNCTION"
+>PQfreemem</CODE
+>, чтобы освободить её.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQMAKEEMPTYPGRESULT"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQmakeEmptyPGresult</CODE
+></DT
+><DD
+><P
+>Конструирует пустой объект <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+> с указанным состоянием. </P><PRE
+CLASS="SYNOPSIS"
+>PGresult *PQmakeEmptyPGresult(PGconn *conn, ExecStatusType status);</PRE
+><P></P
+><P
+>Это внутренняя функция <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>, выделяющая память и инициализирующая пустой объект <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+>. Эта функция возвращает <TT
+CLASS="SYMBOL"
+>NULL</TT
+>, если не может выделить память. Она сделана экспортируемой, так как некоторые приложения находят полезным создавать объекты результатов (в частности, объекты с состоянием ошибки) самостоятельно. Если в <TT
+CLASS="PARAMETER"
+>conn</TT
+> передаётся не null и <TT
+CLASS="PARAMETER"
+>status</TT
+> указывает на ошибку, в <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+> копируется текущее сообщение об ошибке для заданного соединения. Также, если в <TT
+CLASS="PARAMETER"
+>conn</TT
+> передаётся не null, в <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+> копируются все процедуры событий, зарегистрированные для этого соединения. (При этом вызовы <TT
+CLASS="LITERAL"
+>PGEVT_RESULTCREATE</TT
+> не выполняются; см. описание <CODE
+CLASS="FUNCTION"
+>PQfireResultCreateEvents</CODE
+>.) Заметьте, что в конце для этого объекта следует вызвать <CODE
+CLASS="FUNCTION"
+>PQclear</CODE
+>, как и для объекта <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+>, возвращённого самой библиотекой <SPAN
+CLASS="APPLICATION"
+>libpq</SPAN
+>.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQFIRERESULTCREATEEVENTS"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQfireResultCreateEvents</CODE
+></DT
+><DD
+><P
+>Вызывает событие <TT
+CLASS="LITERAL"
+>PGEVT_RESULTCREATE</TT
+> (см. <A
+HREF="libpq-events.html"
+>Раздел 31.13</A
+>) для каждой процедуры событий, зарегистрированной в объекте <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+>. Возвращает ненулевое значение в случае успеха или ноль в случае ошибки в одной из процедур. </P><PRE
+CLASS="SYNOPSIS"
+>int PQfireResultCreateEvents(PGconn *conn, PGresult *res);</PRE
+><P></P
+><P
+>Аргумент <TT
+CLASS="LITERAL"
+>conn</TT
+> передаётся процедурам событий, но непосредственно не используется. Он может быть равен <TT
+CLASS="SYMBOL"
+>NULL</TT
+>, если он не нужен процедурам событий.</P
+><P
+>Процедуры событий, уже получившие событие <TT
+CLASS="LITERAL"
+>PGEVT_RESULTCREATE</TT
+> или <TT
+CLASS="LITERAL"
+>PGEVT_RESULTCOPY</TT
+> для этого объекта, больше не вызываются.</P
+><P
+>Основная причина отделения этой функции от <CODE
+CLASS="FUNCTION"
+>PQmakeEmptyPGresult</CODE
+> в том, что часто требуется создать объект <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+> и наполнить его данными, прежде чем вызывать процедуры событий.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQCOPYRESULT"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQcopyResult</CODE
+></DT
+><DD
+><P
+>Создаёт копию объекта <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+>. Эта копия никак не связана с исходным результатом и поэтому, когда она становится не нужна, необходимо вызвать <CODE
+CLASS="FUNCTION"
+>PQclear</CODE
+>. Если функция завершается ошибкой, она возвращает <TT
+CLASS="SYMBOL"
+>NULL</TT
+>. </P><PRE
+CLASS="SYNOPSIS"
+>PGresult *PQcopyResult(const PGresult *src, int flags);</PRE
+><P></P
+><P
+>Создаваемая копия не будет точной. В возвращаемый результат всегда помещается состояние <TT
+CLASS="LITERAL"
+>PGRES_TUPLES_OK</TT
+> и в него не копируются никакие сообщения об ошибках из исходного объекта. (Однако в него копируется строка состояния команды.) Что ещё в него будет копироваться, определяет аргумент <TT
+CLASS="PARAMETER"
+>flags</TT
+>, в котором складываются несколько флагов. Флаг <TT
+CLASS="LITERAL"
+>PG_COPYRES_ATTRS</TT
+> включает копирование атрибутов исходного объекта (определений колонок), а флаг <TT
+CLASS="LITERAL"
+>PG_COPYRES_TUPLES</TT
+> включает копирование кортежей из исходного объекта (при этом также копируются и атрибуты.) Флаг <TT
+CLASS="LITERAL"
+>PG_COPYRES_NOTICEHOOKS</TT
+> включает копирование обработчиков замечаний, а флаг <TT
+CLASS="LITERAL"
+>PG_COPYRES_EVENTS</TT
+> — событий из исходного объекта результата. (Но любые данные, связанные с экземпляром исходного объекта, не копируются.)</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQSETRESULTATTRS"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQsetResultAttrs</CODE
+></DT
+><DD
+><P
+>Устанавливает атрибуты объекта <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+>. </P><PRE
+CLASS="SYNOPSIS"
+>int PQsetResultAttrs(PGresult *res, int numAttributes, PGresAttDesc *attDescs);</PRE
+><P></P
+><P
+>Предоставленная структура <TT
+CLASS="PARAMETER"
+>attDescs</TT
+> копируется в результат. Если указатель <TT
+CLASS="PARAMETER"
+>attDescs</TT
+> равен <TT
+CLASS="SYMBOL"
+>NULL</TT
+> или <TT
+CLASS="PARAMETER"
+>numAttributes</TT
+> меньше одного, запрос игнорируется и функция выполняется без ошибки. Если <TT
+CLASS="PARAMETER"
+>res</TT
+> уже содержит атрибуты, функция завершается ошибкой. В случае ошибки функция возвращает ноль, а в обратном случае — ненулевое значение.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQSETVALUE"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQsetvalue</CODE
+></DT
+><DD
+><P
+>Устанавливает значение поля кортежа в объекте <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+>. </P><PRE
+CLASS="SYNOPSIS"
+>int PQsetvalue(PGresult *res, int tup_num, int field_num, char *value, int len);</PRE
+><P></P
+><P
+>Эта функция автоматически увеличивает внутренний массив кортежей при необходимости. Однако значение <TT
+CLASS="PARAMETER"
+>tup_num</TT
+> должно быть меньше или равно <CODE
+CLASS="FUNCTION"
+>PQntuples</CODE
+>, что означает, что эта функция может увеличивать массив кортежей только на один кортеж. Но в существующем кортеже любые поля могут изменяться в любом порядке. Если значение в поле с номером <TT
+CLASS="PARAMETER"
+>field_num</TT
+> уже существует, оно будет перезаписано. Если <TT
+CLASS="PARAMETER"
+>len</TT
+> равно -1 или <TT
+CLASS="PARAMETER"
+>value</TT
+> равно <TT
+CLASS="SYMBOL"
+>NULL</TT
+>, в поле будет записано значение SQL NULL. Устанавливаемое значение (<TT
+CLASS="PARAMETER"
+>value</TT
+>) копируется в закрытую область объекта результата, так что от него можно избавиться после завершения функции. Если функция завершается ошибкой, она возвращает ноль, а в обратном случае — ненулевое значение.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQRESULTALLOC"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQresultAlloc</CODE
+></DT
+><DD
+><P
+>Выделяет подчинённую область памяти для объекта <TT
+CLASS="STRUCTNAME"
+>PGresult</TT
+>. </P><PRE
+CLASS="SYNOPSIS"
+>void *PQresultAlloc(PGresult *res, size_t nBytes);</PRE
+><P></P
+><P
+>Любая память, выделенная этой функцией, будет освобождена при очистке объекта <TT
+CLASS="PARAMETER"
+>res</TT
+>. В случае ошибки эта функция возвращает <TT
+CLASS="SYMBOL"
+>NULL</TT
+>. Результат гарантированно выравнивается должным образом для любого типа данных, как и при <CODE
+CLASS="FUNCTION"
+>malloc</CODE
+>.</P
+></DD
+><DT
+><A
+NAME="LIBPQ-PQLIBVERSION"
+></A
+><CODE
+CLASS="FUNCTION"
+>PQlibVersion</CODE
+></DT
+><DD
+><P
+>Возвращает версию используемой библиотеки <SPAN
+CLASS="PRODUCTNAME"
+>libpq</SPAN
+>. </P><PRE
+CLASS="SYNOPSIS"
+>int PQlibVersion(void);</PRE
+><P></P
+><P
+>По результату этой функции можно во время выполнения определить, предоставляется ли определённая функциональность загруженной в данный момент версией libpq. Эта функция может использоваться, например, чтобы понять, какие параметры соединения может принять <CODE
+CLASS="FUNCTION"
+>PQconnectdb</CODE
+> или поддерживается ли вывод <TT
+CLASS="TYPE"
+>bytea</TT
+> в формате <TT
+CLASS="LITERAL"
+>hex</TT
+>, появившийся в PostgreSQL 9.0.</P
+><P
+>Это число формируется в результате преобразования номеров старшей, дополнительной и корректирующей версии в числа из двух цифр и соединения их вместе. Например, для версии 9.1 будет возвращено 90100, а для версии 9.1.2 — 90102 (ведущие нули не показываются).</P
+><DIV
+CLASS="NOTE"
+><BLOCKQUOTE
+CLASS="NOTE"
+><P
+><B
+>Замечание: </B
+>Эта функция появилась в <SPAN
+CLASS="PRODUCTNAME"
+>PostgreSQL</SPAN
+> версии 9.1, поэтому с её помощью нельзя проверить функциональность предыдущих версий, так как при компоновке с ней будет создана зависимость от версии 9.1.</P
+></BLOCKQUOTE
+></DIV
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="libpq-control.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="libpq-notice-processing.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Функции управления</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="libpq.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Обработка замечаний</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

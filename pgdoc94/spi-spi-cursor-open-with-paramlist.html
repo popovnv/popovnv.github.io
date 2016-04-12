@@ -1,0 +1,305 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>SPI_cursor_open_with_paramlist</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REV="MADE"
+HREF="mailto:pgsql-docs@postgresql.org"><LINK
+REL="HOME"
+TITLE="Документация по PostgreSQL 9.4.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Интерфейсные функции"
+HREF="spi-interface.html"><LINK
+REL="PREVIOUS"
+TITLE="SPI_cursor_open_with_args"
+HREF="spi-spi-cursor-open-with-args.html"><LINK
+REL="NEXT"
+TITLE="SPI_cursor_find"
+HREF="spi-spi-cursor-find.html"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="stylesheet.css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=UTF-8"><META
+NAME="creation"
+CONTENT="2016-04-12T07:56:57"></HEAD
+><BODY
+CLASS="REFENTRY"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+VALIGN="bottom"
+><A
+HREF="index.html"
+>Документация по PostgreSQL 9.4.1</A
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+TITLE="SPI_cursor_open_with_args"
+HREF="spi-spi-cursor-open-with-args.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="spi-interface.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="60%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="20%"
+ALIGN="right"
+VALIGN="top"
+><A
+TITLE="SPI_cursor_find"
+HREF="spi-spi-cursor-find.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><H1
+><A
+NAME="SPI-SPI-CURSOR-OPEN-WITH-PARAMLIST"
+></A
+>SPI_cursor_open_with_paramlist</H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN65052"
+></A
+><H2
+>Название</H2
+>SPI_cursor_open_with_paramlist&nbsp;--&nbsp;открыть курсор с параметрами</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN65055"
+></A
+><H2
+>Синтаксис</H2
+><PRE
+CLASS="SYNOPSIS"
+>Portal SPI_cursor_open_with_paramlist(const char *<TT
+CLASS="PARAMETER"
+>name</TT
+>,
+                                      SPIPlanPtr <TT
+CLASS="PARAMETER"
+>plan</TT
+>,
+                                      ParamListInfo <TT
+CLASS="PARAMETER"
+>params</TT
+>,
+                                      bool <TT
+CLASS="PARAMETER"
+>read_only</TT
+>)</PRE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN65061"
+></A
+><H2
+>Описание</H2
+><P
+><CODE
+CLASS="FUNCTION"
+>SPI_cursor_open_with_paramlist</CODE
+> открывает курсор (внутри называемый порталом) для выполнения оператора, подготовленного функцией <CODE
+CLASS="FUNCTION"
+>SPI_prepare</CODE
+>. Эта функция равнозначна <CODE
+CLASS="FUNCTION"
+>SPI_cursor_open</CODE
+>, не считая того, что информация о значениях параметров, передаваемых запросу, представляется по-другому. Представление <TT
+CLASS="LITERAL"
+>ParamListInfo</TT
+> может быть удобным для передачи значений, уже имеющих нужный формат. Эта функция также поддерживает динамические наборы параметров через функции-обработчики, устанавливаемые в <TT
+CLASS="LITERAL"
+>ParamListInfo</TT
+>.</P
+><P
+>Переданные значения параметров копируются в портал курсора, так что их можно освободить и во время существования курсора.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN65070"
+></A
+><H2
+>Аргументы</H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="LITERAL"
+>const char * <TT
+CLASS="PARAMETER"
+>name</TT
+></TT
+></DT
+><DD
+><P
+>имя портала, либо <TT
+CLASS="SYMBOL"
+>NULL</TT
+>, чтобы имя выбрала система</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>SPIPlanPtr <TT
+CLASS="PARAMETER"
+>plan</TT
+></TT
+></DT
+><DD
+><P
+>подготовленный оператор (возвращаемый функцией <CODE
+CLASS="FUNCTION"
+>SPI_prepare</CODE
+>)</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>ParamListInfo <TT
+CLASS="PARAMETER"
+>params</TT
+></TT
+></DT
+><DD
+><P
+>структура данных, содержащая типы и значения параметров; NULL, если их нет</P
+></DD
+><DT
+><TT
+CLASS="LITERAL"
+>bool <TT
+CLASS="PARAMETER"
+>read_only</TT
+></TT
+></DT
+><DD
+><P
+><TT
+CLASS="LITERAL"
+>true</TT
+> для режима выполнения &laquo;только чтение&raquo;</P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN65100"
+></A
+><H2
+>Возвращаемое значение</H2
+><P
+>Указатель на портал, содержащий курсор. Заметьте, что соглашение о возврате ошибок отсутствует; все ошибки выдаются через <CODE
+CLASS="FUNCTION"
+>elog</CODE
+>.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="spi-spi-cursor-open-with-args.html"
+ACCESSKEY="P"
+>Пред.</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Начало</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="spi-spi-cursor-find.html"
+ACCESSKEY="N"
+>След.</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>SPI_cursor_open_with_args</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="spi-interface.html"
+ACCESSKEY="U"
+>Уровень выше</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>SPI_cursor_find</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>
